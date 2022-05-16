@@ -512,11 +512,6 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // heating flow rate of coil in UnitarySystem NOT adjusted by FinalSysSizing(1).SysAirMinFlowRat = 0.3
     EXPECT_NEAR(0.159, state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate, 0.00001);
 
-    // the water cooling coil sizes are only different by the air density used in capacity calculation
-    // water coils use StdRhoAir and UnitarySystem coils use actual air density
-    Real64 CoilInTemp = state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak;
-    Real64 CoilInHumRat = state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak;
-
     EXPECT_NEAR(coil1CoolingCoilRate, state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
     EXPECT_NEAR(coil1CoolingCoilRate, mySys->m_DesignCoolingCapacity, 1.0);
     // the heating coils are sized differently since SysAirMinFlowRat is not accounted for
