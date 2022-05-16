@@ -148,7 +148,7 @@ namespace DualDuct {
                                       state.dataDualDuct->NumDDAirTerminal,
                                       CompName));
             }
-            if (state.dataDualDuct->CheckEquipName(DDNum)) {
+            if (state.dataDualDuct->dd_airterminal(DDNum).CheckEquipName) {
                 if (CompName != state.dataDualDuct->dd_airterminal(DDNum).Name) {
                     ShowFatalError(state,
                                    format("SimulateDualDuct: Invalid CompIndex passed={}, Damper name={}, stored Damper Name for that index={}",
@@ -156,7 +156,7 @@ namespace DualDuct {
                                           CompName,
                                           state.dataDualDuct->dd_airterminal(DDNum).Name));
                 }
-                state.dataDualDuct->CheckEquipName(DDNum) = false;
+                state.dataDualDuct->dd_airterminal(DDNum).CheckEquipName = false;
             }
         }
 
@@ -231,20 +231,16 @@ namespace DualDuct {
         int ADUNum;                           // loop control to search Air Distribution Units
         Real64 DummyOAFlow(0.0);
 
-        state.dataDualDuct->NumDualDuctConstVolDampers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
-        state.dataDualDuct->NumDualDuctVarVolDampers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
+        int NumDualDuctConstVolDampers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
+        int NumDualDuctVarVolDampers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
         state.dataDualDuct->NumDualDuctVarVolOA =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
-        state.dataDualDuct->NumDDAirTerminal =
-            state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
+        state.dataDualDuct->NumDDAirTerminal = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + state.dataDualDuct->NumDualDuctVarVolOA;
         state.dataDualDuct->dd_airterminal.allocate(state.dataDualDuct->NumDDAirTerminal);
         state.dataDualDuct->UniqueDualDuctAirTerminalNames.reserve(state.dataDualDuct->NumDDAirTerminal);
-        state.dataDualDuct->CheckEquipName.dimension(state.dataDualDuct->NumDDAirTerminal, true);
 
-        if (state.dataDualDuct->NumDualDuctConstVolDampers > 0) {
-            for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctConstVolDampers; ++DamperIndex) {
+        if (NumDualDuctConstVolDampers > 0) {
+            for (DamperIndex = 1; DamperIndex <= NumDualDuctConstVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
                 CurrentModuleObject = cCMO_DDConstantVolume;
@@ -407,8 +403,8 @@ namespace DualDuct {
             } // end Number of Damper Loop
         }
 
-        if (state.dataDualDuct->NumDualDuctVarVolDampers > 0) {
-            for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolDampers; ++DamperIndex) {
+        if (NumDualDuctVarVolDampers > 0) {
+            for (DamperIndex = 1; DamperIndex <= NumDualDuctVarVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
                 CurrentModuleObject = cCMO_DDVariableVolume;
@@ -427,7 +423,7 @@ namespace DualDuct {
                                                                          cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
-                DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers;
+                DDNum = DamperIndex + NumDualDuctConstVolDampers;
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataDualDuct->UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 state.dataDualDuct->dd_airterminal(DDNum).Name = AlphArray(1);
@@ -613,7 +609,7 @@ namespace DualDuct {
                                                                          cNumericFields);
 
                 // Anything below this line in this control block should use DDNum
-                DDNum = DamperIndex + state.dataDualDuct->NumDualDuctConstVolDampers + state.dataDualDuct->NumDualDuctVarVolDampers;
+                DDNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataDualDuct->UniqueDualDuctAirTerminalNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 state.dataDualDuct->dd_airterminal(DDNum).Name = AlphArray(1);

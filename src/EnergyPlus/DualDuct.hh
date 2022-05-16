@@ -135,6 +135,7 @@ namespace DualDuct {
         bool MyEnvrnFlag = true;                    // environment flag
         bool MySizeFlag = true;                     // sizing flag
         bool MyAirLoopFlag = true;                  // airloop flag
+        bool CheckEquipName = true;
         DualDuctAirTerminalFlowConditions dd_airterminalHotAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalColdAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalOutlet;
@@ -180,18 +181,13 @@ namespace DualDuct {
 
 struct DualDuctData : BaseGlobalStruct
 {
-
-    Array1D_bool CheckEquipName;
     int NumDDAirTerminal = 0; // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
-    int NumDualDuctConstVolDampers = 0;
-    int NumDualDuctVarVolDampers = 0;
     int NumDualDuctVarVolOA = 0;
     bool GetDualDuctInputFlag = true; // Flag set to make sure you get input once
     Array1D<DualDuct::DualDuctAirTerminal> dd_airterminal;
     std::unordered_map<std::string, std::string> UniqueDualDuctAirTerminalNames;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     bool GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
-
     Array1D_bool RecircIsUsedARR;
     Array1D_string DamperNamesARR;
 
