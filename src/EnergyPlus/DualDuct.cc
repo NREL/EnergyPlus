@@ -136,7 +136,7 @@ namespace DualDuct {
         if (CompIndex == 0) {
             DDNum = UtilityRoutines::FindItemInList(CompName, state.dataDualDuct->dd_airterminal, &DualDuctAirTerminal::Name);
             if (DDNum == 0) {
-                ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimulateDualDuct: Damper not found={}", CompName));
             }
             CompIndex = DDNum;
         } else {
@@ -185,7 +185,7 @@ namespace DualDuct {
             // Update the current Damper to the outlet nodes
             thisDualDuct.UpdateDualDuct(state);
         } else {
-            ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimulateDualDuct: Damper not found={}", CompName));
         }
     }
 
@@ -240,10 +240,10 @@ namespace DualDuct {
         state.dataDualDuct->UniqueDualDuctAirTerminalNames.reserve(state.dataDualDuct->NumDDAirTerminal);
 
         if (NumDualDuctConstVolDampers > 0) {
+            CurrentModuleObject = cCMO_DDConstantVolume;
             for (DamperIndex = 1; DamperIndex <= NumDualDuctConstVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = cCMO_DDConstantVolume;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
@@ -339,8 +339,7 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
-                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                                    format("{}No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [{},{}].", RoutineName, CurrentModuleObject, state.dataDualDuct->dd_airterminal(DDNum).Name));
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -404,10 +403,10 @@ namespace DualDuct {
         }
 
         if (NumDualDuctVarVolDampers > 0) {
+            CurrentModuleObject = cCMO_DDVariableVolume;
             for (DamperIndex = 1; DamperIndex <= NumDualDuctVarVolDampers; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = cCMO_DDVariableVolume;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
@@ -503,8 +502,7 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" +
-                                        CurrentModuleObject + ',' + state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
+                                    format("{}No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [{},{}].", RoutineName, CurrentModuleObject, state.dataDualDuct->dd_airterminal(DDNum).Name));
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -590,11 +588,10 @@ namespace DualDuct {
         }
 
         if (state.dataDualDuct->NumDualDuctVarVolOA > 0) {
+            CurrentModuleObject = cCMO_DDVarVolOA;
             for (DamperIndex = 1; DamperIndex <= state.dataDualDuct->NumDualDuctVarVolOA; ++DamperIndex) {
 
                 // Load the info from the damper
-                CurrentModuleObject = cCMO_DDVarVolOA;
-
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          DamperIndex,
