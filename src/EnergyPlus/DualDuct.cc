@@ -980,8 +980,6 @@ namespace DualDuct {
                             state.dataHeatBal->People(Loop).NumberOfPeople * state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
                     }
                 }
-                this->OAPerPersonByDesignLevel = PeopleFlow;
-
                 this->MyEnvrnFlag = false;
             }
         }
