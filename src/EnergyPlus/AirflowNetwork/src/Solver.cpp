@@ -752,7 +752,7 @@ namespace AirflowNetwork {
                     extra = fields.at("extra_crack_length_or_height_of_pivoting_axis").get<Real64>();
                 }
 
-                Real64 N{fields.at("number_of_sets_of_opening_factor_data")};
+                int N{fields.at("number_of_sets_of_opening_factor_data")};
 
                 std::vector<Real64> factors(N);
                 std::vector<Real64> cds(N);
@@ -2209,7 +2209,7 @@ namespace AirflowNetwork {
                     format("{}Errors found getting {} object. Previous error(s) cause program termination.", RoutineName, CurrentModuleObject));
             }
 
-            AirflowNetworkSimu.MaxIteration = Numbers(1);
+            AirflowNetworkSimu.MaxIteration = static_cast<int>(Numbers(1));
             AirflowNetworkSimu.RelTol = Numbers(2);
             AirflowNetworkSimu.AbsTol = Numbers(3);
             AirflowNetworkSimu.ConvLimit = Numbers(4);
@@ -7160,13 +7160,13 @@ namespace AirflowNetwork {
         }
     }
 
-    Real64 Solver::duct_outside_convection_resistance(Real64 const Ts,      // Surface temperature
-                                                      Real64 const Tamb,    // Free air temperature
-                                                      Real64 const Wamb,    // Free air humidity ratio
-                                                      Real64 const Pamb,    // Free air barometric pressure
-                                                      Real64 const Dh,      // Hydraulic diameter
-                                                      Real64 const ZoneNum, // Zone number
-                                                      Real64 const hOut     // User defined convection coefficient
+    Real64 Solver::duct_outside_convection_resistance(Real64 const Ts,   // Surface temperature
+                                                      Real64 const Tamb, // Free air temperature
+                                                      Real64 const Wamb, // Free air humidity ratio
+                                                      Real64 const Pamb, // Free air barometric pressure
+                                                      Real64 const Dh,   // Hydraulic diameter
+                                                      int const ZoneNum, // Zone number
+                                                      Real64 const hOut  // User defined convection coefficient
     )
     {
         // SUBROUTINE INFORMATION:
@@ -11354,7 +11354,7 @@ namespace AirflowNetwork {
             AirLoopNum = HybridVentSysAvailAirLoopNum(SysAvailNum);
             VentilationCtrl = HybridVentSysAvailVentCtrl(SysAvailNum);
             if (HybridVentSysAvailANCtrlStatus(SysAvailNum) > 0) {
-                ControlType = GetCurrentScheduleValue(m_state, HybridVentSysAvailANCtrlStatus(SysAvailNum));
+                ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, HybridVentSysAvailANCtrlStatus(SysAvailNum)));
             }
             Found = false;
             ActualZoneNum = 0;

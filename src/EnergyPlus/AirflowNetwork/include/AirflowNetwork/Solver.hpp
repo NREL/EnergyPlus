@@ -215,13 +215,13 @@ namespace AirflowNetwork {
                                                  Real64 hIn   // User defined convection coefficient
         );
 
-        Real64 duct_outside_convection_resistance(Real64 Ts,      // Surface temperature
-                                                  Real64 Tamb,    // Free air temperature
-                                                  Real64 Wamb,    // Free air humidity ratio
-                                                  Real64 Pamb,    // Free air barometric pressure
-                                                  Real64 Dh,      // Hydraulic diameter
-                                                  Real64 ZoneNum, // Zone number
-                                                  Real64 hOut     // User defined convection coefficient
+        Real64 duct_outside_convection_resistance(Real64 Ts,   // Surface temperature
+                                                  Real64 Tamb, // Free air temperature
+                                                  Real64 Wamb, // Free air humidity ratio
+                                                  Real64 Pamb, // Free air barometric pressure
+                                                  Real64 Dh,   // Hydraulic diameter
+                                                  int ZoneNum, // Zone number
+                                                  Real64 hOut  // User defined convection coefficient
         );
 
         void calculate_heat_balance();
