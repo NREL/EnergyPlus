@@ -106,6 +106,7 @@ namespace DualDuct {
     constexpr std::string_view cCMO_DDConstantVolume = "AirTerminal:DualDuct:ConstantVolume";
     constexpr std::string_view cCMO_DDVariableVolume = "AirTerminal:DualDuct:VAV";
     constexpr std::string_view cCMO_DDVarVolOA = "AirTerminal:DualDuct:VAV:OutdoorAir";
+    constexpr Real64 DualDuctMassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
     void SimulateDualDuct(
         EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
@@ -818,13 +819,13 @@ namespace DualDuct {
                         ShowSevereError(state, cAlphaFields(7) + " was blank.");
                         ShowContinueError(
                             state, "Occurs in " + std::string(cCMO_DDVarVolOA) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
-                        ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
+                        ShowContinueError(state, R"(Valid choices are "CurrentOccupancy" or "DesignOccupancy")");
                         ErrorsFound = true;
                     } else if ((DummyOAFlow > 0.0) && !(lAlphaBlanks(7))) { // incorrect input
                         ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not a valid key choice.");
                         ShowContinueError(
                             state, "Occurs in " + std::string(cCMO_DDVarVolOA) + " = " + state.dataDualDuct->dd_airterminal(DDNum).Name);
-                        ShowContinueError(state, "Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
+                        ShowContinueError(state, R"(Valid choices are "CurrentOccupancy" or "DesignOccupancy")");
                         ErrorsFound = true;
                     }
                 }
@@ -887,12 +888,6 @@ namespace DualDuct {
         int OutNode;
         int Loop;          // Loop checking control variable
         Real64 PeopleFlow; // local sum variable, m3/s
-
-        // Do the Begin Simulation initializations
-        if (state.dataDualDuct->InitDualDuctMyOneTimeFlag) {
-            state.dataDualDuct->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
-            state.dataDualDuct->InitDualDuctMyOneTimeFlag = false;
-        }
 
         if (!state.dataDualDuct->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataDualDuct->ZoneEquipmentListChecked = true;
@@ -1497,10 +1492,10 @@ namespace DualDuct {
             // Using Mass Continuity to determine the other duct flow quantity
             this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow - this->dd_airterminalColdAirInlet.AirMassFlowRate;
 
-            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
+            if (this->dd_airterminalHotAirInlet.AirMassFlowRate < DualDuctMassFlowSetToler) {
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = MassFlow;
-            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < state.dataDualDuct->MassFlowSetToler) {
+            } else if (this->dd_airterminalColdAirInlet.AirMassFlowRate < DualDuctMassFlowSetToler) {
                 this->dd_airterminalColdAirInlet.AirMassFlowRate = 0.0;
                 this->dd_airterminalHotAirInlet.AirMassFlowRate = MassFlow;
             }
@@ -1661,9 +1656,7 @@ namespace DualDuct {
                     this->dd_airterminalRecircAirInlet.AirMassFlowRate = 0.0;
                 }
 
-            } else if (QRALoad > 0.0) { // heating
-                this->dd_airterminalRecircAirInlet.AirMassFlowRate = 0.0;
-            } else { // none needed.
+            } else { // heating or none needed.
                 this->dd_airterminalRecircAirInlet.AirMassFlowRate = 0.0;
             }
 
@@ -1775,7 +1768,7 @@ namespace DualDuct {
         this->dd_airterminalRecircAirInlet.AirMassFlowRateHist1 = this->dd_airterminalRecircAirInlet.AirMassFlowRate;
     }
 
-    void DualDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
+    void DualDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state, // NOLINT(readability-make-member-function-const)
                                              Real64 &SAMassFlow,   // outside air based on optional user input
                                              Real64 &AirLoopOAFrac // outside air based on optional user input
     )
@@ -1804,7 +1797,6 @@ namespace DualDuct {
         // initialize OA flow rate and OA report variable
         SAMassFlow = 0.0;
         AirLoopOAFrac = 0.0;
-        int AirLoopNum = this->AirLoopNum;
 
         // Calculate the amount of OA based on optional user inputs
         if (AirLoopNum > 0) {
@@ -1826,7 +1818,7 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::CalcOAOnlyMassFlow(EnergyPlusData &state,
+    void DualDuctAirTerminal::CalcOAOnlyMassFlow(EnergyPlusData &state, // NOLINT(readability-make-member-function-const)
                                                  Real64 &OAMassFlow,           // outside air flow from user input kg/s
                                                  Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
     )

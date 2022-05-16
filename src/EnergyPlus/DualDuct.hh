@@ -186,11 +186,9 @@ struct DualDuctData : BaseGlobalStruct
     int NumDualDuctConstVolDampers = 0;
     int NumDualDuctVarVolDampers = 0;
     int NumDualDuctVarVolOA = 0;
-    Real64 MassFlowSetToler = 0.0;
     bool GetDualDuctInputFlag = true; // Flag set to make sure you get input once
     Array1D<DualDuct::DualDuctAirTerminal> dd_airterminal;
     std::unordered_map<std::string, std::string> UniqueDualDuctAirTerminalNames;
-    bool InitDualDuctMyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     bool GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
 
@@ -199,20 +197,7 @@ struct DualDuctData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->CheckEquipName.clear();
-        this->NumDDAirTerminal = 0;
-        this->NumDualDuctConstVolDampers = 0;
-        this->NumDualDuctVarVolDampers = 0;
-        this->NumDualDuctVarVolOA = 0;
-        this->MassFlowSetToler = 0.0;
-        this->GetDualDuctInputFlag = true;
-        this->dd_airterminal.clear();
-        this->UniqueDualDuctAirTerminalNames.clear();
-        this->InitDualDuctMyOneTimeFlag = true;
-        this->ZoneEquipmentListChecked = false;
-        this->GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
-        this->RecircIsUsedARR.clear();
-        this->DamperNamesARR.clear();
+        *this = DualDuctData();
     }
 };
 
