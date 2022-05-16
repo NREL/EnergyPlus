@@ -1328,13 +1328,26 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // A6 Fuel Type
                 std::string fuelType = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
-                // 2022-05-13: Need to add a member for fuel type
-                // 2022-05-13: Consider some default about empty value?
+                if (fuelType == "NATRUALGAS") {
+                    thisPLHP.fuelType = 0;
+                } else if (fuelType == "PROPANE") {
+                    thisPLHP.fuelType = 1;
+                } // 2022-05-15: Add more fuel types here
+                else {
+                    // default natural gas?
+                }
 
                 // A7 End use category
                 std::string endUseCat = UtilityRoutines::MakeUPPERCase(fields.at("end_use_subcategory").get<std::string>());
-                // 2022-05-13: Need to add a member for end use sub
                 // 2022-05-13: default: empty?
+                // 2022-05-14: convert to an int index
+                if (endUseCat == "HEATING") {
+                    thisPLHP.endUseCat = 0;
+                } else if (endUseCat == "DHW") {
+                    thisPLHP.endUseCat = 1; // 2022-05-14 need more categories
+                } else {
+                    // default value?
+                }
 
                 // N1 Nominal heating capacity
                 auto tmpRefCapacity = fields.at("nominal_heating_capacity");
@@ -1366,8 +1379,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 if (tmpDesSupTemp == "Autosize") {
                     //
                 } else {
-                    // 2022-05-13: Add new member for Design Supply Temperature
-                    thisPLHP.loadSideDesignVolFlowRate = tmpDesSupTemp.get<Real64>();
+                    thisPLHP.desSupplyTemp = tmpDesSupTemp.get<Real64>();
                 }
 
                 // N4 Design temperature lift
@@ -1375,8 +1387,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 if (tmpDesTempLift == "Autosize") {
                     //
                 } else {
-                    // 2022-05-13: Add new member for Design Temperature Lift
-                    thisPLHP.loadSideDesignVolFlowRate = tmpDesTempLift.get<Real64>();
+                    thisPLHP.desTempLift = tmpDesTempLift.get<Real64>();
                 }
 
                 // N5 Sizing factor
@@ -1399,6 +1410,15 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // A8 flow mode
                 std::string flowMode = UtilityRoutines::MakeUPPERCase(fields.at("flow_mode").get<std::string>());
+                if (flowMode == "NOTMODULATED") {
+                    thisPLHP.flowMode = 0;
+                } else if (flowMode == "CONSTANTFLOW") {
+                    thisPLHP.flowMode = 1;
+                } else if (flowMode == "LEAVINGSETPOINTMODULATED") {
+                    thisPLHP.flowMode = 2;
+                } else {
+                    thisPLHP.fuelType = 0; // default natural gas?
+                }
 
                 // if (fields.find("reference_coefficient_of_performance") != fields.end()) {
                 //    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
@@ -1420,10 +1440,24 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // A9 outdoor_air_temperature_curve_input_variable
                 std::string oaTempCurveInputVar =
                     UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
+                if (oaTempCurveInputVar == "DRYBULB") {
+                    thisPLHP.oaTempCurveInputVar = 0;
+                } else if (oaTempCurveInputVar == "WETBULB") {
+                    thisPLHP.oaTempCurveInputVar = 1;
+                } else {
+                    thisPLHP.oaTempCurveInputVar = 0;
+                }
 
                 // A10 water_temperature_curve_input_variable
                 std::string waterTempCurveInputVar =
                     UtilityRoutines::MakeUPPERCase(fields.at("water_temperature_curve_input_variable").get<std::string>());
+                if (waterTempCurveInputVar == "ENTERINGCONDENSER") {
+                    thisPLHP.waterTempCurveInputVar = 0;
+                } else if (waterTempCurveInputVar == "LEAVINGCONDENSER") {
+                    thisPLHP.waterTempCurveInputVar = 1;
+                } else {
+                    thisPLHP.waterTempCurveInputVar = 0;
+                }
 
                 // A11 normalized_capacity_function_of_temperature_curve_name
                 auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
@@ -1454,82 +1488,132 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // N6 min PLR
-                auto tmpMinPLR = fields.at("minimum_part_load_ratio");
-                // 2022-05-13: Need revise the following: this field is not autosizable
-                if (tmpMinPLR == "Autosize") {
-                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
-                    thisPLHP.referenceCapacityWasAutoSized = true;
+                if (fields.find("minimum_part_load_ratio") != fields.end()) {
+                    thisPLHP.minPLR = fields.at("minimum_part_load_ratio").get<Real64>();
                 } else {
-                    thisPLHP.referenceCapacity = tmpMinPLR.get<Real64>();
+                    Real64 defaultVal = 0.1;
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "minimum_part_load_ratio", defaultVal)) {
+                        // this error condition would mean that someone broke the input dictionary, not their
+                        // input file.  I can't really unit test it so I'll leave it here as a severe error
+                        // but excluding it from coverage
+                        ShowSevereError(state,                                                                // LCOV_EXCL_LINE
+                                        "EIR FFHP: minimum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                   // LCOV_EXCL_LINE
+                    } else {
+                        thisPLHP.minPLR = defaultVal;
+                    }
                 }
+
                 // N7 max PLR
-                auto tmpMaxPLR = fields.at("maximum_part_load_ratio");
-                // 2022-05-13: Need revise the following: this field is not autosizable
-                if (tmpMaxPLR == "Autosize") {
-                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
-                    thisPLHP.referenceCapacityWasAutoSized = true;
+                if (fields.find("maximum_part_load_ratio") != fields.end()) {
+                    thisPLHP.maxPLR = fields.at("maximum_part_load_ratio").get<Real64>();
                 } else {
-                    thisPLHP.referenceCapacity = tmpMaxPLR.get<Real64>();
+                    Real64 defaultVal = 1.0;
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "maximum_part_load_ratio", defaultVal)) {
+                        // this error condition would mean that someone broke the input dictionary, not their
+                        // input file.  I can't really unit test it so I'll leave it here as a severe error
+                        // but excluding it from coverage
+                        ShowSevereError(state,                                                                // LCOV_EXCL_LINE
+                                        "EIR FFHP: maximum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                   // LCOV_EXCL_LINE
+                    } else {
+                        thisPLHP.maxPLR = defaultVal;
+                    }
                 }
 
                 // A14 fuel_energy_input_ratio_defrost_adjustment_curve_name
-                auto &capFtName2 = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
-                // 2022-05-12: Need to add new member to replace capFuncTempCurveIndex
-                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName2.get<std::string>()));
-                if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName2.get<std::string>());
+                auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
+                thisPLHP.defrostEIRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
+                if (thisPLHP.defrostEIRCurveIndex == 0) {
+                    ShowSevereError(state,
+                                    "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                        "; entered curve name: " + eirDefrostName.get<std::string>());
                     errorsFound = true;
                 }
 
                 // A15 defrost_control_type
                 std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
+                if (defrostControlType == "TIMED") {
+                    thisPLHP.defrostEIRCurveIndex = 0;
+                } else if (defrostControlType == "ONDEMAND") {
+                    thisPLHP.defrostEIRCurveIndex = 1;
+                } else {
+                    thisPLHP.defrostEIRCurveIndex = 0;
+                }
 
                 // N8 defrost_operation_time_fraction
-                auto defrostOpTimeFrac = fields.at("defrost_operation_time_fraction");
-                // 2022-05-14: Need revise the following: this field is not autosizable
-                if (defrostOpTimeFrac == "Autosize") {
-                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
-                    thisPLHP.referenceCapacityWasAutoSized = true;
+                if (fields.find("defrost_operation_time_fraction") != fields.end()) {
+                    thisPLHP.defrostOpTimeFrac = fields.at("defrost_operation_time_fraction").get<Real64>();
                 } else {
-                    thisPLHP.referenceCapacity = defrostOpTimeFrac.get<Real64>();
+                    Real64 defaultVal = 0.0;
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "defrost_operation_time_fraction", defaultVal)) {
+                        // this error condition would mean that someone broke the input dictionary, not their
+                        // input file.  I can't really unit test it so I'll leave it here as a severe error
+                        // but excluding it from coverage
+                        ShowSevereError(state,                                                                          // LCOV_EXCL_LINE
+                                        "EIR FFHP: defrost time fraction not entered and could not get default value"); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                             // LCOV_EXCL_LINE
+                    } else {
+                        thisPLHP.defrostOpTimeFrac = defaultVal;
+                    }
                 }
 
                 // N9 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
-                auto maxOADBTforDefrostOp = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation");
-                // 2022-05-14: Need revise the following: this field is not autosizable
-                if (maxOADBTforDefrostOp == "Autosize") {
-                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
-                    thisPLHP.referenceCapacityWasAutoSized = true;
+                if (fields.find("maximum_outdoor_dry_bulb_temperature_for_defrost_operation") != fields.end()) {
+                    thisPLHP.defrostMaxOADBT = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation").get<Real64>();
                 } else {
-                    thisPLHP.referenceCapacity = maxOADBTforDefrostOp.get<Real64>();
+                    Real64 defaultVal = 5.0;
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "maximum_outdoor_dry_bulb_temperature_for_defrost_operation", defaultVal)) {
+                        // this error condition would mean that someone broke the input dictionary, not their
+                        // input file.  I can't really unit test it so I'll leave it here as a severe error
+                        // but excluding it from coverage
+                        ShowSevereError(
+                            state,                                                                                         // LCOV_EXCL_LINE
+                            "EIR FFHP: max defrost operation OA temperature not entered and could not get default value"); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                                // LCOV_EXCL_LINE
+                    } else {
+                        thisPLHP.defrostMaxOADBT = defaultVal;
+                    }
                 }
 
                 // A16 cycling_ratio_factor_curve_name
-                auto &capFtName3 = fields.at("cycling_ratio_factor_curve_name");
-                // 2022-05-12: Need to add new member to replace capFuncTempCurveIndex
-                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName3.get<std::string>()));
-                if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName3.get<std::string>());
+                auto &cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
+                thisPLHP.cycRatioCurveIndex =
+                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
+                if (thisPLHP.cycRatioCurveIndex == 0) {
+                    ShowSevereError(state,
+                                    "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                        "; entered curve name: " + cycRatioCurveName.get<std::string>());
                     errorsFound = true;
                 }
 
                 // N10 nominal_auxiliary_electric_power
-                auto nominalAuxElecPower = fields.at("nominal_auxiliary_electric_power");
-                // 2022-05-14: Need revise the following: this field is not autosizable
-                if (nominalAuxElecPower == "Autosize") {
-                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
-                    thisPLHP.referenceCapacityWasAutoSized = true;
+                if (fields.find("nominal_auxiliary_electric_power") != fields.end()) {
+                    thisPLHP.nominalAuxElecPower = fields.at("nominal_auxiliary_electric_power").get<Real64>();
                 } else {
-                    thisPLHP.referenceCapacity = nominalAuxElecPower.get<Real64>();
+                    Real64 defaultVal = 0.0;
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "nominal_auxiliary_electric_power", defaultVal)) {
+                        // this error condition would mean that someone broke the input dictionary, not their
+                        // input file.  I can't really unit test it so I'll leave it here as a severe error
+                        // but excluding it from coverage
+                        ShowSevereError(state,                                                                                     // LCOV_EXCL_LINE
+                                        "EIR FFHP: nominal auxiliary electric power not entered and could not get default value"); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                                        // LCOV_EXCL_LINE
+                    } else {
+                        thisPLHP.nominalAuxElecPower = defaultVal;
+                    }
                 }
 
                 // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
                 auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex =
+                thisPLHP.auxElecEIRFoTempCurveIndex =
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
-                if (thisPLHP.capFuncTempCurveIndex == 0) {
+                if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + auxEIRFTName.get<std::string>());
                     errorsFound = true;
@@ -1537,9 +1621,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
                 auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex =
+                thisPLHP.auxElecEIFFoPLRCurveIndex =
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
-                if (thisPLHP.capFuncTempCurveIndex == 0) {
+                if (thisPLHP.auxElecEIFFoPLRCurveIndex == 0) {
                     ShowSevereError(state,
                                     "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + auxEIRFPLRName.get<std::string>());
@@ -1547,15 +1631,22 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // N11 standby_electric_power
-                auto standbyElecPower = fields.at("standby_electric_power");
-                // 2022-05-14: Need revise the following: this field is not autosizable
-                if (standbyElecPower == "Autosize") {
-                    thisPLHP.referenceCapacity = DataSizing::AutoSize; // 2022-05-12: Need to add new members to replace referenceCapacity
-                    thisPLHP.referenceCapacityWasAutoSized = true;
+                if (fields.find("standby_electric_power") != fields.end()) {
+                    thisPLHP.standbyElecPower = fields.at("standby_electric_power").get<Real64>();
                 } else {
-                    thisPLHP.referenceCapacity = standbyElecPower.get<Real64>();
+                    Real64 defaultVal = 0.0;
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "standby_electric_power", defaultVal)) {
+                        // this error condition would mean that someone broke the input dictionary, not their
+                        // input file.  I can't really unit test it so I'll leave it here as a severe error
+                        // but excluding it from coverage
+                        ShowSevereError(state,                                                                           // LCOV_EXCL_LINE
+                                        "EIR FFHP: standby electric power not entered and could not get default value"); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                              // LCOV_EXCL_LINE
+                    } else {
+                        thisPLHP.standbyElecPower = defaultVal;
+                    }
                 }
-
 
                 bool nodeErrorsFound = false;
                 thisPLHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,

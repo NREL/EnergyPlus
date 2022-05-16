@@ -212,6 +212,31 @@ namespace EIRPlantLoopHeatPumps {
 
         // a couple worker functions to easily allow merging of cooling and heating operations
 
+        // New additions for GAHP only
+        int fuelType = 0;
+        int endUseCat = 0;
+        int flowMode = 0;
+        Real64 desSupplyTemp = 60.0;
+        Real64 desTempLift = 11.1;
+        int oaTempCurveInputVar = 0;
+        int waterTempCurveInputVar = 0;
+        // int capFuncTempCurveIndex = 0;
+        // int powerRatioFuncTempCurveIndex = 0;
+        //  int powerRatioFuncPLRCurveIndex = 0;
+        Real64 minPLR = 0.1;
+        Real64 maxPLR = 1.0;
+
+        int defrostEIRCurveIndex = 0;
+        int defrostType = 0;
+        Real64 defrostOpTimeFrac = 0.0;
+        Real64 defrostMaxOADBT = 5.0;
+
+        int cycRatioCurveIndex = 0;
+        Real64 nominalAuxElecPower = 0.0;
+        int auxElecEIRFoTempCurveIndex = 0;
+        int auxElecEIFFoPLRCurveIndex = 0;
+        Real64 standbyElecPower = 0.0;
+
         // Override parent methods to be declared
         void simulate(EnergyPlusData &state,
                       const EnergyPlus::PlantLocation &calledFromLocation,
@@ -221,15 +246,13 @@ namespace EIRPlantLoopHeatPumps {
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
         void setOperatingFlowRatesASHP(EnergyPlusData &state);
         void resetReportingVariables();
-
         static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
         static void pairUpCompanionCoils(EnergyPlusData &state);
         static void processInputForEIRPLHP(EnergyPlusData &state);
-
         void oneTimeInit(EnergyPlusData &state);
 
+        // New or specialized functions for derived struct
         virtual ~EIRFuelFiredHeatPump() = default;
-
         EIRFuelFiredHeatPump() = default;
     };
 } // namespace EIRPlantLoopHeatPumps
