@@ -94,12 +94,12 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     state->dataHeatBalFanSys->EAMFL(ZNnum) = 0.05;
 
     // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-    CalcEarthTubeHumRat(*state, ETnum, ZNnum);
+    state->dataEarthTube->EarthTubeSys(ETnum).CalcEarthTubeHumRat(*state, ZNnum);
     EXPECT_EQ(state->dataEarthTube->EarthTubeSys(ETnum).HumRat, state->dataEnvrn->OutHumRat);
 
     // Second case--condensation so inside humidity should be less than outdoor humidity ratio
     state->dataEarthTube->EarthTubeSys(ETnum).InsideAirTemp = 10.0;
-    CalcEarthTubeHumRat(*state, ETnum, ZNnum);
+    state->dataEarthTube->EarthTubeSys(ETnum).CalcEarthTubeHumRat(*state, ZNnum);
     EXPECT_GT(state->dataEnvrn->OutHumRat, state->dataEarthTube->EarthTubeSys(ETnum).HumRat);
 }
 

@@ -116,39 +116,30 @@ namespace EarthTube {
         Real64 TemperatureTermCoef = 0.0;
         Real64 VelocityTermCoef = 0.0;
         Real64 VelocitySQTermCoef = 0.0;
+        void CalcEarthTubeHumRat(EnergyPlusData &state, int NZ);    // Zone number (index)
     };
 
     struct EarthTubeZoneReportVars
     {
         // Members
-        Real64 EarthTubeHeatLoss;          // [J] Heat loss or cooling to zone from air delivered by earth tube
-        Real64 EarthTubeHeatLossRate;      // [W] Heat loss or cooling rate to zone from air delivered by earth tube
-        Real64 EarthTubeHeatGain;          // [J] Heat Gain to zone from air delivered by earth tube
-        Real64 EarthTubeHeatGainRate;      // [W] Heat Gain rate to zone from air delivered by earth tube
-        Real64 EarthTubeOATreatmentPower;  // [W] rate of heat transfer to/from air.  positive is heating OA to higher temp
-        Real64 EarthTubeVolume;            // Volume of Air {m3} due to EarthTube
-        Real64 EarthTubeVolFlowRate;       // Volume flow rate of air (m3/s) due to EarthTube
-        Real64 EarthTubeVolFlowRateStd;    // Volume flow rate of air (m3/s) due to EarthTube at standard air conditions
-        Real64 EarthTubeMass;              // Mass of Air {kg} due to EarthTube
-        Real64 EarthTubeMassFlowRate;      // Mass flow rate of air (kg/s) due to EarthTube
-        Real64 EarthTubeWaterMassFlowRate; // Mass flow rate of water vapor (kg/s) due to EarthTube
-        Real64 EarthTubeFanElec;           // [J] Fan Electricity consumed by EarthTube
-        Real64 EarthTubeFanElecPower;      // [W] Fan Electric power for EarthTube
-        Real64 EarthTubeAirTemp;           // Air Temp {C} of EarthTube, air leaving tube and entering zone
-        Real64 EarthTubeWetBulbTemp;       // Wet Bulb Temperature {C} of EarthTube, air leaving tube and entering zone
-        Real64 EarthTubeHumRat;            // Humidity Ratio {kg/kg} of EarthTube, air leaving tube and entering zone
-
-        // Default Constructor
-        EarthTubeZoneReportVars()
-            : EarthTubeHeatLoss(0.0), EarthTubeHeatLossRate(0.0), EarthTubeHeatGain(0.0), EarthTubeHeatGainRate(0.0), EarthTubeOATreatmentPower(0.0),
-              EarthTubeVolume(0.0), EarthTubeVolFlowRate(0.0), EarthTubeVolFlowRateStd(0.0), EarthTubeMass(0.0), EarthTubeMassFlowRate(0.0),
-              EarthTubeWaterMassFlowRate(0.0), EarthTubeFanElec(0.0), EarthTubeFanElecPower(0.0), EarthTubeAirTemp(0.0), EarthTubeWetBulbTemp(0.0),
-              EarthTubeHumRat(0.0)
-        {
-        }
+        Real64 EarthTubeHeatLoss = 0.0;          // [J] Heat loss or cooling to zone from air delivered by earth tube
+        Real64 EarthTubeHeatLossRate = 0.0;      // [W] Heat loss or cooling rate to zone from air delivered by earth tube
+        Real64 EarthTubeHeatGain = 0.0;          // [J] Heat Gain to zone from air delivered by earth tube
+        Real64 EarthTubeHeatGainRate = 0.0;      // [W] Heat Gain rate to zone from air delivered by earth tube
+        Real64 EarthTubeOATreatmentPower = 0.0;  // [W] rate of heat transfer to/from air.  positive is heating OA to higher temp
+        Real64 EarthTubeVolume = 0.0;            // Volume of Air {m3} due to EarthTube
+        Real64 EarthTubeVolFlowRate = 0.0;       // Volume flow rate of air (m3/s) due to EarthTube
+        Real64 EarthTubeVolFlowRateStd = 0.0;    // Volume flow rate of air (m3/s) due to EarthTube at standard air conditions
+        Real64 EarthTubeMass = 0.0;              // Mass of Air {kg} due to EarthTube
+        Real64 EarthTubeMassFlowRate = 0.0;      // Mass flow rate of air (kg/s) due to EarthTube
+        Real64 EarthTubeWaterMassFlowRate = 0.0; // Mass flow rate of water vapor (kg/s) due to EarthTube
+        Real64 EarthTubeFanElec = 0.0;           // [J] Fan Electricity consumed by EarthTube
+        Real64 EarthTubeFanElecPower = 0.0;      // [W] Fan Electric power for EarthTube
+        Real64 EarthTubeAirTemp = 0.0;           // Air Temp {C} of EarthTube, air leaving tube and entering zone
+        Real64 EarthTubeWetBulbTemp = 0.0;       // Wet Bulb Temperature {C} of EarthTube, air leaving tube and entering zone
+        Real64 EarthTubeHumRat = 0.0;            // Humidity Ratio {kg/kg} of EarthTube, air leaving tube and entering zone
     };
 
-    // Functions
     void ManageEarthTube(EnergyPlusData &state);
 
     void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
@@ -160,11 +151,6 @@ namespace EarthTube {
     );
 
     void CalcEarthTube(EnergyPlusData &state);
-
-    void CalcEarthTubeHumRat(EnergyPlusData &state,
-                             int Loop, // EarthTube number (index)
-                             int NZ    // Zone number (index)
-    );
 
     void ReportEarthTube(EnergyPlusData &state);
 

@@ -82,13 +82,6 @@ namespace EnergyPlus::EarthTube {
 // 2. K. Labs In: J. Cook, editor, "Passive Cooling",
 // Cambridge Massachusetts, MIT Press, 1989, pp 206-212
 
-// Using/Aliasing
-using namespace DataEnvironment;
-using namespace DataHeatBalFanSys;
-using namespace DataHeatBalance;
-using namespace DataSurfaces;
-using namespace Psychrometrics;
-
 constexpr std::array<std::string_view, static_cast<int>(Ventilation::Num)> ventilationNamesUC = {"NATURAL", "INTAKE", "EXHAUST"};
 constexpr std::array<std::string_view, static_cast<int>(SoilType::Num)> soilTypesUC = {
     "HEAVYANDSATURATED", "HEAVYANDDAMP", "HEAVYANDDRY", "LIGHTANDDRY"};
@@ -131,9 +124,6 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine obtains input data for EarthTube units and
     // stores it in the EarthTube data structure.
-
-    using ScheduleManager::GetScheduleIndex;
-    using ScheduleManager::GetScheduleValuesForDay;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr EarthTubeTempLimit(100.0); // degrees Celsius
@@ -182,7 +172,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
 
         // Second Alpha is Schedule Name
         thisEarthTube.SchedName = state.dataIPShortCut->cAlphaArgs(2);
-        thisEarthTube.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+        thisEarthTube.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (thisEarthTube.SchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 ShowSevereError(state,
@@ -549,10 +539,6 @@ void CalcEarthTube(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the components making up the EarthTube unit.
 
-    // Using/Aliasing
-    using ScheduleManager::GetCurrentScheduleValue;
-    using ScheduleManager::GetScheduleIndex;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
     int NZ;
@@ -595,9 +581,9 @@ void CalcEarthTube(EnergyPlusData &state)
         // Skip if below the temperature difference limit
         if (std::abs(state.dataHeatBalFanSys->MAT(NZ) - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature) continue;
 
-        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
-        AirSpecHeat = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-        EVF = thisEarthTube.DesignLevel * GetCurrentScheduleValue(state, thisEarthTube.SchedPtr);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+        AirSpecHeat = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+        EVF = thisEarthTube.DesignLevel * ScheduleManager::GetCurrentScheduleValue(state, thisEarthTube.SchedPtr);
         state.dataHeatBalFanSys->MCPE(NZ) =
             EVF * AirDensity * AirSpecHeat *
             (thisEarthTube.ConstantTermCoef +
@@ -668,15 +654,11 @@ void CalcEarthTube(EnergyPlusData &state)
             }
         }
 
-        CalcEarthTubeHumRat(state, Loop, NZ);
+        thisEarthTube.CalcEarthTubeHumRat(state, NZ);
     }
 }
 
-void CalcEarthTubeHumRat(EnergyPlusData &state,
-                         int const Loop, // EarthTube number (index)
-                         int const NZ    // Zone number (index)
-)
-{
+void EarthTubeData::CalcEarthTubeHumRat(EnergyPlusData &state, int const NZ) {    // Zone number (index)
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Kwang Ho Lee
@@ -687,50 +669,46 @@ void CalcEarthTubeHumRat(EnergyPlusData &state,
     // This subroutine determines the leaving humidity ratio for the EarthTube
     // and calculates parameters associated with humidity ratio.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 InsideEnthalpy;
-    Real64 OutletAirEnthalpy;
-    Real64 InsideDewPointTemp;
+    Real64 InsideDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
     Real64 InsideHumRat;
 
-    InsideDewPointTemp = PsyTdpFnWPb(state, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
-
-    auto &thisEarthTube = state.dataEarthTube->EarthTubeSys(Loop);
-    if (thisEarthTube.InsideAirTemp >= InsideDewPointTemp) {
+    if (this->InsideAirTemp >= InsideDewPointTemp) {
         InsideHumRat = state.dataEnvrn->OutHumRat;
-        InsideEnthalpy = PsyHFnTdbW(thisEarthTube.InsideAirTemp, state.dataEnvrn->OutHumRat);
+        Real64 const InsideEnthalpy = Psychrometrics::PsyHFnTdbW(this->InsideAirTemp, state.dataEnvrn->OutHumRat);
         // Intake fans will add some heat to the air, raising the temperature for an intake fan...
-        if (thisEarthTube.FanType == Ventilation::Intake) {
+        if (this->FanType == Ventilation::Intake) {
+            Real64 OutletAirEnthalpy;
             if (state.dataHeatBalFanSys->EAMFL(NZ) == 0.0) {
                 OutletAirEnthalpy = InsideEnthalpy;
             } else {
-                OutletAirEnthalpy = InsideEnthalpy + thisEarthTube.FanPower / state.dataHeatBalFanSys->EAMFL(NZ);
+                OutletAirEnthalpy = InsideEnthalpy + this->FanPower / state.dataHeatBalFanSys->EAMFL(NZ);
             }
-            thisEarthTube.AirTemp = PsyTdbFnHW(OutletAirEnthalpy, state.dataEnvrn->OutHumRat);
+            this->AirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, state.dataEnvrn->OutHumRat);
         } else {
-            thisEarthTube.AirTemp = thisEarthTube.InsideAirTemp;
+            this->AirTemp = this->InsideAirTemp;
         }
-        state.dataHeatBalFanSys->MCPTE(NZ) = state.dataHeatBalFanSys->MCPE(NZ) * thisEarthTube.AirTemp;
+        state.dataHeatBalFanSys->MCPTE(NZ) = state.dataHeatBalFanSys->MCPE(NZ) * this->AirTemp;
 
     } else {
-        InsideHumRat = PsyWFnTdpPb(state, thisEarthTube.InsideAirTemp, state.dataEnvrn->OutBaroPress);
-        InsideEnthalpy = PsyHFnTdbW(thisEarthTube.InsideAirTemp, InsideHumRat);
+        InsideHumRat = Psychrometrics::PsyWFnTdpPb(state, this->InsideAirTemp, state.dataEnvrn->OutBaroPress);
+        Real64 const InsideEnthalpy = Psychrometrics::PsyHFnTdbW(this->InsideAirTemp, InsideHumRat);
         // Intake fans will add some heat to the air, raising the temperature for an intake fan...
-        if (thisEarthTube.FanType == Ventilation::Intake) {
+        if (this->FanType == Ventilation::Intake) {
+            Real64 OutletAirEnthalpy;
             if (state.dataHeatBalFanSys->EAMFL(NZ) == 0.0) {
                 OutletAirEnthalpy = InsideEnthalpy;
             } else {
-                OutletAirEnthalpy = InsideEnthalpy + thisEarthTube.FanPower / state.dataHeatBalFanSys->EAMFL(NZ);
+                OutletAirEnthalpy = InsideEnthalpy + this->FanPower / state.dataHeatBalFanSys->EAMFL(NZ);
             }
-            thisEarthTube.AirTemp = PsyTdbFnHW(OutletAirEnthalpy, InsideHumRat);
+            this->AirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, InsideHumRat);
         } else {
-            thisEarthTube.AirTemp = thisEarthTube.InsideAirTemp;
+            this->AirTemp = this->InsideAirTemp;
         }
-        state.dataHeatBalFanSys->MCPTE(NZ) = state.dataHeatBalFanSys->MCPE(NZ) * thisEarthTube.AirTemp;
+        state.dataHeatBalFanSys->MCPTE(NZ) = state.dataHeatBalFanSys->MCPE(NZ) * this->AirTemp;
     }
 
-    thisEarthTube.HumRat = InsideHumRat;
-    thisEarthTube.WetBulbTemp = PsyTwbFnTdbWPb(state, thisEarthTube.InsideAirTemp, InsideHumRat, state.dataEnvrn->OutBaroPress);
+    this->HumRat = InsideHumRat;
+    this->WetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, this->InsideAirTemp, InsideHumRat, state.dataEnvrn->OutBaroPress);
     state.dataHeatBalFanSys->EAMFLxHumRat(NZ) = state.dataHeatBalFanSys->EAMFL(NZ) * InsideHumRat;
 }
 
@@ -744,26 +722,16 @@ void ReportEarthTube(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE: This subroutine fills remaining report variables.
 
-    // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;     // Counter for the # of zones (nz)
-    int EarthTubeNum; // Counter for EarthTube statements
-    Real64 AirDensity;
-    Real64 CpAir;
-    Real64 ReportingConstant; // reporting constant for this module
-
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);
         auto &zoneMCPE = state.dataHeatBalFanSys->MCPE(ZoneLoop);
         auto &zoneTemp = state.dataHeatBalFanSys->ZT(ZoneLoop);
 
         // Break the infiltration load into heat gain and loss components.
-        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
-        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+        Real64 const AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+        Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         thisZone.EarthTubeVolume = (zoneMCPE / CpAir / AirDensity) * ReportingConstant;
         thisZone.EarthTubeMass = (zoneMCPE / CpAir) * ReportingConstant;
         thisZone.EarthTubeVolFlowRate = zoneMCPE / CpAir / AirDensity;
