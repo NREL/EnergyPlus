@@ -180,7 +180,8 @@ using namespace DataRootFinder;
 
 // Number of significant digits to display in error messages for floating-point numbers
 constexpr int NumSigDigits = 15;
-constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> ctrlVarNamesUC = {"INVALID-NONE", "TEMPERATURE", "HUMIDITYRATIO", "TEMPERATUREANDHUMIDITYRATIO", "INVALID-FLOW"};
+constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> ctrlVarNamesUC = {
+    "INVALID-NONE", "TEMPERATURE", "HUMIDITYRATIO", "TEMPERATUREANDHUMIDITYRATIO", "INVALID-FLOW"};
 constexpr std::array<std::string_view, static_cast<int>(ControllerAction::Num)> actionNamesUC = {"", "REVERSE", "NORMAL"};
 
 std::string ControlVariableTypes(CtrlVarType const &c)
@@ -568,7 +569,8 @@ void GetControllerInput(EnergyPlusData &state)
             ControllerProps(Num).ControllerName = AlphArray(1);
             ControllerProps(Num).ControllerType = CurrentModuleObject;
 
-            ControllerProps(Num).ControlVar = static_cast<EnergyPlus::HVACControllers::CtrlVarType>(getEnumerationValue(ctrlVarNamesUC, AlphArray(2)));
+            ControllerProps(Num).ControlVar =
+                static_cast<EnergyPlus::HVACControllers::CtrlVarType>(getEnumerationValue(ctrlVarNamesUC, AlphArray(2)));
             if (ControllerProps(Num).ControlVar == HVACControllers::CtrlVarType::Invalid) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ShowSevereError(state,

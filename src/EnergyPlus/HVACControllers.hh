@@ -91,9 +91,9 @@ namespace HVACControllers {
 
     struct SolutionTrackerType
     {
-        bool DefinedFlag = true;     // Flag set to TRUE when tracker is up-to-date. FALSE otherwise.
-        Real64 ActuatedValue = 0.0; // Actuated value
-        ControllerMode Mode = ControllerMode::None;  // Operational model of controller
+        bool DefinedFlag = true;                    // Flag set to TRUE when tracker is up-to-date. FALSE otherwise.
+        Real64 ActuatedValue = 0.0;                 // Actuated value
+        ControllerMode Mode = ControllerMode::None; // Operational model of controller
     };
 
     struct ControllerPropsType
@@ -216,14 +216,14 @@ namespace HVACControllers {
         // Shared_ptr because we need to put this into an Array1D which is not friendly with move-only types
         SharedFileHandle TraceFile;
         // Used only if > 0. Same size as NumPrimaryAirSys
-        bool FirstTraceFlag = true;                          // To detect first trace to air loop trace file
-        int NumCalls = 0;                                 // Number of times air loop is simulated (number of calls to SimAirLoop)
-        int NumFailedWarmRestarts = 0;                    // Number of times speculative warm restart was attempted and failed
-        int NumSuccessfulWarmRestarts = 0;                // Number of times speculative warm restart was attempted and succeeded
-        int TotSimAirLoopComponents = 0;                  // Total number of times the SimAirLoopComponents() routine has been invoked
-        int MaxSimAirLoopComponents = 0;                  // Maximum number of times the SimAirLoopComponents() routine has been invoked
-        int TotIterations = 0;                            // Total number of iterations required to solve the controllers on this air loop
-        int MaxIterations = 0;                            // Maximum number of iterations required to solve the controllers on this air loop
+        bool FirstTraceFlag = true;                   // To detect first trace to air loop trace file
+        int NumCalls = 0;                             // Number of times air loop is simulated (number of calls to SimAirLoop)
+        int NumFailedWarmRestarts = 0;                // Number of times speculative warm restart was attempted and failed
+        int NumSuccessfulWarmRestarts = 0;            // Number of times speculative warm restart was attempted and succeeded
+        int TotSimAirLoopComponents = 0;              // Total number of times the SimAirLoopComponents() routine has been invoked
+        int MaxSimAirLoopComponents = 0;              // Maximum number of times the SimAirLoopComponents() routine has been invoked
+        int TotIterations = 0;                        // Total number of iterations required to solve the controllers on this air loop
+        int MaxIterations = 0;                        // Maximum number of iterations required to solve the controllers on this air loop
         Array1D<ControllerStatsType> ControllerStats; // Array of statistics for each controller on this air loop
     };
 
