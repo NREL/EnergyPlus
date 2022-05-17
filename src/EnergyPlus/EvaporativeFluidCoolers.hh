@@ -83,6 +83,8 @@ namespace EvaporativeFluidCoolers {
         UserSpecifiedDesignCapacity
     };
 
+    enum class CapacityControl {Invalid = -1, FanCycling, FluidBypass, Num};
+
     struct EvapFluidCoolerInletConds
     {
         Real64 WaterTemp = 0.0;  // Evaporative fluid cooler water inlet temperature (C)
@@ -153,8 +155,7 @@ namespace EvaporativeFluidCoolers {
         int SmallWaterMassFlowErrorCount = 0;    // Counter when water mass flow rate is very small
         int SmallWaterMassFlowErrorIndex = 0;    // Index for very small water mass flow rate recurring error message
         // fluid bypass
-        int CapacityControl = 0; // Type of capacity control for single speed cooling tower:
-        //  0 - FanCycling, 1 - FluidBypass
+        CapacityControl capacityControl = CapacityControl::Invalid; // Type of capacity control for single speed cooling tower
         Real64 BypassFraction = 0.0; // Fraction of fluid bypass as a ratio of total fluid flow
         //  through the tower sump
         // begin water system interactions

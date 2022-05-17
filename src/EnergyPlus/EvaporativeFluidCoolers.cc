@@ -95,8 +95,9 @@ namespace EvaporativeFluidCoolers {
     // METHODOLOGY EMPLOYED:
     // Based on cooling tower by Shirey, Raustad: Dec 2000; Shirey, Sept 2002
 
-    std::string const cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
-    std::string const cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
+    constexpr std::string_view cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
+    constexpr std::string_view cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
+    constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> controlNamesUC = {"FANCYCLING", "FLUIDBYPASS"};
 
     PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
     {
@@ -267,16 +268,16 @@ namespace EvaporativeFluidCoolers {
 
             //   fluid bypass for single speed evaporative fluid cooler
             if (state.dataIPShortCut->lAlphaFieldBlanks(6) || AlphArray(6).empty()) {
-                thisEFC.CapacityControl = 0; // FanCycling
+                thisEFC.capacityControl = CapacityControl::FanCycling; // FanCycling
             } else {
                 {
                     auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(6)));
                     if (SELECT_CASE_var == "FANCYCLING") {
-                        thisEFC.CapacityControl = 0;
+                        thisEFC.capacityControl = CapacityControl::FanCycling;
                     } else if (SELECT_CASE_var == "FLUIDBYPASS") {
-                        thisEFC.CapacityControl = 1;
+                        thisEFC.capacityControl = CapacityControl::FluidBypass;
                     } else {
-                        thisEFC.CapacityControl = 0;
+                        thisEFC.capacityControl = CapacityControl::FanCycling;
                         ShowWarningError(state,
                                          state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisEFC.Name +
                                              "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
@@ -1117,9 +1118,9 @@ namespace EvaporativeFluidCoolers {
                             this->Name);
     }
 
-    void EvapFluidCoolerSpecs::getSizingFactor(Real64 &_SizFac)
+    void EvapFluidCoolerSpecs::getSizingFactor(Real64 &_sizFac)
     {
-        _SizFac = this->SizFac;
+        _sizFac = this->SizFac;
     }
 
     void EvapFluidCoolerSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
@@ -1130,19 +1131,14 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
-
-            MinLoad = 0.0; // signifies non-load based model (i.e. forward)
-            MaxLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
-            OptLoad = this->HighSpeedStandardDesignCapacity;
-
-        } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
-
+        switch (this->Type) {
+        case DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd:
+        case DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd:
             MinLoad = 0.0; // signifies non-load based model (i.e. forward heat exchanger model)
             MaxLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
             OptLoad = this->HighSpeedStandardDesignCapacity;
-
-        } else {
+            break;
+        default:
             ShowFatalError(state, "SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
         }
     }
@@ -1279,7 +1275,7 @@ namespace EvaporativeFluidCoolers {
         // temperature specified in the plant:sizing object
         // is higher than the design entering air wet-bulb temp
         // when autosize feature is used
-        std::array<Real64, 4> Par; // Parameter array need for RegulaFalsi routine
+        std::array<Real64, 4> Par = {0.0}; // Parameter array need for RegulaFalsi routine
 
         Real64 DesEvapFluidCoolerLoad = 0.0; // Design evaporative fluid cooler load [W]
         Real64 tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
@@ -2112,7 +2108,7 @@ namespace EvaporativeFluidCoolers {
             this->SimSimpleEvapFluidCooler(state, this->WaterMassFlowRate, AirFlowRate, UAdesign, this->OutletWaterTemp);
 
             if (this->OutletWaterTemp <= TempSetPoint) {
-                if (this->CapacityControl == 0 || this->OutletWaterTemp <= OWTLowerLimit) {
+                if (this->capacityControl == CapacityControl::FanCycling || this->OutletWaterTemp <= OWTLowerLimit) {
                     //         Setpoint was met with pump ON and fan ON, calculate run-time fraction
                     Real64 FanModeFrac = (TempSetPoint - inletWaterTemp) / (this->OutletWaterTemp - inletWaterTemp);
                     this->FanPower = FanModeFrac * FanPowerOn;
@@ -2130,7 +2126,7 @@ namespace EvaporativeFluidCoolers {
             }
         } else if (inletWaterTemp <= TempSetPoint) {
             // Inlet water temperature lower than setpoint, assume 100% bypass, evaporative fluid cooler fan off
-            if (this->CapacityControl == 1) {
+            if (this->capacityControl == CapacityControl::FluidBypass) {
                 if (inletWaterTemp > OWTLowerLimit) {
                     this->FanPower = 0.0;
                     this->BypassFraction = 1.0;
@@ -2554,7 +2550,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Added for fluid bypass
-        if (this->CapacityControl == 1) {
+        if (this->capacityControl == CapacityControl::FluidBypass) {
             if (this->EvapLossMode == EvapLoss::ByUserFactor) this->EvaporationVdot *= (1 - this->BypassFraction);
             this->DriftVdot *= (1 - this->BypassFraction);
             this->BlowdownVdot *= (1 - this->BypassFraction);
