@@ -116,7 +116,7 @@ namespace EarthTube {
         Real64 TemperatureTermCoef = 0.0;
         Real64 VelocityTermCoef = 0.0;
         Real64 VelocitySQTermCoef = 0.0;
-        void CalcEarthTubeHumRat(EnergyPlusData &state, int NZ);    // Zone number (index)
+        void CalcEarthTubeHumRat(EnergyPlusData &state, int NZ); // Zone number (index)
     };
 
     struct EarthTubeZoneReportVars

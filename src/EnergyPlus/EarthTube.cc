@@ -581,7 +581,8 @@ void CalcEarthTube(EnergyPlusData &state)
         // Skip if below the temperature difference limit
         if (std::abs(state.dataHeatBalFanSys->MAT(NZ) - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature) continue;
 
-        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+        AirDensity =
+            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
         AirSpecHeat = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         EVF = thisEarthTube.DesignLevel * ScheduleManager::GetCurrentScheduleValue(state, thisEarthTube.SchedPtr);
         state.dataHeatBalFanSys->MCPE(NZ) =
@@ -658,7 +659,8 @@ void CalcEarthTube(EnergyPlusData &state)
     }
 }
 
-void EarthTubeData::CalcEarthTubeHumRat(EnergyPlusData &state, int const NZ) {    // Zone number (index)
+void EarthTubeData::CalcEarthTubeHumRat(EnergyPlusData &state, int const NZ)
+{ // Zone number (index)
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Kwang Ho Lee
@@ -730,7 +732,8 @@ void ReportEarthTube(EnergyPlusData &state)
         auto &zoneTemp = state.dataHeatBalFanSys->ZT(ZoneLoop);
 
         // Break the infiltration load into heat gain and loss components.
-        Real64 const AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+        Real64 const AirDensity =
+            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
         Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         thisZone.EarthTubeVolume = (zoneMCPE / CpAir / AirDensity) * ReportingConstant;
         thisZone.EarthTubeMass = (zoneMCPE / CpAir) * ReportingConstant;
