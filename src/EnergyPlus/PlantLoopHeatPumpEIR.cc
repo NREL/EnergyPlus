@@ -1266,7 +1266,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                                                            thisLoadPlantLoop.FluidName,
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
                                                            thisLoadPlantLoop.FluidIndex,
-                                                           "PLHPEIR::simulate()");
+                                                           "PLFFHPEIR::simulate()");
     this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
     this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
@@ -1323,7 +1323,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                                                        thisLoadPlantLoop.FluidName,
                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
                                                        thisLoadPlantLoop.FluidIndex,
-                                                       "PLHPEIR::simulate()");
+                                                       "PLFFHPEIR::simulate()");
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
@@ -1337,6 +1337,16 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
 void EIRFuelFiredHeatPump::resetReportingVariables()
 {
+    this->loadSideHeatTransfer = 0.0;
+    this->loadSideEnergy = 0.0;
+    this->loadSideOutletTemp = this->loadSideInletTemp;
+    this->powerUsage = 0.0;
+    this->powerEnergy = 0.0;
+    this->fuelUsage = 0.0;
+    this->fuelEnergy = 0.0;
+    this->sourceSideHeatTransfer = 0.0;
+    this->sourceSideOutletTemp = this->sourceSideInletTemp;
+    this->sourceSideEnergy = 0.0;
 }
 
 PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name)
@@ -1353,7 +1363,7 @@ PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::
         }
     }
 
-    ShowFatalError(state, "EIR Fuel-Fired Heat Pump factory: Error getting inputs for FFHP named: " + hp_name);
+    ShowFatalError(state, "EIR Fuel-Fired Heat Pump factory: Error getting inputs for PLFFHP named: " + hp_name);
     return nullptr; // LCOV_EXCL_LINE
 }
 
