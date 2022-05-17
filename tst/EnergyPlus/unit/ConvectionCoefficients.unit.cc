@@ -3163,3 +3163,222 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
 
     EXPECT_NEAR(actual_roof_perimeter, state->dataConvectionCoefficient->RoofGeo.Perimeter, 0.0001);
 }
+
+TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_WeirderShape)
+{
+    // Test for #9432
+    //
+    // This is a top view of the building:
+    //                  y
+    //                   ▲
+    //                   │
+    //          [2]      │
+    //           x    20 ┤
+    //                   │         [1]
+    //                15 ┤       x
+    //                   │
+    //                   ┤
+    //      Centroid     │
+    //   (-1.39, 0.60)   ┤
+    //          │        │
+    //          └────► o │
+    //  ─┬───┬───┬───┬───┼───┬───┬───┬───┬───►
+    //                   │   5   10      20   x
+    //                   ┤               x
+    //                   │                 [4]
+    //                   ┤
+    //                   │
+    //                   ┤
+    //                   │
+    //   x               ┤
+    //    [3]            │
+    //                   │
+
+    std::string const idf_objects = delimited_string({
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,                        !- Starting Vertex Position",
+        "  Counterclockwise,                       !- Vertex Entry Direction",
+        "  Relative,                               !- Coordinate System",
+        "  Relative,                               !- Daylighting Reference Point Coordinate System",
+        "  Relative;                               !- Rectangular Surface Coordinate System",
+
+        "Building,",
+        "  Building 1,                             !- Name",
+        "  0,                                      !- North Axis {deg}",
+        "  ,                                       !- Terrain",
+        "  ,                                       !- Loads Convergence Tolerance Value {W}",
+        "  ,                                       !- Temperature Convergence Tolerance Value {deltaC}",
+        "  ,                                       !- Solar Distribution",
+        "  ,                                       !- Maximum Number of Warmup Days",
+        "  ;                                       !- Minimum Number of Warmup Days",
+
+        "Zone,",
+        "  Zone1,                                  !- Name",
+        "  0,                                      !- Direction of Relative North {deg}",
+        "  0,                                      !- X Origin {m}",
+        "  0,                                      !- Y Origin {m}",
+        "  0,                                      !- Z Origin {m}",
+        "  ,                                       !- Type",
+        "  1,                                      !- Multiplier",
+        "  ,                                       !- Ceiling Height {m}",
+        "  ,                                       !- Volume {m3}",
+        "  ,                                       !- Floor Area {m2}",
+        "  ,                                       !- Zone Inside Convection Algorithm",
+        "  ,                                       !- Zone Outside Convection Algorithm",
+        "  Yes;                                    !- Part of Total Floor Area",
+
+        "Material:NoMass,",
+        "  R13-IP,                                 !- Name",
+        "  Smooth,                                 !- Roughness",
+        "  2.28943238786998,                       !- Thermal Resistance {m2-K/W}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "Construction,",
+        "  R13 Construction,                       !- Name",
+        "  R13-IP;                                 !- Layer 1",
+
+        "BuildingSurface:Detailed,",
+        "  1-SOUTH - ABS AZIMUTH 159.44,           !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -20, -20, 3,                            !- X,Y,Z Vertex 1 {m}",
+        "  -20, -20, 0,                            !- X,Y,Z Vertex 2 {m}",
+        "  20, -5, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  20, -5, 3;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  2-WEST - ABS AZIMUTH 284.04,            !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -10, 20, 3,                             !- X,Y,Z Vertex 1 {m}",
+        "  -10, 20, 0,                             !- X,Y,Z Vertex 2 {m}",
+        "  -20, -20, 0,                            !- X,Y,Z Vertex 3 {m}",
+        "  -20, -20, 3;                            !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  3-EAST - ABS AZIMUTH 63.43,             !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  20, -5, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  20, -5, 0,                              !- X,Y,Z Vertex 2 {m}",
+        "  10, 15, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  10, 15, 3;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  4-NORTH - ABS AZIMUTH 14.04,            !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 15, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  10, 15, 0,                              !- X,Y,Z Vertex 2 {m}",
+        "  -10, 20, 0,                             !- X,Y,Z Vertex 3 {m}",
+        "  -10, 20, 3;                             !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  FLOOR,                                  !- Name",
+        "  Floor,                                  !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Ground,                                 !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  NoSun,                                  !- Sun Exposure",
+        "  NoWind,                                 !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  20, -5, 0,                              !- X,Y,Z Vertex 1 {m}",
+        "  -20, -20, 0,                            !- X,Y,Z Vertex 2 {m}",
+        "  -10, 20, 0,                             !- X,Y,Z Vertex 3 {m}",
+        "  10, 15, 0;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  ROOF,                                   !- Name",
+        "  Roof,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 15, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  -10, 20, 3,                             !- X,Y,Z Vertex 2 {m}",
+        "  -20, -20, 3,                            !- X,Y,Z Vertex 3 {m}",
+        "  20, -5, 3;                              !- X,Y,Z Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);                                 // expect no errors
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                            // expect no errors
+
+    // TODO: I think GetSurfaceData is enough? SetupZoneGeometry => GetSurfaceData => CalcSurfaceCentroid
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    auto &surfaces = state->dataSurface->Surface;
+    auto it = std::find_if(surfaces.begin(), surfaces.end(), [](const auto &s) { return s.Name == "ROOF"; });
+    ASSERT_NE(it, surfaces.end());
+    auto &surface = *it;
+    EXPECT_NEAR(surface.Centroid.x, -1.38889, 0.0001);
+    EXPECT_NEAR(surface.Centroid.y, 0.601852, 0.0001);
+    EXPECT_NEAR(surface.Centroid.z, 3.0, 0.0001);
+
+    // GetUserConvectionCoefficients => SetupAdaptiveConvectionStaticMetaData (which is where the perimeter thing is calculated)
+    ConvectionCoefficients::GetUserConvectionCoefficients(*state);
+
+    double actual_roof_perimeter = 0.0;
+    for (int i = 1; i <= surface.Sides; ++i) {
+        int inext = i + 1;
+        if (i == surface.Sides) {
+            inext = 1;
+        }
+        actual_roof_perimeter += distance(surface.Vertex(i), surface.Vertex(inext));
+    }
+    EXPECT_NEAR(126.92728, actual_roof_perimeter, 0.0001);
+
+    EXPECT_NEAR(actual_roof_perimeter, state->dataConvectionCoefficient->RoofGeo.Perimeter, 0.0001);
+}
