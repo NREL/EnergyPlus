@@ -8335,24 +8335,33 @@ namespace SurfaceGeometry {
                                 ShowContinueError(state, "At lease one ground surface view factor should be specified.");
                             }
                         }
-                        auto ground_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
-                        if (!ground_surf_TempSchName.empty()) {
-                            thisGndSurfsProp.GndSurfs[surfNum].TempSchPtr = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_TempSchName));
-                        } else {
-                            if (surfNum == 0) {
-                                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + ".");
-                                ShowContinueError(state, "Ground surface temperature schedule is not specified.");
-                                ShowContinueError(state, "Simulation continues with surface outside face outdoor air drybulb temperature.");
+
+                        auto TempSchName = groundSurface.find("ground_surface_temperature_schedule_name");
+                        if (TempSchName != groundSurface.end()) {
+                            auto ground_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
+                            if (!ground_surf_TempSchName.empty()) {
+                                thisGndSurfsProp.GndSurfs[surfNum].TempSchPtr =
+                                    GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_TempSchName));
+                            } else {
+                                if (surfNum == 0) {
+                                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + ".");
+                                    ShowContinueError(state, "Ground surface temperature schedule is not specified.");
+                                    ShowContinueError(state, "Simulation continues with surface outside face outdoor air drybulb temperature.");
+                                }
                             }
                         }
-                        auto ground_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
-                        if (!ground_surf_ReflSchName.empty()) {
-                            thisGndSurfsProp.GndSurfs[surfNum].ReflSchPtr = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_ReflSchName));
-                        } else {
-                            if (surfNum == 0) {
-                                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + ".");
-                                ShowContinueError(state, "At lease one ground surface reflectance schedule should be specified.");
-                                ShowContinueError(state, "Simulation continues with global reflectance value of 0.2.");
+                        auto ReflSchName = groundSurface.find("ground_surface_reflectance_schedule_name");
+                        if (ReflSchName != groundSurface.end()) {
+                            auto ground_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
+                            if (!ground_surf_ReflSchName.empty()) {
+                                thisGndSurfsProp.GndSurfs[surfNum].ReflSchPtr =
+                                    GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_ReflSchName));
+                            } else {
+                                if (surfNum == 0) {
+                                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + ".");
+                                    ShowContinueError(state, "At lease one ground surface reflectance schedule should be specified.");
+                                    ShowContinueError(state, "Simulation continues with global reflectance value of 0.2.");
+                                }
                             }
                         }
                     }
@@ -8370,6 +8379,23 @@ namespace SurfaceGeometry {
                 //    ShowContinueError(state, "Previous error(s) cause program termination.");
                 //}
                 state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsProp);
+
+                SetupOutputVariable(state,
+                                    "Ground Surfaces Property Average Ground Surface Temperature",
+                                    OutputProcessor::Unit::C,
+                                    state.dataSurface->GroundSurfsProperty(Loop).SurfsTempAvg,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
+                                    state.dataSurface->GroundSurfsProperty(Loop).Name);
+
+                SetupOutputVariable(state,
+                                    "Ground Surfaces Property Average Ground Surface Reflectance",
+                                    OutputProcessor::Unit::None,
+                                    state.dataSurface->GroundSurfsProperty(Loop).SurfsReflAvg,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
+                                    state.dataSurface->GroundSurfsProperty(Loop).Name);
+
             }
         }
     }

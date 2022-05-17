@@ -2635,6 +2635,7 @@ namespace WindowManager {
                         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                         }
+                        // BAN, this is incorrect, should have been tate.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor != -1
                         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorGroundIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
                         }
@@ -2647,6 +2648,10 @@ namespace WindowManager {
                                 DataGlobalConstants::KelvinConv;
                             OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
+                    }
+                    if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
+                        int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
+                        surface.ViewFactorGroundIR = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
                     }
                 }
                 if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)

@@ -765,6 +765,10 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                         OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                     }
                 }
+                if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
+                    int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
+                    state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
+                }
             }
             if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                 if (state.dataEnvrn->IsRain) {                 // Raining: since wind exposed, outside window surface gets wet
