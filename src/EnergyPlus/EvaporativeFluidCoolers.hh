@@ -64,10 +64,12 @@ struct EnergyPlusData;
 
 namespace EvaporativeFluidCoolers {
 
-    enum struct EvapLoss
+    enum class EvapLoss
     {
+        Invalid = -1,
         ByUserFactor,
-        ByMoistTheory
+        ByMoistTheory,
+        Num
     };
 
     enum struct Blowdown

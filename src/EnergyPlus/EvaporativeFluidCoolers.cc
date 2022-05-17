@@ -98,6 +98,7 @@ namespace EvaporativeFluidCoolers {
     constexpr std::string_view cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
     constexpr std::string_view cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
     constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> controlNamesUC = {"FANCYCLING", "FLUIDBYPASS"};
+    constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> evapLossNamesUC = {"LossFactor", "SaturatedExit"};
 
     PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
     {
@@ -270,35 +271,29 @@ namespace EvaporativeFluidCoolers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(6) || AlphArray(6).empty()) {
                 thisEFC.capacityControl = CapacityControl::FanCycling; // FanCycling
             } else {
-                {
-                    auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(6)));
-                    if (SELECT_CASE_var == "FANCYCLING") {
-                        thisEFC.capacityControl = CapacityControl::FanCycling;
-                    } else if (SELECT_CASE_var == "FLUIDBYPASS") {
-                        thisEFC.capacityControl = CapacityControl::FluidBypass;
-                    } else {
-                        thisEFC.capacityControl = CapacityControl::FanCycling;
-                        ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisEFC.Name +
-                                             "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
-                    }
+                thisEFC.capacityControl =
+                    static_cast<CapacityControl>(getEnumerationValue(controlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+                if (thisEFC.capacityControl == CapacityControl::Invalid) {
+                    thisEFC.capacityControl = CapacityControl::FanCycling;
+                    ShowWarningError(state,
+                                     state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisEFC.Name +
+                                         "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
                 }
             }
 
             thisEFC.SizFac = NumArray(12); //  N11  \field Sizing Factor
             if (thisEFC.SizFac <= 0.0) thisEFC.SizFac = 1.0;
 
-            // begin water use and systems get input
-            if (UtilityRoutines::SameString(AlphArray(7), "LossFactor")) {
-                thisEFC.EvapLossMode = EvapLoss::ByUserFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(7), "SaturatedExit")) {
-                thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
-            } else if (AlphArray(7).empty()) {
+            // constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> evapLossNamesUC = {"LossFactor", "SaturatedExit"};
+            if (AlphArray(7).empty()) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + AlphArray(1));
-                ErrorsFound = true;
+                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+                if (thisEFC.EvapLossMode == EvapLoss::Invalid) {
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + AlphArray(1));
+                    ErrorsFound = true;
+                }
             }
 
             thisEFC.UserEvapLossFactor = NumArray(13); //  N13 , \field Evaporation Loss Factor
