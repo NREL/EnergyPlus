@@ -98,8 +98,8 @@ namespace EvaporativeFluidCoolers {
     constexpr std::string_view cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
     constexpr std::string_view cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
     constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> controlNamesUC = {"FANCYCLING", "FLUIDBYPASS"};
-    constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> evapLossNamesUC = {"LossFactor", "SaturatedExit"};
-    constexpr std::array<std::string_view, static_cast<int>(Blowdown::Num)> blowDownNamesUC = {"ConcentrationRatio", "ScheduledRate"};
+    constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> evapLossNamesUC = {"LOSSFACTOR", "SATURATEDEXIT"};
+    constexpr std::array<std::string_view, static_cast<int>(Blowdown::Num)> blowDownNamesUC = {"CONCENTRATIONRATIO", "SCHEDULEDRATE"};
 
     PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
     {
@@ -2692,7 +2692,7 @@ namespace EvaporativeFluidCoolers {
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
         }
     }
-    
+
     void EvapFluidCoolerSpecs::oneTimeInit(EnergyPlusData &state)
     {
         bool ErrorsFound(false); // Flag if input data errors are found
