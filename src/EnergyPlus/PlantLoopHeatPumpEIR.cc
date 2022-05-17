@@ -1251,6 +1251,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
     // 2022-05-17: should the following curve evaluation based on the oaVariable and waterVariable choice:?
+    // 2022-05-17: Maybe how this is set up is related to the flow mode?
     // evaluate capacity modifier curve and determine load side heat transfer
     Real64 capacityModifierFuncTemp =
         CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
@@ -1291,18 +1292,23 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     } else {
         //
     }
-
+    
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = CurveManager::CurveValue(state,
                                                           this->powerRatioFuncTempCurveIndex,
                                                           waterTempforCurve,
                                                           oaTempforCurve); // CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex,
                                                                            // this->loadSideOutletTemp, this->sourceSideInletTemp);
-    Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+
+    Real64 miniPLR = 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
+    Real64 PLFf = max(miniPLR, partLoadRatio);
+
+    Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, PLFf);
     // this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
     // this->powerEnergy = this->powerUsage * reportingInterval;
 
-    Real64 eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTempforCurve);
+    Real64 oaTemp2 = max(-8.8888, min(3.3333, oaTempforCurve));
+    Real64 eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
 
     Real64 CR = 1.0;
     Real64 CRF = 0.5833;
