@@ -116,14 +116,6 @@ namespace RoomAirModelManager {
         // PURPOSE OF THIS SUBROUTINE:
         //     manage room air models.
 
-        // Using/Aliasing
-        using CrossVentMgr::ManageUCSDCVModel;
-        using DisplacementVentMgr::ManageUCSDDVModel;
-        using MundtSimMgr::ManageMundtModel;
-        using RoomAirModelAirflowNetwork::SimRoomAirModelAirflowNetwork;
-        using RoomAirModelUserTempPattern::ManageUserDefinedPatterns;
-        using UFADManager::ManageUCSDUFModels;
-
         if (state.dataRoomAirModelMgr->GetAirModelData) {
             GetAirModelDatas(state);
             state.dataRoomAirModelMgr->GetAirModelData = false;
@@ -133,43 +125,46 @@ namespace RoomAirModelManager {
             SharedDVCVUFDataInit(state, ZoneNum);
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType);
+        switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType) {
+        case DataRoomAirModel::RoomAirModel::UserDefined:
+            RoomAirModelUserTempPattern::ManageUserDefinedPatterns(state, ZoneNum);
+            break;
 
-            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
+        case DataRoomAirModel::RoomAirModel::Mixing: // Mixing air model
+            break;                                   // do nothing
 
-                ManageUserDefinedPatterns(state, ZoneNum);
+        case DataRoomAirModel::RoomAirModel::Mundt: // Mundt air model
+            // simulate room airflow using Mundt model
+            MundtSimMgr::ManageMundtModel(state, ZoneNum);
+            break;
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) { // Mixing air model
-                                                                                    // do nothing
+        case DataRoomAirModel::RoomAirModel::UCSDDV: // UCDV Displacement Ventilation model
+            // simulate room airflow using UCSDDV model
+            DisplacementVentMgr::ManageUCSDDVModel(state, ZoneNum);
+            break;
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) { // Mundt air model
-                // simulate room airflow using Mundt model
-                ManageMundtModel(state, ZoneNum);
+        case DataRoomAirModel::RoomAirModel::UCSDCV: // UCSD Cross Ventilation model
+            // simulate room airflow using UCSDDV model
+            CrossVentMgr::ManageUCSDCVModel(state, ZoneNum);
+            break;
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) { // UCDV Displacement Ventilation model
-                // simulate room airflow using UCSDDV model
-                ManageUCSDDVModel(state, ZoneNum);
+        case DataRoomAirModel::RoomAirModel::UCSDUFI: // UCSD UFAD interior zone model
+            // simulate room airflow using the UCSDUFI model
+            UFADManager::ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFI);
+            break;
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) { // UCSD Cross Ventilation model
-                // simulate room airflow using UCSDDV model
-                ManageUCSDCVModel(state, ZoneNum);
+        case DataRoomAirModel::RoomAirModel::UCSDUFE: // UCSD UFAD exterior zone model
+            // simulate room airflow using the UCSDUFE model
+            UFADManager::ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFE);
+            break;
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
-                // simulate room airflow using the UCSDUFI model
-                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFI);
+        case DataRoomAirModel::RoomAirModel::AirflowNetwork: // RoomAirflowNetwork zone model
+            // simulate room airflow using the AirflowNetwork - based model
+            RoomAirModelAirflowNetwork::SimRoomAirModelAirflowNetwork(state, ZoneNum);
+            break;
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD exterior zone model
-                // simulate room airflow using the UCSDUFE model
-                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFE);
-
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) { // RoomAirflowNetwork zone model
-                // simulate room airflow using the AirflowNetwork - based model
-                SimRoomAirModelAirflowNetwork(state, ZoneNum);
-
-            } else { // mixing air model
-                     // do nothing
-            }
+        default:   // mixing air model
+            break; // do nothing
         }
     }
 

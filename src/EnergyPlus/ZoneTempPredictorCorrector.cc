@@ -6632,36 +6632,37 @@ void CalcZoneSums(EnergyPlusData &state,
         SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
         // determine reference air temperature for this surface
-        {
-            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-            if (SELECT_CASE_var == DataSurfaces::RefAirTemp::ZoneMeanAirTemp) {
-                // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
-                RefAirTemp = MAT(ZoneNum);
-                SumHA += HA;
-            } else if (SELECT_CASE_var == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+        switch (state.dataSurface->SurfTAirRef(SurfNum)) {
+        case DataSurfaces::RefAirTemp::ZoneMeanAirTemp:
+            // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
+            RefAirTemp = MAT(ZoneNum);
+            SumHA += HA;
+            break;
+        case DataSurfaces::RefAirTemp::AdjacentAirTemp:
+            RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+            SumHATref += HA * RefAirTemp;
+            break;
+        case DataSurfaces::RefAirTemp::ZoneSupplyAirTemp:
+            // check whether this zone is a controlled zone or not
+            if (!ControlledZoneAirFlag) {
+                ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                return;
+            }
+            // determine supply air temperature as a weighted average of the inlet temperatures.
+            if (SumSysMCp > 0.0) {
+                RefAirTemp = SumSysMCpT / SumSysMCp;
                 SumHATref += HA * RefAirTemp;
-            } else if (SELECT_CASE_var == DataSurfaces::RefAirTemp::ZoneSupplyAirTemp) {
-                // check whether this zone is a controlled zone or not
-                if (!ControlledZoneAirFlag) {
-                    ShowFatalError(state,
-                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
-                    return;
-                }
-                // determine supply air temperature as a weighted average of the inlet temperatures.
-                if (SumSysMCp > 0.0) {
-                    RefAirTemp = SumSysMCpT / SumSysMCp;
-                    SumHATref += HA * RefAirTemp;
-                } else {
-                    // no system flow (yet) so just use zone air temperature
-                    // #5906
-                    SumHA += HA;
-                }
             } else {
-                // currently set to mean air temp but should add error warning here
-                RefAirTemp = MAT(ZoneNum);
+                // no system flow (yet) so just use zone air temperature
+                // #5906
                 SumHA += HA;
             }
+            break;
+        default:
+            // currently set to mean air temp but should add error warning here
+            RefAirTemp = MAT(ZoneNum);
+            SumHA += HA;
+            break;
         }
 
     } // SurfNum
