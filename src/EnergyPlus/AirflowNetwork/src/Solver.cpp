@@ -3407,7 +3407,7 @@ namespace AirflowNetwork {
                     for (unsigned j = 1; j <= EPDeltaCP(i).WindDir.size() - 1; ++j) {
                         print(m_state.files.eio, "{:.2R},", EPDeltaCP(i).WindDir(j));
                     }
-                    print(m_state.files.eio, "{:.2R}\n", EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()));
+                    print(m_state.files.eio, "{:.2R}\n", EPDeltaCP(i).WindDir(static_cast<int>(EPDeltaCP(i).WindDir.size())));
                 }
             }
         }
@@ -6731,7 +6731,7 @@ namespace AirflowNetwork {
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
         Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
-        int CurveNum = state.dataCurveManager->PerfCurve.size() + 1;
+        int CurveNum = static_cast<int>(state.dataCurveManager->PerfCurve.size()) + 1;
         state.dataCurveManager->PerfCurve.push_back(CurveManager::PerformanceCurveData());
 
         state.dataCurveManager->PerfCurve(CurveNum).Name = name;
