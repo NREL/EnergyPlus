@@ -4320,38 +4320,44 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             }
         } else if (Surface(SurfLoop).Tilt < 45.0) { // TODO Double check tilt wrt outside vs inside
 
-            if (state.dataConvectionCoefficient->FirstRoofSurf) { // Init with something in the group
+            if (state.dataConvectionCoefficient->FirstRoofSurf) {
+                // #9432 - We can't just Init with anything in the group in the group (such as Vertex(1))
+                // Otherwise if for eg the Vertex(1) has a higher X and Y than all other points, then we will not be able
+                // to find the XdYu ones (lo X, high Y), that is the top left corner because
+                //     vertex.x <= RoofGeo.XdYuZd.Vertex.x => True
+                //     vertex.y => RoofGeo.XdYuZd.Vertex.y => False
+                // So instead, we initialize to the Surface's Centroid...
                 state.dataConvectionCoefficient->RoofGeo.XdYdZd.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XdYdZd.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XdYdZd.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XdYdZd.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XdYdZd.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->RoofGeo.XdYdZu.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XdYdZu.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XdYdZu.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->RoofGeo.XdYuZd.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XdYuZd.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XdYuZd.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->RoofGeo.XdYuZu.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XdYuZu.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XdYuZu.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XdYuZu.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XdYuZu.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->RoofGeo.XuYdZd.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XuYdZd.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XuYdZd.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XuYdZd.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XuYdZd.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->RoofGeo.XuYuZd.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XuYuZd.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XuYuZd.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->RoofGeo.XuYdZu.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XuYdZu.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XuYdZu.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XuYdZu.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XuYdZu.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->RoofGeo.XuYuZu.SurfNum = SurfLoop;
-                state.dataConvectionCoefficient->RoofGeo.XuYuZu.VertNum = 1;
-                state.dataConvectionCoefficient->RoofGeo.XuYuZu.Vertex = Surface(SurfLoop).Vertex(1);
+                state.dataConvectionCoefficient->RoofGeo.XuYuZu.VertNum = 0;
+                state.dataConvectionCoefficient->RoofGeo.XuYuZu.Vertex = Surface(SurfLoop).Centroid;
 
                 state.dataConvectionCoefficient->FirstRoofSurf = false;
             }
@@ -4486,6 +4492,39 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
         2.0 * (NorthWestFacade.Zmax - NorthWestFacade.Zmin);
     NorthWestFacade.Height = NorthWestFacade.Zmax - NorthWestFacade.Zmin;
 
+    // Sanity check
+    if (state.dataConvectionCoefficient->RoofGeo.XdYdZd.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYdZd (lo x, lo y, lo z)");
+    }
+
+    if (state.dataConvectionCoefficient->RoofGeo.XdYdZu.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYdZu (lo x, lo y, hi z)");
+    }
+
+    if (state.dataConvectionCoefficient->RoofGeo.XdYuZd.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYuZd (lo x, hi y, lo z)");
+    }
+
+    if (state.dataConvectionCoefficient->RoofGeo.XdYuZu.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYuZu (lo x, hi y, hi z)");
+    }
+
+    if (state.dataConvectionCoefficient->RoofGeo.XuYdZd.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYdZd (hi x, lo y, lo z)");
+    }
+
+    if (state.dataConvectionCoefficient->RoofGeo.XuYuZd.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYuZd (hi x, hi y, lo z)");
+    }
+
+    if (state.dataConvectionCoefficient->RoofGeo.XuYdZu.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYdZu (hi x, lo y, hi z)");
+    }
+
+    if (state.dataConvectionCoefficient->RoofGeo.XuYuZu.VertNum == 0) {
+        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYuZu (hi x, hi y, hi z)");
+    }
+
     // now model roof perimeter
     // move around bounding boxes side walls and find the longest of the four distances
     // Side A: Y low -- uses XdYdZd, XdYdZu, XuYdZd, XuYdZu
@@ -4509,11 +4548,11 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     TestDist(4) = distance(state.dataConvectionCoefficient->RoofGeo.XdYuZu.Vertex, state.dataConvectionCoefficient->RoofGeo.XuYuZu.Vertex);
     SideCLength = maxval(TestDist);
 
-    // Side D: X Lo Hi -- uses XdYuZd, XdYuZu, XuYuZd, XuYuZu
-    TestDist(1) = distance(state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex, state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex);
-    TestDist(2) = distance(state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex, state.dataConvectionCoefficient->RoofGeo.XuYuZu.Vertex);
-    TestDist(3) = distance(state.dataConvectionCoefficient->RoofGeo.XdYuZu.Vertex, state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex);
-    TestDist(4) = distance(state.dataConvectionCoefficient->RoofGeo.XdYuZu.Vertex, state.dataConvectionCoefficient->RoofGeo.XuYuZu.Vertex);
+    // Side D: X Lo -- uses XdYdZd, XdYdZu, XdYuZd, XdYuZu
+    TestDist(1) = distance(state.dataConvectionCoefficient->RoofGeo.XdYdZd.Vertex, state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex);
+    TestDist(2) = distance(state.dataConvectionCoefficient->RoofGeo.XdYdZd.Vertex, state.dataConvectionCoefficient->RoofGeo.XdYuZu.Vertex);
+    TestDist(3) = distance(state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex, state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex);
+    TestDist(4) = distance(state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex, state.dataConvectionCoefficient->RoofGeo.XdYuZu.Vertex);
     SideDLength = maxval(TestDist);
 
     state.dataConvectionCoefficient->RoofGeo.Perimeter = SideALength + SideBLength + SideCLength + SideDLength;
