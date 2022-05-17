@@ -240,6 +240,8 @@ namespace EIRPlantLoopHeatPumps {
         // new output variables for derived class only
         std::string GAHPFuelTypeForOutputVariable = "";
         Real64 loadSideVolumeFlowRate = 0.0;
+        Real64 fuelUsage = 0.0;
+        Real64 fuelEnergy = 0.0;
 
         // Override parent methods to be declared
         void simulate(EnergyPlusData &state,

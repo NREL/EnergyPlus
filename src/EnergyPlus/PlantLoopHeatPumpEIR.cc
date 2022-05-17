@@ -1250,6 +1250,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // get setpoint on the load side outlet
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
+    // 2022-05-17: should the following curve evaluation based on the oaVariable and waterVariable choice:?
     // evaluate capacity modifier curve and determine load side heat transfer
     Real64 capacityModifierFuncTemp =
         CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
@@ -1273,12 +1274,43 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
     this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
 
+    // Determine which variable to use for GAHP:
+    // Load (water) side
+    Real64 waterTempforCurve = this->loadSideInletTemp;
+    if (this->waterTempCurveInputVar == 1) {
+        waterTempforCurve = this->loadSideOutletTemp;
+    } else {
+        //
+    }
+    // Source (air) side
+    Real64 oaTempforCurve =
+        state.dataLoopNodes->Node(this->loadSideNodes.inlet).OutAirDryBulb; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+    if (this->oaTempCurveInputVar == 1) {
+        oaTempforCurve =
+            state.dataLoopNodes->Node(this->loadSideNodes.inlet).OutAirWetBulb; // 2022-05-17: Need to get the wet bulb, maybe should be
+    } else {
+        //
+    }
+
     // calculate power usage from EIR curves
-    Real64 eirModifierFuncTemp =
-        CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncTemp = CurveManager::CurveValue(state,
+                                                          this->powerRatioFuncTempCurveIndex,
+                                                          waterTempforCurve,
+                                                          oaTempforCurve); // CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex,
+                                                                           // this->loadSideOutletTemp, this->sourceSideInletTemp);
     Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, partLoadRatio);
-    this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
-    this->powerEnergy = this->powerUsage * reportingInterval;
+    // this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
+    // this->powerEnergy = this->powerUsage * reportingInterval;
+
+    Real64 eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTempforCurve);
+
+    Real64 CR = 1.0;
+    Real64 CRF = 0.5833;
+    CR = partLoadRatio / this->minPLR;
+    CRF = 0.4167 * CR + 0.5833;
+
+    this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp / CRF;
+    this->fuelEnergy = this->fuelUsage * reportingInterval;
 
     // energy balance on heat pump
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
@@ -1894,7 +1926,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
         SetupOutputVariable(state,
-                            "Fuel-fired Absorption HeatPump Heating Electricity Rate",
+                            "Fuel-fired Absorption HeatPump Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->powerUsage,
                             OutputProcessor::SOVTimeStepType::System,
@@ -1902,7 +1934,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             this->name);
         if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) { // energy from HeatPump:AirToWater:FuelFired:Cooling object
             SetupOutputVariable(state,
-                                "Fuel-fired Absorption HeatPump Heating Electricity Energy",
+                                "Fuel-fired Absorption HeatPump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->powerEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
@@ -1916,7 +1948,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         } else if (this->EIRHPType ==
                    DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) { // energy from HeatPump:AirToWater:FuelFired:Heating object
             SetupOutputVariable(state,
-                                "Fuel-fired Absorption HeatPump Heating Electricity Energy",
+                                "Fuel-fired Absorption HeatPump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->powerEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
