@@ -148,18 +148,17 @@ namespace EvaporativeFluidCoolers {
         // Get number of all evaporative fluid coolers specified in the input data file (idf)
         int NumSingleSpeedEvapFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_SingleSpeed);
         int NumTwoSpeedEvapFluidCoolers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cEvapFluidCooler_TwoSpeed);
-        state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
+        int NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
-        if (state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers <= 0)
+        if (NumSimpleEvapFluidCoolers <= 0)
             ShowFatalError(state,
                            "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. "
                            "Search the input for evaporative fluid cooler to determine the cause for this error.");
 
         // Allocate data structures to hold evaporative fluid cooler input data,
         // report data and evaporative fluid cooler inlet conditions
-        state.dataEvapFluidCoolers->SimpleEvapFluidCooler.allocate(state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers);
-        state.dataEvapFluidCoolers->UniqueSimpleEvapFluidCoolerNames.reserve(
-            static_cast<unsigned>(state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers));
+        state.dataEvapFluidCoolers->SimpleEvapFluidCooler.allocate(NumSimpleEvapFluidCoolers);
+        state.dataEvapFluidCoolers->UniqueSimpleEvapFluidCoolerNames.reserve(NumSimpleEvapFluidCoolers);
 
         // Load data structures with evaporative fluid cooler input data
         state.dataIPShortCut->cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
@@ -541,7 +540,6 @@ namespace EvaporativeFluidCoolers {
             thisEFC.HeatRejectCapNomCapSizingRatio = NumArray(8);
             thisEFC.HighSpeedStandardDesignCapacity = NumArray(9);
             thisEFC.LowSpeedStandardDesignCapacity = NumArray(10);
-            thisEFC.LowSpeedStandardDesignCapacitySizingFactor = NumArray(11);
             thisEFC.HighSpeedEvapFluidCoolerUA = NumArray(12);
             if (thisEFC.HighSpeedEvapFluidCoolerUA == DataSizing::AutoSize) {
                 thisEFC.HighSpeedEvapFluidCoolerUAWasAutoSized = true;
@@ -557,7 +555,6 @@ namespace EvaporativeFluidCoolers {
             }
             thisEFC.HighSpeedUserSpecifiedDesignCapacity = NumArray(16);
             thisEFC.LowSpeedUserSpecifiedDesignCapacity = NumArray(17);
-            thisEFC.LowSpeedUserSpecifiedDesignCapacitySizingFactor = NumArray(18);
             thisEFC.DesignEnteringWaterTemp = NumArray(19);
             thisEFC.DesignEnteringAirTemp = NumArray(20);
             thisEFC.DesignEnteringAirWetBulbTemp = NumArray(21);
