@@ -68,7 +68,13 @@ namespace Fans {
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
 
-    enum class AvailabilityManagerCoupling {Invalid = -1, Coupled, Decoupled, Num};
+    enum class AvailabilityManagerCoupling
+    {
+        Invalid = -1,
+        Coupled,
+        Decoupled,
+        Num
+    };
 
     struct FanEquipConditions
     {
@@ -171,10 +177,11 @@ namespace Fans {
         Real64 VFDInputPower;                           // VFD input power for fan being Simulated [W]
         [[maybe_unused]] Real64 MaxFanPowerEncountered; // Maximum VFD input power encountered [W]
         // zone exhaust fan
-        int FlowFractSchedNum;     // schedule index flow rate modifier schedule
-        AvailabilityManagerCoupling AvailManagerMode = AvailabilityManagerCoupling::Invalid;      // mode for how exhaust fan should react to availability managers
-        int MinTempLimitSchedNum;  // schedule index minimum temperature limit
-        int BalancedFractSchedNum; // schedule index portion recirculated
+        int FlowFractSchedNum; // schedule index flow rate modifier schedule
+        AvailabilityManagerCoupling AvailManagerMode =
+            AvailabilityManagerCoupling::Invalid; // mode for how exhaust fan should react to availability managers
+        int MinTempLimitSchedNum;                 // schedule index minimum temperature limit
+        int BalancedFractSchedNum;                // schedule index portion recirculated
         Real64 UnbalancedOutletMassFlowRate;
         Real64 BalancedOutletMassFlowRate;
         int AirLoopNum;        // Airloop number
@@ -198,8 +205,8 @@ namespace Fans {
               PLBeltEffReg1CurveIndex(0), PLBeltEffReg2CurveIndex(0), PLBeltEffReg3CurveIndex(0), MotorMaxEffCurveIndex(0), PLMotorEffCurveIndex(0),
               VFDEffCurveIndex(0), DeltaPressTot(0.0), FanAirPower(0.0), FanSpd(0.0), FanTrq(0.0), FanWheelEff(0.0), FanShaftPower(0.0),
               BeltMaxEff(0.0), BeltEff(0.0), BeltInputPower(0.0), MotorMaxEff(0.0), MotorInputPower(0.0), VFDEff(0.0), VFDInputPower(0.0),
-              MaxFanPowerEncountered(0.0), FlowFractSchedNum(0), MinTempLimitSchedNum(0), BalancedFractSchedNum(0),
-              UnbalancedOutletMassFlowRate(0.0), BalancedOutletMassFlowRate(0.0), AirLoopNum(0), DesignPointFEI(0.0)
+              MaxFanPowerEncountered(0.0), FlowFractSchedNum(0), MinTempLimitSchedNum(0), BalancedFractSchedNum(0), UnbalancedOutletMassFlowRate(0.0),
+              BalancedOutletMassFlowRate(0.0), AirLoopNum(0), DesignPointFEI(0.0)
         {
         }
     };
@@ -267,9 +274,9 @@ namespace Fans {
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
     void GetFanType(EnergyPlusData &state,
-                    std::string const &FanName,                 // Fan name
-                    int &FanType,                               // returned fantype number
-                    bool &ErrorsFound,                          // error indicator
+                    std::string const &FanName,           // Fan name
+                    int &FanType,                         // returned fantype number
+                    bool &ErrorsFound,                    // error indicator
                     std::string_view ThisObjectType = {}, // parent object type (for error message)
                     std::string_view ThisObjectName = {}  // parent object name (for error message)
     );

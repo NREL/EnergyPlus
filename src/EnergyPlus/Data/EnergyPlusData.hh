@@ -172,7 +172,6 @@ struct HeatBalSurfMgr;
 struct HeatBalanceAirMgrData;
 struct HeatBalanceData;
 struct HeatBalanceIntRadExchgData;
-struct HeatBalanceKivaMgrData;
 struct HeatBalanceMgrData;
 struct HeatPumpWaterToWaterCOOLINGData;
 struct HeatPumpWaterToWaterHEATINGData;
@@ -434,7 +433,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<HeatBalanceAirMgrData> dataHeatBalAirMgr;
     std::unique_ptr<HeatBalanceData> dataHeatBal;
     std::unique_ptr<HeatBalanceIntRadExchgData> dataHeatBalIntRadExchg;
-    std::unique_ptr<HeatBalanceKivaMgrData> dataHeatBalKivaMgr;
     std::unique_ptr<HeatBalanceMgrData> dataHeatBalMgr;
     std::unique_ptr<HeatPumpWaterToWaterCOOLINGData> dataHPWaterToWaterClg;
     std::unique_ptr<HeatPumpWaterToWaterHEATINGData> dataHPWaterToWaterHtg;

@@ -2440,7 +2440,7 @@ namespace EvaporativeFluidCoolers {
         // Par(3) = design air volume flow rate [m3/s]
         // Par(4) = water specific heat [J/(kg*C)]
 
-        Real64 OutWaterTemp;  // outlet water temperature [C]
+        Real64 OutWaterTemp; // outlet water temperature [C]
         this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA, OutWaterTemp);
         Real64 const CoolingOutput = Par[3] * Par[1] * (this->inletConds.WaterTemp - OutWaterTemp);
         return (Par[0] - CoolingOutput) / Par[0];

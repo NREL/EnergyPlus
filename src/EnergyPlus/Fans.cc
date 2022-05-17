@@ -614,8 +614,8 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).AvailManagerMode = static_cast<AvailabilityManagerCoupling>(getEnumerationValue(couplingsUC, cAlphaArgs(7)));
             if (Fan(FanNum).AvailManagerMode == AvailabilityManagerCoupling::Invalid) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) +
-                                    " entered =" + cAlphaArgs(7) + " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
+                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 ErrorsFound = true;
             }
         } else {
