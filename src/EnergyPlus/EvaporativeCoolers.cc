@@ -1600,7 +1600,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                         ShowMessage(state,
                                     "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
-                        ShowContinueError(state, format("User-Specified Celdek Pad Depth of{:.2R} [m]", PadDepthUser));
+                        ShowContinueError(state, format("User-Specified Celdek Pad Depth of {:.2R} [m]", PadDepthUser));
                         ShowContinueError(state, format("differs from Design Size Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -1740,7 +1740,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                         ShowMessage(state,
                                     "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
-                        ShowContinueError(state, format("User-Specified Celdek Pad Depth of{:.2R} [m]", PadDepthUser));
+                        ShowContinueError(state, format("User-Specified Celdek Pad Depth of {:.2R} [m]", PadDepthUser));
                         ShowContinueError(state, format("differs from Design Size Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
