@@ -2953,7 +2953,7 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
 {
 
     // Test for #9432
-    // So this is a perfect square. Expect I am going to rotate the building by 20 degres
+    // So this is a perfect square. Expect I am going to rotate the building by 20 degrees (Not by building north axis, but by vertices adjustments)
     // Surface.Vertex(1) will end up having the highest X and highest Y, and we will trigger a bug where if will fail
     // the XdYu ones (lo X, high Y), that is the top left corner [2] because  the RoofGeo BoundingBoxVertStruct are initialized to Vertex(1) and:
     //     vertex.x <= RoofGeo.XdYuZd.Vertex.x => True
@@ -3018,7 +3018,7 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
         "  R13-IP;                                 !- Layer 1",
 
         "BuildingSurface:Detailed,",
-        "  1-SOUTH - ABS AZIMUTH 200.00,           !- Name",
+        "  1-SOUTH - ABS AZIMUTH 165.00,           !- Name",
         "  Wall,                                   !- Surface Type",
         "  R13 Construction,                       !- Construction Name",
         "  Zone1,                                  !- Zone Name",
@@ -3029,13 +3029,13 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
         "  WindExposed,                            !- Wind Exposure",
         "  ,                                       !- View Factor to Ground",
         "  ,                                       !- Number of Vertices",
-        "  -10, -10, 3,                            !- X,Y,Z Vertex 1 {m}",
-        "  -10, -10, 0,                            !- X,Y,Z Vertex 2 {m}",
-        "  10, -10, 0,                             !- X,Y,Z Vertex 3 {m}",
-        "  10, -10, 3;                             !- X,Y,Z Vertex 4 {m}",
+        "  -7.07106781186548, -12.2474487139159, 3, !- X,Y,Z Vertex 1 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 2 {m}",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  12.2474487139159, -7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
 
         "BuildingSurface:Detailed,",
-        "  2-WEST - ABS AZIMUTH 290.00,            !- Name",
+        "  2-WEST - ABS AZIMUTH 255.00,            !- Name",
         "  Wall,                                   !- Surface Type",
         "  R13 Construction,                       !- Construction Name",
         "  Zone1,                                  !- Zone Name",
@@ -3046,13 +3046,13 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
         "  WindExposed,                            !- Wind Exposure",
         "  ,                                       !- View Factor to Ground",
         "  ,                                       !- Number of Vertices",
-        "  -10, 10, 3,                             !- X,Y,Z Vertex 1 {m}",
-        "  -10, 10, 0,                             !- X,Y,Z Vertex 2 {m}",
-        "  -10, -10, 0,                            !- X,Y,Z Vertex 3 {m}",
-        "  -10, -10, 3;                            !- X,Y,Z Vertex 4 {m}",
+        "  -12.2474487139159, 7.07106781186548, 3, !- X,Y,Z Vertex 1 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 2 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 3 {m}",
+        "  -7.07106781186548, -12.2474487139159, 3; !- X,Y,Z Vertex 4 {m}",
 
         "BuildingSurface:Detailed,",
-        "  3-EAST - ABS AZIMUTH 110.00,            !- Name",
+        "  3-EAST - ABS AZIMUTH 75.00,             !- Name",
         "  Wall,                                   !- Surface Type",
         "  R13 Construction,                       !- Construction Name",
         "  Zone1,                                  !- Zone Name",
@@ -3063,13 +3063,13 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
         "  WindExposed,                            !- Wind Exposure",
         "  ,                                       !- View Factor to Ground",
         "  ,                                       !- Number of Vertices",
-        "  10, -10, 3,                             !- X,Y,Z Vertex 1 {m}",
-        "  10, -10, 0,                             !- X,Y,Z Vertex 2 {m}",
-        "  10, 10, 0,                              !- X,Y,Z Vertex 3 {m}",
-        "  10, 10, 3;                              !- X,Y,Z Vertex 4 {m}",
+        "  12.2474487139159, -7.07106781186548, 3, !- X,Y,Z Vertex 1 {m}",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 2 {m}",
+        "  7.07106781186548, 12.2474487139159, 0,  !- X,Y,Z Vertex 3 {m}",
+        "  7.07106781186548, 12.2474487139159, 3;  !- X,Y,Z Vertex 4 {m}",
 
         "BuildingSurface:Detailed,",
-        "  4-NORTH - ABS AZIMUTH 20.00,            !- Name",
+        "  4-NORTH - ABS AZIMUTH 345.00,           !- Name",
         "  Wall,                                   !- Surface Type",
         "  R13 Construction,                       !- Construction Name",
         "  Zone1,                                  !- Zone Name",
@@ -3080,10 +3080,10 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
         "  WindExposed,                            !- Wind Exposure",
         "  ,                                       !- View Factor to Ground",
         "  ,                                       !- Number of Vertices",
-        "  10, 10, 3,                              !- X,Y,Z Vertex 1 {m}",
-        "  10, 10, 0,                              !- X,Y,Z Vertex 2 {m}",
-        "  -10, 10, 0,                             !- X,Y,Z Vertex 3 {m}",
-        "  -10, 10, 3;                             !- X,Y,Z Vertex 4 {m}",
+        "  7.07106781186548, 12.2474487139159, 3,  !- X,Y,Z Vertex 1 {m}",
+        "  7.07106781186548, 12.2474487139159, 0,  !- X,Y,Z Vertex 2 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  -12.2474487139159, 7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
 
         "BuildingSurface:Detailed,",
         "  FLOOR,                                  !- Name",
@@ -3097,10 +3097,10 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
         "  NoWind,                                 !- Wind Exposure",
         "  ,                                       !- View Factor to Ground",
         "  ,                                       !- Number of Vertices",
-        "  10, -10, 0,                             !- X,Y,Z Vertex 1 {m}",
-        "  -10, -10, 0,                            !- X,Y,Z Vertex 2 {m}",
-        "  -10, 10, 0,                             !- X,Y,Z Vertex 3 {m}",
-        "  10, 10, 0;                              !- X,Y,Z Vertex 4 {m}",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 1 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 2 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  7.07106781186548, 12.2474487139159, 0;  !- X,Y,Z Vertex 4 {m}",
 
         "BuildingSurface:Detailed,",
         "  ROOF,                                   !- Name",
@@ -3114,10 +3114,10 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
         "  WindExposed,                            !- Wind Exposure",
         "  ,                                       !- View Factor to Ground",
         "  ,                                       !- Number of Vertices",
-        "  10, 10, 3,                              !- X,Y,Z Vertex 1 {m}",
-        "  -10, 10, 3,                             !- X,Y,Z Vertex 2 {m}",
-        "  -10, -10, 3,                            !- X,Y,Z Vertex 3 {m}",
-        "  10, -10, 3;                             !- X,Y,Z Vertex 4 {m}",
+        "  7.07106781186548, 12.2474487139159, 3,  !- X,Y,Z Vertex 1 {m}",
+        "  -12.2474487139159, 7.07106781186548, 3, !- X,Y,Z Vertex 2 {m}",
+        "  -7.07106781186548, -12.2474487139159, 3, !- X,Y,Z Vertex 3 {m}",
+        "  12.2474487139159, -7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
 
     });
 
