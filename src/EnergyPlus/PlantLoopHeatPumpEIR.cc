@@ -1204,7 +1204,25 @@ void EIRFuelFiredHeatPump::simulate(
     this->loadSideInletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
     this->sourceSideInletTemp = state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp;
 
-    this->setOperatingFlowRatesASHP(state);
+    if (this->waterSource) {
+        this->setOperatingFlowRatesWSHP(state);
+        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
+            PlantUtilities::UpdateChillerComponentCondenserSide(state,
+                                                                this->sourceSidePlantLoc.loopNum,
+                                                                this->sourceSidePlantLoc.loopSideNum,
+                                                                this->EIRHPType,
+                                                                this->sourceSideNodes.inlet,
+                                                                this->sourceSideNodes.outlet,
+                                                                this->sourceSideHeatTransfer,
+                                                                this->sourceSideInletTemp,
+                                                                this->sourceSideOutletTemp,
+                                                                this->sourceSideMassFlowRate,
+                                                                FirstHVACIteration);
+            return;
+        }
+    } else if (this->airSource) {
+        this->setOperatingFlowRatesASHP(state);
+    }
 
     if (this->running) {
         this->doPhysics(state, CurLoad);
@@ -1219,11 +1237,71 @@ void EIRFuelFiredHeatPump::simulate(
 
 void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
+    // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
+    // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
+    if ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling && currentLoad >= 0.0) ||
+        (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad <= 0.0)) {
+        this->resetReportingVariables();
+        return;
+    }
+
+    // get setpoint on the load side outlet
+    Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
+
+    // evaluate capacity modifier curve and determine load side heat transfer
+    Real64 capacityModifierFuncTemp =
+        CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+    Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
+    Real64 partLoadRatio = 0.0;
+    if (availableCapacity > 0) {
+        partLoadRatio = max(0.0, min(std::abs(currentLoad) / availableCapacity, 1.0));
+    }
+
+    // evaluate the actual current operating load side heat transfer rate
+    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
+    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           thisLoadPlantLoop.FluidName,
+                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
+                                                           thisLoadPlantLoop.FluidIndex,
+                                                           "PLHPEIR::simulate()");
+    this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
+    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
+
+    // calculate load side outlet conditions
+    Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
+    this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
+
+    // calculate power usage from EIR curves
+    Real64 eirModifierFuncTemp =
+        CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+    this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
+    this->powerEnergy = this->powerUsage * reportingInterval;
+
+    // energy balance on heat pump
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+
+    // calculate source side outlet conditions
+    Real64 CpSrc = 0.0;
+    if (this->waterSource) {
+        CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
+                                                       thisLoadPlantLoop.FluidName,
+                                                       state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
+                                                       thisLoadPlantLoop.FluidIndex,
+                                                       "PLHPEIR::simulate()");
+    } else if (this->airSource) {
+        CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+    }
+    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 }
 
-void EIRFuelFiredHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
-{
-}
+// void EIRFuelFiredHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
+// {
+// }
 
 void EIRFuelFiredHeatPump::resetReportingVariables()
 {
@@ -1383,7 +1461,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // N3 Design supply temperature
                 auto tmpDesSupTemp = fields.at("design_supply_temperature");
                 if (tmpDesSupTemp == "Autosize") {
-                    //
+                    // sizing
                 } else {
                     thisPLHP.desSupplyTemp = tmpDesSupTemp.get<Real64>();
                 }
@@ -1391,7 +1469,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // N4 Design temperature lift
                 auto tmpDesTempLift = fields.at("design_temperature_lift");
                 if (tmpDesTempLift == "Autosize") {
-                    //
+                    // sizing
                 } else {
                     thisPLHP.desTempLift = tmpDesTempLift.get<Real64>();
                 }
@@ -1552,7 +1630,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else if (defrostControlType == "ONDEMAND") {
                     thisPLHP.defrostEIRCurveIndex = 1;
                 } else {
-                    thisPLHP.defrostEIRCurveIndex = 0;
+                    thisPLHP.defrostEIRCurveIndex = 0; // default Timed
                 }
 
                 // N8 defrost_operation_time_fraction
