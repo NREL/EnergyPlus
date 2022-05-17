@@ -99,6 +99,7 @@ namespace EvaporativeFluidCoolers {
     constexpr std::string_view cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
     constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> controlNamesUC = {"FANCYCLING", "FLUIDBYPASS"};
     constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> evapLossNamesUC = {"LossFactor", "SaturatedExit"};
+    constexpr std::array<std::string_view, static_cast<int>(Blowdown::Num)> blowDownNamesUC = {"ConcentrationRatio", "ScheduledRate"};
 
     PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
     {
@@ -284,7 +285,6 @@ namespace EvaporativeFluidCoolers {
             thisEFC.SizFac = NumArray(12); //  N11  \field Sizing Factor
             if (thisEFC.SizFac <= 0.0) thisEFC.SizFac = 1.0;
 
-            // constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> evapLossNamesUC = {"LossFactor", "SaturatedExit"};
             if (AlphArray(7).empty()) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
@@ -316,20 +316,19 @@ namespace EvaporativeFluidCoolers {
             }
             thisEFC.ConcentrationRatio = NumArray(15); //  N15, \field Blowdown Concentration Ratio
 
-            if (UtilityRoutines::SameString(AlphArray(8), "ScheduledRate")) {
-                thisEFC.BlowdownMode = Blowdown::BySchedule;
-            } else if (UtilityRoutines::SameString(AlphArray(8), "ConcentrationRatio")) {
-                thisEFC.BlowdownMode = Blowdown::ByConcentration;
-            } else if (AlphArray(8).empty()) {
+            if (AlphArray(8).empty()) {
                 thisEFC.BlowdownMode = Blowdown::ByConcentration;
                 if ((NumNums < 15) && (thisEFC.ConcentrationRatio == 0.0)) {
-                    // assume Concetration ratio was omitted and should be defaulted
+                    // assume Concentration ratio was omitted and should be defaulted
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " =" + AlphArray(1));
-                ErrorsFound = true;
+                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(8))));
+                if (thisEFC.BlowdownMode == Blowdown::Invalid) {
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " =" + AlphArray(1));
+                    ErrorsFound = true;
+                }
             }
 
             thisEFC.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(9));
@@ -589,17 +588,15 @@ namespace EvaporativeFluidCoolers {
             thisEFC.SizFac = NumArray(22); //  N16  \field Sizing Factor
             if (thisEFC.SizFac <= 0.0) thisEFC.SizFac = 1.0;
 
-            // begin water use and systems get input
-            if (UtilityRoutines::SameString(AlphArray(6), "LossFactor")) {
-                thisEFC.EvapLossMode = EvapLoss::ByUserFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(6), "SaturatedExit")) {
-                thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + AlphArray(1));
-                ErrorsFound = true;
+                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+                if (thisEFC.EvapLossMode == EvapLoss::Invalid) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + AlphArray(1));
+                    ErrorsFound = true;
+                }
             }
 
             thisEFC.UserEvapLossFactor = NumArray(23); //  N23 , \field Evaporation Loss Factor
@@ -621,21 +618,21 @@ namespace EvaporativeFluidCoolers {
 
             thisEFC.ConcentrationRatio = NumArray(25); //  N25, \field Blowdown Concentration Ratio
 
-            if (UtilityRoutines::SameString(AlphArray(7), "ScheduledRate")) {
-                thisEFC.BlowdownMode = Blowdown::BySchedule;
-            } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
-                thisEFC.BlowdownMode = Blowdown::ByConcentration;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+            if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 thisEFC.BlowdownMode = Blowdown::ByConcentration;
                 if ((NumNums < 25) && (thisEFC.ConcentrationRatio == 0.0)) {
-                    // assume Concetration ratio was omitted and should be defaulted
+                    // assume Concentration ratio was omitted and should be defaulted
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + AlphArray(1));
-                ErrorsFound = true;
+                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+                if (thisEFC.BlowdownMode == Blowdown::Invalid) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + AlphArray(1));
+                    ErrorsFound = true;
+                }
             }
+
             thisEFC.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((thisEFC.SchedIDBlowdown == 0) && (thisEFC.BlowdownMode == Blowdown::BySchedule)) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
@@ -2437,8 +2434,6 @@ namespace EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on SimpleTowerUAResidual by Fred Buhl, May 2002
 
-        Real64 Residuum; // residual to be minimized to zero
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // Par(2) = design water mass flow rate [kg/s]
@@ -2446,12 +2441,9 @@ namespace EvaporativeFluidCoolers {
         // Par(4) = water specific heat [J/(kg*C)]
 
         Real64 OutWaterTemp;  // outlet water temperature [C]
-        Real64 CoolingOutput; // Evaporative fluid cooler cooling output [W]
-
         this->SimSimpleEvapFluidCooler(state, Par[1], Par[2], UA, OutWaterTemp);
-        CoolingOutput = Par[3] * Par[1] * (this->inletConds.WaterTemp - OutWaterTemp);
-        Residuum = (Par[0] - CoolingOutput) / Par[0];
-        return Residuum;
+        Real64 const CoolingOutput = Par[3] * Par[1] * (this->inletConds.WaterTemp - OutWaterTemp);
+        return (Par[0] - CoolingOutput) / Par[0];
     }
 
     void EvapFluidCoolerSpecs::CalculateWaterUsage(EnergyPlusData &state)
@@ -2682,9 +2674,7 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the evaporative fluid cooler.
 
-        Real64 ReportingConstant;
-
-        ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (!RunFlag) {
             this->fluidCoolerInletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
@@ -2702,6 +2692,7 @@ namespace EvaporativeFluidCoolers {
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
         }
     }
+    
     void EvapFluidCoolerSpecs::oneTimeInit(EnergyPlusData &state)
     {
         bool ErrorsFound(false); // Flag if input data errors are found

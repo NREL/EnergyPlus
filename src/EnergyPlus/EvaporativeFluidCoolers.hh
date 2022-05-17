@@ -72,10 +72,12 @@ namespace EvaporativeFluidCoolers {
         Num
     };
 
-    enum struct Blowdown
+    enum class Blowdown
     {
+        Invalid = -1,
         ByConcentration,
-        BySchedule
+        BySchedule,
+        Num
     };
 
     enum struct PIM
