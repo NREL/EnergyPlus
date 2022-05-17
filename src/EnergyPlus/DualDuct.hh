@@ -76,9 +76,9 @@ namespace DualDuct {
     enum class PerPersonMode
     {
         Invalid = -1,
-        ModeNotSet = 20,
-        DCVByCurrentLevel = 21,
-        ByDesignLevel = 22,
+        ModeNotSet,
+        DCVByCurrentLevel,
+        ByDesignLevel,
         Num
     };
 
