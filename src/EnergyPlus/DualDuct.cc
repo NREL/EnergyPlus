@@ -1562,7 +1562,6 @@ namespace DualDuct {
         Real64 HumRat;          // [Kg Moisture / Kg dry air]
         Real64 Enthalpy;        // [Watts]
         Real64 Temperature;     // [C]
-        Real64 QTotLoadRemain;  // [W]
         Real64 QtoHeatSPRemain; // [W]
         Real64 QtoCoolSPRemain; // [W]
         //  REAL(r64) :: QTotRemainAdjust  ! [W]
@@ -1570,7 +1569,6 @@ namespace DualDuct {
         Real64 QtoCoolSPRemainAdjust; // [W]
         Real64 QOALoadToHeatSP;       // [W]
         Real64 QOALoadToCoolSP;       // [W]
-        Real64 QOALoad;               // Amount of cooling load accounted for by OA Stream [W]
         Real64 QRALoad;               // Amount of cooling load accounted for by Recirc Stream [W]
         Real64 CpAirZn;               // specific heat of zone air
         Real64 CpAirSysOA;            // specific heat of outdoor air
@@ -1588,7 +1586,6 @@ namespace DualDuct {
         this->CalcOAOnlyMassFlow(state, OAMassFlow);
 
         // The calculated load from the Heat Balance, adjusted for any equipment sequenced before terminal
-        QTotLoadRemain = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         QtoHeatSPRemain = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         QtoCoolSPRemain = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
@@ -1609,16 +1606,12 @@ namespace DualDuct {
         //..Find the amount of load that the OAMassFlow accounted for
         if (std::abs((CpAirSysOA * this->dd_airterminalOAInlet.AirTemp) - (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) / CpAirZn >
             SmallTempDiff) {
-            QOALoad = this->dd_airterminalOAInlet.AirMassFlowRate *
-                      (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
-
             QOALoadToHeatSP = this->dd_airterminalOAInlet.AirMassFlowRate * (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp -
                                                                              CpAirZn * state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum));
             QOALoadToCoolSP = this->dd_airterminalOAInlet.AirMassFlowRate * (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp -
                                                                              CpAirZn * state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum));
 
         } else {
-            QOALoad = 0.0;
             QOALoadToHeatSP = 0.0;
             QOALoadToCoolSP = 0.0;
         }
@@ -1816,7 +1809,7 @@ namespace DualDuct {
 
     void DualDuctAirTerminal::CalcOAOnlyMassFlow(EnergyPlusData &state,        // NOLINT(readability-make-member-function-const)
                                                  Real64 &OAMassFlow,           // outside air flow from user input kg/s
-                                                 Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
+                                                 [[maybe_unused]] Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
     )
     {
 
@@ -1851,7 +1844,6 @@ namespace DualDuct {
         if (this->NoOAFlowInputFromUser) {
             ShowSevereError(
                 state, "CalcOAOnlyMassFlow: Problem in AirTerminal:DualDuct:VAV:OutdoorAir = " + this->Name + ", check outdoor air specification");
-            if (present(MaxOAVolFlow)) MaxOAVolFlow = 0.0;
             return;
         }
 
@@ -1877,7 +1869,6 @@ namespace DualDuct {
         if (present(MaxOAVolFlow)) {
             OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
                 state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, false, true);
-            MaxOAVolFlow = OAVolumeFlowRate;
         }
     }
 
