@@ -10448,6 +10448,12 @@ void SkyDifSolarShading(EnergyPlusData &state)
                 state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
             }
         }
+        if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
+            int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
+            if (state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum)) {
+                state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
+            }
+        }
     }
 
     //  DEALLOCATE(WithShdgIsoSky)
