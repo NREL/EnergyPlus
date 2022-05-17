@@ -757,56 +757,44 @@ void ReportEarthTube(EnergyPlusData &state)
     ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+        auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);
+        auto &zoneMCPE = state.dataHeatBalFanSys->MCPE(ZoneLoop);
+        auto &zoneTemp = state.dataHeatBalFanSys->ZT(ZoneLoop);
 
         // Break the infiltration load into heat gain and loss components.
         AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeVolume = (state.dataHeatBalFanSys->MCPE(ZoneLoop) / CpAir / AirDensity) * ReportingConstant;
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeMass = (state.dataHeatBalFanSys->MCPE(ZoneLoop) / CpAir) * ReportingConstant;
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeVolFlowRate = state.dataHeatBalFanSys->MCPE(ZoneLoop) / CpAir / AirDensity;
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeVolFlowRateStd = state.dataHeatBalFanSys->MCPE(ZoneLoop) / CpAir / state.dataEnvrn->StdRhoAir;
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeMassFlowRate = state.dataHeatBalFanSys->MCPE(ZoneLoop) / CpAir;
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeWaterMassFlowRate = state.dataHeatBalFanSys->EAMFLxHumRat(ZoneLoop);
+        thisZone.EarthTubeVolume = (zoneMCPE / CpAir / AirDensity) * ReportingConstant;
+        thisZone.EarthTubeMass = (zoneMCPE / CpAir) * ReportingConstant;
+        thisZone.EarthTubeVolFlowRate = zoneMCPE / CpAir / AirDensity;
+        thisZone.EarthTubeVolFlowRateStd = zoneMCPE / CpAir / state.dataEnvrn->StdRhoAir;
+        thisZone.EarthTubeMassFlowRate = zoneMCPE / CpAir;
+        thisZone.EarthTubeWaterMassFlowRate = state.dataHeatBalFanSys->EAMFLxHumRat(ZoneLoop);
 
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeFanElec = 0.0;
-        state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeAirTemp = 0.0;
-        for (EarthTubeNum = 1; EarthTubeNum <= (int)state.dataEarthTube->EarthTubeSys.size(); ++EarthTubeNum) {
-            if (state.dataEarthTube->EarthTubeSys(EarthTubeNum).ZonePtr == ZoneLoop) {
-                state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeFanElec =
-                    state.dataEarthTube->EarthTubeSys(EarthTubeNum).FanPower * ReportingConstant;
-                state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeFanElecPower = state.dataEarthTube->EarthTubeSys(EarthTubeNum).FanPower;
+        thisZone.EarthTubeFanElec = 0.0;
+        thisZone.EarthTubeAirTemp = 0.0;
+        for (auto &thisEarthTube : state.dataEarthTube->EarthTubeSys) {
+            if (thisEarthTube.ZonePtr == ZoneLoop) {
+                thisZone.EarthTubeFanElec = thisEarthTube.FanPower * ReportingConstant;
+                thisZone.EarthTubeFanElecPower = thisEarthTube.FanPower;
 
                 // Break the EarthTube load into heat gain and loss components.
-
-                if (state.dataHeatBalFanSys->ZT(ZoneLoop) > state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp) {
-
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatLoss =
-                        state.dataHeatBalFanSys->MCPE(ZoneLoop) *
-                        (state.dataHeatBalFanSys->ZT(ZoneLoop) - state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp) * ReportingConstant;
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatLossRate =
-                        state.dataHeatBalFanSys->MCPE(ZoneLoop) *
-                        (state.dataHeatBalFanSys->ZT(ZoneLoop) - state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp);
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatGain = 0.0;
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatGainRate = 0.0;
-
-                } else if (state.dataHeatBalFanSys->ZT(ZoneLoop) <= state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp) {
-
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatGain =
-                        state.dataHeatBalFanSys->MCPE(ZoneLoop) *
-                        (state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp - state.dataHeatBalFanSys->ZT(ZoneLoop)) * ReportingConstant;
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatGainRate =
-                        state.dataHeatBalFanSys->MCPE(ZoneLoop) *
-                        (state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp - state.dataHeatBalFanSys->ZT(ZoneLoop));
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatLoss = 0.0;
-                    state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHeatLossRate = 0.0;
+                if (zoneTemp > thisEarthTube.AirTemp) {
+                    thisZone.EarthTubeHeatLoss = zoneMCPE * (zoneTemp - thisEarthTube.AirTemp) * ReportingConstant;
+                    thisZone.EarthTubeHeatLossRate = zoneMCPE * (zoneTemp - thisEarthTube.AirTemp);
+                    thisZone.EarthTubeHeatGain = 0.0;
+                    thisZone.EarthTubeHeatGainRate = 0.0;
+                } else if (zoneTemp <= thisEarthTube.AirTemp) {
+                    thisZone.EarthTubeHeatGain = zoneMCPE * (thisEarthTube.AirTemp - zoneTemp) * ReportingConstant;
+                    thisZone.EarthTubeHeatGainRate = zoneMCPE * (thisEarthTube.AirTemp - zoneTemp);
+                    thisZone.EarthTubeHeatLoss = 0.0;
+                    thisZone.EarthTubeHeatLossRate = 0.0;
                 }
 
-                state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeAirTemp = state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp;
-                state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeWetBulbTemp = state.dataEarthTube->EarthTubeSys(EarthTubeNum).WetBulbTemp;
-                state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeHumRat = state.dataEarthTube->EarthTubeSys(EarthTubeNum).HumRat;
-                state.dataEarthTube->ZnRptET(ZoneLoop).EarthTubeOATreatmentPower =
-                    state.dataHeatBalFanSys->MCPE(ZoneLoop) *
-                    (state.dataEarthTube->EarthTubeSys(EarthTubeNum).AirTemp - state.dataEnvrn->OutDryBulbTemp);
+                thisZone.EarthTubeAirTemp = thisEarthTube.AirTemp;
+                thisZone.EarthTubeWetBulbTemp = thisEarthTube.WetBulbTemp;
+                thisZone.EarthTubeHumRat = thisEarthTube.HumRat;
+                thisZone.EarthTubeOATreatmentPower = zoneMCPE * (thisEarthTube.AirTemp - state.dataEnvrn->OutDryBulbTemp);
                 break; // DO loop
             }
         }
