@@ -52,7 +52,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -2430,7 +2430,7 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
 
     if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
         state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-        if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
+        if (state.afn->AirflowNetworkNumOfExhFan == 0) {
             state.dataHVACGlobal->UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
             if (Fan(FanNum).BalancedFractSchedNum > 0) {
                 state.dataHVACGlobal->BalancedExhMassFlow =
