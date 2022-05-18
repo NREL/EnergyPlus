@@ -3832,11 +3832,9 @@ namespace WindowManager {
             ++iter;
 
             // Calculations based on number of glass layers
-            auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-
             GetHeatBalanceEqCoefMatrix(state,
                                        SurfNum,
-                                       SELECT_CASE_var,
+                                       state.dataWindowManager->ngllayer,
                                        ShadeFlag,
                                        sconsh,
                                        TauShIR,
@@ -6990,17 +6988,18 @@ namespace WindowManager {
         Real64 rIn = 1.0 / (hInRad + state.dataWindowManager->hcin);
         Real64 Rbare = 0;
 
-        auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-
-        if (SELECT_CASE_var == 1) {
+        switch (state.dataWindowManager->ngllayer) {
+        // the switch cases here are just the integer number of layers, not exactly "magic" numbers 1, 2, 3. and 4.
+        case 1:
             Rbare = 1.0 / state.dataWindowManager->scon[0];
             state.dataWindowManager->Rtot = rOut + Rbare + rIn;
             SHGC = AbsBeamNorm(1) * (rOut + (0.5 / state.dataWindowManager->scon[0])) /
                    state.dataWindowManager->Rtot; // BG changed for CR7682 (solar absorbed in middle of layer)
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
 
-        } else if (SELECT_CASE_var == 2) {
+        case 2:
             hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
                                        pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
             Rbare = 1.0 / state.dataWindowManager->scon[0] + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon[1];
@@ -7010,8 +7009,9 @@ namespace WindowManager {
                        state.dataWindowManager->Rtot; // CR7682
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
 
-        } else if (SELECT_CASE_var == 3) {
+        case 3:
             hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
                                        pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
             hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
@@ -7028,8 +7028,9 @@ namespace WindowManager {
                        state.dataWindowManager->Rtot;
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
 
-        } else if (SELECT_CASE_var == 4) {
+        case 4:
             hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
                                        pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
             hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
@@ -7052,6 +7053,9 @@ namespace WindowManager {
                        state.dataWindowManager->Rtot; // CR7682
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
+        default:
+            break;
         }
         NominalConductance = 1.0 / (rOut + Rbare + rIn);
     }
@@ -7188,8 +7192,7 @@ namespace WindowManager {
 
             ++iter;
 
-            auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-            GetHeatBalanceEqCoefMatrixSimple(state, SELECT_CASE_var, hr, hgap, Aface, Bface);
+            GetHeatBalanceEqCoefMatrixSimple(state, state.dataWindowManager->ngllayer, hr, hgap, Aface, Bface);
 
             LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx,
                             d); // Note that these routines change Aface;
