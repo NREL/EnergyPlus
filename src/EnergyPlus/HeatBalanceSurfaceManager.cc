@@ -5653,7 +5653,7 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
 
             for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
-                if (reportPeriodFlags(i) > 0) {
+                if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
                     bool &CrossedColdThreshRepPeriod = state.dataHeatBalFanSys->CrossedColdThreshRepPeriod(ZoneNum, ReportPeriodIdx);
@@ -5866,7 +5866,7 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
 
             for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
-                if (reportPeriodFlags(i) > 0) {
+                if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
 
                     if (HI <= 26.7) {
@@ -6094,7 +6094,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBins(ZoneNum)[2] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
             for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
-                if (reportPeriodFlags(i) > 0) {
+                if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     if (ZoneAirCO2 <= 1000) {
                         state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
@@ -6202,7 +6202,7 @@ void ReportVisualResilience(EnergyPlusData &state)
                 state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBins(ZoneNum)[3] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
             for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
-                if (reportPeriodFlags(i) > 0) {
+                if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     if (avgZoneIllum <= 100) {
                         state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
