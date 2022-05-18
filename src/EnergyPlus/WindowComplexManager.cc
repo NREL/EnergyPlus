@@ -2776,14 +2776,7 @@ namespace WindowComplexManager {
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
                         SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                        }
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                        }
+
                         for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
                              SrdSurfNum++) {
                             SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
