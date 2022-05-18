@@ -1352,13 +1352,72 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    // 2022-05-18: The following line needs a protection on setting this->sourceSideMassFlowRate to a safe value for GAHP
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 }
 
-// void EIRFuelFiredHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
-// {
-// }
+void EIRFuelFiredHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
+{
+    // size the source-side for the air-source HP
+    bool errorsFound = false;
+
+    // these variables will be used throughout this function as a temporary value of that physical state
+    Real64 tmpCapacity = this->referenceCapacity;
+    Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
+    Real64 tmpSourceVolFlow = 0.0;
+
+    // will leave like this for now
+    // need to update these to better values later
+    Real64 sourceSideInitTemp = 20;
+    Real64 sourceSideHumRat = 0.0;
+    if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+        // same here; update later
+        sourceSideInitTemp = 20;
+    }
+
+    Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
+    Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
+
+    // set the source-side flow rate
+    if (this->sourceSideDesignVolFlowRateWasAutoSized) {
+        // load-side capacity should already be set, so unless the flow rate is specified, we can set
+        // an assumed reasonable flow rate since this doesn't affect downstream components
+        Real64 DeltaT_src = 10;
+        // to get the source flow, we first must calculate the required heat impact on the source side
+        // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
+        // Then the energy balance:     Qsrc = Qload + Power
+        // Substituting for Power:      Qsrc = Qload + Qload/COP, therefore Qsrc = Qload (1 + 1/COP)
+        Real64 const designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+        // To get the design source flow rate, just apply the sensible heat rate equation:
+        //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
+        //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
+        tmpSourceVolFlow = designSourceSideHeatTransfer / (rhoSrc * CpSrc * DeltaT_src);
+    } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate > 0) {
+        // given the value by the user
+        // set it directly
+        tmpSourceVolFlow = this->sourceSideDesignVolFlowRate;
+    } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate == 0) { // LCOV_EXCL_LINE
+        // user gave a flow rate of 0
+        // protected by the input processor to be >0.0
+        // fatal out just in case
+        errorsFound = true; // LCOV_EXCL_LINE
+        ShowSevereError(state,
+                        format("Invalid condenser flow rate for EIR PLHP (name={}; entered value: {}",
+                               this->name,
+                               this->sourceSideDesignVolFlowRate)); // LCOV_EXCL_LINE
+    } else {
+        // can't imagine how it would ever get to this point
+        // just assume it's the same as the load side if we don't have any sizing information
+        tmpSourceVolFlow = tmpLoadVolFlow; // LCOV_EXCL_LINE
+    }
+
+    this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
+
+    if (errorsFound) {
+        ShowFatalError(state, "Preceding sizing errors cause program termination"); // LCOV_EXCL_LINE
+    }
+}
 
 void EIRFuelFiredHeatPump::resetReportingVariables()
 {

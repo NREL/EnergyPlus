@@ -252,6 +252,7 @@ namespace EIRPlantLoopHeatPumps {
         //              bool const RunFlag);
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
         // void setOperatingFlowRatesASHP(EnergyPlusData &state);
+        void sizeSrcSideASHP(EnergyPlusData &state);
         void resetReportingVariables();
         static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
         static void pairUpCompanionCoils(EnergyPlusData &state);
