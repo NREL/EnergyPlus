@@ -1375,6 +1375,36 @@ PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::
 
 void EIRFuelFiredHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
 {
+    for (auto &thisHP : state.dataEIRFuelFiredHeatPump->heatPumps) {
+        if (!thisHP.companionCoilName.empty()) {
+            auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
+            auto &thisCoilType = thisHP.EIRHPType;
+            auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
+            for (auto &potentialCompanionCoil : state.dataEIRFuelFiredHeatPump->heatPumps) {
+                auto &potentialCompanionType = potentialCompanionCoil.EIRHPType;
+                auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
+                if (potentialCompanionName == thisCoilName) {
+                    // skip the current coil
+                    continue;
+                }
+                if (potentialCompanionName == targetCompanionName) {
+                    if (thisCoilType == potentialCompanionType) {
+                        ShowSevereError(state, "Invalid companion specification for EIR Plant Loop Fuel-Fired Heat Pump named \"" + thisCoilName + "\"");
+                        ShowContinueError(state, "For heating objects, the companion must be a cooling object, and vice-versa");
+                        ShowFatalError(state, "Invalid companion object causes program termination");
+                    }
+                    thisHP.companionHeatPumpCoil = &potentialCompanionCoil;
+                    break;
+                }
+            }
+            if (!thisHP.companionHeatPumpCoil) {
+                ShowSevereError(state, "Could not find matching companion heat pump coil.");
+                ShowContinueError(state, "Base coil: " + thisCoilName);
+                ShowContinueError(state, "Looking for companion coil named: " + targetCompanionName);
+                ShowFatalError(state, "Simulation aborts due to previous severe error");
+            }
+        }
+    }
 }
 
 void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
