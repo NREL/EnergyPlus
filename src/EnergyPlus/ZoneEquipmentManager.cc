@@ -686,7 +686,8 @@ void SizeZoneEquipment(EnergyPlusData &state)
             state.dataHeatBalFanSys->NonAirSystemResponse(ActualZoneNum) = SysOutputProvided;
             if (zoneLatentSizing) {
                 Real64 ZoneMult = state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
-                state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) += MoistureLoad / ZoneMult;
+                state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) +=
+                    (LatOutputProvided * PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp)) / ZoneMult;
             }
         }
 
