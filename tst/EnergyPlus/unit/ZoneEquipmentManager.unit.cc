@@ -4466,7 +4466,6 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
     state->dataContaminantBalance->ZoneAirGC(2) = 20.0;
 
     state->dataEarthTube->GetInputFlag = false;
-    state->dataEarthTube->TotEarthTube = 0;
     state->dataCoolTower->GetInputFlag = false;
     state->dataThermalChimneys->ThermalChimneyGetInputFlag = false;
     state->dataThermalChimneys->TotThermalChimney = 0;

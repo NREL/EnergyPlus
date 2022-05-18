@@ -213,14 +213,6 @@ namespace HeatBalanceKivaManager {
 
 } // namespace HeatBalanceKivaManager
 
-struct HeatBalanceKivaMgrData : BaseGlobalStruct
-{
-
-    void clear_state() override
-    {
-    }
-};
-
 } // namespace EnergyPlus
 
 #endif // HeatBalanceKivaManager_hh_INCLUDED
