@@ -294,7 +294,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     SetSurfaceWindSpeedAt(state);
     SetSurfaceWindDirAt(state);
-    InitLocalEnvironmentsViewFactors(state);
+    InitSurfacePropertyViewFactors(state);
     //  DO SurfNum = 1, TotSurfaces
     //    IF (Surface(SurfNum)%ExtWind) Surface(SurfNum)%WindSpeed = WindSpeedAt(Surface(SurfNum)%Centroid%z)
     //  END DO
@@ -8836,7 +8836,7 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
     }
 }
 
-void InitLocalEnvironmentsViewFactors(EnergyPlusData &state)
+void InitSurfacePropertyViewFactors(EnergyPlusData &state)
 {
 
     // purpuse:

@@ -2836,7 +2836,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     // Calculate temperature based on supply flow rate
 
-    HeatBalanceSurfaceManager::InitLocalEnvironmentsViewFactors(*state);
+    HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
 

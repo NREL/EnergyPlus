@@ -199,7 +199,7 @@ namespace HeatBalanceSurfaceManager {
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
-    void InitLocalEnvironmentsViewFactors(EnergyPlusData &state);
+    void InitSurfacePropertyViewFactors(EnergyPlusData &state);
 
 } // namespace HeatBalanceSurfaceManager
 
