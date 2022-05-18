@@ -4321,7 +4321,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestCO2ResilienceReportRepPe
     state->dataGlobal->TimeStepZone = 1;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalSurfMgr->reportCO2ResilienceFirstTime = true;
 
     state->dataHeatBal->TotPeople = 1;
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
@@ -4479,7 +4478,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     state->dataGlobal->TimeStepZone = 1;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalSurfMgr->reportVisualResilienceFirstTime = true;
 
     state->dataHeatBal->TotPeople = 1;
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
@@ -4488,17 +4486,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
 
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
-//    state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
-//    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
-//    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
-//    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
-//    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
-//    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
-//    state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
-//    state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;
-//    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1) = 300;
-//    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 400;
-//    state->dataOutRptTab->displayVisualResilienceSummary = true;
+    int totDaylightingControls = state->dataGlobal->NumOfZones;
+    state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
+    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
+    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
+    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
+    state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;
+    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1) = 300;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 400;
+    state->dataOutRptTab->displayVisualResilienceSummary = true;
 
     int NoBins = 4;
 
@@ -4509,26 +4508,108 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     }
 
     state->dataHeatBalFanSys->ZoneNumOcc.dimension(state->dataGlobal->NumOfZones, 0);
-    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
     state->dataOutRptTab->displayVisualResilienceSummary = true;
     state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
-    state->dataDaylightingData->ZoneDaylight(1).zoneAvgIllumSum = 250;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 250;
     for (int hour = 1; hour <= 4; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportVisualResilience(*state);
     }
-    // fixme: update this
-//    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
-//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 600;
+    for (int hour = 5; hour <= 7; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 70;
+    for (int hour = 8; hour <= 10; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 600;
+    for (int hour = 13; hour <= 15; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 70;
+    for (int hour = 16; hour <= 18; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8);
 
 }
 
