@@ -244,11 +244,11 @@ namespace EIRPlantLoopHeatPumps {
         Real64 fuelEnergy = 0.0;
 
         // Override parent methods to be declared
-        void simulate(EnergyPlusData &state,
-                      const EnergyPlus::PlantLocation &calledFromLocation,
-                      bool const FirstHVACIteration,
-                      Real64 &CurLoad,
-                      bool const RunFlag);
+        //void simulate(EnergyPlusData &state,
+        //              const EnergyPlus::PlantLocation &calledFromLocation,
+        //              bool const FirstHVACIteration,
+        //              Real64 &CurLoad,
+        //              bool const RunFlag);
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
         // void setOperatingFlowRatesASHP(EnergyPlusData &state);
         void resetReportingVariables();
