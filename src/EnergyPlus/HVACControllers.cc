@@ -179,8 +179,10 @@ using namespace DataHVACControllers;
 using namespace DataRootFinder;
 
 // Number of significant digits to display in error messages for floating-point numbers
-constexpr Real64 SomeFloatingPoint(1.0);
-int const NumSigDigits(PRECISION(SomeFloatingPoint));
+constexpr int NumSigDigits = 15;
+constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> ctrlVarNamesUC = {
+    "INVALID-NONE", "TEMPERATURE", "HUMIDITYRATIO", "TEMPERATUREANDHUMIDITYRATIO", "INVALID-FLOW"};
+constexpr std::array<std::string_view, static_cast<int>(ControllerAction::Num)> actionNamesUC = {"", "REVERSE", "NORMAL"};
 
 std::string ControlVariableTypes(CtrlVarType const &c)
 {
@@ -369,13 +371,10 @@ void ManageControllers(EnergyPlusData &state,
         // Simulate the correct Controller with the current ControlNum
         ControllerType = ControllerProps(ControlNum).ControllerType_Num;
 
-        {
-            auto const SELECT_CASE_var1(ControllerType);
-            if (SELECT_CASE_var1 == ControllerSimple_Type) { // 'Controller:WaterCoil'
-                CalcSimpleController(state, ControlNum, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerName);
-            } else {
-                ShowFatalError(state, "Invalid controller type in ManageControllers=" + ControllerProps(ControlNum).ControllerType);
-            }
+        if (ControllerType == ControllerSimple_Type) { // 'Controller:WaterCoil'
+            CalcSimpleController(state, ControlNum, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerName);
+        } else {
+            ShowFatalError(state, "Invalid controller type in ManageControllers=" + ControllerProps(ControlNum).ControllerType);
         }
 
         // Update the current Controller to the outlet nodes
@@ -392,14 +391,11 @@ void ManageControllers(EnergyPlusData &state,
         // Check convergence for the correct Controller with the current ControlNum
         ControllerType = ControllerProps(ControlNum).ControllerType_Num;
 
-        {
-            auto const SELECT_CASE_var1(ControllerType);
-            if (SELECT_CASE_var1 == ControllerSimple_Type) { // 'Controller:WaterCoil'
-                CheckSimpleController(state, ControlNum, IsConvergedFlag);
-                SaveSimpleController(state, ControlNum, FirstHVACIteration, IsConvergedFlag);
-            } else {
-                ShowFatalError(state, "Invalid controller type in ManageControllers=" + ControllerProps(ControlNum).ControllerType);
-            }
+        if (ControllerType == ControllerSimple_Type) { // 'Controller:WaterCoil'
+            CheckSimpleController(state, ControlNum, IsConvergedFlag);
+            SaveSimpleController(state, ControlNum, FirstHVACIteration, IsConvergedFlag);
+        } else {
+            ShowFatalError(state, "Invalid controller type in ManageControllers=" + ControllerProps(ControlNum).ControllerType);
         }
 
     } break;
@@ -572,35 +568,24 @@ void GetControllerInput(EnergyPlusData &state)
 
             ControllerProps(Num).ControllerName = AlphArray(1);
             ControllerProps(Num).ControllerType = CurrentModuleObject;
-            {
-                auto const SELECT_CASE_var(AlphArray(2));
-                if (SELECT_CASE_var == "TEMPERATURE") {
-                    ControllerProps(Num).ControlVar = HVACControllers::CtrlVarType::Temperature;
-                } else if (SELECT_CASE_var == "HUMIDITYRATIO") {
-                    ControllerProps(Num).ControlVar = HVACControllers::CtrlVarType::HumidityRatio;
-                } else if (SELECT_CASE_var == "TEMPERATUREANDHUMIDITYRATIO") {
-                    ControllerProps(Num).ControlVar = HVACControllers::CtrlVarType::TemperatureAndHumidityRatio;
-                    //        CASE ('FLOW')
-                    //          ControllerProps(Num)%ControlVar  = iFlow
-                } else {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                    ShowSevereError(state,
-                                    "...Invalid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                        "\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio.");
-                    ErrorsFound = true;
-                }
+
+            ControllerProps(Num).ControlVar =
+                static_cast<EnergyPlus::HVACControllers::CtrlVarType>(getEnumerationValue(ctrlVarNamesUC, AlphArray(2)));
+            if (ControllerProps(Num).ControlVar == HVACControllers::CtrlVarType::Invalid) {
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                ShowSevereError(state,
+                                "...Invalid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
+                                    "\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio.");
+                ErrorsFound = true;
             }
-            if (UtilityRoutines::SameString(AlphArray(3), "Normal")) {
-                ControllerProps(Num).Action = ControllerAction::NormalAction;
-            } else if (UtilityRoutines::SameString(AlphArray(3), "Reverse")) {
-                ControllerProps(Num).Action = ControllerAction::Reverse;
-            } else if (lAlphaBlanks(3)) {
-                ControllerProps(Num).Action = ControllerAction::NoAction;
-            } else {
+
+            ControllerProps(Num).Action = static_cast<ControllerAction>(getEnumerationValue(actionNamesUC, AlphArray(3)));
+            if (ControllerProps(Num).Action == ControllerAction::Invalid) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ShowSevereError(state, "...Invalid " + cAlphaFields(3) + "=\"" + AlphArray(3) + R"(", must be "Normal", "Reverse" or blank.)");
                 ErrorsFound = true;
             }
+
             if (AlphArray(4) == "FLOW") {
                 ControllerProps(Num).ActuatorVar = HVACControllers::CtrlVarType::Flow;
             } else {

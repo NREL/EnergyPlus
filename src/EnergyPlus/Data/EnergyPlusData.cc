@@ -156,7 +156,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataHeatBalHAMTMgr = std::make_unique<HeatBalHAMTMgrData>();
     this->dataHeatBalIntHeatGains = std::make_unique<HeatBalInternalHeatGainsData>();
     this->dataHeatBalIntRadExchg = std::make_unique<HeatBalanceIntRadExchgData>();
-    this->dataHeatBalKivaMgr = std::make_unique<HeatBalanceKivaMgrData>();
     this->dataHeatBalMgr = std::make_unique<HeatBalanceMgrData>();
     this->dataHeatBalSurf = std::make_unique<HeatBalSurfData>();
     this->dataHeatBalSurfMgr = std::make_unique<HeatBalSurfMgr>();
@@ -414,7 +413,6 @@ void EnergyPlusData::clear_state()
     this->dataHeatBalHAMTMgr->clear_state();
     this->dataHeatBalIntHeatGains->clear_state();
     this->dataHeatBalIntRadExchg->clear_state();
-    this->dataHeatBalKivaMgr->clear_state();
     this->dataHeatBalMgr->clear_state();
     this->dataHeatBalSurf->clear_state();
     this->dataHeatBalSurfMgr->clear_state();
