@@ -301,11 +301,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->SurfHasLinkedOutAirNode(SurfNum)) {
-                int const linkedNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
-                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirDryBulb;
-                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWetBulb;
-                state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindSpeed;
-                state.dataSurface->SurfOutWindDir(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindDir;
+                auto &linkedNode = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum));
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = linkedNode.OutAirDryBulb;
+                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = linkedNode.OutAirWetBulb;
+                state.dataSurface->SurfOutWindSpeed(SurfNum) = linkedNode.OutAirWindSpeed;
+                state.dataSurface->SurfOutWindDir(SurfNum) = linkedNode.OutAirWindDir;
             }
         }
     }
