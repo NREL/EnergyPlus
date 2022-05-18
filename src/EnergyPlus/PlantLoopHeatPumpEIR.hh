@@ -213,8 +213,9 @@ namespace EIRPlantLoopHeatPumps {
         // a couple worker functions to easily allow merging of cooling and heating operations
 
         // New additions for GAHP only
+        std::string fuelTypeStr = "";
         DataGlobalConstants::ResourceType fuelType = DataGlobalConstants::ResourceType::None; // resource type assignment
-        std::string endUseSubcat = ""; // identifier use for the end use subcategory
+        std::string endUseSubcat = "";                                                        // identifier use for the end use subcategory
         DataPlant::FlowMode flowMode = DataPlant::FlowMode::Invalid;
         Real64 desSupplyTemp = 60.0;
         Real64 desTempLift = 11.1;
@@ -244,7 +245,7 @@ namespace EIRPlantLoopHeatPumps {
         Real64 fuelEnergy = 0.0;
 
         // Override parent methods to be declared
-        //void simulate(EnergyPlusData &state,
+        // void simulate(EnergyPlusData &state,
         //              const EnergyPlus::PlantLocation &calledFromLocation,
         //              bool const FirstHVACIteration,
         //              Real64 &CurLoad,

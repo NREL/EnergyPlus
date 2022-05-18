@@ -1494,7 +1494,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string condenserType = "AIRSOURCE"; // UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
                 // A4
                 std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
-                std::string sourceSideOutletNodeName = ""; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+                std::string sourceSideOutletNodeName =
+                    ""; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
 
                 // A5
                 if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
@@ -1502,17 +1503,17 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A6 Fuel Type
-                std::string fuelType = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
+                thisPLHP.fuelTypeStr = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
                 // Validate fuel type input
                 // Locals
                 static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
                 bool FuelTypeError(false);
                 UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
-                    fuelType, thisPLHP.GAHPFuelTypeForOutputVariable, thisPLHP.fuelType, FuelTypeError);
+                    thisPLHP.fuelTypeStr, thisPLHP.GAHPFuelTypeForOutputVariable, thisPLHP.fuelType, FuelTypeError);
                 if (FuelTypeError) {
                     ShowSevereError(state, fmt::format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
                     // ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Invalid Fuel Type = " + fuelType);
+                    ShowContinueError(state, "Invalid Fuel Type = " + thisPLHP.fuelTypeStr);
                     // Set to Electric to avoid errors when setting up output variables
                     thisPLHP.GAHPFuelTypeForOutputVariable = "NaturalGas";
                     thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
@@ -1526,8 +1527,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 if (endUseCat != "") {
                     thisPLHP.endUseSubcat = endUseCat;
                 } else {
-                    thisPLHP.endUseSubcat = "General"; // leave this as "GAHP" instead of "general" like other end use subcategories since
-                                                       // it appears this way in existing output files?
+                    thisPLHP.endUseSubcat = "Heat Pump Fuel Fired"; // or "General"?
                 }
 
                 // N1 Nominal heating capacity
@@ -1857,16 +1857,16 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
                 DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
                 DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
-                 if (condenserType == "WATERSOURCE") {
+                if (condenserType == "WATERSOURCE") {
                     thisPLHP.waterSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Water;
                     condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
                     condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
                 } else if (condenserType == "AIRSOURCE") {
-                thisPLHP.airSource = true;
-                condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-                condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+                    thisPLHP.airSource = true;
+                    condenserNodeType = DataLoopNode::NodeFluidType::Air;
+                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
+                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(state,
@@ -1874,7 +1874,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                          "; entered type: " + condenserType);                    // LCOV_EXCL_LINE
                     errorsFound = true;                                                          // LCOV_EXCL_LINE
                 }
-                 thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
+                thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                      sourceSideInletNodeName,
                                                                                      nodeErrorsFound,
                                                                                      objType,
@@ -1883,7 +1883,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                      condenserNodeConnectionType_Inlet,
                                                                                      NodeInputManager::CompFluidStream::Secondary,
                                                                                      DataLoopNode::ObjectIsNotParent);
-                 thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
+                thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                       sourceSideOutletNodeName,
                                                                                       nodeErrorsFound,
                                                                                       objType,
@@ -1948,20 +1948,20 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             _,
                             _,
                             "Plant");
-        SetupOutputVariable(state,
-                            "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            this->sourceSideHeatTransfer,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->name);
-        SetupOutputVariable(state,
-                            "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
-                            this->sourceSideEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
-                            this->name);
+        // SetupOutputVariable(state,
+        //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Rate",
+        //                    OutputProcessor::Unit::W,
+        //                    this->sourceSideHeatTransfer,
+        //                    OutputProcessor::SOVTimeStepType::System,
+        //                    OutputProcessor::SOVStoreType::Average,
+        //                    this->name);
+        // SetupOutputVariable(state,
+        //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Energy",
+        //                    OutputProcessor::Unit::J,
+        //                    this->sourceSideEnergy,
+        //                    OutputProcessor::SOVTimeStepType::System,
+        //                    OutputProcessor::SOVStoreType::Summed,
+        //                    this->name);
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Inlet Temperature", // "Heat Pump Load Side Inlet Temperature",
                             OutputProcessor::Unit::C,
@@ -1976,13 +1976,13 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
-        SetupOutputVariable(state,
-                            "Fuel-fired Absorption Heat Pump Source Side Inlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->sourceSideInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->name);
+        // SetupOutputVariable(state,
+        //                    "Fuel-fired Absorption Heat Pump Source Side Inlet Temperature",
+        //                    OutputProcessor::Unit::C,
+        //                    this->sourceSideInletTemp,
+        //                    OutputProcessor::SOVTimeStepType::System,
+        //                    OutputProcessor::SOVStoreType::Average,
+        //                    this->name);
         // SetupOutputVariable(state,
         //                    "Heat Pump Source Side Outlet Temperature",
         //                    OutputProcessor::Unit::C,
@@ -1991,6 +1991,13 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
         SetupOutputVariable(state,
+                            "Fuel-fired Absorption HeatPump Fuel Rate",
+                            OutputProcessor::Unit::W,
+                            this->fuelUsage,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->powerUsage,
@@ -1998,6 +2005,18 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) { // energy from HeatPump:AirToWater:FuelFired:Cooling object
+            SetupOutputVariable(state,
+                                "Fuel-fired Absorption HeatPump Fuel Energy",
+                                OutputProcessor::Unit::J,
+                                this->fuelEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->name,
+                                _,
+                                this->fuelTypeStr,
+                                "Cooling",
+                                this->endUseSubcat, //"Heat Pump",
+                                "Plant");
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -2008,10 +2027,22 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 _,
                                 "Electricity",
                                 "Cooling",
-                                "Heat Pump",
+                                this->endUseSubcat, // "Heat Pump",
                                 "Plant");
         } else if (this->EIRHPType ==
                    DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) { // energy from HeatPump:AirToWater:FuelFired:Heating object
+            SetupOutputVariable(state,
+                                "Fuel-fired Absorption HeatPump Fuel Energy",
+                                OutputProcessor::Unit::J,
+                                this->powerEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->name,
+                                _,
+                                this->fuelTypeStr,
+                                "Heating",
+                                this->endUseSubcat, // "Heat Pump",
+                                "Plant");
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -2022,7 +2053,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 _,
                                 "Electricity",
                                 "Heating",
-                                "Heat Pump",
+                                this->endUseSubcat, // "Heat Pump",
                                 "Plant");
         }
         SetupOutputVariable(state,
