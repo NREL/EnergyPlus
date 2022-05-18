@@ -4,8 +4,8 @@ Autosizing for High Latent Loads
 
 **Richard Raustad, FSEC Energy Research Center**
 
- - Original Date: 4/29/2022
- - Final NFP Revision Date: 
+ - Initial NFP Original Date: 4/29/2022
+ - Final NFP Revision Date: 5/17/22
  
 
 ## Justification for New Feature ##
@@ -16,33 +16,35 @@ Autosizing for High Latent Loads
 
 ## E-mail and  Conference Call Conclusions ##
 
-TBD
+Mike Witte - 5/4/22 - Depending on the application, the user might want to size a given system on latent-only, sensible-only, or the max of both requirements. Perhaps the sizing options should include a Maximum option?
+
+Resolution: added Latent Load sizing option.
 
 ## Summary ##
 
-EnergyPlus currently calculates a zone design sensible air flow rate based on a predicted zone sensible load and user provided supply air conditions. The following describes a mirrored approach to calculate and report the zone design latent air flow rate. The underlying principal is that the existing calculation of zone sensible load and corresponding **sensible** air flow rate provides a zone flow rate that meets the peak cooling or heating load. This calculation is based on a user provided zone temperature set point and a design supply air temperature (or delta T). If the calculated peak air flow rate is provided to a zone at the user supplied supply air temperature, the peak zone sensible load will be met (assuming design day conditions accurately represent peak weather file conditions). A similar approach is proposed for latent sizing and described in this new feature proposal.
+EnergyPlus currently calculates a zone design sensible supply air mass flow rate based on a predicted zone sensible load and user provided supply air conditions. The following describes a mirrored approach to calculate and report the zone design latent load and latent air mass flow rate. The underlying principal is that the existing calculation of zone sensible load and corresponding **sensible** air mass flow rate provides a zone supply air mass flow rate that meets the peak cooling or heating sensible load. This calculation is based on a user provided zone temperature set point and a design supply air temperature (or delta T). If the calculated peak air mass flow rate is provided to a zone at the user supplied supply air temperature, the peak zone sensible load will be met. A similar approach is proposed for latent sizing and described in this new feature proposal.
 
 ## Overview ##
 
 **Current Methodology:**
 
-During zone sizing calculations, E+ currently predicts the zone sensible load based on the active thermostat set point temperature. Latent load is also predicted during zone sizing but currently unused. During zone sizing, the zone set point temperature is maintained at set point to facilitate the calculation of only the zone sensible loads in the zone load prediction (i.e., no inclusion of loads due to zone thermal capacitance or storage other than zone thermostat setup and setback). The impact of a DOAS system can be included in zone sizing calculations, if desired, to provide a more accurate zone sensible load. For each design day and each time interval, the zone sensible air mass flow rate is calculated based on the predicted zone sensible load and user specified supply air conditions. The peak zone sensible load, derived from time series data collected during zone sizing, is used to select the zone sensible design air flow rate. The results of zone sensible sizing are reported to the zone sizing report (`epluszsz.csv`) as the zone sensible cooling and heating mass flow rates and zone sensible cooling and heating loads (4 reports per zone). The peak zone sensible design air flow rate is subsequently used for zone equipment and cumulatively for air system component sizing.
+During zone sizing calculations, E+ currently predicts the zone sensible load based on the active thermostat set point temperature. Latent load is also predicted during zone sizing but currently unused. During zone sizing, the zone set point temperature is maintained at set point to facilitate the calculation of only the zone sensible loads in the zone heat balance (i.e., no inclusion of loads due to zone thermal capacitance or storage other than zone thermostat setup and setback). The impact of a DOAS system can be included in zone sizing calculations, if desired, to provide a more accurate **remaining** zone sensible load. For each design day and each time interval, the zone sensible air mass flow rate is calculated based on the predicted zone sensible load and user specified supply air conditions. The peak zone sensible load, derived from time series data collected during zone sizing, is used to select the zone sensible design air mass flow rate. The results of zone sensible sizing are reported to the zone sizing report (`epluszsz.csv`) as the zone sensible cooling and heating mass flow rates and zone sensible cooling and heating loads (4 reports per zone). The peak zone sensible design air flow rate is subsequently used for zone equipment and cumulatively for air system component sizing.
 
 **Proposed Methodology:**
 
-A similar approach to the existing zone sensible air flow calculation will be used to determine zone latent air flow rate. The zone condition will be maintained at an assumed or humidistat set point to facilitate an accurate prediction of zone latent loads. It is proposed that zone latent sizing occur based on a user input/request, whether or not a humidistat is present, however, if a humidistat is present the zone humidistat will be used to provide the control point. If latent sizing is not requested and a humidistat is present that zone's latent load could still be calculated (or turned off as desired) based on an assumed humidistat set point. The results of zone latent sizing will be included in the zone sizing report as the zone latent cooling and heating mass flow rates and zone latent cooling and heating loads. For comparison purposes, two additional reports will be added to document the original zone sensible and latent loads prior to application of a DOAS system as Sensible Load No DOAS and Latent Load No DOAS (10 reports per zone).
+A similar approach to the existing zone sensible air flow calculation will be used to determine zone latent air flow rate. The zone condition will be maintained at an assumed or humidistat set point to facilitate an accurate prediction of zone latent loads. It is proposed that zone latent sizing occur based on a user input/request, whether or not a humidistat is present, however, if a humidistat is present the zone humidistat will be used to provide the control point. The results of zone latent sizing will be included in the zone sizing report as the zone latent cooling and heating mass flow rates and zone latent cooling and heating loads. For comparison purposes, two additional reports will be added to document the original zone sensible and latent loads prior to application of a DOAS system as Sensible Load No DOAS and Latent Load No DOAS (10 reports per zone).
 
 The proposed methodology allows a user to determine both sensible and latent loads via a loads only type simulation ([PR #9402](https://github.com/NREL/EnergyPlus/pull/9402)). Uncontrolled zones will not have a sensible or latent load and are identified by whether or not a `ZoneHVAC:EquipmentConnections` object is associated with a zone (which identifies the zone supply air node name). 
 
 ## Approach ##
 
-**Porposed update to Function SizeZoneEquipment**
+**Proposed update to Function SizeZoneEquipment**
 
-E+ currently calculates the sensible air mass flow rate required to meet the zone sensible load. The sensible air mass flow rate and user supplied supply air temperature and humidity ratio are passed to the zone as the supply air conditions to be used in the correct step of ZoneTempPredictorCorrector (`CorrectZoneAirTemp` and `CorrectZoneHumRat`). The sensible and latent loads are also passed to `UpdateSystemOutputRequired`, which should return 0 remaining sensible and latent loads (as xxxOutputProvided).
+E+ currently calculates the sensible air mass flow rate required to meet the zone sensible load. The sensible air mass flow rate and user supplied supply air temperature and humidity ratio are passed to the zone as the supply air conditions to be used in the correct step of ZoneTempPredictorCorrector (`CorrectZoneAirTemp` and `CorrectZoneHumRat`). The sensible and latent loads are also passed to `UpdateSystemOutputRequired`, which will inherently return 0 remaining sensible and latent loads (predicted loads are passed as xxxOutputProvided).
 
     UpdateSystemOutputRequired(state, ActualZoneNum, SysOutputProvided, LatOutputProvided);
 
-This new feature will use similar calculations where a zone latent load is used to calculate a zone heating and cooling latent air mass flow rate based on the user specified zone supply air humidity ratio. One caveat here is that since the latent mass flow rate will usually be different from the sensible mass flow rate, an adjustment to the supply air humidity ratio will be calculated such that both the sensible and latent loads are met each time interval to maintain the zone at the thermostat and humidistat set points. Initial testing has determined that holding the zone at a predetermined humidity level does not significantly impact the zone sensible loads or prediction of sensible air mass flow rate.
+This new feature will use similar calculations where a zone latent load is used to calculate a zone heating and cooling latent air mass flow rate based on the user specified zone supply air humidity ratio. One caveat here is that since the latent mass flow rate will usually be different from the sensible mass flow rate, an adjustment to the supply air humidity ratio will be calculated such that both the sensible and latent loads are met each time interval to maintain the zone at the thermostat and humidistat set points. Initial testing has determined that holding the zone at a predetermined humidity level does not significantly impact the zone sensible loads or prediction of zone sensible air mass flow rate.
 
 **New Feature Choice Options**
 
@@ -52,46 +54,79 @@ The `Sizing:System` object has a choice for `Type of Load to Size On`. Valid cho
 
 **Zone**
 
-The inclusion or removal of the zone humidistat could trigger the zone latent load calculations used for zone equipment sizing (Option A). Alternately, proposed solution is to add two new input fields to `Sizing:Zone` that requests the type of load sizing to perform with a default that provides the same answer currently provided and an assumed humidity set point (Option B). There will likely be some coordination required between these new inputs and those proposed for the air system.
+The proposed solution for disabling zone latent sizing is to add new input fields to `Sizing:Zone` that requests the type of load sizing to perform with a default that provides the same answer currently provided. Addtional inputs will provide an assumed humidity set point schedule and supply air moisture as either a humidity ratio or a delta humidity ratio. 
 
 **System**
 
-There may be zones connected to an air system that do not have a humidistat or there may be no zones with a humidistat. One or more zones on an air loop may not have significant latent loads, and therefore no humidistat, or a user may not have included humidistats and set the `Type of Load to Size On = Latent` just as a verification of latent loads. For this reason, if a system serves a zone without a humidistat, that zone's humidistat setting will be assumed as 50% RH or other user specified value (see Input Description section below), where the corresponding zone humidity ratio with respect to zone supply air humidity ratio will be used to calculate latent mass flow rate (see Model Design Document section below). Changing the key choice from Latent to other key choices will effectively turn off air system latent sizing.
+There may be zones connected to an air system that do not have a humidistat or there may be no zones with a humidistat. One or more zones on an air loop may not have significant latent loads, and therefore no humidistat, or a user may not have included humidistats and set the `Type of Load to Size On = Latent` just as a verification of latent loads. For this reason, if a system serves a zone without a humidistat, that zone's humidistat setting will be assumed as 50% RH or other user specified value (see Input Description section below), where the corresponding zone supply air humidity ratio with respect to zone humidity ratio will be used to calculate latent mass flow rate (see Model Design Document section below). Using any choice other than the key choice Latent will effectively turn off air system latent sizing.
 
 ## Input Description ##
 
-A new choice field will be added to Sizing:Zone to allow control of sizing calculations. In addition to the proposed key choices, an additional key choice for `Latent Load Only` could be included for completeness. A new numeric field will be added to specify the assumed zone humidity control point which would be overridden by a zone humidistat if present (i.e., humidistat has priority). These fields could be added just after the zone supply air conditions inputs or at end of object to avoid transition. Since changing the zone conditions during zone sizing (i.e., holding a zone humidity level) will change the zone sensible load and resulting zone air flow calculations, even if only slightly, it is proposed that a mechanism be used to turn this feature off completely. When latent loads are not used during sizing, 0's will be reported to the zone sizing results file `epluszsz.csv`. The `Sensible Load Only No Latent Load` field could potentially be removed after example file diffs are scrutinized and changes to existing simulations are deemed small enough to ignore.
+A new choice field will be added to Sizing:Zone to allow control of sizing calculations. Six additional new fields will be added to mirror the supply air temperature input fields and to specify the assumed zone humidity control point if no humidistat is present. The control point input would be overridden by a zone humidistat if present (i.e., humidistat has priority). These fields could be added just after the zone supply air conditions inputs or at end of object to avoid transition. Since changing the zone conditions during zone sizing (i.e., holding a zone humidity level) will change the zone sensible load and resulting zone sensible air flow calculation, even if only slightly, it is proposed that a mechanism be used to turn this feature off completely. When latent loads are not used during sizing, 0's will be reported to the zone sizing results file `epluszsz.csv`. The `Sensible Load Only No Latent Load` field could potentially be removed after example file diffs are scrutinized and changes to existing simulations are deemed small enough to ignore.
 
     Sizing:Zone,
-      Ax, \field Zone Load Sizing Method
+      A10,\field Zone Load Sizing Method
           \note Specifies the basis for sizing the zone supply air flow rate.
           \note Zone latent loads will not be used during sizing only when
           \note Zone Load Sizing Method = Sensible Load Only No Latent Load.
           \note For this case the zone humidity level will float according to
           \note the fields Cooling and Heating Design Supply Air Humidity Ratio.
           \note For all other choices the zone humidity level will be controlled.
-          \note Sensible Load Only will use zone sensible air flow rate for zone
-          \note component sizing. Latent loads will be reported during sizing.
+          \note Sensible Load will use zone sensible air flow rate for zone
+          \note component sizing. Latent loads will also be reported during sizing.
+          \note Latent Load will use zone latent air flow rate for zone
+          \note component sizing. Sensible loads will also be reported during sizing.
           \note Sensible and Latent Load will use the larger of sensible and
-          \note latent air flow rate for zone component sizing. Latent loads will
-          \note be reported during sizing.
+          \note latent air flow rate for zone component sizing.
           \note Sensible Load Only No Latent Load or leaving this field blank
           \note will disable zone latent sizing and reporting. Latent loads will
           \note not be reported during sizing (reported as 0's).
           \type choice
-          \key Sensible Load Only
+          \key Sensible Load
+          \key Latent Load
           \key Sensible And Latent Load
           \key Sensible Load Only No Latent Load
           \default Sensible Load Only No Latent Load
-      Nx, \field Zone Humidistat Set Point (Schedule Name?)
-          \note Enter the zone relative humidity used for zone latent sizing
-          \note calculations.
+      A11,\field Zone Latent Cooling Design Supply Air Humidity Ratio Input Method
+          \type choice
+          \key SupplyAirHumidityRatio
+          \key HumidityRatioDifference
+          \default SupplyAirHumidity
+      A12,\field Zone Latent Heating Design Supply Air Humidity Ratio Input Method
+          \type choice
+          \key SupplyAirHumidityRatio
+          \key HumidityRatioDifference
+          \default SupplyAirHumidity
+      N19,\field Zone Cooling Design Supply Air Humidity Ratio Difference
+          \minimum 0.0
+          \type real
+          \default 0.005
+          \units kgWater/kgDryAir
+      N20,\field Zone Heating Design Supply Air Humidity Ratio Difference
+          \minimum 0.0
+          \type real
+          \default 0.005
+          \units kgWater/kgDryAir
+      A13,\field Zone Humidistat Dehumidification Set Point Schedule Name
+          \note Enter the zone relative humidity schedule used for zone latent
+          \note cooling calculations.
           \note A zone humidistat will take priority over this input.
           \note This field is not used if Zone Load Sizing Method = Sensible Load
           \note Only No Latent Load or a zone humidistat is present.
-          \type real
+          \note A default of 50.0 will be used if no schedule is provided and
+          \note no humidistat is associated with this zone.
+          \type alpha
           \units percent
-          \default 50.0
+     A14;\field Zone Humidistat Humidification Set Point Schedule Name
+          \note Enter the zone relative humidity schedule used for zone latent
+          \note heating calculations.
+          \note A zone humidistat will take priority over this input.
+          \note This field is not used if Zone Load Sizing Method = Sensible Load
+          \note Only No Latent Load or a zone humidistat is present.
+          \note A default of 50.0 will be used if no schedule is provided and
+          \note no humidistat is associated with this zone.
+          \type alpha
+          \units percent
 
 A single key choice will be added to the Sizing:System `Type of Load to Size On` field.
 
@@ -115,7 +150,7 @@ A single key choice will be added to the Sizing:System `Type of Load to Size On`
 
 ## Transition Requirements ##
 
-If new Sizing:Zone input fields are inserted within this object a transition is required to insert 2 blank fields. If these fields are added to the end of the object, no transition is required.
+If new Sizing:Zone input fields are inserted within this object a transition is required to insert 7 blank fields. If these fields are added to the end of the object, no transition is required.
 
 ## Outputs Description ##
 
@@ -214,10 +249,11 @@ Proposed `epluszsz.csv` zone sizing information:
     Des Latent Cool Mass Flow [kg/s]
     Des Heat Load No DOAS [W]  - original zone load prior to DOAS simulation
     Des Cool Load No DOAS [W]  - original zone load prior to DOAS simulation
+    (consider splitting these last 2 into sensible and latent or delete)
 
 ## Testing/Validation/Data Sources ##
 
-Compare a few files using Sizing:Zone Zone Load Sizing Method = Sensible Load Only and
+Compare a few files using Sizing:Zone Zone Load Sizing Method = Sensible Load and
 Zone Load Sizing Method = Sensible Load Only No Latent Load to verify the magnitude of
 sizing changes when humidistat control is used during sizing calculations.
 
@@ -231,11 +267,12 @@ Update Sizing:Zone and Sizing:System to include new input fields in `group-desig
 
 ## Engineering Reference ##
 
-Update sizing discussion, deign data arrays, and equations in `zone-design-loads-and-air-flow-rates` and `system-design-loads-and-air-flow-rates`.
+Update sizing discussion, design data arrays, and equations in `zone-design-loads-and-air-flow-rates` and `system-design-loads-and-air-flow-rates`.
 
 ## Example File and Transition Changes ##
 
-Include a zone equipment and air loop equipment example files to exercise latent sizing. transition requirements are TBD.
+Include a zone equipment and air loop equipment example file to exercise latent sizing.   
+Transition requirements are TBD.
 
 ## References ##
 
@@ -248,15 +285,15 @@ Include a zone equipment and air loop equipment example files to exercise latent
 
 ## Model Design Documentation ##
 
-The following code documentation is two fold. One is to document the existing calculations  and methodology used during sizing, and the second is to provide a template for the proposed changes. This proposal suggests to duplicate existing sensible calculations with corresponding latent calculations to provide a time series representation of both sensible and latent sizing data.
+The following code documentation is two fold. One is to document the existing calculations and methodology used during sizing, and the second is to provide a template for the proposed changes. This proposal suggests to duplicate existing sensible calculations with corresponding latent calculations to provide a time series representation of both sensible and latent sizing data.
 
 **Proposed Calculation of Latent Sizing Data**
 
-Regardless of the approach used to size zone or air system components, an accurate representation of zone sensible and latent loads are required. For this reason it is proposed to:
+Regardless of the approach used to size zone or air system components, an accurate representation of zone sensible and latent loads is required. For this reason it is proposed to:
 
 1) hold zone air humidity ratio at the humidistat set point during zone sizing. Otherwise the predicted latent load will include zone moisture capacitance and storage effects.
 2) calculate and save latent sizing data similar to existing sensible sizing data
-3) user input for sizing method will choose which time interval data is used for component sizing (i.e, sensible only, max of sensible and latent, or using exiting calculations representing sensible only with no zone humidity control).
+3) user input for sizing method will choose which time interval data is used for component sizing (i.e, sensible load, latent load, sensible and latent load, or sensible load only with no latent load).
 
 **Existing zone sizing calculation for sensible cooling (similar for heating)**
 
@@ -264,8 +301,7 @@ Regardless of the approach used to size zone or air system components, an accura
 
     LatOutputProvided = 0.0;
     DOASCpAir = PsyCpAirFnW(DOASSupplyHumRat);
-    DOASSysOutputProvided = DOASMassFlowRate *
-        DOASCpAir * (DOASSupplyTemp - Node(ZoneNode).Temp);
+    DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * (DOASSupplyTemp - Node(ZoneNode).Temp);
     // DOAS simulation does not update latent cooling provided by DOAS
     UpdateSystemOutputRequired(state, ActualZoneNum, DOASSysOutputProvided, LatOutputProvided);
 
@@ -275,7 +311,7 @@ Next the zone cooling supply air temperature and humidity ratio from the `Sizing
       N1, \field Zone Cooling Design Supply Air Temperature
       N5, \field Zone Cooling Design Supply Air Humidity Ratio
 
-are used as the known supply air condition (`Temp, HumRat`), to then calculate the temperature difference (`DeltaTemp`, which could have instead been input by the user) between the supply air temperature and zone air temperature (thermostat set point). Then calculate the `Enthalpy` of the supply air and read the zone sensible load from the predict step, `SysOutputRequired`. Using the supply air specific heat, `CpAir`, calculate the zone sensible air `MassFlowRate`. Save these data in time series arrays for further processing. Repeat for other zones (`ControlledZoneNum`) and for each design day (`CurOverallSimDay`). A final call to `UpdateSystemOutputRequired` is made which ideally should zero out the remaining load for this zone.
+are used as the known supply air condition (`Temp, HumRat`), to then calculate the temperature difference (`DeltaTemp`, which could have instead been input by the user) between the supply air temperature and zone air temperature (thermostat set point). Then calculate the `Enthalpy` of the supply air and read the zone sensible load from the predict step, `SysOutputRequired`. Using the supply air specific heat, `CpAir`, calculate the zone sensible air `MassFlowRate`. Save these data in time series arrays for further processing. Repeat for other zones (`ControlledZoneNum`) and for each design day (`CurOverallSimDay`). A final call to `UpdateSystemOutputRequired` is made which will inherently zero out the remaining load for this zone.
 
     Temp = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesTemp;
     HumRat = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesHumRat;
@@ -294,19 +330,21 @@ These data are placed on the zone supply node for use in the correct step of `Zo
     Node(SupplyAirNode).Enthalpy = Enthalpy;
     Node(SupplyAirNode).MassFlowRate = MassFlowRate;
 
-Finally, save the time series data. The example shown here is when there is a cooling load. This is actually incorrect since the air loop may not peak at the same time as the zone and the documentation for zone conditions for both heating and cooling need to be known for each time step (e.g., should not set `HeatZoneTemp = 0`). This data saving methodoloty will be revised during this effort (i.e., HeatZoneTemp and CoolZoneTemp will always be saved regardless of load).
+Finally, save the time series data. The example shown here is when there is a cooling load. 
 
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLoad = SysOutputProvided;
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatMassFlow = MassFlowRate;
+    if (SysOutputProvided > 0.0) {
+    } else if (SysOutputProvided < 0.0) {
+        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLoad = -SysOutputProvided;
+        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolMassFlow = MassFlowRate;
+        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLoad = 0.0;
+        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatMassFlow = 0.0;
+    } else {
+    }
+
     CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatZoneTemp = Node(ZoneNode).Temp;
     CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatZoneHumRat = Node(ZoneNode).HumRat;
-    // why do we set these to 0 in E+, doesn't the allocation initialization do that?
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLoad = 0.0;
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolMassFlow = 0.0;
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolZoneTemp = 0.0;
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolZoneHumRat = 0.0;
-
-
+    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolZoneTemp = Node(ZoneNode).Temp;
+    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolZoneHumRat = Node(ZoneNode).HumRat;
     CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutTemp = OutDryBulbTemp;
     CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutHumRat = OutHumRat;
     CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutTemp = OutDryBulbTemp;
@@ -331,52 +369,58 @@ Finally, save the time series data. The example shown here is when there is a co
 
     DOASLatOutputProvided = 0.0;
     DOASCpAir = PsyCpAirFnW(DOASSupplyHumRat);
-    DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir *
-                           (DOASSupplyTemp - Node(ZoneNode).Temp);
+    DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * (DOASSupplyTemp - Node(ZoneNode).Temp);
     // example if test to turn off latent calcs (note: this if test may not be needed)
     if (zoneRHSizing) { // new latent sizing code
-        DOASLatOutputProvided = DOASMassFlowRate * 
-        (DOASSupplyHumRat - Node(ZoneNode).HumRat);
+        DOASLatOutputProvided = DOASMassFlowRate * (DOASSupplyHumRat - Node(ZoneNode).HumRat);
     }
 
     UpdateSystemOutputRequired(state, ActualZoneNum, DOASSysOutputProvided, DOASLatOutputProvided);
     
-**Step 3:** Repeate zone sensible calulations for zone sensible mass flow rate (not shown, same as existing code above) and add new calculations for zone latent load and mass flow rate. Note: some of the variables (e.g., T, w, RH) shown in this example will be used for debugging purposes.
+**Step 3:** Repeate zone sensible calulations for zone sensible mass flow rate (not shown, same as existing code above) and add new calculations for zone latent load and mass flow rate.
 
-        Real64 ZoneTemp = Node(ZoneNode).Temp;
-        Real64 ZoneHumRat = Node(ZoneNode).HumRat;
-        Real64 ZoneRH = PsyRhFnTdbWPb(state, ZoneTemp, ZoneHumRat, OutBaroPress);
-        Real64 H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
         Real64 LatentAirMassFlow = 0.0;
-        Real64 MoistureLoad = 0.0;
+        Real64 DeltaHumRat = 0.0;
         if (zoneRHSizing) {
-            // positive MoistureLoad means humidification load
+            // positive LatOutputProvided means humidification load
             LatOutputProvided = ZoneSysMoistureDemand(ZoneNum).RemainingOutputRequired;
-            MoistureLoad = LatOutputProvided * H2OHtOfVap;
-            Real64 DeltaHumRat = 0.0;
-            if (LatOutputProvided < 0.0) {
-                DeltaHumRat = -0.005;
-            } else if (LatOutputProvided > 0.0) {
-                DeltaHumRat = 0.005;
+            if (LatOutputProvided < 0.0) { // Dehumidification case
+                // If the user specify the design cooling supply air humrat, then
+                if (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).ZnCoolDgnSAMethod == SupplyAirHumidityRatio) {
+                    HumRat = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).LatentCoolDesHumRat;
+                    DeltaHumRat = HumRat - Node(ZoneNode).HumRat;
+                    // If the user specify the design cooling supply air humrat difference, then
+                } else {
+                    DeltaHumRat = -std::abs(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).LatentCoolDesHumRatDiff);
+                    HumRat = DeltaHumRat + Node(ZoneNode).HumRat;
+                }
+            } else { // Heating Case
+                // If the user specify the design heating supply air humrat, then
+                if (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).ZnHeatDgnSAMethod == SupplyAirHumidityRatio) {
+                    HumRat = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).HeatDesHumRat;
+                    DeltaHumRat = HumRat - Node(ZoneNode).HumRat;
+                    // If the user specify the design heating supply air temperature difference, then
+                } else {
+                    DeltaHumRat = std::abs(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).LatentHeatDesHumRatDiff);
+                    HumRat = DeltaHumRat + Node(ZoneNode).HumRat;
+                }
             }
-            EnthalpyDiff = H2OHtOfVap * DeltaHumRat;
-            if (std::abs(EnthalpyDiff) > DataHVACGlobals::VerySmallMassFlow) 
-                LatentAirMassFlow = MoistureLoad / EnthalpyDiff;
+            if (std::abs(DeltaHumRat) > DataHVACGlobals::VerySmallMassFlow) 
+                LatentAirMassFlow = LatOutputProvided / DeltaHumRat;
         }
 
 **Step 4:** Now that zone sensible and latent mass flow rate is known, and likely different, correct the zone supply air node entering conditions to meet both the thermostat and humidistat set points. Make sure that the correct mass flow rates are saved prior to making any adjustment to zone supply node mass flow rate.
 
     if (zoneRHSizing) {
         if (MassFlowRate > 0.0) {
-            HumRat = ZoneHumRat + LatOutputProvidedNoDOAS / MassFlowRate;
+            HumRat = ZoneHumRat + LatOutputProvided / MassFlowRate;
            // need to recalculate SA Temp based on new Cp?
             Enthalpy = PsyHFnTdbW(Temp, HumRat);
         } else {  // sensible zone mass flow rate is 0
             // if there is no sensible load then still need to hold zone RH at set point
-            // could look at LatOutputProvided and just used some temporary mass flow rate?
             if (LatentAirMassFlow > DataHVACGlobals::VerySmallMassFlow) {
                 // no need to recalculate T, Sensible load = 0 so T = Tzone
-                HumRat = ZoneHumRat + LatOutputProvidedNoDOAS / LatentAirMassFlow;
+                HumRat = ZoneHumRat + LatOutputProvided / LatentAirMassFlow;
                 MassFlowRate = LatentAirMassFlow;
                 Enthalpy = PsyHFnTdbW(Temp, HumRat);
             } else {
@@ -385,7 +429,7 @@ Finally, save the time series data. The example shown here is when there is a co
         }
     }
     
-**Step 5:** The final call to update `UpdateSystemOutputRequired` should 0 out any remaining sensbile and latent loads.
+**Step 5:** The final call to update `UpdateSystemOutputRequired` should 0 out any remaining sensible and latent loads.
 
     UpdateSystemOutputRequired(state, ActualZoneNum, SysOutputProvided, LatOutputProvided);
 
@@ -393,7 +437,7 @@ Just as is done with existing zone sizing results, the data calculated here must
 
 **Proposed zone sizing variables used for post processing:**
 
-The following section describes the new struct variables required to implement the latent sizing new feature. These new variables will be added to the code at locations similar to those used for sensible data processing.
+The following section describes the new Struct variables required to implement the latent sizing new feature. These new variables will be added to the code at locations similar to those used for sensible data processing.
 
 Existing Struct variables tracking zone sizing information. Zone temperature and humidity ratio are also tracked but not shown in the example.
 
@@ -404,10 +448,10 @@ Existing Struct variables tracking zone sizing information. Zone temperature and
 
 New Struct variables tracking zone sizing information shown as example code in `ZoneEquipmentManager::SizeZoneEquipment`.
 
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneHeatLatentLoad = MoistureLoad;
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneHeatLatentMassFlow = LatentAirMassFlow;
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneCoolLatentLoad = 0.0;
-    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneCoolLatentMassFlow = 0.0;
+    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLatentLoad = MoistureLoad;
+    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLatentMassFlow = LatentAirMassFlow;
+    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLatentLoad = 0.0;
+    CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLatentMassFlow = 0.0;
 
     if (SysOutputProvidedNoDOAS > 0.0) {
         CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLoadNoDOAS = 0.0;
@@ -419,18 +463,18 @@ New Struct variables tracking zone sizing information shown as example code in `
         CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLoadNoDOAS = 0.0;
         CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLoadNoDOAS = 0.0;
     }
-    LatOutputProvidedNoDOAS *= H2OHtOfVap;
     if (zoneRHSizing) {
+        LatOutputProvidedNoDOAS *= PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
         if (LatOutputProvidedNoDOAS > 0.0) {
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneCoolLatentLoadNoDOAS = 0.0;
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneHeatLatentLoadNoDOAS =                     LatOutputProvidedNoDOAS;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLatentLoadNoDOAS = 0.0;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLatentLoadNoDOAS =                     LatOutputProvidedNoDOAS;
         } else if (LatOutputProvidedNoDOAS < 0.0) {
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneCoolLatentLoadNoDOAS = -LatOutputProvidedNoDOAS;
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneHeatLatentLoadNoDOAS = 0.0;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLatentLoadNoDOAS = -LatOutputProvidedNoDOAS;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLatentLoadNoDOAS = 0.0;
         }
     } else {
-        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneCoolLatentLoadNoDOAS = 0.0;
-        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZoneHeatLatentLoadNoDOAS = 0.0;
+        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolLatentLoadNoDOAS = 0.0;
+        CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatLatentLoadNoDOAS = 0.0;
     }
 
 **During Day Sizing Data Processing**
@@ -494,7 +538,7 @@ For each time interval the cooling load is compared to a scalar DesCoolLoad (ini
         }
     }
     
-Once the peak is known, the peak load air mass flow rate is converted to volume and the coil inlet temperature and humdiity ratio are calculated.
+Once the peak is known, the peak load air mass flow rate is converted to volume and the coil inlet temperature and humidity ratio are calculated.
 
     if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolMassFlow > 0.0) {
         CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolVolFlow =
@@ -582,11 +626,11 @@ And finally, check for zero zone loads for reporting purposes and then report zo
 
 **Application of Latent Sizing to Component Sizing**
 
-Component sizing is currently based on a calculation of zone air mass flow rate, a predicted zone sensible load, and a zone thermostat and supply air temperature. The peak air mass flow rate can meet the peak zone sensible load at the user specified supply air temperature. Mdot, sens = Qsens / (Cp * (Tsupply - Tzone)).
+Component sizing is currently based on a calculation of zone sensible supply air mass flow rate, a predicted zone sensible load, and a zone thermostat and supply air temperature. The peak air mass flow rate can meet the peak zone sensible load at the user specified supply air temperature. Mdot, sens = Qsens / (Cp * (Tsupply - Tzone)).  
 
-Latent sizing would be based on this same principle of calculating a zone air mass flow rate to meet the peak latent load. The final zone design air mass flow rate will either be selected, based on user input, as the peak sensible air mass flow (sensible only sizing) or the maximum of the sensible and latent air mass flow (sensible and latent sizing). Mdot, lat = (Qlat * H2OHtOfVap) / (H2OHtOfVap * (w, supply - w, zone)). H2OHtOfVap will cancel out here so will check that during implementation.
+Latent sizing would be based on this same principle of calculating a zone latent air mass flow rate to meet the peak latent load. The final zone design air mass flow rate will either be selected, based on user input, as the peak sensible air mass flow (`Sensible Load` or `Sensible Load Only No Latent Load` sizing), the peak latent air mass flow (`Latent Load` sizing) or the maximum of the sensible and latent air mass flow (`Sensible And Latent Load` sizing). Mdot, lat = Qlat / (w, supply - w, zone).  
 
-The zone latent load is independent of zone sensible load, save any dependence of moist air properties (specific heat) on resultant load calculations. I assume zone sensible loads will change slightly if zone humidity ratio changes (i.e., will now be held constant) during sizing. I intend to prove that assumption, and that the changes are small.
+The zone latent load is independent of zone sensible load, save any dependence of moist air properties (specific heat) on resultant load calculations. I assume zone sensible loads will change slightly if zone humidity ratio changes during sizing (i.e., zone humidity will now be held constant). I intend to prove that assumption, and that the changes are small.  
 
-The proposed result of zone sizing is to record both a zone sensible mass flow rate and sensible load, and a latent mass flow rate and latent load. These time series data are the basis for zone and air system component sizing. With the addition of zone latent load sizing calculations other components should be more accurately sized to meet the imposed loads (e.g., DOAS systems or zone/air system cooling coils)
+The proposed result of zone sizing is to record both a zone sensible mass flow rate and sensible load, and a latent mass flow rate and latent load. These time series data are the basis for zone and air system component sizing. With the addition of zone latent load sizing calculations other components should be more accurately sized to meet the imposed loads (e.g., DOAS systems or zone/air system cooling coils).  
 

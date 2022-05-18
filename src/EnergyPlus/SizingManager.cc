@@ -3482,6 +3482,23 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
+                // get zone sizing type, sensible, latent, or sensible only with no latent
+                if (NumAlphas > 9) {
+                    auto const zoneSizingType(state.dataIPShortCut->cAlphaArgs(10));
+                    if (zoneSizingType == "SENSIBLE LOAD ONLY") {
+                        state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneLatentSizing = true;
+                    } else if (zoneSizingType == "SENSIBLE AND LATENT LOAD") {
+                        state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneLatentSizing = true;
+                    } else if (zoneSizingType == "SENSIBLE LOAD ONLY NO LATENT LOAD") {
+                        // don't calculate any change in zone inlet humidity ratio
+                    }
+                }
+                if (NumNumbers > 18) {
+                    state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneRHDehumidifySetPoint = state.dataIPShortCut->rNumericArgs(19);
+                }
+                if (NumNumbers > 19) {
+                    state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneRHHumidifySetPoint = state.dataIPShortCut->rNumericArgs(20);
+                }
             }
         }
     }
@@ -3708,19 +3725,12 @@ void GetSystemSizingInput(EnergyPlusData &state)
             auto const loadSizeType(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum));
             if (loadSizeType == "SENSIBLE") {
                 SysSizInput(SysSizIndex).LoadSizeType = Sensible;
-                // } else if ( loadSizeType == "LATENT" ) {
-                // SysSizInput( SysSizIndex ).LoadSizeType = Latent;
+            } else if (loadSizeType == "LATENT") {
+                SysSizInput(SysSizIndex).LoadSizeType = Latent;
             } else if (loadSizeType == "TOTAL") {
                 SysSizInput(SysSizIndex).LoadSizeType = Total;
             } else if (loadSizeType == "VENTILATIONREQUIREMENT") {
                 SysSizInput(SysSizIndex).LoadSizeType = Ventilation;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iLoadTypeSizeAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are Sensible, Total, or VentilationRequirement.");
-                ErrorsFound = true;
             }
         }
         // assign CoolingPeakLoadType based on LoadSizeType for now

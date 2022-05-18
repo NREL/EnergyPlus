@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -4880,6 +4881,26 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         break;
     } // HumidControlledZoneNum
 
+    // if zone latent sizing is requested but no humidistat exists
+    if (state.dataGlobal->DoingSizing && !ControlledHumidZoneFlag) {
+        for (int zoneEqConfigNum = 1; zoneEqConfigNum <= state.dataZoneEquip->ZoneEquipConfig.size(); ++zoneEqConfigNum) {
+            auto &zoneEqConfig = state.dataZoneEquip->ZoneEquipConfig(zoneEqConfigNum);
+            if (zoneEqConfig.ActualZoneNum != ZoneNum) continue;
+            int ZoneSizNum =
+                UtilityRoutines::FindItemInList(zoneEqConfig.ZoneName, state.dataSize->ZoneSizingInput, &DataSizing::ZoneSizingInputData::ZoneName);
+            if (ZoneSizNum > 0) {
+                auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizNum);
+                if (zoneSizingInput.zoneLatentSizing) {
+                    ZoneRHDehumidifyingSetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
+                    ZoneRHHumidifyingSetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
+                    if (ZoneRHHumidifyingSetPoint == ZoneRHDehumidifyingSetPoint) SingleSetPoint = true;
+                    ControlledHumidZoneFlag = true;
+                }
+            }
+            break;
+        }
+    }
+
     if (ControlledHumidZoneFlag) {
 
         // Calculate hourly humidity ratio from infiltration + humidity added from latent load
@@ -4951,6 +4972,9 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // the amount of moisture that must be removed by the system.
         // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
         WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+        if (Zone(ZoneNum).SystemZoneNodeNumber > 0) {
+            state.dataLoopNodes->Node(Zone(ZoneNum).SystemZoneNodeNumber).HumRatMin = WZoneSetPoint;
+        }
         Real64 exp_700_A_C(0.0);
         if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             LoadToHumidifySetPoint =
@@ -4971,6 +4995,9 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
         ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
         WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+        if (Zone(ZoneNum).SystemZoneNodeNumber > 0) {
+            state.dataLoopNodes->Node(Zone(ZoneNum).SystemZoneNodeNumber).HumRatMax = WZoneSetPoint;
+        }
         if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             LoadToDehumidifySetPoint =
                 ((11.0 / 6.0) * C + A) * WZoneSetPoint - (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
