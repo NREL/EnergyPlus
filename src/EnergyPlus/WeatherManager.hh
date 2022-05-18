@@ -721,6 +721,14 @@ namespace WeatherManager {
 
     void ReadUserWeatherInput(EnergyPlusData &state);
 
+    //    copy report period data from source to target
+    void CopyReportPeriodObject(const Array1D<WeatherManager::ReportPeriodData> &source,
+                                const int sourceIdx,
+                                Array1D<WeatherManager::ReportPeriodData> &target,
+                                const int targetIdx);
+
+    void GroupReportPeriodByType(EnergyPlusData &state, const int nReportPeriods);
+
     void GetReportPeriodData(EnergyPlusData &state,
                              int &nReportPeriods, // Total number of Report Periods requested
                              bool &ErrorsFound);
@@ -880,6 +888,9 @@ struct WeatherManagerData : BaseGlobalStruct
     int TotRunPers;    // Total number of Run Periods (Weather data) to Setup
     int TotRunDesPers; // Total number of Run Design Periods (Weather data) to Setup
     int TotReportPers; // Total number of reporting periods
+    int TotThermalReportPers; // Total number of thermal reporting periods
+    int TotCO2ReportPers; // Total number of CO2 reporting periods
+    int TotVisualReportPers; // Total number of visual reporting periods
 
     int NumSpecialDays;
     Array1D_int SpecialDayTypes; // To hold holiday types given in input file NOLINT(cert-err58-cpp)
@@ -1003,6 +1014,9 @@ struct WeatherManagerData : BaseGlobalStruct
     EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
     Array1D<WeatherManager::ReportPeriodData> ReportPeriodInput;
+    Array1D<WeatherManager::ReportPeriodData> ThermalReportPeriodInput;
+    Array1D<WeatherManager::ReportPeriodData> CO2ReportPeriodInput;
+    Array1D<WeatherManager::ReportPeriodData> VisualReportPeriodInput;
     std::unordered_map<std::string, std::string> ReportPeriodInputUniqueNames;
     EPVector<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
     WeatherManager::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
@@ -1083,6 +1097,9 @@ struct WeatherManagerData : BaseGlobalStruct
         this->TotRunPers = 0;    // Total number of Run Periods (Weather data) to Setup
         this->TotRunDesPers = 0; // Total number of Run Design Periods (Weather data) to Setup
         this->TotReportPers = 0; // Total number of reporting periods
+        this->TotThermalReportPers = 0; // Total number of thermal reporting periods
+        this->TotCO2ReportPers = 0; // Total number of CO2 reporting periods
+        this->TotVisualReportPers = 0; // Total number of visual reporting periods
         this->NumSpecialDays = 0;
 
         this->SpecialDayTypes = Array1D<int>(366, 0);
@@ -1178,6 +1195,9 @@ struct WeatherManagerData : BaseGlobalStruct
         this->RunPeriodDesignInput.deallocate();
         this->RunPeriodDesignInputUniqueNames.clear();
         this->ReportPeriodInput.deallocate();
+        this->ThermalReportPeriodInput.deallocate();
+        this->CO2ReportPeriodInput.deallocate();
+        this->VisualReportPeriodInput.deallocate();
         this->ReportPeriodInputUniqueNames.clear();
         this->TypicalExtremePeriods.deallocate();
 
@@ -1261,13 +1281,13 @@ struct WeatherManagerData : BaseGlobalStruct
           WeatherFileElevation(0.0), GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
           SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),
           WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""), wthFCGroundTemps(false),
-          TotRunPers(0), TotRunDesPers(0), TotReportPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0),
-          NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), UseRainValues(true), UseSnowValues(true),
-          EPWDaylightSaving(false), IDFDaylightSaving(false), DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0),
-          Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0), NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0),
-          SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0),
-          EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0), DatesShouldBeReset(false),
-          StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
+          TotRunPers(0), TotRunDesPers(0), TotReportPers(0), TotThermalReportPers(0), TotCO2ReportPers(0), TotVisualReportPers(0), NumSpecialDays(0),
+          SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true),
+          UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false),
+          DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0),
+          NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0),
+          HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}),
+          LeapYearAdd(0), DatesShouldBeReset(false), StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
     {
     }
 };

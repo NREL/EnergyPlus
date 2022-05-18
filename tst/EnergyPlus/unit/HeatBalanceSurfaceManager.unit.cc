@@ -3749,7 +3749,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(1, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBins(1)[2]);
 }
 
-TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRepPeriod)
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportRepPeriod)
 {
     std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
                                                       "ReportPeriod_1,               !- field Name,",
@@ -3780,6 +3780,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     state->dataWeatherManager->TotReportPers = 2;
 
     WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    state->dataWeatherManager->TotThermalReportPers = 0;
+    state->dataWeatherManager->TotCO2ReportPers = 0;
+    state->dataWeatherManager->TotVisualReportPers = 0;
+    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+
+    EXPECT_EQ(state->dataWeatherManager->TotThermalReportPers, 2);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
@@ -3817,22 +3823,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state->dataGlobal->NumOfZones, 28.0);
 
-    state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                              state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+                                                                              state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                                   state->dataWeatherManager->TotReportPers);
+                                                                                   state->dataWeatherManager->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                                       state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+                                                                                       state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
     state->dataHeatBalFanSys->CrossedColdThreshRepPeriod = false;
     state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod = false;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
@@ -3856,12 +3862,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     state->dataHeatBalFanSys->ZonePierceSETLastStep.dimension(state->dataGlobal->NumOfZones, 0);
     state->dataHeatBalFanSys->ZoneLowSETHours.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneHighSETHours.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->lowSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->highSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->lowSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    state->dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->lowSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->highSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->lowSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
 
@@ -4257,6 +4263,273 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReportRe
     // ---------------------------------------------------------------------
     // Report Period II end
     // ---------------------------------------------------------------------
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestCO2ResilienceReportRepPeriod)
+{
+    std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_1,               !- field Name,",
+                                                      "CO2ResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "1,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "10;                           !- End Hour of Day",
+
+                                                      "Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_2,               !- field Name,",
+                                                      "CO2ResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "13,                           !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "20;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    state->dataWeatherManager->TotThermalReportPers = 0;
+    state->dataWeatherManager->TotCO2ReportPers = 0;
+    state->dataWeatherManager->TotVisualReportPers = 0;
+    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+
+    EXPECT_EQ(state->dataWeatherManager->TotCO2ReportPers, 2);
+
+    state->dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(1);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBins.allocate(1);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBins.allocate(1);
+    state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalSurfMgr->reportCO2ResilienceFirstTime = true;
+
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 2;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
+
+    int NoBins = 3;
+
+    for (int i = 1; i <= state->dataWeatherManager->TotCO2ReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+    }
+
+    state->dataHeatBalFanSys->ZoneNumOcc.dimension(state->dataGlobal->NumOfZones, 0);
+    state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataOutRptTab->displayCO2ResilienceSummary = true;
+    state->dataScheduleMgr->Schedule.allocate(1);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 900;
+    for (int hour = 1; hour <= 4; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
+    for (int hour = 5; hour <= 7; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 5500;
+    state->dataGlobal->HourOfDay = 8;
+    ReportCO2Resilience(*state);
+
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 2000;
+    for (int hour = 9; hour <= 10; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(5.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(6.4, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(5.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1500;
+    for (int hour = 13; hour <= 18; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRepPeriod)
+{
+    std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_1,               !- field Name,",
+                                                      "VisualResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "1,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "10;                           !- End Hour of Day",
+
+                                                      "Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_2,               !- field Name,",
+                                                      "VisualResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "13,                           !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "20;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    state->dataWeatherManager->TotThermalReportPers = 0;
+    state->dataWeatherManager->TotCO2ReportPers = 0;
+    state->dataWeatherManager->TotVisualReportPers = 0;
+    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+
+    EXPECT_EQ(state->dataWeatherManager->TotVisualReportPers, 2);
+
+    state->dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(1);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(1);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBins.allocate(1);
+    state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalSurfMgr->reportVisualResilienceFirstTime = true;
+
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 2;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
+
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+//    state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
+//    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+//    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
+//    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
+//    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
+//    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
+//    state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
+//    state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;
+//    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1) = 300;
+//    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 400;
+//    state->dataOutRptTab->displayVisualResilienceSummary = true;
+
+    int NoBins = 4;
+
+    for (int i = 1; i <= state->dataWeatherManager->TotVisualReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+    }
+
+    state->dataHeatBalFanSys->ZoneNumOcc.dimension(state->dataGlobal->NumOfZones, 0);
+    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
+    state->dataOutRptTab->displayVisualResilienceSummary = true;
+    state->dataScheduleMgr->Schedule.allocate(1);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+    state->dataDaylightingData->ZoneDaylight(1).zoneAvgIllumSum = 250;
+    for (int hour = 1; hour <= 4; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+    // fixme: update this
+//    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+//    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)

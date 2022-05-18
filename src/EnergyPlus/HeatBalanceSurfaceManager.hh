@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "WCETarcog.hpp"
 
@@ -158,7 +159,10 @@ namespace HeatBalanceSurfaceManager {
 
     bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx);
 
-    int findReportPeriodIdx(EnergyPlusData &state);
+    void findReportPeriodIdx(EnergyPlusData &state,
+                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                             const int nReportPeriods,
+                             Array1D_bool &inReportPeriodFlags);
 
     // End of Reporting subroutines for the HB Module
 

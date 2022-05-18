@@ -67,6 +67,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -564,6 +565,11 @@ namespace OutputReportTabular {
 
     void WriteTableOfContents(EnergyPlusData &state);
 
+    void AddTOCReportPeriod(const int nReportPeriods,
+                            const std::string kw,
+                            const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                            std::ostream &tbl_stream);
+
     //======================================================================================================================
     //======================================================================================================================
 
@@ -647,6 +653,11 @@ namespace OutputReportTabular {
     void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool produceSQLite);
 
     void WriteAdaptiveComfortTable(EnergyPlusData &state);
+
+    void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
+                                          const std::string reportKeyWord,
+                                          const int periodIdx,
+                                          const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
 
     void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const periodIdx);
 

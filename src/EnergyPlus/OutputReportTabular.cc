@@ -3401,37 +3401,26 @@ void WriteTableOfContents(EnergyPlusData &state)
                     }
                 }
             }
-            if (ort->displayThermalResilienceSummary) {
-                int nReportPeriods = state.dataWeatherManager->TotReportPers;
-                std::string ReportPeriod_Thermal_Resilience_Summary = "";
-                for (int i = 1; i <= nReportPeriods; i++) {
-                    if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
-                        std::string kws[3] = {"Thermal", "CO2", "Visual"};
-                        for (int j = 0; j < 3; j++) {
-                            ReportPeriod_Thermal_Resilience_Summary = fmt::format(
-                                "{} Resilience Summary for Reporting Period {}: {}", kws[j], i, state.dataWeatherManager->ReportPeriodInput(i).title);
-                            tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility) << "\">"
-                                       << kws[j] << " Resilience Summary for Reporting Period " << i << ": "
-                                       << state.dataWeatherManager->ReportPeriodInput(i).title << "</a>\n";
-                        }
-                    } else {
-                        std::string kw;
-                        if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
-                            kw = "Thermal";
-                        } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
-                            kw = "CO2";
-                        } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
-                            kw = "Visual";
-                        }
-                        ReportPeriod_Thermal_Resilience_Summary = fmt::format(
-                            "{} Resilience Summary for Reporting Period {}: {}", kw, i, state.dataWeatherManager->ReportPeriodInput(i).title);
-                        tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Thermal_Resilience_Summary, Entire_Facility) << "\">" << kw
-                                   << " Resilience Summary for Reporting Period " << i << ": " << state.dataWeatherManager->ReportPeriodInput(i).title
-                                   << "</a>\n";
-                    }
-                }
-            }
+            AddTOCReportPeriod(
+                state.dataWeatherManager->TotThermalReportPers, "Thermal", state.dataWeatherManager->ThermalReportPeriodInput, tbl_stream);
+            AddTOCReportPeriod(state.dataWeatherManager->TotCO2ReportPers, "CO2", state.dataWeatherManager->CO2ReportPeriodInput, tbl_stream);
+            AddTOCReportPeriod(
+                state.dataWeatherManager->TotVisualReportPers, "Visual", state.dataWeatherManager->VisualReportPeriodInput, tbl_stream);
         }
+    }
+}
+
+void AddTOCReportPeriod(const int nReportPeriods,
+                        const std::string kw,
+                        const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                        std::ostream &tbl_stream)
+{
+    static std::string const Entire_Facility("Entire Facility");
+    for (int i = 1; i <= nReportPeriods; i++) {
+        std::string ReportPeriod_Resilience_Summary =
+            fmt::format("{} Resilience Summary for Reporting Period {}: {}", kw, i, ReportPeriodInputData(i).title);
+        tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Resilience_Summary, Entire_Facility) << "\">" << kw
+                   << " Resilience Summary for Reporting Period " << i << ": " << ReportPeriodInputData(i).title << "</a>\n";
     }
 }
 
@@ -5324,18 +5313,14 @@ void WriteTabularReports(EnergyPlusData &state)
         if (ort->displayThermalResilienceSummary) {
             WriteThermalResilienceTables(state);
         }
-        for (int i = 1; i <= state.dataWeatherManager->TotReportPers; i++) {
-            if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
-                WriteThermalResilienceTablesRepPeriod(state, i);
-            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
-                WriteCO2ResilienceTablesRepPeriod(state, i);
-            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
-                WriteVisualResilienceTablesRepPeriod(state, i);
-            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
-                WriteThermalResilienceTablesRepPeriod(state, i);
-                WriteCO2ResilienceTablesRepPeriod(state, i);
-                WriteVisualResilienceTablesRepPeriod(state, i);
-            }
+        for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+            WriteThermalResilienceTablesRepPeriod(state, i);
+        }
+        for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+            WriteCO2ResilienceTablesRepPeriod(state, i);
+        }
+        for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+            WriteVisualResilienceTablesRepPeriod(state, i);
         }
         if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
         if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
@@ -12530,36 +12515,37 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
     }
 }
 
-void WriteReportHeaderReportingPeriod(EnergyPlusData &state, const std::string reportKeyWord, const int periodIdx)
+void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
+                                      const std::string reportKeyWord,
+                                      const int periodIdx,
+                                      const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
 {
-    WriteReportHeaders(state,
-                       fmt::format("{} Resilience Summary for Reporting Period {}: {}",
-                                   reportKeyWord,
-                                   periodIdx,
-                                   state.dataWeatherManager->ReportPeriodInput(periodIdx).title),
-                       "Entire Facility",
-                       OutputProcessor::StoreType::Averaged);
+    WriteReportHeaders(
+        state,
+        fmt::format("{} Resilience Summary for Reporting Period {}: {}", reportKeyWord, periodIdx, ReportPeriodInputData(periodIdx).title),
+        "Entire Facility",
+        OutputProcessor::StoreType::Averaged);
 
-    if (state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear != 0) {
+    if (ReportPeriodInputData(periodIdx).startYear != 0) {
         WriteSubtitle(state,
                       format("Reporting period: {}/{}/{} {}:00 -- {}/{}/{} {}:00",
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endYear,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+                             ReportPeriodInputData(periodIdx).startYear,
+                             ReportPeriodInputData(periodIdx).startMonth,
+                             ReportPeriodInputData(periodIdx).startDay,
+                             ReportPeriodInputData(periodIdx).startHour,
+                             ReportPeriodInputData(periodIdx).endYear,
+                             ReportPeriodInputData(periodIdx).endMonth,
+                             ReportPeriodInputData(periodIdx).endDay,
+                             ReportPeriodInputData(periodIdx).endHour));
     } else {
         WriteSubtitle(state,
                       format("Reporting period: {}/{} {}:00 -- {}/{} {}:00",
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startDay,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endDay,
-                             state.dataWeatherManager->ReportPeriodInput(periodIdx).endHour));
+                             ReportPeriodInputData(periodIdx).startMonth,
+                             ReportPeriodInputData(periodIdx).startDay,
+                             ReportPeriodInputData(periodIdx).startHour,
+                             ReportPeriodInputData(periodIdx).endMonth,
+                             ReportPeriodInputData(periodIdx).endDay,
+                             ReportPeriodInputData(periodIdx).endHour));
     }
 }
 
@@ -12578,7 +12564,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             degreeHourConversion = 1.0;
         }
 
-        WriteReportHeaderReportingPeriod(state, "Thermal", periodIdx);
+        WriteReportHeaderReportingPeriod(state, "Thermal", periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
 
         int columnNum = 5;
         Array1D_int columnWidth;
@@ -13271,7 +13257,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
 {
     auto &ort(state.dataOutRptTab);
     if (ort->WriteTabularFiles) {
-        WriteReportHeaderReportingPeriod(state, "CO2", periodIdx);
+        WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
 
         int columnNum = 3;
         Array1D_int columnWidth;
@@ -13365,7 +13351,7 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
 {
     auto &ort(state.dataOutRptTab);
     if (ort->WriteTabularFiles) {
-        WriteReportHeaderReportingPeriod(state, "Visual", periodIdx);
+        WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
 
         int columnNum = 4;
         Array1D_int columnWidth;

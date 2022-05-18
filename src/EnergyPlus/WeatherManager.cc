@@ -5227,8 +5227,9 @@ namespace WeatherManager {
             GetRunPeriodData(state, state.dataWeatherManager->TotRunPers, ErrorsFound);
         }
 
-        if (state.dataWeatherManager->TotReportPers >= 1) {
+        if (state.dataWeatherManager->TotReportPers > 0) {
             GetReportPeriodData(state, state.dataWeatherManager->TotReportPers, ErrorsFound);
+            GroupReportPeriodByType(state, state.dataWeatherManager->TotReportPers);
         }
 
         if (state.dataSysVars->FullAnnualRun) {
@@ -5297,7 +5298,6 @@ namespace WeatherManager {
                              int &nReportPeriods, // Total number of Report Periods requested
                              bool &ErrorsFound)
     {
-        // Call Input Get routine to retrieve annual run data
         state.dataWeatherManager->ReportPeriodInput.allocate(nReportPeriods);
         state.dataWeatherManager->ReportPeriodInputUniqueNames.reserve(static_cast<unsigned>(nReportPeriods));
 
@@ -5391,6 +5391,76 @@ namespace WeatherManager {
             state.dataWeatherManager->ReportPeriodInput(i).endJulianDate = computeJulianDate(state.dataWeatherManager->ReportPeriodInput(i).endYear,
                                                                                              state.dataWeatherManager->ReportPeriodInput(i).endMonth,
                                                                                              state.dataWeatherManager->ReportPeriodInput(i).endDay);
+        }
+    }
+
+    void CopyReportPeriodObject(const Array1D<WeatherManager::ReportPeriodData> &source,
+                                const int sourceIdx,
+                                Array1D<WeatherManager::ReportPeriodData> &target,
+                                const int targetIdx)
+    {
+        target(targetIdx).title = source(sourceIdx).title;
+        target(targetIdx).startYear = source(sourceIdx).startYear;
+        target(targetIdx).startMonth = source(sourceIdx).startMonth;
+        target(targetIdx).startDay = source(sourceIdx).startDay;
+        target(targetIdx).startHour = source(sourceIdx).startHour;
+        target(targetIdx).startJulianDate = source(sourceIdx).startJulianDate;
+        target(targetIdx).endYear = source(sourceIdx).endYear;
+        target(targetIdx).endMonth = source(sourceIdx).endMonth;
+        target(targetIdx).endDay = source(sourceIdx).endDay;
+        target(targetIdx).endHour = source(sourceIdx).endHour;
+        target(targetIdx).endJulianDate = source(sourceIdx).endJulianDate;
+    }
+
+    void GroupReportPeriodByType(EnergyPlusData &state, const int nReportPeriods)
+    {
+        // transfer data from the reporting period object to the corresponding report period type arrays
+        // ThermalResilienceSummary, CO2ResilienceSummary, VisualResilienceSummary, and AllResilienceSummaries
+        for (int i = 1; i <= nReportPeriods; ++i) {
+            if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
+                state.dataWeatherManager->TotThermalReportPers += 1;
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
+                state.dataWeatherManager->TotCO2ReportPers += 1;
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
+                state.dataWeatherManager->TotVisualReportPers += 1;
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
+                state.dataWeatherManager->TotThermalReportPers += 1;
+                state.dataWeatherManager->TotCO2ReportPers += 1;
+                state.dataWeatherManager->TotVisualReportPers += 1;
+            }
+        }
+
+        state.dataWeatherManager->ThermalReportPeriodInput.allocate(state.dataWeatherManager->TotThermalReportPers);
+        state.dataWeatherManager->CO2ReportPeriodInput.allocate(state.dataWeatherManager->TotCO2ReportPers);
+        state.dataWeatherManager->VisualReportPeriodInput.allocate(state.dataWeatherManager->TotVisualReportPers);
+
+        int ThermalReportPeriodsIdx = 1;
+        int CO2ReportPeriodsIdx = 1;
+        int VisualReportPeriodsIdx = 1;
+        for (int i = 1; i <= nReportPeriods; ++i) {
+            if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
+                CopyReportPeriodObject(
+                    state.dataWeatherManager->ReportPeriodInput, i, state.dataWeatherManager->ThermalReportPeriodInput, ThermalReportPeriodsIdx);
+                ThermalReportPeriodsIdx += 1;
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
+                CopyReportPeriodObject(
+                    state.dataWeatherManager->ReportPeriodInput, i, state.dataWeatherManager->CO2ReportPeriodInput, CO2ReportPeriodsIdx);
+                CO2ReportPeriodsIdx += 1;
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
+                CopyReportPeriodObject(
+                    state.dataWeatherManager->ReportPeriodInput, i, state.dataWeatherManager->VisualReportPeriodInput, VisualReportPeriodsIdx);
+                VisualReportPeriodsIdx += 1;
+            } else if (state.dataWeatherManager->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
+                CopyReportPeriodObject(
+                    state.dataWeatherManager->ReportPeriodInput, i, state.dataWeatherManager->ThermalReportPeriodInput, ThermalReportPeriodsIdx);
+                ThermalReportPeriodsIdx += 1;
+                CopyReportPeriodObject(
+                    state.dataWeatherManager->ReportPeriodInput, i, state.dataWeatherManager->CO2ReportPeriodInput, CO2ReportPeriodsIdx);
+                CO2ReportPeriodsIdx += 1;
+                CopyReportPeriodObject(
+                    state.dataWeatherManager->ReportPeriodInput, i, state.dataWeatherManager->VisualReportPeriodInput, VisualReportPeriodsIdx);
+                VisualReportPeriodsIdx += 1;
+            }
         }
     }
 
