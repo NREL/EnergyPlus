@@ -953,9 +953,12 @@
     Sys 2 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Gross Reference Total Cooling Capacity {W}
+    Autosize,                !- Gross Reference Sensible Cooling Capacity {W}
+    5.12,                    !- Gross Reference Cooling COP {W/W}
+    29.44,                   !- Reference Entering Water Temperature {C}
+    Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
+    Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -970,8 +973,11 @@
     Sys 2 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP {W/W}
+    Autosize,                !- Gross Reference Heating Capacity {W}
+    4.75,                    !- Gross Reference Heating COP {W/W}
+    20.0,                    !- Reference Entering Water Temperature {C}
+    Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
@@ -1075,9 +1081,12 @@
     Sys 1 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Gross Reference Total Cooling Capacity {W}
+    Autosize,                !- Gross Reference Sensible Cooling Capacity {W}
+    5.12,                    !- Gross Reference Cooling COP {W/W}
+    29.44,                   !- Reference Entering Water Temperature {C}
+    Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
+    Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -1092,8 +1101,11 @@
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
-    Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP {W/W}
+    Autosize,                !- Gross Reference Heating Capacity {W}
+    4.75,                    !- Gross Reference Heating COP {W/W}
+    20.0,                    !- Reference Entering Water Temperature {C}
+    Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
