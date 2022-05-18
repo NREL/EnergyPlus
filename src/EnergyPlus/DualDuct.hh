@@ -101,7 +101,6 @@ namespace DualDuct {
     {
         std::string Name;                                    // Name of the Damper
         DualDuctDamper DamperType = DualDuctDamper::Invalid; // Type of Damper ie. VAV, Mixing, Inducing, etc.
-        std::string Schedule;                                // Damper Operation Schedule
         int SchedPtr = 0;                                    // Pointer to the correct schedule
         Real64 MaxAirVolFlowRate = 0.0;                      // Max Specified Volume Flow Rate of Damper [m3/sec]
         Real64 MaxAirMassFlowRate = 0.0;                     // Max Specified MAss Flow Rate of Damper [kg/s]

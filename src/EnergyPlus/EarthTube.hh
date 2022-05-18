@@ -87,7 +87,6 @@ namespace EarthTube {
     {
         int ZonePtr = 0;
         int SchedPtr = 0;
-        std::string SchedName;
         Real64 DesignLevel = 0.0;
         Real64 MinTemperature = 0.0;
         Real64 MaxTemperature = 0.0;

@@ -1123,14 +1123,12 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        switch (this->Type) {
-        case DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd:
-        case DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd:
+        if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd ||
+            this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
             MinLoad = 0.0; // signifies non-load based model (i.e. forward heat exchanger model)
             MaxLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
             OptLoad = this->HighSpeedStandardDesignCapacity;
-            break;
-        default:
+        } else {
             ShowFatalError(state, "SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
         }
     }

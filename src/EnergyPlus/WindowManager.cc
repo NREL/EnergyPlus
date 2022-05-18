@@ -6989,7 +6989,7 @@ namespace WindowManager {
         Real64 Rbare = 0;
 
         switch (state.dataWindowManager->ngllayer) {
-
+        // the switch cases here are just the integer number of layers, not exactly "magic" numbers 1, 2, 3. and 4.
         case 1:
             Rbare = 1.0 / state.dataWindowManager->scon[0];
             state.dataWindowManager->Rtot = rOut + Rbare + rIn;

@@ -83,7 +83,7 @@ namespace EnergyPlus::EarthTube {
 // Cambridge Massachusetts, MIT Press, 1989, pp 206-212
 
 constexpr std::array<std::string_view, static_cast<int>(Ventilation::Num)> ventilationNamesUC = {"NATURAL", "INTAKE", "EXHAUST"};
-constexpr std::array<std::string_view, static_cast<int>(SoilType::Num)> soilTypesUC = {
+constexpr std::array<std::string_view, static_cast<int>(SoilType::Num)> soilTypeNamesUC = {
     "HEAVYANDSATURATED", "HEAVYANDDAMP", "HEAVYANDDRY", "LIGHTANDDRY"};
 
 void ManageEarthTube(EnergyPlusData &state)
@@ -171,7 +171,6 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         }
 
         // Second Alpha is Schedule Name
-        thisEarthTube.SchedName = state.dataIPShortCut->cAlphaArgs(2);
         thisEarthTube.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (thisEarthTube.SchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
@@ -330,29 +329,17 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             ErrorsFound = true;
         }
 
-        auto soilType = static_cast<SoilType>(getEnumerationValue(soilTypesUC, state.dataIPShortCut->cAlphaArgs(4)));
-        switch (soilType) {
-        case SoilType::HeavyAndSat:
-            thisEarthTube.SoilThermDiff = 0.0781056;
-            thisEarthTube.SoilThermCond = 2.42;
-            break;
-        case SoilType::HeavyAndDamp:
-            thisEarthTube.SoilThermDiff = 0.055728;
-            thisEarthTube.SoilThermCond = 1.3;
-            break;
-        case SoilType::HeavyAndDry:
-            thisEarthTube.SoilThermDiff = 0.0445824;
-            thisEarthTube.SoilThermCond = 0.865;
-            break;
-        case SoilType::LightAndDry:
-            thisEarthTube.SoilThermDiff = 0.024192;
-            thisEarthTube.SoilThermCond = 0.346;
-            break;
-        default:
+        auto soilType = static_cast<SoilType>(getEnumerationValue(soilTypeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalDiffusivity = {0.0781056, 0.055728, 0.0445824, 0.024192};
+        constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalConductivity = {2.42, 1.3, 0.865, 0.346};
+        if (soilType == SoilType::Invalid) {
             ShowSevereError(state,
                             cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                 ", " + state.dataIPShortCut->cAlphaFieldNames(4) + " invalid=" + state.dataIPShortCut->cAlphaArgs(4));
             ErrorsFound = true;
+        } else {
+            thisEarthTube.SoilThermDiff = thermalDiffusivity[static_cast<int>(soilType)];
+            thisEarthTube.SoilThermCond = thermalConductivity[static_cast<int>(soilType)];
         }
 
         thisEarthTube.AverSoilSurTemp = state.dataIPShortCut->rNumericArgs(12);
