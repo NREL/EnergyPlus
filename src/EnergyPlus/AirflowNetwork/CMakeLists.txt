@@ -11,7 +11,7 @@ set(SRCS src/Solver.cpp src/Elements.cpp src/Properties.cpp)
 add_library(airflownetworklib STATIC ${SRCS} ${HDRS})
 
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
-  target_compile_options(project_warnings INTERFACE -Wno-attributes) # Don't warn on attributes g++/Clang don't know
+  target_compile_options(airflownetworklib INTERFACE -Wno-attributes) # Don't warn on attributes g++/Clang don't know
 endif()
 
 target_include_directories(airflownetworklib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
