@@ -45,14 +45,14 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::AirflowNetworkBalanceManager unit tests
+// EnergyPlus::AirflowNetwork unit tests
 
 // Google test headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -69,7 +69,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace AirflowNetworkBalanceManager;
+using namespace AirflowNetwork;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
@@ -162,9 +162,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input();
 
-    EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver));
+    EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->afn->AirflowNetworkSimu.solver));
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
@@ -260,9 +260,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(*state);
+    state->afn->get_input();
 
-    EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver));
+    EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->afn->AirflowNetworkSimu.solver));
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
