@@ -1194,7 +1194,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
     }
 }
 
-//void EIRFuelFiredHeatPump::simulate(
+// void EIRFuelFiredHeatPump::simulate(
 //    EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
 //{
 //
@@ -1287,12 +1287,11 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 oaTempforCurve =
         state.dataLoopNodes->Node(this->loadSideNodes.inlet).OutAirDryBulb; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
     if (this->oaTempCurveInputVar == 1) {
-        oaTempforCurve =
-            state.dataLoopNodes->Node(this->loadSideNodes.inlet).OutAirWetBulb; // 2022-05-17: Need to get the wet bulb, maybe should be
+        oaTempforCurve = state.dataLoopNodes->Node(this->loadSideNodes.inlet).OutAirWetBulb; // 2022-05-17: Need to get the wet bulb, maybe should be
     } else {
         //
     }
-    
+
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = CurveManager::CurveValue(state,
                                                           this->powerRatioFuncTempCurveIndex,
@@ -1308,18 +1307,38 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // this->powerEnergy = this->powerUsage * reportingInterval;
 
     Real64 oaTemp2 = max(-8.8888, min(3.3333, oaTempforCurve));
-    Real64 eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
+    Real64 eirDefrost = 1.0;
+    if (this->defrostEIRCurveIndex > 0) {
+        eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
+    }
 
+    // Cycling Ratio
     Real64 CR = 1.0;
     Real64 CRF = 0.5833;
     CR = partLoadRatio / this->minPLR;
     CRF = 0.4167 * CR + 0.5833;
-
-    this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp / CRF;
+    if (this->cycRatioCurveIndex > 0) {
+        CRF = CurveManager::CurveValue(state, this->cycRatioCurveIndex, CR);
+    }
+    this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
     this->fuelEnergy = this->fuelUsage * reportingInterval;
 
+    // aux elec
+    Real64 eirAuxElecFuncTemp = 0.0;
+    if (this->auxElecEIRFoTempCurveIndex > 0) {
+        eirAuxElecFuncTemp = CurveManager::CurveValue(state, this->auxElecEIRFoTempCurveIndex, waterTempforCurve, oaTempforCurve);
+    }
+    Real64 eirAuxElecFuncPLR = 0.0;
+    if (this->auxElecEIRFoPLRCurveIndex > 0) {
+        eirAuxElecFuncPLR = CurveManager::CurveValue(state, this->auxElecEIRFoPLRCurveIndex, partLoadRatio);
+    }
+
+    this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR + this->standbyElecPower;
+    this->powerEnergy = this->powerEnergy * reportingInterval;
+
     // energy balance on heat pump
-    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+    // this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->fuelUsage + this->powerUsage - this->standbyElecPower);
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions
@@ -1389,7 +1408,8 @@ void EIRFuelFiredHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
                 }
                 if (potentialCompanionName == targetCompanionName) {
                     if (thisCoilType == potentialCompanionType) {
-                        ShowSevereError(state, "Invalid companion specification for EIR Plant Loop Fuel-Fired Heat Pump named \"" + thisCoilName + "\"");
+                        ShowSevereError(state,
+                                        "Invalid companion specification for EIR Plant Loop Fuel-Fired Heat Pump named \"" + thisCoilName + "\"");
                         ShowContinueError(state, "For heating objects, the companion must be a cooling object, and vice-versa");
                         ShowFatalError(state, "Invalid companion object causes program termination");
                     }
@@ -1428,16 +1448,16 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         }
     };
     std::vector<ClassType> classesToInput = {
-        ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating,
-                  "Hot Water Nodes",
-                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::add,
-                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract,
-                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract},
         ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling,
                   "Chilled Water Nodes",
                   EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract,
                   EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::add,
                   EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::add},
+        ClassType{DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating,
+                  "Hot Water Nodes",
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::add,
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract,
+                  EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::subtract},
     };
 
     bool errorsFound = false;
@@ -1454,9 +1474,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // Cannot imagine how you would have numPLHP > 0 and yet the instances is empty
                 // this would indicate a major problem in the input processor, not a problem here
                 // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
-                ShowSevereError(state,                                                                   // LCOV_EXCL_LINE
-                                "EIR FFHP: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-                errorsFound = true;                                                                      // LCOV_EXCL_LINE
+                ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
+                                "EIR PLFFHP: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                        // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -1789,9 +1809,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
                 auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
-                thisPLHP.auxElecEIFFoPLRCurveIndex =
+                thisPLHP.auxElecEIRFoPLRCurveIndex =
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
-                if (thisPLHP.auxElecEIFFoPLRCurveIndex == 0) {
+                if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
                     ShowSevereError(state,
                                     "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + auxEIRFPLRName.get<std::string>());
@@ -1964,7 +1984,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
-        //SetupOutputVariable(state,
+        // SetupOutputVariable(state,
         //                    "Heat Pump Source Side Outlet Temperature",
         //                    OutputProcessor::Unit::C,
         //                    this->sourceSideOutletTemp,

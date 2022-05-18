@@ -234,7 +234,7 @@ namespace EIRPlantLoopHeatPumps {
         int cycRatioCurveIndex = 0;
         Real64 nominalAuxElecPower = 0.0;
         int auxElecEIRFoTempCurveIndex = 0;
-        int auxElecEIFFoPLRCurveIndex = 0;
+        int auxElecEIRFoPLRCurveIndex = 0;
         Real64 standbyElecPower = 0.0;
 
         // new output variables for derived class only
