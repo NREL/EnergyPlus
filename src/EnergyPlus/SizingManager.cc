@@ -1402,7 +1402,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
             // conincident sizing result if available for block air flow
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
 
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
             state.dataSize->VpsHtgBySys(AirLoopNum) = 0.0;
@@ -1529,7 +1529,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             state.dataSize->VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
             state.dataSize->EvzByZoneCool(termUnitSizingIndex) = TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
             state.dataSize->EvzMinBySysCool(AirLoopNum) = state.dataSize->EvzByZoneCool(termUnitSizingIndex);
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
             state.dataSize->VpzClgSumBySys(AirLoopNum) = state.dataSize->VdzClgByZone(termUnitSizingIndex);
             // single zone heating
             state.dataSize->VotHtgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
@@ -1549,7 +1549,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             state.dataSize->VpzClgSumBySys(AirLoopNum) = 0.0;
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
             // conincident sizing result if available for block air flow
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
             state.dataSize->VpsHtgBySys(AirLoopNum) = 0.0;
             state.dataSize->VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
