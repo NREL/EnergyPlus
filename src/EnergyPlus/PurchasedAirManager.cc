@@ -2208,7 +2208,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         // Check if cooling of the supply air stream is required
 
         // Cooling operation
-        if ((MinOASensOutput >= QZnCoolSP) && (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != SingleHeatingSetPoint)) {
+        if ((MinOASensOutput >= QZnCoolSP) &&
+            (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating)) {
             OperatingMode = OpMode::Cool;
             // Calculate supply mass flow, temp and humidity with the following constraints:
             //  Min cooling supply temp
@@ -2519,7 +2520,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             }
             // Heating or no-load operation
         } else { // Heating or no-load case
-            if ((MinOASensOutput < QZnHeatSP) && (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != SingleCoolingSetPoint)) {
+            if ((MinOASensOutput < QZnHeatSP) &&
+                (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
                 OperatingMode = OpMode::Heat;
             } else { // DeadBand mode shuts off heat recovery and economizer
                 OperatingMode = OpMode::DeadBand;

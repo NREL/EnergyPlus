@@ -60,6 +60,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -2201,4 +2202,130 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     BranchNodeConnections::CheckNodeConnections(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 }
+
+TEST_F(EnergyPlusFixture, Fix_BranchNodeErrorCheck10Test)
+{
+    bool errFlag = false;
+    RegisterNodeConnection(*state,
+                           1,
+                           "FirstNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object1",
+                           DataLoopNode::ConnectionType::ZoneNode,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           2,
+                           "GoodNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object2",
+                           DataLoopNode::ConnectionType::Sensor,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           1,
+                           "OkNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object3",
+                           DataLoopNode::ConnectionType::ZoneNode,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           2,
+                           "GoodNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object4",
+                           DataLoopNode::ConnectionType::Outlet,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+
+    RegisterNodeConnection(*state,
+                           3,
+                           "PSZ-AC:4_OA-PSZ-AC:4_UNITARY_PACKAGENODE",
+                           DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
+                           "PSZ-AC4_OA_CONTROLLER",
+                           DataLoopNode::ConnectionType::Sensor,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           4,
+                           "PSZ-AC:4_OAINLET NODE",
+                           DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
+                           "PSZ-AC4_OA_CONTROLLER",
+                           DataLoopNode::ConnectionType::Actuator,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           5,
+                           "PSZ-AC:4_OARELIEF NODE",
+                           DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
+                           "PSZ-AC4_OA_CONTROLLER",
+                           DataLoopNode::ConnectionType::Actuator,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           6,
+                           "PSZ-AC:4 SUPPLY EQUIPMENT INLET NODE",
+                           DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
+                           "PSZ-AC4_OA_CONTROLLER",
+                           DataLoopNode::ConnectionType::Sensor,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+
+    RegisterNodeConnection(*state,
+                           7,
+                           "PSZ-AC:1_OAINLET NODE",
+                           DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                           "PSZ-AC:1 OA HEAT RECOVERY",
+                           DataLoopNode::ConnectionType::Inlet,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+
+    RegisterNodeConnection(*state,
+                           8,
+                           "PSZ-AC:1 HEAT RECOVERY OUTLET NODE",
+                           DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                           "PSZ-AC:1 OA HEAT RECOVERY",
+                           DataLoopNode::ConnectionType::Outlet,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+
+    RegisterNodeConnection(*state,
+                           9,
+                           "PSZ-AC:1_OARELIEF NODE",
+                           DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                           "PSZ-AC:1 OA HEAT RECOVERY",
+                           DataLoopNode::ConnectionType::Inlet,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+
+    RegisterNodeConnection(*state,
+                           10,
+                           "PSZ-AC:1 HEAT RECOVERY SECONDARY OUTLET NODE",
+                           DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                           "PSZ-AC:1 OA HEAT RECOVERY",
+                           DataLoopNode::ConnectionType::Outlet,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+
+    bool ErrorsFound = false;
+
+    CheckNodeConnections(*state, ErrorsFound);
+
+    EXPECT_TRUE(ErrorsFound); // Node check will fail on Check 10 -- having both inelt and outlet connections > 1 on a flow stream
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "(Developer) Node Connection Error, Object=Coil:UserDefined:PSZ-AC:1 OA HEAT RECOVERY");
+}
+
 } // namespace EnergyPlus

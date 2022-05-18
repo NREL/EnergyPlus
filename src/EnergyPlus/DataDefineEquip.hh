@@ -128,6 +128,7 @@ namespace DataDefineEquip {
         Real64 CoolRate = 0.0;              // [W]
         Real64 HeatGain = 0.0;              // [J]
         Real64 CoolGain = 0.0;              // [J]
+        bool EachOnceFlag = true;
 
         // Default Constructor
         ZoneAirEquip()

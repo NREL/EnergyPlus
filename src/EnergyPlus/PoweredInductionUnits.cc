@@ -108,8 +108,6 @@ namespace EnergyPlus::PoweredInductionUnits {
 
 // Using/Aliasing
 using namespace DataLoopNode;
-using DataHVACGlobals::SingleCoolingSetPoint;
-using DataHVACGlobals::SingleHeatingSetPoint;
 using DataHVACGlobals::SmallAirVolFlow;
 using DataHVACGlobals::SmallLoad;
 using DataHVACGlobals::SmallMassFlow;
@@ -1920,7 +1918,8 @@ void CalcSeriesPIU(EnergyPlusData &state,
     // check if heating coil is off
     QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                         (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
-    if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
+    if ((!UnitOn) || (QActualHeating < SmallLoad) ||
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }
@@ -2240,7 +2239,8 @@ void CalcParallelPIU(EnergyPlusData &state,
     // check if heating coil is off
     QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                         (state.dataLoopNodes->Node(HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
-    if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
+    if ((!UnitOn) || (QActualHeating < SmallLoad) ||
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }
