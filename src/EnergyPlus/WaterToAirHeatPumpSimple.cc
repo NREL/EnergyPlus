@@ -1234,19 +1234,19 @@ namespace WaterToAirHeatPumpSimple {
         Real64 OutAirFrac;              // Outdoor air fraction at cooling design conditions
         Real64 HeatOutAirFrac;          // Outdoor air fraction at heating design conditions
         Real64 VolFlowRate;
-        Real64 CoolCapAtPeak;              // Load on the cooling coil at cooling design conditions
-        Real64 HeatCapAtPeak;              // Load on the heating coil at heating design conditions
-        Real64 PeakTotCapTempModFac = 0.0; // Peak total cooling capacity curve modifier
-        Real64 RefTotCapTempModFac = 0.0;  // Reference total cooling capacity curve modifier
-        Real64 PeakHeatCapTempModFac;      // Peak heating capacity curve modifier
-        Real64 SensCapAtPeak;              // Sensible load on the cooling coil at cooling design conditions
-        Real64 PeakSensCapTempModFac;      // Peak sensible cooling capacity curve modifier
-        Real64 RefSensCapTempModFac = 0.0; // Reference sensible cooling capacity curve modifier
-        Real64 RefHeatCapTempModFac = 0.0; // Reference heating capacity curve modifier
-        Real64 RefCoolPowerTempModFac;     // Reference cooling power curve modifier
-        Real64 RefHeatPowerTempModFac;     // Reference heating power curve modifier
-        Real64 RefCapCoolTotalDesCDD;      // Reference total cooling coil capacity determined at cooling design conditions
-        constexpr Real64 Tref(283.15);     // Reference Temperature for performance curves,10C [K]
+        Real64 CoolCapAtPeak;                // Load on the cooling coil at cooling design conditions
+        Real64 HeatCapAtPeak;                // Load on the heating coil at heating design conditions
+        Real64 PeakTotCapTempModFac = 0.0;   // Peak total cooling capacity curve modifier
+        Real64 RefTotCapTempModFac = 0.0;    // Reference total cooling capacity curve modifier
+        Real64 PeakHeatCapTempModFac = 0.0;  // Peak heating capacity curve modifier
+        Real64 SensCapAtPeak;                // Sensible load on the cooling coil at cooling design conditions
+        Real64 PeakSensCapTempModFac = 0.0;  // Peak sensible cooling capacity curve modifier
+        Real64 RefSensCapTempModFac = 0.0;   // Reference sensible cooling capacity curve modifier
+        Real64 RefHeatCapTempModFac = 0.0;   // Reference heating capacity curve modifier
+        Real64 RefCoolPowerTempModFac = 0.0; // Reference cooling power curve modifier
+        Real64 RefHeatPowerTempModFac = 0.0; // Reference heating power curve modifier
+        Real64 RefCapCoolTotalDesCDD;        // Reference total cooling coil capacity determined at cooling design conditions
+        constexpr Real64 Tref(283.15);       // Reference Temperature for performance curves,10C [K]
         int TimeStepNumAtMax;
         int DDNum;
         int PltSizNum;
@@ -1410,7 +1410,11 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 } else {
                     CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = CoolingAirVolFlowRateDes;
+                    if (CoolingAirVolFlowRateDes > 0.0) {
+                        VolFlowRate = CoolingAirVolFlowRateDes;
+                    } else {
+                        VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
+                    }
                     // cooling design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
@@ -1526,7 +1530,11 @@ namespace WaterToAirHeatPumpSimple {
                 } else {
                     CheckZoneSizing(
                         state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = CoolingAirVolFlowRateDes;
+                    if (CoolingAirVolFlowRateDes > 0.0) {
+                        VolFlowRate = CoolingAirVolFlowRateDes;
+                    } else {
+                        VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
+                    }
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         // cooling design calculations
                         if (state.dataSize->ZoneEqDXCoil) {
@@ -1644,7 +1652,11 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 } else {
                     CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = CoolingAirVolFlowRateDes;
+                    if (CoolingAirVolFlowRateDes > 0.0) {
+                        VolFlowRate = CoolingAirVolFlowRateDes;
+                    } else {
+                        VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
+                    }
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
                             MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
@@ -1758,7 +1770,11 @@ namespace WaterToAirHeatPumpSimple {
                 } else {
                     CheckZoneSizing(
                         state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = CoolingAirVolFlowRateDes;
+                    if (CoolingAirVolFlowRateDes > 0.0) {
+                        VolFlowRate = CoolingAirVolFlowRateDes;
+                    } else {
+                        VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
+                    }
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
@@ -2234,7 +2250,11 @@ namespace WaterToAirHeatPumpSimple {
             if (IsAutoSize) {
                 if (state.dataSize->CurSysNum > 0) {
                     CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = HeatingAirVolFlowRateDes;
+                    if (HeatingAirVolFlowRateDes > 0.0) {
+                        VolFlowRate = HeatingAirVolFlowRateDes;
+                    } else {
+                        VolFlowRate = CoolingAirVolFlowRateDes; // system air flow
+                    }
                     // heating design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
@@ -2322,7 +2342,11 @@ namespace WaterToAirHeatPumpSimple {
                 } else if (state.dataSize->CurZoneEqNum > 0) {
                     CheckZoneSizing(
                         state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                    VolFlowRate = HeatingAirVolFlowRateDes;
+                    if (HeatingAirVolFlowRateDes > 0.0) {
+                        VolFlowRate = HeatingAirVolFlowRateDes;
+                    } else {
+                        VolFlowRate = CoolingAirVolFlowRateDes; // system air flow
+                    }
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
