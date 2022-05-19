@@ -20505,7 +20505,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
-    state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = false;
+    state->afn->simulation_control.allow_unsupported_zone_equipment = false;
 
     // Create Fans
     Real64 supplyFlowRate = 0.005;
@@ -20687,7 +20687,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
-    state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+    state->afn->simulation_control.allow_unsupported_zone_equipment = true;
 
     // Create Fans
     Real64 supplyFlowRate = 0.005;
@@ -20856,7 +20856,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
-    state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+    state->afn->simulation_control.allow_unsupported_zone_equipment = true;
 
     // Create Fans
     Real64 supplyFlowRate = 0.005;
@@ -21036,7 +21036,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
-    state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = false;
+    state->afn->simulation_control.allow_unsupported_zone_equipment = false;
 
     // Create Fan
     state->dataFans->Fan.allocate(1);
@@ -21175,7 +21175,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
-    state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+    state->afn->simulation_control.allow_unsupported_zone_equipment = true;
 
     // Create Fan
     state->dataFans->Fan.allocate(1);
@@ -21305,7 +21305,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // Set flag to support zone equipment
-    state->afn->AirflowNetworkSimu.AllowSupportZoneEqp = true;
+    state->afn->simulation_control.allow_unsupported_zone_equipment = true;
 
     // Create Fan
     state->dataFans->Fan.allocate(1);
@@ -21444,23 +21444,23 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     state->afn->get_input();
 
     // MultizoneZoneData has only 1 element so may be hardcoded
-    EXPECT_TRUE(state->afn->AFNDefaultControlFlag);
+    EXPECT_TRUE(state->afn->control_defaulted);
 
-    EXPECT_EQ(state->afn->AirflowNetworkSimu.AirflowNetworkSimuName, "AFNDefaultControl");
-    EXPECT_EQ(state->afn->AirflowNetworkSimu.Control, "MULTIZONEWITHOUTDISTRIBUTION");
-    EXPECT_EQ(state->afn->AirflowNetworkSimu.WPCCntr, "SURFACEAVERAGECALCULATION");
-    EXPECT_EQ(state->afn->AirflowNetworkSimu.HeightOption, "OPENINGHEIGHT");
-    EXPECT_EQ(state->afn->AirflowNetworkSimu.BldgType, "LOWRISE");
-    EXPECT_EQ(state->afn->AirflowNetworkSimu.InitType, "ZERONODEPRESSURES");
-    EXPECT_FALSE(state->afn->AirflowNetworkSimu.TExtHeightDep);
-    EXPECT_TRUE(compare_enums(state->afn->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU));
+    EXPECT_EQ(state->afn->simulation_control.name, "AFNDefaultControl");
+    EXPECT_EQ(state->afn->simulation_control.Control, "MULTIZONEWITHOUTDISTRIBUTION");
+    EXPECT_EQ(state->afn->simulation_control.WPCCntr, "SURFACEAVERAGECALCULATION");
+    EXPECT_EQ(state->afn->simulation_control.HeightOption, "OPENINGHEIGHT");
+    EXPECT_EQ(state->afn->simulation_control.BldgType, "LOWRISE");
+    EXPECT_EQ(state->afn->simulation_control.InitType, "ZERONODEPRESSURES");
+    EXPECT_FALSE(state->afn->simulation_control.temperature_height_dependence);
+    EXPECT_TRUE(compare_enums(state->afn->simulation_control.solver, AirflowNetwork::SimulationControl::Solver::SkylineLU));
     //// Use default values for numerical fields
-    EXPECT_EQ(state->afn->AirflowNetworkSimu.MaxIteration, 500);
-    EXPECT_NEAR(state->afn->AirflowNetworkSimu.RelTol, 1.0E-4, 0.00001);
-    EXPECT_NEAR(state->afn->AirflowNetworkSimu.AbsTol, 1.E-6, 0.0000001);
-    EXPECT_NEAR(state->afn->AirflowNetworkSimu.ConvLimit, -0.5, 0.01);
-    EXPECT_NEAR(state->afn->AirflowNetworkSimu.Azimuth, 0.0, 0.0001);
-    EXPECT_NEAR(state->afn->AirflowNetworkSimu.AspectRatio, 1.0, 0.0001);
+    EXPECT_EQ(state->afn->simulation_control.maximum_iterations, 500);
+    EXPECT_NEAR(state->afn->simulation_control.relative_convergence_tolerance, 1.0E-4, 0.00001);
+    EXPECT_NEAR(state->afn->simulation_control.absolute_convergence_tolerance, 1.E-6, 0.0000001);
+    EXPECT_NEAR(state->afn->simulation_control.convergence_acceleration_limit, -0.5, 0.01);
+    EXPECT_NEAR(state->afn->simulation_control.azimuth, 0.0, 0.0001);
+    EXPECT_NEAR(state->afn->simulation_control.aspect_ratio, 1.0, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)

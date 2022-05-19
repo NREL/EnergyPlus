@@ -72,6 +72,27 @@ struct EnergyPlusData;
 
 namespace AirflowNetwork {
 
+    // Vent Control  DistSys Control  Flag    Description
+    //  NONE           NONE           0      No AirflowNetwork and SIMPLE
+    //  SIMPLE         NONE           1      Simple calculations only
+    //  MULTIZONE      NONE           2      Perform multizone calculations only
+    //  NONE           DISTSYS        3      Perform distribution system during system on time only
+    //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
+    //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
+
+    int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
+    int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
+    int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system on time and simple calculations during off time
+    int constexpr AirflowNetworkControlMultiADS(5);  // Perform distribution system during system on time and multizone calculations during off time
+
+    enum class ControlType
+    {
+        NoMultizoneOrDistribution = 0,                   // Simple calculations only, AirflowNetworkControlSimple(1)
+        MultizoneWithoutDistribution,                    // Perform multizone calculations only, AirflowNetworkControlMultizone(2)
+        MultizoneWithDistributionOnlyDuringFanOperation, // Perform distribution system during system on time and simple calculations during off time, AirflowNetworkControlSimpleADS(4)
+        MultizoneWithDistribution                        // Perform distribution system during system on time and multizone calculations during off time, AirflowNetworkControlMultiADS(5)
+    };
+
     struct AirflowNetworkReportVars
     {
         // Members
@@ -147,6 +168,42 @@ namespace AirflowNetwork {
 
         bool closing_probability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
+
+    
+    struct SimulationControl // Basic parameters for AirflowNetwork simulation
+    {
+        enum class Solver
+        {
+            SkylineLU,
+            ConjugateGradient
+        };
+
+        // Members
+        std::string name; // Provide a unique object name
+        std::string Control = "NoMultizoneOrDistribution";
+        ControlType type =
+            ControlType::NoMultizoneOrDistribution; // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION, MULTIZONE WITHOUT DISTRIBUTION, MULTIZONE
+                                                    // WITH DISTRIBUTION ONLY DURING FAN OPERATION, and NO MULTIZONE OR DISTRIBUTION
+        std::string WPCCntr = "SURFACEAVERAGECALCULATION"; // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
+        iWPCCntr iWPCCnt = iWPCCntr::SurfAvg;              // Integer equivalent for WPCCntr field
+        std::string BldgType = "LowRise";                  // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
+        std::string HeightOption = "OpeningHeight";        // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
+        int maximum_iterations = 500;                      // Maximum number of iteration, default 500
+        int InitFlag = 1;                                  // Initialization flag
+        Solver solver = Solver::SkylineLU;
+        Real64 relative_convergence_tolerance = 0.0001; // Relative airflow convergence
+        Real64 absolute_convergence_tolerance = 1e-06;  // Absolute airflow convergence
+        Real64 convergence_acceleration_limit = -0.5;   // Convergence acceleration limit
+        Real64 MaxPressure = 500.0;                     // Maximum pressure change in an element [Pa]
+        Real64 azimuth = 0.0;                           // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
+        Real64 aspect_ratio = 1.0;                      // Ratio of Building Width Along Short Axis to Width Along Long Axis
+        // Real64 DiffP;                          // Minimum pressure difference
+        std::string InitType = "ZeroNodePressures";    // Initialization flag type:
+        bool temperature_height_dependence = false;    // Choice of height dependence of external node temperature
+        bool allow_unsupported_zone_equipment = false; // Allow unsupported zone equipment
+        // "ZeroNodePressures", or "LinearInitializationMethod"
+    };
+
 
     struct Solver : BaseGlobalStruct
     {
@@ -243,7 +300,7 @@ namespace AirflowNetwork {
         Real64 zone_OA_change_rate(int ZoneNum); // hybrid ventilation system controlled zone number
         int get_airloop_number(int NodeNumber);  // Get air loop number for each distribution node and linkage
 
-        EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
+        EPVector<OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
         int AirflowNetworkNumOfExtSurfaces = 0;
         // Inverse matrix
@@ -415,20 +472,19 @@ namespace AirflowNetwork {
         Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
         int PressureSetFlag = 0;             // PressureSet flag
         Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
-        bool AFNDefaultControlFlag = false;  // Default simulation control flag
+        bool control_defaulted = false;  // Default simulation control flag
 
         Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
         Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
 
-        AirflowNetwork::AirflowNetworkSimuProp AirflowNetworkSimu;
-        // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
-        // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
-        // Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit |
-        // Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along
-        // Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening
-        // error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large
-        // opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag
-        // type
+        SimulationControl simulation_control;
+
+        // Moved from simulation control to outer object
+        int ExtLargeOpeningErrCount = 0; // Exterior large opening error count during HVAC system operation
+        int ExtLargeOpeningErrIndex = 0; // Exterior large opening error index during HVAC system operation
+        int OpenFactorErrCount = 0;      // Large opening error count at Open factor > 1.0
+        int OpenFactorErrIndex = 0;      // Large opening error error index at Open factor > 1.0
+        
         Array1D<AirflowNetwork::AirflowNetworkNodeProp> AirflowNetworkNodeData;
         Array1D<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
@@ -598,7 +654,11 @@ namespace AirflowNetwork {
             MultiSpeedHPIndicator = 0;
             VAVTerminalRatio = 0.0;
             VAVSystem = false;
-            AirflowNetworkSimu = AirflowNetwork::AirflowNetworkSimuProp();
+            simulation_control = AirflowNetwork::SimulationControl();
+            ExtLargeOpeningErrCount = 0;
+            ExtLargeOpeningErrIndex = 0;
+            OpenFactorErrCount = 0;
+            OpenFactorErrIndex = 0;
             AirflowNetworkNodeData.clear();
             AirflowNetworkCompData.clear();
             AirflowNetworkLinkageData.clear();

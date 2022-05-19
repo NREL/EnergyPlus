@@ -211,21 +211,6 @@ namespace AirflowNetwork {
     // Link simulation variable in air distribution system
     // Sensible and latent exchange variable in air distribution system
 
-    // Vent Control  DistSys Control  Flag    Description
-    //  NONE           NONE           0      No AirflowNetwork and SIMPLE
-    //  SIMPLE         NONE           1      Simple calculations only
-    //  MULTIZONE      NONE           2      Perform multizone calculations only
-    //  NONE           DISTSYS        3      Perform distribution system during system on time only
-    //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
-    //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
-
-    int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
-    int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
-    int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system
-    // on time and simple calculations during off time
-    int constexpr AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
-                                                    // and multizone calculations during off time
-
     void generic_crack(Real64 &coef,             // Flow coefficient
                        Real64 const expn,        // Flow exponent
                        bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
@@ -247,86 +232,6 @@ namespace AirflowNetwork {
     );
 
     // Types
-
-    struct AirflowNetworkSimuProp // Basic parameters for AirflowNetwork simulation
-    {
-        enum class Solver
-        {
-            Invalid = -1,
-            SkylineLU,
-            ConjugateGradient,
-            Num
-        };
-
-        // Members
-        std::string AirflowNetworkSimuName; // Provide a unique object name
-        std::string Control;                // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
-        // MULTIZONE WITHOUT DISTRIBUTION
-        // MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION,
-        // and NO MULTIZONE OR DISTRIBUTION
-        std::string WPCCntr;                  // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        iWPCCntr iWPCCnt = iWPCCntr::Invalid; // Integer equivalent for WPCCntr field
-        std::string BldgType;                 // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-        std::string HeightOption;             // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-        int MaxIteration;                     // Maximum number of iteration, default 500
-        int InitFlag;                         // Initialization flag
-        Solver solver;
-        Real64 RelTol;               // Relative airflow convergence
-        Real64 AbsTol;               // Absolute airflow convergence
-        Real64 ConvLimit;            // Convergence acceleration limit
-        Real64 MaxPressure;          // Maximum pressure change in an element [Pa]
-        Real64 Azimuth;              // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
-        Real64 AspectRatio;          // Ratio of Building Width Along Short Axis to Width Along Long Axis
-        Real64 DiffP;                // Minimum pressure difference
-        int ExtLargeOpeningErrCount; // Exterior large opening error count during HVAC system operation
-        int ExtLargeOpeningErrIndex; // Exterior large opening error index during HVAC system operation
-        int OpenFactorErrCount;      // Large opening error count at Open factor > 1.0
-        int OpenFactorErrIndex;      // Large opening error error index at Open factor > 1.0
-        std::string InitType;        // Initialization flag type:
-        bool TExtHeightDep;          // Choice of height dependence of external node temperature
-        bool AllowSupportZoneEqp;    // Allow unsupported zone equipment
-        // "ZeroNodePressures", or "LinearInitializationMethod"
-
-        // Default Constructor
-        AirflowNetworkSimuProp()
-            : Control("NoMultizoneOrDistribution"), WPCCntr("Input"), MaxIteration(500), InitFlag(0), solver(Solver::SkylineLU), RelTol(1.0e-5),
-              AbsTol(1.0e-5), ConvLimit(-0.5), MaxPressure(500.0), Azimuth(0.0), AspectRatio(1.0), DiffP(1.0e-4), ExtLargeOpeningErrCount(0),
-              ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), InitType("ZeroNodePressures"), TExtHeightDep(false)
-        {
-        }
-
-        // Member Constructor
-        AirflowNetworkSimuProp(std::string const &AirflowNetworkSimuName, // Provide a unique object name
-                               std::string const &Control,                // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
-                               std::string const &WPCCntr,      // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-                               std::string const &BldgType,     // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATION"
-                               std::string const &HeightOption, // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-                               int const MaxIteration,          // Maximum number of iteration, default 500
-                               int const InitFlag,              // Initialization flag
-                               Real64 const RelTol,             // Relative airflow convergence
-                               Real64 const AbsTol,             // Absolute airflow convergence
-                               Real64 const ConvLimit,          // Convergence acceleration limit
-                               Real64 const MaxPressure,        // Maximum pressure change in an element [Pa]
-                               Real64 const Azimuth,            // Azimuth Angle of Long Axis of Building, not used at WPCCntr = "INPUT"
-                               Real64 const AspectRatio,        // Ratio of Building Width Along Short Axis to Width Along Long Axis
-                               Real64 const DiffP,              // Minimum pressure difference
-                               int const ExtLargeOpeningErrCount, // Exterior large opening error count during HVAC system operation
-                               int const ExtLargeOpeningErrIndex, // Exterior large opening error index during HVAC system operation
-                               int const OpenFactorErrCount,      // Large opening error count at Open factor > 1.0
-                               int const OpenFactorErrIndex,      // Large opening error error index at Open factor > 1.0
-                               std::string const &InitType,       // Initialization flag type:
-                               Solver solver,                     // Solver type
-                               bool const TExtHeightDep           // Choice of height dependence of external node temperature
-                               )
-            : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), BldgType(BldgType), HeightOption(HeightOption),
-              MaxIteration(MaxIteration), InitFlag(InitFlag), solver(solver), RelTol(RelTol), AbsTol(AbsTol), ConvLimit(ConvLimit),
-              MaxPressure(MaxPressure), Azimuth(Azimuth), AspectRatio(AspectRatio), DiffP(DiffP), ExtLargeOpeningErrCount(ExtLargeOpeningErrCount),
-              ExtLargeOpeningErrIndex(ExtLargeOpeningErrIndex), OpenFactorErrCount(OpenFactorErrCount), OpenFactorErrIndex(OpenFactorErrIndex),
-              InitType(InitType), TExtHeightDep(TExtHeightDep)
-        {
-        }
-    };
-
     struct MultizoneZoneProp // Zone information
     {
         // Members

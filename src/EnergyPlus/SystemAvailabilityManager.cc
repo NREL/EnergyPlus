@@ -4259,7 +4259,8 @@ namespace SystemAvailabilityManager {
                 if (state.afn->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                     ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
-                } else if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                } else if (state.afn->simulation_control.type ==
+                           AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
                     ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError(state, "The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");

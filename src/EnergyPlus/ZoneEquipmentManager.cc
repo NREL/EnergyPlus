@@ -5314,8 +5314,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
     if (state.dataHeatBal->AirFlowFlag != UseSimpleAirFlow) return;
     // AirflowNetwork Multizone field /= SIMPLE
-    if (!(state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
-          state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS)) {
+    if (!(state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution ||
+          state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation)) {
         return;
     }
 
@@ -5518,7 +5518,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced)
                     state.dataHeatBal->Ventilation(j).FanPower *= 2.0;
                 // calc electric
-                if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
                     // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
                     if (!state.dataGlobal->KickOffSimulation) {
                         if (!(state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||

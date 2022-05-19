@@ -6316,8 +6316,8 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
             // AFN infiltration -- check that afn sim is being done.
-            if (!(state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                  state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
+            if (!(state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution ||
+                  state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistribution)) {
                 ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNVentVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen = 0.0;
