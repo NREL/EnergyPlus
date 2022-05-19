@@ -115,7 +115,7 @@ namespace EvaporativeCoolers {
 
     struct EvapConditions
     {
-        std::string EvapCoolerName; // Name of the EvapCooler
+        std::string Name; // Name of the EvapCooler
         int EquipIndex;
         EvapCoolerType evapCoolerType; // Type of the EvapCooler
         std::string EvapControlType;   // Type of Control for the EvapCooler
@@ -339,13 +339,13 @@ namespace EvaporativeCoolers {
 
     void SizeEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
-    void CalcDirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcDirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcDryIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcDryIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcWetIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcWetIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum);
+    void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum);
 
     void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                                                        int EvapCoolNum,
