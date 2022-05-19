@@ -1470,9 +1470,10 @@ namespace HeatingCoils {
         // Do the following initializations (every time step): This should be the info from
         // the previous components outlets or the node data in this section.
         // First set the conditions for the air into the coil model
+        int AirOutletNodeNum = heatingCoil.AirOutletNodeNum;
+        int ControlNodeNum = heatingCoil.TempSetPointNodeNum;
         auto &airInletNode = state.dataLoopNodes->Node(heatingCoil.AirInletNodeNum);
-        auto &airOutletNode = state.dataLoopNodes->Node(heatingCoil.AirOutletNodeNum);
-        auto &controlNode = state.dataLoopNodes->Node(heatingCoil.TempSetPointNodeNum);
+        auto &airOutletNode = state.dataLoopNodes->Node(AirOutletNodeNum);
         heatingCoil.InletAirMassFlowRate = airInletNode.MassFlowRate;
         heatingCoil.InletAirTemp = airInletNode.Temp;
         heatingCoil.InletAirHumRat = airInletNode.HumRat;
@@ -1485,12 +1486,12 @@ namespace HeatingCoils {
         heatingCoil.RTF = 0.0;
 
         // If a temperature setpoint controlled coil must set the desired outlet temp everytime
-        if (heatingCoil.TempSetPointNodeNum == 0) {
+        if (ControlNodeNum == 0) {
             heatingCoil.DesiredOutletTemp = 0.0;
-        } else if (heatingCoil.TempSetPointNodeNum == heatingCoil.AirOutletNodeNum) {
-            heatingCoil.DesiredOutletTemp = controlNode.TempSetPoint;
         } else {
-            heatingCoil.DesiredOutletTemp = controlNode.TempSetPoint - (controlNode.Temp - airOutletNode.Temp);
+            auto &controlNode = state.dataLoopNodes->Node(ControlNodeNum);
+            heatingCoil.DesiredOutletTemp =
+                controlNode.TempSetPoint - ((ControlNodeNum == AirOutletNodeNum) ? 0 : (controlNode.Temp - airOutletNode.Temp));
         }
 
         if (QCoilRequired == SensedLoadFlagValue && state.dataHeatingCoils->MySPTestFlag(CoilNum) &&
@@ -1503,7 +1504,7 @@ namespace HeatingCoils {
                 //     2) TempSetPointNodeNum .EQ. 0, this is not correct, control node is required
                 //     3) TempSetPointNodeNum .GT. 0 and TempSetPoint == SensedNodeFlagValue, this is not correct, missing temperature setpoint
                 //     test 2) here (fatal message)
-                if (heatingCoil.TempSetPointNodeNum == 0) {
+                if (ControlNodeNum == 0) {
                     ShowSevereError(state, format("{} \"{}\"", cAllCoilTypes(heatingCoil.HCoilType_Num), heatingCoil.Name));
                     ShowContinueError(state, "... Missing control node for heating coil.");
                     ShowContinueError(state, "... enter a control node name in the coil temperature setpoint node field for this heating coil.");
@@ -1511,6 +1512,7 @@ namespace HeatingCoils {
                     state.dataHeatingCoils->HeatingCoilFatalError = true;
                     //     test 3) here (fatal message)
                 } else { // IF(ControlNode .GT. 0)THEN
+                    auto &controlNode = state.dataLoopNodes->Node(ControlNodeNum);
                     if (controlNode.TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, format("{} \"{}\"", cAllCoilTypes(heatingCoil.HCoilType_Num), heatingCoil.Name));
@@ -1518,10 +1520,8 @@ namespace HeatingCoils {
                             ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
                             state.dataHeatingCoils->HeatingCoilFatalError = true;
                         } else {
-                            CheckIfNodeSetPointManagedByEMS(state,
-                                                            heatingCoil.TempSetPointNodeNum,
-                                                            EMSManager::SPControlType::TemperatureSetPoint,
-                                                            state.dataHeatingCoils->HeatingCoilFatalError);
+                            CheckIfNodeSetPointManagedByEMS(
+                                state, ControlNodeNum, EMSManager::SPControlType::TemperatureSetPoint, state.dataHeatingCoils->HeatingCoilFatalError);
                             if (state.dataHeatingCoils->HeatingCoilFatalError) {
                                 ShowSevereError(state, format("{} \"{}\"", cAllCoilTypes(heatingCoil.HCoilType_Num), heatingCoil.Name));
                                 ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
@@ -1542,7 +1542,7 @@ namespace HeatingCoils {
             //   3) TempSetPointNodeNum .GT. 0 and TempSetPoint == SensedNodeFlagValue, control node not required if load based control
             //   4) TempSetPointNodeNum .GT. 0 and TempSetPoint /= SensedNodeFlagValue, control node not required if load based control
             //   test 3) and 4) here (warning only)
-            if (heatingCoil.TempSetPointNodeNum > 0) {
+            if (ControlNodeNum > 0) {
                 ShowWarningError(state, format("{} \"{}\"", cAllCoilTypes(heatingCoil.HCoilType_Num), heatingCoil.Name));
                 ShowContinueError(state, " The \"Temperature Setpoint Node Name\" input is not required for this heating coil.");
                 ShowContinueError(state, " Leaving the input field \"Temperature Setpoint Node Name\" blank will eliminate this warning.");
