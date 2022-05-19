@@ -1948,14 +1948,14 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
 
         // setup output variables
         SetupOutputVariable(state,
-                            "Fuel-fired Absorption HeatPump Heating Rate",
+                            "Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->loadSideHeatTransfer,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
-                            "Fuel-fired Absorption HeatPump Heating Energy",
+                            "Fuel-fired Absorption HeatPump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->loadSideEnergy,
                             OutputProcessor::SOVTimeStepType::System,
