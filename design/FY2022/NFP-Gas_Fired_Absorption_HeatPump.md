@@ -5,6 +5,7 @@ Equation-Fit Based Gas Fired Absorption Heat Pump (GAHP) Module
 
  - Original Date: April 22, 2022
  - Revised: April 29, 2022
+ - Revised: May 19, 2022
 
 
 ## Justification for New Feature ##
@@ -24,7 +25,9 @@ In addition, for both of the two existing models ChillerHeater:Absorption:Direct
 From 2022-04-22 to 2022-04-29, a few email exchanges with the feature requester (Alex Fridlyand) regarding the first draft NFP and a few related questions. Some comments and additional feedbacks were offered by Alex on the equipment's operation modes, typical application scenarios, typical input parameter values, and output variables. 
 
 ### Conference Call Communications ###
+On 2022-05-04, the NFP was presented to the development during a technicality conference call session. A few comments were gathered regarding: 1) how to reuse current objects, inputs, and code structures when developing the new model (Edwin Lee at NREL); and 2) the application scenarios of the new GAHP (Tianzhen Hong at LBNL). 
 
+On 2022-05-11, a conference call meeting was made between the NFP authors and Edwin Lee, and Matt Mitchell at NREL for a further discussion about how to reuse current code structures. A few possible ways were discussed regarding minimize repeated code development. It was recommended to use the existing data/code structure similar to HeatPUmp:PlantLoop:EIR:Cooling/Heating objects by either direct modifying on the existing module or setting up an inheritance relationship; and the new IDD object proposed in the current NFP can still be the way to go regardless of the underlying data/code structure choice. 
 
 ## Overview ##
 
@@ -112,7 +115,7 @@ HeatPump:AirToWater:FuelFired:Heating,
        \object-list OutdoorAirNodeNames
        \note This is the air source node name, which is the evaporator side of the heat pump in heating mode.
        \note Enter the name of an OutdoorAir:Node object.
-  A5,  \field Companion Cooling Heat Pump Name
+  A5 , \field Companion Cooling Heat Pump Name
        \note The name of the companion HeatPump:AirToWater:FuelFired:Cooling object
        \note This field is used for a heat pump with switchable heating and cooling mode.
        \type object-list
@@ -141,7 +144,7 @@ HeatPump:AirToWater:FuelFired:Heating,
        \minimum> 0
        \units W
        \note Nominal Heating Capacity in [W] (autosizeable)
-  N2 , \field Design Flow Rate (autosizeable)
+  N2 , \field Design Flow Rate
        \autosizable
        \minimum> 0
        \units m3/s
@@ -175,7 +178,7 @@ HeatPump:AirToWater:FuelFired:Heating,
        \default DryBulb
        \note Outdoor air temperature curve input variable;
        \note The options are Outdoor Air Dry Bulb or Wet Bulb temperature for curves
-  A10 , \field Water Temperature Curve Input Variable
+  A10, \field Water Temperature Curve Input Variable
        \required-field
        \type choice
        \key EnteringCondenser
@@ -222,7 +225,7 @@ HeatPump:AirToWater:FuelFired:Heating,
        \note Defrost operation control type: timed or OnDemand
   N8 , \field Defrost Operation Time Fraction
        \minimum 0
-       \maximum 1   
+       \maximum 1
        \default 0
        \note Defrost operation time fraction, which will be used for timed defrost control type.
   N9 , \field Maximum Outdoor Dry-bulb Temperature for Defrost Operation
@@ -267,7 +270,7 @@ HeatPump:AirToWater:FuelFired:Cooling,
   A1 , \field Name
        \required-field
        \reference HeatPumpAirToWaterFuelFiredCoolingNames
-       \note Name of the fuel-fired absorption heat pump system system
+       \note Name of the fuel fired absorption heat pump system system
   A2 , \field Water Inlet Node Name
        \required-field
        \type node
@@ -281,7 +284,7 @@ HeatPump:AirToWater:FuelFired:Cooling,
        \object-list OutdoorAirNodeNames
        \note This is the air source node name, which is the condenser side of the heat pump in cooling mode.
        \note Enter the name of an OutdoorAir:Node object.
-  A5,  \field Companion Heating Heat Pump Name
+  A5 , \field Companion Heating Heat Pump Name
        \note The name of the companion HeatPump:AirToWater:FuelFired:Heating object
        \note This field is used for a heat pump with switchable heating and cooling mode.
        \type object-list
@@ -310,21 +313,20 @@ HeatPump:AirToWater:FuelFired:Cooling,
        \minimum> 0
        \units W
        \note Nominal Cooling Capacity in [W] (autosizeable)
-  N2 , \field Design Flow Rate (autosizeable)
+  N2 , \field Design Flow Rate
        \autosizable
        \minimum> 0
        \units m3/s
        \note Design Flow Rate in m3/s (autosizeable)
   N3 , \field Design Supply Temperature
-       \default 7
+       \default 60
        \units C
        \note Design Supply Temperature in [degree C]
   N4 , \field Design Temperature Lift
        \autosizable
-       \default 4
+       \default 11.1
        \units deltaC
        \note Design Temperature Lift in [degree C]
-       \note For cooling this is the designed water temperature drop of the waterside outlet
   N5 , \field Sizing Factor
        \minimum 1.0
        \default 1.0
@@ -345,7 +347,7 @@ HeatPump:AirToWater:FuelFired:Cooling,
        \default DryBulb
        \note Outdoor air temperature curve input variable;
        \note The options are Outdoor Air Dry Bulb or Wet Bulb temperature for curves
-  A10 , \field Water Temperature Curve Input Variable
+  A10, \field Water Temperature Curve Input Variable
        \required-field
        \type choice
        \key EnteringCondenser
@@ -411,15 +413,14 @@ Output variables will reported for operation conditions, such as heating energy 
 The newly added output variables are listed as follows:
 
 ```
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Fuel Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Fuel Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Electricity Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Electricity Rate [W]
-HVAC,average,Fuel-fired Absorption HeatPump Runtime Fraction [];
-HVAC,average,Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s];
+HVAC,average,Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [W]
+HVAC,average,Fuel-fired Absorption HeatPump Fuel Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Fuel Energy [J]
+HVAC,average,Fuel-fired Absorption HeatPump Electricity Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Electricity Energy [J]
 HVAC,average,Fuel-fired Absorption HeatPump Mass Flow Rate [m3/s];
+HVAC,average,Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s];
 HVAC,average,Fuel-fired Absorption HeatPump Inlet Temperature [C]
 HVAC,average,Fuel-fired Absorption HeatPump Outlet Temperature [C]
 ```
@@ -528,15 +529,14 @@ See the Input Output Reference documentation contents update above.
 The following output will be added the to the new gas-fired (fuel-fired) absorption heat pump system: 
 
 ```
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Fuel Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Fuel Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Heating Electricity Energy [J]
-HVAC,average,Fuel-fired Absorption HeatPump Heating Electricity Rate [W]
-HVAC,average,Fuel-fired Absorption HeatPump Runtime Fraction [];
-HVAC,average,Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s];
+HVAC,average,Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [W]
+HVAC,average,Fuel-fired Absorption HeatPump Fuel Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Fuel Energy [J]
+HVAC,average,Fuel-fired Absorption HeatPump Electricity Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Electricity Energy [J]
 HVAC,average,Fuel-fired Absorption HeatPump Mass Flow Rate [m3/s];
+HVAC,average,Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s];
 HVAC,average,Fuel-fired Absorption HeatPump Inlet Temperature [C]
 HVAC,average,Fuel-fired Absorption HeatPump Outlet Temperature [C]
 ```
