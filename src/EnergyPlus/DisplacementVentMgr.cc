@@ -54,7 +54,7 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -654,13 +654,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     SumMCpT = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
               state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
               state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
-        SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
-                 state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp +
-                 state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
-        SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
-                  state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT +
-                  state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
+    if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
+        SumMCp = state.afn->exchangeData(ZoneNum).SumMCp + state.afn->exchangeData(ZoneNum).SumMVCp + state.afn->exchangeData(ZoneNum).SumMMCp;
+        SumMCpT = state.afn->exchangeData(ZoneNum).SumMCpT + state.afn->exchangeData(ZoneNum).SumMVCpT + state.afn->exchangeData(ZoneNum).SumMMCpT;
     }
 
     MCp_Total = SumMCp + SumSysMCp;
@@ -690,23 +686,20 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     // outflowing. The lower apertures have to be located below 0.8m and the upper apertures
     // have to be located above 1.8m.
 
-    if (state.dataAirflowNetwork->NumOfLinksMultiZone > 0) {
+    if (state.afn->NumOfLinksMultiZone > 0) {
         for (Loop = 1; Loop <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Loop) {
             // direct AirflowNetwork surface
 
-            if (state.dataSurface
-                    ->Surface(
-                        state.dataAirflowNetwork->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
+            if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
                     .Zone == ZoneNum) {
 
                 if ((state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax < 0.8 &&
-                     state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW >
-                         0)) {
+                     state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0)) {
                     FlagApertures = 0;
                     break;
                 }
                 if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin > 1.8 &&
-                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
+                    state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
                     FlagApertures = 0;
                     break;
                 }
@@ -723,62 +716,56 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
 
                 if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
                             Zone(state.dataSurface
-                                     ->Surface(state.dataAirflowNetwork
-                                                   ->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
-                                                   .SurfNum)
+                                     ->Surface(
+                                         state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
                                      .Zone)
                                 .OriginZ -
                             Zone(ZoneNum).OriginZ <
                         0.8 &&
-                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
+                    state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
                     FlagApertures = 0;
                     break;
                 }
                 if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
                             Zone(state.dataSurface
-                                     ->Surface(state.dataAirflowNetwork
-                                                   ->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
-                                                   .SurfNum)
+                                     ->Surface(
+                                         state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
                                      .Zone)
                                 .OriginZ -
                             Zone(ZoneNum).OriginZ >
                         1.8 &&
-                    state.dataAirflowNetwork->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0) {
+                    state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0) {
                     FlagApertures = 0;
                     break;
                 }
                 if ((state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
                              Zone(state.dataSurface
-                                      ->Surface(state.dataAirflowNetwork
-                                                    ->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
-                                                    .SurfNum)
+                                      ->Surface(
+                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
                                       .Zone)
                                  .OriginZ -
                              Zone(ZoneNum).OriginZ >
                          0.8 &&
                      state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
                              Zone(state.dataSurface
-                                      ->Surface(state.dataAirflowNetwork
-                                                    ->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
-                                                    .SurfNum)
+                                      ->Surface(
+                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
                                       .Zone)
                                  .OriginZ -
                              Zone(ZoneNum).OriginZ <
                          1.8) ||
                     (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
                              Zone(state.dataSurface
-                                      ->Surface(state.dataAirflowNetwork
-                                                    ->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
-                                                    .SurfNum)
+                                      ->Surface(
+                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
                                       .Zone)
                                  .OriginZ -
                              Zone(ZoneNum).OriginZ >
                          0.8 &&
                      state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
                              Zone(state.dataSurface
-                                      ->Surface(state.dataAirflowNetwork
-                                                    ->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
-                                                    .SurfNum)
+                                      ->Surface(
+                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
                                       .Zone)
                                  .OriginZ -
                              Zone(ZoneNum).OriginZ <
