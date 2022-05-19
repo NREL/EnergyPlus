@@ -372,7 +372,7 @@ namespace FaultsManager {
                     EvapCoolerNum =
                         UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
                                                         state.dataEvapCoolers->EvapCond,
-                                                        &EvaporativeCoolers::EvapConditions::EvapCoolerName);
+                                                        &EvaporativeCoolers::EvapConditions::Name);
                     if (EvapCoolerNum <= 0) {
                         ShowSevereError(state,
                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +

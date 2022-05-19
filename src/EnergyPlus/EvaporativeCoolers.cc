@@ -3309,7 +3309,6 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     auto &thisOutletNode = state.dataLoopNodes->Node(thisEvapCond.OutletNode);
     auto &thisInletNode = state.dataLoopNodes->Node(thisEvapCond.InletNode);
     auto &thisInletNodeSec = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
-    auto &thisOutletNodeSec = state.dataLoopNodes->Node(thisEvapCond.SecondaryOutletNode);
 
     // Set the outlet air nodes of the EvapCooler
     thisOutletNode.MassFlowRate = thisEvapCond.OutletMassFlowRate;
