@@ -10,5 +10,9 @@ set(SRCS src/Solver.cpp src/Elements.cpp src/Properties.cpp)
 # this will be linked statically to create the DLL and also the unit tests
 add_library(airflownetworklib STATIC ${SRCS} ${HDRS})
 
+if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
+  target_compile_options(airflownetworklib PRIVATE -Wno-attributes) # Don't warn on attributes that g++ and Clang don't know
+endif()
+
 target_include_directories(airflownetworklib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(airflownetworklib PUBLIC fmt::fmt)
