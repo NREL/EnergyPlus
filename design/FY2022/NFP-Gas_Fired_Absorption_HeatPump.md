@@ -547,19 +547,78 @@ The fundamental methods and equations used for the model, as well as the origina
 
 ## Designs ##
 
-### getGasFireAbsorptionHeatPumpInput() ###
+### New data struct ###
+A new data struct `EIRFuelFiredHeatPump` will be created, which is derived (and inherited) from the existing data struct named `EIRPlantLoopHeatPump`. This will allow the code to use a similar calling structure to simulate the equipment and seamlessly plug into the upper level plant loop simulations. 
 
-A function to process the input fields for the HeatPump:AirToWater:FuelFired:Heating object. It will read input information for the system's connection, equipment sizing, and operation mode.
+Following new member variables to the child `EIRFuelFiredHeatPump` struct to accommodate the additional input field, output variables, and intermediate variables need for the newly added HeatPump:AirToWater:FuelFired:Heating/Cooling object:
+```
+        // New additions for GAHP only
+        std::string fuelTypeStr = "";
+        DataGlobalConstants::ResourceType fuelType = DataGlobalConstants::ResourceType::None; // resource type assignment
+        std::string endUseSubcat = "";                                                        // identifier use for the end use subcategory
+        DataPlant::FlowMode flowMode = DataPlant::FlowMode::Invalid;
+        Real64 desSupplyTemp = 60.0;
+        Real64 desTempLift = 11.1;
+        int oaTempCurveInputVar = 0;
+        int waterTempCurveInputVar = 0;
+        // int capFuncTempCurveIndex = 0;
+        // int powerRatioFuncTempCurveIndex = 0;
+        //  int powerRatioFuncPLRCurveIndex = 0;
+        Real64 minPLR = 0.1;
+        Real64 maxPLR = 1.0;
 
-### SizeGasFiredAbsorptionHeatPump() ###
+        int defrostEIRCurveIndex = 0;
+        int defrostType = 0;
+        Real64 defrostOpTimeFrac = 0.0;
+        Real64 defrostMaxOADBT = 5.0;
 
-This function will be added to size the system's nominal heat capacity and design flow rate.
+        int cycRatioCurveIndex = 0;
+        Real64 nominalAuxElecPower = 0.0;
+        int auxElecEIRFoTempCurveIndex = 0;
+        int auxElecEIRFoPLRCurveIndex = 0;
+        Real64 standbyElecPower = 0.0;
 
-### SimGasFiredAbsorptionHeatPump() ###
+        // new output variables for derived class only
+        std::string GAHPFuelTypeForOutputVariable = "";
+        Real64 loadSideVolumeFlowRate = 0.0;
+        Real64 fuelUsage = 0.0;
+        Real64 fuelEnergy = 0.0;
 
-### ReportGasFiredAbsorptionHeatPumpSystem() ###
+```
 
-The function is for reporting the variables related to the gas-fired absorption heatpump system, such as the heating energy (or rate), electricity usage (rate), and exhaust fans' flow rates, energy usages, and pressure drops.
+A few existing methods (functions) in the parent needs to be overridden for the child struct, such as: 
+```
+        // Override parent methods to be declared
+        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
+        void resetReportingVariables();
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
+        static void pairUpCompanionCoils(EnergyPlusData &state);
+        static void processInputForEIRPLHP(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state);
+```
+
+### Overriden functions ###
+The overridden functions will have their own versions for the `EIRFuelFiredHeatPump` object. But still they still could fit into the calling structure of the parent `EIRPlantLoopHeatPump` object. A few major functions that need to be overridden are introduced here:
+
+#### processInputForEIRPLHP() ####
+
+This function will be revised in the new child struct to process the input fields for the HeatPump:AirToWater:FuelFired:Heating/Cooling objects. It will read input information for the system's connection, equipment sizing, and operation mode. 
+
+#### sizeLoadSide() ####
+
+This function will be revised in the new child struct to size the GAHP equipment, such as the nominal heat capacity and design flow rate.
+
+### static void pairUpCompanionCoils() ###
+This function will be revised in the new child struct to accommodate the cooling/heating pairing relationship the GAHP. 
+
+### doPhysics() ###
+This function will be revised in the new child struct to model the GAHP. Compared to the parent version, the energy flows associated with fuel other than electricity will also be calculated, as well as the additional operation features needed to the fuel-fired heat pump. 
+
+### oneTimeInit() ###
+This function will be revised in the new child struct to accommodate the output variables for the GAHP. Compared to the parent version, the energy flows associated with fuel will also be processed and reported here. 
+
+### resetReportingVariables() ###
+This function will be revised in the new child struct to reset reporting variables, especially the energy values for a new timestep. For the GAHP, fuel energy related variables needs to be added to this overridden function. 
 
 ### Other possible functions ###
 
