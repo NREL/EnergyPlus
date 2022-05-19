@@ -111,6 +111,8 @@ namespace EnergyPlus::PipeHeatTransfer {
 
 // OTHER NOTES: Equation Numbers listed in buried pipe routines are from Piechowski's thesis
 
+constexpr std::array<std::string_view, static_cast<int>(PipeIndoorBoundaryType::Num)> pipeIndoorBoundaryTypeNamesUC = {"ZONE", "SCHEDULE"};
+
 // Using/Aliasing
 using namespace GroundTemperatureManager;
 
@@ -317,42 +319,43 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) state.dataIPShortCut->cAlphaArgs(5) = "ZONE";
 
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(5));
-
-            if (SELECT_CASE_var == "ZONE") {
-                state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
-                state.dataPipeHT->PipeHT(Item).EnvrZonePtr =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
-                if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                    ErrorsFound = true;
-                }
-
-            } else if (SELECT_CASE_var == "SCHEDULE") {
-                state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ScheduleEnv;
-                state.dataPipeHT->PipeHT(Item).EnvrSchedule = state.dataIPShortCut->cAlphaArgs(7);
-                state.dataPipeHT->PipeHT(Item).EnvrSchedPtr = GetScheduleIndex(state, state.dataPipeHT->PipeHT(Item).EnvrSchedule);
-                state.dataPipeHT->PipeHT(Item).EnvrVelSchedule = state.dataIPShortCut->cAlphaArgs(8);
-                state.dataPipeHT->PipeHT(Item).EnvrVelSchedPtr = GetScheduleIndex(state, state.dataPipeHT->PipeHT(Item).EnvrVelSchedule);
-                if (state.dataPipeHT->PipeHT(Item).EnvrSchedPtr == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                    ErrorsFound = true;
-                }
-                if (state.dataPipeHT->PipeHT(Item).EnvrVelSchedPtr == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                    ErrorsFound = true;
-                }
-
-            } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
+        auto indoorType =
+            static_cast<PipeIndoorBoundaryType>(getEnumerationValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+        switch (indoorType) {
+        case PipeIndoorBoundaryType::Zone:
+            state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
+            state.dataPipeHT->PipeHT(Item).EnvrZonePtr =
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
+            if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, R"(Should be "ZONE" or "SCHEDULE")"); // TODO rename point
                 ErrorsFound = true;
             }
+            break;
+
+        case PipeIndoorBoundaryType::Schedule:
+            state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ScheduleEnv;
+            state.dataPipeHT->PipeHT(Item).EnvrSchedule = state.dataIPShortCut->cAlphaArgs(7);
+            state.dataPipeHT->PipeHT(Item).EnvrSchedPtr = GetScheduleIndex(state, state.dataPipeHT->PipeHT(Item).EnvrSchedule);
+            state.dataPipeHT->PipeHT(Item).EnvrVelSchedule = state.dataIPShortCut->cAlphaArgs(8);
+            state.dataPipeHT->PipeHT(Item).EnvrVelSchedPtr = GetScheduleIndex(state, state.dataPipeHT->PipeHT(Item).EnvrVelSchedule);
+            if (state.dataPipeHT->PipeHT(Item).EnvrSchedPtr == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ErrorsFound = true;
+            }
+            if (state.dataPipeHT->PipeHT(Item).EnvrVelSchedPtr == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ErrorsFound = true;
+            }
+            break;
+
+        default:
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, R"(Should be "ZONE" or "SCHEDULE")"); // TODO rename point
+            ErrorsFound = true;
         }
 
         // dimensions

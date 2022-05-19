@@ -146,51 +146,7 @@ struct RoomAirModelManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->GetUCSDDVDataFlag = true;
-        this->GetAirModelData = true;
-        this->MyOneTimeFlag = true;
-        this->CompNum = 0;
-        this->TypeNum = 0;
-        this->NodeNum1 = 0;
-        this->NodeNum2 = 0;
-        this->CompNumber = 0;
-        this->TypeNumber = 0;
-        this->NodeNumber1 = 0;
-        this->NodeNumber2 = 0;
-        this->contFloorBegin = 0;
-        this->contFloorLast = 0;
-        this->contFloor = 0;
-        this->contCeilingBegin = 0;
-        this->contCeilingLast = 0;
-        this->contCeiling = 0;
-        this->contWallBegin = 0;
-        this->contWallLast = 0;
-        this->contWall = 0;
-        this->contWindowBegin = 0;
-        this->contWindowLast = 0;
-        this->contWindow = 0;
-        this->contInternalBegin = 0;
-        this->contInternalLast = 0;
-        this->contInternal = 0;
-        this->contDoorBegin = 0;
-        this->contDoorLast = 0;
-        this->contDoor = 0;
-        this->Loop = 0;
-        this->Loop2 = 0;
-        this->Loop3 = 0;
-        this->i = 0;
-        this->N = 0;
-        this->Z1ZoneAux = 0.0;
-        this->Z2ZoneAux = 0.0;
-        this->Z1Zone = 0.0;
-        this->Z2Zone = 0.0;
-        this->CeilingHeightDiffMax = 0.1;
-        this->Z1ofZoneAux = 0.0;
-        this->Z2ofZoneAux = 0.0;
-        this->Z1ofZone = 0.0;
-        this->Z2ofZone = 0.0;
-        this->CeilingHeightDiffMaximum = 0.1;
-        this->MyEnvrnFlag.clear();
+        *this = RoomAirModelManagerData();
     }
 };
 

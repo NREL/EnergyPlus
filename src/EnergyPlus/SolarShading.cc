@@ -6348,7 +6348,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             state.dataSurface->SurfOpaqAO(SurfNum) = 0.0;
         }
     }
-    if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+    if ((int)state.dataDaylightingDevicesData->TDDPipe.size() > 0) {
         for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
             int SurfDome = e.Dome;
             for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
@@ -9934,16 +9934,15 @@ void WindowShadingManager(EnergyPlusData &state)
                         }
                     }
 
-                    auto const SELECT_CASE_var(state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds);
-
-                    if (SELECT_CASE_var == WSC_SAC_FixedSlatAngle) { // 'FIXEDSLATANGLE'
+                    switch (state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds) {
+                    case WSC_SAC_FixedSlatAngle: { // 'FIXEDSLATANGLE'
                         state.dataSurface->SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
                         if ((state.dataSurface->SurfWinSlatAngThisTS(ISurf) <= state.dataSolarShading->ThetaSmall ||
                              state.dataSurface->SurfWinSlatAngThisTS(ISurf) >= state.dataSolarShading->ThetaBig) &&
                             (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
                             state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
-
-                    } else if (SELECT_CASE_var == WSC_SAC_ScheduledSlatAngle) { // 'SCHEDULEDSLATANGLE'
+                    } break;
+                    case WSC_SAC_ScheduledSlatAngle: { // 'SCHEDULEDSLATANGLE'
                         state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
                             GetCurrentScheduleValue(state, state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
                         state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
@@ -9954,8 +9953,8 @@ void WindowShadingManager(EnergyPlusData &state)
                              state.dataSurface->SurfWinSlatAngThisTS(ISurf) >= state.dataSolarShading->ThetaBig) &&
                             (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
                             state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
-
-                    } else if (SELECT_CASE_var == WSC_SAC_BlockBeamSolar) { // 'BLOCKBEAMSOLAR'
+                    } break;
+                    case WSC_SAC_BlockBeamSolar: { // 'BLOCKBEAMSOLAR'
                         if (BeamSolarOnWindow > 0.0) {
                             if (state.dataHeatBal->Blind(BlNum).SlatSeparation >= state.dataHeatBal->Blind(BlNum).SlatWidth) {
                                 // TH 5/20/2010. CR 8064.
@@ -10003,6 +10002,9 @@ void WindowShadingManager(EnergyPlusData &state)
                         } else {
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
                         }
+                    } break;
+                    default:
+                        break;
                     }
 
                     state.dataSurface->SurfWinSlatAngThisTSDeg(ISurf) =
@@ -10194,27 +10196,26 @@ void WindowGapAirflowControl(EnergyPlusData &state)
             state.dataSurface->SurfWinAirflowThisTS(ISurf) = 0.0;
             if (state.dataSurface->SurfWinMaxAirflow(ISurf) == 0.0) continue;
             if (state.dataSurface->Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
-            {
-                auto const SELECT_CASE_var(state.dataSurface->SurfWinAirflowControlType(ISurf));
-
-                if (SELECT_CASE_var == AirFlowWindow_ControlType_MaxFlow) {
-                    state.dataSurface->SurfWinAirflowThisTS(ISurf) = state.dataSurface->SurfWinMaxAirflow(ISurf);
-
-                } else if (SELECT_CASE_var == AirFlowWindow_ControlType_AlwaysOff) {
-                    state.dataSurface->SurfWinAirflowThisTS(ISurf) = 0.0;
-
-                } else if (SELECT_CASE_var == AirFlowWindow_ControlType_Schedule) {
-                    if (state.dataSurface->SurfWinAirflowHasSchedule(ISurf)) {
-                        int SchedulePtr = state.dataSurface->SurfWinAirflowSchedulePtr(ISurf); // Schedule pointer
-                        Real64 ScheduleMult = GetCurrentScheduleValue(state, SchedulePtr);     // Multiplier value from schedule
-                        if (ScheduleMult < 0.0 || ScheduleMult > 1.0) {
-                            ShowFatalError(state,
-                                           "Airflow schedule has a value outside the range 0.0 to 1.0 for window=" +
-                                               state.dataSurface->Surface(ISurf).Name);
-                        }
-                        state.dataSurface->SurfWinAirflowThisTS(ISurf) = ScheduleMult * state.dataSurface->SurfWinMaxAirflow(ISurf);
+            switch (state.dataSurface->SurfWinAirflowControlType(ISurf)) {
+            case AirFlowWindow_ControlType_MaxFlow: {
+                state.dataSurface->SurfWinAirflowThisTS(ISurf) = state.dataSurface->SurfWinMaxAirflow(ISurf);
+            } break;
+            case AirFlowWindow_ControlType_AlwaysOff: {
+                state.dataSurface->SurfWinAirflowThisTS(ISurf) = 0.0;
+            } break;
+            case AirFlowWindow_ControlType_Schedule: {
+                if (state.dataSurface->SurfWinAirflowHasSchedule(ISurf)) {
+                    int SchedulePtr = state.dataSurface->SurfWinAirflowSchedulePtr(ISurf); // Schedule pointer
+                    Real64 ScheduleMult = GetCurrentScheduleValue(state, SchedulePtr);     // Multiplier value from schedule
+                    if (ScheduleMult < 0.0 || ScheduleMult > 1.0) {
+                        ShowFatalError(
+                            state, "Airflow schedule has a value outside the range 0.0 to 1.0 for window=" + state.dataSurface->Surface(ISurf).Name);
                     }
+                    state.dataSurface->SurfWinAirflowThisTS(ISurf) = ScheduleMult * state.dataSurface->SurfWinMaxAirflow(ISurf);
                 }
+            } break;
+            default:
+                break;
             }
         }
 

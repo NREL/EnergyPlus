@@ -93,51 +93,47 @@ namespace DataDefineEquip {
     {
         // Members
         std::string Name;         // Name or identifier of this piece of equipment
-        int OutletNodeNum;        // index of outlet node
-        int NumComponents;        // number of subcomponents (=1)
-        int NumControls;          // number of controls (not used; =0)
+        int OutletNodeNum = 0;    // index of outlet node
+        int NumComponents = 0;    // number of subcomponents (=1)
+        int NumControls = 0;      // number of controls (not used; =0)
         Array1D_string EquipType; // Pointer identifying type of subcomponent
         Array1D<DataDefineEquip::ZnAirLoopEquipType> EquipTypeEnum;
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
-        std::shared_ptr<AirTerminalUnit> airTerminalPtr;
+        std::shared_ptr<AirTerminalUnit> airTerminalPtr = nullptr;
         Array1D_string EquipName; // name of subcomponent
         Array1D_int EquipIndex;
-        int AirTerminalSizingSpecIndex; // index to DesignSpecification:AirTerminal:Sizing obect
-        int TermUnitSizingNum;          // index to TermUnitSizing and TermUnitFinalZoneSizing for this air distribution unit
-        Real64 UpStreamLeakFrac;        // upstream nominal leakage fraction
-        Real64 DownStreamLeakFrac;      // downstream constant leakage fraction
-        Real64 MassFlowRateUpStrLk;     // current air mass flow rate of the upstream leak [kg/s]
-        Real64 MassFlowRateDnStrLk;     // current air mass flow rate of the downstream leak [kg/s]
-        Real64 MassFlowRateTU;          // current air mass flow rate through the terminal unit [kg/s]
-        Real64 MassFlowRateZSup;        // current air mass flow rate of zone supply air [kg/s]
-        Real64 MassFlowRateSup;         // current air mass flow rate of supply air upstream of upstream leak [kg/s]
-        Real64 MassFlowRatePlenInd;     // current air mass flow rate of induced air from plenum [kg/s]
-        Real64 MaxAvailDelta;           // change in max avail mass low rate due to leaks [kg/s]
-        Real64 MinAvailDelta;           // change in min avail mass low rate due to leaks [kg/s]
-        int InletNodeNum;               // index of inlet node 1
-        int InletNodeNum2;              // index of inlet node 2 (used for dual duct airterminals)
-        int ZoneEqNum;                  // index of zone equipment object for this terminal unit
-        int AirLoopNum;                 // index to airloop that this terminal unit is connected to
-        Real64 LeakLoadMult;            // zome load multiplier to adjust for downstream leak
-        bool UpStreamLeak;              // if true, there is an upstream leak
-        bool DownStreamLeak;            // if true, there is an downstream leak
-        int RetPlenumNum;               // return plenum number that this ADU can leak to, zero if none
-        int ZoneNum;                    // index of the zone object for this terminal unit
-        bool AccountForDOAS;            // if true user has asked for DOAS
-        Real64 HeatRate;                // [W]
-        Real64 CoolRate;                // [W]
-        Real64 HeatGain;                // [J]
-        Real64 CoolGain;                // [J]
+        int AirTerminalSizingSpecIndex = 0; // index to DesignSpecification:AirTerminal:Sizing obect
+        int TermUnitSizingNum = 0;          // index to TermUnitSizing and TermUnitFinalZoneSizing for this air distribution unit
+        Real64 UpStreamLeakFrac = 0.0;      // upstream nominal leakage fraction
+        Real64 DownStreamLeakFrac = 0.0;    // downstream constant leakage fraction
+        Real64 MassFlowRateUpStrLk = 0.0;   // current air mass flow rate of the upstream leak [kg/s]
+        Real64 MassFlowRateDnStrLk = 0.0;   // current air mass flow rate of the downstream leak [kg/s]
+        Real64 MassFlowRateTU = 0.0;        // current air mass flow rate through the terminal unit [kg/s]
+        Real64 MassFlowRateZSup = 0.0;      // current air mass flow rate of zone supply air [kg/s]
+        Real64 MassFlowRateSup = 0.0;       // current air mass flow rate of supply air upstream of upstream leak [kg/s]
+        Real64 MassFlowRatePlenInd = 0.0;   // current air mass flow rate of induced air from plenum [kg/s]
+        Real64 MaxAvailDelta = 0.0;         // change in max avail mass low rate due to leaks [kg/s]
+        Real64 MinAvailDelta = 0.0;         // change in min avail mass low rate due to leaks [kg/s]
+        int InletNodeNum = 0;               // index of inlet node 1
+        int InletNodeNum2 = 0;              // index of inlet node 2 (used for dual duct airterminals)
+        int ZoneEqNum = 0;                  // index of zone equipment object for this terminal unit
+        int AirLoopNum = 0;                 // index to airloop that this terminal unit is connected to
+        Real64 LeakLoadMult = 0.0;          // zome load multiplier to adjust for downstream leak
+        bool UpStreamLeak = false;          // if true, there is an upstream leak
+        bool DownStreamLeak = false;        // if true, there is an downstream leak
+        int RetPlenumNum = 0;               // return plenum number that this ADU can leak to, zero if none
+        int ZoneNum = 0;                    // index of the zone object for this terminal unit
+        bool AccountForDOAS = false;        // if true user has asked for DOAS
+        Real64 HeatRate = 0.0;              // [W]
+        Real64 CoolRate = 0.0;              // [W]
+        Real64 HeatGain = 0.0;              // [J]
+        Real64 CoolGain = 0.0;              // [J]
+        bool EachOnceFlag = true;
 
         // Default Constructor
         ZoneAirEquip()
-            : OutletNodeNum(0), NumComponents(0), NumControls(0), EquipType(MaxZoneAirComponents),
-              EquipTypeEnum(MaxZoneAirComponents, DataDefineEquip::ZnAirLoopEquipType::Invalid), airTerminalPtr(nullptr),
-              EquipName(MaxZoneAirComponents), EquipIndex(MaxZoneAirComponents, 0), AirTerminalSizingSpecIndex(0), TermUnitSizingNum(0),
-              UpStreamLeakFrac(0.0), DownStreamLeakFrac(0.0), MassFlowRateUpStrLk(0.0), MassFlowRateDnStrLk(0.0), MassFlowRateTU(0.0),
-              MassFlowRateZSup(0.0), MassFlowRateSup(0.0), MassFlowRatePlenInd(0.0), MaxAvailDelta(0.0), MinAvailDelta(0.0), InletNodeNum(0),
-              InletNodeNum2(0), ZoneEqNum(0), AirLoopNum(0), LeakLoadMult(0.0), UpStreamLeak(false), DownStreamLeak(false), RetPlenumNum(0),
-              ZoneNum(0), AccountForDOAS(false), HeatRate(0.0), CoolRate(0.0), HeatGain(0.0), CoolGain(0.0)
+            : EquipType(MaxZoneAirComponents), EquipTypeEnum(MaxZoneAirComponents, DataDefineEquip::ZnAirLoopEquipType::Invalid),
+              EquipName(MaxZoneAirComponents), EquipIndex(MaxZoneAirComponents, 0)
         {
         }
     };
@@ -146,14 +142,11 @@ namespace DataDefineEquip {
 
 struct DefineEquipData : BaseGlobalStruct
 {
-
-    int NumAirDistUnits = 0;
     Array1D<DataDefineEquip::ZoneAirEquip> AirDistUnit; // Used to specify zone related
 
     void clear_state() override
     {
-        this->NumAirDistUnits = 0;
-        this->AirDistUnit.deallocate();
+        *this = DefineEquipData();
     }
 };
 

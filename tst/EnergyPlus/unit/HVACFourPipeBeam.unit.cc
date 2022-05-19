@@ -236,7 +236,6 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
                                             DataLoopNode::ObjectIsNotParent,
                                             "Test zone node");
 
-    state->dataDefineEquipment->NumAirDistUnits = 1;
     state->dataDefineEquipment->AirDistUnit.allocate(1);
     state->dataDefineEquipment->AirDistUnit(1).EquipName(1) =
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP

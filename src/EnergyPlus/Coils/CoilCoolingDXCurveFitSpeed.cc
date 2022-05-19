@@ -386,6 +386,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     }
     state.dataSize->DataFlowUsedForSizing = 0.0;
     state.dataSize->DataCapacityUsedForSizing = 0.0;
+    state.dataSize->DataTotCapCurveIndex = 0;
     state.dataSize->DataSizingFraction = 1.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;

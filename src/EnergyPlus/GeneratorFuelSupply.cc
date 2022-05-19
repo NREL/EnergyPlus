@@ -127,16 +127,16 @@ namespace GeneratorFuelSupply {
 
         if (state.dataGeneratorFuelSupply->MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
-            state.dataGenerator->NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            int NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-            if (state.dataGenerator->NumGeneratorFuelSups <= 0) {
+            if (NumGeneratorFuelSups <= 0) {
                 ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
                 ErrorsFound = true;
             }
 
-            state.dataGenerator->FuelSupply.allocate(state.dataGenerator->NumGeneratorFuelSups);
+            state.dataGenerator->FuelSupply.allocate(NumGeneratorFuelSups);
 
-            for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
+            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          FuelSupNum,
@@ -210,19 +210,19 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupNum).eCO2 = NumArray(5);
 
                 if (state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode == DataGenerators::FuelMode::GaseousConstituents) {
-                    state.dataGenerator->NumFuelConstit = NumArray(6);
-                    state.dataGenerator->FuelSupply(FuelSupNum).NumConstituents = state.dataGenerator->NumFuelConstit;
+                    int NumFuelConstit = NumArray(6);
+                    state.dataGenerator->FuelSupply(FuelSupNum).NumConstituents = NumFuelConstit;
 
-                    if (state.dataGenerator->NumFuelConstit > 12) {
+                    if (NumFuelConstit > 12) {
                         ShowSevereError(state, cCurrentModuleObject + " model not set up for more than 12 fuel constituents");
                         ErrorsFound = true;
                     }
-                    if (state.dataGenerator->NumFuelConstit < 1) {
+                    if (NumFuelConstit < 1) {
                         ShowSevereError(state, cCurrentModuleObject + " model needs at least one fuel constituent");
                         ErrorsFound = true;
                     }
 
-                    for (ConstitNum = 1; ConstitNum <= state.dataGenerator->NumFuelConstit; ++ConstitNum) {
+                    for (ConstitNum = 1; ConstitNum <= NumFuelConstit; ++ConstitNum) {
                         state.dataGenerator->FuelSupply(FuelSupNum).ConstitName(ConstitNum) = AlphArray(ConstitNum + 6);
                         state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract(ConstitNum) = NumArray(ConstitNum + 6);
                     }
@@ -239,7 +239,7 @@ namespace GeneratorFuelSupply {
 
             // now make calls to Setup
 
-            for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
+            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 SetupFuelConstituentData(state, FuelSupNum, ErrorsFound);
             }
 

@@ -534,4 +534,3 @@ TEST_F(EnergyPlusFixture, Test_SimulationControl_ZeroSimulation)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
-
