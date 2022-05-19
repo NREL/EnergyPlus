@@ -195,21 +195,13 @@ namespace EIRPlantLoopHeatPumps {
     struct EIRFuelFiredHeatPump : public EIRPlantLoopHeatPump
     {
         // fixed configuration parameters
-
         // reference data
-
         // curve references
-
         // flow rate terms
-
         // simulation variables
-
         // topology variables
-
         // counters and indexes
-
         // logic flags
-
         // a couple worker functions to easily allow merging of cooling and heating operations
 
         // New additions for GAHP only
@@ -245,14 +237,8 @@ namespace EIRPlantLoopHeatPumps {
         Real64 fuelEnergy = 0.0;
 
         // Override parent methods to be declared
-        // void simulate(EnergyPlusData &state,
-        //              const EnergyPlus::PlantLocation &calledFromLocation,
-        //              bool const FirstHVACIteration,
-        //              Real64 &CurLoad,
-        //              bool const RunFlag);
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
-        // void setOperatingFlowRatesASHP(EnergyPlusData &state);
-        void sizeSrcSideASHP(EnergyPlusData &state);
+        void sizeSrcSideASHP(EnergyPlusData &state); // 2022-05-18: may not need this one
         void resetReportingVariables();
         static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
         static void pairUpCompanionCoils(EnergyPlusData &state);

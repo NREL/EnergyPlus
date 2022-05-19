@@ -1194,47 +1194,6 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
     }
 }
 
-// void EIRFuelFiredHeatPump::simulate(
-//    EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
-//{
-//
-//    // Call initialize to set flow rates, run flag, and entering temperatures
-//    this->running = RunFlag;
-//
-//    this->loadSideInletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-//    this->sourceSideInletTemp = state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp;
-//
-//    if (this->waterSource) {
-//        this->setOperatingFlowRatesWSHP(state);
-//        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
-//            PlantUtilities::UpdateChillerComponentCondenserSide(state,
-//                                                                this->sourceSidePlantLoc.loopNum,
-//                                                                this->sourceSidePlantLoc.loopSideNum,
-//                                                                this->EIRHPType,
-//                                                                this->sourceSideNodes.inlet,
-//                                                                this->sourceSideNodes.outlet,
-//                                                                this->sourceSideHeatTransfer,
-//                                                                this->sourceSideInletTemp,
-//                                                                this->sourceSideOutletTemp,
-//                                                                this->sourceSideMassFlowRate,
-//                                                                FirstHVACIteration);
-//            return;
-//        }
-//    } else if (this->airSource) {
-//        this->setOperatingFlowRatesASHP(state);
-//    }
-//
-//    if (this->running) {
-//        this->doPhysics(state, CurLoad);
-//    } else {
-//        this->resetReportingVariables();
-//    }
-//
-//    // update nodes
-//    state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
-//    state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
-//}
-
 void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
     Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -1975,7 +1934,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         // currently there are no straightforward unit tests possible to get here
         // all curves are required and inputs are validated by the input processor
         // obviously this will stay here but I don't feel like counting it against coverage
-        ShowFatalError(state, "Previous EIR FFHP errors cause program termination"); // LCOV_EXCL_LINE
+        ShowFatalError(state, "Previous EIR PLFFHP errors cause program termination"); // LCOV_EXCL_LINE
     }
 }
 
