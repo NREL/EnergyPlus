@@ -410,11 +410,11 @@ HeatPump:AirToWater:FuelFired:Cooling,
 
 Output variables will reported for operation conditions, such as heating energy (rate), fuel energy (rate), electricity energy (rate)load, PLR, flow rate values. 
 
-The newly added output variables are listed as follows:
+The output variables are listed as follows:
 
 ```
-HVAC,average,Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate [W]
-HVAC,sum,Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [W]
+HVAC,average,Fuel-fired Absorption HeatPump Load Side Heat Transfer Rate [W]
+HVAC,sum,Fuel-fired Absorption HeatPump Load Side Heat Transfer Energy [J]
 HVAC,average,Fuel-fired Absorption HeatPump Fuel Rate [W]
 HVAC,sum,Fuel-fired Absorption HeatPump Fuel Energy [J]
 HVAC,average,Fuel-fired Absorption HeatPump Electricity Rate [W]
@@ -458,7 +458,7 @@ The name of the gas-fired (fuel-fired) absorption heat pump system.
 
 #### Field: Water Inlet Node Name ####
 
-Note that here the "water" is literally mean "water". Rather it is the working fluid in the connected water side plant loop, which is usually some kind of glycol-water solution. 
+Note that here the "water" does not literally mean "water". Rather it is the working fluid in the connected water side plant loop, which is usually some kind of glycol-water solution. 
 
 #### Field: Fuel Type ####
 This alpha field determines the type of fuel that the chiller uses. The default is NaturalGas. Valid values are NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2.
@@ -472,12 +472,11 @@ This optional name field allows the user to specify the companion cooling water 
 #### Field: Flow Mode ####
 This choice field determines how the gas-fired absorption heat pump operates with respect to the intended fluid flow through the device. There are three different choices for specifying operating modes for the intended flow behavior: "NotModulated," "ConstantFlow," and "LeavingSetpointModulated." NotModulated is useful for either variable or constant speed pumping arrangements where the boiler is passive in the sense that although it makes a nominal request for its design flow rate it can operate at varying flow rates. ConstantFlow is useful for constant speed pumping arrangements where the heat pump's request for flow is more strict and can increase the overall loop flow. LeavingSetpointModulated changes the heat pump model to internally vary the flow rate so that the temperature leaving the heat pump matches a setpoint. In all cases the operation of the external plant system can also impact the flow through the heat pump---for example if the relative sizes and operation are such that flow is restricted and the requests cannot be met. The default, if not specified, is NotModulated.
 
-#### Field: Temperature Curve Input Variable 2 ####
+#### Field: Water Temperature Curve Input Variable ####
 This field sets the second independent variable in the three temperature dependent performance curves to either the leaving or entering condenser water temperature. Manufacturers express the performance of their heat pumps using either the leaving condenser water temperature or the entering condenser water temperature. Valid choices for this field are: LeavingCondenser or EnteringCondenser. It is important that the performance curves and this field are consistent with each other. The default is EnteringCondenser.
 
 #### Field: Maximum Part Load Ratio ####
 A positive fraction that represents the maximum heating output possible when operated continually at rated temperature conditions divided by the available heating capacity at those same conditions. If greater than 1.0, the equipment is typically thought of as capable of being overloaded. The default is 1.0.
-
 
 #### Field: ####
 
@@ -561,9 +560,6 @@ Following new member variables to the child `EIRFuelFiredHeatPump` struct to acc
         Real64 desTempLift = 11.1;
         int oaTempCurveInputVar = 0;
         int waterTempCurveInputVar = 0;
-        // int capFuncTempCurveIndex = 0;
-        // int powerRatioFuncTempCurveIndex = 0;
-        //  int powerRatioFuncPLRCurveIndex = 0;
         Real64 minPLR = 0.1;
         Real64 maxPLR = 1.0;
 
@@ -583,7 +579,6 @@ Following new member variables to the child `EIRFuelFiredHeatPump` struct to acc
         Real64 loadSideVolumeFlowRate = 0.0;
         Real64 fuelUsage = 0.0;
         Real64 fuelEnergy = 0.0;
-
 ```
 
 A few existing methods (functions) in the parent needs to be overridden for the child struct, such as: 
@@ -619,12 +614,6 @@ This function will be revised in the new child struct to accommodate the output 
 
 ### resetReportingVariables() ###
 This function will be revised in the new child struct to reset reporting variables, especially the energy values for a new timestep. For the GAHP, fuel energy related variables needs to be added to this overridden function. 
-
-### Other possible functions ###
-
-#### Initialize() ####
-
-#### getDesignCapcities() ####
 
 ## Reference ##
 
