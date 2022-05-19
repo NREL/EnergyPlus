@@ -9501,7 +9501,7 @@ namespace SurfaceGeometry {
                                                            "BETWEENGLASSBLIND"  // 9
                                                        });
 
-        int constexpr NumValidWindowShadingControlTypes(22);
+        int constexpr NumValidWindowShadingControlTypes(static_cast<int>(WindowShadingControlType::Num) - 1);
         static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
                                                                     {"ALWAYSON",
                                                                      "ALWAYSOFF",

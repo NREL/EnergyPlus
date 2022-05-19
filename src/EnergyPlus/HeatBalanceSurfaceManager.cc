@@ -814,7 +814,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, state.dataSurface->WindowShadingControl(curWSC).Name);
                     // shading report
-                    std::vector<std::string> WindowShadingTypeStr = {
+                    static constexpr std::array<std::string_view, 10> WindowShadingTypeStr = {
                         "No Shade",  // 0
                         "Shade Off", // 1
                         "Interior Shade",
@@ -826,29 +826,29 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         "Between Glass Shade",
                         "Between Glass Blind",
                     };
-                    std::vector<std::string> WindowShadingControlTypeStr = {"Uncontrolled",
-                                                                            "AlwaysOn",
-                                                                            "AlwaysOff",
-                                                                            "OnIfScheduleAllows",
-                                                                            "OnIfHighSolarOnWindow",
-                                                                            "OnIfHighHorizontalSolar",
-                                                                            "OnIfHighOutdoorAirTemperature",
-                                                                            "OnIfHighZoneAirTemperature",
-                                                                            "OnIfHighZoneCooling",
-                                                                            "OnIfHighGlare",
-                                                                            "MeetDaylightIlluminanceSetpoint",
-                                                                            "OnNightIfLowOutdoorTempAndOffDay",
-                                                                            "OnNightIfLowInsideTempAndOffDay",
-                                                                            "OnNightIfHeatingAndOffDay",
-                                                                            "OnNightIfLowOutdoorTempAndOnDayIfCooling",
-                                                                            "OnNightIfHeatingAndOnDayIfCooling",
-                                                                            "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
-                                                                            "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
-                                                                            "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
-                                                                            "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
-                                                                            "OnIfHighZoneAirTempAndHighSolarOnWindow",
-                                                                            "OnIfHighZoneAirTempAndHighHorizontalSolar",
-                                                                            "OnIfHighLuminanceOrHighSolarTillMidnight"};
+                    static constexpr std::array<std::string_view, 23> WindowShadingControlTypeStr = {"WindowShadingControl:Uncontrolled",
+                                                                            "WindowShadingControl:AlwaysOn",
+                                                                            "WindowShadingControl:AlwaysOff",
+                                                                            "WindowShadingControl:OnIfScheduleAllows",
+                                                                            "WindowShadingControl:OnIfHighSolarOnWindow",
+                                                                            "WindowShadingControl:OnIfHighHorizontalSolar",
+                                                                            "WindowShadingControl:OnIfHighOutdoorAirTemperature",
+                                                                            "WindowShadingControl:OnIfHighZoneAirTemperature",
+                                                                            "WindowShadingControl:OnIfHighZoneCooling",
+                                                                            "WindowShadingControl:OnIfHighGlare",
+                                                                            "WindowShadingControl:MeetDaylightIlluminanceSetpoint",
+                                                                            "WindowShadingControl:OnNightIfLowOutdoorTempAndOffDay",
+                                                                            "WindowShadingControl:OnNightIfLowInsideTempAndOffDay",
+                                                                            "WindowShadingControl:OnNightIfHeatingAndOffDay",
+                                                                            "WindowShadingControl:OnNightIfLowOutdoorTempAndOnDayIfCooling",
+                                                                            "WindowShadingControl:OnNightIfHeatingAndOnDayIfCooling",
+                                                                            "WindowShadingControl:OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+                                                                            "WindowShadingControl:OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+                                                                            "WindowShadingControl:OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+                                                                            "WindowShadingControl:OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+                                                                            "WindowShadingControl:OnIfHighZoneAirTempAndHighSolarOnWindow",
+                                                                            "WindowShadingControl:OnIfHighZoneAirTempAndHighHorizontalSolar",
+                                                                            "WindowShadingControl:OnIfHighLuminanceOrHighSolarTillMidnight"};
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscShading,
                                      surfName,
