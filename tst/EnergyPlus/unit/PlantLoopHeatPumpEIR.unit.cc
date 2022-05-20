@@ -2996,5 +2996,122 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
     EXPECT_TRUE(thisCoolingPLHP->running);
 }
 
+TEST_F(EnergyPlusFixture, GAHP_HeatingConstructionFullObjectsNoCompanion)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:AirToWater:FuelFired:Heating,",
+                                                      "  Fuel Fired hp heating side, ! A1",
+                                                      "  node w1, ! A2",
+                                                      "  node w2, ! A3",
+                                                      "  node a3, ! A4",
+                                                      "  , ! A5 Comanion coil",
+                                                      "  NaturalGas, ! A6 fuel type",
+                                                      "  GAHP_Custom, ! A7 end use cat",
+                                                      "  3000, ! N1 capacity",
+                                                      "  0.005, ! N2 design flow rate",
+                                                      "  60, ! N3 Design Supply Temp",
+                                                      "  11.1, ! N4 Design Lift",
+                                                      "  1.0, ! N5 sizing factor",
+                                                      " NotModulated, ! A8 flow mode",
+                                                      " DryBulb, ! A9 oa temp var type",
+                                                      " EnteringCondenser, ! A9 oa temp var type",
+                                                      "  CapCurveFuncTemp, ! A10 CapFoT",
+                                                      "  EIRCurveFuncTemp, ! A11 EIRFoT",
+                                                      "  EIRCurveFuncPLR, ! A12 EIRFoPLR",
+                                                      " 0.2, ! N6 minPLR",
+                                                      " 1.0, ! N7 maxPLR",
+                                                      " , ! A14 EIRdefrost curve",
+                                                      " OnDemand, ! A15 defrost control type",
+                                                      " , ! N8 defrost time frac",
+                                                      " 3.0, ! N9 max oa DBT for defrost",
+                                                      " unidummyCurve4, ! A16 crf curve name",
+                                                      " 500, ! N10 nominal aux elec power",
+                                                      " EIRCurveFuncTemp, ! A17 EIRAuxFoT",
+                                                      " unidummyCurve6, ! A18 EIRAuxFoPLR",
+                                                      " 20; ! N11 standby elec power",
+
+                                                      "Curve:Biquadratic,",
+                                                      "  CapCurveFuncTemp,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  5.0,",
+                                                      "  10.0,",
+                                                      "  24.0,",
+                                                      "  35.0,",
+                                                      "  ,",
+                                                      "  ,",
+                                                      "  Temperature,",
+                                                      "  Temperature,",
+                                                      "  Dimensionless;",
+                                                      "Curve:Biquadratic,",
+                                                      "  EIRCurveFuncTemp,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  5.0,",
+                                                      "  10.0,",
+                                                      "  24.0,",
+                                                      "  35.0,",
+                                                      "  ,",
+                                                      "  ,",
+                                                      "  Temperature,",
+                                                      "  Temperature,",
+                                                      "  Dimensionless;",
+                                                      "Curve:Quadratic,",
+                                                      "  EIRCurveFuncPLR,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  1.0;"
+
+                                                      "Curve:Linear,",
+                                                      "  unidummyCurve3,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"
+                                                      "Curve:Linear,",
+                                                      "  unidummyCurve4,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"
+                                                      "Curve:Linear,",
+                                                      "  unidummyCurve6,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRFuelFiredHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, "FUEL FIRED HP HEATING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, state->dataEIRFuelFiredHeatPump->heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRFuelFiredHeatPump *thisHeatingPLHP = &state->dataEIRFuelFiredHeatPump->heatPumps[0];
+
+    // validate the heating side
+    EXPECT_EQ("FUEL FIRED HP HEATING SIDE", thisHeatingPLHP->name);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, thisHeatingPLHP->EIRHPType));
+    EXPECT_EQ(nullptr, thisHeatingPLHP->companionHeatPumpCoil);
+    EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
+    EXPECT_EQ(2, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
+    EXPECT_EQ(3, thisHeatingPLHP->powerRatioFuncPLRCurveIndex);
+
+    // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
+    EXPECT_THROW(EIRFuelFiredHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRFuelFiredHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling, "FUEL FIRED HP HEATING SIDE"), std::runtime_error);
+}
+
 #pragma clang diagnostic pop
 #pragma clang diagnostic pop
