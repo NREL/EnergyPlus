@@ -21447,7 +21447,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     EXPECT_TRUE(state->afn->control_defaulted);
 
     EXPECT_EQ(state->afn->simulation_control.name, "AFNDefaultControl");
-    EXPECT_EQ(state->afn->simulation_control.Control, "MULTIZONEWITHOUTDISTRIBUTION");
+    EXPECT_EQ(state->afn->simulation_control.type, AirflowNetwork::ControlType::MultizoneWithoutDistribution);
     EXPECT_EQ(state->afn->simulation_control.WPCCntr, "SURFACEAVERAGECALCULATION");
     EXPECT_EQ(state->afn->simulation_control.HeightOption, "OPENINGHEIGHT");
     EXPECT_EQ(state->afn->simulation_control.BldgType, "LOWRISE");
