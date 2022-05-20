@@ -12365,8 +12365,7 @@ namespace SurfaceGeometry {
         DataVectorTypes::Polyhedron updZonePoly = zonePoly; // set the return value to the original polyhedron describing the zone
 
         for (int iFace = 1; iFace <= updZonePoly.NumSurfaceFaces; ++iFace) {
-            bool faceUpdated = false;
-            DataVectorTypes::Face updFace = updZonePoly.SurfaceFace(iFace);
+            DataVectorTypes::Face &updFace = updZonePoly.SurfaceFace(iFace);
             for (int iterationLimiter = 0; iterationLimiter < 20;
                  ++iterationLimiter) { // could probably be while loop but want to make sure it does not get stuck
                 bool insertedVertext = false;
@@ -12388,20 +12387,19 @@ namespace SurfaceGeometry {
                             if (isPointOnLineBetweenPoints(curVertex, nextVertex, testVertex)) {
                                 foundIntermediateVertex = testVertex;
                                 found = true;
+                                break;
                             }
                         }
                     }
                     if (found) {
                         insertVertexOnFace(updFace, nextVertexIndex, foundIntermediateVertex);
-                        faceUpdated = true;
                         insertedVertext = true;
                         break;
                     }
                 }
-                if (!insertedVertext) break;
-            }
-            if (faceUpdated) {
-                updZonePoly.SurfaceFace(iFace) = updFace;
+                if (!insertedVertext) {
+                    break;
+                }
             }
         }
         return updZonePoly;
