@@ -251,6 +251,7 @@ HeatPump:AirToWater:FuelFired:Heating,
        \note which accounts for system internal fans, pumps, and electronics
   A18, \field Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
        \type object-list
+       \object-list UnivariateFunctions
        \note Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name,
        \note which is a cubic curve or a lookup table.
   N11; \field Standby Electric Power
@@ -398,6 +399,7 @@ HeatPump:AirToWater:FuelFired:Cooling,
        \note which accounts for system internal fans, pumps, and electronics
   A16, \field Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
        \type object-list
+       \object-list UnivariateFunctions
        \note Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name,
        \note which is a cubic curve or a lookup table.
   N9 ; \field Standby Electric Power
