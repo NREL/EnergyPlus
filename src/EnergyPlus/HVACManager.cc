@@ -259,7 +259,7 @@ void ManageHVAC(EnergyPlusData &state)
     ManageHybridVentilation(state);
 
     CalcAirFlowSimple(state);
-    if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+    if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
         state.afn->RollBackFlag = false;
         state.afn->manage_balance(false);
     }
@@ -324,7 +324,7 @@ void ManageHVAC(EnergyPlusData &state)
 
             ManageHybridVentilation(state);
             CalcAirFlowSimple(state, SysTimestepLoop);
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->RollBackFlag = false;
                 state.afn->manage_balance(false);
             }
@@ -1857,7 +1857,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
     if (FirstHVACIteration) {
         state.dataHVACMgr->RepIterAir = 0;
         // Call AirflowNetwork simulation to calculate air flows and pressures
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+        if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
             state.afn->manage_balance(FirstHVACIteration);
         }
         ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
@@ -1883,7 +1883,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             ++IterAir; // Increment the iteration counter
             // Call AirflowNetwork simulation to calculate air flows and pressures
             ResimulateAirZone = false;
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->manage_balance(FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
@@ -1909,7 +1909,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
 
             //      IterAir = IterAir + 1   ! Increment the iteration counter
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
                     SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
                     SimZoneEquipment = true;
@@ -2422,12 +2422,11 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
 
     // Ensure no airflownetwork and simple calculations
-    if (state.afn->SimulateAirflowNetwork == 0) {
-        return;
-    }
+    //if (state.afn->SimulateAirflowNetwork == 0) {
+    //    return;
+    //}
 
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
-    // if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
         state.afn->report();
     }
 

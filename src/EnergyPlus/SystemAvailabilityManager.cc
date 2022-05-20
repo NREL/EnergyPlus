@@ -4247,7 +4247,7 @@ namespace SystemAvailabilityManager {
                 }
             }
 
-            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                 ShowContinueError(state, "The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError(state,
@@ -4256,7 +4256,7 @@ namespace SystemAvailabilityManager {
             }
 
             if (hybridVentMgr.SimpleControlTypeSchedPtr == 0) {
-                if (state.afn->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                     ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
                 } else if (state.afn->simulation_control.type ==
@@ -4772,7 +4772,7 @@ namespace SystemAvailabilityManager {
                 ACH = 0.0;
                 HybridVentModeOA = true;
                 if (!hybridVentMgr.HybridVentMgrConnectedToAirLoop) {
-                    if (state.afn->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                    if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                         HybridVentModeOA = false;
                     }
                 }

@@ -1645,7 +1645,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
         }
 
         // from pressure driven model
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+        if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
             for (auto &con : state.dataContaminantBalance->ZoneContamGenericPDriven) {
                 SurfNum = con.SurfNum;
                 Pi = state.afn->AirflowNetworkNodeSimu(state.afn->MultizoneSurfaceData(SurfNum).NodeNums[0]).PZ;
@@ -1933,8 +1933,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone CO2.  The A, B, C coefficients are analogous to the CO2 balance.
                 // Assume that the system will have flow
-                if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution ||
-                    state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistribution ||
+                if (state.afn->multizone_always_simulated ||
                     (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                      state.afn->AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
@@ -2064,8 +2063,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone GC.  The A, B, C coefficients are analogous to the GC balance.
                 // Assume that the system will have flow
-                if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution ||
-                    state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistribution ||
+                if (state.afn->multizone_always_simulated ||
                     (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                      state.afn->AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
@@ -2694,8 +2692,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             A = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
                 state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
                 state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
-            if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution ||
-                state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistribution ||
+            if (state.afn->multizone_always_simulated ||
                 (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                  state.afn->AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
@@ -2706,7 +2703,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         }
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+            if (state.afn->distribution_simulated) {
                 B += state.afn->exchangeData(ZoneNum).TotalCO2;
             }
 
@@ -2767,8 +2764,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             A = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
                 state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
                 state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
-            if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution ||
-                state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistribution ||
+            if (state.afn->multizone_always_simulated ||
                 (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
                  state.afn->AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
@@ -2779,7 +2775,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+            if (state.afn->distribution_simulated) {
                 B += state.afn->exchangeData(ZoneNum).TotalGC;
             }
 

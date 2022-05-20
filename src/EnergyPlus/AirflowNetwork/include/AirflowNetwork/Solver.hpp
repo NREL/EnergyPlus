@@ -437,7 +437,6 @@ namespace AirflowNetwork {
         // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
         Array1D<Real64> SUMF;
 
-        int SimulateAirflowNetwork = 1;
         Array1D_bool AirflowNetworkZoneFlag;
         int NumOfNodesMultiZone = 0;    // Number of nodes for multizone calculation
         int NumOfNodesDistribution = 0; // Number of nodes for distribution system calculation
@@ -478,6 +477,8 @@ namespace AirflowNetwork {
         Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
 
         SimulationControl simulation_control;
+        bool distribution_simulated = false;     // True if distribution is being simulated
+        bool multizone_always_simulated = false; // True if the multizone solution is always computed
 
         // Moved from simulation control to outer object
         int ExtLargeOpeningErrCount = 0; // Exterior large opening error count during HVAC system operation
@@ -627,7 +628,6 @@ namespace AirflowNetwork {
             dos.clear();
             properties.clear();
 
-            SimulateAirflowNetwork = 1;
             AirflowNetworkNodeSimu.clear();
             AirflowNetworkLinkSimu.clear();
             AirflowNetworkZoneFlag.clear();
@@ -655,6 +655,8 @@ namespace AirflowNetwork {
             VAVTerminalRatio = 0.0;
             VAVSystem = false;
             simulation_control = AirflowNetwork::SimulationControl();
+            distribution_simulated = false;
+            multizone_always_simulated = false;
             ExtLargeOpeningErrCount = 0;
             ExtLargeOpeningErrIndex = 0;
             OpenFactorErrCount = 0;

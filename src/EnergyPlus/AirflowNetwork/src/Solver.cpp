@@ -192,7 +192,7 @@ namespace AirflowNetwork {
             ResimulateAirZone = false;
         }
 
-        if (SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
+        if (simulation_control.type == ControlType::NoMultizoneOrDistribution) return;
 
         if (m_state.dataGlobal->BeginEnvrnFlag) {
             TurnFansOn = false; // The FAN should be off when BeginEnvrnFlag = .True.
@@ -208,8 +208,7 @@ namespace AirflowNetwork {
 
         AirflowNetworkFanActivated = false;
 
-        if (present(FirstHVACIteration) && (simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation ||
-                                            simulation_control.type == ControlType::MultizoneWithDistribution)) {
+        if (present(FirstHVACIteration) && distribution_simulated) {
             if (FirstHVACIteration) {
                 if (allocated(m_state.dataAirLoop->AirLoopAFNInfo)) {
                     for (i = 1; i <= DisSysNumOfCVFs; i++) {
@@ -262,9 +261,7 @@ namespace AirflowNetwork {
             AirflowNetworkFanActivated = false;
         }
 
-        if (present(Iter) && present(ResimulateAirZone) &&
-            (simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation ||
-             simulation_control.type == ControlType::MultizoneWithDistribution)) {
+        if (present(Iter) && present(ResimulateAirZone) && distribution_simulated) {
             if (AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == FanType_SimpleOnOff) {
                 ResimulateAirZone = true;
             }
@@ -275,7 +272,7 @@ namespace AirflowNetwork {
                 if (!AirflowNetworkFanActivated && Iter < 3) ResimulateAirZone = true;
             }
         }
-        if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+        if (AirflowNetworkFanActivated && distribution_simulated) {
             NetworkNumOfNodes = AirflowNetworkNumOfNodes;
             NetworkNumOfLinks = AirflowNetworkNumOfLinks;
         }
@@ -291,7 +288,7 @@ namespace AirflowNetwork {
             AssignFanAirLoopNumFlag = false;
         }
 
-        if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+        if (AirflowNetworkFanActivated && distribution_simulated) {
             if (ValidateDistributionSystemFlag) {
                 validate_distribution();
                 validate_fan_flowrate();
@@ -300,7 +297,7 @@ namespace AirflowNetwork {
         }
         calculate_balance();
 
-        if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+        if (AirflowNetworkFanActivated && distribution_simulated) {
 
             LoopOnOffFlag = false;
             for (i = 1; i <= DisSysNumOfCVFs; i++) {
@@ -1955,13 +1952,12 @@ namespace AirflowNetwork {
                 simulation_control.azimuth = 0.0;
                 simulation_control.aspect_ratio = 1.0;
                 simulation_control.MaxPressure = 500.0; // Maximum pressure difference by default
-                SimulateAirflowNetwork = AirflowNetworkControlMultizone;
                 SimAirNetworkKey = "MultizoneWithoutDistribution";
                 simulation_control.InitFlag = 1;
                 ShowWarningError(m_state, format("{}{} object is not found ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state, "..The default behaviour values are assigned. Please see details in Input Output Reference.");
             } else {
-                SimulateAirflowNetwork = AirflowNetworkControlSimple;
+                simulation_control.type = ControlType::NoMultizoneOrDistribution;
                 print(m_state.files.eio, Format_110);
                 print(m_state.files.eio, Format_120, "NoMultizoneOrDistribution");
                 return;
@@ -2004,27 +2000,34 @@ namespace AirflowNetwork {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(simulation_control.Control));
                 if (SELECT_CASE_var == "NOMULTIZONEORDISTRIBUTION") {
                     simulation_control.type = ControlType::NoMultizoneOrDistribution;
-                    SimulateAirflowNetwork = AirflowNetworkControlSimple;
                     SimAirNetworkKey = "NoMultizoneOrDistribution";
                 } else if (SELECT_CASE_var == "MULTIZONEWITHOUTDISTRIBUTION") {
                     simulation_control.type = ControlType::MultizoneWithoutDistribution;
-                    SimulateAirflowNetwork = AirflowNetworkControlMultizone;
                     SimAirNetworkKey = "MultizoneWithoutDistribution";
                 } else if (SELECT_CASE_var == "MULTIZONEWITHDISTRIBUTIONONLYDURINGFANOPERATION") {
                     simulation_control.type = ControlType::MultizoneWithDistributionOnlyDuringFanOperation;
-                    SimulateAirflowNetwork = AirflowNetworkControlSimpleADS;
                     SimAirNetworkKey = "MultizoneWithDistributionOnlyDuringFanOperation";
                 } else { // if (SELECT_CASE_var == "MULTIZONEWITHDISTRIBUTION") {
                     simulation_control.type = ControlType::MultizoneWithDistribution;
-                    SimulateAirflowNetwork = AirflowNetworkControlMultiADS;
                     SimAirNetworkKey = "MultizoneWithDistribution";
                 }
             }
         }
 
+        // Determine a convenience boolean or two to simplify the checking
+        // The first one is true if distribution is simulated, replaces some > and >= comparisons
+        // SimulateAirflowNetwork > AirflowNetworkControlMultizone -> type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation
+        //                                                            type == ControlType::MultizoneWithDistribution
+        // SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS -> type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation
+        //                                                             type == ControlType::MultizoneWithDistribution
+        distribution_simulated = simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation ||
+                                 simulation_control.type == ControlType::MultizoneWithDistribution;
+        // This one is true if the multizone simulation is ALWAYS done
+        multizone_always_simulated = simulation_control.type == ControlType::MultizoneWithDistribution ||
+                                     simulation_control.type == ControlType::MultizoneWithoutDistribution;
+
         // Check the number of primary air loops
-        if (simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation ||
-            simulation_control.type == ControlType::MultizoneWithDistribution) {
+        if (distribution_simulated) {
             NumAPL = m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "AirLoopHVAC");
             if (NumAPL > 0) {
                 LoopPartLoadRatio.allocate(NumAPL);
@@ -2059,10 +2062,11 @@ namespace AirflowNetwork {
         }
 
         // Check whether a user wants to perform SIMPLE calculation only or not
-        if (simulation_control.type == ControlType::NoMultizoneOrDistribution) return;
+        if (simulation_control.type == ControlType::NoMultizoneOrDistribution) {
+            return;
+        }
 
-        if (simulation_control.type == ControlType::MultizoneWithoutDistribution ||
-            simulation_control.type == ControlType::MultizoneWithDistribution) {
+        if (multizone_always_simulated) {
             if (m_state.dataHeatBal->TotInfiltration > 0) {
                 ShowWarningError(m_state, format("{}{} object, ", RoutineName, CurrentModuleObject));
                 ShowContinueError(m_state,
@@ -3883,7 +3887,7 @@ namespace AirflowNetwork {
                 }
             }
         } else {
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
+            if (distribution_simulated) {
                 ShowSevereError(m_state, format(RoutineName) + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -3891,7 +3895,7 @@ namespace AirflowNetwork {
 
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
         if (DisSysNumOfDucts == 0) {
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
+            if (distribution_simulated) {
                 ShowSevereError(m_state, format(RoutineName) + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -3996,7 +4000,7 @@ namespace AirflowNetwork {
 
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
         if (DisSysNumOfCVFs == 0) {
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
+            if (distribution_simulated) {
                 ShowSevereError(m_state, format(RoutineName) + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -4112,7 +4116,7 @@ namespace AirflowNetwork {
         }
 
         // Assign numbers of nodes and linkages
-        if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
+        if (simulation_control.type != ControlType::NoMultizoneOrDistribution) {
             if (simulation_control.iWPCCnt == iWPCCntr::Input) {
                 NumOfNodesMultiZone = AirflowNetworkNumOfZones + AirflowNetworkNumOfExtNode;
             } else {
@@ -4124,7 +4128,7 @@ namespace AirflowNetwork {
             AirflowNetworkNumOfLinks = NumOfLinksMultiZone;
             if (NumOfLinksIntraZone > 0) AirflowNetworkNumOfLinks = AirflowNetworkNumOfLinks + NumOfLinksIntraZone;
         }
-        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
+        if (distribution_simulated) {
             AirflowNetworkNumOfNodes = NumOfNodesMultiZone + DisSysNumOfNodes + NumOfNodesIntraZone;
         }
 
@@ -4514,7 +4518,7 @@ namespace AirflowNetwork {
         // Read AirflowNetwork linkage data
         CurrentModuleObject = "AirflowNetwork:Distribution:Linkage";
         DisSysNumOfLinks = m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, CurrentModuleObject);
-        if (DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Multizone + Distribution
+        if (DisSysNumOfLinks > 0 && distribution_simulated) { // Multizone + Distribution
             AirflowNetworkNumOfLinks = NumOfLinksMultiZone + DisSysNumOfLinks;
             AirflowNetworkLinkageData.allocate(DisSysNumOfLinks + AirflowNetworkNumOfSurfaces);
         } else { // Multizone + IntraZone only
@@ -4767,7 +4771,7 @@ namespace AirflowNetwork {
             }
         }
 
-        if (DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Distribution
+        if (DisSysNumOfLinks > 0 && distribution_simulated) { // Distribution
 
             for (auto &e : AirflowNetworkLinkageData)
                 e.ZoneNum = 0;
@@ -4867,7 +4871,7 @@ namespace AirflowNetwork {
             }
         } else {
 
-            if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
+            if (distribution_simulated) {
                 ShowSevereError(m_state, format(RoutineName) + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
             }
@@ -5083,8 +5087,7 @@ namespace AirflowNetwork {
         //        }
 
         // Ensure the name of each heat exchanger is shown either once or twice in the field of
-        if (simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation ||
-            simulation_control.type == ControlType::MultizoneWithDistribution) {
+        if (distribution_simulated) {
             for (int i = 1; i <= DisSysNumOfHXs; ++i) {
                 count = 0;
                 for (j = 1; j <= AirflowNetworkNumOfLinks; ++j) {
@@ -5355,7 +5358,7 @@ namespace AirflowNetwork {
         }
         if (!m_state.dataGlobal->BeginEnvrnFlag) {
             initializeMyEnvrnFlag = true;
-            if (SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (simulation_control.type != ControlType::NoMultizoneOrDistribution) {
                 if (RollBackFlag) {
                     for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                         ANZT(i) = m_state.dataHeatBalFanSys->XMAT(i);
@@ -6402,7 +6405,7 @@ namespace AirflowNetwork {
                 if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::DOP ||
                     AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SOP ||
                     AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
-                    if (AirflowNetworkFanActivated && (SimulateAirflowNetwork > AirflowNetworkControlMultizone) &&
+                    if (AirflowNetworkFanActivated && distribution_simulated &&
                         MultizoneSurfaceData(i).OpenFactor > 0.0 &&
                         (m_state.dataSurface->Surface(j).ExtBoundCond == ExternalEnvironment ||
                          (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
@@ -8569,7 +8572,7 @@ namespace AirflowNetwork {
         int FanNum;
         Real64 RepOnOffFanRunTimeFraction;
 
-        if (SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
+        if (simulation_control.type == ControlType::NoMultizoneOrDistribution) return;
 
         if (!onetime) {
             onceZoneFlag.dimension(m_state.dataGlobal->NumOfZones, false);
@@ -8636,8 +8639,7 @@ namespace AirflowNetwork {
         }
 
         // Calculate sensible and latent loads in each zone from multizone airflows
-        if (simulation_control.type == ControlType::MultizoneWithoutDistribution || 
-            simulation_control.type == ControlType::MultizoneWithDistribution || 
+        if (multizone_always_simulated || 
             (simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation && AirflowNetworkFanActivated)) {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) { // Multizone airflow energy
                 n = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -8860,7 +8862,7 @@ namespace AirflowNetwork {
         }
 
         // Assign data for report
-        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+        if (distribution_simulated) {
             for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                 if (exchangeData(i).LeakSen > 0.0) {
                     AirflowNetworkReportData(i).LeakSenGainW = exchangeData(i).LeakSen;
@@ -9216,8 +9218,7 @@ namespace AirflowNetwork {
             }
         }
 
-        if (!(simulation_control.type == ControlType::MultizoneWithoutDistribution ||
-              simulation_control.type == ControlType::MultizoneWithDistribution)) {
+        if (!multizone_always_simulated) {
             return;
         }
 
@@ -9398,8 +9399,7 @@ namespace AirflowNetwork {
         }
 
         // Calculate sensible and latent loads in each zone from multizone airflows
-        if (simulation_control.type == ControlType::MultizoneWithoutDistribution || 
-            simulation_control.type == ControlType::MultizoneWithDistribution || 
+        if (multizone_always_simulated ||
             (simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation && AirflowNetworkFanActivated)) {
             for (i = 1; i <= NumOfLinksMultiZone; ++i) { // Multizone airflow energy
                 n = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -9537,7 +9537,7 @@ namespace AirflowNetwork {
             }
         }
 
-        if (!AirflowNetworkFanActivated && (SimulateAirflowNetwork > AirflowNetworkControlMultizone)) {
+        if (!AirflowNetworkFanActivated && distribution_simulated) {
             for (i = NumOfNodesMultiZone + NumOfNodesIntraZone + 1; i <= AirflowNetworkNumOfNodes; ++i) {
                 AirflowNetworkNodeSimu(i).PZ = 0.0;
             }
@@ -9550,9 +9550,9 @@ namespace AirflowNetwork {
             }
         }
 
-        if (!(AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone)) return;
+        if (!(AirflowNetworkFanActivated && distribution_simulated)) return;
 
-        if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
+        if (distribution_simulated) {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) { // Multizone airflow energy
                 n = AirflowNetworkLinkageData(i).NodeNums[0];
                 M = AirflowNetworkLinkageData(i).NodeNums[1];
