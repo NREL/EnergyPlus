@@ -1684,7 +1684,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     errorsFound = true;
                 }
                 // A13 fuel_energy_input_ratio_function_of_plr_curve_name
-                auto &eirFplrName = fields.at("fuel_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
+                auto &eirFplrName = fields.at("fuel_energy_input_ratio_function_of_plr_curve_name");
                 thisPLHP.powerRatioFuncPLRCurveIndex =
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
@@ -1730,13 +1730,18 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A14 fuel_energy_input_ratio_defrost_adjustment_curve_name
-                auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
-                thisPLHP.defrostEIRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
-                if (thisPLHP.defrostEIRCurveIndex == 0) {
-                    ShowSevereError(state,
-                                    "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + eirDefrostName.get<std::string>());
-                    errorsFound = true;
+                if (fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name") != fields.end()) {
+                    auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
+                    thisPLHP.defrostEIRCurveIndex =
+                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
+                    if (thisPLHP.defrostEIRCurveIndex == 0) {
+                        ShowSevereError(state,
+                                        "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                            "; entered curve name: " + eirDefrostName.get<std::string>());
+                        errorsFound = true;
+                    }
+                } else {
+                    thisPLHP.defrostEIRCurveIndex = 0;
                 }
 
                 // A15 defrost_control_type
