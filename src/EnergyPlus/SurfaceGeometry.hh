@@ -306,7 +306,7 @@ namespace SurfaceGeometry {
 
     std::vector<EdgeOfSurf> edgesNotTwoForEnclosedVolumeTest(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> const &uniqueVertices);
 
-    void makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> &uniqVertices);
+    std::vector<Vector> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly);
 
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
                                                                            std::vector<Vector> const &uniqVertices);

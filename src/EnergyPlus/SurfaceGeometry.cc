@@ -12197,13 +12197,11 @@ namespace SurfaceGeometry {
     {
         // J. Glazer - March 2017
 
-        std::vector<Vector> uniqueVertices;
-        makeListOfUniqueVertices(zonePoly, uniqueVertices);
+        std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
         std::vector<EdgeOfSurf> edgeNot2orig = edgesNotTwoForEnclosedVolumeTest(zonePoly, uniqueVertices);
-
         // if all edges had two counts then it is fully enclosed
-        if (edgeNot2orig.size() == size_t(0)) {
+        if (edgeNot2orig.empty()) {
             edgeNot2 = edgeNot2orig;
             return true;
         } else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not
@@ -12212,7 +12210,7 @@ namespace SurfaceGeometry {
             DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints(
                 zonePoly, uniqueVertices); // this is done after initial test since it is computationally intensive.
             std::vector<EdgeOfSurf> edgeNot2again = edgesNotTwoForEnclosedVolumeTest(updatedZonePoly, uniqueVertices);
-            if (edgeNot2again.size() == size_t(0)) {
+            if (edgeNot2again.empty()) {
                 return true;
             } else {
                 edgeNot2 = edgesInBoth(edgeNot2orig,
@@ -12231,8 +12229,8 @@ namespace SurfaceGeometry {
         // this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20.
 
         std::vector<EdgeOfSurf> inBoth;
-        for (auto e1 : edges1) {
-            for (auto e2 : edges2) {
+        for (const auto &e1 : edges1) {
+            for (const auto &e2 : edges2) {
                 if (edgesEqualOnSameSurface(e1, e2)) {
                     inBoth.push_back(e1);
                     break;
@@ -12245,17 +12243,12 @@ namespace SurfaceGeometry {
     // returns true if the edges match - including the surface number
     bool edgesEqualOnSameSurface(EdgeOfSurf a, EdgeOfSurf b)
     {
-        if (a.surfNum == b.surfNum) {
-            if (a.start == b.start && a.end == b.end) { // vertex comparison
-                return true;
-            } else if (a.start == b.end && a.end == b.start) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+        if (a.surfNum != b.surfNum) {
             return false;
         }
+
+        // vertex comparison (we compare indices, so absolute equal)
+        return ((a.start == b.start && a.end == b.end) || (a.start == b.end && a.end == b.start));
     }
 
     // returns the number of times the edges of the polyhedron of the zone are not used twice by the sides
@@ -12330,12 +12323,12 @@ namespace SurfaceGeometry {
     }
 
     // create a list of unique vertices given the polyhedron describing the zone
-    void makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> &uniqVertices)
+    std::vector<Vector> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly)
     {
         // J. Glazer - March 2017
 
         using DataVectorTypes::Vector;
-        uniqVertices.clear();
+        std::vector<Vector> uniqVertices;
         uniqVertices.reserve(zonePoly.NumSurfaceFaces * 6);
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
@@ -12345,7 +12338,7 @@ namespace SurfaceGeometry {
                     uniqVertices.emplace_back(curVertex);
                 } else {
                     bool found = false;
-                    for (auto unqV : uniqVertices) {
+                    for (const auto &unqV : uniqVertices) {
                         if (isAlmostEqual3dPt(curVertex, unqV)) {
                             found = true;
                             break;
@@ -12357,6 +12350,7 @@ namespace SurfaceGeometry {
                 }
             }
         }
+        return uniqVertices;
     }
 
     // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing

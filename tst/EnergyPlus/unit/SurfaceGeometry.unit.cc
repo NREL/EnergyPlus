@@ -1180,6 +1180,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints_Fa
     DataVectorTypes::Vector t(15.0, 0.0, 0.3); // Notice wrong z, it's 30cm off!
 
     EXPECT_FALSE(isPointOnLineBetweenPoints(a, b, t));
+    EXPECT_EQ(0.3, distanceFromPointToLine(a, b, t));
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findIndexOfVertex)
@@ -1928,8 +1929,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_makeListOfUniqueVertices_test
     zonePoly.SurfaceFace(6).FacePoints(4).y = 8.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 3.;
 
-    std::vector<Vector> uniqueVertices;
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
     EXPECT_EQ(size_t(8), uniqueVertices.size());
     EXPECT_EQ(Vector(0., 0., 3.), uniqueVertices.at(0));
@@ -2068,8 +2068,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_numberOfEdgesNotTwoForEnclose
     zonePoly.SurfaceFace(6).FacePoints(4).y = 8.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 3.;
 
-    std::vector<Vector> uniqueVertices;
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
     EXPECT_EQ(size_t(8), uniqueVertices.size());
 
@@ -2080,7 +2079,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_numberOfEdgesNotTwoForEnclose
     zonePoly.SurfaceFace(6).FacePoints(4).y = 0.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 0.;
 
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    uniqueVertices = makeListOfUniqueVertices(zonePoly);
     EXPECT_EQ(size_t(8), uniqueVertices.size());
 
     std::vector<EdgeOfSurf> e2 = edgesNotTwoForEnclosedVolumeTest(zonePoly, uniqueVertices);
@@ -2235,8 +2234,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_updateZonePolygonsForMissingC
     zonePoly.SurfaceFace(6).FacePoints(4).y = 8.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 3.;
 
-    std::vector<Vector> uniqueVertices;
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
     EXPECT_EQ(size_t(10), uniqueVertices.size());
 
