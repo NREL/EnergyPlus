@@ -12712,14 +12712,30 @@ namespace SurfaceGeometry {
         return sqrt(pow(v1.x - v2.x, 2) + pow(v1.y - v2.y, 2) + pow(v1.z - v2.z, 2));
     }
 
+    Real64 distanceFromPointToLine(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test)
+    {
+        // np.linalg.norm(np.cross(e-s,p-s)/np.linalg.norm(e-s))
+        DataVectorTypes::Vector t = end - start;
+        t.normalize(); // Unit vector of start to end
+
+        DataVectorTypes::Vector other = test - start;
+
+        DataVectorTypes::Vector projection = DataVectorTypes::cross(t, other); // normal unit vector, that's the distance component
+        return projection.length();
+    }
+
     // tests if a point in space lies on the line segment defined by two other points
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test)
     {
         // J. Glazer - March 2017
         // The tolerance has to be low enough. Take for eg a plenum that has an edge that's 30meters long, you risk adding point from the floor to
         // the roof, cf #7383
-        Real64 tol = 0.001; //  1mm
-        return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        // compute the shortest distance from the point to the line first to avoid false positive
+        Real64 tol = 0.0127;
+        if (distanceFromPointToLine(start, end, test) < tol) { // distanceFromPointToLine always positive, it's calculated as norml_L2
+            return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        }
+        return false;
     }
 
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound)

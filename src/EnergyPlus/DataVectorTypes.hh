@@ -85,8 +85,9 @@ namespace DataVectorTypes {
     //  subscript lookup and are templates so we are using them as plug replacements
     //  for consistent API and to avoid cost of copying them
     // Note: For vectorization contexts std::array is a better choice
-    typedef ObjexxFCL::Vector3<Real64> Vector;
-    typedef ObjexxFCL::Vector2<Real64> Vector_2d;
+    using Vector = ObjexxFCL::Vector3<Real64>;
+    using Vector_2d = ObjexxFCL::Vector2<Real64>;
+    using ObjexxFCL::cross;
 
     struct Vector2dCount : Vector_2d
     {

@@ -338,6 +338,8 @@ namespace SurfaceGeometry {
 
     Real64 distance(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
 
+    Real64 distanceFromPointToLine(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
+
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound);
