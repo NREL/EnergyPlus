@@ -288,10 +288,12 @@ namespace SurfaceGeometry {
 
     struct EdgeOfSurf
     {
-        int surfNum;
+        int surfNum = 0;
         Vector start;
         Vector end;
-        EdgeOfSurf() : surfNum(0), start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
+        std::vector<int> otherSurfNums;
+        int count = 0;
+        EdgeOfSurf() : start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
         {
         }
     };

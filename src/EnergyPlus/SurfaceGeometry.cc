@@ -12055,11 +12055,26 @@ namespace SurfaceGeometry {
                     default:
                         assert(false);
                     }
-                    for (auto edge : listOfedgeNotUsedTwice) {
-                        ShowContinueError(
-                            state,
-                            "  The surface    \"" + state.dataSurface->Surface(edge.surfNum).Name +
-                                "\" has an edge that is either not an edge on another surface or is an edge on three or more surfaces: ");
+                    for (auto &edge : listOfedgeNotUsedTwice) {
+                        if (edge.count < 2) {
+                            ShowContinueError(
+                                state,
+                                fmt::format("  The surface \"{}\" has an edge that was used only once: it is not an edge on another surface",
+                                            state.dataSurface->Surface(edge.surfNum).Name,
+                                            edge.count));
+
+                        } else {
+                            ShowContinueError(
+                                state,
+                                fmt::format("  The surface \"{}\" has an edge that was used {} times: it is an edge on three or more surfaces: ",
+                                            state.dataSurface->Surface(edge.surfNum).Name,
+                                            edge.count));
+                            std::string surfaceNames = "    It was found on the following Surfaces: ";
+                            for (int surfNum : edge.otherSurfNums) {
+                                surfaceNames += fmt::format("'{}' ", state.dataSurface->Surface(surfNum).Name);
+                            }
+                            ShowContinueError(state, surfaceNames);
+                        }
                         ShowContinueError(state, format("    Vertex start {{ {:.4R}, {:.4R}, {:.4R}}}", edge.start.x, edge.start.y, edge.start.z));
                         ShowContinueError(state, format("    Vertex end   {{ {:.4R}, {:.4R}, {:.4R}}}", edge.end.x, edge.end.y, edge.end.z));
                     }
@@ -12256,6 +12271,7 @@ namespace SurfaceGeometry {
             int end;
             int count;
             int firstSurfNum;
+            std::vector<int> otherSurfNums;
             EdgeByPts() : start(0), end(0), count(0), firstSurfNum(0)
             {
             }
@@ -12278,16 +12294,12 @@ namespace SurfaceGeometry {
                     prevVertexIndex = curVertexIndex;
                 }
                 curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
-                curVertexIndex = findIndexOfVertex(curVertex, uniqueVertices);
-                int found = -1;
-                for (std::size_t i = 0; i < uniqueEdges.size(); i++) {
-                    if ((uniqueEdges[i].start == curVertexIndex && uniqueEdges[i].end == prevVertexIndex) ||
-                        (uniqueEdges[i].start == prevVertexIndex && uniqueEdges[i].end == curVertexIndex)) {
-                        found = i;
-                        break;
-                    }
-                }
-                if (found == -1) {
+                curVertexIndex = findIndexOfVertex(curVertex, uniqueVertices); // uses isAlmostEqual3dPt
+                auto it = std::find_if(uniqueEdges.begin(), uniqueEdges.end(), [&curVertexIndex, &prevVertexIndex](const auto &edge) {
+                    return ((edge.start == curVertexIndex && edge.end == prevVertexIndex) ||
+                            (edge.start == prevVertexIndex && edge.end == curVertexIndex));
+                });
+                if (it == uniqueEdges.end()) {
                     EdgeByPts curEdge;
                     curEdge.start = prevVertexIndex;
                     curEdge.end = curVertexIndex;
@@ -12295,19 +12307,22 @@ namespace SurfaceGeometry {
                     curEdge.firstSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
                     uniqueEdges.emplace_back(curEdge);
                 } else {
-                    ++uniqueEdges[found].count;
+                    ++(it->count);
+                    it->otherSurfNums.push_back(zonePoly.SurfaceFace(iFace).SurfNum);
                 }
             }
         }
         // All edges for an enclosed polyhedron should be shared by two (and only two) sides.
         // So if the count is not two for all edges, the polyhedron is not enclosed
         std::vector<EdgeOfSurf> edgesNotTwoCount;
-        for (auto anEdge : uniqueEdges) {
+        for (const auto &anEdge : uniqueEdges) {
             if (anEdge.count != 2) {
                 EdgeOfSurf curEdgeOne;
                 curEdgeOne.surfNum = anEdge.firstSurfNum;
                 curEdgeOne.start = uniqueVertices[anEdge.start];
                 curEdgeOne.end = uniqueVertices[anEdge.end];
+                curEdgeOne.count = anEdge.count;
+                curEdgeOne.otherSurfNums = anEdge.otherSurfNums;
                 edgesNotTwoCount.push_back(curEdgeOne);
             }
         }
