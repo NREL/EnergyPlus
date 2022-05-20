@@ -1171,6 +1171,17 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints)
     EXPECT_TRUE(isPointOnLineBetweenPoints(a, b, t));
 }
 
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints_FalsePositive)
+{
+    // cf #7383
+
+    DataVectorTypes::Vector a(0.0, 0.0, 0.0);
+    DataVectorTypes::Vector b(30.0, 0.0, 0.0);
+    DataVectorTypes::Vector t(15.0, 0.0, 0.3); // Notice wrong z, it's 30cm off!
+
+    EXPECT_FALSE(isPointOnLineBetweenPoints(a, b, t));
+}
+
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findIndexOfVertex)
 {
     DataVectorTypes::Vector a;
@@ -2502,6 +2513,84 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_BoxWithSplit
     // leave gap
     zonePoly.SurfaceFace(1).FacePoints(3) = Vector(9., 0., 0.);
     EXPECT_FALSE(isEnclosedVolume(zonePoly, edgeNot2));
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_VeryFlatShape)
+{
+    // Test for #7383
+    // This is a shoebox model that has a very flat aspect: a 30x10x0.3m one
+    // The south wall is split in two equal segments, the rest is just one surface per orientation
+
+    DataVectorTypes::Polyhedron zonePoly;
+
+    zonePoly.NumSurfaceFaces = 7;
+    zonePoly.SurfaceFace.allocate(7);
+
+    // 1-SOUTH-1
+    zonePoly.SurfaceFace(1).SurfNum = 2;
+    zonePoly.SurfaceFace(1).NSides = 4;
+    zonePoly.SurfaceFace(1).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(1).FacePoints(1) = Vector(0.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(1).FacePoints(2) = Vector(0.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(1).FacePoints(3) = Vector(15.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(1).FacePoints(4) = Vector(15.0, 0.0, 0.3);
+
+    // 1-SOUTH-2
+    zonePoly.SurfaceFace(2).SurfNum = 1;
+    zonePoly.SurfaceFace(2).NSides = 4;
+    zonePoly.SurfaceFace(2).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(2).FacePoints(1) = Vector(15.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(2).FacePoints(2) = Vector(15.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(2).FacePoints(3) = Vector(30.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(2).FacePoints(4) = Vector(30.0, 0.0, 0.3);
+
+    // 4-NORTH
+    zonePoly.SurfaceFace(3).SurfNum = 3;
+    zonePoly.SurfaceFace(3).NSides = 4;
+    zonePoly.SurfaceFace(3).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(3).FacePoints(1) = Vector(30.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(3).FacePoints(2) = Vector(30.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(3).FacePoints(3) = Vector(0.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(3).FacePoints(4) = Vector(0.0, 10.0, 0.3);
+
+    // 3-EAST
+    zonePoly.SurfaceFace(4).SurfNum = 4;
+    zonePoly.SurfaceFace(4).NSides = 4;
+    zonePoly.SurfaceFace(4).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(4).FacePoints(1) = Vector(30.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(4).FacePoints(2) = Vector(30.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(4).FacePoints(3) = Vector(30.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(4).FacePoints(4) = Vector(30.0, 10.0, 0.3);
+
+    // ROOF
+    zonePoly.SurfaceFace(5).SurfNum = 5;
+    zonePoly.SurfaceFace(5).NSides = 4;
+    zonePoly.SurfaceFace(5).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(5).FacePoints(1) = Vector(30.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(5).FacePoints(2) = Vector(30.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(5).FacePoints(3) = Vector(0.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(5).FacePoints(4) = Vector(0.0, 0.0, 0.3);
+
+    // 2-WEST
+    zonePoly.SurfaceFace(6).SurfNum = 6;
+    zonePoly.SurfaceFace(6).NSides = 4;
+    zonePoly.SurfaceFace(6).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(6).FacePoints(1) = Vector(0.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(6).FacePoints(2) = Vector(0.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(6).FacePoints(3) = Vector(0.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(6).FacePoints(4) = Vector(0.0, 0.0, 0.3);
+
+    // FLOOR
+    zonePoly.SurfaceFace(7).SurfNum = 7;
+    zonePoly.SurfaceFace(7).NSides = 4;
+    zonePoly.SurfaceFace(7).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(7).FacePoints(1) = Vector(0.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(7).FacePoints(2) = Vector(0.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(7).FacePoints(3) = Vector(30.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(7).FacePoints(4) = Vector(30.0, 0.0, 0.0);
+
+    std::vector<EdgeOfSurf> edgeNot2;
+    EXPECT_TRUE(isEnclosedVolume(zonePoly, edgeNot2));
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
