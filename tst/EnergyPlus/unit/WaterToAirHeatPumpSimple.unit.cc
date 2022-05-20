@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataCurveManager->PerfCurve(CurveNum).Var3Min = 0;
     state->dataCurveManager->PerfCurve(CurveNum).Var3Max = 100;
     state->dataCurveManager->PerfCurve(CurveNum).Var4Min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var4Max = 38;       
+    state->dataCurveManager->PerfCurve(CurveNum).Var4Max = 38;
 
     // performance curve coefficients
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex = 1;
