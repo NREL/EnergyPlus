@@ -12716,8 +12716,9 @@ namespace SurfaceGeometry {
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test)
     {
         // J. Glazer - March 2017
-
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
+        // The tolerance has to be low enough. Take for eg a plenum that has an edge that's 30meters long, you risk adding point from the floor to
+        // the roof, cf #7383
+        Real64 tol = 0.001; //  1mm
         return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
     }
 
