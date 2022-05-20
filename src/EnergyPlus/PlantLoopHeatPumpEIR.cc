@@ -1684,7 +1684,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     errorsFound = true;
                 }
                 // A13 fuel_energy_input_ratio_function_of_plr_curve_name
-                auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
+                auto &eirFplrName = fields.at("fuel_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
                 thisPLHP.powerRatioFuncPLRCurveIndex =
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
