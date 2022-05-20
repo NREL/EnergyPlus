@@ -1312,7 +1312,8 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
     // 2022-05-18: The following line needs a protection on setting this->sourceSideMassFlowRate to a safe value for GAHP
-    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+    // Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+    Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate ) * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 }
 
@@ -1669,7 +1670,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
-                        state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName.get<std::string>());
+                        state, "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName.get<std::string>());
                     errorsFound = true;
                 }
 
@@ -1679,7 +1680,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
-                        state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + eirFtName.get<std::string>());
+                        state, "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name + "; entered curve name: " + eirFtName.get<std::string>());
                     errorsFound = true;
                 }
                 // A13 fuel_energy_input_ratio_function_of_plr_curve_name
@@ -1688,7 +1689,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
-                        state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + eirFplrName.get<std::string>());
+                        state, "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name + "; entered curve name: " + eirFplrName.get<std::string>());
                     errorsFound = true;
                 }
 
@@ -1703,7 +1704,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
                         ShowSevereError(state,                                                                // LCOV_EXCL_LINE
-                                        "EIR FFHP: minimum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
+                                        "EIR PLFFHP: minimum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
                         errorsFound = true;                                                                   // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.minPLR = defaultVal;
@@ -1721,7 +1722,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
                         ShowSevereError(state,                                                                // LCOV_EXCL_LINE
-                                        "EIR FFHP: maximum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
+                                        "EIR PLFFHP: maximum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
                         errorsFound = true;                                                                   // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.maxPLR = defaultVal;
@@ -1759,7 +1760,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
                         ShowSevereError(state,                                                                          // LCOV_EXCL_LINE
-                                        "EIR FFHP: defrost time fraction not entered and could not get default value"); // LCOV_EXCL_LINE
+                                        "EIR PLFFHP: defrost time fraction not entered and could not get default value"); // LCOV_EXCL_LINE
                         errorsFound = true;                                                                             // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.defrostOpTimeFrac = defaultVal;
@@ -1778,7 +1779,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // but excluding it from coverage
                         ShowSevereError(
                             state,                                                                                         // LCOV_EXCL_LINE
-                            "EIR FFHP: max defrost operation OA temperature not entered and could not get default value"); // LCOV_EXCL_LINE
+                            "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value"); // LCOV_EXCL_LINE
                         errorsFound = true;                                                                                // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.defrostMaxOADBT = defaultVal;
@@ -1791,7 +1792,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
                 if (thisPLHP.cycRatioCurveIndex == 0) {
                     ShowSevereError(state,
-                                    "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                    "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + cycRatioCurveName.get<std::string>());
                     errorsFound = true;
                 }
@@ -1807,7 +1808,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
                         ShowSevereError(state,                                                                                     // LCOV_EXCL_LINE
-                                        "EIR FFHP: nominal auxiliary electric power not entered and could not get default value"); // LCOV_EXCL_LINE
+                                        "EIR PLFFHP: nominal auxiliary electric power not entered and could not get default value"); // LCOV_EXCL_LINE
                         errorsFound = true;                                                                                        // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.nominalAuxElecPower = defaultVal;
@@ -1948,7 +1949,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
 
         // setup output variables
         SetupOutputVariable(state,
-                            "Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate",
+                            "Fuel-fired Absorption HeatPump Load Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->loadSideHeatTransfer,
                             OutputProcessor::SOVTimeStepType::System,
