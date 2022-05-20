@@ -1936,7 +1936,6 @@ namespace AirflowNetwork {
                 m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, "AirflowNetwork:MultiZone:Surface") >= 2) {
                 control_defaulted = true;
                 simulation_control.name = "AFNDefaultControl";
-                simulation_control.Control = "MULTIZONEWITHOUTDISTRIBUTION";
                 simulation_control.type = ControlType::MultizoneWithoutDistribution;
                 simulation_control.WPCCntr = "SURFACEAVERAGECALCULATION";
                 simulation_control.HeightOption = "OPENINGHEIGHT";
@@ -1983,7 +1982,6 @@ namespace AirflowNetwork {
                                                                        cNumericFields);
 
             simulation_control.name = Alphas(1);
-            simulation_control.Control = Alphas(2);
             simulation_control.WPCCntr = Alphas(3);
             simulation_control.HeightOption = Alphas(4);
             simulation_control.BldgType = Alphas(5);
@@ -1997,7 +1995,7 @@ namespace AirflowNetwork {
             // Find a flag for possible combination of vent and distribution system
             // This SELECT_CASE_var will go on input refactor, no need to fix
             {
-                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(simulation_control.Control));
+                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(Alphas(2)));
                 if (SELECT_CASE_var == "NOMULTIZONEORDISTRIBUTION") {
                     simulation_control.type = ControlType::NoMultizoneOrDistribution;
                     SimAirNetworkKey = "NoMultizoneOrDistribution";

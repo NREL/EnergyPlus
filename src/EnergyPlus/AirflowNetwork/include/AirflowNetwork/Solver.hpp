@@ -79,11 +79,11 @@ namespace AirflowNetwork {
     //  NONE           DISTSYS        3      Perform distribution system during system on time only
     //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
     //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
-
-    int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
-    int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
-    int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system on time and simple calculations during off time
-    int constexpr AirflowNetworkControlMultiADS(5);  // Perform distribution system during system on time and multizone calculations during off time
+    //
+    // int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
+    // int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
+    // int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system on time and simple calculations during off time
+    // int constexpr AirflowNetworkControlMultiADS(5);  // Perform distribution system during system on time and multizone calculations during off time
 
     enum class ControlType
     {
@@ -180,7 +180,6 @@ namespace AirflowNetwork {
 
         // Members
         std::string name; // Provide a unique object name
-        std::string Control = "NoMultizoneOrDistribution";
         ControlType type =
             ControlType::NoMultizoneOrDistribution; // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION, MULTIZONE WITHOUT DISTRIBUTION, MULTIZONE
                                                     // WITH DISTRIBUTION ONLY DURING FAN OPERATION, and NO MULTIZONE OR DISTRIBUTION
