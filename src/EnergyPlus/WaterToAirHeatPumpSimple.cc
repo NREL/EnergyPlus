@@ -2055,7 +2055,7 @@ namespace WaterToAirHeatPumpSimple {
                 } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING") {
 
                     //       use companion heating coil capacity to calculate volumetric flow rate
-                    if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
+                    if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
                         SystemCapacity =
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapHeat;
                     } else {
