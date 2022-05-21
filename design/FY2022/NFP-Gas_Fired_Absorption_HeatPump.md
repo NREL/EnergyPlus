@@ -5,7 +5,7 @@ Equation-Fit Based Gas Fired Absorption Heat Pump (GAHP) Module
 
  - Original Date: April 22, 2022
  - Revised: April 29, 2022
- - Revised: May 19, 2022
+ - Revised: May 20, 2022
 
 
 ## Justification for New Feature ##
@@ -210,6 +210,7 @@ HeatPump:AirToWater:FuelFired:Heating,
        \note Minimum Part Load Ratio (PLR) in between 0 and 1
   N7 , \field Maximum Part Load Ratio
        \minimum> 0.0
+       \maximum 1.0
        \default 1.0
        \note Maximum Part Load Ratio (PLR) in between 0 and 1
   A14, \field Fuel Energy Input Ratio Defrost Adjustment Curve name
@@ -380,6 +381,7 @@ HeatPump:AirToWater:FuelFired:Cooling,
        \note Minimum Part Load Ratio (PLR) in between 0 and 1
   N7 , \field Maximum Part Load Ratio
        \minimum> 0.0
+       \maximum 1.0
        \default 1.0
        \note Maximum Part Load Ratio (PLR) in between 0 and 1
   A14, \field Cycling Ratio Factor Curve Name
