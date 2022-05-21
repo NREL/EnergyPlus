@@ -1591,7 +1591,6 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // N5 Sizing factor
-                // 2022-05-13: check the following line, why need to check if it is the last one?
                 if (fields.find("sizing_factor") != fields.end()) {
                     thisPLHP.sizingFactor = fields.at("sizing_factor").get<Real64>();
                     if (thisPLHP.sizingFactor <= 0.0) thisPLHP.sizingFactor = 1.0;
@@ -1793,14 +1792,18 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A16 cycling_ratio_factor_curve_name
-                auto &cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
-                thisPLHP.cycRatioCurveIndex =
-                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
-                if (thisPLHP.cycRatioCurveIndex == 0) {
-                    ShowSevereError(state,
-                                    "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + cycRatioCurveName.get<std::string>());
-                    errorsFound = true;
+                if (fields.find("cycling_ratio_factor_curve_name") != fields.end()) {
+                    auto &cycRatioCurveName = fields.at("cycling_ratio_factor_curve_name");
+                    thisPLHP.cycRatioCurveIndex =
+                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
+                    if (thisPLHP.cycRatioCurveIndex == 0) {
+                        ShowSevereError(state,
+                                        "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name +
+                                            "; entered curve name: " + cycRatioCurveName.get<std::string>());
+                        errorsFound = true;
+                    }
+                } else {
+                    thisPLHP.cycRatioCurveIndex = 0;
                 }
 
                 // N10 nominal_auxiliary_electric_power
@@ -1822,24 +1825,33 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
-                auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
-                thisPLHP.auxElecEIRFoTempCurveIndex =
-                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
-                if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state, "Invalid curve name for EIR FFHP (name=" + thisPLHP.name + "; entered curve name: " + auxEIRFTName.get<std::string>());
-                    errorsFound = true;
+                if (fields.find("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name") != fields.end()) {
+                    auto &auxEIRFTName = fields.at("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
+                    thisPLHP.auxElecEIRFoTempCurveIndex =
+                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
+                    if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
+                        ShowSevereError(state,
+                                        "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                            "; entered curve name: " + auxEIRFTName.get<std::string>());
+                        errorsFound = true;
+                    }
+                } else {
+                    thisPLHP.auxElecEIRFoTempCurveIndex = 0;
                 }
 
                 // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
-                auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
-                thisPLHP.auxElecEIRFoPLRCurveIndex =
-                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
-                if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
-                    ShowSevereError(state,
-                                    "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + auxEIRFPLRName.get<std::string>());
-                    errorsFound = true;
+                if (fields.find("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name") != fields.end()) {
+                    auto &auxEIRFPLRName = fields.at("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
+                    thisPLHP.auxElecEIRFoPLRCurveIndex =
+                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
+                    if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
+                        ShowSevereError(state,
+                                        "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                            "; entered curve name: " + auxEIRFPLRName.get<std::string>());
+                        errorsFound = true;
+                    }
+                } else {
+                    thisPLHP.auxElecEIRFoPLRCurveIndex = 0;
                 }
 
                 // N11 standby_electric_power
