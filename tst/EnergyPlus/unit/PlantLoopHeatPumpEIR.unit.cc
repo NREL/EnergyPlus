@@ -3023,10 +3023,10 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingConstructionFullObjectsNoCompanion)
                                                       " OnDemand, ! A15 defrost control type",
                                                       " , ! N8 defrost time frac",
                                                       " 3.0, ! N9 max oa DBT for defrost",
-                                                      " unidummyCurve4, ! A16 crf curve name",
+                                                      " uniCRFCurve5, ! A16 crf curve name",
                                                       " 500, ! N10 nominal aux elec power",
                                                       " EIRCurveFuncTemp, ! A17 EIRAuxFoT",
-                                                      " unidummyCurve6, ! A18 EIRAuxFoPLR",
+                                                      " uniAuxElecEIRFoPLRCurve6, ! A18 EIRAuxFoPLR",
                                                       " 20; ! N11 standby elec power",
 
                                                       "Curve:Biquadratic,",
@@ -3072,19 +3072,19 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingConstructionFullObjectsNoCompanion)
                                                       "  1.0;"
 
                                                       "Curve:Linear,",
-                                                      "  unidummyCurve3,",
+                                                      "  uniDefrostCurve4,",
                                                       "  1,",
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"
                                                       "Curve:Linear,",
-                                                      "  unidummyCurve4,",
+                                                      "  uniCRFCurve5,",
                                                       "  1,",
                                                       "  0,",
                                                       "  1,",
                                                       "  1;"
                                                       "Curve:Linear,",
-                                                      "  unidummyCurve6,",
+                                                      "  uniAuxElecEIRFoPLRCurve6,",
                                                       "  1,",
                                                       "  0,",
                                                       "  1,",
@@ -3107,10 +3107,18 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingConstructionFullObjectsNoCompanion)
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(2, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(3, thisHeatingPLHP->powerRatioFuncPLRCurveIndex);
+    EXPECT_EQ(0, thisHeatingPLHP->defrostEIRCurveIndex);
+    EXPECT_EQ(5, thisHeatingPLHP->cycRatioCurveIndex);
+    EXPECT_EQ(2, thisHeatingPLHP->auxElecEIRFoTempCurveIndex);
+    EXPECT_EQ(6, thisHeatingPLHP->auxElecEIRFoPLRCurveIndex);
+
+    EXPECT_EQ(500.0, thisHeatingPLHP->nominalAuxElecPower);
+    EXPECT_EQ(20.0, thisHeatingPLHP->standbyElecPower);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
     EXPECT_THROW(EIRFuelFiredHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRFuelFiredHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling, "FUEL FIRED HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRFuelFiredHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling, "FUEL FIRED HP HEATING SIDE"),
+                 std::runtime_error);
 }
 
 #pragma clang diagnostic pop
