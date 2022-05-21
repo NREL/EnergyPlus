@@ -1313,7 +1313,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
     // 2022-05-18: The following line needs a protection on setting this->sourceSideMassFlowRate to a safe value for GAHP
     // Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
-    Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate ) * CpSrc;
+    Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate) * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 }
 
@@ -1688,8 +1688,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.powerRatioFuncPLRCurveIndex =
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state, "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name + "; entered curve name: " + eirFplrName.get<std::string>());
+                    ShowSevereError(state,
+                                    "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name +
+                                        "; entered curve name: " + eirFplrName.get<std::string>());
                     errorsFound = true;
                 }
 
@@ -1703,9 +1704,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                // LCOV_EXCL_LINE
+                        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
                                         "EIR PLFFHP: minimum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                   // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                     // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.minPLR = defaultVal;
                     }
@@ -1721,9 +1722,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                // LCOV_EXCL_LINE
+                        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
                                         "EIR PLFFHP: maximum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                   // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                     // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.maxPLR = defaultVal;
                     }
@@ -1747,11 +1748,11 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // A15 defrost_control_type
                 std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
                 if (defrostControlType == "TIMED") {
-                    thisPLHP.defrostEIRCurveIndex = 0;
+                    thisPLHP.defrostType = 0;
                 } else if (defrostControlType == "ONDEMAND") {
-                    thisPLHP.defrostEIRCurveIndex = 1;
+                    thisPLHP.defrostType = 1;
                 } else {
-                    thisPLHP.defrostEIRCurveIndex = 0; // default Timed
+                    thisPLHP.defrostType = 0; // default Timed
                 }
 
                 // N8 defrost_operation_time_fraction
@@ -1764,9 +1765,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                          // LCOV_EXCL_LINE
+                        ShowSevereError(state,                                                                            // LCOV_EXCL_LINE
                                         "EIR PLFFHP: defrost time fraction not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                             // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                               // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.defrostOpTimeFrac = defaultVal;
                     }
@@ -1783,9 +1784,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
                         ShowSevereError(
-                            state,                                                                                         // LCOV_EXCL_LINE
+                            state,                                                                                           // LCOV_EXCL_LINE
                             "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                                // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                                  // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.defrostMaxOADBT = defaultVal;
                     }
@@ -1812,9 +1813,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                                     // LCOV_EXCL_LINE
+                        ShowSevereError(state,                                                                                       // LCOV_EXCL_LINE
                                         "EIR PLFFHP: nominal auxiliary electric power not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                                        // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                                          // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.nominalAuxElecPower = defaultVal;
                     }
