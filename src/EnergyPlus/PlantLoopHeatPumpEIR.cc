@@ -1730,64 +1730,79 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A14 fuel_energy_input_ratio_defrost_adjustment_curve_name
-                if (fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name") != fields.end()) {
-                    auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
-                    thisPLHP.defrostEIRCurveIndex =
-                        CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
-                    if (thisPLHP.defrostEIRCurveIndex == 0) {
-                        ShowSevereError(state,
-                                        "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
-                                            "; entered curve name: " + eirDefrostName.get<std::string>());
-                        errorsFound = true;
-                    }
-                } else {
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                     thisPLHP.defrostEIRCurveIndex = 0;
-                }
-
-                // A15 defrost_control_type
-                std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
-                if (defrostControlType == "TIMED") {
-                    thisPLHP.defrostType = 0;
-                } else if (defrostControlType == "ONDEMAND") {
-                    thisPLHP.defrostType = 1;
                 } else {
-                    thisPLHP.defrostType = 0; // default Timed
-                }
 
-                // N8 defrost_operation_time_fraction
-                if (fields.find("defrost_operation_time_fraction") != fields.end()) {
-                    thisPLHP.defrostOpTimeFrac = fields.at("defrost_operation_time_fraction").get<Real64>();
-                } else {
-                    Real64 defaultVal = 0.0;
-                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                            state, cCurrentModuleObject, "defrost_operation_time_fraction", defaultVal)) {
-                        // this error condition would mean that someone broke the input dictionary, not their
-                        // input file.  I can't really unit test it so I'll leave it here as a severe error
-                        // but excluding it from coverage
-                        ShowSevereError(state,                                                                            // LCOV_EXCL_LINE
-                                        "EIR PLFFHP: defrost time fraction not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                               // LCOV_EXCL_LINE
+                    if (fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name") != fields.end()) {
+                        auto &eirDefrostName = fields.at("fuel_energy_input_ratio_defrost_adjustment_curve_name");
+                        thisPLHP.defrostEIRCurveIndex =
+                            CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
+                        if (thisPLHP.defrostEIRCurveIndex == 0) {
+                            ShowSevereError(state,
+                                            "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
+                                                "; entered curve name: " + eirDefrostName.get<std::string>());
+                            errorsFound = true;
+                        }
                     } else {
-                        thisPLHP.defrostOpTimeFrac = defaultVal;
+                        thisPLHP.defrostEIRCurveIndex = 0;
+                    }
+                }
+                // A15 defrost_control_type
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                    thisPLHP.defrostType = 0;
+                } else {
+                    std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
+                    if (defrostControlType == "TIMED") {
+                        thisPLHP.defrostType = 0;
+                    } else if (defrostControlType == "ONDEMAND") {
+                        thisPLHP.defrostType = 1;
+                    } else {
+                        thisPLHP.defrostType = 0; // default Timed
+                    }
+                }
+                // N8 defrost_operation_time_fraction
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                    thisPLHP.defrostOpTimeFrac = 0.0;
+                } else {
+                    if (fields.find("defrost_operation_time_fraction") != fields.end()) {
+                        thisPLHP.defrostOpTimeFrac = fields.at("defrost_operation_time_fraction").get<Real64>();
+                    } else {
+                        Real64 defaultVal = 0.0;
+                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                                state, cCurrentModuleObject, "defrost_operation_time_fraction", defaultVal)) {
+                            // this error condition would mean that someone broke the input dictionary, not their
+                            // input file.  I can't really unit test it so I'll leave it here as a severe error
+                            // but excluding it from coverage
+                            ShowSevereError(state,                                                                            // LCOV_EXCL_LINE
+                                            "EIR PLFFHP: defrost time fraction not entered and could not get default value"); // LCOV_EXCL_LINE
+                            errorsFound = true;                                                                               // LCOV_EXCL_LINE
+                        } else {
+                            thisPLHP.defrostOpTimeFrac = defaultVal;
+                        }
                     }
                 }
 
                 // N9 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
-                if (fields.find("maximum_outdoor_dry_bulb_temperature_for_defrost_operation") != fields.end()) {
-                    thisPLHP.defrostMaxOADBT = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation").get<Real64>();
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                    thisPLHP.defrostMaxOADBT = 5.0;
                 } else {
-                    Real64 defaultVal = 5.0;
-                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
-                            state, cCurrentModuleObject, "maximum_outdoor_dry_bulb_temperature_for_defrost_operation", defaultVal)) {
-                        // this error condition would mean that someone broke the input dictionary, not their
-                        // input file.  I can't really unit test it so I'll leave it here as a severe error
-                        // but excluding it from coverage
-                        ShowSevereError(
-                            state,                                                                                           // LCOV_EXCL_LINE
-                            "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                                  // LCOV_EXCL_LINE
+                    if (fields.find("maximum_outdoor_dry_bulb_temperature_for_defrost_operation") != fields.end()) {
+                        thisPLHP.defrostMaxOADBT = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation").get<Real64>();
                     } else {
-                        thisPLHP.defrostMaxOADBT = defaultVal;
+                        Real64 defaultVal = 5.0;
+                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                                state, cCurrentModuleObject, "maximum_outdoor_dry_bulb_temperature_for_defrost_operation", defaultVal)) {
+                            // this error condition would mean that someone broke the input dictionary, not their
+                            // input file.  I can't really unit test it so I'll leave it here as a severe error
+                            // but excluding it from coverage
+                            ShowSevereError(
+                                state,                                                                                           // LCOV_EXCL_LINE
+                                "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value"); // LCOV_EXCL_LINE
+                            errorsFound = true;                                                                                  // LCOV_EXCL_LINE
+                        } else {
+                            thisPLHP.defrostMaxOADBT = defaultVal;
+                        }
                     }
                 }
 
