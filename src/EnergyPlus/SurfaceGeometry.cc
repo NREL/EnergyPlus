@@ -12390,7 +12390,7 @@ namespace SurfaceGeometry {
                             }
                         }
                     }
-                    // Break out of the surface loop too, and start again at the while
+                    // Break out of the loop on vertices of the surface too, and start again at the while
                     if (insertedVertext) {
                         break;
                     }
