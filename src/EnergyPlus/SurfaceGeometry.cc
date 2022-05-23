@@ -8278,7 +8278,6 @@ namespace SurfaceGeometry {
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            //ErrorsFound = true;
             return;
         } else {
             int Loop = 0;
@@ -8307,31 +8306,35 @@ namespace SurfaceGeometry {
                 if (groundSurfaces != fields.end()) {
                     auto groundSurfacesArray = groundSurfaces.value();
                     numGndSurfs = groundSurfacesArray.size();
-                    thisGndSurfsProp.GndSurfs.allocate(numGndSurfs);
                     thisGndSurfsProp.NumGndSurfs = numGndSurfs;
                     int surfNum = -1;
                     for (auto groundSurface : groundSurfacesArray) {
                         surfNum += 1;
-                        auto ground_surf_name = groundSurface.at("ground_surface_name");
-                        if (!ground_surf_name.empty()) {
-                            thisGndSurfsProp.GndSurfs[surfNum].Name = ground_surf_name.get<std::string>();
+                        GroundSurfacesData thisgndSurface;
+                        auto GndSurfName = groundSurface.find("ground_surface_name");
+                        if (GndSurfName != groundSurface.end()) {
+                            auto ground_surf_name = groundSurface.at("ground_surface_name").get<std::string>();
+                            if (!ground_surf_name.empty()) {
+                                std::string name = EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_name);
+                                thisgndSurface.Name = name;
+                            }
                         }
-                        auto ground_surf_viewfactor = groundSurface.at("ground_surface_view_factor");
-                        if (!ground_surf_viewfactor.empty()) {
-                            thisGndSurfsProp.GndSurfs[surfNum].ViewFactor = ground_surf_viewfactor.get<Real64>();
+                        auto groundSurfViewFactor = groundSurface.find("ground_surface_view_factor");
+                        if (groundSurfViewFactor != groundSurface.end()) {
+                            Real64 ground_surf_viewfactor = groundSurface.at("ground_surface_view_factor").get<Real64>();
+                            thisgndSurface.ViewFactor = ground_surf_viewfactor;
                         } else {
                             if (surfNum == 0) {
                                 ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cNumericFieldNames(1) + ".");
                                 ShowContinueError(state, "At lease one ground surface view factor should be specified.");
                             }
                         }
-
                         auto TempSchName = groundSurface.find("ground_surface_temperature_schedule_name");
                         if (TempSchName != groundSurface.end()) {
                             auto ground_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
                             if (!ground_surf_TempSchName.empty()) {
-                                thisGndSurfsProp.GndSurfs[surfNum].TempSchPtr =
-                                    GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_TempSchName));
+                                int TempSchIndex = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_TempSchName));
+                                thisgndSurface.TempSchPtr = TempSchIndex;
                             } else {
                                 if (surfNum == 0) {
                                     ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + ".");
@@ -8344,8 +8347,8 @@ namespace SurfaceGeometry {
                         if (ReflSchName != groundSurface.end()) {
                             auto ground_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
                             if (!ground_surf_ReflSchName.empty()) {
-                                thisGndSurfsProp.GndSurfs[surfNum].ReflSchPtr =
-                                    GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_ReflSchName));
+                                int ReflSchIndex = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_ReflSchName));
+                                thisgndSurface.ReflSchPtr = ReflSchIndex;
                             } else {
                                 if (surfNum == 0) {
                                     ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + ".");
@@ -8354,6 +8357,7 @@ namespace SurfaceGeometry {
                                 }
                             }
                         }
+                        thisGndSurfsProp.GndSurfs.push_back(thisgndSurface);
                     }
                 }
                 // calculate ground surfaces view factor sum once for later use
@@ -8364,10 +8368,6 @@ namespace SurfaceGeometry {
                     ShowWarningError(state, cCurrentModuleObject + "=\"" + "sum of ground surfaces view factor is zero.");
                     ShowContinueError(state, "At least one ground surface view factor should be specified.");
                 }
-                //if (ErrorsFound) {
-                //    ShowFatalError(state, format(RoutineName) + "Errors found getting for object name = " + thisGndSurfsProp.Name);
-                //    ShowContinueError(state, "Previous error(s) cause program termination.");
-                //}
                 state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsProp);
 
                 SetupOutputVariable(state,
@@ -8385,7 +8385,6 @@ namespace SurfaceGeometry {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->GroundSurfsProperty(Loop).Name);
-
             }
         }
     }
