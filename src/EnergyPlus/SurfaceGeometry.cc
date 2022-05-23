@@ -12366,9 +12366,9 @@ namespace SurfaceGeometry {
 
         for (int iFace = 1; iFace <= updZonePoly.NumSurfaceFaces; ++iFace) {
             DataVectorTypes::Face &updFace = updZonePoly.SurfaceFace(iFace);
-            for (int iterationLimiter = 0; iterationLimiter < 20;
-                 ++iterationLimiter) { // could probably be while loop but want to make sure it does not get stuck
-                bool insertedVertext = false;
+            bool insertedVertext = true;
+            while (insertedVertext) {
+                insertedVertext = false;
                 for (int curVertexIndex = updFace.NSides; curVertexIndex >= 1; --curVertexIndex) { // go through array from end
                     Vector curVertex = updFace.FacePoints(curVertexIndex);
                     Vector nextVertex;
@@ -12380,25 +12380,19 @@ namespace SurfaceGeometry {
                     }
                     nextVertex = updFace.FacePoints(nextVertexIndex);
                     // now go through all the vertices and see if they are colinear with start and end vertices
-                    bool found = false;
-                    Vector foundIntermediateVertex;
                     for (auto testVertex : uniqVertices) {
                         if (!isAlmostEqual3dPt(curVertex, testVertex) && !isAlmostEqual3dPt(nextVertex, testVertex)) {
                             if (isPointOnLineBetweenPoints(curVertex, nextVertex, testVertex)) {
-                                foundIntermediateVertex = testVertex;
-                                found = true;
+                                insertVertexOnFace(updFace, nextVertexIndex, testVertex);
+                                insertedVertext = true;
                                 break;
                             }
                         }
                     }
-                    if (found) {
-                        insertVertexOnFace(updFace, nextVertexIndex, foundIntermediateVertex);
-                        insertedVertext = true;
+                    // Break out of the loop on vertices too, and start again at the while
+                    if (insertedVertext) {
                         break;
                     }
-                }
-                if (!insertedVertext) {
-                    break;
                 }
             }
         }
