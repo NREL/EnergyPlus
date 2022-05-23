@@ -35,6 +35,8 @@ In the current workorder, we would focus on two metrics only and propose to focu
 SEER2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
 capacities less than 65,000 Btu/h
 
+SEER2 = PLF(0.5) * EER2 
+
 ![image](https://user-images.githubusercontent.com/49325382/165989369-12ff95cd-3e8d-4b4d-8bc5-d29a7c260687.png)
 
 based on the following temperature bin values
