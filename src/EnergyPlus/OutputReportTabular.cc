@@ -10254,7 +10254,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             columnHead,
                             "SourceEnergyEndUseComponentsSummary",
                             "Entire Facility",
-                            "Source Energy End Use Component Per Conditioned Floor Area");
+                            "Source Energy End Use Components Per Conditioned Floor Area");
                     }
                 }
                 if (produceTabular) {
@@ -10265,7 +10265,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             columnHead,
                             "Source Energy End Use Components Summary",
                             "Entire Facility",
-                            "Source Energy End Use Component Per Conditioned Floor Area");
+                            "Source Energy End Use Components Per Conditioned Floor Area");
                     }
                 }
             } // End of Normalized by Conditioned Area
@@ -12679,8 +12679,8 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             if (produceTabular) {
-                WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-                WriteSubtitle(state, "Heat Emission by Components");
+                WriteReportHeaders(state, "Annual Heat Emissions Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                WriteSubtitle(state, "Annual Heat Emissions Summary");
             }
 
             columnWidth.allocate(6);
