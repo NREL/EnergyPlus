@@ -640,7 +640,7 @@ namespace DataHeatBalance {
         Real64 WindDirEMSOverrideValue = 0.0;        // value to use for EMS override of the surface's outside wind speed
 
         bool HasLinkedOutAirNode = false; // true if an OutdoorAir::Node is linked to the surface
-        int LinkedOutAirNode = 0.0;       // Index of the an OutdoorAir:Node
+        int LinkedOutAirNode = 0;         // Index of the an OutdoorAir:Node
 
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified
