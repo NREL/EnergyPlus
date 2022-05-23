@@ -10444,9 +10444,6 @@ void SkyDifSolarShading(EnergyPlusData &state)
             if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                 state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
             }
-            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor != -1) {
-                state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-            }
         }
         if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
             int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
