@@ -3308,7 +3308,6 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
     auto &thisOutletNode = state.dataLoopNodes->Node(thisEvapCond.OutletNode);
     auto &thisInletNode = state.dataLoopNodes->Node(thisEvapCond.InletNode);
-    auto &thisInletNodeSec = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
 
     // Set the outlet air nodes of the EvapCooler
     thisOutletNode.MassFlowRate = thisEvapCond.OutletMassFlowRate;
@@ -3320,6 +3319,7 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     thisOutletNode.Press = thisEvapCond.OutletPressure;
 
     if (thisEvapCond.SecondaryOutletNode > 0) {
+        auto &thisInletNodeSec = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
         // set outlet nodes of the secondary air side of the EvapCooler (mass Flow Rate Only)
         if (thisEvapCond.evapCoolerType == EvapCoolerType::IndirectRDDSpecial && thisEvapCond.EvapCoolerOperationControlFlag) {
             thisInletNodeSec.Temp = thisEvapCond.SecOutletTemp;
