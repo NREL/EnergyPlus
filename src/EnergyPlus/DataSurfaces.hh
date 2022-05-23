@@ -1287,10 +1287,10 @@ namespace DataSurfaces {
     struct GroundSurfacesData
     {
         // Members
-        std::string Name;  // name of a ground surface
-        Real64 ViewFactor; // view factor to a ground surface
-        int TempSchPtr;    // pointer to a ground surface temperature schedule object
-        int ReflSchPtr;    // pointer to a ground Surface reflectance schedule object
+        std::string Name;        // name of a ground surface
+        Real64 ViewFactor = 0.0; // view factor to a ground surface
+        int TempSchPtr = 0;      // pointer to a ground surface temperature schedule object
+        int ReflSchPtr = 0;      // pointer to a ground Surface reflectance schedule object
 
         // Default Constructor
         GroundSurfacesData() : ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0)
@@ -1302,11 +1302,11 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;                     // name of multiple ground surfaces object
-        int NumGndSurfs;                      // number of groundSurfaces
+        int NumGndSurfs = 0;                  // number of groundSurfaces
         Array1D<GroundSurfacesData> GndSurfs; // ground surfaces data
-        Real64 SurfsTempAvg;                  // ground Surfaces average temperature at each time step
-        Real64 SurfsReflAvg;                  // ground Surfaces average reflectance at each time step
-        Real64 SurfsViewFactorSum;            // sum of view factors of ground surfaces seen by an exterior surface
+        Real64 SurfsTempAvg = 0.0;            // ground Surfaces average temperature at each time step
+        Real64 SurfsReflAvg = 0.0;            // ground Surfaces average reflectance at each time step
+        Real64 SurfsViewFactorSum = 0.0;      // sum of view factors of ground surfaces seen by an exterior surface
 
         // Default Constructor
         GroundSurfacesProperty() : NumGndSurfs(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0), SurfsViewFactorSum(0.0)
