@@ -309,14 +309,13 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
             if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime && state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
                 Real64 SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                
+                int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
                 Real64 SrdSurfsViewFactor = 0;
                 Real64 GroundSurfsViewFactor = 0;
                 if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
                     SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                 }
-                if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
-                    int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
+                if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {                    
                     GroundSurfsViewFactor = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
                     SrdSurfsViewFactor += GroundSurfsViewFactor;
                 }
@@ -333,30 +332,24 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     // If both surface sky and ground view factor defined, overwrite with the defined value
                     Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                    //if (GroundSurfsViewFactor > 0.0) {
-                    //    Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                    //}
                 } else if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 && GroundSurfsViewFactor == 0) {
                     // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
                     Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
-                    //if (GroundSurfsViewFactor > 0.0) {
-                    //    Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                    //}
+                    if (Surface(SurfNum).ViewFactorGroundIR > 0.0) {
+                        state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum = Surface(SurfNum).ViewFactorGroundIR;
+                    }
                 } else if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor < 0 && GroundSurfsViewFactor > 0) {
                     // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
                     Surface(SurfNum).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
-                    //if (GroundSurfsViewFactor > 0.0) {
-                    //    Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                    //}
                 } else {
                     // If neither ground or sky view factor define, continue to use the original proportion.
                     Surface(SurfNum).ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
-                    //if (GroundSurfsViewFactor > 0.0) {
-                    //    Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                    //}
+                    if (Surface(SurfNum).ViewFactorGroundIR > 0.0) {
+                        state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum = Surface(SurfNum).ViewFactorGroundIR;
+                    }
                 }
             }
         }

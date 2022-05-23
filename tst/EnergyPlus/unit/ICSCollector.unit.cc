@@ -142,7 +142,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
     state->dataSurface->IsSurfPropertyGndSurfacesDefined.allocate(NumOfSurf);
     state->dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum) = false;
+    state->dataSurface->UseSurfPropertyGndSurfTemp.allocate(NumOfSurf);
     state->dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
+    state->dataSurface->UseSurfPropertyGndSurfRefl.allocate(NumOfSurf);
     state->dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces

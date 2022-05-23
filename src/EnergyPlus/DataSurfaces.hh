@@ -1347,7 +1347,7 @@ namespace DataSurfaces {
         // Members
         std::string Name;
         Real64 SkyViewFactor;
-        int SkyTempSchNum; // schedule pointer
+        int SkyTempSchNum;         // schedule pointer
         int TotSurroundingSurface; // Total number of surrounding surfaces defined for an exterior surface
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
 
