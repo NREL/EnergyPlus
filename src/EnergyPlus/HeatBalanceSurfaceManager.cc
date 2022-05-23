@@ -2808,6 +2808,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
         // Calculate Exterior Incident Short Wave (i.e. Solar) Radiation on shading surfaces
         if (state.dataSurface->BuildingShadingCount || state.dataSurface->FixedShadingCount || state.dataSurface->AttachedShadingCount) {
             for (int SurfNum = state.dataSurface->ShadingSurfaceFirst; SurfNum <= state.dataSurface->ShadingSurfaceLast; SurfNum++) {
+                Real64 GndSurfReflectance = 0.0;
+                if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
+                    GndSurfReflectance = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum)).SurfsReflAvg;
+                } else {
+                    GndSurfReflectance = state.dataEnvrn->GndReflectance;
+                }
                 // Cosine of incidence angle and solar incident on outside of surface, for reporting
                 Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
                 state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = CosInc;
@@ -2822,24 +2828,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
                 // Incident diffuse solar from beam-to-diffuse reflection from ground
                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
-                                                                              state.dataEnvrn->GndReflectance *
-                                                                              state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+                                                                              GndSurfReflectance * state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
                 // Incident diffuse solar from sky diffuse reflection from ground
                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
                 // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                 // in SkySolarInc.
                 state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
                     state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
                     state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
-
-                // not applicable for shading surfaces
-                // Real64 GndSurfReflectance = 0.0;
-                // if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
-                //    GndSurfReflectance = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum)).SurfsReflAvg;
-                //} else {
-                //    GndSurfReflectance = state.dataEnvrn->GndReflectance;
-                //}
             }
         }
 
