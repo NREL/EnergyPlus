@@ -1566,6 +1566,11 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else {
                     thisPLHP.loadSideDesignVolFlowRate = tmpFlowRate.get<Real64>();
                 }
+
+                // GAHP: Add a default source side flow rate, not from input
+                Real64 defDummyASDesVolFlowRate = 1.0;
+                thisPLHP.sourceSideDesignVolFlowRate = defDummyASDesVolFlowRate;
+
                 // auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
                 // if (tmpSourceFlowRate == "Autosize") {
                 //    thisPLHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
