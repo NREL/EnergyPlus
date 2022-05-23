@@ -52,7 +52,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -113,6 +113,8 @@ using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
 using Psychrometrics::PsyTdbFnHW;
 using namespace ScheduleManager;
+
+constexpr std::array<std::string_view, static_cast<int>(AvailabilityManagerCoupling::Num)> couplingsUC = {"COUPLED", "DECOUPLED"};
 
 void SimulateFanComponents(EnergyPlusData &state,
                            std::string_view const CompName,
@@ -609,21 +611,15 @@ void GetFanInput(EnergyPlusData &state)
         }
 
         if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
-            {
-                auto const SELECT_CASE_var(cAlphaArgs(7));
-                if (SELECT_CASE_var == "COUPLED") {
-                    Fan(FanNum).AvailManagerMode = ExhaustFanCoupledToAvailManagers;
-                } else if (SELECT_CASE_var == "DECOUPLED") {
-                    Fan(FanNum).AvailManagerMode = ExhaustFanDecoupledFromAvailManagers;
-                } else {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) +
-                                        " entered =" + cAlphaArgs(7) + " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                    ErrorsFound = true;
-                }
+            Fan(FanNum).AvailManagerMode = static_cast<AvailabilityManagerCoupling>(getEnumerationValue(couplingsUC, cAlphaArgs(7)));
+            if (Fan(FanNum).AvailManagerMode == AvailabilityManagerCoupling::Invalid) {
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) +
+                                    " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                ErrorsFound = true;
             }
         } else {
-            Fan(FanNum).AvailManagerMode = ExhaustFanCoupledToAvailManagers;
+            Fan(FanNum).AvailManagerMode = AvailabilityManagerCoupling::Coupled;
         }
 
         if (NumAlphas > 7 && !lAlphaFieldBlanks(8)) {
@@ -2102,7 +2098,7 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     //  and TurnFansOff to LocalTurnFansOff in the IF statement below.
 
     // apply controls to determine if operating
-    if (Fan(FanNum).AvailManagerMode == ExhaustFanCoupledToAvailManagers) {
+    if (Fan(FanNum).AvailManagerMode == AvailabilityManagerCoupling::Coupled) {
         if (((GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
             !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) { // available
             if (Fan(FanNum).MinTempLimitSchedNum > 0) {
@@ -2118,7 +2114,7 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
             FanIsRunning = false;
         }
 
-    } else if (Fan(FanNum).AvailManagerMode == ExhaustFanDecoupledFromAvailManagers) {
+    } else if (Fan(FanNum).AvailManagerMode == AvailabilityManagerCoupling::Decoupled) {
         if (GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
             if (Fan(FanNum).MinTempLimitSchedNum > 0) {
                 if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
@@ -2434,7 +2430,7 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
 
     if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
         state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-        if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
+        if (state.afn->AirflowNetworkNumOfExhFan == 0) {
             state.dataHVACGlobal->UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
             if (Fan(FanNum).BalancedFractSchedNum > 0) {
                 state.dataHVACGlobal->BalancedExhMassFlow =
