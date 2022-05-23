@@ -2086,7 +2086,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Fuel Energy",
                                 OutputProcessor::Unit::J,
-                                this->powerEnergy,
+                                this->fuelEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
