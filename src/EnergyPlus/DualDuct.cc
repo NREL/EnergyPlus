@@ -929,7 +929,6 @@ namespace DualDuct {
 
             } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
                 auto &thisOAInNode = state.dataLoopNodes->Node(OAInNode);
-
                 Real64 schedValue = ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr);
                 // The first time through set the mass flow rate to the Max for VAV:OutdoorAir
                 if ((thisOAInNode.MassFlowRate > 0.0) && (schedValue > 0.0)) {
