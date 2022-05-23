@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects, false));
     GetBoilerInput(*state);
-    auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
+    auto &thisBoiler = state->dataBoilerSteam->Boiler((int)state->dataBoilerSteam->Boiler.size());
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
     EXPECT_TRUE(compare_enums(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS")));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
@@ -103,9 +103,9 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     EXPECT_EQ(thisBoiler.MinPartLoadRat, 0.00001);
     EXPECT_EQ(thisBoiler.MaxPartLoadRat, 1.0);
     EXPECT_EQ(thisBoiler.OptPartLoadRat, 0.2);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(1), 0.8);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(2), 0.1);
-    EXPECT_EQ(thisBoiler.FullLoadCoef(3), 0.1);
+    EXPECT_EQ(thisBoiler.FullLoadCoef[0], 0.8);
+    EXPECT_EQ(thisBoiler.FullLoadCoef[1], 0.1);
+    EXPECT_EQ(thisBoiler.FullLoadCoef[2], 0.1);
     EXPECT_EQ(thisBoiler.SizFac, 1.0);
 
     // Additional tests for fuel type input
@@ -158,7 +158,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     }
 
     GetBoilerInput(*state);
-    auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
+    auto &thisBoiler = state->dataBoilerSteam->Boiler((int)state->dataBoilerSteam->Boiler.size());
 
     state->dataPlnt->PlantLoop(1).Name = "SteamLoop";
     state->dataPlnt->PlantLoop(1).FluidName = "Steam";
