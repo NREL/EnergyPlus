@@ -311,8 +311,6 @@ namespace SurfaceGeometry {
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
                                                                            std::vector<Vector> const &uniqVertices);
 
-    void insertVertexOnFace(DataVectorTypes::Face &face, int indexBefore, DataVectorTypes::Vector const &vertexToInsert);
-
     bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
     bool areWallHeightSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);

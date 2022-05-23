@@ -12364,32 +12364,33 @@ namespace SurfaceGeometry {
 
         DataVectorTypes::Polyhedron updZonePoly = zonePoly; // set the return value to the original polyhedron describing the zone
 
-        for (int iFace = 1; iFace <= updZonePoly.NumSurfaceFaces; ++iFace) {
-            DataVectorTypes::Face &updFace = updZonePoly.SurfaceFace(iFace);
+        for (auto &updFace : updZonePoly.SurfaceFace) {
             bool insertedVertext = true;
             while (insertedVertext) {
                 insertedVertext = false;
-                for (int curVertexIndex = updFace.NSides; curVertexIndex >= 1; --curVertexIndex) { // go through array from end
-                    Vector curVertex = updFace.FacePoints(curVertexIndex);
-                    Vector nextVertex;
-                    int nextVertexIndex;
-                    if (curVertexIndex == updFace.NSides) {
-                        nextVertexIndex = 1;
-                    } else {
-                        nextVertexIndex = curVertexIndex + 1;
+                auto &vertices = updFace.FacePoints;
+                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+
+                    auto itnext = std::next(it);
+                    if (itnext == std::end(vertices)) {
+                        itnext = std::begin(vertices);
                     }
-                    nextVertex = updFace.FacePoints(nextVertexIndex);
+
+                    auto curVertex = *it;
+                    auto nextVertex = *itnext;
+
                     // now go through all the vertices and see if they are colinear with start and end vertices
-                    for (auto testVertex : uniqVertices) {
+                    for (const auto &testVertex : uniqVertices) {
                         if (!isAlmostEqual3dPt(curVertex, testVertex) && !isAlmostEqual3dPt(nextVertex, testVertex)) {
                             if (isPointOnLineBetweenPoints(curVertex, nextVertex, testVertex)) {
-                                insertVertexOnFace(updFace, nextVertexIndex, testVertex);
+                                vertices.insert(itnext, testVertex);
+                                ++updFace.NSides;
                                 insertedVertext = true;
                                 break;
                             }
                         }
                     }
-                    // Break out of the loop on vertices too, and start again at the while
+                    // Break out of the surface loop too, and start again at the while
                     if (insertedVertext) {
                         break;
                     }
@@ -12397,25 +12398,6 @@ namespace SurfaceGeometry {
             }
         }
         return updZonePoly;
-    }
-
-    // inserts a vertex in the polygon describing the face (wall) of polyhedron (zone)
-    void insertVertexOnFace(DataVectorTypes::Face &face,
-                            int const indexAt, // index of where to insert new vertex - remaining vertices are moved later
-                            DataVectorTypes::Vector const &vertexToInsert)
-    {
-        // J. Glazer - March 2017
-
-        if (indexAt >= 1 && indexAt <= face.NSides) {
-            int origNumSides = face.NSides;
-            DataVectorTypes::Vector emptyVector(0., 0., 0.);
-            face.FacePoints.append(emptyVector); // just to add new item to the end of array
-            for (int i = origNumSides + 1; i > indexAt; --i) {
-                face.FacePoints(i) = face.FacePoints(i - 1); // move existing items one location further
-            }
-            face.FacePoints(indexAt) = vertexToInsert;
-            ++face.NSides;
-        }
     }
 
     // test if the ceiling and floor are the same except for their height difference by looking at the corners
