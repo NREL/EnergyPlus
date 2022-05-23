@@ -3305,7 +3305,7 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+    auto &thisEvapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
     auto &thisOutletNode = state.dataLoopNodes->Node(thisEvapCond.OutletNode);
     auto &thisInletNode = state.dataLoopNodes->Node(thisEvapCond.InletNode);
 
@@ -3319,13 +3319,13 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     thisOutletNode.Press = thisEvapCond.OutletPressure;
 
     if (thisEvapCond.SecondaryOutletNode > 0) {
-        auto &thisInletNodeSec = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
+        auto &thisOutletNodeSec = state.dataLoopNodes->Node(thisEvapCond.SecondaryOutletNode);
         // set outlet nodes of the secondary air side of the EvapCooler (mass Flow Rate Only)
         if (thisEvapCond.evapCoolerType == EvapCoolerType::IndirectRDDSpecial && thisEvapCond.EvapCoolerOperationControlFlag) {
-            thisInletNodeSec.Temp = thisEvapCond.SecOutletTemp;
-            thisInletNodeSec.HumRat = thisEvapCond.SecOutletHumRat;
-            thisInletNodeSec.Enthalpy = thisEvapCond.SecOutletEnthalpy;
-            thisInletNodeSec.MassFlowRate = thisEvapCond.SecOutletMassFlowRate;
+            thisOutletNodeSec.Temp = thisEvapCond.SecOutletTemp;
+            thisOutletNodeSec.HumRat = thisEvapCond.SecOutletHumRat;
+            thisOutletNodeSec.Enthalpy = thisEvapCond.SecOutletEnthalpy;
+            thisOutletNodeSec.MassFlowRate = thisEvapCond.SecOutletMassFlowRate;
         }
     }
 
@@ -3340,7 +3340,7 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
 
     // check if should be starved by restricted flow from tank
     if (thisEvapCond.EvapWaterSupplyMode == WaterSupply::FromTank) {
-        Real64 const AvailWaterRate =
+        Real64 AvailWaterRate =
             state.dataWaterData->WaterStorage(thisEvapCond.EvapWaterSupTankID).VdotAvailDemand(thisEvapCond.EvapWaterTankDemandARRID);
         if (AvailWaterRate < thisEvapCond.EvapWaterConsumpRate) {
             thisEvapCond.EvapWaterStarvMakupRate = thisEvapCond.EvapWaterConsumpRate - AvailWaterRate;
