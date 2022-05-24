@@ -17452,7 +17452,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SenLatLoadsConservation_Test)
     EXPECT_NEAR(hdiff, sum, 0.0001);
 }
 
-TEST_F(EnergyPlusFixture, AirLoopNumTest)
+TEST_F(EnergyPlusFixture, AirflowNetwork_9286_LoopOnOffFlag)
 {
 
     std::string const idf_objects = delimited_string({
