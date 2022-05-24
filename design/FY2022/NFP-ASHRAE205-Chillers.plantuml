@@ -1,0 +1,53 @@
+@startuml
+left to right direction
+
+skinparam shadowing false
+skinparam class {
+	BorderColor Indigo
+	BackgroundColor White
+	ArrowColor Indigo
+}
+skinparam note {
+	BorderColor Indigo
+   BorderThickness 2
+   BackgroundColor #F5F5F5
+}
+skinparam stereotypeCBackgroundColor LightSteelBlue
+skinparam classAttributeIconSize      0
+
+class ASHRAE205LiquidCooledChillerSpecs {
+   + std::string instance_205;
+   __
+   + {static} void getInput();
+   + void setupOutputVariables();
+   + {static} ASHRAE205LiquidCooledChillerSpecs *factory();
+   + void ^simulate();
+   + void ^initialize();
+   + void ^size();
+   + void calculate();
+   + void ^oneTimeInit();
+}
+
+class BaseChillerSpecs {
+   + void ^getDesignCapacities();
+   + void ^getSizingFactor();
+   + void ^onInitLoopEquip();
+   + void ^getDesignTemperatures();
+   + {abstract} void initialize();
+   + {abstract} void size();
+}
+
+abstract class PlantComponent {
+   + {abstract} void simulate();
+   + void getDesignCapacities()
+   + void getDesignTemperatures()
+   + void getSizingFactor()
+   + void onInitLoopEquip()
+   + {abstract} void oneTimeInit();
+   + void oneTimeInit_new()
+}
+
+BaseChillerSpecs <|- ASHRAE205LiquidCooledChillerSpecs
+PlantComponent <|- BaseChillerSpecs
+
+@enduml
