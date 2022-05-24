@@ -30,7 +30,7 @@ install(TARGETS ConvertInputFormat DESTINATION ./)
 if(BUILD_TESTING)
 
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst") # build/src/ConverInputFormat/tst
-  set(IDF_FILE "${PROJECT_SOURCE_DIR}/../testfiles/1ZoneUncontrolled.idf")
+  set(IDF_FILE "${PROJECT_SOURCE_DIR}/../../testfiles/1ZoneUncontrolled.idf")
 
   # This will make use of ctest Fixtures, because add_test doesn't support more than one "COMMAND" argument
   # Setup Fixture
