@@ -1279,6 +1279,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     if (this->cycRatioCurveIndex > 0) {
         CRF = CurveManager::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
+    if (CRF < 0.1) CRF = 0.5833;
     this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
     this->fuelEnergy = this->fuelUsage * reportingInterval;
 
@@ -1514,7 +1515,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // A4
                 std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
                 std::string sourceSideOutletNodeName =
-                    ""; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+                    "dummy_condenser"; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+                for (int i = 1; i <= 3; ++i) {
+                    sourceSideOutletNodeName += ("_" + std::to_string(rand()));
+                }
 
                 // A5
                 if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
