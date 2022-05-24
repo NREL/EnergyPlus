@@ -8984,9 +8984,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsData)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    //GetSurfaceGroundSurfsData(*state, ErrorsFound);
-    //GetSurfaceSrdSurfsData(*state, ErrorsFound);
-    //GetSurfaceLocalEnvData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property sky and ground view factors inputs
