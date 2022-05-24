@@ -242,6 +242,8 @@ namespace AirflowNetwork {
         void single_sided_Cps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
         Real64 zone_OA_change_rate(int ZoneNum); // hybrid ventilation system controlled zone number
         int get_airloop_number(int NodeNumber);  // Get air loop number for each distribution node and linkage
+        // Safe getter to get the loop flag. if airLoopNum < 0, will just return false
+        bool isLoopOn(int airLoopNum) const;
 
         EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
