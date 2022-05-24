@@ -602,10 +602,10 @@ Zone Summary
 
 \begin{itemize}
     \item
-        If the Zone \lstinline!Part of Total Floor Area! is set to 'No', then it will only be counted towards the "Not Part of Total" row
+        If the Zone \lstinline!Part of Total Floor Area! is set to `No', then it will only be counted towards the ``Not Part of Total'' row
     \item
-        Otherwise, it is added to the "Total" row. Then, if the zone is also conditioned, it is added to the "Conditioned Total" row;
-        If unconditioned, it is added to the "Unconditioned Total" row.
+        Otherwise, it is added to the ``Total'' row. Then, if the zone is also conditioned, it is added to the ``Conditioned Total'' row;
+        If unconditioned, it is added to the ``Unconditioned Total'' row.
 \end{itemize}
 
 {\tiny
@@ -1279,7 +1279,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Zone Name(s)} This is the zone, or list of zones, found to be associated with this coil.  The zone name is defined by the user in the Zone object.  For multizone systems, the coils can have a list of zone names with the individual names separated by a semicolon. The zones listed here are those used to generate (aggregate and volume-weighted average) values for the room conditions and loads. Text string. 
 
-\emph{System Sizing Method Concurrence} This field applies to ``AirLoop'' coils.  It describes if the central air system sizing was done using ``Coincident'' or ``Non-Coincident'' method. This refers to how the ideal loads sizing routines process the time sequence of zone loads.  The concurrent sum of peaks, or coincident or "block", is often lower than the sum of the individual peaks regardless of when they occur, or non-coincident sum.  This field is not applicable to ``Zone Equipment'' coils and will show ``N/A'' here.  This corresponds to the input field called Type of Zone Sum to Use in the Sizing:System input object. Text string.
+\emph{System Sizing Method Concurrence} This field applies to ``AirLoop'' coils.  It describes if the central air system sizing was done using ``Coincident'' or ``Non-Coincident'' method. This refers to how the ideal loads sizing routines process the time sequence of zone loads.  The concurrent sum of peaks, or coincident or ``block'', is often lower than the sum of the individual peaks regardless of when they occur, or non-coincident sum.  This field is not applicable to ``Zone Equipment'' coils and will show ``N/A'' here.  This corresponds to the input field called Type of Zone Sum to Use in the Sizing:System input object. Text string.
 
 \emph{System Sizing Method Capacity} This field applies to ``AirLoop'' coils.  It describes what was chosen for the method of determining coil capacity during ideal loads sizing routines. The values here will match the input key choices available for the the Sizing:System object's input fields called \emph{Cooling Design Capacity Method}, for cooling coils, and \emph{Heating Design Capacity Method}, for heating coils. Values here of ``HeatingDesignCapacity'' or ``CoolingDesignCapacity'' mean that the coil was sized using the design loads calculated from the zone ideal loads results. When sizing was scaled using floor area the value here would be ``CapacityPerFloorArea.''  Values of \emph{FractionOfAutosizedHeatingCapacity} and \emph{FractionOfAutosizeCoolingCapacity} mean that the usual design load based results were further scaled by a separate user scaling factor. This field is not applicable to ``Zone Equipment'' coils and will show ``N/A'' here. Text string.
 
