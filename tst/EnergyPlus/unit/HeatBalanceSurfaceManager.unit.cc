@@ -5241,20 +5241,37 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsI
     auto &SrdSurfsProperty_2 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(3);
     auto &SrdSurfsProperty_3 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_1.SkyViewFactor);
-    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty_1.GroundViewFactor);
-    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.SkyViewFactor);
-    EXPECT_DOUBLE_EQ(-1, SrdSurfsProperty_2.GroundViewFactor);
-    EXPECT_DOUBLE_EQ(-1, SrdSurfsProperty_3.SkyViewFactor);
-    EXPECT_DOUBLE_EQ(-1, SrdSurfsProperty_3.GroundViewFactor);
 
-    // set the surfaces sky and ground view factors
-    InitSurfacePropertyViewFactors(*state);
-
-    // test surfaces sky and ground view factors reset
     auto &Surface_1 = state->dataSurface->Surface(1);
     auto &Surface_2 = state->dataSurface->Surface(2);
     auto &Surface_3 = state->dataSurface->Surface(3);
+
+    // check surface property view factors get inputs
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_1.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty_1.GroundViewFactor);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty_2.GroundViewFactor);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty_3.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty_3.GroundViewFactor);
+    // check exterior surfaces default view factors
+    EXPECT_DOUBLE_EQ(0.5, Surface_1.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_1.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_2.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_2.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_3.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_3.ViewFactorGroundIR);
+
+    // reset sky and ground view factors
+    InitSurfacePropertyViewFactors(*state);
+
+    // test surface property sky and ground view factors reset
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_1.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty_1.GroundViewFactor);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.GroundViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_3.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_3.GroundViewFactor);
+    // test exterior surfaces sky and ground view factors reset
     EXPECT_DOUBLE_EQ(0.3, Surface_1.ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.1, Surface_1.ViewFactorGroundIR);
     EXPECT_DOUBLE_EQ(0.2, Surface_2.ViewFactorSkyIR);

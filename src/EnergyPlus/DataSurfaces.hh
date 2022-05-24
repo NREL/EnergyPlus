@@ -1323,7 +1323,7 @@ namespace DataSurfaces {
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
 
         // Default Constructor
-        SurroundingSurfacesProperty() : SkyViewFactor(-1.0), SkyTempSchNum(0), GroundViewFactor(-1.0), GroundTempSchNum(0), TotSurroundingSurface(0)
+        SurroundingSurfacesProperty() : SkyViewFactor(0.0), SkyTempSchNum(0), GroundViewFactor(0.0), GroundTempSchNum(0), TotSurroundingSurface(0)
         {
         }
     };
