@@ -17452,7 +17452,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SenLatLoadsConservation_Test)
     EXPECT_NEAR(hdiff, sum, 0.0001);
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
+TEST_F(EnergyPlusFixture, AirLoopNumTest)
 {
 
     std::string const idf_objects = delimited_string({
@@ -17475,7 +17475,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
 
-        "  Output:DebuggingData,0,0;",
+        "  Output:DebuggingData,No,No;",
 
         "  ZoneCapacitanceMultiplier:ResearchSpecial,",
         "    Multiplier,              !- Name",
@@ -20196,9 +20196,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
         "  20.44,                                                   !- November Ground Temperature",
         "  20.20;                                                   !- December Ground Temperature",
 
-        "Output:Diagnostics,DisplayExtraWarnings;",
-
-        "Output:Diagnostics,DisplayUnusedSchedules;"});
+        "Output:Diagnostics,DisplayExtraWarnings,DisplayUnusedSchedules;"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -20277,8 +20275,10 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
 
+    // TODO: you can't go ahead and read them twice, or it'll just try to add the same object twice to the unordered_map solver.elements
+    // except we throw a fatal if that happens
     // Read AirflowNetwork inputs
-    state->afn->get_input();
+    // state->afn->get_input();
 
     state->afn->AirflowNetworkGetInputFlag = false;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
