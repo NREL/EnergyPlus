@@ -19908,29 +19908,30 @@ TEST_F(EnergyPlusFixture, AirLoopNumTest)
         "    OA Inlet Node,           !- Node 2 Name",
         "    ReturnLeakELR1;          !- Component Name",
 
-        "  AirflowNetwork:Distribution:Linkage,",
-        "    MainSupplyLeakLink,      !- Name",
-        "    SupplyMainNode,          !- Node 1 Name",
-        "    ATTIC ZONE,              !- Node 2 Name",
-        "    MainSupplyLeak;          !- Component Name",
+        // TODO: Make the Attic not part of the linkage
+        // "  AirflowNetwork:Distribution:Linkage,",
+        // "    MainSupplyLeakLink,      !- Name",
+        // "    SupplyMainNode,          !- Node 1 Name",
+        // "    ATTIC ZONE,              !- Node 2 Name",
+        // "    MainSupplyLeak;          !- Component Name",
 
-        "  AirflowNetwork:Distribution:Linkage,",
-        "    Zone1SupplyLeakLink,     !- Name",
-        "    Zone1SupplyNode,         !- Node 1 Name",
-        "    ATTIC ZONE,              !- Node 2 Name",
-        "    ZoneSupplyELR1;          !- Component Name",
+        // "  AirflowNetwork:Distribution:Linkage,",
+        // "    Zone1SupplyLeakLink,     !- Name",
+        // "    Zone1SupplyNode,         !- Node 1 Name",
+        // "    ATTIC ZONE,              !- Node 2 Name",
+        // "    ZoneSupplyELR1;          !- Component Name",
+
+        // "  AirflowNetwork:Distribution:Linkage,",
+        // "    Zone2SupplyLeakLink,     !- Name",
+        // "    Zone2SupplyNode,         !- Node 1 Name",
+        // "    ATTIC ZONE,              !- Node 2 Name",
+        // "    ZoneSupplyELR2;          !- Component Name",
 
         "  AirflowNetwork:Distribution:Linkage,",
         "    Zone2ReturnLeakLink,     !- Name",
         "    Zone2ReturnNode,         !- Node 1 Name",
         "    OA Inlet Node,           !- Node 2 Name",
         "    ReturnLeakELR2;          !- Component Name",
-
-        "  AirflowNetwork:Distribution:Linkage,",
-        "    Zone2SupplyLeakLink,     !- Name",
-        "    Zone2SupplyNode,         !- Node 1 Name",
-        "    ATTIC ZONE,              !- Node 2 Name",
-        "    ZoneSupplyELR2;          !- Component Name",
 
         "  AirflowNetwork:Distribution:Linkage,",
         "    OASystemFanLink,       !- Name",
@@ -20243,6 +20244,7 @@ TEST_F(EnergyPlusFixture, AirLoopNumTest)
     state->dataLoopNodes->Node.allocate(17);
 
     state->dataLoopNodes->Node(state->afn->DisSysCompCVFData(1).InletNode).MassFlowRate = 1.40;
+    state->dataLoopNodes->Node(state->afn->DisSysCompCVFData(1).OutletNode).MassFlowRate = 1.40;
     state->afn->DisSysCompCVFData(1).FlowRate = state->dataLoopNodes->Node(state->afn->DisSysCompCVFData(1).InletNode).MassFlowRate;
 
     state->afn->DisSysCompOutdoorAirData(1).InletNode = 6;
@@ -20289,6 +20291,17 @@ TEST_F(EnergyPlusFixture, AirLoopNumTest)
     // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
     state->afn->manage_balance(true);
     EXPECT_EQ(state->afn->DisSysCompCVFData(1).AirLoopNum, 1);
+
+    // Test for #9286. Above the ATTIC ZONE isn't part of the linkage (the AirflowNetwork:Distribution:Linkage refering to Attic are commented out)
+    // Not the first iteration, so that AirflowNetworkFanActivated is set to true inside ManageAirflowNetworkBalance
+    state->afn->AirflowNetworkFanActivated = true;
+    auto &nodeData = state->afn->AirflowNetworkNodeData(4);
+    EXPECT_EQ("ATTIC ZONE", nodeData.Name);
+    nodeData.AirLoopNum = 0;
+    nodeData.EPlusNodeNum = 4;
+    state->afn->AirflowNetworkNodeData(19).EPlusNodeNum = 16;
+
+    state->afn->manage_balance(false);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
