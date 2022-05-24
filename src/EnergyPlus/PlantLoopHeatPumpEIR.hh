@@ -155,7 +155,7 @@ namespace EIRPlantLoopHeatPumps {
                                  [[maybe_unused]] Real64 &MinLoad,
                                  [[maybe_unused]] Real64 &OptLoad) override;
 
-        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
+        virtual void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
         void sizeLoadSide(EnergyPlusData &state);
 
@@ -169,7 +169,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void setOperatingFlowRatesWSHP(EnergyPlusData &state);
 
-        void resetReportingVariables();
+        virtual void resetReportingVariables();
 
         static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
 
