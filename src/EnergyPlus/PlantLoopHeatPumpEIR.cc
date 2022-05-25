@@ -1515,7 +1515,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // A4
                 std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("air_source_node_name").get<std::string>());
                 std::string sourceSideOutletNodeName =
-                    "dummy_condenser"; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+                    "DUMMY_CONDENSER"; // UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
+                srand(time(NULL));
                 for (int i = 1; i <= 3; ++i) {
                     sourceSideOutletNodeName += ("_" + std::to_string(rand()));
                 }
