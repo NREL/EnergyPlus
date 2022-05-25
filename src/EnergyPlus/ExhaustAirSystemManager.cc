@@ -50,7 +50,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -360,8 +360,7 @@ namespace ExhaustAirSystemManager {
         constexpr std::string_view RoutineName = "CalExhaustAirSystem: ";
         std::string cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
         bool ErrorsFound = false;
-        if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-              state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+        if (!(state.afn->AirflowNetworkFanActivated && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
             MixerComponent::SimAirMixer(state, thisExhSys.ZoneMixerName, thisExhSys.ZoneMixerIndex);
         } else {
             // Give a warning that the current model does not work with AirflowNetwork for now

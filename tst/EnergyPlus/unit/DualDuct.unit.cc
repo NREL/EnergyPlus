@@ -444,7 +444,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
