@@ -1209,11 +1209,26 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // get setpoint on the load side outlet
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
+    // Determine which air variable to use for GAHP:
+    // Source (air) side variable to use
+    Real64 oaTempforCurve = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+    if (this->oaTempCurveInputVar == 1) {
+        oaTempforCurve = Psychrometrics::PsyTwbFnTdbWPb(state,
+                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
+                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).HumRat,
+                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).Press,
+                                                        "PLFFHPEIR::simulate()");
+    } else {
+        //
+    }
+
     // 2022-05-17: should the following curve evaluation based on the oaVariable and waterVariable choice:?
     // 2022-05-17: Maybe how this is set up is related to the flow mode?
     // evaluate capacity modifier curve and determine load side heat transfer
     Real64 capacityModifierFuncTemp =
-        CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+        // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+        CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, oaTempforCurve);
+
     Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
     Real64 partLoadRatio = 0.0;
     if (availableCapacity > 0) {
@@ -1234,19 +1249,10 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
     this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
 
-    // Determine which variable to use for GAHP:
     // Load (water) side
     Real64 waterTempforCurve = this->loadSideInletTemp;
     if (this->waterTempCurveInputVar == 1) {
         waterTempforCurve = this->loadSideOutletTemp;
-    } else {
-        //
-    }
-    // Source (air) side
-    Real64 oaTempforCurve =
-        state.dataLoopNodes->Node(this->loadSideNodes.inlet).OutAirDryBulb; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-    if (this->oaTempCurveInputVar == 1) {
-        oaTempforCurve = state.dataLoopNodes->Node(this->loadSideNodes.inlet).OutAirWetBulb; // 2022-05-17: Need to get the wet bulb, maybe should be
     } else {
         //
     }
@@ -1258,7 +1264,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                                                           oaTempforCurve); // CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex,
                                                                            // this->loadSideOutletTemp, this->sourceSideInletTemp);
 
-    Real64 miniPLR = 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
+    Real64 miniPLR = this->minPLR; // 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
     Real64 PLFf = max(miniPLR, partLoadRatio);
 
     Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, PLFf);
@@ -1279,7 +1285,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     if (this->cycRatioCurveIndex > 0) {
         CRF = CurveManager::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
-    if (CRF < 0.1) CRF = 0.5833;
+    if (CRF <= 0.0) CRF = 0.5833;
     this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
     this->fuelEnergy = this->fuelUsage * reportingInterval;
 
