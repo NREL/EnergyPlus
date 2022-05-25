@@ -8889,7 +8889,6 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
             SrdSurfsProperty.GroundViewFactor = Surface.ViewFactorGroundIR;
         }
     }
-
 }
 
 } // namespace EnergyPlus::HeatBalanceSurfaceManager
