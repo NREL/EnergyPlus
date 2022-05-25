@@ -13,17 +13,17 @@ EnergyPlus will implement a new Chiller object deriving from BaseChillerSpecs, w
 
 ![ASHRAE205LiquidCooledChillerSpecs](NFP-ASHRAE205-Chillers.png)
 
-Standard 205 representations are stored in either human-readable JSON or serialized CBOR format. The new libtk205 (Toolkit 205) library supports all operations relating to opening and parsing the representation file, and will link with EnergyPlus to populate the new EP Chiller object.
+Standard 205 representations are stored in either human-readable JSON or serialized CBOR format. The new libtk205 (Toolkit 205) library supports all operations relating to opening and parsing the representation file, and will link with EnergyPlus to populate the new EP Chiller object. 
 
 Critically, integrating the Toolkit 205 library will introduce *Git submodules* into the EnergyPlus source hierarchy. A typical implementation would simply add the entire libtk205 repository as a subdirectory of `/third_party`, where it would be built and linked just as existing third-party libraries are. The main CMakeLists.txt file will be modified to automatically pull this submodule repository whenever EnergyPlus is cloned, so the dependency stays in sync with EnergyPlus with no additional user input.
 
-### Error conditions / Validation
-
 ### Calculations
 
-Performance calculation in Sim function
+One of the advantages offered by ASHRAE Standard 205 is the available operating conditions of equipment must be provided explicitly in a representation, and equipment performance is interpolated within the closest available data to the operating point, rather than extracted from a global theoretical curve. This performance calculation will be embedded in the `simulate()` function of our `ASHRAE205LiquidCooledChillerSpecs` class.
 
-Scaling outputs from files for other-sized chillers
+@@@ Scaling outputs from files for other-sized chillers
+
+### Error conditions / Validation
 
 ## Testing
 
@@ -67,7 +67,7 @@ Add new object `Chillers:ASHRAE205`:
        \minimum> 0.0
 -->
 ```
-Chiller:ASHRAE205,
+Chiller:ASHRAE205LiquidCooled,
    \memo @@@
   A1 , \field Name
        \type alpha

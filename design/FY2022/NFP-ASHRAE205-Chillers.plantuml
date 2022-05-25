@@ -18,14 +18,14 @@ skinparam classAttributeIconSize      0
 class ASHRAE205LiquidCooledChillerSpecs {
    + std::string instance_205;
    __
+   + {static} ASHRAE205LiquidCooledChillerSpecs *factory();
    + {static} void getInput();
    + void setupOutputVariables();
-   + {static} ASHRAE205LiquidCooledChillerSpecs *factory();
    + void ^simulate();
    + void ^initialize();
    + void ^size();
-   + void calculate();
    + void ^oneTimeInit();
+   + void calculate();
 }
 
 class BaseChillerSpecs {
@@ -38,13 +38,13 @@ class BaseChillerSpecs {
 }
 
 abstract class PlantComponent {
-   + {abstract} void simulate();
    + void getDesignCapacities()
    + void getDesignTemperatures()
    + void getSizingFactor()
    + void onInitLoopEquip()
-   + {abstract} void oneTimeInit();
    + void oneTimeInit_new()
+   + {abstract} void oneTimeInit();
+   + {abstract} void simulate();
 }
 
 BaseChillerSpecs <|- ASHRAE205LiquidCooledChillerSpecs
