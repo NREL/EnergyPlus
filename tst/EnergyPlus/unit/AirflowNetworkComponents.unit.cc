@@ -52,13 +52,13 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Properties.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -4464,4 +4464,4 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     state->dataAirLoop->AirLoopAFNInfo.deallocate();
 }
 
-}
+} // namespace EnergyPlus

@@ -2421,11 +2421,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     auto &Fan(state.dataFans->Fan);
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
 
-    // Ensure no airflownetwork and simple calculations
-    //if (state.afn->SimulateAirflowNetwork == 0) {
-    //    return;
-    //}
-
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
         state.afn->report();
     }

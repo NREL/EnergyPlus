@@ -4247,7 +4247,8 @@ namespace SystemAvailabilityManager {
                 }
             }
 
-            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
+            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 &&
+                state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                 ShowContinueError(state, "The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError(state,
@@ -4259,8 +4260,7 @@ namespace SystemAvailabilityManager {
                 if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                     ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
-                } else if (state.afn->simulation_control.type ==
-                           AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
+                } else if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
                     ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError(state, "The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");

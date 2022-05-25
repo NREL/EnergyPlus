@@ -83,14 +83,17 @@ namespace AirflowNetwork {
     // int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
     // int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
     // int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system on time and simple calculations during off time
-    // int constexpr AirflowNetworkControlMultiADS(5);  // Perform distribution system during system on time and multizone calculations during off time
+    // int constexpr AirflowNetworkControlMultiADS(5);  // Perform distribution system during system on time and multizone calculations during off
+    // time
 
     enum class ControlType
     {
         NoMultizoneOrDistribution = 0,                   // Simple calculations only, AirflowNetworkControlSimple(1)
         MultizoneWithoutDistribution,                    // Perform multizone calculations only, AirflowNetworkControlMultizone(2)
-        MultizoneWithDistributionOnlyDuringFanOperation, // Perform distribution system during system on time and simple calculations during off time, AirflowNetworkControlSimpleADS(4)
-        MultizoneWithDistribution                        // Perform distribution system during system on time and multizone calculations during off time, AirflowNetworkControlMultiADS(5)
+        MultizoneWithDistributionOnlyDuringFanOperation, // Perform distribution system during system on time and simple calculations during off time,
+                                                         // AirflowNetworkControlSimpleADS(4)
+        MultizoneWithDistribution // Perform distribution system during system on time and multizone calculations during off time,
+                                  // AirflowNetworkControlMultiADS(5)
     };
 
     struct AirflowNetworkReportVars
@@ -169,7 +172,6 @@ namespace AirflowNetwork {
         bool closing_probability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
-    
     struct SimulationControl // Basic parameters for AirflowNetwork simulation
     {
         enum class Solver
@@ -202,7 +204,6 @@ namespace AirflowNetwork {
         bool allow_unsupported_zone_equipment = false; // Allow unsupported zone equipment
         // "ZeroNodePressures", or "LinearInitializationMethod"
     };
-
 
     struct Solver : BaseGlobalStruct
     {
@@ -470,7 +471,7 @@ namespace AirflowNetwork {
         Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
         int PressureSetFlag = 0;             // PressureSet flag
         Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
-        bool control_defaulted = false;  // Default simulation control flag
+        bool control_defaulted = false;      // Default simulation control flag
 
         Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
         Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
@@ -484,7 +485,7 @@ namespace AirflowNetwork {
         int ExtLargeOpeningErrIndex = 0; // Exterior large opening error index during HVAC system operation
         int OpenFactorErrCount = 0;      // Large opening error count at Open factor > 1.0
         int OpenFactorErrIndex = 0;      // Large opening error error index at Open factor > 1.0
-        
+
         Array1D<AirflowNetwork::AirflowNetworkNodeProp> AirflowNetworkNodeData;
         Array1D<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;

@@ -3885,8 +3885,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
         MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
-        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated &&
-            state.afn->VAVTerminalRatio > 0.0) {
+        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
             MassFlow *= state.afn->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                 MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
@@ -3922,8 +3921,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         }
 
         // the AirflowNetwork model overrids the mass flow rate value
-        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated &&
-            state.afn->VAVTerminalRatio > 0.0) {
+        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
             MassFlow *= state.afn->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                 MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
@@ -4027,8 +4025,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
         MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
 
-        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated &&
-            state.afn->VAVTerminalRatio > 0.0) {
+        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
             MassFlow *= state.afn->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                 MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;

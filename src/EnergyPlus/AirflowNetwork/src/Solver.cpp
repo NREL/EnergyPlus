@@ -2021,8 +2021,8 @@ namespace AirflowNetwork {
         distribution_simulated = simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation ||
                                  simulation_control.type == ControlType::MultizoneWithDistribution;
         // This one is true if the multizone simulation is ALWAYS done
-        multizone_always_simulated = simulation_control.type == ControlType::MultizoneWithDistribution ||
-                                     simulation_control.type == ControlType::MultizoneWithoutDistribution;
+        multizone_always_simulated =
+            simulation_control.type == ControlType::MultizoneWithDistribution || simulation_control.type == ControlType::MultizoneWithoutDistribution;
 
         // Check the number of primary air loops
         if (distribution_simulated) {
@@ -2164,8 +2164,7 @@ namespace AirflowNetwork {
                                 format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(3) + " = " + simulation_control.WPCCntr +
                                     " is not valid.");
                 ShowContinueError(m_state,
-                                  "Valid choices are Input or SurfaceAverageCalculation. " + CurrentModuleObject + " = " +
-                                      simulation_control.name);
+                                  "Valid choices are Input or SurfaceAverageCalculation. " + CurrentModuleObject + " = " + simulation_control.name);
                 ErrorsFound = true;
                 SimObjectError = true;
             }
@@ -6403,8 +6402,7 @@ namespace AirflowNetwork {
                 if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::DOP ||
                     AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SOP ||
                     AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::HOP) {
-                    if (AirflowNetworkFanActivated && distribution_simulated &&
-                        MultizoneSurfaceData(i).OpenFactor > 0.0 &&
+                    if (AirflowNetworkFanActivated && distribution_simulated && MultizoneSurfaceData(i).OpenFactor > 0.0 &&
                         (m_state.dataSurface->Surface(j).ExtBoundCond == ExternalEnvironment ||
                          (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
                           m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtWind)) &&
@@ -8637,7 +8635,7 @@ namespace AirflowNetwork {
         }
 
         // Calculate sensible and latent loads in each zone from multizone airflows
-        if (multizone_always_simulated || 
+        if (multizone_always_simulated ||
             (simulation_control.type == ControlType::MultizoneWithDistributionOnlyDuringFanOperation && AirflowNetworkFanActivated)) {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) { // Multizone airflow energy
                 n = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -12939,9 +12937,8 @@ namespace AirflowNetwork {
                               "..Iterations=" + std::to_string(ITER) + ", Max allowed=" + std::to_string(simulation_control.maximum_iterations));
             ShowFatalError(m_state, "AirflowNetwork: SOLVER, The previous error causes termination.");
         } else {
-            ShowRecurringWarningErrorAtEnd(m_state,
-                                           "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.",
-                                           ExtLargeOpeningErrIndex);
+            ShowRecurringWarningErrorAtEnd(
+                m_state, "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.", ExtLargeOpeningErrIndex);
         }
     }
 
