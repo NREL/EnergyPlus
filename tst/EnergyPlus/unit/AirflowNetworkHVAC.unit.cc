@@ -2159,13 +2159,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     state->dataEnvrn->WindSpeed = 4.9;
     state->dataEnvrn->WindDir = 270.0;
 
-    int index = UtilityRoutines::FindItemInList("OA INLET NODE", state->afn->AirflowNetworkNodeData);
+    int index = UtilityRoutines::FindItemInList("OA INLET NODE", state->afn->nodes);
     for (i = 1; i <= 36; ++i) {
         state->afn->AirflowNetworkNodeSimu(i).TZ = 23.0;
         state->afn->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == index) { // NFACADE, EFACADE, SFACADE, WFACADE, HORIZONTAL are always at indexes 5 through 9
             state->afn->AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(*state, state->afn->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+                DataEnvironment::OutDryBulbTempAt(*state, state->afn->nodes(i).NodeHeight); // AirflowNetworkNodeData vals differ
             state->afn->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
@@ -2194,7 +2194,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
         state->afn->DisSysCompReliefAirData(1).InletNode = 6;
         state->afn->DisSysCompReliefAirData(1).OutletNode = 5;
     }
-    state->afn->AirflowNetworkNodeData(3).AirLoopNum = 1;
+    state->afn->nodes(3).AirLoopNum = 1;
     state->afn->AirflowNetworkLinkageData(46).AirLoopNum = 1;
 
     state->dataAirLoop->AirLoopAFNInfo.allocate(1);
@@ -5955,7 +5955,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         state->afn->AirflowNetworkNodeSimu(i).TZ = 23.0;
         state->afn->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == 32) {
-            state->afn->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, state->afn->AirflowNetworkNodeData(i).NodeHeight);
+            state->afn->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, state->afn->nodes(i).NodeHeight);
             state->afn->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
@@ -5978,7 +5978,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         state->afn->DisSysCompReliefAirData(1).OutletNode = 1;
     }
 
-    state->afn->AirflowNetworkNodeData(3).AirLoopNum = 1;
+    state->afn->nodes(3).AirLoopNum = 1;
     state->afn->AirflowNetworkLinkageData(51).AirLoopNum = 1;
     state->afn->AirflowNetworkLinkageData(52).AirLoopNum = 1;
     state->afn->AirflowNetworkLinkageData(66).AirLoopNum = 2;
@@ -6230,9 +6230,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     state->afn->AirflowNetworkNumOfNodes = 1;
-    state->afn->AirflowNetworkNodeData.allocate(1);
-    state->afn->AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
-    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->afn->nodes.allocate(1);
+    state->afn->nodes(1).Name = "ATTIC ZONE";
+    state->afn->nodes(1).EPlusZoneNum = 1;
 
     state->afn->SplitterNodeNumbers.allocate(2);
     state->afn->SplitterNodeNumbers(1) = 0;
@@ -10440,7 +10440,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
         state->afn->AirflowNetworkNodeSimu(i).TZ = 23.0;
         state->afn->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i > 4 && i < 10) || i == 32) {
-            state->afn->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, state->afn->AirflowNetworkNodeData(i).NodeHeight);
+            state->afn->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, state->afn->nodes(i).NodeHeight);
             state->afn->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
@@ -10700,9 +10700,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     state->afn->AirflowNetworkNumOfNodes = 1;
-    state->afn->AirflowNetworkNodeData.allocate(1);
-    state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
-    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->afn->nodes.allocate(1);
+    state->afn->nodes(1).Name = "ZONE 1";
+    state->afn->nodes(1).EPlusZoneNum = 1;
 
     state->afn->SplitterNodeNumbers.allocate(2);
     state->afn->SplitterNodeNumbers(1) = 0;
@@ -10882,9 +10882,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     state->afn->AirflowNetworkNumOfNodes = 1;
-    state->afn->AirflowNetworkNodeData.allocate(1);
-    state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
-    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->afn->nodes.allocate(1);
+    state->afn->nodes(1).Name = "ZONE 1";
+    state->afn->nodes(1).EPlusZoneNum = 1;
 
     state->afn->SplitterNodeNumbers.allocate(2);
     state->afn->SplitterNodeNumbers(1) = 0;
@@ -11051,9 +11051,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     state->afn->AirflowNetworkNumOfNodes = 1;
-    state->afn->AirflowNetworkNodeData.allocate(1);
-    state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
-    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->afn->nodes.allocate(1);
+    state->afn->nodes(1).Name = "ZONE 1";
+    state->afn->nodes(1).EPlusZoneNum = 1;
 
     state->afn->SplitterNodeNumbers.allocate(2);
     state->afn->SplitterNodeNumbers(1) = 0;
@@ -11231,9 +11231,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     state->afn->AirflowNetworkNumOfNodes = 1;
-    state->afn->AirflowNetworkNodeData.allocate(1);
-    state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
-    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->afn->nodes.allocate(1);
+    state->afn->nodes(1).Name = "ZONE 1";
+    state->afn->nodes(1).EPlusZoneNum = 1;
 
     state->afn->SplitterNodeNumbers.allocate(2);
     state->afn->SplitterNodeNumbers(1) = 0;
@@ -11370,9 +11370,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     state->afn->AirflowNetworkNumOfNodes = 1;
-    state->afn->AirflowNetworkNodeData.allocate(1);
-    state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
-    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->afn->nodes.allocate(1);
+    state->afn->nodes(1).Name = "ZONE 1";
+    state->afn->nodes(1).EPlusZoneNum = 1;
 
     state->afn->SplitterNodeNumbers.allocate(2);
     state->afn->SplitterNodeNumbers(1) = 0;
@@ -11500,9 +11500,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
 
     // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
     state->afn->AirflowNetworkNumOfNodes = 1;
-    state->afn->AirflowNetworkNodeData.allocate(1);
-    state->afn->AirflowNetworkNodeData(1).Name = "ZONE 1";
-    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+    state->afn->nodes.allocate(1);
+    state->afn->nodes(1).Name = "ZONE 1";
+    state->afn->nodes(1).EPlusZoneNum = 1;
 
     state->afn->SplitterNodeNumbers.allocate(2);
     state->afn->SplitterNodeNumbers(1) = 0;

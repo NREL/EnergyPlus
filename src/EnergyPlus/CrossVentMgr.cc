@@ -769,26 +769,26 @@ namespace CrossVentMgr {
                 NodeNum1 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[0];
                 NodeNum2 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[1];
                 if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) {
-                    if (state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
+                    if (state.afn->nodes(NodeNum1).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(state.afn->MultizoneSurfaceData(MaxSurf).SurfNum);
-                    } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModelType ==
+                    } else if (state.dataRoomAirMod->AirModel(state.afn->nodes(NodeNum1).EPlusZoneNum).AirModelType ==
                                DataRoomAirModel::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
-                            state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum);
+                            state.dataRoomAirMod->RoomOutflowTemp(state.afn->nodes(NodeNum1).EPlusZoneNum);
                     } else {
-                        state.dataRoomAirMod->Tin(ZoneNum) = state.dataHeatBalFanSys->MAT(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum);
+                        state.dataRoomAirMod->Tin(ZoneNum) = state.dataHeatBalFanSys->MAT(state.afn->nodes(NodeNum1).EPlusZoneNum);
                     }
 
                 } else {
 
-                    if (state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum <= 0) {
+                    if (state.afn->nodes(NodeNum2).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(state.afn->MultizoneSurfaceData(MaxSurf).SurfNum);
-                    } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModelType ==
+                    } else if (state.dataRoomAirMod->AirModel(state.afn->nodes(NodeNum2).EPlusZoneNum).AirModelType ==
                                DataRoomAirModel::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
-                            state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum);
+                            state.dataRoomAirMod->RoomOutflowTemp(state.afn->nodes(NodeNum2).EPlusZoneNum);
                     } else {
-                        state.dataRoomAirMod->Tin(ZoneNum) = state.dataHeatBalFanSys->MAT(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum);
+                        state.dataRoomAirMod->Tin(ZoneNum) = state.dataHeatBalFanSys->MAT(state.afn->nodes(NodeNum2).EPlusZoneNum);
                     }
                 }
             } else if ((state.dataSurface->Surface(state.afn->MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) &&

@@ -96,11 +96,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     state->afn->MultizoneSurfaceData(i).Height = 5.0;
     state->afn->MultizoneSurfaceData(i).OpenFactor = 1.0;
 
-    state->afn->node_states.clear();
-    for (int it = 0; it < 2; ++it)
-        state->afn->node_states.emplace_back(AirState(AIRDENSITY_CONSTEXPR(20.0, 101325.0, 0.0)));
-    state->afn->node_states[0].density = 1.2;
-    state->afn->node_states[1].density = 1.18;
+    state->afn->nodes.clear();
+    state->afn->nodes.allocate(2);
+    state->afn->nodes[0].density = 1.2;
+    state->afn->nodes[1].density = 1.18;
 
     state->afn->MultizoneCompHorOpeningData.allocate(1);
     state->afn->MultizoneCompHorOpeningData(1).FlowCoef = 0.1;
@@ -116,14 +115,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     Real64 control = 1.0;
 
     NF = state->afn->MultizoneCompHorOpeningData(1).calculate(
-        *state, 1, 0.05, 1, multiplier, control, state->afn->node_states[0], state->afn->node_states[1], F, DF);
+        *state, 1, 0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
     EXPECT_NEAR(3.47863, F[0], 0.00001);
     EXPECT_NEAR(34.7863, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
     EXPECT_EQ(0.0, DF[1]);
 
     NF = state->afn->MultizoneCompHorOpeningData(1).calculate(
-        *state, 1, -0.05, 1, multiplier, control, state->afn->node_states[0], state->afn->node_states[1], F, DF);
+        *state, 1, -0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
     EXPECT_NEAR(-3.42065, F[0], 0.00001);
     EXPECT_NEAR(34.20649, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
@@ -150,14 +149,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     state->afn->DisSysCompCoilData[0].hydraulicDiameter = 1.0;
     state->afn->DisSysCompCoilData[0].L = 1.0;
 
-    state->afn->node_states.clear();
-    for (int it = 0; it < 2; ++it)
-        state->afn->node_states.emplace_back(AirState(AIRDENSITY_CONSTEXPR(20.0, 101325.0, 0.0)));
-    state->afn->node_states[0].density = 1.2;
-    state->afn->node_states[1].density = 1.2;
+    state->afn->nodes.clear();
+    state->afn->nodes.allocate(2);
+    state->afn->nodes[0].density = 1.2;
+    state->afn->nodes[1].density = 1.2;
 
-    state->afn->node_states[0].viscosity = 1.0e-5;
-    state->afn->node_states[1].viscosity = 1.0e-5;
+    state->afn->nodes[0].viscosity = 1.0e-5;
+    state->afn->nodes[1].viscosity = 1.0e-5;
 
     F[1] = DF[1] = 0.0;
 
@@ -165,14 +163,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     Real64 control = 1.0;
 
     NF = state->afn->DisSysCompCoilData[0].calculate(
-        *state, 1, 0.05, 1, multiplier, control, state->afn->node_states[0], state->afn->node_states[1], F, DF);
+        *state, 1, 0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
     EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[1]);
 
     NF = state->afn->DisSysCompCoilData[0].calculate(
-        *state, 1, -0.05, 1, multiplier, control, state->afn->node_states[0], state->afn->node_states[1], F, DF);
+        *state, 1, -0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
     EXPECT_NEAR(294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);
@@ -282,7 +280,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedMassFlow)
     AirflowNetwork::SpecifiedMassFlow element;
     element.mass_flow = 0.1;
 
-    AirflowNetwork::AirState state0, state1;
+    AirflowNetwork::Node state0, state1;
 
     Real64 dp{10.0};
     Real64 f = element.mass_flow;
@@ -485,7 +483,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestTriangularWindowWarning)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    state->afn->AirflowNetworkNodeData.deallocate();
+    state->afn->nodes.deallocate();
     state->afn->AirflowNetworkCompData.deallocate();
     state->afn->MultizoneExternalNodeData.deallocate();
     state->dataHeatBal->Zone.deallocate();
@@ -4431,7 +4429,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         state->afn->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i >= 4 && i <= 7)) {
             state->afn->AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(*state, state->afn->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+                DataEnvironment::OutDryBulbTempAt(*state, state->afn->nodes(i).NodeHeight); // AirflowNetworkNodeData vals differ
             state->afn->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }
@@ -4452,7 +4450,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
         state->afn->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i >= 4 && i <= 7)) {
             state->afn->AirflowNetworkNodeSimu(i).TZ =
-                DataEnvironment::OutDryBulbTempAt(*state, state->afn->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+                DataEnvironment::OutDryBulbTempAt(*state, state->afn->nodes(i).NodeHeight); // AirflowNetworkNodeData vals differ
             state->afn->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }

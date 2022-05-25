@@ -394,7 +394,6 @@ namespace AirflowNetwork {
         std::unordered_map<std::string, int> compnum; // Stopgap until all the introspection is dealt with
 
         AirProperties properties;
-        std::vector<AirState> node_states;
 
         // int const NrInt; // Number of intervals for a large opening
 
@@ -486,7 +485,7 @@ namespace AirflowNetwork {
         int OpenFactorErrCount = 0;      // Large opening error count at Open factor > 1.0
         int OpenFactorErrIndex = 0;      // Large opening error error index at Open factor > 1.0
 
-        Array1D<AirflowNetwork::AirflowNetworkNodeProp> AirflowNetworkNodeData;
+        EPVector<Node> nodes;
         Array1D<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
         Array1D<AirflowNetwork::MultizoneZoneProp> MultizoneZoneData;
@@ -618,7 +617,6 @@ namespace AirflowNetwork {
             AU.clear();
             elements.clear();
             compnum.clear();
-            node_states.clear();
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
             newIK.deallocate();
@@ -661,7 +659,7 @@ namespace AirflowNetwork {
             ExtLargeOpeningErrIndex = 0;
             OpenFactorErrCount = 0;
             OpenFactorErrIndex = 0;
-            AirflowNetworkNodeData.clear();
+            nodes.clear();
             AirflowNetworkCompData.clear();
             AirflowNetworkLinkageData.clear();
             MultizoneZoneData.clear();

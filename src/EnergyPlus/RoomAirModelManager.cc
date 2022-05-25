@@ -1138,10 +1138,10 @@ namespace RoomAirModelManager {
                 state.dataRoomAirModelMgr->NodeNum1 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[0];
                 state.dataRoomAirModelMgr->NodeNum2 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[1];
                 if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Zone == ThisZone ||
-                    (state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum == ThisZone &&
-                     state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum > 0) ||
-                    (state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum > 0 &&
-                     state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum == ThisZone)) {
+                    (state.afn->nodes(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum == ThisZone &&
+                     state.afn->nodes(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum > 0) ||
+                    (state.afn->nodes(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum > 0 &&
+                     state.afn->nodes(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum == ThisZone)) {
                     state.dataRoomAirModelMgr->CompNum = state.afn->AirflowNetworkLinkageData(Loop2).CompNum;
                     state.dataRoomAirModelMgr->TypeNum = state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).TypeNum;
                     if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
@@ -2261,11 +2261,11 @@ namespace RoomAirModelManager {
                         } else {
                             state.dataRoomAirModelMgr->NodeNumber1 = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).NodeNums[0];
                             state.dataRoomAirModelMgr->NodeNumber2 = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).NodeNums[1];
-                            if ((state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNumber2).EPlusZoneNum ==
+                            if ((state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber2).EPlusZoneNum ==
                                      state.dataRoomAirModelMgr->Loop &&
-                                 state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNumber1).EPlusZoneNum > 0) ||
-                                (state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNumber2).EPlusZoneNum > 0 &&
-                                 state.afn->AirflowNetworkNodeData(state.dataRoomAirModelMgr->NodeNumber1).EPlusZoneNum ==
+                                 state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber1).EPlusZoneNum > 0) ||
+                                (state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber2).EPlusZoneNum > 0 &&
+                                 state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber1).EPlusZoneNum ==
                                      state.dataRoomAirModelMgr->Loop)) {
                                 state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(SurfNum, state.dataRoomAirModelMgr->Loop) =
                                     state.dataRoomAirModelMgr->Loop2;

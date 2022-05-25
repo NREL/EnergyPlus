@@ -749,7 +749,7 @@ namespace AirflowNetwork {
             SumFracSuppLeak = 0.0;
             for (k = 1; k <= state.afn->ActualNumOfLinks; ++k) {
                 if (state.afn->AirflowNetworkLinkageData(k).VAVTermDamper && state.afn->AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
-                    k1 = state.afn->AirflowNetworkNodeData(state.afn->AirflowNetworkLinkageData(k).NodeNums[0]).EPlusNodeNum;
+                    k1 = state.afn->nodes(state.afn->AirflowNetworkLinkageData(k).NodeNums[0]).EPlusNodeNum;
                     if (state.dataLoopNodes->Node(k1).MassFlowRate > 0.0) {
                         SumTermFlow += state.dataLoopNodes->Node(k1).MassFlowRate;
                     }
@@ -758,8 +758,8 @@ namespace AirflowNetwork {
                     // Calculate supply leak sensible losses
                     Node1 = state.afn->AirflowNetworkLinkageData(k).NodeNums[0];
                     Node2 = state.afn->AirflowNetworkLinkageData(k).NodeNums[1];
-                    if ((state.afn->AirflowNetworkNodeData(Node2).EPlusZoneNum > 0) && (state.afn->AirflowNetworkNodeData(Node1).EPlusNodeNum == 0) &&
-                        (state.afn->AirflowNetworkNodeData(Node1).AirLoopNum == AirLoopNum)) {
+                    if ((state.afn->nodes(Node2).EPlusZoneNum > 0) && (state.afn->nodes(Node1).EPlusNodeNum == 0) &&
+                        (state.afn->nodes(Node1).AirLoopNum == AirLoopNum)) {
                         SumFracSuppLeak +=
                             state.afn->DisSysCompELRData(state.afn->AirflowNetworkCompData(state.afn->AirflowNetworkLinkageData(k).CompNum).TypeNum)
                                 .ELR;
@@ -3900,7 +3900,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void DetailedOpeningSolver::pstack(EnergyPlusData &state, std::vector<AirflowNetwork::AirState> &props, Array1D<Real64> &pz)
+    void DetailedOpeningSolver::pstack(EnergyPlusData &state, const EPVector<Node> &props, Array1D<Real64> &pz)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4003,9 +4003,9 @@ namespace AirflowNetwork {
             // Initialisation
             From = state.afn->AirflowNetworkLinkageData(i).NodeNums[0];
             To = state.afn->AirflowNetworkLinkageData(i).NodeNums[1];
-            if (state.afn->AirflowNetworkNodeData(From).EPlusZoneNum > 0 && state.afn->AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
+            if (state.afn->nodes(From).EPlusZoneNum > 0 && state.afn->nodes(To).EPlusZoneNum > 0) {
                 ll = 0;
-            } else if (state.afn->AirflowNetworkNodeData(From).EPlusZoneNum == 0 && state.afn->AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
+            } else if (state.afn->nodes(From).EPlusZoneNum == 0 && state.afn->nodes(To).EPlusZoneNum > 0) {
                 ll = 1;
             } else {
                 ll = 3;
@@ -4020,11 +4020,11 @@ namespace AirflowNetwork {
                 ActLOwnh = 0.0;
             }
 
-            TempL1 = props[From].temperature;
-            Xhl1 = props[From].humidity_ratio;
-            TzFrom = props[From].temperature;
-            XhzFrom = props[From].humidity_ratio;
-            RhoL1 = props[From].density;
+            TempL1 = props(From).temperature;
+            Xhl1 = props(From).humidity_ratio;
+            TzFrom = props(From).temperature;
+            XhzFrom = props(From).humidity_ratio;
+            RhoL1 = props(From).density;
             if (ll == 0 || ll == 3) {
                 PzFrom = pz(From);
             } else {
@@ -4040,11 +4040,11 @@ namespace AirflowNetwork {
                 Fromz = From;
             }
 
-            TempL2 = props[To].temperature;
-            Xhl2 = props[To].humidity_ratio;
-            TzTo = props[To].temperature;
-            XhzTo = props[To].humidity_ratio;
-            RhoL2 = props[To].density;
+            TempL2 = props(To).temperature;
+            Xhl2 = props(To).humidity_ratio;
+            TzTo = props(To).temperature;
+            XhzTo = props(To).humidity_ratio;
+            RhoL2 = props(To).density;
 
             if (ll < 3) {
                 PzTo = pz(To);
@@ -4178,10 +4178,10 @@ namespace AirflowNetwork {
             // CALCULATE STACK PRESSURE FOR THE PATH ITSELF for different flow directions
             H = double(state.afn->AirflowNetworkLinkageData(i).NodeHeights[1]) - double(state.afn->AirflowNetworkLinkageData(i).NodeHeights[0]);
             if (ll == 0 || ll == 3 || ll == 6) {
-                H -= state.afn->AirflowNetworkNodeData(From).NodeHeight;
+                H -= state.afn->nodes(From).NodeHeight;
             }
             if (ll < 3) {
-                H += state.afn->AirflowNetworkNodeData(To).NodeHeight;
+                H += state.afn->nodes(To).NodeHeight;
             }
 
             // IF AIR FLOWS from "From" to "To"

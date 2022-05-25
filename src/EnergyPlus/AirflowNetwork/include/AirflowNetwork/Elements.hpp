@@ -341,6 +341,9 @@ namespace AirflowNetwork {
         }
     };
 
+    struct AirflowNetworkLinkageProp; // Forward declare for now, fix later
+    struct Node;                      // Forward declare for now, fix later
+
     struct AirflowElement
     {
         AirflowElement()
@@ -428,7 +431,7 @@ namespace AirflowNetwork {
                          Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
         );
 
-        void pstack(EnergyPlusData &state, std::vector<AirflowNetwork::AirState> &props, Array1D<Real64> &pz);
+        void pstack(EnergyPlusData &state, const EPVector<Node> &props, Array1D<Real64> &pz);
 
         Real64 psz(Real64 const Pz0,  // Pressure at altitude z0 [Pa]
                    Real64 const Rho0, // density at altitude z0 [kg/m3]
@@ -1311,7 +1314,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct AirflowNetworkNodeProp // AirflowNetwork nodal data
+    struct Node : public AirState // AirflowNetwork nodal data
     {
         // Members
         std::string Name;      // Provide a unique node name
@@ -1332,7 +1335,7 @@ namespace AirflowNetwork {
         int AirLoopNum;  // AirLoop number
 
         // Default Constructor
-        AirflowNetworkNodeProp()
+        Node()
             : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0),
               EPlusTypeNum(iEPlusNodeType::Invalid), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
