@@ -1221,13 +1221,21 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     } else {
         //
     }
+    // Load (water) side temperature variable
+    Real64 waterTempforCurve = this->loadSideInletTemp;
+    if (this->waterTempCurveInputVar == 1) {
+        waterTempforCurve = this->loadSideOutletTemp;
+    } else {
+        //
+    }
 
     // 2022-05-17: should the following curve evaluation based on the oaVariable and waterVariable choice:?
     // 2022-05-17: Maybe how this is set up is related to the flow mode?
     // evaluate capacity modifier curve and determine load side heat transfer
     Real64 capacityModifierFuncTemp =
         // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
-        CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, oaTempforCurve);
+        // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, oaTempforCurve);
+        CurveManager::CurveValue(state, this->capFuncTempCurveIndex, waterTempforCurve, oaTempforCurve);
 
     Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
     Real64 partLoadRatio = 0.0;
@@ -1242,20 +1250,13 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
                                                            thisLoadPlantLoop.FluidIndex,
                                                            "PLFFHPEIR::simulate()");
-    this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
+    // this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
+    this->loadSideHeatTransfer = availableCapacity * (partLoadRatio >= this->minPLR ? partLoadRatio : 0.0);
     this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
     // calculate load side outlet conditions
     Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
     this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
-
-    // Load (water) side
-    Real64 waterTempforCurve = this->loadSideInletTemp;
-    if (this->waterTempCurveInputVar == 1) {
-        waterTempforCurve = this->loadSideOutletTemp;
-    } else {
-        //
-    }
 
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = CurveManager::CurveValue(state,
@@ -1264,8 +1265,8 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                                                           oaTempforCurve); // CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex,
                                                                            // this->loadSideOutletTemp, this->sourceSideInletTemp);
 
-    Real64 miniPLR = this->minPLR; // 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
-    Real64 PLFf = max(miniPLR, partLoadRatio);
+    Real64 miniPLR_mod = 0.25; // 2022-05-17: maybe should use input minPLR; however, this is to duplicate the ems verson
+    Real64 PLFf = max(miniPLR_mod, partLoadRatio);
 
     Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, PLFf);
     // this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
@@ -1286,8 +1287,6 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         CRF = CurveManager::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
     if (CRF <= 0.0) CRF = 0.5833;
-    this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
-    this->fuelEnergy = this->fuelUsage * reportingInterval;
 
     // aux elec
     Real64 eirAuxElecFuncTemp = 0.0;
@@ -1299,7 +1298,14 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         eirAuxElecFuncPLR = CurveManager::CurveValue(state, this->auxElecEIRFoPLRCurveIndex, partLoadRatio);
     }
 
-    this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR + this->standbyElecPower;
+    if (partLoadRatio < this->minPLR) {
+        this->fuelUsage = 0.0;
+        this->powerUsage = 0.0;
+    } else {
+        this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
+        this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR + this->standbyElecPower;
+    }
+    this->fuelEnergy = this->fuelUsage * reportingInterval;
     this->powerEnergy = this->powerEnergy * reportingInterval;
 
     // energy balance on heat pump
