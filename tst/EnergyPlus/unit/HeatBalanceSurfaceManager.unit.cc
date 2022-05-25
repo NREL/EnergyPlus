@@ -5642,9 +5642,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     ScheduleManager::UpdateScheduleValues(*state);
 
     // check ground temperature values
-    Real64 const Tgndsurf_grass = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(1).TempSchPtr); //15.0;
-    Real64 const Tgndsurf_parking = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(2).TempSchPtr); // 18.0;
-    Real64 const Tgndsurf_lake = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(3).TempSchPtr); // 12.0;
+    Real64 const Tgndsurf_grass = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(1).TempSchPtr);
+    Real64 const Tgndsurf_parking = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(2).TempSchPtr);
+    Real64 const Tgndsurf_lake = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(3).TempSchPtr);
     EXPECT_DOUBLE_EQ(25.0, Tgndsurf_grass);
     EXPECT_DOUBLE_EQ(28.0, Tgndsurf_parking);
     EXPECT_DOUBLE_EQ(22.0, Tgndsurf_lake);
@@ -5678,7 +5678,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     // check parking area ground surface temperature
     EXPECT_DOUBLE_EQ(results_gndSurfsAvgTemp, GndSurfsProperty.SurfsTempAvg);
 
-    // test 3: surface viewing lake area only
+    // test 4: surface viewing lake area only
     GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
     GndSurfsProperty.GndSurfs(2).ViewFactor = 0.0;
     GndSurfsProperty.GndSurfs(3).ViewFactor = 0.4;
@@ -5687,6 +5687,322 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     results_gndSurfsAvgTemp = 22.0;
     // check lake area ground surface temperature
     EXPECT_DOUBLE_EQ(results_gndSurfsAvgTemp, GndSurfsProperty.SurfsTempAvg);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
+{
+    bool ErrorsFound(false);
+    std::string const idf_objects = delimited_string({
+        "  Material,",
+        "    Concrete Block,               !- Name",
+        "    MediumRough,                  !- Roughness",
+        "    0.1014984,                    !- Thickness {m}",
+        "    0.3805070,                    !- Conductivity {W/m-K}",
+        "    608.7016,                     !- Density {kg/m3}",
+        "    836.8000;                     !- Specific Heat {J/kg-K}",
+
+        "  Construction,",
+        "    WallConstruction,             !- Name",
+        "    Concrete Block;               !- Outside Layer",
+
+        "  WindowMaterial:SimpleGlazingSystem,",
+        "    WindowMaterial,               !- Name",
+        "    5.778,                        !- U-Factor {W/m2-K}",
+        "    0.819,                        !- Solar Heat Gain Coefficient",
+        "    0.881;                        !- Visible Transmittance",
+
+        "  Construction,",
+        "    WindowConstruction,           !- Name",
+        "    WindowMaterial;               !- Outside Layer",
+
+        "  WindowProperty:FrameAndDivider,",
+        "    WindowFrame,                  !- Name",
+        "    0.05,                         !- Frame Width {m}",
+        "    0.00,                         !- Frame Outside Projection {m}",
+        "    0.00,                         !- Frame Inside Projection {m}",
+        "    5.0,                          !- Frame Conductance {W/m2-K}",
+        "    1.2,                          !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
+        "    0.8,                          !- Frame Solar Absorptance",
+        "    0.8,                          !- Frame Visible Absorptance",
+        "    0.9,                          !- Frame Thermal Hemispherical Emissivity",
+        "    DividedLite,                  !- Divider Type",
+        "    0.02,                         !- Divider Width {m}",
+        "    2,                            !- Number of Horizontal Dividers",
+        "    2,                            !- Number of Vertical Dividers",
+        "    0.00,                         !- Divider Outside Projection {m}",
+        "    0.00,                         !- Divider Inside Projection {m}",
+        "    5.0,                          !- Divider Conductance {W/m2-K}",
+        "    1.2,                          !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
+        "    0.8,                          !- Divider Solar Absorptance",
+        "    0.8,                          !- Divider Visible Absorptance",
+        "    0.9;                          !- Divider Thermal Hemispherical Emissivity",
+
+        "  FenestrationSurface:Detailed,",
+        "    FenestrationSurface,          !- Name",
+        "    Window,                       !- Surface Type",
+        "    WindowConstruction,           !- Construction Name",
+        "    Wall,                         !- Building Surface Name",
+        "    ,                             !- Outside Boundary Condition Object",
+        "    0.5000000,                    !- View Factor to Ground",
+        "    WindowFrame,                  !- Frame and Divider Name",
+        "    1.0,                          !- Multiplier",
+        "    4,                            !- Number of Vertices",
+        "    0.200000,0.0,9.900000,        !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.200000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.900000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.900000,0.0,9.900000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:FenestrationSurface,   !- Name",
+        "    FenestrationSurface,          !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:FenesSurface,        !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:FenesSurface;        !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:FenesSurface,        !- Name",
+        "    0.5,                          !- Sky View Factor",
+        "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+        "    SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name",
+        "    0.1,                          !- Surrounding Surface 1 View Factor",
+        "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:FenesSurface,        !-Name",
+        "    GndSurfs GrassArea,           !-Ground Surface 1 Name",
+        "    0.2,                          !-Ground Surface 1 View Factor",
+        "    GrassArea Ground Temp Sch,    !-Ground Surface 1 Temperature Schedule Name",
+        "    GrassArea Ground Refl Sch,    !-Ground Surface 1 Reflectance Schedule Name",
+        "    GndSurfs ParkingArea,         !-Ground Surface 2 Name",
+        "    0.1,                          !-Ground Surface 2 View Factor",
+        "    ParkingArea Ground Temp Sch,  !-Ground Surface 2 Temperature Schedule Name",
+        "    ParkingArea Ground Refl Sch,  !-Ground Surface 2 Reflectance Schedule Name",
+        "    GndSurfs LakeArea,            !-Ground Surface 3 Name",
+        "    0.1,                          !-Ground Surface 3 View Factor",
+        "    LakeArea Ground Temp Sch,     !-Ground Surface 3 Temperature Schedule Name",
+        "    LakeArea Ground Refl Sch;     !-Ground Surface 3 Reflectance Schedule Name",
+
+        "  Schedule:Compact,",
+        "    Surrounding Temp Sch 1,       !- Name",
+        "    Temperature,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 26.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    GrassArea Ground Temp Sch,    !- Name",
+        "    Temperature,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 25.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    ParkingArea Ground Temp Sch,  !- Name",
+        "    Temperature,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 28.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    LakeArea Ground Temp Sch,     !- Name",
+        "    Temperature,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 22.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Sky Temp Sch,                 !- Name",
+        "    Temperature,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 20.0;           !- Field 3",
+
+        "  ScheduleTypeLimits,",
+        "    Temperature,                  !- Name",
+        "    -60,                          !- Lower Limit Value",
+        "    200,                          !- Upper Limit Value",
+        "    CONTINUOUS,                   !- Numeric Type",
+        "    Temperature;                  !- Unit Type",
+
+        "  Schedule:Compact,",
+        "    GrassArea Ground Refl Sch,    !- Name",
+        "    Fraction,                     !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 0.25;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    ParkingArea Ground Refl Sch,  !- Name",
+        "    Fraction,                     !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 0.50;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    LakeArea Ground Refl Sch,     !- Name",
+        "    Fraction,                     !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 0.10;           !- Field 3",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                     !- Name",
+        "    0,                            !- Lower Limit Value",
+        "    1,                            !- Upper Limit Value",
+        "    CONTINUOUS;                   !- Numeric Type",
+
+        "  BuildingSurface:Detailed,",
+        "    Wall,                         !- Name",
+        "    Wall,                         !- Surface Type",
+        "    WallConstruction,             !- Construction Name",
+        "    Zone,                         !- Zone Name",
+        "    ,                             !- Space Name",
+        "    Outdoors,                     !- Outside Boundary Condition",
+        "    ,                             !- Outside Boundary Condition Object",
+        "    SunExposed,                   !- Sun Exposure",
+        "    WindExposed,                  !- Wind Exposure",
+        "    0.5000000,                    !- View Factor to Ground",
+        "    4,                            !- Number of Vertices",
+        "    0.0,0.000000,10.00000,        !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,0.000000,0.0,             !- X,Y,Z ==> Vertex 2 {m}",
+        "    10.00000,0.0,0.0,             !- X,Y,Z ==> Vertex 3 {m}",
+        "    10.00000,0.0,10.00000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,"
+        "    Floor,                        !- Name",
+        "    Floor,                        !- Surface Type",
+        "    WallConstruction,             !- Construction Name",
+        "    Zone,                         !- Zone Name",
+        "    ,                             !- Space Name",
+        "    Outdoors,                     !- Outside Boundary Condition",
+        "    ,                             !- Outside Boundary Condition Object",
+        "    NoSun,                        !- Sun Exposure",
+        "    NoWind,                       !- Wind Exposure",
+        "    1.0,                          !- View Factor to Ground",
+        "    4,                            !- Number of Vertices",
+        "    0.000000,0.000000,0,          !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000000,10.000000,0,         !- X,Y,Z ==> Vertex 2 {m}",
+        "    10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}",
+        "    10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  Zone,"
+        "    Zone,                         !- Name",
+        "    0,                            !- Direction of Relative North {deg}",
+        "    6.000000,                     !- X Origin {m}",
+        "    6.000000,                     !- Y Origin {m}",
+        "    0,                            !- Z Origin {m}",
+        "    1,                            !- Type",
+        "    1,                            !- Multiplier",
+        "    autocalculate,                !- Ceiling Height {m}",
+        "    autocalculate;                !- Volume {m3}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set global and environmental variables
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->HourOfDay = 15;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->OutBaroPress = 100000;
+
+    // update schedule values
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+    // test surface property sky and ground view factors inputs
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).GroundSurfsNum);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).SurroundingSurfsPtr);
+    // set local derived data vars
+    int SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(3);
+    auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    int GndSurfsNum = state->dataSurface->IsSurfPropertyGndSurfacesDefined(3);
+    auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    // check sky view factors
+    EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
+    // check surrounding surfaces view factors
+    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty.SurroundingSurfs(1).ViewFactor);
+    // check ground surfaces view factors
+    EXPECT_EQ("GNDSURFS GRASSAREA", GndSurfsProperty.GndSurfs(1).Name);
+    EXPECT_DOUBLE_EQ(0.2, GndSurfsProperty.GndSurfs(1).ViewFactor);
+    EXPECT_EQ("GNDSURFS PARKINGAREA", GndSurfsProperty.GndSurfs(2).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(2).ViewFactor);
+    EXPECT_EQ("GNDSURFS LAKEAREA", GndSurfsProperty.GndSurfs(3).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(3).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.4, GndSurfsProperty.SurfsViewFactorSum);
+
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    // check ground temperature values
+    Real64 const Rgndsurf_grass = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(1).ReflSchPtr); 
+    Real64 const Rgndsurf_parking = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(2).ReflSchPtr);
+    Real64 const Rgndsurf_lake = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(3).ReflSchPtr);
+    EXPECT_DOUBLE_EQ(0.25, Rgndsurf_grass);
+    EXPECT_DOUBLE_EQ(0.5, Rgndsurf_parking);
+    EXPECT_DOUBLE_EQ(0.1, Rgndsurf_lake);
+
+    // test 1: surface viewing grass, parking and lake areas
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    Real64 dTK = DataGlobalConstants::KelvinConv;
+    Real64 results_gndSurfsAvgRefl = 0.0;
+    results_gndSurfsAvgRefl = (0.2 * Rgndsurf_grass + 0.1 * Rgndsurf_parking + 0.1 * Rgndsurf_lake) / (0.2 + 0.1 + 0.1);
+    // check ground surfaces average temperature
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
+
+    // test 2: surface viewing grass area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.4;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.0;
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    results_gndSurfsAvgRefl = 0.25;
+    // check grass area ground surface reflectance
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
+
+    // test 3: surface viewing parking area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.4;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.0;
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    results_gndSurfsAvgRefl = 0.50;
+    // check parking area ground surface reflectance
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
+
+    // test 4: surface viewing lake area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.4;
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    results_gndSurfsAvgRefl = 0.10;
+    // check lake area ground surface reflectance
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
 }
 
 } // namespace EnergyPlus
