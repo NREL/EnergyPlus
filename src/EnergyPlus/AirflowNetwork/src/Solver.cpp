@@ -2807,6 +2807,7 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     }
                 }
+                MultizoneSurfaceData(i).surface = &m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum);
             }
             // Ensure zones defined in inside and outside environment are used in the object of AIRFLOWNETWORK:MULTIZONE:ZONE
             found = false;

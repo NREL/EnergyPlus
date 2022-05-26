@@ -49,6 +49,7 @@
 #define AIRFLOWNETWORK_ELEMENTS_HPP
 
 #include "AirflowNetwork/Properties.hpp"
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <optional>
 
@@ -275,23 +276,24 @@ namespace AirflowNetwork {
     struct MultizoneSurfaceProp // Surface information
     {
         // Members
-        std::string SurfName;         // Name of Associated EnergyPlus surface
-        std::string OpeningName;      // Name of opening component, either simple or detailed large opening
-        std::string ExternalNodeName; // Name of external node, but not used at WPC="INPUT"
-        Real64 Factor;                // Crack Actual Value or Window Open Factor for Ventilation
-        int SurfNum;                  // Surface number
-        std::array<int, 2> NodeNums;  // Positive: Zone numbers; 0: External
-        Real64 OpenFactor;            // Surface factor
-        Real64 OpenFactorLast;        // Surface factor at previous time step
-        bool EMSOpenFactorActuated;   // True if EMS actuation is on
-        Real64 EMSOpenFactor;         // Surface factor value from EMS for override
-        Real64 Height;                // Surface Height
-        Real64 Width;                 // Surface width
-        Real64 CHeight;               // Surface central height in z direction
-        std::string VentControl;      // Ventilation Control Mode: TEMPERATURE, ENTHALPIC, CONSTANT, ZONELEVEL or NOVENT
-        std::string VentSchName;      // ! Name of ventilation temperature control schedule
-        Real64 ModulateFactor;        // Limit Value on Multiplier for Modulating Venting Open Factor
-        Real64 LowValueTemp;          // Lower Value on Inside/Outside Temperature Difference for
+        std::string SurfName;                           // Name of Associated EnergyPlus surface
+        std::string OpeningName;                        // Name of opening component, either simple or detailed large opening
+        std::string ExternalNodeName;                   // Name of external node, but not used at WPC="INPUT"
+        Real64 Factor;                                  // Crack Actual Value or Window Open Factor for Ventilation
+        int SurfNum;                                    // Surface number
+        EnergyPlus::DataSurfaces::SurfaceData *surface; // Pointer to heat transfer surface, cannot be null after input
+        std::array<int, 2> NodeNums;                    // Positive: Zone numbers; 0: External
+        Real64 OpenFactor;                              // Surface factor
+        Real64 OpenFactorLast;                          // Surface factor at previous time step
+        bool EMSOpenFactorActuated;                     // True if EMS actuation is on
+        Real64 EMSOpenFactor;                           // Surface factor value from EMS for override
+        Real64 Height;                                  // Surface Height
+        Real64 Width;                                   // Surface width
+        Real64 CHeight;                                 // Surface central height in z direction
+        std::string VentControl;                        // Ventilation Control Mode: TEMPERATURE, ENTHALPIC, CONSTANT, ZONELEVEL or NOVENT
+        std::string VentSchName;                        // ! Name of ventilation temperature control schedule
+        Real64 ModulateFactor;                          // Limit Value on Multiplier for Modulating Venting Open Factor
+        Real64 LowValueTemp;                            // Lower Value on Inside/Outside Temperature Difference for
         // Modulating the Venting Open Factor with temp control
         Real64 UpValueTemp; // Upper Value on Inside/Outside Temperature Difference for
         // Modulating the Venting Open Factor with temp control
@@ -329,10 +331,10 @@ namespace AirflowNetwork {
 
         // Default Constructor
         MultizoneSurfaceProp()
-            : Factor(0.0), SurfNum(0), NodeNums{{0, 0}}, OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false), EMSOpenFactor(0.0),
-              Height(0.0), Width(0.0), CHeight(0.0), VentControl("ZONELEVEL"), ModulateFactor(0.0), LowValueTemp(0.0), UpValueTemp(100.0),
-              LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(VentControlType::None), VentingSchNum(0), ZonePtr(0),
-              IndVentControl(false), ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0),
+            : Factor(0.0), SurfNum(0), surface(nullptr), NodeNums{{0, 0}}, OpenFactor(0.0), OpenFactorLast(0.0), EMSOpenFactorActuated(false),
+              EMSOpenFactor(0.0), Height(0.0), Width(0.0), CHeight(0.0), VentControl("ZONELEVEL"), ModulateFactor(0.0), LowValueTemp(0.0),
+              UpValueTemp(100.0), LowValueEnth(0.0), UpValueEnth(300000.0), VentSchNum(0), VentSurfCtrNum(VentControlType::None), VentingSchNum(0),
+              ZonePtr(0), IndVentControl(false), ExtLargeOpeningErrCount(0), ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0),
               Multiplier(1.0), HybridVentClose(false), HybridCtrlGlobal(false), HybridCtrlMaster(false), WindModifier(1.0),
               OccupantVentilationControlNum(0), OpeningStatus(OpenStatus::FreeOperation), PrevOpeningstatus(OpenStatus::FreeOperation),
               CloseElapsedTime(0.0), OpenElapsedTime(0.0), ClosingProbStatus(ProbabilityCheck::NoAction),
@@ -364,7 +366,6 @@ namespace AirflowNetwork {
         virtual int calculate(EnergyPlusData &state,
                               bool const LFLAG,                   // Initialization flag.If = 1, use laminar relationship
                               Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                              //int const i,                        // Linkage number
                               const Real64 multiplier,            // Element multiplier
                               const Real64 control,               // Element control signal
                               AirflowNetworkLinkageProp &linkage, // Linkage
@@ -374,12 +375,12 @@ namespace AirflowNetwork {
 
         // Make this abstract once all the classes implement it
         virtual int calculate([[maybe_unused]] EnergyPlusData &state,
-                              [[maybe_unused]] const Real64 PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
-                              [[maybe_unused]] const Real64 multiplier,  // Element multiplier
-                              [[maybe_unused]] const Real64 control,     // Element control signal
+                              [[maybe_unused]] const Real64 PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                              [[maybe_unused]] const Real64 multiplier,            // Element multiplier
+                              [[maybe_unused]] const Real64 control,               // Element control signal
                               [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
-                              [[maybe_unused]] std::array<Real64, 2> &F, // Airflow through the component [kg/s]
-                              [[maybe_unused]] std::array<Real64, 2> &DF // Partial derivative:  DF/DP
+                              [[maybe_unused]] std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              [[maybe_unused]] std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
         )
         {
             return 1;
@@ -502,7 +503,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -533,7 +533,6 @@ namespace AirflowNetwork {
         int calculate(EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -563,7 +562,6 @@ namespace AirflowNetwork {
         int calculate(EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -590,7 +588,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       [[maybe_unused]] bool const LFLAG,                   // Initialization flag.If = 1, use laminar relationship
                       [[maybe_unused]] Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                      //[[maybe_unused]] int const i,                        // Linkage number
                       const Real64 multiplier,                             // Element multiplier
                       const Real64 control,                                // Element control signal
                       [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
@@ -617,7 +614,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       [[maybe_unused]] bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
                       [[maybe_unused]] Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                      //[[maybe_unused]] int const i,        // Linkage number
                       const Real64 multiplier,             // Element multiplier
                       const Real64 control,                // Element control signal
                       AirflowNetworkLinkageProp &linkage,  // Linkage
@@ -666,23 +662,22 @@ namespace AirflowNetwork {
         }
 
         int calculate([[maybe_unused]] EnergyPlusData &state,
-                      bool const linear,            // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,           // Total pressure drop across a component (P1 - P2) [Pa]
-                      //[[maybe_unused]] int const i, // Linkage number
-                      const Real64 multiplier,      // Element multiplier
-                      const Real64 control,         // Element control signal
+                      bool const linear,                  // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                      const Real64 multiplier,            // Element multiplier
+                      const Real64 control,               // Element control signal
                       AirflowNetworkLinkageProp &linkage, // Linkage
-                      std::array<Real64, 2> &F,     // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF     // Partial derivative:  DF/DP
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
         );
 
         virtual int calculate(EnergyPlusData &state,
-                              const Real64 pdrop,       // Total pressure drop across a component (P1 - P2) [Pa]
-                              const Real64 multiplier,  // Element multiplier
-                              const Real64 control,     // Element control signal
+                              const Real64 pdrop,                 // Total pressure drop across a component (P1 - P2) [Pa]
+                              const Real64 multiplier,            // Element multiplier
+                              const Real64 control,               // Element control signal
                               AirflowNetworkLinkageProp &linkage, // Linkage
-                              std::array<Real64, 2> &F, // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF // Partial derivative:  DF/DP
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type()
@@ -709,7 +704,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //[[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -757,7 +751,6 @@ namespace AirflowNetwork {
         int calculate(EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -842,7 +835,8 @@ namespace AirflowNetwork {
         Real64 control;                       // Control value
 
         // Default Constructor
-        AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), indices{{0, 0}}, nodes{{nullptr, nullptr}}, LinkNum(0), element(nullptr), control(1.0)
+        AirflowNetworkLinkage()
+            : NodeHeights{{0.0, 0.0}}, CompNum(0), indices{{0, 0}}, nodes{{nullptr, nullptr}}, LinkNum(0), element(nullptr), control(1.0)
         {
         }
 
@@ -905,7 +899,6 @@ namespace AirflowNetwork {
         int calculate(EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -944,7 +937,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //[[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1000,7 +992,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //[[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1045,7 +1036,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1091,7 +1081,6 @@ namespace AirflowNetwork {
         int calculate(EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1126,7 +1115,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1165,7 +1153,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1204,7 +1191,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //[[maybe_unused]] int const i,             // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1245,7 +1231,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1273,7 +1258,6 @@ namespace AirflowNetwork {
         int calculate([[maybe_unused]] EnergyPlusData &state,
                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                       const Real64 PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      //int const i,                              // Linkage number
                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                       [[maybe_unused]] const Real64 control,    // Element control signal
                       AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1417,7 +1401,6 @@ namespace AirflowNetwork {
         virtual int calculate(EnergyPlusData &state,
                               bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                               const Real64 PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                              //int const i,                              // Linkage number
                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
                               [[maybe_unused]] const Real64 control,    // Element control signal
                               AirflowNetworkLinkageProp &linkage,       // Linkage
@@ -1442,7 +1425,6 @@ namespace AirflowNetwork {
         virtual int calculate(EnergyPlusData &state,
                               bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                               const Real64 PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                              //int const i,                              // Linkage number
                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
                               [[maybe_unused]] const Real64 control,    // Element control signal
                               AirflowNetworkLinkageProp &linkage,       // Linkage
