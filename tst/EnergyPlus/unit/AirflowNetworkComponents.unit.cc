@@ -111,6 +111,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     state->afn->AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
     state->afn->AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
     state->afn->AirflowNetworkLinkageData(i).nodes = {{&state->afn->nodes[0], &state->afn->nodes[0]}};
+    state->afn->AirflowNetworkLinkageData(i).set_surface(&state->afn->MultizoneSurfaceData(i));
 
     Real64 multiplier = 1.0;
     Real64 control = 1.0;

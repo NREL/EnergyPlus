@@ -106,7 +106,7 @@ namespace AirflowNetwork {
         Real64 constexpr EPS(0.001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -253,7 +253,7 @@ namespace AirflowNetwork {
         Real64 constexpr EPS(0.001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -385,7 +385,7 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a surface crack component
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
         // Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
@@ -462,7 +462,7 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a surface crack component
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
         // Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
@@ -546,7 +546,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
         Real64 RhozNorm = state.afn->properties.density(101325.0, 20.0, 0.0);
@@ -636,7 +636,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
         Real64 RhozNorm = state.afn->properties.density(101325.0, 20.0, 0.0);
@@ -714,7 +714,7 @@ namespace AirflowNetwork {
         auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr CycFanCycComp(1); // fan cycles with compressor operation
@@ -818,7 +818,7 @@ namespace AirflowNetwork {
         Real64 constexpr TOL(0.00001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int j;
@@ -942,7 +942,7 @@ namespace AirflowNetwork {
         Real64 constexpr TOL(0.00001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int j;
@@ -1069,7 +1069,7 @@ namespace AirflowNetwork {
         Real64 C;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
@@ -1126,7 +1126,7 @@ namespace AirflowNetwork {
         Real64 C;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
@@ -1191,7 +1191,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Get component properties
         FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
@@ -1273,7 +1273,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // Get component properties
         FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
@@ -1804,7 +1804,7 @@ namespace AirflowNetwork {
         Real64 constexpr SQRT2(1.414213562373095);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DPMID; // pressure drop at mid-height of doorway.
@@ -1946,7 +1946,7 @@ namespace AirflowNetwork {
         int k;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         int n = linkage.indices[0];
         int m = linkage.indices[1];
@@ -2000,7 +2000,7 @@ namespace AirflowNetwork {
         static Real64 const sqrt_2(std::sqrt(2.0));
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -2085,7 +2085,7 @@ namespace AirflowNetwork {
         static Real64 const sqrt_2(std::sqrt(2.0));
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -2169,7 +2169,7 @@ namespace AirflowNetwork {
         Real64 constexpr TurDynCoef(0.0001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2323,7 +2323,7 @@ namespace AirflowNetwork {
         Real64 constexpr TurDynCoef(0.0001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2469,7 +2469,7 @@ namespace AirflowNetwork {
         Real64 constexpr TurDynCoef(0.0001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2632,7 +2632,7 @@ namespace AirflowNetwork {
         Real64 constexpr TurDynCoef(0.0001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2774,7 +2774,7 @@ namespace AirflowNetwork {
         Real64 constexpr TurDynCoef(0.0001);
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 A0;
@@ -2901,7 +2901,7 @@ namespace AirflowNetwork {
         using DataHVACGlobals::VerySmallMassFlow;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -3025,7 +3025,7 @@ namespace AirflowNetwork {
         using DataHVACGlobals::VerySmallMassFlow;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -3139,7 +3139,7 @@ namespace AirflowNetwork {
         // NISTIR 89-4052, National Institute of Standards and Technology, Gaithersburg, MD
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhozAver;
@@ -3295,7 +3295,7 @@ namespace AirflowNetwork {
         // This subroutine computes airflow for a specified volume flow element.
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         Real64 flow = volume_flow * control * multiplier;
 
@@ -3336,7 +3336,7 @@ namespace AirflowNetwork {
         int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
@@ -3456,7 +3456,7 @@ namespace AirflowNetwork {
         int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[0]; // Node 2 properties
+        const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
