@@ -294,7 +294,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     SetSurfaceWindSpeedAt(state);
     SetSurfaceWindDirAt(state);
-    InitSurfacePropertyViewFactors(state);
     //  DO SurfNum = 1, TotSurfaces
     //    IF (Surface(SurfNum)%ExtWind) Surface(SurfNum)%WindSpeed = WindSpeedAt(Surface(SurfNum)%Centroid%z)
     //  END DO
