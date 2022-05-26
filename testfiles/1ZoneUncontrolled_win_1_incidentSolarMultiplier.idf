@@ -387,6 +387,13 @@
     15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
+  SurfaceProperty:IncidentSolarMultiplier,
+    Zn001:Wall001:Win001,     !- Surface Name
+    ,                      !- Shading Multiplier
+    SolarMultConst;           !- Shading Multiplier Schedule Name
+
+  Schedule:Constant,SolarMultConst,Fraction,0.8;
+
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
