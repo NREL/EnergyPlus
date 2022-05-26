@@ -953,8 +953,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     // for each surface in the input file.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_string const ConvCoeffCalcs(
-        {1, 9}, {"ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm"});
+    constexpr static std::array<std::string_view, 9> ConvCoeffCalcs = {
+        "ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm"};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string BaseSurfName;
@@ -1114,8 +1114,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 AlgoName = DataSurfaces::HeatTransAlgoStrs[(int)thisSurface.HeatTransferAlgorithm];
 
                 // Default Convection Coefficient Calculation Algorithms
-                IntConvCoeffCalc = ConvCoeffCalcs(state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo);
-                ExtConvCoeffCalc = ConvCoeffCalcs(state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo);
+                IntConvCoeffCalc = ConvCoeffCalcs[state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo - 1];
+                ExtConvCoeffCalc = ConvCoeffCalcs[state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo - 1];
 
                 *eiostream << "HeatTransfer Surface," << thisSurface.Name << "," << cSurfaceClass(thisSurface.Class) << "," << BaseSurfName << ","
                            << AlgoName << ",";
@@ -1198,14 +1198,14 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                         overrideTypeStrs[(int)state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(surf))
                                              .OverrideType];
                 } else if (state.dataSurface->SurfIntConvCoeffIndex(surf) < 0) { // not in use yet.
-                    IntConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfIntConvCoeffIndex(surf)));
+                    IntConvCoeffCalc = ConvCoeffCalcs[std::abs(state.dataSurface->SurfIntConvCoeffIndex(surf)) - 1];
                 }
                 if (state.dataSurface->SurfExtConvCoeffIndex(surf) > 0) {
                     ExtConvCoeffCalc =
                         overrideTypeStrs[(int)state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(surf))
                                              .OverrideType];
                 } else if (state.dataSurface->SurfExtConvCoeffIndex(surf) < 0) {
-                    ExtConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfExtConvCoeffIndex(surf)));
+                    ExtConvCoeffCalc = ConvCoeffCalcs[std::abs(state.dataSurface->SurfExtConvCoeffIndex(surf)) - 1];
                 }
                 if (thisSurface.ExtBoundCond == DataSurfaces::ExternalEnvironment) {
                     *eiostream << "ExternalEnvironment"
@@ -1412,7 +1412,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     // lines.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Array1D_string const colorstring(7, {"WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE"});
+    constexpr static std::array<std::string_view, 7> colorstring = {"WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE"};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string ShadeType;
@@ -1489,8 +1489,8 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         if (thisSurface.IsAirBoundarySurf) continue;
         if (thisSurface.Class == DataSurfaces::SurfaceClass::Shading) continue;
         if (thisSurface.Sides == 0) continue;
-        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_F) colorindex = 3;
-        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_B) colorindex = 7;
+        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_F) colorindex = 2;
+        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_B) colorindex = 6;
         if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_F) {
             ShadeType = "Fixed Shading";
             print(wrlfile, "# Fixed Shading:{}\n", thisSurface.Name);
@@ -1498,7 +1498,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             ShadeType = "Building Shading";
             print(wrlfile, "# Building Shading:{}", thisSurface.Name);
         }
-        print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
+        print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[colorindex], "Surf", surf);
         for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
             print<check_syntax(Format_802)>(wrlfile, Format_802, thisSurface.Vertex(vert).x, thisSurface.Vertex(vert).y, thisSurface.Vertex(vert).z);
         }
@@ -1538,15 +1538,15 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             if (thisSurface.Zone != zoneNum) continue;
             if (thisSurface.Sides == 0) continue;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::IntMass) continue;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Wall) colorindex = 1;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Roof) colorindex = 5;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::TDD_Dome) colorindex = 2;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = 6;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) colorindex = 2;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = 2;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Wall) colorindex = 0;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Roof) colorindex = 4;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::TDD_Dome) colorindex = 1;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = 5;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) colorindex = 1;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = 1;
 
             print(wrlfile, "# {}:{}\n", thisSurface.ZoneName, thisSurface.Name);
-            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring(colorindex), "Surf", oldSurfNum);
+            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[colorindex], "Surf", oldSurfNum);
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 print(wrlfile, Format_802, thisSurface.Vertex(vert).x, thisSurface.Vertex(vert).y, thisSurface.Vertex(vert).z);
             }
@@ -1578,7 +1578,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             }
         }
         // still have to do shading surfaces for zone
-        colorindex = 4;
+        colorindex = 3;
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             auto &thisSurface = state.dataSurface->Surface(surf);
             //      !if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
@@ -1586,7 +1586,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             if (thisSurface.ZoneName != state.dataHeatBal->Zone(zoneNum).Name) continue;
             if (thisSurface.Sides == 0) continue;
             print(wrlfile, "# {}:{}\n", thisSurface.ZoneName, thisSurface.Name);
-            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
+            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[colorindex], "Surf", surf);
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 print(wrlfile, Format_802, thisSurface.Vertex(vert).x, thisSurface.Vertex(vert).y, thisSurface.Vertex(vert).z);
             }
