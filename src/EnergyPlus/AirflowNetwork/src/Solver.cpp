@@ -4526,25 +4526,25 @@ namespace AirflowNetwork {
         // Assign Multizone linkage based on surfaces, by assuming every surface has a crack or opening
         j = 0;
         for (count = 1; count <= AirflowNetworkNumOfSurfaces; ++count) {
+            auto &link = AirflowNetworkLinkageData(count);
             if (MultizoneSurfaceData(count).SurfNum == 0) continue;
-            AirflowNetworkLinkageData(count).Name = MultizoneSurfaceData(count).SurfName;
-            AirflowNetworkLinkageData(count).indices[0] = MultizoneSurfaceData(count).NodeNums[0];
-            AirflowNetworkLinkageData(count).indices[1] = MultizoneSurfaceData(count).NodeNums[1];
-            AirflowNetworkLinkageData(count).nodes[0] = &(nodes(MultizoneSurfaceData(count).NodeNums[0]));
-            AirflowNetworkLinkageData(count).nodes[1] = &(nodes(MultizoneSurfaceData(count).NodeNums[1]));
-            AirflowNetworkLinkageData(count).CompName = MultizoneSurfaceData(count).OpeningName;
-            AirflowNetworkLinkageData(count).ZoneNum = 0;
-            AirflowNetworkLinkageData(count).LinkNum = count;
-            AirflowNetworkLinkageData(count).NodeHeights[0] = MultizoneSurfaceData(count).CHeight;
-            AirflowNetworkLinkageData(count).NodeHeights[1] = MultizoneSurfaceData(count).CHeight;
+            link.Name = MultizoneSurfaceData(count).SurfName;
+            link.indices[0] = MultizoneSurfaceData(count).NodeNums[0];
+            link.indices[1] = MultizoneSurfaceData(count).NodeNums[1];
+            link.nodes[0] = &(nodes(MultizoneSurfaceData(count).NodeNums[0]));
+            link.nodes[1] = &(nodes(MultizoneSurfaceData(count).NodeNums[1]));
+            link.set_surface(&MultizoneSurfaceData(count));
+            link.CompName = MultizoneSurfaceData(count).OpeningName;
+            link.ZoneNum = 0;
+            link.LinkNum = count;
+            link.NodeHeights[0] = MultizoneSurfaceData(count).CHeight;
+            link.NodeHeights[1] = MultizoneSurfaceData(count).CHeight;
             if (!m_state.dataSurface->WorldCoordSystem) {
-                if (nodes(AirflowNetworkLinkageData(count).indices[0]).EPlusZoneNum > 0) {
-                    AirflowNetworkLinkageData(count).NodeHeights[0] -=
-                        Zone(nodes(AirflowNetworkLinkageData(count).indices[0]).EPlusZoneNum).OriginZ;
+                if (link.nodes[0]->EPlusZoneNum > 0) {
+                    link.NodeHeights[0] -= Zone(link.nodes[0]->EPlusZoneNum).OriginZ;
                 }
-                if (nodes(AirflowNetworkLinkageData(count).indices[1]).EPlusZoneNum > 0) {
-                    AirflowNetworkLinkageData(count).NodeHeights[1] -=
-                        Zone(nodes(AirflowNetworkLinkageData(count).indices[1]).EPlusZoneNum).OriginZ;
+                if (link.nodes[1]->EPlusZoneNum > 0) {
+                    link.NodeHeights[1] -= Zone(link.nodes[1]->EPlusZoneNum).OriginZ;
                 }
             }
             // Find component number
@@ -4557,9 +4557,9 @@ namespace AirflowNetwork {
                 auto compnum_iter = compnum.find(AirflowNetworkLinkageData(count).CompName);
                 assert(compnum_iter != compnum.end());
                 int compnum = compnum_iter->second;
-                AirflowNetworkLinkageData(count).CompNum = compnum;
+                link.CompNum = compnum;
 
-                switch (AirflowNetworkLinkageData(count).element->type()) {
+                switch (link.element->type()) {
                 case ComponentType::DOP: {
                     // if (AirflowNetworkLinkageData(count).CompName ==
                     // AirflowNetworkCompData(i).Name) {
@@ -4567,7 +4567,7 @@ namespace AirflowNetwork {
                     //    found = true;
                     //    if (AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::DOP) {
                     ++j;
-                    AirflowNetworkLinkageData(count).DetOpenNum = j;
+                    link.DetOpenNum = j;
                     MultizoneSurfaceData(count).Multiplier = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Multiplier;
                     if (m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt < 10.0 ||
                         m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt > 170.0) {
@@ -4583,7 +4583,7 @@ namespace AirflowNetwork {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
-                                            AirflowNetworkLinkageData(count).Name);
+                                            link.Name);
                         ErrorsFound = true;
                     }
                     if (m_state.dataSurface->SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
@@ -4593,7 +4593,7 @@ namespace AirflowNetwork {
                                             format(RoutineName) +
                                                 "AirflowNetworkComponent: The opening with horizontally pivoted type must be assigned to a "
                                                 "window surface at " +
-                                                AirflowNetworkLinkageData(count).Name);
+                                                link.Name);
                             ErrorsFound = true;
                         }
                     }
@@ -4617,7 +4617,7 @@ namespace AirflowNetwork {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
-                                            AirflowNetworkLinkageData(count).Name);
+                                            link.Name);
                         ErrorsFound = true;
                     }
                 } break;
@@ -4626,16 +4626,14 @@ namespace AirflowNetwork {
                     MultizoneSurfaceData(count).Multiplier = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Multiplier;
                     // Get linkage height from upper and lower zones
                     if (MultizoneZoneData(AirflowNetworkLinkageData(count).indices[0]).ZoneNum > 0) {
-                        AirflowNetworkLinkageData(count).NodeHeights[0] =
-                            Zone(MultizoneZoneData(AirflowNetworkLinkageData(count).indices[0]).ZoneNum).Centroid.z;
+                        AirflowNetworkLinkageData(count).NodeHeights[0] = Zone(MultizoneZoneData(link.indices[0]).ZoneNum).Centroid.z;
                     }
                     if (AirflowNetworkLinkageData(count).indices[1] <= AirflowNetworkNumOfZones) {
                         if (MultizoneZoneData(AirflowNetworkLinkageData(count).indices[1]).ZoneNum > 0) {
-                            AirflowNetworkLinkageData(count).NodeHeights[1] =
-                                Zone(m_state.afn->MultizoneZoneData(AirflowNetworkLinkageData(count).indices[1]).ZoneNum).Centroid.z;
+                            link.NodeHeights[1] = Zone(m_state.afn->MultizoneZoneData(link.indices[1]).ZoneNum).Centroid.z;
                         }
                     }
-                    if (AirflowNetworkLinkageData(count).indices[1] > AirflowNetworkNumOfZones) {
+                    if (link.indices[1] > AirflowNetworkNumOfZones) {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The horizontal opening must be located between two thermal zones at " +
@@ -4643,8 +4641,7 @@ namespace AirflowNetwork {
                         ShowContinueError(m_state, "This component is exposed to outdoors.");
                         ErrorsFound = true;
                     } else {
-                        if (!(MultizoneZoneData(AirflowNetworkLinkageData(count).indices[0]).ZoneNum > 0 &&
-                              MultizoneZoneData(AirflowNetworkLinkageData(count).indices[1]).ZoneNum > 0)) {
+                        if (!(MultizoneZoneData(link.indices[0]).ZoneNum > 0 && MultizoneZoneData(link.indices[1]).ZoneNum > 0)) {
                             ShowSevereError(m_state,
                                             format(RoutineName) +
                                                 "AirflowNetworkComponent: The horizontal opening must be located between two thermal zones at " +
@@ -4670,7 +4667,7 @@ namespace AirflowNetwork {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
-                                            AirflowNetworkLinkageData(count).Name);
+                                            link.Name);
                         ErrorsFound = true;
                     }
                 } break;
@@ -4680,8 +4677,7 @@ namespace AirflowNetwork {
                 }
             } else {
                 ShowSevereError(m_state,
-                                format(RoutineName) + CurrentModuleObject + ": The component is not defined in " +
-                                    AirflowNetworkLinkageData(count).Name);
+                                format(RoutineName) + CurrentModuleObject + ": The component is not defined in " + link.Name);
                 ErrorsFound = true;
             }
         }
@@ -13046,7 +13042,7 @@ namespace AirflowNetwork {
             // if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = AirflowNetworkLinkageData(i).CompNum;
 
-            NF = AirflowNetworkLinkageData(i).element->calculate(m_state, LFLAG, DP, i, multiplier, control, nodes(n), nodes(m), F, DF);
+            NF = AirflowNetworkLinkageData(i).element->calculate(m_state, LFLAG, DP, multiplier, control, AirflowNetworkLinkageData(i), F, DF);
             if (AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
                 DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
             }

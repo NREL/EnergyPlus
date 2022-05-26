@@ -110,19 +110,19 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     state->afn->AirflowNetworkLinkageData.allocate(i);
     state->afn->AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
     state->afn->AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
+    state->afn->AirflowNetworkLinkageData(i).nodes = {{&state->afn->nodes[0], &state->afn->nodes[0]}};
 
     Real64 multiplier = 1.0;
     Real64 control = 1.0;
 
     NF = state->afn->MultizoneCompHorOpeningData(1).calculate(
-        *state, 1, 0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
+        *state, 1, 0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(3.47863, F[0], 0.00001);
     EXPECT_NEAR(34.7863, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = state->afn->MultizoneCompHorOpeningData(1).calculate(
-        *state, 1, -0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
+    NF = state->afn->MultizoneCompHorOpeningData(1).calculate(*state, 1, -0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(-3.42065, F[0], 0.00001);
     EXPECT_NEAR(34.20649, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
@@ -157,20 +157,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     state->afn->nodes[0].viscosity = 1.0e-5;
     state->afn->nodes[1].viscosity = 1.0e-5;
 
+    state->afn->AirflowNetworkLinkageData.allocate(1);
+    state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[0]}};
+
     F[1] = DF[1] = 0.0;
 
     Real64 multiplier = 1.0;
     Real64 control = 1.0;
 
-    NF = state->afn->DisSysCompCoilData[0].calculate(
-        *state, 1, 0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
+    NF = state->afn->DisSysCompCoilData[0].calculate(*state, 1, 0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = state->afn->DisSysCompCoilData[0].calculate(
-        *state, 1, -0.05, 1, multiplier, control, state->afn->nodes[0], state->afn->nodes[1], F, DF);
+    NF = state->afn->DisSysCompCoilData[0].calculate(*state, 1, -0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);
@@ -191,21 +192,24 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
     crack.coefficient = 0.001;
     crack.exponent = 0.65;
 
-    AirflowNetwork::AirState state0, state1;
-    Real64 sqrt_density = state0.sqrt_density; // = state1.sqrt_density
-    Real64 viscosity = state0.viscosity;       // = state1.viscosity
-
     Real64 dp{10.0};
 
+    state->afn->nodes.clear();
+    state->afn->nodes.allocate(2);
+    Real64 sqrt_density = state->afn->nodes[0].sqrt_density; // = state1.sqrt_density
+    Real64 viscosity = state->afn->nodes[0].viscosity;       // = state1.viscosity
+    state->afn->AirflowNetworkLinkageData.allocate(1);
+    state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[0]}};
+
     // Linear
-    NF = crack.calculate(*state, true, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = crack.calculate(*state, true, dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(0.01 * sqrt_density / viscosity, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = crack.calculate(*state, true, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = crack.calculate(*state, true, -dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(-0.01 * sqrt_density / viscosity, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
@@ -213,14 +217,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
     EXPECT_EQ(1, NF);
 
     // Nonlinear
-    NF = crack.calculate(*state, false, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = crack.calculate(*state, false, dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(0.001 * std::pow(10.0, 0.65), F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = crack.calculate(*state, false, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = crack.calculate(*state, false, -dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(-0.001 * std::pow(10.0, 0.65), F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
@@ -279,21 +283,22 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedMassFlow)
 
     AirflowNetwork::SpecifiedMassFlow element;
     element.mass_flow = 0.1;
-
     AirflowNetwork::Node state0, state1;
+    AirflowNetwork::AirflowNetworkLinkageProp link;
+    link.nodes = {{&state0, &state1}};
 
     Real64 dp{10.0};
     Real64 f = element.mass_flow;
 
     // Linear
-    NF = element.calculate(*state, true, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, true, dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, true, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, true, -dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
@@ -301,14 +306,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedMassFlow)
     EXPECT_EQ(1, NF);
 
     // Nonlinear tests
-    NF = element.calculate(*state, false, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, false, dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, false, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, false, -dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
@@ -326,21 +331,23 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedVolumeFlow)
     AirflowNetwork::SpecifiedVolumeFlow element;
     element.volume_flow = 0.1;
 
-    AirflowNetwork::AirState state0, state1;
+    AirflowNetwork::Node state0, state1;
     Real64 density = state0.density; // = state1.density
+    AirflowNetwork::AirflowNetworkLinkageProp link;
+    link.nodes = {{&state0, &state1}};
 
     Real64 dp{10.0};
     Real64 f = element.volume_flow * density;
 
     // Linear
-    NF = element.calculate(*state, true, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, true, dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, true, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, true, -dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
@@ -348,14 +355,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedVolumeFlow)
     EXPECT_EQ(1, NF);
 
     // Nonlinear tests
-    NF = element.calculate(*state, false, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, false, dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, false, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    NF = element.calculate(*state, false, -dp, 1.0, 1.0, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
