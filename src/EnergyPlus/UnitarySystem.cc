@@ -7591,6 +7591,9 @@ namespace UnitarySystems {
                 // (i.e., this line calc's a supp heater load, then next line also calc's it?)
                 if (state.dataUnitarySystems->MoistureLoad < 0.0) this->m_SupHeaterLoad = SupHeaterLoad;
                 // so it look's like this next line should only be valid for HP's.
+                if (this->m_DesignSuppHeatingCapacity > 0.0 && this->m_NumOfSpeedSuppHeating == 0) {
+                    this->m_SuppHeatPartLoadFrac = min(1.0, SupHeaterLoad / this->m_DesignSuppHeatingCapacity);
+                }
             } else {
                 SupHeaterLoad = 0.0;
                 this->m_SuppHeatPartLoadFrac = 0.0;
@@ -7616,7 +7619,7 @@ namespace UnitarySystems {
         // check supplemental heating coil outlet temp based on maximum allowed
         if (this->m_SuppCoilExists) {
             // only need to test for high supply air temp if supplemental coil is operating
-            if (SupHeaterLoad > 0.0 && this->m_DesignSuppHeatingCapacity > 0.0) {
+            if (this->m_SuppHeatPartLoadFrac > 0.0) {
                 this->calcUnitarySystemToLoad(state,
                                               AirLoopNum,
                                               FirstHVACIteration,
@@ -7629,13 +7632,6 @@ namespace UnitarySystems {
                                               HeatCoilLoad,
                                               SupHeaterLoad,
                                               CompressorOn);
-                if (this->m_DesignSuppHeatingCapacity > 0.0) {
-                    if (this->m_NumOfSpeedSuppHeating == 0) {
-                        this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
-                    }
-                } else {
-                    this->m_SuppHeatPartLoadFrac = 0.0;
-                }
             }
         }
 
@@ -9036,7 +9032,7 @@ namespace UnitarySystems {
                                                       CompressorONFlag);
                         PartLoadRatio = HeatPLR;
                     } else if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->HeatingLoad &&
-                               this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         CoolPLR = 0.0;
                         if (this->m_HeatingSpeedNum == 1) {
                             this->m_HeatingCycRatio = (ZoneLoad - SensOutputOff) / (this->FullOutput[this->m_HeatingSpeedNum] - SensOutputOff);
@@ -15988,7 +15984,7 @@ namespace UnitarySystems {
             SpeedNum = int(Par[5]);
             FanOpMode = int(Par[6]);
 
-            HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
+            HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual);
 
             OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
         } break;
