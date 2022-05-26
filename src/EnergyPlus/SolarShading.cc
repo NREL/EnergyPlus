@@ -10438,16 +10438,6 @@ void SkyDifSolarShading(EnergyPlusData &state)
             state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
         }
         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
-
-        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-            SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != 0) {
-                state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-            }
-            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor != 0) {
-                state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-            }
-        }
     }
 
     //  DEALLOCATE(WithShdgIsoSky)
