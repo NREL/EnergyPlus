@@ -75,8 +75,8 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -2313,31 +2313,33 @@ TEST_F(EnergyPlusFixture, Window5DataFileSpaceInName)
     EXPECT_TRUE(ConstructionFound);
 }
 
-TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput) {
+TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
+{
 
-    std::string const idf_objects = delimited_string({"SurfaceProperty:IncidentSolarMultiplier,",
-                                                      "Zn001:Wall001:Win001,     !- Surface Name",
-                                                      "0.6,                      !- Shading Multiplier",
-                                                      "SolarMultCompact;           !- Shading Multiplier Schedule Name",
+    std::string const idf_objects = delimited_string({
+        "SurfaceProperty:IncidentSolarMultiplier,",
+        "Zn001:Wall001:Win001,     !- Surface Name",
+        "0.6,                      !- Shading Multiplier",
+        "SolarMultCompact;           !- Shading Multiplier Schedule Name",
 
-                                                      "  ScheduleTypeLimits,",
-                                                      "    Any Number;              !- Name",
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
 
-                                                      "Schedule:Compact,",
-                                                      "  SolarMultCompact,  !- Name",
-                                                      "  Any Number,              !- Schedule Type Limits Name",
-                                                      "  Through: 5/31,           !- Field 1",
-                                                      "  For: AllDays,            !- Field 2",
-                                                      "  Until: 24:00,            !- Field 3",
-                                                      "  0.1,                       !- Field 4",
-                                                      "  Through: 9/30,           !- Field 5",
-                                                      "  For: AllDays,            !- Field 6",
-                                                      "  Until: 24:00,            !- Field 7",
-                                                      "  0.3,                       !- Field 8",
-                                                      "  Through: 12/31,          !- Field 9",
-                                                      "  For: AllDays,            !- Field 10",
-                                                      "  Until: 24:00,            !- Field 11",
-                                                      "  0.1;                       !- Field 12",
+        "Schedule:Compact,",
+        "  SolarMultCompact,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0.1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  0.3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  0.1;                       !- Field 12",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
