@@ -7635,14 +7635,14 @@ namespace UnitarySystems {
                                               HeatCoilLoad,
                                               SupHeaterLoad,
                                               CompressorOn);
-            }
-            if (this->m_DesignSuppHeatingCapacity > 0.0) {
-                if (this->m_NumOfSpeedSuppHeating > 0) {
+                if (this->m_DesignSuppHeatingCapacity > 0.0) {
+                    if (this->m_NumOfSpeedSuppHeating > 0) {
+                    } else {
+                        this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
+                    }
                 } else {
-                    this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
+                    this->m_SuppHeatPartLoadFrac = 0.0;
                 }
-            } else {
-                this->m_SuppHeatPartLoadFrac = 0.0;
             }
         }
 
