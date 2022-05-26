@@ -3050,7 +3050,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, FoundError);
-    EXPECT_FALSE(FoundError);                           
+    EXPECT_FALSE(FoundError);
     SurfaceGeometry::SetupZoneGeometry(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
@@ -3098,13 +3098,13 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     Real64 results_Surface_SkyViewFactor = 0.0;
     Real64 results_Surface_GndViewFactor = 0.0;
     // check exterior surfaces sky and ground view factors
-    results_Surface_SkyViewFactor = 0.5 *(1 - 0.2);
-    results_Surface_GndViewFactor = 0.5 *(1 - 0.2);
+    results_Surface_SkyViewFactor = 0.5 * (1 - 0.2);
+    results_Surface_GndViewFactor = 0.5 * (1 - 0.2);
     EXPECT_DOUBLE_EQ(results_Surface_SkyViewFactor, win_Surface.ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(results_Surface_GndViewFactor, win_Surface.ViewFactorGroundIR);
     // run SkyDifSolarShading function
     SolarShading::SkyDifSolarShading(*state);
-    state->dataSolarShading->CalcSkyDifShading = false;   
+    state->dataSolarShading->CalcSkyDifShading = false;
     // test exterior surface sky and ground view factors
     EXPECT_DOUBLE_EQ(0.40, win_Surface.ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.40, win_Surface.ViewFactorGroundIR);
