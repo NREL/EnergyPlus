@@ -2761,7 +2761,7 @@ namespace AirflowNetwork {
                     }
                     AirflowNetworkNumOfOutAirNode -= 1;
                     AirflowNetworkNumOfExtNode -= 1;
-                    MultizoneExternalNodeData.redimension(AirflowNetworkNumOfExtNode);
+                    MultizoneExternalNodeData.resize(AirflowNetworkNumOfExtNode);
                 }
             }
         }
@@ -6830,13 +6830,13 @@ namespace AirflowNetwork {
 
         // Facade azimuth angle
         for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
-            FacadeAng(FacadeNum) = m_state.afn->simulation_control.azimuth + (FacadeNum - 1) * 90.0;
-            if (FacadeAng(FacadeNum) >= 360.0) {
-                FacadeAng(FacadeNum) -= 360.0;
+            FacadeAng[FacadeNum - 1] = m_state.afn->simulation_control.azimuth + (FacadeNum - 1) * 90.0;
+            if (FacadeAng[FacadeNum - 1] >= 360.0) {
+                FacadeAng[FacadeNum - 1] -= 360.0;
             }
         }
 
-        FacadeAng(5) = simulation_control.azimuth + 90.0;
+        FacadeAng[4] = simulation_control.azimuth + 90.0;
 
         // Create AirflowNetwork external node objects -- one for each of the external surfaces
 
@@ -6865,12 +6865,12 @@ namespace AirflowNetwork {
                 if (m_state.dataSurface->Surface(SurfNum).Tilt >= 45.0) { // "Vertical" surface
                     SurfAng = m_state.dataSurface->Surface(SurfNum).Azimuth;
                     FacadeNumThisSurf = 1;
-                    AngDiffMin = std::abs(SurfAng - FacadeAng(1));
+                    AngDiffMin = std::abs(SurfAng - FacadeAng[0]);
                     if (AngDiffMin > 359.0) {
                         AngDiffMin = std::abs(AngDiffMin - 360.0);
                     }
                     for (FacadeNum = 2; FacadeNum <= 4; ++FacadeNum) {
-                        AngDiff = std::abs(SurfAng - FacadeAng(FacadeNum));
+                        AngDiff = std::abs(SurfAng - FacadeAng[FacadeNum - 1]);
                         if (AngDiff > 359.0) {
                             AngDiff = std::abs(AngDiff - 360.0);
                         }
@@ -6918,7 +6918,7 @@ namespace AirflowNetwork {
                 std::vector<Real64> vals(13);
                 for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
                     Real64 WindAng = (windDirNum - 1) * 30.0;
-                    IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    IncAng = std::abs(WindAng - FacadeAng[FacadeNum - 1]);
                     if (IncAng > 180.0) IncAng = 360.0 - IncAng;
                     IAng = int(IncAng / 30.0) + 1;
                     DelAng = mod(IncAng, 30.0);
@@ -6997,7 +6997,7 @@ namespace AirflowNetwork {
                 SideRatioFac = std::log(SideRatio);
                 for (int windDirNum = 1; windDirNum <= 36; ++windDirNum) {
                     Real64 WindAng = (windDirNum - 1) * 10.0;
-                    IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                    IncAng = std::abs(WindAng - FacadeAng[FacadeNum - 1]);
                     if (IncAng > 180.0) IncAng = 360.0 - IncAng;
                     IAng = int(IncAng / 10.0) + 1;
                     DelAng = mod(IncAng, 10.0);
@@ -7022,7 +7022,7 @@ namespace AirflowNetwork {
             }
             for (int windDirNum = 1; windDirNum <= 12; ++windDirNum) {
                 Real64 WindAng = (windDirNum - 1) * 30.0;
-                IncAng = std::abs(WindAng - FacadeAng(FacadeNum));
+                IncAng = std::abs(WindAng - FacadeAng[FacadeNum - 1]);
                 if (IncAng > 180.0) IncAng = 360.0 - IncAng;
                 IAng = int(IncAng / 30.0) + 1;
                 DelAng = mod(IncAng, 30.0);

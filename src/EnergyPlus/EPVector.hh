@@ -69,6 +69,7 @@ template <typename T> struct EPVector : private std::vector<T>
     using std::vector<T>::clear;
     using std::vector<T>::emplace_back;
     using std::vector<T>::push_back;
+    using std::vector<T>::resize;
     using const_iterator = typename std::vector<T>::const_iterator;
 
     using value_type = T;
@@ -151,6 +152,7 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     using std::vector<std::uint8_t>::clear;
     using std::vector<std::uint8_t>::emplace_back;
     using std::vector<std::uint8_t>::push_back;
+    using std::vector<std::uint8_t>::resize;
     using const_iterator = typename std::vector<std::uint8_t>::const_iterator;
 
     using value_type = std::uint8_t;
@@ -326,6 +328,18 @@ template <typename T>[[nodiscard]] T maxval(EPVector<T> const &a)
         return std::numeric_limits<T>::lowest();
     }
     return *max;
+}
+
+template <typename T> void clear_and_resize(T &a, const size_t size)
+{
+    a.clear();
+    a.resize(size);
+}
+
+template <typename T> void clear_and_resize(T &a, const size_t size, const T &v)
+{
+    a.clear();
+    a.resize(size, v);
 }
 
 } // namespace EnergyPlus

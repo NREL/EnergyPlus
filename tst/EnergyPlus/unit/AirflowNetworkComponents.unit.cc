@@ -78,8 +78,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
 {
 
-    int i = 1;
-    int j = 1;
     int n;
     int m;
     int NF;
@@ -89,41 +87,41 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     n = 1;
     m = 2;
 
-    state->afn->AirflowNetworkCompData.allocate(j);
-    state->afn->AirflowNetworkCompData(j).TypeNum = 1;
-    state->afn->MultizoneSurfaceData.allocate(i);
-    state->afn->MultizoneSurfaceData(i).Width = 10.0;
-    state->afn->MultizoneSurfaceData(i).Height = 5.0;
-    state->afn->MultizoneSurfaceData(i).OpenFactor = 1.0;
+    clear_and_resize(state->afn->AirflowNetworkCompData, 1);
+    state->afn->AirflowNetworkCompData[0].TypeNum = 1;
+    state->afn->MultizoneSurfaceData.allocate(1);
+    state->afn->MultizoneSurfaceData[0].Width = 10.0;
+    state->afn->MultizoneSurfaceData[0].Height = 5.0;
+    state->afn->MultizoneSurfaceData[0].OpenFactor = 1.0;
 
     state->afn->nodes.clear();
     state->afn->nodes.allocate(2);
     state->afn->nodes[0].density = 1.2;
     state->afn->nodes[1].density = 1.18;
 
-    state->afn->MultizoneCompHorOpeningData.allocate(1);
-    state->afn->MultizoneCompHorOpeningData(1).FlowCoef = 0.1;
-    state->afn->MultizoneCompHorOpeningData(1).FlowExpo = 0.5;
-    state->afn->MultizoneCompHorOpeningData(1).Slope = 90.0;
-    state->afn->MultizoneCompHorOpeningData(1).DischCoeff = 0.2;
+    clear_and_resize(state->afn->MultizoneCompHorOpeningData, 1);
+    state->afn->MultizoneCompHorOpeningData[0].FlowCoef = 0.1;
+    state->afn->MultizoneCompHorOpeningData[0].FlowExpo = 0.5;
+    state->afn->MultizoneCompHorOpeningData[0].Slope = 90.0;
+    state->afn->MultizoneCompHorOpeningData[0].DischCoeff = 0.2;
 
-    state->afn->AirflowNetworkLinkageData.allocate(i);
-    state->afn->AirflowNetworkLinkageData(i).NodeHeights[0] = 4.0;
-    state->afn->AirflowNetworkLinkageData(i).NodeHeights[1] = 2.0;
-    state->afn->AirflowNetworkLinkageData(i).nodes = {{&state->afn->nodes[0], &state->afn->nodes[0]}};
-    state->afn->AirflowNetworkLinkageData(i).set_surface(&state->afn->MultizoneSurfaceData(i));
+    clear_and_resize(state->afn->AirflowNetworkLinkageData, 1);
+    state->afn->AirflowNetworkLinkageData[0].NodeHeights[0] = 4.0;
+    state->afn->AirflowNetworkLinkageData[0].NodeHeights[1] = 2.0;
+    state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[1]}};
+    state->afn->AirflowNetworkLinkageData[0].set_surface(&state->afn->MultizoneSurfaceData[0]);
 
     Real64 multiplier = 1.0;
     Real64 control = 1.0;
 
-    NF = state->afn->MultizoneCompHorOpeningData(1).calculate(
+    NF = state->afn->MultizoneCompHorOpeningData[0].calculate(
         *state, 1, 0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(3.47863, F[0], 0.00001);
     EXPECT_NEAR(34.7863, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = state->afn->MultizoneCompHorOpeningData(1).calculate(*state, 1, -0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    NF = state->afn->MultizoneCompHorOpeningData[0].calculate(*state, 1, -0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(-3.42065, F[0], 0.00001);
     EXPECT_NEAR(34.20649, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
@@ -143,23 +141,22 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     std::array<Real64, 2> F;
     std::array<Real64, 2> DF;
 
-    state->afn->AirflowNetworkCompData.allocate(1);
+    clear_and_resize(state->afn->AirflowNetworkCompData, 1);
     state->afn->AirflowNetworkCompData[0].TypeNum = 1;
 
-    state->afn->DisSysCompCoilData.allocate(1);
+    clear_and_resize(state->afn->DisSysCompCoilData, 1);
     state->afn->DisSysCompCoilData[0].hydraulicDiameter = 1.0;
     state->afn->DisSysCompCoilData[0].L = 1.0;
 
-    state->afn->nodes.clear();
-    state->afn->nodes.allocate(2);
+    clear_and_resize(state->afn->nodes, 2);
     state->afn->nodes[0].density = 1.2;
     state->afn->nodes[1].density = 1.2;
 
     state->afn->nodes[0].viscosity = 1.0e-5;
     state->afn->nodes[1].viscosity = 1.0e-5;
 
-    state->afn->AirflowNetworkLinkageData.allocate(1);
-    state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[0]}};
+    clear_and_resize(state->afn->AirflowNetworkLinkageData, 1);
+    state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[1]}};
 
     F[1] = DF[1] = 0.0;
 
@@ -178,8 +175,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[1]);
 
-    state->afn->DisSysCompCoilData.deallocate();
-    state->afn->AirflowNetworkCompData.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
@@ -195,12 +190,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
 
     Real64 dp{10.0};
 
-    state->afn->nodes.clear();
-    state->afn->nodes.allocate(2);
+    clear_and_resize(state->afn->nodes, 2);
     Real64 sqrt_density = state->afn->nodes[0].sqrt_density; // = state1.sqrt_density
     Real64 viscosity = state->afn->nodes[0].viscosity;       // = state1.viscosity
     state->afn->AirflowNetworkLinkageData.allocate(1);
-    state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[0]}};
+    state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[1]}};
 
     // Linear
     NF = crack.calculate(*state, true, dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
@@ -376,10 +370,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestTriangularWindowWarning)
 
     // Unit test for #5384
 
-    state->dataHeatBal->Zone.allocate(1);
+    clear_and_resize(state->dataHeatBal->Zone, 1);
     state->dataHeatBal->Zone(1).Name = "WEST_ZONE";
 
-    state->dataSurface->Surface.allocate(3);
+    clear_and_resize(state->dataSurface->Surface, 3);
     state->dataSurface->Surface(1).Name = "SURFACE_1";
     state->dataSurface->Surface(1).Zone = 1;
     state->dataSurface->Surface(1).ZoneName = "WEST_ZONE";

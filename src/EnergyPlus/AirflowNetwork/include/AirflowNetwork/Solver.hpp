@@ -348,8 +348,7 @@ namespace AirflowNetwork {
         bool AirflowNetworkGetInputFlag = true;
         bool AssignFanAirLoopNumFlag = true;
         bool ValidateDistributionSystemFlag = true;
-        Array1D<Real64> FacadeAng =
-            Array1D<Real64>(5); // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+        std::array<Real64, 5> FacadeAng; // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
         Array1D<Real64> LoopPartLoadRatio;
         Array1D<Real64> LoopOnOffFanRunTimeFraction;
         Array1D<bool> LoopOnOffFlag;
@@ -486,39 +485,39 @@ namespace AirflowNetwork {
         int OpenFactorErrIndex = 0;      // Large opening error error index at Open factor > 1.0
 
         EPVector<Node> nodes;
-        Array1D<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
-        Array1D<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
-        Array1D<AirflowNetwork::MultizoneZoneProp> MultizoneZoneData;
-        Array1D<AirflowNetwork::MultizoneSurfaceProp> MultizoneSurfaceData;
-        Array1D<AirflowNetwork::DetailedOpening> MultizoneCompDetOpeningData;
-        Array1D<AirflowNetwork::SimpleOpening> MultizoneCompSimpleOpeningData;
-        Array1D<AirflowNetwork::HorizontalOpening> MultizoneCompHorOpeningData;
-        Array1D<AirflowNetwork::SurfaceCrack> MultizoneSurfaceCrackData;
-        Array1D<AirflowNetwork::EffectiveLeakageArea> MultizoneSurfaceELAData;
-        Array1D<AirflowNetwork::SpecifiedMassFlow> SpecifiedMassFlowData;
-        Array1D<AirflowNetwork::SpecifiedVolumeFlow> SpecifiedVolumeFlowData;
-        Array1D<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
-        Array1D<AirflowNetwork::DeltaCpProp> DeltaCp;
-        Array1D<AirflowNetwork::DeltaCpProp> EPDeltaCP;
-        Array1D<AirflowNetwork::ZoneExhaustFan> MultizoneCompExhaustFanData;
-        Array1D<AirflowNetwork::IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
-        Array1D<AirflowNetwork::IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
-        Array1D<AirflowNetwork::DisSysNodeProp> DisSysNodeData;
-        Array1D<AirflowNetwork::DuctLeak> DisSysCompLeakData;
-        Array1D<AirflowNetwork::EffectiveLeakageRatio> DisSysCompELRData;
-        Array1D<AirflowNetwork::Duct> DisSysCompDuctData;
-        Array1D<AirflowNetwork::Damper> DisSysCompDamperData;
-        Array1D<AirflowNetwork::ConstantVolumeFan> DisSysCompCVFData;
-        Array1D<AirflowNetwork::DetailedFan> DisSysCompDetFanData;
-        Array1D<AirflowNetwork::DisSysCompCoilProp> DisSysCompCoilData;
-        Array1D<AirflowNetwork::DisSysCompHXProp> DisSysCompHXData;
-        Array1D<AirflowNetwork::DisSysCompTermUnitProp> DisSysCompTermUnitData;
-        Array1D<AirflowNetwork::ConstantPressureDrop> DisSysCompCPDData;
-        Array1D<AirflowNetwork::AiflowNetworkReportProp> AirflowNetworkReportData;
-        Array1D<AirflowNetwork::PressureControllerProp> PressureControllerData;
-        Array1D<AirflowNetwork::OutdoorAirFan> DisSysCompOutdoorAirData;
-        Array1D<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
-        Array1D<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
+        EPVector<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
+        EPVector<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
+        EPVector<AirflowNetwork::MultizoneZoneProp> MultizoneZoneData;
+        EPVector<AirflowNetwork::MultizoneSurfaceProp> MultizoneSurfaceData;
+        EPVector<AirflowNetwork::DetailedOpening> MultizoneCompDetOpeningData;
+        EPVector<AirflowNetwork::SimpleOpening> MultizoneCompSimpleOpeningData;
+        EPVector<AirflowNetwork::HorizontalOpening> MultizoneCompHorOpeningData;
+        EPVector<AirflowNetwork::SurfaceCrack> MultizoneSurfaceCrackData;
+        EPVector<AirflowNetwork::EffectiveLeakageArea> MultizoneSurfaceELAData;
+        EPVector<AirflowNetwork::SpecifiedMassFlow> SpecifiedMassFlowData;
+        EPVector<AirflowNetwork::SpecifiedVolumeFlow> SpecifiedVolumeFlowData;
+        EPVector<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
+        EPVector<AirflowNetwork::DeltaCpProp> DeltaCp;
+        EPVector<AirflowNetwork::DeltaCpProp> EPDeltaCP;
+        EPVector<AirflowNetwork::ZoneExhaustFan> MultizoneCompExhaustFanData;
+        EPVector<AirflowNetwork::IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
+        EPVector<AirflowNetwork::IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
+        EPVector<AirflowNetwork::DisSysNodeProp> DisSysNodeData;
+        EPVector<AirflowNetwork::DuctLeak> DisSysCompLeakData;
+        EPVector<AirflowNetwork::EffectiveLeakageRatio> DisSysCompELRData;
+        EPVector<AirflowNetwork::Duct> DisSysCompDuctData;
+        EPVector<AirflowNetwork::Damper> DisSysCompDamperData;
+        EPVector<AirflowNetwork::ConstantVolumeFan> DisSysCompCVFData;
+        EPVector<AirflowNetwork::DetailedFan> DisSysCompDetFanData;
+        EPVector<AirflowNetwork::DisSysCompCoilProp> DisSysCompCoilData;
+        EPVector<AirflowNetwork::DisSysCompHXProp> DisSysCompHXData;
+        EPVector<AirflowNetwork::DisSysCompTermUnitProp> DisSysCompTermUnitData;
+        EPVector<AirflowNetwork::ConstantPressureDrop> DisSysCompCPDData;
+        EPVector<AirflowNetwork::AiflowNetworkReportProp> AirflowNetworkReportData;
+        EPVector<AirflowNetwork::PressureControllerProp> PressureControllerData;
+        EPVector<AirflowNetwork::OutdoorAirFan> DisSysCompOutdoorAirData;
+        EPVector<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
+        EPVector<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
         void clear_state() override
         {
@@ -569,7 +568,7 @@ namespace AirflowNetwork {
             AirflowNetworkGetInputFlag = true;
             AssignFanAirLoopNumFlag = true;
             ValidateDistributionSystemFlag = true;
-            FacadeAng = Array1D<Real64>(5);
+            FacadeAng = {0.0, 0.0, 0.0, 0.0, 0.0};
             AirflowNetworkZnRpt.deallocate();
             LoopPartLoadRatio.deallocate();
             LoopOnOffFanRunTimeFraction.deallocate();
