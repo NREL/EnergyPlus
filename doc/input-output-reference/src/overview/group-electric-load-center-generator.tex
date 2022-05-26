@@ -295,7 +295,7 @@ This alpha field is used to describe how the electric load center is configured 
 \begin{itemize}
 \tightlist
 \item
-  DirectCurrentWithInverterDCStorage. This type of load center is for adding one or more on-site generatros the produce DC power and one on-site storage device that uses DC power. An inverter is needed to convert power from DC to AC and is located between the storage and where the subpanel feeds into the main panel. The connection between the load center and the main building panel is bidirectional so that storage can be charged by drawing from the grid. An AC to DC converter is needed if the storage operation scheme is such that the control might draw power from the main facility panel into the load center in order to charge storage. Transformer is optional.
+  DirectCurrentWithInverterDCStorage. This type of load center is for adding one or more on-site generators the produce DC power and one on-site storage device that uses DC power. An inverter is needed to convert power from DC to AC and is located between the storage and where the subpanel feeds into the main panel. The connection between the load center and the main building panel is bidirectional so that storage can be charged by drawing from the grid. An AC to DC converter is needed if the storage operation scheme is such that the control might draw power from the main facility panel into the load center in order to charge storage. Transformer is optional.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -307,7 +307,7 @@ This alpha field is used to describe how the electric load center is configured 
 \begin{itemize}
 \tightlist
 \item
-  DirectCurrentWithInverterACStorage. This type of load center is for adding one or more on-site generatros the produce DC power and one on-site storage device that uses AC power. The connection between the load center and the main building panel is bidirectional so that storage can be charged by drawing from the grid. The inverter is located between the generators and the storage device. Transformer is optional.
+  DirectCurrentWithInverterACStorage. This type of load center is for adding one or more on-site generators the produce DC power and one on-site storage device that uses AC power. The connection between the load center and the main building panel is bidirectional so that storage can be charged by drawing from the grid. The inverter is located between the generators and the storage device. Transformer is optional.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -429,11 +429,11 @@ Even if no ElectricLoadCenter:Distribution object is included, the following who
 \item
   HVAC,Sum,Facility Net Purchased Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Facility Total Building Electric Demand Power {[}W{]}
+  HVAC,Average,Facility Total Building Electricity Demand Rate {[}W{]}
 \item
-  HVAC,Average,Facility Total HVAC Electric Demand Power {[}W{]}
+  HVAC,Average,Facility Total HVAC Electricity Demand Rate {[}W{]}
 \item
-  HVAC,Average,Facility Total Electric Demand Power {[}W{]}
+  HVAC,Average,Facility Total Electricity Demand Rate {[}W{]}
 \item
   HVAC,Average,Facility Total Produced Electricity Rate {[}W{]}
 \item
@@ -1413,7 +1413,7 @@ This alpha field contains the schedule name (ref. Schedule objects) that describ
 
 \paragraph{Field: Zone Name}\label{liion-zone-name}
 
-This field contains the name of the thermal zone where the battery is located. Entering a valid name of zone here will direct EnergyPlus to include the energy storage losses as heat gains to the named thermal zone. If the battery is not within a thermal zone, this field can be left blank and the thermal energy associated with storage losses is removed from the building model.
+This field contains the name of the thermal zone where the battery is located. Entering a valid name of zone here will direct EnergyPlus to include the energy storage losses as heat gains to the named thermal zone; and the thermal zone temperature will be used as the working environment temperature for the battery. If the battery is not within a thermal zone, this field can be left blank and the thermal energy associated with storage losses is removed from the building model; and in this case the outdoor air (dry-bulb) temperature will be used as the battery's working environment temperature.
 
 \paragraph{Field: Radiative Fraction}\label{liion-rad-frac}
 
