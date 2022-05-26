@@ -10272,7 +10272,6 @@ void SkyDifSolarShading(EnergyPlusData &state)
 
     // Using/Aliasing
 
-    int SrdSurfsNum;        // Srd surface counter
     Real64 Fac1WoShdg;      // Intermediate calculation factor, without shading
     Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
     Real64 Fac1WithShdg;    // Intermediate calculation factor, with shading
@@ -10438,6 +10437,17 @@ void SkyDifSolarShading(EnergyPlusData &state)
             state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
         }
         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
+
+        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+            int SrdSurfsNum;
+            Real64 SrdSurfsViewFactor = 0.0;
+            SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+            auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+            for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+            }
+            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR - SrdSurfsViewFactor;
+        }
     }
 
     //  DEALLOCATE(WithShdgIsoSky)

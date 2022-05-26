@@ -3106,6 +3106,6 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SolarShading::SkyDifSolarShading(*state);
     state->dataSolarShading->CalcSkyDifShading = false;   
     // test exterior surface sky and ground view factors
-    EXPECT_DOUBLE_EQ(0.4, win_Surface.ViewFactorSkyIR);
-    EXPECT_DOUBLE_EQ(0.4, win_Surface.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.40, win_Surface.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.40, win_Surface.ViewFactorGroundIR);
 }
