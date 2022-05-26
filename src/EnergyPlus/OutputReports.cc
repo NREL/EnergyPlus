@@ -89,24 +89,17 @@ void ReportSurfaces(EnergyPlusData &state)
     // a file created.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SurfDetails;
-    bool SurfVert;
-    bool SurfDet;
-    bool DXFDone;
-    bool VRMLDone;
-    std::string Option1;
-    std::string Option2;
-    bool DoReport;
 
     state.dataErrTracking->AskForSurfacesReport = false;
 
-    SurfDetails = 0;
-    SurfVert = false;
-    SurfDet = false;
-    DXFDone = false;
-    VRMLDone = false;
-    Option1 = "";
-    Option2 = "";
+    int SurfDetails = 0;
+    bool SurfVert = false;
+    bool SurfDet = false;
+    bool DXFDone = false;
+    bool VRMLDone = false;
+    std::string Option1 = "";
+    std::string Option2 = "";
+    bool DoReport;
 
     General::ScanForReports(state, "Surfaces", DoReport, "Lines", Option1);
     if (DoReport) LinesOut(state, Option1);
@@ -1164,8 +1157,6 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
         {1, 9}, {"ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm"});
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int vert;    // Loop counter
-    int ZoneNum; // Loop counter
     std::string BaseSurfName;
     std::string ConstructionName;
     std::string ScheduleName;
@@ -1177,7 +1168,6 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     std::string cSchedMin;
     std::string cSchedMax;
     std::string SolarDiffusing;
-    int fd;
     std::string AlgoName;
 
     auto &Surface = state.dataSurface->Surface;
@@ -1293,7 +1283,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 *eiostream << ",,,,,,,,,," << fmt::to_string(Surface(surf).Sides) << ",";
             }
             if (RptType == 10) continue;
-            for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
+            for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 if (vert != Surface(surf).Sides) {
                     *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y) << ","
                                << format("{:.2R}", Surface(surf).Vertex(vert).z) << ",";
@@ -1307,7 +1297,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
         }
     }
 
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         *eiostream << "Zone Surfaces," << state.dataHeatBal->Zone(ZoneNum).Name << ","
                    << (state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
@@ -1484,7 +1474,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 // if window, report frame/divider as appropriate
                 if (Surface(surf).FrameDivider > 0) {
-                    fd = Surface(surf).FrameDivider;
+                    int fd = Surface(surf).FrameDivider;
                     if (state.dataSurface->FrameDivider(fd).FrameWidth > 0.0) {
                         AlgoName = DataSurfaces::HeatTransAlgoStrs[(int)Surface(surf).HeatTransferAlgorithm];
                         *eiostream << "Frame/Divider Surface," << state.dataSurface->FrameDivider(fd).Name << ","
