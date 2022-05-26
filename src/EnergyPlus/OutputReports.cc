@@ -295,24 +295,25 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 
     auto &Surface = state.dataSurface->Surface;
 
-    Array1D<Real64> StemX(4, -10.0);
-    Array1D<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
-    Array1D<Real64> StemZ(4, {0.1, 0.0, 0.0, 0.1});
-    Array1D<Real64> Head1X(4, {-10.0, -10.0, -10.5, -10.5});
-    Array1D<Real64> Head1Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    Array1D<Real64> Head1Z(4, {0.1, 0.0, 0.0, 0.1});
-    Array1D<Real64> Head2X(4, {-10.0, -10.0, -9.5, -9.5});
-    Array1D<Real64> Head2Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    Array1D<Real64> Head2Z(4, {0.1, 0.0, 0.0, 0.1});
-    Array1D<Real64> NSide1X(4, -10.5);
-    Array1D<Real64> NSide1Y(4, {4.5, 4.5, 3.5, 3.5});
-    Array1D<Real64> NSide1Z(4, {0.1, 0.0, 0.0, 0.1});
-    Array1D<Real64> NSide2X(4, {-10.5, -10.5, -9.5, -9.5});
-    Array1D<Real64> NSide2Y(4, {4.5, 4.5, 3.5, 3.5});
-    Array1D<Real64> NSide2Z(4, {0.1, 0.0, 0.0, 0.1});
-    Array1D<Real64> NSide3X(4, -9.5);
-    Array1D<Real64> NSide3Y(4, {4.5, 4.5, 3.5, 3.5});
-    Array1D<Real64> NSide3Z(4, {0.1, 0.0, 0.0, 0.1});
+    constexpr int lenArr = 4;
+    std::array<Real64, lenArr> StemX = {-10.0, -10.0, -10.0, -10.0};
+    std::array<Real64, lenArr> StemY = {3.0, 3.0, 0.0, 0.0};
+    std::array<Real64, lenArr> StemZ = {0.1, 0.0, 0.0, 0.1};
+    std::array<Real64, lenArr> Head1X = {-10.0, -10.0, -10.5, -10.5};
+    std::array<Real64, lenArr> Head1Y = {3.0, 3.0, 2.133975, 2.133975};
+    std::array<Real64, lenArr> Head1Z = {0.1, 0.0, 0.0, 0.1};
+    std::array<Real64, lenArr> Head2X = {-10.0, -10.0, -9.5, -9.5};
+    std::array<Real64, lenArr> Head2Y = {3.0, 3.0, 2.133975, 2.133975};
+    std::array<Real64, lenArr> Head2Z = {0.1, 0.0, 0.0, 0.1};
+    std::array<Real64, lenArr> NSide1X = {-10.5, -10.5, -10.5, -10.5};
+    std::array<Real64, lenArr> NSide1Y = {4.5, 4.5, 3.5, 3.5};
+    std::array<Real64, lenArr> NSide1Z = {0.1, 0.0, 0.0, 0.1};
+    std::array<Real64, lenArr> NSide2X = {-10.5, -10.5, -9.5, -9.5};
+    std::array<Real64, lenArr> NSide2Y = {4.5, 4.5, 3.5, 3.5};
+    std::array<Real64, lenArr> NSide2Z = {0.1, 0.0, 0.0, 0.1};
+    std::array<Real64, lenArr> NSide3X = {-9.5, -9.5, -9.5, -9.5};
+    std::array<Real64, lenArr> NSide3Y = {4.5, 4.5, 3.5, 3.5};
+    std::array<Real64, lenArr> NSide3Z = {0.1, 0.0, 0.0, 0.1};
 
     if (ColorScheme.empty()) {
         print(of, Format_708, "Color Scheme", ",", "Default");
@@ -330,19 +331,19 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
         }
     }
 
-    for (int vert = 1; vert <= 4; ++vert) {
-        StemX(vert) += minx;
-        StemY(vert) += miny;
-        Head1X(vert) += minx;
-        Head1Y(vert) += miny;
-        Head2X(vert) += minx;
-        Head2Y(vert) += miny;
-        NSide1X(vert) += minx;
-        NSide1Y(vert) += miny;
-        NSide2X(vert) += minx;
-        NSide2Y(vert) += miny;
-        NSide3X(vert) += minx;
-        NSide3Y(vert) += miny;
+    for (int vert = 0; vert < lenArr; ++vert) {
+        StemX[vert] += minx;
+        StemY[vert] += miny;
+        Head1X[vert] += minx;
+        Head1Y[vert] += miny;
+        Head2X[vert] += minx;
+        Head2Y[vert] += miny;
+        NSide1X[vert] += minx;
+        NSide1Y[vert] += miny;
+        NSide2X[vert] += minx;
+        NSide2Y[vert] += miny;
+        NSide3X[vert] += minx;
+        NSide3Y[vert] += miny;
     }
 
     auto &DXFcolorno = state.dataSurfColor->DXFcolorno;
@@ -350,59 +351,59 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
     // This writes "True North" above the Arrow Head
     print(of, Format_710, "Text - True North");
     print<check_syntax(Format_800)>(
-        of, Format_800, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)], StemX(1) - 1.0, StemY(1), StemZ(1));
+        of, Format_800, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)], StemX[0] - 1.0, StemY[0], StemZ[0]);
 
     print(of, Format_710, "Text - Building Title");
     print<check_syntax(Format_801)>(of,
                                     Format_801,
                                     DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)],
-                                    StemX(1) - 4.0,
-                                    StemY(1) - 4.0,
-                                    StemZ(1),
+                                    StemX[0] - 4.0,
+                                    StemY[0] - 4.0,
+                                    StemZ[0],
                                     "Building - " + state.dataHeatBal->BuildingName);
 
     // We want to point the north arrow to true north
     print(of, Format_710, "North Arrow Stem");
     print(of, Format_703_0, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)]);
-    print(of, Format_703_1, StemX(1), StemY(1), StemZ(1));
-    print(of, Format_703_2, StemX(2), StemY(2), StemZ(2));
-    print(of, Format_703_3, StemX(3), StemY(3), StemZ(3));
-    print(of, Format_703_4, StemX(4), StemY(4), StemZ(4));
+    print(of, Format_703_1, StemX[0], StemY[0], StemZ[0]);
+    print(of, Format_703_2, StemX[1], StemY[1], StemZ[1]);
+    print(of, Format_703_3, StemX[2], StemY[2], StemZ[2]);
+    print(of, Format_703_4, StemX[3], StemY[3], StemZ[3]);
 
     print(of, Format_710, "North Arrow Head 1");
     print(of, Format_703_0, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)]);
-    print(of, Format_703_1, Head1X(1), Head1Y(1), Head1Z(1));
-    print(of, Format_703_2, Head1X(2), Head1Y(2), Head1Z(2));
-    print(of, Format_703_3, Head1X(3), Head1Y(3), Head1Z(3));
-    print(of, Format_703_4, Head1X(4), Head1Y(4), Head1Z(4));
+    print(of, Format_703_1, Head1X[0], Head1Y[0], Head1Z[0]);
+    print(of, Format_703_2, Head1X[1], Head1Y[1], Head1Z[1]);
+    print(of, Format_703_3, Head1X[2], Head1Y[2], Head1Z[2]);
+    print(of, Format_703_4, Head1X[3], Head1Y[3], Head1Z[3]);
 
     print(of, Format_710, "North Arrow Head 2");
     print(of, Format_703_0, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)]);
-    print(of, Format_703_1, Head2X(1), Head2Y(1), Head2Z(1));
-    print(of, Format_703_2, Head2X(2), Head2Y(2), Head2Z(2));
-    print(of, Format_703_3, Head2X(3), Head2Y(3), Head2Z(3));
-    print(of, Format_703_4, Head2X(4), Head2Y(4), Head2Z(4));
+    print(of, Format_703_1, Head2X[0], Head2Y[0], Head2Z[0]);
+    print(of, Format_703_2, Head2X[1], Head2Y[1], Head2Z[1]);
+    print(of, Format_703_3, Head2X[2], Head2Y[2], Head2Z[2]);
+    print(of, Format_703_4, Head2X[3], Head2Y[3], Head2Z[3]);
 
     print(of, Format_710, "North Arrow Side 1");
     print(of, Format_703_0, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)]);
-    print(of, Format_703_1, NSide1X(1), NSide1Y(1), NSide1Z(1));
-    print(of, Format_703_2, NSide1X(2), NSide1Y(2), NSide1Z(2));
-    print(of, Format_703_3, NSide1X(3), NSide1Y(3), NSide1Z(3));
-    print(of, Format_703_4, NSide1X(4), NSide1Y(4), NSide1Z(4));
+    print(of, Format_703_1, NSide1X[0], NSide1Y[0], NSide1Z[0]);
+    print(of, Format_703_2, NSide1X[1], NSide1Y[1], NSide1Z[1]);
+    print(of, Format_703_3, NSide1X[2], NSide1Y[2], NSide1Z[2]);
+    print(of, Format_703_4, NSide1X[3], NSide1Y[3], NSide1Z[3]);
 
     print(of, Format_710, "North Arrow Side 2");
     print(of, Format_703_0, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)]);
-    print(of, Format_703_1, NSide2X(1), NSide2Y(1), NSide2Z(1));
-    print(of, Format_703_2, NSide2X(2), NSide2Y(2), NSide2Z(2));
-    print(of, Format_703_3, NSide2X(3), NSide2Y(3), NSide2Z(3));
-    print(of, Format_703_4, NSide2X(4), NSide2Y(4), NSide2Z(4));
+    print(of, Format_703_1, NSide2X[0], NSide2Y[0], NSide2Z[0]);
+    print(of, Format_703_2, NSide2X[1], NSide2Y[1], NSide2Z[1]);
+    print(of, Format_703_3, NSide2X[2], NSide2Y[2], NSide2Z[2]);
+    print(of, Format_703_4, NSide2X[3], NSide2Y[3], NSide2Z[3]);
 
     print(of, Format_710, "North Arrow Side 3");
     print(of, Format_703_0, DXFcolorno[static_cast<int>(DataSurfaceColors::ColorNo::Text)]);
-    print(of, Format_703_1, NSide3X(1), NSide3Y(1), NSide3Z(1));
-    print(of, Format_703_2, NSide3X(2), NSide3Y(2), NSide3Z(2));
-    print(of, Format_703_3, NSide3X(3), NSide3Y(3), NSide3Z(3));
-    print(of, Format_703_4, NSide3X(4), NSide3Y(4), NSide3Z(4));
+    print(of, Format_703_1, NSide3X[0], NSide3Y[0], NSide3Z[0]);
+    print(of, Format_703_2, NSide3X[1], NSide3Y[1], NSide3Z[1]);
+    print(of, Format_703_3, NSide3X[2], NSide3Y[2], NSide3Z[2]);
+    print(of, Format_703_4, NSide3X[3], NSide3Y[3], NSide3Z[3]);
 
     print(of, Format_710, "Zone Names");
 
@@ -1461,7 +1462,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     *eiostream << format("{:.2R}", Surface(surf).ViewFactorGround) << "," << format("{:.2R}", Surface(surf).ViewFactorSky) << ","
                                << format("{:.2R}", Surface(surf).ViewFactorGroundIR) << "," << format("{:.2R}", Surface(surf).ViewFactorSkyIR) << ","
                                << fmt::to_string(Surface(surf).Sides) << ",";
-                    for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
+                    for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                         if (vert != Surface(surf).Sides) {
                             *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y)
                                        << "," << format("{:.2R}", Surface(surf).Vertex(vert).z) << ",";
@@ -1510,7 +1511,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 *eiostream << "HeatTransfer Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << BaseSurfName << ","
                            << AlgoName << ",";
                 *eiostream << fmt::to_string(Surface(surf).Sides) << ",";
-                for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
+                for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
                     if (vert != Surface(surf).Sides) {
                         *eiostream << format("{:.2R}", Surface(surf).Vertex(vert).x) << "," << format("{:.2R}", Surface(surf).Vertex(vert).y) << ","
                                    << format("{:.2R}", Surface(surf).Vertex(vert).z) << ",";
