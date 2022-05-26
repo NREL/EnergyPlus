@@ -41,7 +41,7 @@ A new object *SurfaceProperty:IncidentSolarMultiplier* will be created.
       A1, \field Surface Name
           \required-field
           \type object-list
-          \object-list AllHeatTranSurfNames
+          \object-list SurfaceNames
           \note Enter the name of an exterior window outside surface object
       N1, \field Shading Multiplier
           \note a constant multiplier for window solar transmittance 
@@ -61,7 +61,7 @@ A new object *SurfaceProperty:IncidentSolarMultiplier* will be created.
 ## Proposed additions to Meters ##
 
 N/A
- 
+
 ## Proposed Report Variables ##
 
 N/A
