@@ -210,16 +210,16 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).Link(3).AirflowNetworkLinkSimuID = 5;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).AirflowNetworkNodeID = 2;
 
-    state->afn->AirflowNetworkLinkageData(1).NodeNums[0] = 1;
-    state->afn->AirflowNetworkLinkageData(2).NodeNums[0] = 1;
-    state->afn->AirflowNetworkLinkageData(3).NodeNums[0] = 1;
-    state->afn->AirflowNetworkLinkageData(1).NodeNums[1] = 3;
-    state->afn->AirflowNetworkLinkageData(2).NodeNums[1] = 4;
-    state->afn->AirflowNetworkLinkageData(3).NodeNums[1] = 2;
-    state->afn->AirflowNetworkLinkageData(4).NodeNums[0] = 2;
-    state->afn->AirflowNetworkLinkageData(5).NodeNums[0] = 2;
-    state->afn->AirflowNetworkLinkageData(4).NodeNums[1] = 5;
-    state->afn->AirflowNetworkLinkageData(5).NodeNums[1] = 6;
+    state->afn->AirflowNetworkLinkageData(1).indices[0] = 1;
+    state->afn->AirflowNetworkLinkageData(2).indices[0] = 1;
+    state->afn->AirflowNetworkLinkageData(3).indices[0] = 1;
+    state->afn->AirflowNetworkLinkageData(1).indices[1] = 3;
+    state->afn->AirflowNetworkLinkageData(2).indices[1] = 4;
+    state->afn->AirflowNetworkLinkageData(3).indices[1] = 2;
+    state->afn->AirflowNetworkLinkageData(4).indices[0] = 2;
+    state->afn->AirflowNetworkLinkageData(5).indices[0] = 2;
+    state->afn->AirflowNetworkLinkageData(4).indices[1] = 5;
+    state->afn->AirflowNetworkLinkageData(5).indices[1] = 6;
     state->afn->AirflowNetworkNodeSimu(1).TZ = 25.0;
     state->afn->AirflowNetworkNodeSimu(1).WZ = 0.001;
     state->afn->AirflowNetworkNodeSimu(2).TZ = 20.0;

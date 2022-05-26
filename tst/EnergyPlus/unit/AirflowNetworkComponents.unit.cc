@@ -192,7 +192,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
     crack.exponent = 0.65;
 
     AirflowNetwork::AirState state0, state1;
-    Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
+    Real64 sqrt_density = state0.sqrt_density; // = state1.sqrt_density
     Real64 viscosity = state0.viscosity;       // = state1.viscosity
 
     Real64 dp{10.0};
@@ -238,7 +238,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_GenericCrack)
     Real64 expo{0.65};
 
     AirflowNetwork::AirState state0, state1;
-    Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
+    Real64 sqrt_density = state0.sqrt_density; // = state1.sqrt_density
     Real64 viscosity = state0.viscosity;       // = state1.viscosity
 
     Real64 dp{10.0};

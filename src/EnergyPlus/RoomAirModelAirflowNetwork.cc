@@ -576,14 +576,14 @@ namespace RoomAirModelAirflowNetwork {
         if (NodeNum > 0) {
             for (linkNum = 1; linkNum <= ThisRAFNNode.NumOfAirflowLinks; ++linkNum) {
                 Link = ThisRAFNNode.Link(linkNum).AirflowNetworkLinkSimuID;
-                if (state.afn->AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
-                    NodeIn = state.afn->AirflowNetworkLinkageData(Link).NodeNums[1];
+                if (state.afn->AirflowNetworkLinkageData(Link).indices[0] == NodeNum) { // incoming flow
+                    NodeIn = state.afn->AirflowNetworkLinkageData(Link).indices[1];
                     ThisRAFNNode.Link(linkNum).TempIn = state.afn->AirflowNetworkNodeSimu(NodeIn).TZ;
                     ThisRAFNNode.Link(linkNum).HumRatIn = state.afn->AirflowNetworkNodeSimu(NodeIn).WZ;
                     ThisRAFNNode.Link(linkNum).MdotIn = state.afn->AirflowNetworkLinkSimu(Link).FLOW2;
                 }
-                if (state.afn->AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
-                    NodeIn = state.afn->AirflowNetworkLinkageData(Link).NodeNums[0];
+                if (state.afn->AirflowNetworkLinkageData(Link).indices[1] == NodeNum) { // outgoing flow
+                    NodeIn = state.afn->AirflowNetworkLinkageData(Link).indices[0];
                     ThisRAFNNode.Link(linkNum).TempIn = state.afn->AirflowNetworkNodeSimu(NodeIn).TZ;
                     ThisRAFNNode.Link(linkNum).HumRatIn = state.afn->AirflowNetworkNodeSimu(NodeIn).WZ;
                     ThisRAFNNode.Link(linkNum).MdotIn = state.afn->AirflowNetworkLinkSimu(Link).FLOW;

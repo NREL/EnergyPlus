@@ -766,8 +766,8 @@ namespace CrossVentMgr {
             // adiabatic surface
             if (state.afn->MultizoneSurfaceData(MaxSurf).SurfNum ==
                 state.dataSurface->Surface(state.afn->MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond) {
-                NodeNum1 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[0];
-                NodeNum2 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[1];
+                NodeNum1 = state.afn->AirflowNetworkLinkageData(MaxSurf).indices[0];
+                NodeNum2 = state.afn->AirflowNetworkLinkageData(MaxSurf).indices[1];
                 if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) {
                     if (state.afn->nodes(NodeNum1).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(state.afn->MultizoneSurfaceData(MaxSurf).SurfNum);
