@@ -204,17 +204,9 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     // Use the surface absolute coordinate information to produce
     // lines.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
 
     static constexpr std::string_view vertexstring("X,Y,Z ==> Vertex");
 
@@ -803,10 +795,6 @@ void DXFOut(EnergyPlusData &state,
         }
     }
 
-    //  711 format('  0',/,'LINE',/,'  8',/,A,/,' 62',/,I3)
-    //  712 format(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,  &
-    //             ' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)
-
     DXFDaylightingReferencePoints(state, dxffile);
 
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
@@ -976,13 +964,6 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
                       Surface(surf).Vertex(sptr).y,
                       Surface(surf).Vertex(sptr).z);
             }
-
-            // 715 format('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,  &
-            //    ' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,  &
-            //    ' 70',/,'   1',/,' 40',/,A,/,' 41',/,A)
-            // 716 format('  0',/'VERTEX',/,'  8',/,A,/,  &
-            //    ' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)
-            // 717 format('  0',/'SEQEND',/,'  8',/,A)
         }
         // still have to do shading surfaces for zone
         surfcount = 0;
@@ -1189,12 +1170,6 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     // This subroutine provides an optional detailed surface report
     // for each surface in the input file.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
@@ -1202,18 +1177,9 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     using ScheduleManager::GetScheduleMinValue;
     using ScheduleManager::GetScheduleName;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static Array1D_string const ConvCoeffCalcs(
         {1, 9}, {"ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm"});
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int vert;    // Loop counter
@@ -1604,25 +1570,9 @@ void CostInfoOut(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Access data in DataSurfaces and report
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_bool uniqueSurf;
