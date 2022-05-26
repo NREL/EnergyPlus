@@ -72,20 +72,6 @@ struct EnergyPlusData;
 
 namespace AirflowNetwork {
 
-    // Vent Control  DistSys Control  Flag    Description
-    //  NONE           NONE           0      No AirflowNetwork and SIMPLE
-    //  SIMPLE         NONE           1      Simple calculations only
-    //  MULTIZONE      NONE           2      Perform multizone calculations only
-    //  NONE           DISTSYS        3      Perform distribution system during system on time only
-    //  SIMPLE         DISTSYS        4      Perform distribution system during system on time and simple calculations during off time
-    //  MULTIZONE      DISTSYS        5      Perform distribution system during system on time and multizone calculations during off time
-    //
-    // int constexpr AirflowNetworkControlSimple(1);    // Simple calculations only
-    // int constexpr AirflowNetworkControlMultizone(2); // Perform multizone calculations only
-    // int constexpr AirflowNetworkControlSimpleADS(4); // Perform distribution system during system on time and simple calculations during off time
-    // int constexpr AirflowNetworkControlMultiADS(5);  // Perform distribution system during system on time and multizone calculations during off
-    // time
-
     enum class ControlType
     {
         NoMultizoneOrDistribution = 0,                   // Simple calculations only, AirflowNetworkControlSimple(1)
