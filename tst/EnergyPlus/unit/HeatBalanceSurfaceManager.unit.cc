@@ -2483,6 +2483,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataSurface->SurfTAirRef(2) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
+    InitSurfacePropertyViewFactors(*state);
+
     InitSurfaceHeatBalance(*state);
 
     state->dataSurface->SurfAirSkyRadSplit.allocate(6);
