@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
 
     state->afn->AirflowNetworkCompData.allocate(j);
     state->afn->AirflowNetworkCompData(j).TypeNum = 1;
-    state->afn->MultizoneSurfaceData.allocate(i);
+    clear_and_resize(state->afn->MultizoneSurfaceData, i);
     state->afn->MultizoneSurfaceData(i).Width = 10.0;
     state->afn->MultizoneSurfaceData(i).Height = 5.0;
     state->afn->MultizoneSurfaceData(i).OpenFactor = 1.0;

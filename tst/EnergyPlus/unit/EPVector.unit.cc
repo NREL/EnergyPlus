@@ -71,6 +71,25 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Basic)
     ASSERT_THROW(v[4] = 5, std::out_of_range);
     ASSERT_THROW(v(5) = 5, std::out_of_range);
 #endif // !NDEBUG
+    v.resize(2);
+    EXPECT_EQ(2, v.size());
+    EXPECT_EQ(1, v(1));
+    EXPECT_EQ(2, v(2));
+    v.resize(4);
+    EXPECT_EQ(1, v(1));
+    EXPECT_EQ(2, v(2));
+    EXPECT_EQ(0, v(3));
+    EXPECT_EQ(0, v(4));
+    clear_and_resize(v, 4);
+    EXPECT_EQ(0, v(1));
+    EXPECT_EQ(0, v(2));
+    EXPECT_EQ(0, v(3));
+    EXPECT_EQ(0, v(4));
+    clear_and_resize(v, 4, 1);
+    EXPECT_EQ(1, v(1));
+    EXPECT_EQ(1, v(2));
+    EXPECT_EQ(1, v(3));
+    EXPECT_EQ(1, v(4));
 }
 
 TEST_F(EnergyPlusFixture, EPVectorTest_Bools)
@@ -89,4 +108,23 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Bools)
     ASSERT_THROW(v[4] = true, std::out_of_range);
     ASSERT_THROW(v(5) = false, std::out_of_range);
 #endif // !NDEBUG
+    v.resize(2);
+    EXPECT_EQ(2, v.size());
+    EXPECT_TRUE(v(1));
+    EXPECT_FALSE(v(2));
+    v.resize(4);
+    EXPECT_TRUE(v(1));
+    EXPECT_FALSE(v(2));
+    EXPECT_FALSE(v(3));
+    EXPECT_FALSE(v(4));
+    clear_and_resize(v, 4);
+    EXPECT_FALSE(v(1));
+    EXPECT_FALSE(v(2));
+    EXPECT_FALSE(v(3));
+    EXPECT_FALSE(v(4));
+    clear_and_resize(v, 4, true);
+    EXPECT_TRUE(v(1));
+    EXPECT_TRUE(v(2));
+    EXPECT_TRUE(v(3));
+    EXPECT_TRUE(v(4));
 }
