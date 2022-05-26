@@ -1269,6 +1269,20 @@ namespace DataSurfaces {
         }
     };
 
+    struct SurfaceIncidentSolarMultiplier
+    {
+        // Members
+        std::string Name;
+        int SurfaceIdx; // surface index
+        Real64 Scaler;
+        int SchedPtr; // schedule pointer
+
+        // Default Constructor
+        SurfaceIncidentSolarMultiplier() : SurfaceIdx(0), Scaler(1.0), SchedPtr(0)
+        {
+        }
+    };
+
     struct FenestrationSolarAbsorbed
     {
         // Members
@@ -1383,6 +1397,7 @@ struct SurfacesData : BaseGlobalStruct
     int TotOSCM = 0;               // Total number of Other Side Conditions Model Blocks.
     int TotExtVentCav = 0;         // Total number of ExteriorNaturalVentedCavity
     int TotSurfIncSolSSG = 0;      // Total number of scheduled surface gains for incident solar radiation on surface
+    int TotSurfIncSolMultiplier = 0;      // Total number of surfaces with incident solar multipliers
     int TotFenLayAbsSSG = 0;       // Total number of scheduled surface gains for absorbed solar radiation in window layers
     int TotSurfLocalEnv = 0;       // Total number of surface level outdoor air node.
     int Corner = 0;                // Which corner is specified as the first vertex
@@ -1767,6 +1782,7 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::ShadingVertexData> ShadeV;
     EPVector<DataSurfaces::ExtVentedCavityStruct> ExtVentedCavity;
     EPVector<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
+    EPVector<DataSurfaces::SurfaceIncidentSolarMultiplier> SurfIncSolMultiplier;
     EPVector<DataSurfaces::FenestrationSolarAbsorbed> FenLayAbsSSG;
     EPVector<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
     EPVector<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
@@ -1786,6 +1802,7 @@ struct SurfacesData : BaseGlobalStruct
         this->TotOSCM = 0;
         this->TotExtVentCav = 0;
         this->TotSurfIncSolSSG = 0;
+        this->TotSurfIncSolMultiplier = 0;
         this->TotFenLayAbsSSG = 0;
         this->TotSurfLocalEnv = 0;
         this->Corner = 0;
@@ -2109,6 +2126,7 @@ struct SurfacesData : BaseGlobalStruct
         this->ShadeV.deallocate();
         this->ExtVentedCavity.deallocate();
         this->SurfIncSolSSG.deallocate();
+        this->SurfIncSolMultiplier.deallocate();
         this->FenLayAbsSSG.deallocate();
         this->SurfLocalEnvironment.deallocate();
         this->SurroundingSurfsProperty.deallocate();

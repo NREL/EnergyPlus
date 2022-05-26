@@ -175,6 +175,8 @@ namespace HeatBalanceManager {
                                         bool &ErrorsFound // If errors found in input
     );
 
+    void GetIncidentSolarMultiplier(EnergyPlusData &state, bool &ErrorsFound);
+
     void GetScheduledSurfaceGains(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void CheckScheduledSurfaceGains(EnergyPlusData &state, int const ZoneNum); // Zone number for which error check will be performed

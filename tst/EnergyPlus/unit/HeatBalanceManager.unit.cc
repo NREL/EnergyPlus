@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -74,6 +75,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -2309,5 +2311,76 @@ TEST_F(EnergyPlusFixture, Window5DataFileSpaceInName)
 
     EXPECT_EQ(ConstructName, "DOUBLE CLEAR");
     EXPECT_TRUE(ConstructionFound);
+}
+
+TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput) {
+
+    std::string const idf_objects = delimited_string({"SurfaceProperty:IncidentSolarMultiplier,",
+                                                      "Zn001:Wall001:Win001,     !- Surface Name",
+                                                      "0.6,                      !- Shading Multiplier",
+                                                      "SolarMultCompact;           !- Shading Multiplier Schedule Name",
+
+                                                      "  ScheduleTypeLimits,",
+                                                      "    Any Number;              !- Name",
+
+                                                      "Schedule:Compact,",
+                                                      "  SolarMultCompact,  !- Name",
+                                                      "  Any Number,              !- Schedule Type Limits Name",
+                                                      "  Through: 5/31,           !- Field 1",
+                                                      "  For: AllDays,            !- Field 2",
+                                                      "  Until: 24:00,            !- Field 3",
+                                                      "  0.1,                       !- Field 4",
+                                                      "  Through: 9/30,           !- Field 5",
+                                                      "  For: AllDays,            !- Field 6",
+                                                      "  Until: 24:00,            !- Field 7",
+                                                      "  0.3,                       !- Field 8",
+                                                      "  Through: 12/31,          !- Field 9",
+                                                      "  For: AllDays,            !- Field 10",
+                                                      "  Until: 24:00,            !- Field 11",
+                                                      "  0.1;                       !- Field 12",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 31;
+    state->dataGlobal->HourOfDay = 24;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 0);
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN001:WALL001:WIN001";
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_EQ(state->dataSurface->SurfIncSolMultiplier(1).Scaler, 0.6);
+    EXPECT_EQ(GetScheduleName(*state, state->dataSurface->SurfIncSolMultiplier(1).SchedPtr), "SOLARMULTCOMPACT");
+
+    EXPECT_EQ(ScheduleManager::GetCurrentScheduleValue(*state, state->dataSurface->SurfIncSolMultiplier(1).SchedPtr), 0.1);
+
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Door;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** IncidentSolarMultiplier should be defined for exterior windows",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).ExtBoundCond = 1;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 } // namespace EnergyPlus
