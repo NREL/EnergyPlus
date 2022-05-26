@@ -310,20 +310,20 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             if (!state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) continue;
 
             if ((state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) || state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum))) {
-                Real64 SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                 int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
+                int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                 Real64 SrdSurfsViewFactor = 0;
-                Real64 SkyViewFactor = 0;
+                Real64 SurfsSkyViewFactor = 0;
                 Real64 GroundSurfsViewFactor = 0;
-
+                bool SetGroundViewFactorObject = false;
                 if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                    SkyViewFactor = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                    if (SkyViewFactor >= 0) {
-                        SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
+                    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                    SurfsSkyViewFactor = SrdSurfsProperty.SkyViewFactor;
+                    if (SurfsSkyViewFactor >= 0) {
+                        SrdSurfsViewFactor += SrdSurfsProperty.SkyViewFactor;
                     }
-                    for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                         SrdSurfNum++) {
-                        SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                    for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                        SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
                     }
                 }
                 if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
@@ -335,20 +335,16 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
                     ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
                 }
-                if (SkyViewFactor >= 0 && GroundSurfsViewFactor > 0) {
+                if (SurfsSkyViewFactor >= 0 && GroundSurfsViewFactor > 0) {
                     // If both surface sky and ground view factor defined, overwrite with the defined value
-                    Surface(SurfNum).ViewFactorSkyIR = SkyViewFactor;
+                    Surface(SurfNum).ViewFactorSkyIR = SurfsSkyViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                } else if (SkyViewFactor >= 0 && GroundSurfsViewFactor == 0) {
+                } else if (SurfsSkyViewFactor >= 0 && GroundSurfsViewFactor == 0) {
                     // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
-                    Surface(SurfNum).ViewFactorSkyIR = SkyViewFactor;
+                    Surface(SurfNum).ViewFactorSkyIR = SurfsSkyViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
-                    if (Surface(SurfNum).ViewFactorGroundIR > 0.0) {
-                        state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum = Surface(SurfNum).ViewFactorGroundIR;
-                        // reset view factor to one ground surface object
-                        ReSetGroundSurfacesViewFactor(state, SurfNum);
-                    }
-                } else if (SkyViewFactor < 0 && GroundSurfsViewFactor > 0) {
+                    SetGroundViewFactorObject = true;
+                } else if (SurfsSkyViewFactor < 0 && GroundSurfsViewFactor > 0) {
                     // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
                     Surface(SurfNum).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
@@ -356,11 +352,10 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     // If neither ground or sky view factor define, continue to use the original proportion.
                     Surface(SurfNum).ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
-                    if (Surface(SurfNum).ViewFactorGroundIR > 0.0) {
-                        state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum = Surface(SurfNum).ViewFactorGroundIR;
-                        // reset view factor to one ground surface object
-                        ReSetGroundSurfacesViewFactor(state, SurfNum);
-                    }
+                    SetGroundViewFactorObject = true;
+                }
+                if (SetGroundViewFactorObject) {
+                    ReSetGroundSurfacesViewFactor(state, SurfNum);
                 }
             }
         }
@@ -8999,8 +8994,9 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
 void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
 {
     // purpose of subroutine:
-    // resets ground veiew factors based view factors indetity
-    // rests the groun view factors to one of the memebrs
+    // resets ground veiew factors based on view factors indetity
+    // rests the ground view factors to the first memebr and adds
+    // one GroundSurfacesData object if it doesnot exist
 
     // local vars
     Real64 GndSurfViewFactor;
@@ -9008,6 +9004,7 @@ void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
 
     if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) return;
     auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum));
+    GndSurfsProperty.SurfsViewFactorSum = state.dataSurface->Surface(SurfNum).ViewFactorGroundIR;
 
     if (GndSurfsProperty.SurfsViewFactorSum > 0.0) {
         if (!GndSurfsProperty.GndSurfs.allocated()) GndSurfsProperty.GndSurfs.allocate(1);
@@ -9021,7 +9018,6 @@ void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
             GndSurfsProperty.GndSurfs(1).ViewFactor = GndSurfsProperty.SurfsViewFactorSum;
         }
     }
-
 }
 
 } // namespace EnergyPlus::HeatBalanceSurfaceManager
