@@ -5185,7 +5185,8 @@ namespace HeatBalanceManager {
         state.dataSurface->TotSurfIncSolMultiplier = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotSurfIncSolMultiplier > 0) {
             if (!allocated(state.dataSurface->SurfIncSolMultiplier)) {
-                state.dataSurface->SurfIncSolMultiplier.allocate(state.dataSurface->TotSurfIncSolMultiplier);
+                // could be extended to interior surfaces later
+                state.dataSurface->SurfIncSolMultiplier.allocate(state.dataSurface->TotSurfaces);
             }
 
             int NumAlpha;
@@ -5210,8 +5211,6 @@ namespace HeatBalanceManager {
                     continue;
                 }
 
-                state.dataSurface->SurfIncSolMultiplier(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
-
                 // Assign surface number
                 int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
                 if (SurfNum == 0) {
@@ -5225,14 +5224,16 @@ namespace HeatBalanceManager {
                 } else {
                     if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window &&
                         state.dataSurface->Surface(SurfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
-                        state.dataSurface->SurfIncSolMultiplier(Loop).SurfaceIdx = SurfNum;
+                        state.dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = state.dataIPShortCut->rNumericArgs(1);
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     } else {
                         ShowSevereError(state, "IncidentSolarMultiplier should be defined for exterior windows");
                     }
                 }
 
-                state.dataSurface->SurfIncSolMultiplier(Loop).Scaler = state.dataIPShortCut->rNumericArgs(1);
-                state.dataSurface->SurfIncSolMultiplier(Loop).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             }
         }
     }

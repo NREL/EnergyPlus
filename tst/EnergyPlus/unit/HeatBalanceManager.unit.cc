@@ -2363,25 +2363,28 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 0);
     ScheduleManager::UpdateScheduleValues(*state);
 
-    state->dataSurface->Surface.allocate(1);
-    state->dataSurface->Surface(1).Name = "ZN001:WALL001:WIN001";
-    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->TotSurfaces = 2;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface(1).Name = "ZN001:WALL001";
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Name = "ZN001:WALL001:WIN001";
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
     GetIncidentSolarMultiplier(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    EXPECT_EQ(state->dataSurface->SurfIncSolMultiplier(1).Scaler, 0.6);
-    EXPECT_EQ(GetScheduleName(*state, state->dataSurface->SurfIncSolMultiplier(1).SchedPtr), "SOLARMULTCOMPACT");
+    EXPECT_EQ(state->dataSurface->SurfIncSolMultiplier(2).Scaler, 0.6);
+    EXPECT_EQ(GetScheduleName(*state, state->dataSurface->SurfIncSolMultiplier(2).SchedPtr), "SOLARMULTCOMPACT");
 
-    EXPECT_EQ(ScheduleManager::GetCurrentScheduleValue(*state, state->dataSurface->SurfIncSolMultiplier(1).SchedPtr), 0.1);
+    EXPECT_EQ(ScheduleManager::GetCurrentScheduleValue(*state, state->dataSurface->SurfIncSolMultiplier(2).SchedPtr), 0.1);
 
-    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Door;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Door;
     GetIncidentSolarMultiplier(*state, ErrorsFound);
     std::string const error_string = delimited_string({
         "   ** Severe  ** IncidentSolarMultiplier should be defined for exterior windows",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->Surface(1).ExtBoundCond = 1;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).ExtBoundCond = 1;
     GetIncidentSolarMultiplier(*state, ErrorsFound);
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

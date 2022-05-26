@@ -705,6 +705,7 @@ namespace DataSurfaces {
                                       // UnenteredAdjacentZoneSurface ("Zone") are used until reconciled.
         bool ExtSolar;                // True if the "outside" of the surface is exposed to solar
         bool ExtWind;                 // True if the "outside" of the surface is exposed to wind Heat transfer coefficients
+        bool hasIncSolMultiplier;     // Whether the surface has a incident solar multiplier
         Real64 ViewFactorGround;      // View factor to the ground from the exterior of the surface for diffuse solar radiation
         Real64 ViewFactorSky;         // View factor to the sky from the exterior of the surface for diffuse solar radiation
         Real64 ViewFactorGroundIR;    // View factor to the ground and shadowing surfaces from the exterior of the surface for IR radiation
@@ -753,11 +754,11 @@ namespace DataSurfaces {
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(HeatTransferModel::Invalid), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
-              ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
-              OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
-              SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
-              FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
-              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
+              ExtSolar(false), ExtWind(false), hasIncSolMultiplier(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0),
+              ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false),
+              SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false),
+              activeShadedConstruction(0), activeShadedConstructionPrev(0), FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0),
+              SolarEnclSurfIndex(0), IsAirBoundarySurf(false), ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
         {
         }
 
