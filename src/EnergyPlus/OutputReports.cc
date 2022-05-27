@@ -1412,7 +1412,21 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     // lines.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr static std::array<std::string_view, 7> colorstring = {"WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE"};
+    enum class Color
+    {
+        Invalid = -1,
+        Wall,
+        Window,
+        FixedShade,
+        SubShade,
+        Roof,
+        Floor,
+        BldgShade,
+        Num
+    };
+
+    constexpr static std::array<std::string_view, static_cast<int>(Color::Num)> colorstring = {
+        "WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE"};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string ShadeType;
@@ -1480,7 +1494,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     print<check_syntax(Format_800)>(wrlfile, Format_800, "SUBSHADE", "1 0 1");
     print<check_syntax(Format_800)>(wrlfile, Format_800, "BACKCOLOR", "0.502 0.502 0.784");
 
-    int colorindex = 0;
+    Color colorindex = Color::Invalid;
 
     //  Do all detached shading surfaces first
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
@@ -1489,8 +1503,8 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         if (thisSurface.IsAirBoundarySurf) continue;
         if (thisSurface.Class == DataSurfaces::SurfaceClass::Shading) continue;
         if (thisSurface.Sides == 0) continue;
-        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_F) colorindex = 2;
-        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_B) colorindex = 6;
+        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_F) colorindex = Color::FixedShade;
+        if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_B) colorindex = Color::BldgShade;
         if (thisSurface.Class == DataSurfaces::SurfaceClass::Detached_F) {
             ShadeType = "Fixed Shading";
             print(wrlfile, "# Fixed Shading:{}\n", thisSurface.Name);
@@ -1498,7 +1512,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             ShadeType = "Building Shading";
             print(wrlfile, "# Building Shading:{}", thisSurface.Name);
         }
-        print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[colorindex], "Surf", surf);
+        print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[static_cast<int>(colorindex)], "Surf", surf);
         for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
             print<check_syntax(Format_802)>(wrlfile, Format_802, thisSurface.Vertex(vert).x, thisSurface.Vertex(vert).y, thisSurface.Vertex(vert).z);
         }
@@ -1538,15 +1552,15 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             if (thisSurface.Zone != zoneNum) continue;
             if (thisSurface.Sides == 0) continue;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::IntMass) continue;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Wall) colorindex = 0;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Roof) colorindex = 4;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::TDD_Dome) colorindex = 1;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = 5;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) colorindex = 1;
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = 1;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Wall) colorindex = Color::Wall;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Roof) colorindex = Color::Roof;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::TDD_Dome) colorindex = Color::Window;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = Color::Floor;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) colorindex = Color::Window;
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = Color::Window;
 
             print(wrlfile, "# {}:{}\n", thisSurface.ZoneName, thisSurface.Name);
-            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[colorindex], "Surf", oldSurfNum);
+            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[static_cast<int>(colorindex)], "Surf", oldSurfNum);
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 print(wrlfile, Format_802, thisSurface.Vertex(vert).x, thisSurface.Vertex(vert).y, thisSurface.Vertex(vert).z);
             }
@@ -1578,7 +1592,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             }
         }
         // still have to do shading surfaces for zone
-        colorindex = 3;
+        colorindex = Color::SubShade;
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             auto &thisSurface = state.dataSurface->Surface(surf);
             //      !if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
@@ -1586,7 +1600,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             if (thisSurface.ZoneName != state.dataHeatBal->Zone(zoneNum).Name) continue;
             if (thisSurface.Sides == 0) continue;
             print(wrlfile, "# {}:{}\n", thisSurface.ZoneName, thisSurface.Name);
-            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[colorindex], "Surf", surf);
+            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring[static_cast<int>(colorindex)], "Surf", surf);
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 print(wrlfile, Format_802, thisSurface.Vertex(vert).x, thisSurface.Vertex(vert).y, thisSurface.Vertex(vert).z);
             }
