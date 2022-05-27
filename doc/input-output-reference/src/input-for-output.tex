@@ -653,15 +653,16 @@ The energy is obtained internally from the following facility meters:
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule
+%Electricity:Facility & Diesel:Facility \tabularnewline
+%\midrule
+%\endfirsthead
+%
+%\toprule
+%Electricity:Facility & Diesel:Facility \tabularnewline
+%\midrule
+%\endhead
+%
 Electricity:Facility & Diesel:Facility \tabularnewline
-\midrule
-\endfirsthead
-
-\toprule
-Electricity:Facility & Diesel:Facility \tabularnewline
-\midrule
-\endhead
-
 DistrictCooling:Facility & DistrictHeating:Facility \tabularnewline
 NaturalGas:Facility & Gasoline:Facility \tabularnewline
 Coal:Facility & FuelOilNo1:Facility \tabularnewline
@@ -2067,6 +2068,24 @@ The following different output meters could appear in the standard meter output 
 \end{itemize}
 
 What shows up in the output are the Energy Meters that were utilized in this particular input file, the pollutants, and the Total Carbon Equivalent.
+
+\subsection{Output:JSON}\label{outputjson}
+
+Output from EnergyPlus can be written to JSON files for manipulation with the widely used JSON (JavaScript Object Notation) format.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Option Type}
+This is a required field specifying the content to be reported in the JSON output file. Two options are available---\emph{TimeSeries} and \emph{TimeSeriesAndTabular}. The former option will output time series data only; and the latter will output both the time series data and the tabular report data.
+
+\paragraph{Field: Output JSON}
+The option to turn on or off JSON output. The default is \emph{Yes}.
+
+\paragraph{Field: Output CBOR}
+The option to turn on or off CBOR output. The default is \emph{No}.
+
+\paragraph{Field: Output MessagePack}
+The option to turn on or off MessagePack output. The default is \emph{No}.
 
 \subsection{Output:SQLite}\label{outputsqlite}
 
