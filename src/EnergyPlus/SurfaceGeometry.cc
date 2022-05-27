@@ -8101,11 +8101,11 @@ namespace SurfaceGeometry {
                     }
                 }
 
-                // Assign surrounding surfaces object number;
+                // get ground surfaces object number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    int GroundSurfacesNum =
+                    int GndSurfsNum =
                         UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataSurface->GroundSurfsProperty);
-                    if (GroundSurfacesNum == 0) {
+                    if (GndSurfsNum == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(6) + " has been found.");
@@ -8114,7 +8114,7 @@ namespace SurfaceGeometry {
                                               "\" no corresponding ground surfaces properties has been found in the input file.");
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum = GroundSurfacesNum;
+                        state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum = GndSurfsNum;
                     }
                 }
 
@@ -8268,14 +8268,12 @@ namespace SurfaceGeometry {
         // local variables:
         int NumAlpha;
         int NumNumeric;
-        int Loop;
         int IOStat;
-        int TotGndSurfsProperty;
+        int NumGndSurfsObj;
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
-        TotGndSurfsProperty = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-
+        NumGndSurfsObj = 0;
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             return;
@@ -8283,9 +8281,11 @@ namespace SurfaceGeometry {
             int Loop = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++Loop;
+                ++NumGndSurfsObj;
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
-                                                                         ++Loop,
+                                                                         Loop,
                                                                          state.dataIPShortCut->cAlphaArgs,
                                                                          NumAlpha,
                                                                          state.dataIPShortCut->rNumericArgs,
@@ -8369,9 +8369,13 @@ namespace SurfaceGeometry {
                     ShowContinueError(state, "At least one ground surface view factor should be specified.");
                 }
                 state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsProp);
-
+            }
+        }
+        // set report variables
+        if (NumGndSurfsObj > 0) {
+            for (int Loop = 1; Loop <= NumGndSurfsObj; Loop++) {
                 SetupOutputVariable(state,
-                                    "Ground Surfaces Property Average Ground Surface Temperature",
+                                    "Surfaces Property Ground Surfaces Average Temperature",
                                     OutputProcessor::Unit::C,
                                     state.dataSurface->GroundSurfsProperty(Loop).SurfsTempAvg,
                                     OutputProcessor::SOVTimeStepType::Zone,
@@ -8379,7 +8383,7 @@ namespace SurfaceGeometry {
                                     state.dataSurface->GroundSurfsProperty(Loop).Name);
 
                 SetupOutputVariable(state,
-                                    "Ground Surfaces Property Average Ground Surface Reflectance",
+                                    "Surfaces Property Ground Surfaces Average Reflectance",
                                     OutputProcessor::Unit::None,
                                     state.dataSurface->GroundSurfsProperty(Loop).SurfsReflAvg,
                                     OutputProcessor::SOVTimeStepType::Zone,

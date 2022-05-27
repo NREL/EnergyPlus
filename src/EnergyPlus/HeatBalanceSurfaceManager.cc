@@ -8933,7 +8933,7 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) continue;
         auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum));
-        if (GndSurfsProperty.SurfsViewFactorSum == 0.0) { // || state.dataGlobal->DoDesDaySim
+        if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
             state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
             continue;
         }
@@ -8945,10 +8945,11 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
             GndSurfViewFactor = GndSurfsProperty.GndSurfs(gSurfNum).ViewFactor;
             if (GndSurfViewFactor == 0.0) continue;
             if (GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr == 0) continue;
-            GndSurfaceTemp = GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr) + DataGlobalConstants::KelvinConv;
-            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp);
+            GndSurfaceTemp = GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr);
+            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp + DataGlobalConstants::KelvinConv);
         }
         if (GndSurfaceTempSum == 0.0) {
+            GndSurfsProperty.SurfsTempAvg = 0.0;
             state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
             continue;
         }
@@ -8972,22 +8973,23 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
 
         if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) continue;
         auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum));
-        if (GndSurfsProperty.SurfsViewFactorSum == 0.0) { //  || state.dataGlobal->DoDesDaySim
+        if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
             state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
             continue;
         }
         GndSurfRefl = 0.0;
-        GndSurfsReflSum = 0.0;           
+        GndSurfsReflSum = 0.0;
         for (int gSurfNum = 1; gSurfNum <= GndSurfsProperty.NumGndSurfs; gSurfNum++) {
             if (GndSurfsProperty.GndSurfs(gSurfNum).ReflSchPtr == 0) continue;
             GndSurfRefl = GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).ReflSchPtr);
             GndSurfsReflSum += GndSurfsProperty.GndSurfs(gSurfNum).ViewFactor * GndSurfRefl;
         }
         if (GndSurfsReflSum == 0.0) {
+            GndSurfsProperty.SurfsReflAvg = 0.0;
             state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
             continue;
         }
-        GndSurfsProperty.SurfsReflAvg = GndSurfsReflSum / GndSurfsProperty.SurfsViewFactorSum;        
+        GndSurfsProperty.SurfsReflAvg = GndSurfsReflSum / GndSurfsProperty.SurfsViewFactorSum;
     }
 }
 
