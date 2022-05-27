@@ -5619,7 +5619,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property sky and ground view factors inputs
-    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).GroundSurfsNum);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).GroundSurfsPtr);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).SurroundingSurfsPtr);
     // set local derived data vars
     int SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(3);
@@ -5935,7 +5935,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property sky and ground view factors inputs
-    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).GroundSurfsNum);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).GroundSurfsPtr);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).SurroundingSurfsPtr);
     // set local derived data vars
     int SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(3);

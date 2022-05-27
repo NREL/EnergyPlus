@@ -1322,10 +1322,10 @@ namespace DataSurfaces {
         int ExtShadingSchedPtr;  // schedule pointer
         int SurroundingSurfsPtr; // schedule pointer
         int OutdoorAirNodePtr;   // schedule pointer
-        int GroundSurfsNum;         // pointer to multiple ground surfaces object
+        int GroundSurfsPtr;      // pointer to multiple ground surfaces object
 
         // Default Constructor
-        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0), GroundSurfsNum(0)
+        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0), GroundSurfsPtr(0)
         {
         }
     };
@@ -1414,6 +1414,7 @@ struct SurfacesData : BaseGlobalStruct
     int TotSurfIncSolSSG = 0;      // Total number of scheduled surface gains for incident solar radiation on surface
     int TotFenLayAbsSSG = 0;       // Total number of scheduled surface gains for absorbed solar radiation in window layers
     int TotSurfLocalEnv = 0;       // Total number of surface level outdoor air node.
+    int TotSurfPropGndSurfs = 0;   // Total number of surface property ground surfaces object
     int Corner = 0;                // Which corner is specified as the first vertex
     int MaxVerticesPerSurface = 4; // Maximum number of vertices allowed for a single surface (default -- can go higher)
     int BuildingShadingCount = 0;  // Total number of Building External Shades
@@ -1542,7 +1543,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
     Array1D<bool> UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
     Array1D<bool> UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
-                  
+
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
     Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
@@ -1806,7 +1807,6 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::IntMassObject> IntMassObjects;
     EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
 
-
     int actualMaxSlatAngs = DataSurfaces::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
 
     void clear_state() override
@@ -1823,6 +1823,7 @@ struct SurfacesData : BaseGlobalStruct
         this->TotSurfIncSolSSG = 0;
         this->TotFenLayAbsSSG = 0;
         this->TotSurfLocalEnv = 0;
+        this->TotSurfPropGndSurfs = 0;
         this->Corner = 0;
         this->MaxVerticesPerSurface = 4;
         this->BuildingShadingCount = 0;
@@ -1951,7 +1952,6 @@ struct SurfacesData : BaseGlobalStruct
         this->GroundSurfsPropertyNum.deallocate();
         this->UseSurfPropertyGndSurfTemp.deallocate();
         this->UseSurfPropertyGndSurfRefl.deallocate();
-
 
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();

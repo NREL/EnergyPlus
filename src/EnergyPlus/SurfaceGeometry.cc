@@ -8103,8 +8103,7 @@ namespace SurfaceGeometry {
 
                 // get ground surfaces object number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    int GndSurfsNum =
-                        UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataSurface->GroundSurfsProperty);
+                    int GndSurfsNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataSurface->GroundSurfsProperty);
                     if (GndSurfsNum == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -8114,10 +8113,9 @@ namespace SurfaceGeometry {
                                               "\" no corresponding ground surfaces properties has been found in the input file.");
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum = GndSurfsNum;
+                        state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsPtr = GndSurfsNum;
                     }
                 }
-
             }
         }
         // Link surface properties to surface object
@@ -8136,11 +8134,11 @@ namespace SurfaceGeometry {
                         state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
                         state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr;
                     }
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum != 0) {
+                    if (state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsPtr != 0) {
                         state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfLoop) = true;
                         state.dataSurface->UseSurfPropertyGndSurfTemp(SurfLoop) = true;
                         state.dataSurface->UseSurfPropertyGndSurfRefl(SurfLoop) = true;
-                        state.dataSurface->GroundSurfsPropertyNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsNum;
+                        state.dataSurface->GroundSurfsPropertyNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsPtr;
                     }
                 }
             }
@@ -8252,128 +8250,72 @@ namespace SurfaceGeometry {
         }
     }
 
-    void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
+    void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound)
     {
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // load input data for ground surfaces properties used with a building exterior surfaces
-
-        // Using/Aliasing
-        using namespace DataErrorTracking;
-        using ScheduleManager::GetScheduleIndex;
-
-        // subroutine parameter definition:
-        static constexpr std::string_view RoutineName("GetSurfaceGroundSurfsData: ");
-
-        // local variables:
-        int NumAlpha;
-        int NumNumeric;
-        int IOStat;
-        int NumGndSurfsObj;
-
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
-        NumGndSurfsObj = 0;
+        std::string cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
+        state.dataSurface->TotSurfPropGndSurfs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             return;
         } else {
-            int Loop = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                ++Loop;
-                ++NumGndSurfsObj;
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         Loop,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlpha,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumeric,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
-                GroundSurfacesProperty thisGndSurfsProp;
-                thisGndSurfsProp.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                int numGndSurfs;
+                GroundSurfacesProperty thisGndSurfsObj;
+                thisGndSurfsObj.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 auto groundSurfaces = fields.find("ground_surfaces");
                 if (groundSurfaces != fields.end()) {
                     auto groundSurfacesArray = groundSurfaces.value();
-                    numGndSurfs = groundSurfacesArray.size();
-                    thisGndSurfsProp.NumGndSurfs = numGndSurfs;
-                    int surfNum = -1;
+                    thisGndSurfsObj.NumGndSurfs = groundSurfacesArray.size();
                     for (auto groundSurface : groundSurfacesArray) {
-                        surfNum += 1;
-                        GroundSurfacesData thisgndSurface;
+                        GroundSurfacesData thisGndSurf;
                         auto GndSurfName = groundSurface.find("ground_surface_name");
                         if (GndSurfName != groundSurface.end()) {
                             auto ground_surf_name = groundSurface.at("ground_surface_name").get<std::string>();
                             if (!ground_surf_name.empty()) {
-                                std::string name = EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_name);
-                                thisgndSurface.Name = name;
+                                thisGndSurf.Name = EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_name);
                             }
                         }
                         auto groundSurfViewFactor = groundSurface.find("ground_surface_view_factor");
                         if (groundSurfViewFactor != groundSurface.end()) {
-                            Real64 ground_surf_viewfactor = groundSurface.at("ground_surface_view_factor").get<Real64>();
-                            thisgndSurface.ViewFactor = ground_surf_viewfactor;
-                        } else {
-                            if (surfNum == 0) {
-                                ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cNumericFieldNames(1) + ".");
-                                ShowContinueError(state, "At lease one ground surface view factor should be specified.");
-                            }
+                            thisGndSurf.ViewFactor = groundSurface.at("ground_surface_view_factor").get<Real64>();
                         }
                         auto TempSchName = groundSurface.find("ground_surface_temperature_schedule_name");
                         if (TempSchName != groundSurface.end()) {
-                            auto ground_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
-                            if (!ground_surf_TempSchName.empty()) {
-                                int TempSchIndex = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_TempSchName));
-                                thisgndSurface.TempSchPtr = TempSchIndex;
-                            } else {
-                                if (surfNum == 0) {
-                                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + ".");
-                                    ShowContinueError(state, "Ground surface temperature schedule is not specified.");
-                                    ShowContinueError(state, "Simulation continues with surface outside face outdoor air drybulb temperature.");
-                                }
+                            auto gnd_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
+                            if (!gnd_surf_TempSchName.empty()) {
+                                thisGndSurf.TempSchPtr =
+                                    ScheduleManager::GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(gnd_surf_TempSchName));
                             }
                         }
                         auto ReflSchName = groundSurface.find("ground_surface_reflectance_schedule_name");
                         if (ReflSchName != groundSurface.end()) {
-                            auto ground_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
-                            if (!ground_surf_ReflSchName.empty()) {
-                                int ReflSchIndex = GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_ReflSchName));
-                                thisgndSurface.ReflSchPtr = ReflSchIndex;
-                            } else {
-                                if (surfNum == 0) {
-                                    ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + ".");
-                                    ShowContinueError(state, "At lease one ground surface reflectance schedule should be specified.");
-                                    ShowContinueError(state, "Simulation continues with global reflectance value of 0.2.");
-                                }
+                            auto gnd_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
+                            if (!gnd_surf_ReflSchName.empty()) {
+                                thisGndSurf.ReflSchPtr =
+                                    ScheduleManager::GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(gnd_surf_ReflSchName));
                             }
                         }
-                        thisGndSurfsProp.GndSurfs.push_back(thisgndSurface);
+                        thisGndSurfsObj.GndSurfs.push_back(thisGndSurf);
                     }
                 }
-                // calculate ground surfaces view factor sum once for later use
-                for (int gSurfNum = 1; gSurfNum <= thisGndSurfsProp.NumGndSurfs; gSurfNum++) {
-                    thisGndSurfsProp.SurfsViewFactorSum += thisGndSurfsProp.GndSurfs(gSurfNum).ViewFactor;
+                for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
+                    thisGndSurfsObj.SurfsViewFactorSum += thisGndSurfsObj.GndSurfs(gSurfNum).ViewFactor;
                 }
-                if (thisGndSurfsProp.SurfsViewFactorSum == 0.0) {
-                    ShowWarningError(state, cCurrentModuleObject + "=\"" + "sum of ground surfaces view factor is zero.");
-                    ShowContinueError(state, "At least one ground surface view factor should be specified.");
+                if (thisGndSurfsObj.SurfsViewFactorSum == 0.0) {
+                    ShowWarningError(state, format(cCurrentModuleObject, ": get inputs error for ground surface named : ", thisGndSurfsObj.Name));
+                    ShowContinueError(state, format("Ground surfaces view factor sum is zero."));
+                    ShowContinueError(state, format("At least one ground surface view factor should be specified."));
                 }
-                state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsProp);
+                state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsObj);
             }
         }
         // set report variables
-        if (NumGndSurfsObj > 0) {
-            for (int Loop = 1; Loop <= NumGndSurfsObj; Loop++) {
+        if (state.dataSurface->TotSurfPropGndSurfs > 0) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotSurfPropGndSurfs; Loop++) {
                 SetupOutputVariable(state,
                                     "Surfaces Property Ground Surfaces Average Temperature",
                                     OutputProcessor::Unit::C,
