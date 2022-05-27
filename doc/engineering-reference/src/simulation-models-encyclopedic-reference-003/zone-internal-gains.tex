@@ -23,7 +23,7 @@ where:
 
 \(MassFlowRA\) is the mass flow rate at the return node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 When both node names of return air and exhaust air are entered in the Lights object, the return heat is shared by both nodes. Both nodes will have the same temperature due to added return heat:
 
@@ -41,7 +41,7 @@ where:
 
 \(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 Although a single Lights object allows a return node and an exhaust node, it is possible to have multiple Lights objects with different return nodes and referrred to the same exhaust node. Therefore, the exhaust node will share return heat from different return nodes. The temperature rise at i-th return node is given below:
 
@@ -57,7 +57,7 @@ TempRetRise_i = \frac{QRetAir_i} {(MassFlowRA_i + MassFlowEx ) * CpAir}
 
 \(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 The temperature arise at the exhaust node is a sum of all return node temperature rise:
 
@@ -75,7 +75,7 @@ where:
 
 \(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 \(n\) is the number of Lights objects with the same exhaust node
 

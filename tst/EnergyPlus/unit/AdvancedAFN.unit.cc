@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -61,7 +61,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::AirflowNetworkBalanceManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace CurveManager;
 
@@ -77,32 +76,28 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     int CurveNum;
 
     AirflowNetworkNumOfOccuVentCtrls = 1;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl.allocate(AirflowNetworkNumOfOccuVentCtrls);
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).MinOpeningTime = 4;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).MinClosingTime = 4;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).MinTimeControlOnly = true;
+    state->afn->OccupantVentilationControl.allocate(AirflowNetworkNumOfOccuVentCtrls);
+    state->afn->OccupantVentilationControl(1).MinOpeningTime = 4;
+    state->afn->OccupantVentilationControl(1).MinClosingTime = 4;
+    state->afn->OccupantVentilationControl(1).MinTimeControlOnly = true;
 
     TimeOpenElapsed = 3.0;
     TimeCloseElapsed = 0.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenStatus);
 
     TimeOpenElapsed = 5.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenStatus);
 
     TimeOpenElapsed = 0.0;
     TimeCloseElapsed = 3.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenStatus);
 
     TimeOpenElapsed = 0.0;
     TimeCloseElapsed = 5.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenStatus);
 
     state->dataEnvrn->OutDryBulbTemp = 15.0;
@@ -114,10 +109,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
 
     TimeOpenElapsed = 5.0;
     TimeCloseElapsed = 0.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).MinTimeControlOnly = false;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).ComfortBouPoint = 10.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).ComfortLowTempCurveNum = 1;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).ComfortHighTempCurveNum = 2;
+    state->afn->OccupantVentilationControl(1).MinTimeControlOnly = false;
+    state->afn->OccupantVentilationControl(1).ComfortBouPoint = 10.0;
+    state->afn->OccupantVentilationControl(1).ComfortLowTempCurveNum = 1;
+    state->afn->OccupantVentilationControl(1).ComfortHighTempCurveNum = 2;
 
     state->dataCurveManager->NumCurves = 2;
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
@@ -152,15 +147,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
 
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenProbStatus);
     EXPECT_EQ(1, CloseProbStatus);
 
     state->dataHeatBalFanSys->MAT(1) = 26.0;
     state->dataHeatBal->ZoneMRT(1) = 26.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
@@ -173,16 +166,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
 
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 28.0;
-    state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
-        *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 }
