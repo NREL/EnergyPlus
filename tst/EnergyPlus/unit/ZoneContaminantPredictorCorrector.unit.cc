@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -215,7 +215,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
+    state->afn->SimulateAirflowNetwork = 0;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
@@ -368,7 +368,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataHeatBalFanSys->MDotOA.allocate(1);
     state->dataHeatBalFanSys->MDotOA(1) = 0.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
+    state->afn->SimulateAirflowNetwork = 0;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
@@ -555,7 +555,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
+    state->afn->SimulateAirflowNetwork = 0;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
@@ -762,7 +762,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
+    state->afn->SimulateAirflowNetwork = 0;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 

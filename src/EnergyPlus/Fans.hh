@@ -68,8 +68,13 @@ namespace Fans {
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
 
-    constexpr int ExhaustFanCoupledToAvailManagers = 150;
-    constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+    enum class AvailabilityManagerCoupling
+    {
+        Invalid = -1,
+        Coupled,
+        Decoupled,
+        Num
+    };
 
     struct FanEquipConditions
     {
@@ -172,10 +177,11 @@ namespace Fans {
         Real64 VFDInputPower;                           // VFD input power for fan being Simulated [W]
         [[maybe_unused]] Real64 MaxFanPowerEncountered; // Maximum VFD input power encountered [W]
         // zone exhaust fan
-        int FlowFractSchedNum;     // schedule index flow rate modifier schedule
-        int AvailManagerMode;      // mode for how exhaust fan should react to availability managers
-        int MinTempLimitSchedNum;  // schedule index minimum temperature limit
-        int BalancedFractSchedNum; // schedule index portion recirculated
+        int FlowFractSchedNum; // schedule index flow rate modifier schedule
+        AvailabilityManagerCoupling AvailManagerMode =
+            AvailabilityManagerCoupling::Invalid; // mode for how exhaust fan should react to availability managers
+        int MinTempLimitSchedNum;                 // schedule index minimum temperature limit
+        int BalancedFractSchedNum;                // schedule index portion recirculated
         Real64 UnbalancedOutletMassFlowRate;
         Real64 BalancedOutletMassFlowRate;
         int AirLoopNum;        // Airloop number
@@ -199,8 +205,8 @@ namespace Fans {
               PLBeltEffReg1CurveIndex(0), PLBeltEffReg2CurveIndex(0), PLBeltEffReg3CurveIndex(0), MotorMaxEffCurveIndex(0), PLMotorEffCurveIndex(0),
               VFDEffCurveIndex(0), DeltaPressTot(0.0), FanAirPower(0.0), FanSpd(0.0), FanTrq(0.0), FanWheelEff(0.0), FanShaftPower(0.0),
               BeltMaxEff(0.0), BeltEff(0.0), BeltInputPower(0.0), MotorMaxEff(0.0), MotorInputPower(0.0), VFDEff(0.0), VFDInputPower(0.0),
-              MaxFanPowerEncountered(0.0), FlowFractSchedNum(0), AvailManagerMode(0), MinTempLimitSchedNum(0), BalancedFractSchedNum(0),
-              UnbalancedOutletMassFlowRate(0.0), BalancedOutletMassFlowRate(0.0), AirLoopNum(0), DesignPointFEI(0.0)
+              MaxFanPowerEncountered(0.0), FlowFractSchedNum(0), MinTempLimitSchedNum(0), BalancedFractSchedNum(0), UnbalancedOutletMassFlowRate(0.0),
+              BalancedOutletMassFlowRate(0.0), AirLoopNum(0), DesignPointFEI(0.0)
         {
         }
     };
@@ -229,7 +235,7 @@ namespace Fans {
     };
 
     void SimulateFanComponents(EnergyPlusData &state,
-                               std::string_view const CompName,
+                               std::string_view CompName,
                                bool FirstHVACIteration,
                                int &CompIndex,
                                Optional<Real64 const> SpeedRatio = _,
@@ -261,18 +267,18 @@ namespace Fans {
 
     void ReportFan(EnergyPlusData &state, int FanNum);
 
-    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view const ThisObjectType = {});
+    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view ThisObjectType = {});
 
     void GetFanVolFlow(EnergyPlusData &state, int FanIndex, Real64 &FanVolFlow);
 
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
     void GetFanType(EnergyPlusData &state,
-                    std::string const &FanName,                 // Fan name
-                    int &FanType,                               // returned fantype number
-                    bool &ErrorsFound,                          // error indicator
-                    std::string_view const ThisObjectType = {}, // parent object type (for error message)
-                    std::string_view const ThisObjectName = {}  // parent object name (for error message)
+                    std::string const &FanName,           // Fan name
+                    int &FanType,                         // returned fantype number
+                    bool &ErrorsFound,                    // error indicator
+                    std::string_view ThisObjectType = {}, // parent object type (for error message)
+                    std::string_view ThisObjectName = {}  // parent object name (for error message)
     );
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
@@ -371,21 +377,7 @@ struct FansData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumFans = 0;
-        this->NumNightVentPerf = 0;
-        this->GetFanInputFlag = true;
-        this->LocalTurnFansOn = false;
-        this->LocalTurnFansOff = false;
-        this->MyOneTimeFlag = true;
-        this->ZoneEquipmentListChecked = false;
-        this->MySizeFlag.deallocate();
-        this->MyEnvrnFlag.deallocate();
-        this->CheckEquipName.deallocate();
-        this->Fan.deallocate();
-        this->UniqueFanNames.clear();
-        this->NightVentPerf.deallocate();
-        this->FanNumericFields.deallocate();
-        this->ErrCount = 0;
+        *this = FansData();
     }
 };
 

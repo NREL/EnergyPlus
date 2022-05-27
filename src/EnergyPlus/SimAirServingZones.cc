@@ -57,7 +57,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchInputManager.hh>
@@ -411,8 +411,8 @@ void GetAirPathData(EnergyPlusData &state)
     state.dataAirLoop->AirLoopFlow.allocate(NumPrimaryAirSys);
     state.dataConvergeParams->AirLoopConvergence.allocate(NumPrimaryAirSys);
     state.dataSize->UnitarySysEqSizing.allocate(NumPrimaryAirSys);
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-        state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+    if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+        state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
         state.dataAirLoop->AirLoopAFNInfo.allocate(NumPrimaryAirSys);
     }
 
