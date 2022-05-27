@@ -99,20 +99,18 @@ template <typename T> struct EPVector : private std::vector<T>
 
     void allocate(std::size_t size)
     {
-        m_allocated = true;
         this->resize(size);
         std::fill(begin(), end(), T{});
     }
 
     void deallocate() noexcept
     {
-        m_allocated = false;
         this->clear();
     }
 
     [[nodiscard]] bool allocated() const noexcept
     {
-        return m_allocated || !this->empty();
+        return !this->empty();
     }
 
     // operator= used for initialization of the vector
@@ -134,8 +132,6 @@ template <typename T> struct EPVector : private std::vector<T>
         return static_cast<int>(this->size());
     }
 
-private:
-    bool m_allocated{false};
 };
 
 template <> struct EPVector<bool> : private std::vector<std::uint8_t>
@@ -192,19 +188,17 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
 
     [[nodiscard]] bool allocated() const noexcept
     {
-        return m_allocated || !this->empty();
+        return !this->empty();
     }
 
     void allocate(std::size_t size)
     {
-        m_allocated = true;
         this->resize(size);
         std::fill(begin(), end(), false);
     }
 
     void deallocate() noexcept
     {
-        m_allocated = false;
         this->clear();
     }
 
@@ -227,8 +221,6 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
         return static_cast<int>(this->size());
     }
 
-private:
-    bool m_allocated{false};
 };
 
 template <typename T>[[nodiscard]] bool allocated(EPVector<T> const &v) noexcept
@@ -328,18 +320,6 @@ template <typename T>[[nodiscard]] T maxval(EPVector<T> const &a)
         return std::numeric_limits<T>::lowest();
     }
     return *max;
-}
-
-template <typename T> void clear_and_resize(EPVector<T> &a, size_t size)
-{
-    a.clear();
-    a.resize(size);
-}
-
-template <typename T> void clear_and_resize(EPVector<T> &a, size_t size, const T &v)
-{
-    a.clear();
-    a.resize(size, v);
 }
 
 } // namespace EnergyPlus
