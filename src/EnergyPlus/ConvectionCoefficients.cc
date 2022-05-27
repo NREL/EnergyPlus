@@ -4365,11 +4365,16 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             // treat as part of roof group
             RoofGeo.Area += thisArea;
 
+            // I take the double by reference to avoid adding a rounding error on top of a rounding error (the centroid is calculated...)
+            auto lesserThanWithTol = [](const auto &lhs, const auto &rhs) { return lhs - rhs <= 0.000001; };
+            auto greaterThanWithTol = [](const auto &lhs, const auto &rhs) { return lhs - rhs >= -0.000001; };
+
             for (VertLoop = 1; VertLoop <= Surface(SurfLoop).Sides; ++VertLoop) {
 
                 auto &vertex = Surface(SurfLoop).Vertex(VertLoop);
                 // 1 low x, low y, low z
-                if ((vertex.x <= RoofGeo.XdYdZd.Vertex.x) && (vertex.y <= RoofGeo.XdYdZd.Vertex.y) && (vertex.z <= RoofGeo.XdYdZd.Vertex.z)) {
+                if (lesserThanWithTol(vertex.x, RoofGeo.XdYdZd.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XdYdZd.Vertex.y) &&
+                    lesserThanWithTol(vertex.z, RoofGeo.XdYdZd.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XdYdZd.SurfNum = SurfLoop;
                     RoofGeo.XdYdZd.VertNum = VertLoop;
@@ -4378,7 +4383,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 }
 
                 // 2 low x, low y, hi z
-                if ((vertex.x <= RoofGeo.XdYdZu.Vertex.x) && (vertex.y <= RoofGeo.XdYdZu.Vertex.y) && (vertex.z >= RoofGeo.XdYdZu.Vertex.z)) {
+                if (lesserThanWithTol(vertex.x, RoofGeo.XdYdZu.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XdYdZu.Vertex.y) &&
+                    greaterThanWithTol(vertex.z, RoofGeo.XdYdZu.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XdYdZu.SurfNum = SurfLoop;
                     RoofGeo.XdYdZu.VertNum = VertLoop;
@@ -4387,7 +4393,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 }
 
                 // 3 low x, hi y, low z
-                if ((vertex.x <= RoofGeo.XdYuZd.Vertex.x) && (vertex.y >= RoofGeo.XdYuZd.Vertex.y) && (vertex.z <= RoofGeo.XdYuZd.Vertex.z)) {
+                if (lesserThanWithTol(vertex.x, RoofGeo.XdYuZd.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XdYuZd.Vertex.y) &&
+                    lesserThanWithTol(vertex.z, RoofGeo.XdYuZd.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XdYuZd.SurfNum = SurfLoop;
                     RoofGeo.XdYuZd.VertNum = VertLoop;
@@ -4396,7 +4403,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 }
 
                 // 4 low x, hi y, hi z
-                if ((vertex.x <= RoofGeo.XdYuZu.Vertex.x) && (vertex.y >= RoofGeo.XdYuZu.Vertex.y) && (vertex.z >= RoofGeo.XdYuZu.Vertex.z)) {
+                if (lesserThanWithTol(vertex.x, RoofGeo.XdYuZu.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XdYuZu.Vertex.y) &&
+                    greaterThanWithTol(vertex.z, RoofGeo.XdYuZu.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XdYuZu.SurfNum = SurfLoop;
                     RoofGeo.XdYuZu.VertNum = VertLoop;
@@ -4405,7 +4413,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 }
 
                 // 5 hi x, low y, low z
-                if ((vertex.x >= RoofGeo.XuYdZd.Vertex.x) && (vertex.y <= RoofGeo.XuYdZd.Vertex.y) && (vertex.z <= RoofGeo.XuYdZd.Vertex.z)) {
+                if (greaterThanWithTol(vertex.x, RoofGeo.XuYdZd.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XuYdZd.Vertex.y) &&
+                    lesserThanWithTol(vertex.z, RoofGeo.XuYdZd.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XuYdZd.SurfNum = SurfLoop;
                     RoofGeo.XuYdZd.VertNum = VertLoop;
@@ -4414,7 +4423,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 }
 
                 // 6 hi x, hi y, low z
-                if ((vertex.x >= RoofGeo.XuYuZd.Vertex.x) && (vertex.y >= RoofGeo.XuYuZd.Vertex.y) && (vertex.z <= RoofGeo.XuYuZd.Vertex.z)) {
+                if (greaterThanWithTol(vertex.x, RoofGeo.XuYuZd.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XuYuZd.Vertex.y) &&
+                    lesserThanWithTol(vertex.z, RoofGeo.XuYuZd.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XuYuZd.SurfNum = SurfLoop;
                     RoofGeo.XuYuZd.VertNum = VertLoop;
@@ -4423,7 +4433,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 }
 
                 // 7 hi x, low y, hi z
-                if ((vertex.x >= RoofGeo.XuYdZu.Vertex.x) && (vertex.y <= RoofGeo.XuYdZu.Vertex.y) && (vertex.z >= RoofGeo.XuYdZu.Vertex.z)) {
+                if (greaterThanWithTol(vertex.x, RoofGeo.XuYdZu.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XuYdZu.Vertex.y) &&
+                    greaterThanWithTol(vertex.z, RoofGeo.XuYdZu.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XuYdZu.SurfNum = SurfLoop;
                     RoofGeo.XuYdZu.VertNum = VertLoop;
@@ -4432,7 +4443,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 }
 
                 // 8 hi x, hi y, hi z
-                if ((vertex.x >= RoofGeo.XuYuZu.Vertex.x) && (vertex.y >= RoofGeo.XuYuZu.Vertex.y) && (vertex.z >= RoofGeo.XuYuZu.Vertex.z)) {
+                if (greaterThanWithTol(vertex.x, RoofGeo.XuYuZu.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XuYuZu.Vertex.y) &&
+                    greaterThanWithTol(vertex.z, RoofGeo.XuYuZu.Vertex.z)) {
                     // this point is more toward this bound
                     RoofGeo.XuYuZu.SurfNum = SurfLoop;
                     RoofGeo.XuYuZu.VertNum = VertLoop;
