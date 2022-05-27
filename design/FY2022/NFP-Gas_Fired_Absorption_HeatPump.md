@@ -6,6 +6,7 @@ Equation-Fit Based Gas Fired Absorption Heat Pump (GAHP) Module
  - Original Date: April 22, 2022
  - Revised: April 29, 2022
  - Revised: May 20, 2022
+ - Revised: May 27, 2022
 
 
 ## Justification for New Feature ##
@@ -553,6 +554,8 @@ The fundamental methods and equations used for the model, as well as the origina
 ### New data struct ###
 A new data struct `EIRFuelFiredHeatPump` will be created, which is derived (and inherited) from the existing data struct named `EIRPlantLoopHeatPump`. This will allow the code to use a similar calling structure to simulate the equipment and seamlessly plug into the upper level plant loop simulations. 
 
+Two new plant loop equipment type named `HeatPumpFuelFiredHeating` and `HeatPumpFuelFiredCooling` will also be created as the new plant loop category names for the HeatPump:AirToWater:FuelFired:Heating/Cooling objects.
+
 Following new member variables to the child `EIRFuelFiredHeatPump` struct to accommodate the additional input field, output variables, and intermediate variables need for the newly added HeatPump:AirToWater:FuelFired:Heating/Cooling object:
 ```
         // New additions for GAHP only
@@ -607,18 +610,20 @@ This function will be revised in the new child struct to process the input field
 
 This function will be revised in the new child struct to size the GAHP equipment, such as the nominal heat capacity and design flow rate.
 
-### static void pairUpCompanionCoils() ###
+#### pairUpCompanionCoils() ####
 This function will be revised in the new child struct to accommodate the cooling/heating pairing relationship the GAHP. 
 
-### doPhysics() ###
+#### doPhysics() ####
 This function will be revised in the new child struct to model the GAHP. Compared to the parent version, the energy flows associated with fuel other than electricity will also be calculated, as well as the additional operation features needed to the fuel-fired heat pump. 
 
-### oneTimeInit() ###
+#### oneTimeInit() ####
 This function will be revised in the new child struct to accommodate the output variables for the GAHP. Compared to the parent version, the energy flows associated with fuel will also be processed and reported here. 
 
-### resetReportingVariables() ###
+#### resetReportingVariables() ####
 This function will be revised in the new child struct to reset reporting variables, especially the energy values for a new timestep. For the GAHP, fuel energy related variables needs to be added to this overridden function. 
 
+#### Others function(s) ####
+Any other functions that inovles a special treatment for the new fuel-fired heat pump would need to be overridden from the parent heat pump struct.
 ## Reference ##
 
 [1] Fridlyand, Alex; Glanville, Paul; and Garrabrant, Michael, 2021. "Pathways to Decarbonization of Residential Heating," International High Performance Buildings Conference. Paper 354. https://docs.lib.purdue.edu/ihpbc/354).
