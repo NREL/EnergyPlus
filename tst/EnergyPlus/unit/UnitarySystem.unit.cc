@@ -7907,6 +7907,59 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(9), thisSys->m_HeatVolumeFlowRate[9]);
     EXPECT_NEAR(thisSys->m_HeatVolumeFlowRate[10], 0.085245, 0.000001);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(10), thisSys->m_HeatVolumeFlowRate[10]);
+
+    // test fan speed ratio variables
+    // expect speed ratio variables to be not yet set since fan is autosized
+    EXPECT_EQ(thisSys->m_ActualFanVolFlowRate, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_HeatingFanSpeedRatio, 0.0);
+    EXPECT_EQ(thisSys->m_CoolingFanSpeedRatio, 0.0);
+    EXPECT_EQ(thisSys->m_NoHeatCoolSpeedRatio, 0.0);
+
+    thisSys->m_MySizingCheckFlag = false; // don't call sizing again
+    int ZoneOAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    thisSys->initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+
+    // expect speed ratio variables to still not be set since fan has not been sized (Init does not call fan model)
+    EXPECT_EQ(thisSys->m_ActualFanVolFlowRate, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_HeatingFanSpeedRatio, 0.0);
+    EXPECT_EQ(thisSys->m_CoolingFanSpeedRatio, 0.0);
+    EXPECT_EQ(thisSys->m_NoHeatCoolSpeedRatio, 0.0);
+    EXPECT_TRUE(thisSys->m_MyFanFlag); // fan speed variables still need to be set
+
+    // multispeed coil speed ratios are initially set based on DesignFanVolFlowRate
+    EXPECT_NEAR(thisSys->m_MSCoolingSpeedRatio[1], thisSys->m_CoolVolumeFlowRate[1] / thisSys->m_DesignFanVolFlowRate, 0.001);
+    EXPECT_NEAR(thisSys->m_MSCoolingSpeedRatio[2], thisSys->m_CoolVolumeFlowRate[2] / thisSys->m_DesignFanVolFlowRate, 0.001);
+    EXPECT_NEAR(thisSys->m_MSCoolingSpeedRatio[3], thisSys->m_CoolVolumeFlowRate[3] / thisSys->m_DesignFanVolFlowRate, 0.001);
+
+    thisSys->m_ActualFanVolFlowRate = thisSys->m_MaxHeatAirVolFlow; // set fan flow, act as if fan has been sized
+
+    thisSys->initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
+
+    // expect fan to be sized and speed ratio variables set
+    EXPECT_NE(thisSys->m_ActualFanVolFlowRate, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_HeatingFanSpeedRatio, 1.0);
+    EXPECT_EQ(thisSys->m_CoolingFanSpeedRatio, 1.0);
+    EXPECT_EQ(thisSys->m_NoHeatCoolSpeedRatio, 1.0);
+
+    // multispeed coil speed ratios now match design spec object
+    EXPECT_NEAR(thisSys->m_MSCoolingSpeedRatio[1], 0.3333, 0.0001);
+    EXPECT_NEAR(thisSys->m_MSCoolingSpeedRatio[2], 0.6667, 0.0001);
+    EXPECT_EQ(thisSys->m_MSCoolingSpeedRatio[3], 1.0);
+    EXPECT_EQ(thisSys->m_MSCoolingSpeedRatio[1], state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[0]);
+    EXPECT_EQ(thisSys->m_MSCoolingSpeedRatio[2], state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[1]);
+    EXPECT_EQ(thisSys->m_MSCoolingSpeedRatio[3], state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[2]);
+    // and equally distributed because design spec ratios were autosized, speeds = 3
+    EXPECT_NEAR(1.0 / 3, thisSys->m_MSCoolingSpeedRatio[1] / thisSys->m_MSCoolingSpeedRatio[3], 0.00001);
+
+    // speed ratios are proportional to heating flow with respect to fan flow
+    EXPECT_EQ(thisSys->m_MSHeatingSpeedRatio[1], thisSys->m_HeatVolumeFlowRate[1] / thisSys->m_ActualFanVolFlowRate);
+    EXPECT_EQ(thisSys->m_MSHeatingSpeedRatio[5], thisSys->m_HeatVolumeFlowRate[5] / thisSys->m_ActualFanVolFlowRate);
+    EXPECT_EQ(thisSys->m_MSHeatingSpeedRatio[10], thisSys->m_HeatVolumeFlowRate[10] / thisSys->m_ActualFanVolFlowRate);
+    // and equally distributed because design spec ratios were autosized, speeds = 10
+    EXPECT_NEAR(1.0 / 10, thisSys->m_MSHeatingSpeedRatio[1] / thisSys->m_MSHeatingSpeedRatio[10], 0.00001);
+
+    EXPECT_FALSE(thisSys->m_MyFanFlag); // fan speed variables have been set
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
