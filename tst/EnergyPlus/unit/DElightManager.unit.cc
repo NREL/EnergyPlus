@@ -353,7 +353,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    EXPECT_EQ(1, state->dataDaylightingData->TotDElightCFS);
+    EXPECT_EQ(1, (int)state->dataDaylightingData->DElightComplexFene.size());
 
     EXPECT_EQ("TEST CFS", state->dataDaylightingData->DElightComplexFene(1).Name);
     EXPECT_EQ("BTDF^GEN^LIGHTSHELF^1.0^20.0", state->dataDaylightingData->DElightComplexFene(1).ComplexFeneType);

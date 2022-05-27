@@ -413,7 +413,7 @@ namespace HVACSingleDuctInduc {
                         "Air Nodes");
 
             AirNodeFound = false;
-            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+            for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum = ADUNum;
                 }

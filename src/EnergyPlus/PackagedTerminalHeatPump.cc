@@ -6102,41 +6102,45 @@ void ControlPTUnitOutput(EnergyPlusData &state,
 
             // If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
             SupHeaterLoad = 0.0;
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                  FirstHVACIteration,
-                                                  SupHeaterLoad,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateWaterCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                                                PartLoadFrac);
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateSteamCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad);
-                }
+            switch (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                              FirstHVACIteration,
+                                              SupHeaterLoad,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex);
+            } break;
+            case Coil_HeatingWater: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateWaterCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                                            PartLoadFrac);
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateSteamCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad);
+            } break;
+            default:
+                break;
             }
 
             //     If the outlet temperature is below the maximum supplemental heater supply air temperature, reduce the load passed to
@@ -6548,65 +6552,128 @@ void CalcPTUnit(EnergyPlusData &state,
     }
     if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
         if (SupHeaterLoad < SmallLoad) {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                  FirstHVACIteration,
-                                                  SupHeaterLoad,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                  QActual,
-                                                  True,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateWaterCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateSteamCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                QActual,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                }
+            switch (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                              FirstHVACIteration,
+                                              SupHeaterLoad,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                              QActual,
+                                              True,
+                                              state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            case Coil_HeatingWater: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateWaterCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateSteamCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            QActual,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            default:
+                break;
             }
         } else {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                  FirstHVACIteration,
-                                                  SupHeaterLoad,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                  QActual,
-                                                  True,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
+            switch (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                              FirstHVACIteration,
+                                              SupHeaterLoad,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                              QActual,
+                                              True,
+                                              state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            case Coil_HeatingWater: {
+                MaxHotWaterFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
+                SetComponentFlowRate(state,
+                                     MaxHotWaterFlow,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                QActual = SupHeaterLoad;
+                // simulate the hot water supplemental heating coil
+                SimulateWaterCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            QActual,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+                if (QActual > (SupHeaterLoad + SmallLoad)) {
+                    // control water flow to obtain output matching SupHeaterLoad
+                    SolFlag = 0;
+                    MinWaterFlow = 0.0;
+                    CalcPTUnitPar(1) = double(PTUnitNum);
+                    if (FirstHVACIteration) {
+                        CalcPTUnitPar(2) = 1.0;
+                    } else {
+                        CalcPTUnitPar(2) = 0.0;
+                    }
+                    CalcPTUnitPar(3) = SupHeaterLoad;
                     MaxHotWaterFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                    SetComponentFlowRate(state,
-                                         MaxHotWaterFlow,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                    SolveRoot(
+                        state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, CalcPTUnitPar);
+                    if (SolFlag == -1) {
+                        if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex == 0) {
+                            ShowWarningMessage(state,
+                                               "CalcPTUnit: Hot water coil control failed for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" +
+                                                   state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
+                        }
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       format("CalcPTUnit: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                                              SolveMaxIter,
+                                                              state.dataPTHP->PTUnit(PTUnitNum).UnitType,
+                                                              state.dataPTHP->PTUnit(PTUnitNum).Name),
+                                                       state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex);
+                    } else if (SolFlag == -2) {
+                        if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
+                            ShowWarningMessage(state,
+                                               "CalcPTUnit: Hot water coil control failed (maximum flow limits) for " +
+                                                   state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
+                                                   "\"");
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state, "...Bad hot water maximum flow rate limits");
+                            ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
+                            ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
+                        }
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "CalcPTUnit: Hot water coil control failed (flow limits) for " +
+                                                           state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" +
+                                                           state.dataPTHP->PTUnit(PTUnitNum).Name + "\"",
+                                                       state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
+                                                       MaxHotWaterFlow,
+                                                       MinWaterFlow,
+                                                       _,
+                                                       "[kg/s]",
+                                                       "[kg/s]");
+                    }
                     QActual = SupHeaterLoad;
                     // simulate the hot water supplemental heating coil
                     SimulateWaterCoilComponents(state,
@@ -6615,90 +6682,27 @@ void CalcPTUnit(EnergyPlusData &state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                 QActual,
                                                 state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                    if (QActual > (SupHeaterLoad + SmallLoad)) {
-                        // control water flow to obtain output matching SupHeaterLoad
-                        SolFlag = 0;
-                        MinWaterFlow = 0.0;
-                        CalcPTUnitPar(1) = double(PTUnitNum);
-                        if (FirstHVACIteration) {
-                            CalcPTUnitPar(2) = 1.0;
-                        } else {
-                            CalcPTUnitPar(2) = 0.0;
-                        }
-                        CalcPTUnitPar(3) = SupHeaterLoad;
-                        MaxHotWaterFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SolveRoot(state,
-                                  ErrTolerance,
-                                  SolveMaxIter,
-                                  SolFlag,
-                                  HotWaterMdot,
-                                  HotWaterCoilResidual,
-                                  MinWaterFlow,
-                                  MaxHotWaterFlow,
-                                  CalcPTUnitPar);
-                        if (SolFlag == -1) {
-                            if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex == 0) {
-                                ShowWarningMessage(state,
-                                                   "CalcPTUnit: Hot water coil control failed for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType +
-                                                       "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state,
-                                                  format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
-                            }
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           format("CalcPTUnit: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
-                                                                  SolveMaxIter,
-                                                                  state.dataPTHP->PTUnit(PTUnitNum).UnitType,
-                                                                  state.dataPTHP->PTUnit(PTUnitNum).Name),
-                                                           state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex);
-                        } else if (SolFlag == -2) {
-                            if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
-                                ShowWarningMessage(state,
-                                                   "CalcPTUnit: Hot water coil control failed (maximum flow limits) for " +
-                                                       state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
-                                                       "\"");
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
-                                ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
-                            }
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           "CalcPTUnit: Hot water coil control failed (flow limits) for " +
-                                                               state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" +
-                                                               state.dataPTHP->PTUnit(PTUnitNum).Name + "\"",
-                                                           state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
-                                                           MaxHotWaterFlow,
-                                                           MinWaterFlow,
-                                                           _,
-                                                           "[kg/s]",
-                                                           "[kg/s]");
-                        }
-                        QActual = SupHeaterLoad;
-                        // simulate the hot water supplemental heating coil
-                        SimulateWaterCoilComponents(state,
-                                                    state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                    FirstHVACIteration,
-                                                    state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    QActual,
-                                                    state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                    }
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-
-                    // simulate the steam supplemental heating coil
-                    SimulateSteamCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                QActual,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode);
                 }
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+
+                // simulate the steam supplemental heating coil
+                SimulateSteamCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            QActual,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            default:
+                break;
             }
         }
     }
@@ -8080,43 +8084,47 @@ void ControlVSHPOutput(EnergyPlusData &state,
 
             // If supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
             SupHeaterLoad = 0.0;
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                  FirstHVACIteration,
-                                                  SupHeaterLoad,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                  _,
-                                                  true);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateWaterCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                                                PartLoadFrac);
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateSteamCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad);
-                }
+            switch (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                              FirstHVACIteration,
+                                              SupHeaterLoad,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                              _,
+                                              true);
+            } break;
+            case Coil_HeatingWater: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateWaterCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                                            PartLoadFrac);
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateSteamCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad);
+            } break;
+            default:
+                break;
             }
 
             //     If the outlet temperature is below the maximum supplemental heater supply air temperature, reduce the load passed to
@@ -8686,65 +8694,137 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
 
     if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
         if (SupHeaterLoad < SmallLoad) {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                  FirstHVACIteration,
-                                                  SupHeaterLoad,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                  QActual,
-                                                  true,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateWaterCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-                    SimulateSteamCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                QActual,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                }
+            switch (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                              FirstHVACIteration,
+                                              SupHeaterLoad,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                              QActual,
+                                              true,
+                                              state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            case Coil_HeatingWater: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateWaterCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = 0.0;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                SimulateSteamCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            QActual,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            default:
+                break;
             }
         } else {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                  FirstHVACIteration,
-                                                  SupHeaterLoad,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                  QActual,
-                                                  true,
-                                                  state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                } else if (SELECT_CASE_var == Coil_HeatingWater) {
+            switch (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num) {
+            case Coil_HeatingGasOrOtherFuel:
+            case Coil_HeatingElectric: {
+                SimulateHeatingCoilComponents(state,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                              FirstHVACIteration,
+                                              SupHeaterLoad,
+                                              state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                              QActual,
+                                              true,
+                                              state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            case Coil_HeatingWater: {
+                MaxHotWaterFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
+                SetComponentFlowRate(state,
+                                     MaxHotWaterFlow,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                QActual = SupHeaterLoad;
+                // simulate the hot water supplemental heating coil
+                SimulateWaterCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            QActual,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+                if (QActual > (SupHeaterLoad + SmallLoad)) {
+                    // control water flow to obtain output matching SupHeaterLoad
+                    SolFlag = 0;
+                    state.dataPTHP->MinWaterFlow = 0.0;
+                    CalcVarSpeedHeatPumpPar(1) = double(PTUnitNum);
+                    if (FirstHVACIteration) {
+                        CalcVarSpeedHeatPumpPar(2) = 1.0;
+                    } else {
+                        CalcVarSpeedHeatPumpPar(2) = 0.0;
+                    }
+                    CalcVarSpeedHeatPumpPar(3) = SupHeaterLoad;
                     MaxHotWaterFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                    SetComponentFlowRate(state,
-                                         MaxHotWaterFlow,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+                    SolveRoot(state,
+                              ErrTolerance,
+                              SolveMaxIter,
+                              SolFlag,
+                              HotWaterMdot,
+                              HotWaterCoilResidual,
+                              state.dataPTHP->MinWaterFlow,
+                              MaxHotWaterFlow,
+                              CalcVarSpeedHeatPumpPar);
+                    if (SolFlag == -1) {
+                        if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex == 0) {
+                            ShowWarningMessage(state,
+                                               "RoutineName//Hot water coil control failed for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType +
+                                                   "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
+                                                   "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
+                        }
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            format("RoutineName//Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                   SolveMaxIter,
+                                   state.dataPTHP->PTUnit(PTUnitNum).UnitType,
+                                   state.dataPTHP->PTUnit(PTUnitNum).Name),
+                            state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                    } else if (SolFlag == -2) {
+                        if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
+                            ShowWarningMessage(state,
+                                               "RoutineName//Hot water coil control failed (maximum flow limits) for " +
+                                                   state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
+                                                   "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state, "...Bad hot water maximum flow rate limits");
+                            ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", state.dataPTHP->MinWaterFlow));
+                            ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
+                        }
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "RoutineName//Hot water coil control failed (flow limits) for " +
+                                                           state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" +
+                                                           state.dataPTHP->PTUnit(PTUnitNum).Name + "\"",
+                                                       state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
+                                                       MaxHotWaterFlow,
+                                                       state.dataPTHP->MinWaterFlow,
+                                                       _,
+                                                       "[kg/s]",
+                                                       "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                    }
                     QActual = SupHeaterLoad;
                     // simulate the hot water supplemental heating coil
                     SimulateWaterCoilComponents(state,
@@ -8753,92 +8833,27 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                 QActual,
                                                 state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                    if (QActual > (SupHeaterLoad + SmallLoad)) {
-                        // control water flow to obtain output matching SupHeaterLoad
-                        SolFlag = 0;
-                        state.dataPTHP->MinWaterFlow = 0.0;
-                        CalcVarSpeedHeatPumpPar(1) = double(PTUnitNum);
-                        if (FirstHVACIteration) {
-                            CalcVarSpeedHeatPumpPar(2) = 1.0;
-                        } else {
-                            CalcVarSpeedHeatPumpPar(2) = 0.0;
-                        }
-                        CalcVarSpeedHeatPumpPar(3) = SupHeaterLoad;
-                        MaxHotWaterFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SolveRoot(state,
-                                  ErrTolerance,
-                                  SolveMaxIter,
-                                  SolFlag,
-                                  HotWaterMdot,
-                                  HotWaterCoilResidual,
-                                  state.dataPTHP->MinWaterFlow,
-                                  MaxHotWaterFlow,
-                                  CalcVarSpeedHeatPumpPar);
-                        if (SolFlag == -1) {
-                            if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex == 0) {
-                                ShowWarningMessage(state,
-                                                   "RoutineName//Hot water coil control failed for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType +
-                                                       "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
-                                                       "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state,
-                                                  format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
-                            }
-                            ShowRecurringWarningErrorAtEnd(
-                                state,
-                                format("RoutineName//Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
-                                       SolveMaxIter,
-                                       state.dataPTHP->PTUnit(PTUnitNum).UnitType,
-                                       state.dataPTHP->PTUnit(PTUnitNum).Name),
-                                state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant RoutineName + "Hot water...
-                        } else if (SolFlag == -2) {
-                            if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
-                                ShowWarningMessage(state,
-                                                   "RoutineName//Hot water coil control failed (maximum flow limits) for " +
-                                                       state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
-                                                       "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", state.dataPTHP->MinWaterFlow));
-                                ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
-                            }
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           "RoutineName//Hot water coil control failed (flow limits) for " +
-                                                               state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" +
-                                                               state.dataPTHP->PTUnit(PTUnitNum).Name + "\"",
-                                                           state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
-                                                           MaxHotWaterFlow,
-                                                           state.dataPTHP->MinWaterFlow,
-                                                           _,
-                                                           "[kg/s]",
-                                                           "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
-                        }
-                        QActual = SupHeaterLoad;
-                        // simulate the hot water supplemental heating coil
-                        SimulateWaterCoilComponents(state,
-                                                    state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                    FirstHVACIteration,
-                                                    state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    QActual,
-                                                    state.dataPTHP->PTUnit(PTUnitNum).OpMode);
-                    }
-                } else if (SELECT_CASE_var == Coil_HeatingSteam) {
-                    mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
-
-                    // simulate the steam supplemental heating coil
-                    SimulateSteamCoilComponents(state,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                SupHeaterLoad,
-                                                QActual,
-                                                state.dataPTHP->PTUnit(PTUnitNum).OpMode);
                 }
+            } break;
+            case Coil_HeatingSteam: {
+                mdot = state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
+
+                // simulate the steam supplemental heating coil
+                SimulateSteamCoilComponents(state,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            SupHeaterLoad,
+                                            QActual,
+                                            state.dataPTHP->PTUnit(PTUnitNum).OpMode);
+            } break;
+            default:
+                break;
             }
         }
     }

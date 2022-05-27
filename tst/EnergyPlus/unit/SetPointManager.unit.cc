@@ -646,8 +646,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum(1) = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum[0] = 1;
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches);
 
