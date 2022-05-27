@@ -226,13 +226,15 @@ namespace HeatingCoils {
             CalcElectricHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
         } break;
         case Coil_HeatingElectric_MultiStage: {
-            CalcMultiStageElectricHeatingCoil(state,
-                                              CoilNum,
-                                              SpeedRatio,
-                                              PartLoadRatio,
-                                              StageNum,
-                                              OpMode,
-                                              QCoilActual2); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
+            CalcMultiStageElectricHeatingCoil(
+                state,
+                CoilNum,
+                SpeedRatio,
+                PartLoadRatio,
+                StageNum,
+                OpMode,
+                QCoilActual2,
+                state.dataHeatingCoils->CoilIsSuppHeater); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
         } break;
         case Coil_HeatingGasOrOtherFuel: {
             CalcFuelHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
@@ -2080,8 +2082,8 @@ namespace HeatingCoils {
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
                                            int const FanOpMode,     // Fan operation mode
-                                           Real64 &QCoilActual      // coil load actually delivered (W)
-    )
+                                           Real64 &QCoilActual,     // coil load actually delivered (W)
+                                           bool const SuppHeat)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2210,6 +2212,11 @@ namespace HeatingCoils {
 
                 // for cycling fan, reset mass flow to full on rate
                 if (FanOpMode == CycFanCycCoil) AirMassFlow /= PartLoadRat;
+                if (FanOpMode == ContFanCycCoil) {
+                    if (!SuppHeat) {
+                        AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+                    }
+                }
 
                 TotCap = heatingCoil.MSNominalCapacity(StageNumLS);
 

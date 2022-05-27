@@ -217,8 +217,8 @@ namespace HeatingCoils {
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
                                            int const FanOpMode,     // Fan operation mode
-                                           Real64 &QCoilActual      // coil load actually delivered (W)
-    );
+                                           Real64 &QCoilActual,     // coil load actually delivered (W)
+                                           bool const SuppHeat);
 
     void CalcFuelHeatingCoil(EnergyPlusData &state,
                              int const CoilNum, // index to heating coil
