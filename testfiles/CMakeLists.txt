@@ -228,6 +228,7 @@ add_simulation_test(IDF_FILE DOAToVRF.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_T
 add_simulation_test(IDF_FILE DOAToWaterToAirHPInlet.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DOAToWaterToAirHPSupply.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DXCoilSystemAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE DXCoilSystemAuto_incidentSolarMultiplier.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DaylightingDeviceShelf.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DaylightingDeviceTubular.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DesiccantCVRh.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

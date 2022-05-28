@@ -1,11 +1,11 @@
-! DXCoilSystemAuto.idf
+! DXCoilSystemAuto_incidentSolarMultiplier.idf
 ! Basic file description:  DX coil systems for both cooling and heating.
 !                          1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.
 !
 ! Highlights:              Example of built up heat pump air conditioner with autosizing.
-!                          This file is similar to HeatPumpAuto.idf but uses lower level description of
-!                          air handler components with setpoint managers instead of load-based unitary controls
+!                          This file is similar to DXCoilSystemAuto.idf but with an added
+!                          SurfaceProperty:IncidentSolarMultiplier
 !
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -954,6 +954,13 @@
     For: Alldays,            !- Field 10
     Until: 24:00,1;          !- Field 11
 
+  SurfaceProperty:IncidentSolarMultiplier,
+    Zn001:Wall001:Win001,     !- Surface Name
+    0.5,                      !- Shading Multiplier
+    SolarMultConst;           !- Shading Multiplier Schedule Name
+
+  Schedule:Constant,SolarMultConst,Fraction,1.0;
+
   People,
     WestPeople,              !- Name
     West Zone,               !- Zone or ZoneList Name
@@ -1789,6 +1796,10 @@
     1.0,                     !- Motor In Airstream Fraction
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+
+  Output:Variable,*,Surface Outside Face Incident Solar Radiation Rate per Area,hourly;
+
+  Output:Variable,*,Surface Window Transmitted Solar Radiation Rate,hourly;
 
   Output:Variable,*,Coil System Part Load Ratio,hourly;
 
