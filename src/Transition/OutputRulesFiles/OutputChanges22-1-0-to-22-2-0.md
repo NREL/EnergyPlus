@@ -14,8 +14,6 @@ This will eventually become a more structured file, but currently it isn't clear
 
 The report `Initialization Summary` which was the only one with a space in its name was renamed to `InitializationSummary`.
 
-Under the report `SourceEnergyEndUseComponentsSummary`, the table `Source Energy End Use Component Per Conditioned Floor Area` was renamed to `Source Energy End Use Components Per Conditioned Floor Area` to match the HTML output and the other Source Energy End Use Component**s** tables.
-
 #### New reports in JSON output
 
 `AnnualHeatEmissionsReport` and `InitializationSummary` reports were **added** to the JSON output.
@@ -44,8 +42,15 @@ Six reports have been renamed to remove spaces:
 +SurfaceShadowingSummary
 ```
 
+#### Renames in both SQLite and JSON
+
 Under the report `SourceEnergyEndUseComponentsSummary`, the table `Source Energy End Use Component Per Conditioned Floor Area` was renamed to `Source Energy End Use Components Per Conditioned Floor Area` to match the HTML output and the other Source Energy End Use Component**s** tables.
 
+The Adaptive Comfort Summary/Report was renamed to match the HTML:
 
-See pull request [#9458](https://github.com/NREL/EnergyPlus/pull/9458) for more details.
+```diff
+-AdaptiveComfortReport,People Summary
++AdaptiveComfortSummary,Time Not Meeting the Adaptive Comfort Models during Occupied Hours
+```
 
+See pull request [#9461](https://github.com/NREL/EnergyPlus/pull/9461) for more details.
