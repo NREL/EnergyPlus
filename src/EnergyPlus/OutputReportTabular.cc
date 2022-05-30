@@ -12445,12 +12445,21 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
 
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                               rowHead,
+                                                                               columnHead,
+                                                                               "AdaptiveComfortSummary",
+                                                                               "Entire Facility",
+                                                                               "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
         }
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
+                tableBody,
+                rowHead,
+                columnHead,
+                "AdaptiveComfortSummary",
+                "Entire Facility",
+                "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
         }
     }
 }
