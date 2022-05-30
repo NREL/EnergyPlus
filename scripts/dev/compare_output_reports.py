@@ -59,8 +59,8 @@
 This script aims to check that the Tabular Reports are the same between the
 HTML, SQL, and JSON outputs.
 
-RefBldgMediumOfficeNew2004_Chicago_JSON_Outputs.idf has all the required
-objects (Output:SQLite, Output:JSON) with AllSummary enabled.
+5ZoneCAV_MaxTemp_JSON_Outputs.idf has all the required
+objects (Output:SQLite, Output:JSON) with 'AllSummary' enabled.
 
 cf: https://github.com/NREL/EnergyPlus/issues/9419
 """
