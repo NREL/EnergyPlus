@@ -12727,6 +12727,10 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
 
             if (produceTabular) {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
+                }
             }
             if (produceSQLite) {
                 if (state.dataSQLiteProcedures->sqlite) {
@@ -13513,6 +13517,10 @@ void WriteEioTables(EnergyPlusData &state)
                     if (produceTabular) {
                         WriteSubtitle(state, tableName);
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                        }
                     }
                     if (produceSQLite) {
                         if (state.dataSQLiteProcedures->sqlite) {
