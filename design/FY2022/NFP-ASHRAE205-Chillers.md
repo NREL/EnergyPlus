@@ -13,17 +13,17 @@ EnergyPlus will implement a new Chiller object deriving from BaseChillerSpecs, w
 
 ![ASHRAE205ChillerSpecs](NFP-ASHRAE205-Chillers.png)
 
-Standard 205 representations are stored in either human-readable JSON or serialized CBOR (Concise Binary Object Representation) format. The new libtk205 (Toolkit 205) library, part of the open-source project [open205](https://github.com/open205) supports all operations relating to opening and parsing the representation file, and will link with EnergyPlus to populate the new EnergyPlus Chiller object. 
+Standard 205 representations are stored in either human-readable JSON or serialized CBOR (Concise Binary Object Representation) format. The new libtk205 (Toolkit 205) library, part of the open-source project [open205](https://github.com/open205), supports all operations relating to opening and parsing the representation file, and will link with EnergyPlus to populate the new EnergyPlus Chiller object. 
 
 ### Calculations
 
-One of the advantages of ASHRAE Standard 205 is that available equipment operating conditions must be provided explicitly in a representation. These data are straightforward to arrange in a tabular format, which the libtk205 library passes to the same multi-dimensional interpolation engine ([btwxt](https://github.com/bigladder/btwxt)) which is already used in EnergyPlus to calculate performance at different operating conditions. Rather than being extracted from a regression curve, equipment performance is thus interpolated within the closest available data to the operating point. This is an advantage since regression curves can have issues with physicality and boundary conditions. The performance calculation will be embedded in the `simulate()` function of our `ASHRAE205ChillerSpecs` class. 
+One of the advantages of ASHRAE Standard 205 is that available equipment operating conditions must be provided explicitly in a representation. These data are straightforward to arrange in a tabular format, which the libtk205 library passes to the same multi-dimensional interpolation engine ([btwxt](https://github.com/bigladder/btwxt)) which is already used in EnergyPlus to calculate performance at different operating conditions. Rather than being extracted from a regression curve, which can have issues with physicality and boundary conditions, equipment performance is interpolated within the closest available data to the operating point. The performance calculation will be embedded in the `simulate()` function of our `ASHRAE205ChillerSpecs` class. 
 
 One complication from relying on a 205 chiller representation arises when design conditions require a chiller capacity other than what is specified in the representation file. We expect that the existing autosizing algorithm in EnergyPlus will apply to variables given in a representation, but that autosizing will need to be added to the interpolated performance outputs. The sizing calculations will also include a *Sizing Factor* as enumerated in the [IDD](#markdown-header-idd-changes-and-transition) section below.
 
 ## Testing
 
-In order to test the new 'ASHRAE205ChillerSpecs' object, we will create a new model based on an existing one, such as 'ReformulatedEIRChillerSpecs'. A new ASHRAE 205 representation file will be created using performance characteristics from the known model, using its regression curve to back-calculate the tabular parameter and lookup information required by the new representation.
+In order to test the new `ASHRAE205ChillerSpecs` object, we will create a new model based on an existing one, e.g. `ReformulatedEIRChillerSpecs`. A new ASHRAE 205 representation file will be created using performance characteristics from the known model, using its regression curve to back-calculate the tabular parameter and lookup information required by the new representation.
 
 ## IDD Changes and Transition
 
