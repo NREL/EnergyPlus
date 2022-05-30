@@ -15,10 +15,10 @@ skinparam note {
 skinparam stereotypeCBackgroundColor LightSteelBlue
 skinparam classAttributeIconSize      0
 
-class ASHRAE205LiquidCooledChillerSpecs {
+class ASHRAE205ChillerSpecs {
    + std::string instance_205;
    __
-   + {static} ASHRAE205LiquidCooledChillerSpecs *factory();
+   + {static} ASHRAE205ChillerSpecs *factory();
    + {static} void getInput();
    + void setupOutputVariables();
    + void ^simulate();
@@ -47,7 +47,7 @@ abstract class PlantComponent {
    + {abstract} void simulate();
 }
 
-BaseChillerSpecs <|- ASHRAE205LiquidCooledChillerSpecs
+BaseChillerSpecs <|- ASHRAE205ChillerSpecs
 PlantComponent <|- BaseChillerSpecs
 
 @enduml

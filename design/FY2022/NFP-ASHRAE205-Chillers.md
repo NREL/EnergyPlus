@@ -4,34 +4,30 @@
 
 ## Overview
 
-ASHRAE Standard 205 introduces a comprehensive method of equipment specification, which includes performance calculation parameters that depend on measured data instead of theoretical curves. 
-As a first step to introducing the full set of equipment specified by 205, we will integrate the representation of liquid-cooled chillers as a standalone modeling object.
+ASHRAE Standard 205P introduces a comprehensive procedure for equipment performance characterization, which relies on calculation parameters that are given in an equipment representation specification. The standard is in its fourth public review at the time of this writing; an overview can be found at http://data.ashrae.org/standard205/. 
+As a first step to introducing the full set of equipment specified by 205, we will integrate the representation of chillers as a standalone modeling object. Although the current specification for chillers, known as RS0001, is limited to liquid-cooled chillers, it will evolve to contain other capabilities.
 
 ## Implementation
 
 EnergyPlus will implement a new Chiller object deriving from BaseChillerSpecs, which will reflect the 205 specification for liquid-cooled chillers. 
 
-![ASHRAE205LiquidCooledChillerSpecs](NFP-ASHRAE205-Chillers.png)
+![ASHRAE205ChillerSpecs](NFP-ASHRAE205-Chillers.png)
 
-Standard 205 representations are stored in either human-readable JSON or serialized CBOR format. The new libtk205 (Toolkit 205) library supports all operations relating to opening and parsing the representation file, and will link with EnergyPlus to populate the new EP Chiller object. 
-
-Critically, integrating the Toolkit 205 library will introduce *Git submodules* into the EnergyPlus source hierarchy. A typical implementation would simply add the entire libtk205 repository as a subdirectory of `/third_party`, where it would be built and linked just as existing third-party libraries are. The main CMakeLists.txt file will be modified to automatically pull this submodule repository whenever EnergyPlus is cloned, so the dependency stays in sync with EnergyPlus with no additional user input.
+Standard 205 representations are stored in either human-readable JSON or serialized CBOR (Concise Binary Object Representation) format. The new libtk205 (Toolkit 205) library, part of the open-source project [open205](https://github.com/open205) supports all operations relating to opening and parsing the representation file, and will link with EnergyPlus to populate the new EnergyPlus Chiller object. 
 
 ### Calculations
 
-One of the advantages offered by ASHRAE Standard 205 is the available operating conditions of equipment must be provided explicitly in a representation, and equipment performance is interpolated within the closest available data to the operating point, rather than extracted from a global theoretical curve. This performance calculation will be embedded in the `simulate()` function of our `ASHRAE205LiquidCooledChillerSpecs` class.
+One of the advantages of ASHRAE Standard 205 is that available equipment operating conditions must be provided explicitly in a representation. These data are straightforward to arrange in a tabular format, which the libtk205 library passes to the same multi-dimensional interpolation engine ([btwxt](https://github.com/bigladder/btwxt)) which is already used in EnergyPlus to calculate performance at different operating conditions. Rather than being extracted from a regression curve, equipment performance is thus interpolated within the closest available data to the operating point. This is an advantage since regression curves can have issues with physicality and boundary conditions. The performance calculation will be embedded in the `simulate()` function of our `ASHRAE205ChillerSpecs` class. 
 
-@@@ Scaling outputs from files for other-sized chillers
-
-### Error conditions / Validation
+One complication from relying on a 205 chiller representation arises when design conditions require a chiller capacity other than what is specified in the representation file. We expect that the existing autosizing algorithm in EnergyPlus will apply to variables given in a representation, but that autosizing will need to be added to the interpolated performance outputs. The sizing calculations will also include a *Sizing Factor* as enumerated in the [IDD](#markdown-header-idd-changes-and-transition) section below.
 
 ## Testing
 
-
+In order to test the new 'ASHRAE205ChillerSpecs' object, we will create a new model based on an existing one, such as 'ReformulatedEIRChillerSpecs'. A new ASHRAE 205 representation file will be created using performance characteristics from the known model, using its regression curve to back-calculate the tabular parameter and lookup information required by the new representation.
 
 ## IDD Changes and Transition
 
-Add new object `Chillers:ASHRAE205`:
+We will add a new object `Chillers:ASHRAE205`. As ASHRAE 205 eliminates the need to specify regression coefficients, the IDD entry primarily describes the equipment topology.
 
 <!-- Do we need reference temperatures?
   N4 , \field Reference Leaving Chilled Water Temperature
@@ -67,8 +63,8 @@ Add new object `Chillers:ASHRAE205`:
        \minimum> 0.0
 -->
 ```
-Chiller:ASHRAE205LiquidCooled,
-   \memo @@@
+Chiller:ASHRAE205,
+   \memo This chiller model is based on the ASHRAE Standard 205 representation specification for chillers.
   A1 , \field Name
        \type alpha
        \reference Chillers
@@ -77,9 +73,10 @@ Chiller:ASHRAE205LiquidCooled,
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
-  A2 , \field Filename
+  A2 , \field Representation File Name
+       \note The name of the ASHRAE205 RS0001 (chiller) representation file
        \type alpha
-       \reference Chillers
+       \retaincase
        \required-field
   N1 , \field Reference Capacity
        \type real
