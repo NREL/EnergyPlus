@@ -3628,3 +3628,5 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
+  Output:SQLite,
+    SimpleAndTabular;        !- Option Type
