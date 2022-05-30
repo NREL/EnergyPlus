@@ -13219,7 +13219,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Component Sizing Summary",
+                            "ComponentSizingSummary",
                             "Entire Facility",
                             state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
                             "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
@@ -13500,13 +13500,13 @@ void WriteEioTables(EnergyPlusData &state)
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                                tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                                tableBody, rowHead, columnHead, "InitializationSummary", "Entire Facility", tableName);
                         }
                     }
                     if (produceSQLite) {
                         if (state.dataSQLiteProcedures->sqlite) {
                             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                                tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                                tableBody, rowHead, columnHead, "InitializationSummary", "Entire Facility", tableName);
                         }
                     }
                 }
