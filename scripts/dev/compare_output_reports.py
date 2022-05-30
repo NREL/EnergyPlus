@@ -181,7 +181,7 @@ def parse_html(out_dir):
         return None
 
     with open(out_dir / "eplustbl.htm", "rb") as f:
-        soup = BeautifulSoup(f.read(), features="lxml")
+        soup = BeautifulSoup(f.read(), features="html.parser")
 
     manual_html_mapping_dict = find_manual_mapping_html()
     html_report_to_tables_list = []
