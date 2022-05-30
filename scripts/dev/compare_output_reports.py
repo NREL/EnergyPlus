@@ -163,7 +163,8 @@ def find_manual_mapping_html():
     manual_html_mapping_dict = {}
     for line in lines:
         if "= newPreDefReport" in line:
-            if m := re_predef_report.search(line):
+            m = re_predef_report.search(line)
+            if m:
                 d = m.groupdict()
                 inReportName = d["inReportName"]
                 anchor = MakeAnchorName(d["inReportNamewithSpaces"])
