@@ -56,6 +56,8 @@ based on the following temperature bin values
 
 ![image](https://user-images.githubusercontent.com/49325382/165988518-3237a3b7-8a1b-4a41-ae6f-38fc5ec5dc6a.png)
 
+These temperature bin values changes in the newer version, thus we need to define two arrays one for the older and one for the newer version. 
+
 
 ## Approach ##
 
