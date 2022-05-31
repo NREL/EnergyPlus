@@ -8866,16 +8866,16 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
             ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface.Name + ".");
             ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than or equal to 1.0.");
         }
-        if (SrdSurfsProperty.SkyViewFactor > 0.0 && SrdSurfsProperty.GroundViewFactor > 0.0) {
+        if (!SrdSurfsProperty.IsSkyViewFactorBlank && !SrdSurfsProperty.IsGroundViewFactorBlank) {
             // If both surface sky and ground view factor defined, overwrite with the defined value
             Surface.ViewFactorSkyIR = SrdSurfsProperty.SkyViewFactor;
             Surface.ViewFactorGroundIR = SrdSurfsProperty.GroundViewFactor;
-        } else if (SrdSurfsProperty.SkyViewFactor > 0.0 && SrdSurfsProperty.GroundViewFactor == 0.0) {
+        } else if (!SrdSurfsProperty.IsSkyViewFactorBlank && SrdSurfsProperty.IsGroundViewFactorBlank) {
             // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
             Surface.ViewFactorSkyIR = SrdSurfsProperty.SkyViewFactor;
             Surface.ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
             SrdSurfsProperty.GroundViewFactor = Surface.ViewFactorGroundIR;
-        } else if (SrdSurfsProperty.SkyViewFactor == 0.0 && SrdSurfsProperty.GroundViewFactor > 0.0) {
+        } else if (SrdSurfsProperty.IsSkyViewFactorBlank && !SrdSurfsProperty.IsGroundViewFactorBlank) {
             // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
             Surface.ViewFactorGroundIR = SrdSurfsProperty.GroundViewFactor;
             Surface.ViewFactorSkyIR = 1 - SrdSurfsViewFactor;

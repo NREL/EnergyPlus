@@ -8179,6 +8179,7 @@ namespace SurfaceGeometry {
                 // N1: sky view factor
                 if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
                     state.dataSurface->SurroundingSurfsProperty(Loop).SkyViewFactor = state.dataIPShortCut->rNumericArgs(1);
+                    state.dataSurface->SurroundingSurfsProperty(Loop).IsSkyViewFactorBlank = false;
                 }
 
                 // A2: sky temp sch name
@@ -8189,6 +8190,7 @@ namespace SurfaceGeometry {
                 // N2: ground view factor
                 if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
                     state.dataSurface->SurroundingSurfsProperty(Loop).GroundViewFactor = state.dataIPShortCut->rNumericArgs(2);
+                    state.dataSurface->SurroundingSurfsProperty(Loop).IsGroundViewFactorBlank = false;
                 }
 
                 // A3: ground temp sch name

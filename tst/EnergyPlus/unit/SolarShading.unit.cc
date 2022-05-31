@@ -3090,6 +3090,9 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SrdSurfsProperty.SurroundingSurfs(1).ViewFactor = 0.2;
     SrdSurfsProperty.SkyViewFactor = 0.0;
     SrdSurfsProperty.GroundViewFactor = 0.0;
+    SrdSurfsProperty.IsSkyViewFactorBlank = true;
+    SrdSurfsProperty.IsGroundViewFactorBlank = true;
+
     // reset sky and ground view factors
     HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
     // check surface property sky and ground view factors
