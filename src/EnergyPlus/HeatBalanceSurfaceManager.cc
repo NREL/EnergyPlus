@@ -2906,9 +2906,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                                                     ConInc; // NOTE: sunlit and coninc array set to SurfNum2
 
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
+            Real64 CurrentIncidentSolarMultiplier = 1.0;
+            if (state.dataSurface->Surface(SurfNum).hasIncSolMultiplier) {
+                CurrentIncidentSolarMultiplier = GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
+                                                 state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
+            }
             state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
-                state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
-                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
+                CurrentIncidentSolarMultiplier * state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) +
+                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) +
+                state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
         }
 
         for (int ShelfNum = 1; ShelfNum <= (int)state.dataDaylightingDevicesData->Shelf.size(); ++ShelfNum) {
