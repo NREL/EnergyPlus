@@ -68,7 +68,7 @@ We will add a new object `Chiller:Electric:ASHRAE205`. As ASHRAE 205 eliminates 
 ```
 Chiller:Electric:ASHRAE205,
    \memo This chiller model is based on the ASHRAE Standard 205 representation specification for chillers.
-  A1 , \field Name
+  A1,  \field Name
        \type alpha
        \reference Chillers
        \required-field
@@ -76,41 +76,57 @@ Chiller:Electric:ASHRAE205,
        \reference validPlantEquipmentNames
        \reference-class-name validBranchEquipmentTypes
        \reference validBranchEquipmentNames
-  A2 , \field Representation File Name
+  A2,  \field Representation File Name
        \note The name of the ASHRAE205 RS0001 (chiller) representation file
        \type alpha
        \retaincase
        \required-field
-  N1 , \field Reference Capacity
+  A3,  \field Zone Name
+       \note Chiller losses are added as heat gains to this Zone. If blank, losses are not added to any Zone.
+       \type object-list
+       \object-list ZoneNames
+  N1,  \field Reference Capacity
        \type real
        \units W
        \required-field
        \minimum> 0.0
        \autosizable
-  N2, \field Sizing Factor
+  N2,  \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
-  A3 , \field Chilled Water Inlet Node Name
+  A4,  \field Chilled Water Inlet Node Name
        \type node
        \required-field
-  A4 , \field Chilled Water Outlet Node Name
+  A5,  \field Chilled Water Outlet Node Name
        \type node
        \required-field
-  A5 , \field Condenser Inlet Node Name
+  A6,  \field Condenser Inlet Node Name
        \type node
        \note Not required if air-cooled or evaporatively-cooled
-  A6 , \field Condenser Outlet Node Name
+  A7,  \field Condenser Outlet Node Name
        \type node
        \note Not required if air-cooled or evaporatively-cooled
-  A7, \field Heat Recovery Inlet Node Name
+  A8,  \field Oil Cooler Inlet Node Name
+       \type node
+       \note Not required if air-cooled or evaporatively-cooled, or if heat rejection is met by condenser
+  A9,  \field Oil Cooler Outlet Node Name
+       \type node
+       \note Not required if air-cooled or evaporatively-cooled, or if heat rejection is met by condenser
+  A10, \field Auxiliary Inlet Node Name
+       \type node
+       \note Not required if heat rejection is met by condenser
+  A11, \field Auxiliary Outlet Node Name
+       \type node
+       \note Not required if heat rejection is met by condenser
+  A12, \field Heat Recovery Inlet Node Name
        \type node
        \note For 205 expansion; heat recovery not currently supported
-  A8, \field Heat Recovery Outlet Node Name
+  A13, \field Heat Recovery Outlet Node Name
        \type node
        \note For 205 expansion; heat recovery not currently supported
-  A9; \field End-Use Subcategory
+  A14, \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
        \retaincase
