@@ -261,6 +261,9 @@ void ManageSizing(EnergyPlusData &state)
             // the difference seen in the loads in the epluspls and epluszsz files are not
             // simple decreasing curves but appear as amost random fluctuations.
             state.dataGlobal->isPulseZoneSizing = (state.dataGlobal->CompLoadReportIsReq && (iZoneCalcIter == 1));
+            if (state.dataGlobal->DoPureLoadCalc && !state.dataGlobal->isPulseZoneSizing) {
+                state.dataGlobal->DoOutputReporting = true;
+            }
 
             Available = true;
 
@@ -280,6 +283,15 @@ void ManageSizing(EnergyPlusData &state)
                 }
 
                 ++NumSizingPeriodsPerformed;
+
+                if (state.dataGlobal->DoPureLoadCalc && !state.dataGlobal->isPulseZoneSizing) {
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->sqliteBegin();
+                        state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+                            state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
+                        state.dataSQLiteProcedures->sqlite->sqliteCommit();
+                    }
+                }
 
                 state.dataGlobal->BeginEnvrnFlag = true;
                 if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&

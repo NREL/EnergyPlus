@@ -304,11 +304,11 @@ namespace SimulationManager {
         }
         Available = true;
 
-        if (state.dataGlobal->DoPureLoadCalc) {            // pure load calcs option
-            state.dataGlobal->DoOutputReporting = true;    // pure load calcs option
-            Available = false;                             // pure load calcs option, don't run any environments for final simulation
-            state.dataOutRptTab->WriteTabularFiles = true; // pure load calcs option, need tabular reports for component loads tables
-        }                                                  // pure load calcs option
+        if (state.dataGlobal->DoPureLoadCalc) {
+            state.dataGlobal->DoOutputReporting = true;
+            Available = false;
+            state.dataOutRptTab->WriteTabularFiles = true;
+        }
 
         if (state.dataBranchInputManager->InvalidBranchDefinitions) {
             ShowFatalError(state, "Preceding error(s) in Branch Input cause termination.");
@@ -408,9 +408,10 @@ namespace SimulationManager {
             ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
-        ShowMessage(state, "Beginning Simulation");
-        DisplayString(state, "Beginning Primary Simulation");
-
+        if (!state.dataGlobal->DoPureLoadCalc) {
+            ShowMessage(state, "Beginning Simulation");
+            DisplayString(state, "Beginning Primary Simulation");
+        }
         ResetEnvironmentCounter(state);
 
         EnvCount = 0;
@@ -595,10 +596,6 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         state.dataGlobal->WarmupFlag = false;
-
-        if (state.dataGlobal->DoPureLoadCalc) { // pure load calcs option
-            ReportHeatBalance(state);           // need to kick reporting at least once with flags set
-        }
 
         if (!SimsDone && state.dataGlobal->DoDesDaySim) {
             if ((state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
@@ -1164,11 +1161,10 @@ namespace SimulationManager {
             state.dataGlobal->DoWeathSim = true;
         }
 
-        if ((!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim &&     // pure load calcs option
-             !state.dataGlobal->DoHVACSizingSimulation) &&                          // pure load calcs option
-            (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing)) { // pure load calcs option
-            state.dataGlobal->DoPureLoadCalc = true;                                // pure load calcs option
-        }                                                                           // pure load calcs option
+        if ((!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim && !state.dataGlobal->DoHVACSizingSimulation) &&
+            (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing)) {
+            state.dataGlobal->DoPureLoadCalc = true;
+        }
 
         CurrentModuleObject = "PerformancePrecisionTradeoffs";
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);

@@ -2467,6 +2467,10 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
 
+        if (!op->MeterValue.allocated()) {
+            return;
+        }
+
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             if (op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDec && op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDiff) {
                 op->EnergyMeters(Meter).TSValue += op->MeterValue(Meter);
