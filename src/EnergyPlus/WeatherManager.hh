@@ -885,12 +885,12 @@ struct WeatherManagerData : BaseGlobalStruct
     std::string WaterMainsTempsScheduleName;                        // water mains tempeature schedule name
     bool wthFCGroundTemps;
 
-    int TotRunPers;    // Total number of Run Periods (Weather data) to Setup
-    int TotRunDesPers; // Total number of Run Design Periods (Weather data) to Setup
-    int TotReportPers; // Total number of reporting periods
+    int TotRunPers;           // Total number of Run Periods (Weather data) to Setup
+    int TotRunDesPers;        // Total number of Run Design Periods (Weather data) to Setup
+    int TotReportPers;        // Total number of reporting periods
     int TotThermalReportPers; // Total number of thermal reporting periods
-    int TotCO2ReportPers; // Total number of CO2 reporting periods
-    int TotVisualReportPers; // Total number of visual reporting periods
+    int TotCO2ReportPers;     // Total number of CO2 reporting periods
+    int TotVisualReportPers;  // Total number of visual reporting periods
 
     int NumSpecialDays;
     Array1D_int SpecialDayTypes; // To hold holiday types given in input file NOLINT(cert-err58-cpp)
@@ -1094,12 +1094,12 @@ struct WeatherManagerData : BaseGlobalStruct
         this->WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
         this->WaterMainsTempsScheduleName = "";      // water mains tempeature schedule name
         this->wthFCGroundTemps = false;
-        this->TotRunPers = 0;    // Total number of Run Periods (Weather data) to Setup
-        this->TotRunDesPers = 0; // Total number of Run Design Periods (Weather data) to Setup
-        this->TotReportPers = 0; // Total number of reporting periods
+        this->TotRunPers = 0;           // Total number of Run Periods (Weather data) to Setup
+        this->TotRunDesPers = 0;        // Total number of Run Design Periods (Weather data) to Setup
+        this->TotReportPers = 0;        // Total number of reporting periods
         this->TotThermalReportPers = 0; // Total number of thermal reporting periods
-        this->TotCO2ReportPers = 0; // Total number of CO2 reporting periods
-        this->TotVisualReportPers = 0; // Total number of visual reporting periods
+        this->TotCO2ReportPers = 0;     // Total number of CO2 reporting periods
+        this->TotVisualReportPers = 0;  // Total number of visual reporting periods
         this->NumSpecialDays = 0;
 
         this->SpecialDayTypes = Array1D<int>(366, 0);
