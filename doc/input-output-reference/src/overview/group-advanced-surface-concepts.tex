@@ -2537,14 +2537,6 @@ This field defines the constant sky view factor to an external surface. The sky 
 
 This field is used to supply a schedule name of the sky temperature. The sky temperature used in solar radiation calculation of the surface would be overwritten with the value of the scheduled temperature if defined here. If the field is left blank, the global sky temperature would be used.
 
-\subsubsection{Field: Ground View Factor}\label{field-ground-view-factor}
-
-This field defines the constant ground view factor to an external surface. The ground view factor used in solar radiation calculation of the surface would be overwritten with the value of the fraction if defined here. If the field is left blank, the ground view factor of this surface will be calculated with the rules demonstrated above.
-
-\subsubsection{Field: Ground Temperature Schedule Name}\label{field-ground-temperature-schedule-name}
-
-This field is used to supply a schedule name of the ground temperature. The ground temperature used in long wave radiation exchange calculation of the surface would be overwritten with the value of the scheduled temperature if defined here. If the field is left blank, the global ground temperature would be used.
-
 \subsubsection{Field: Surrounding Surface 1 Name}\label{field-surrounding-surface-1-name}
 
 This field defines the name of a surrounding surface to the external surface.
@@ -2566,8 +2558,6 @@ SurfaceProperty:SurroundingSurfaces,
   SrdSurfs:Window,             !- Name
   0.3,                         !- Sky View Factor
   ,                            !- Sky Temperature Schedule Name
-  0.1,                         !- Ground View Factor
-  ,                            !- Ground Temperature Schedule Name
   SurroundingSurface1,         !- Surrounding Surface 1 Name
   0.6,                         !- Surrounding Surface 1 View Factor
   Surrounding Temp Sch 1;      !- Surrounding Surface 1 Temperature Schedule Name
