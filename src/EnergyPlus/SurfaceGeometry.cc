@@ -8306,11 +8306,6 @@ namespace SurfaceGeometry {
                 for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
                     thisGndSurfsObj.SurfsViewFactorSum += thisGndSurfsObj.GndSurfs(gSurfNum).ViewFactor;
                 }
-                if (thisGndSurfsObj.SurfsViewFactorSum == 0.0) {
-                    ShowWarningError(state, format(cCurrentModuleObject, ": get inputs error for ground surface named : ", thisGndSurfsObj.Name));
-                    ShowContinueError(state, format("Ground surfaces view factor sum is zero."));
-                    ShowContinueError(state, format("At least one ground surface view factor should be specified."));
-                }
                 state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsObj);
             }
         }

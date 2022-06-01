@@ -5219,7 +5219,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
         "  SurfaceProperty:GroundSurfaces,",
         "    GndSurfs:Living:South,        !-Name",
         "    GndSurfs SouthGrassArea,      !-Ground Surface 1 Name",
-        "    0.3,                          !-Ground Surface 1 View Factor",
+        "    ,                             !-Ground Surface 1 View Factor",
         "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
         "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
 
