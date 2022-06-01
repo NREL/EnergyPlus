@@ -335,16 +335,16 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
                     ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
                 }
-                if (SurfsSkyViewFactor >= 0 && GroundSurfsViewFactor > 0) {
+                if (SurfsSkyViewFactor >= 0 && state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet) {
                     // If both surface sky and ground view factor defined, overwrite with the defined value
                     Surface(SurfNum).ViewFactorSkyIR = SurfsSkyViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                } else if (SurfsSkyViewFactor >= 0 && GroundSurfsViewFactor == 0) {
+                } else if (SurfsSkyViewFactor >= 0 && !state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet) {
                     // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
                     Surface(SurfNum).ViewFactorSkyIR = SurfsSkyViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
                     SetGroundViewFactorObject = true;
-                } else if (SurfsSkyViewFactor < 0 && GroundSurfsViewFactor > 0) {
+                } else if (SurfsSkyViewFactor < 0 && state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet) {
                     // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
                     Surface(SurfNum).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;

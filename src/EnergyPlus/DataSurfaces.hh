@@ -1307,9 +1307,10 @@ namespace DataSurfaces {
         Real64 SurfsTempAvg = 0.0;            // ground Surfaces average temperature at each time step
         Real64 SurfsReflAvg = 0.0;            // ground Surfaces average reflectance at each time step
         Real64 SurfsViewFactorSum = 0.0;      // sum of view factors of ground surfaces seen by an exterior surface
+        bool IsGroundViewFactorSet = false;   // true if the ground view factor field is not blank
 
         // Default Constructor
-        GroundSurfacesProperty() : NumGndSurfs(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0), SurfsViewFactorSum(0.0)
+        GroundSurfacesProperty() : NumGndSurfs(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0), SurfsViewFactorSum(0.0), IsGroundViewFactorSet(false)
         {
         }
     };

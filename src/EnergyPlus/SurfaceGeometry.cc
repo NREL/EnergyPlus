@@ -8282,6 +8282,7 @@ namespace SurfaceGeometry {
                         auto groundSurfViewFactor = groundSurface.find("ground_surface_view_factor");
                         if (groundSurfViewFactor != groundSurface.end()) {
                             thisGndSurf.ViewFactor = groundSurface.at("ground_surface_view_factor").get<Real64>();
+                            thisGndSurfsObj.IsGroundViewFactorSet = true;
                         }
                         auto TempSchName = groundSurface.find("ground_surface_temperature_schedule_name");
                         if (TempSchName != groundSurface.end()) {
