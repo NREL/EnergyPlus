@@ -105,7 +105,7 @@ SurfaceProperty:LocalEnvironment,
 
 ```
 SurfaceProperty:GroundSurfaces,
-       \min-fields 5
+       \min-fields 3
        \memo This object defines a list of ground surfaces for use with an exterior surface.
        \extensible:4 -- duplicate last set of ground surface properties (the last four fields), remembering to remove ; from "inner" fields.
    A1, \field Name
@@ -124,13 +124,11 @@ SurfaceProperty:GroundSurfaces,
        \maximum 1.0
        \default 0.5
    A3, \field Ground Surface 1 Temperature Schedule Name
-       \required-field
 	   \type alpha
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are real numbers, -100.0 to 100.0, units C
    A4, \field Ground Surface 1 Reflectance Schedule Name
-       \required-field
        \type object-list
        \object-list ScheduleNames
        \note Schedule values are fraction, 0.0 to 1.0, units dimensionless
@@ -278,6 +276,29 @@ This field is used to provide a schedule name of the of a ground surface reflect
 
 This object is extensible, so the last four fields can be repeated to define ground surface name, ground surface view factor, ground surface temperature, and ground surface reflectace sets.
 
+Ground surfaces solar reflectance values derived from satelite data for common surfaces obtained from Ground Albedo Measurements and Modeling (Bill Marion, 2018) are summerized in table below.
+
+\begin{longtable}[c]{p{1.5in}p{3.5in}p{1.5in}}
+\toprule
+Item & Ground Surface Type & Ground Surface Reflectance [] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule
+Item & Ground Surface Type & Ground Surface Reflectance [] \tabularnewline
+\midrule
+\endhead
+
+1 & Grass & 0.15 - 0.26 \tabularnewline
+2 & Black Earth & 0.08 - 0.13 \tabularnewline
+3 & White Sand, New Mexico & 0.60 \tabularnewline
+4 & Snow & 0.55 - 0.98 \tabularnewline
+5 & Asphalt Pavement & 0.09 - 0.18 \tabularnewline
+6 & Concrete Pavement & 0.20 - 0.40 \tabularnewline
+
+\bottomrule
+\end{longtable}
+
 An example IDF objects.
 
 \begin{lstlisting}
@@ -410,15 +431,23 @@ Transition is required to remove two redundant fields in SurfaceProperty:Surroun
 
 ## Proposed Report Variables: ##
 
-Ground Surfaces Average Temperature
+Output variables applicable to SurfaceProperty:GroundSurfaces object are:
 
-Ground Surfaces Average Reflectance
+Zone,Average,Surfaces Property Ground Surfaces Average Temperature [C]
+Zone,Average,Surfaces Property Ground Surfaces Average Reflectance []
 
-Other As Needed.
+
+Surfaces Property Ground Surfaces Average Temperature [C]
+This is average surface temperature of multiple ground surfaces in deg C viewed by an exterior surface for each time step. If there is only one ground surface specified in a given SurfaceProperty:GroundSurfaces object, then the average surface temperature will be the same as the specified ground surface temperature.
+
+
+Surfaces Property Ground Surfaces Average Reflectance []
+This is average surface reflectance of multiple ground surfaces viewed by an exterior surface for each time step. If there is only one ground surface specified in a given SurfaceProperty:GroundSurfaces object, then the average surface reflectance will be the same as the specified ground surface reflectance.
 
 ## References ##
 
-N/A
+Bill Marion. 2018. Ground Albedo Measurements and Modeling. Bifacial PV Workshop Lakewood, Colorado. September 11, 2018
+https://www.nrel.gov/docs/fy20osti/72589.pdf
 
 
 

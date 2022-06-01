@@ -9006,7 +9006,7 @@ void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
     }
     if (!GndSurfsProperty.GndSurfs.allocated()) {
         GndSurfsProperty.GndSurfs.allocate(1);
-        if (GndSurfsProperty.NumGndSurfs == 0) GndSurfsProperty.NumGndSurfs = 1;
+        GndSurfsProperty.NumGndSurfs = 1;
     }
     GndSurfsProperty.GndSurfs(1).ViewFactor = GndSurfsProperty.SurfsViewFactorSum;
 }
