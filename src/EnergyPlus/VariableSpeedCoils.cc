@@ -4723,7 +4723,6 @@ namespace VariableSpeedCoils {
             }
 
         } else if (state.dataSize->CurZoneEqNum > 0) {
-            auto &finalZoneSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum);
             if (!RatedCapCoolTotalAutoSized && !SizingDesRunThisZone) { // Simulation continue
                 HardSizeNoDesRun = true;
                 if (varSpeedCoil.RatedCapCoolTotal > 0.0) {
@@ -4735,6 +4734,7 @@ namespace VariableSpeedCoils {
                 }
             } else {
                 CheckZoneSizing(state, format("COIL:{}{}", varSpeedCoil.CoolHeatType, CurrentObjSubfix), varSpeedCoil.Name);
+                auto &finalZoneSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum);
                 VolFlowRate = varSpeedCoil.RatedAirVolFlowRate;
                 if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                     if (state.dataSize->ZoneEqDXCoil) {
