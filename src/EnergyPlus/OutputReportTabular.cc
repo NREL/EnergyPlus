@@ -5419,7 +5419,8 @@ void parseStatLine(const std::string &lineIn,
                    bool &desConditionlinepassed,
                    bool &heatingDesignlinepassed,
                    bool &coolingDesignlinepassed,
-                   bool &isKoppen)
+                   bool &isKoppen,
+                   bool &insideLiquidPrecipitation)
 {
     // assumes that all the variables are initialized outside of this routine -- it does not re-initialize them
     if (has_prefix(lineIn, "Statistics")) {
@@ -5468,13 +5469,16 @@ void parseStatLine(const std::string &lineIn,
         lineType = StatLineType::WithHDDLine;
     } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
         lineType = StatLineType::WithCDDLine;
-    } else if (has(lineIn, "Max Hourly")) {
+
+    } else if (has(lineIn, "Statistics for Liquid Precipitation")) {
+        insideLiquidPrecipitation = true;
+    } else if (insideLiquidPrecipitation && has(lineIn, "Total")) {
+        lineType = StatLineType::MonthlyPrec;
+    } else if (insideLiquidPrecipitation && has(lineIn, "Max Hourly")) {
         lineType = StatLineType::MaxHourlyPrec;
-    } else if (has(lineIn, "Total")) {
-        if (!has(lineIn, "Statistics for Total Sky Cover")) {
-            lineType = StatLineType::MonthlyPrec;
-        }
+        insideLiquidPrecipitation = false;
     }
+
     // these not part of big if/else because sequential
     if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
     if (lineType == StatLineType::KoppenLine && isKoppen) lineType = StatLineType::KoppenDes1Line;
@@ -5510,9 +5514,6 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
 
     StatLineType lineType = StatLineType::Initialized;
     StatLineType lineTypeinterim = StatLineType::Initialized;
-    bool isASHRAE;
-    bool iscalc;
-    bool isKoppen;
     std::string::size_type ashPtr;
     std::string::size_type lnPtr;
     int col1;
@@ -5529,20 +5530,17 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
     std::string curNameWithSIUnits;
     std::string curNameAndUnits;
     int indexUnitConv;
+
+    bool isASHRAE = false;
+    bool iscalc = false;
+    bool isKoppen = false;
+    bool heatingDesignlinepassed = false;
+    bool coolingDesignlinepassed = false;
+    bool desConditionlinepassed = false;
+    bool insideLiquidPrecipitation = false;
     std::string storeASHRAEHDD;
     std::string storeASHRAECDD;
-    bool heatingDesignlinepassed;
-    bool coolingDesignlinepassed;
-    bool desConditionlinepassed;
 
-    isASHRAE = false;
-    iscalc = false;
-    isKoppen = false;
-    heatingDesignlinepassed = false;
-    coolingDesignlinepassed = false;
-    desConditionlinepassed = false;
-    storeASHRAEHDD = "";
-    storeASHRAECDD = "";
     lineTypeinterim = StatLineType::Initialized;
     if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
         auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
@@ -5552,7 +5550,8 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             // reconcile line with different versions of stat file
             // v7.1 added version as first line.
             strip(lineIn);
-            parseStatLine(lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen);
+            parseStatLine(
+                lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen, insideLiquidPrecipitation);
 
             switch (lineType) {
             case StatLineType::StatisticsLine: { // Statistics for USA_CA_San.Francisco_TMY2

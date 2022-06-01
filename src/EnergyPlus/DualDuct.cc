@@ -929,7 +929,6 @@ namespace DualDuct {
 
             } else if (this->DamperType == DualDuctDamper::OutdoorAir) {
                 auto &thisOAInNode = state.dataLoopNodes->Node(OAInNode);
-                auto &thisRAInNode = state.dataLoopNodes->Node(RAInNode);
                 Real64 schedValue = ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr);
                 // The first time through set the mass flow rate to the Max for VAV:OutdoorAir
                 if ((thisOAInNode.MassFlowRate > 0.0) && (schedValue > 0.0)) {
@@ -938,6 +937,7 @@ namespace DualDuct {
                     thisOAInNode.MassFlowRate = 0.0;
                 }
                 if (this->RecircIsUsed) {
+                    auto &thisRAInNode = state.dataLoopNodes->Node(RAInNode);
                     if ((thisRAInNode.MassFlowRate > 0.0) && (schedValue > 0.0)) {
                         thisRAInNode.MassFlowRate = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
                     } else {
@@ -955,6 +955,7 @@ namespace DualDuct {
                     thisOAInNode.MassFlowRateMaxAvail = 0.0;
                 }
                 if (this->RecircIsUsed) {
+                    auto &thisRAInNode = state.dataLoopNodes->Node(RAInNode);
                     if ((thisRAInNode.MassFlowRateMaxAvail > 0.0) && (schedValue > 0.0)) {
                         thisRAInNode.MassFlowRateMaxAvail = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
                     } else {
@@ -963,7 +964,10 @@ namespace DualDuct {
                 }
                 // The last item is to take care of the Min Avail Flow Rates. VAV:OutdoorAir
                 thisOAInNode.MassFlowRateMinAvail = 0.0;
-                if (this->RecircIsUsed) thisRAInNode.MassFlowRateMinAvail = 0.0;
+                if (this->RecircIsUsed) {
+                    auto &thisRAInNode = state.dataLoopNodes->Node(RAInNode);
+                    thisRAInNode.MassFlowRateMinAvail = 0.0;
+                }
             }
         }
 
