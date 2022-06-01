@@ -10194,8 +10194,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
         "AUTOCALCULATE,           !- Sensible Heat Fraction",
         "ACTIVITY_SCH,            !- Activity Level Schedule Name",
         ",                        !- Carbon Dioxide Generation Rate {m3/s-W}",
-        "10.5,                    !- Cold Stress Temperature Thresh [C]",
-        "32.5,                    !- Heat Stress Temperature Thresh [C]",
+        "11.5,                    !- Cold Stress Temperature Thresh [C]",
+        "30.5,                    !- Heat Stress Temperature Thresh [C]",
         "No,                      !- Enable ASHRAE 55 Comfort Warnings",
         "ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
         ",                        !- Surface Name/Angle Factor List Name",
@@ -10270,8 +10270,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
     state->dataOutRptTab->displayThermalResilienceSummary = true;
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
-    std::string const error_string = delimited_string({"   ** Warning ** Thermal resilience tabular report assumes at most one people object per "
-                                                       "zone, but multiple people objects are defined for Zone 1"});
+    std::string error_string = delimited_string({"   ** Warning ** Zone 1 has multiple people objects with different Cold Stress Temperature Threshold.",
+    "   ** Warning ** Zone 1 has multiple people objects with different Heat Stress Temperature Threshold."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
