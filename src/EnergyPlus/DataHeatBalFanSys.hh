@@ -308,6 +308,9 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array2D<std::vector<Real64>> ZoneLowSETHoursRepPeriod;
     Array2D<std::vector<Real64>> ZoneHighSETHoursRepPeriod;
 
+    int PierceSETerrorIndex = 0;
+    int PMVerrorIndex = 0;
+
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
     void clear_state() override

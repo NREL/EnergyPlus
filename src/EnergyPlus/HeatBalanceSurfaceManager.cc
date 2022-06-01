@@ -5557,6 +5557,9 @@ void ReportThermalResilience(EnergyPlusData &state)
         Real64 HeatTempThresh = 30.0;
         // Trace current time step Zone Pierce SET; NaN if no occupant or SET not calculated
         // Record last time step SET to trace SET unmet duration;
+
+        std::vector<std::optional<Real64>> PierceSETCurrent(state.dataGlobal->NumOfZones, std::nullopt);
+        std::vector<std::optional<Real64>> PMVCurrent(state.dataGlobal->NumOfZones, std::nullopt);
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
             state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) = state.dataHeatBal->People(iPeople).NumberOfPeople *
@@ -5652,6 +5655,28 @@ void ReportThermalResilience(EnergyPlusData &state)
                     (PMV - VeryHotPMVThresh) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
 
+            // check whether PierceSET changed for people in a zone
+            if (!PierceSETCurrent[ZoneNum - 1].has_value()) {
+                PierceSETCurrent[ZoneNum - 1] = state.dataHeatBalFanSys->ZonePierceSET(ZoneNum);
+            } else {
+                if (PierceSETCurrent[ZoneNum - 1] != state.dataHeatBalFanSys->ZonePierceSET(ZoneNum)) {
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   fmt::format("Zone {} has multiple people objects with different PierceSet.", ZoneNum),
+                                                   state.dataHeatBalFanSys->PierceSETerrorIndex);
+                }
+            }
+
+            // check whether PierceSET, PMV, etc. changed for different people in a zone
+            if (!PMVCurrent[ZoneNum - 1].has_value()) {
+                PMVCurrent[ZoneNum - 1] = PMV;
+            } else {
+                if (PMVCurrent[ZoneNum - 1] != PMV) {
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   fmt::format("Zone {} has multiple people objects with different PMV.", ZoneNum),
+                                                   state.dataHeatBalFanSys->PMVerrorIndex);
+                }
+            }
+
             for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
@@ -5743,7 +5768,6 @@ void ReportThermalResilience(EnergyPlusData &state)
                 }
             }
         }
-
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 HI = state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum);
             Real64 Humidex = state.dataHeatBalFanSys->ZoneHumidex(ZoneNum);

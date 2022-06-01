@@ -214,13 +214,31 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
         GetInputTabularTimeBins(state);
         GetInputTabularStyle(state);
         GetInputOutputTableSummaryReports(state);
+        // check whether multiple people have different threshold for a zone
         if (state.dataOutRptTab->displayThermalResilienceSummary) {
-            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; zoneNum++) {
-                if (state.dataHeatBal->Zone(zoneNum).numPeopleObject > 1) {
-                    ShowWarningMessage(state,
-                                       fmt::format("Thermal resilience tabular report assumes at most one people object per zone, but multiple "
-                                                   "people objects are defined for Zone {}",
-                                                   zoneNum));
+            std::vector<std::optional<Real64>> ColdStressTempThreshCurrent(state.dataGlobal->NumOfZones, std::nullopt);
+            std::vector<std::optional<Real64>> HeatStressTempThreshCurrent(state.dataGlobal->NumOfZones, std::nullopt);
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
+                int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
+
+                Real64 ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
+                if (!ColdStressTempThreshCurrent[ZoneNum - 1].has_value()) {
+                    ColdStressTempThreshCurrent[ZoneNum - 1] = ColdTempThresh;
+                } else {
+                    if (ColdStressTempThreshCurrent[ZoneNum - 1] != ColdTempThresh) {
+                        ShowWarningMessage(
+                            state, fmt::format("Zone {} has multiple people objects with different Cold Stress Temperature Threshold.", ZoneNum));
+                    }
+                }
+
+                Real64 HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
+                if (!HeatStressTempThreshCurrent[ZoneNum - 1].has_value()) {
+                    HeatStressTempThreshCurrent[ZoneNum - 1] = HeatTempThresh;
+                } else {
+                    if (HeatStressTempThreshCurrent[ZoneNum - 1] != HeatTempThresh) {
+                        ShowWarningMessage(
+                            state, fmt::format("Zone {} has multiple people objects with different Heat Stress Temperature Threshold.", ZoneNum));
+                    }
                 }
             }
         }
