@@ -749,14 +749,9 @@ namespace SimulationManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            {
-                auto const SELECT_CASE_var(Alphas(1));
-                if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
-                    (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED") || (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCESIMPLIFIED")) {
-                    CondFDAlgo = true;
-                } else {
-                }
-            }
+            static constexpr std::array<std::string_view, 4> condFDTypes = {
+                "CONDUCTIONFINITEDIFFERENCE", "CONDFD", "CONDUCTIONFINITEDIFFERENCEDETAILED", "CONDUCTIONFINITEDIFFERENCESIMPLIFIED"};
+            CondFDAlgo = std::find(condFDTypes.begin(), condFDTypes.end(), Alphas(1)) != condFDTypes.end();
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -774,14 +769,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(Alphas(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-
-                    } else {
-                    }
-                }
+                if (Alphas(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
@@ -800,13 +788,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(Alphas(3));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (Alphas(3) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
@@ -825,13 +807,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (state.dataIPShortCut->cAlphaArgs(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
@@ -850,13 +826,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (state.dataIPShortCut->cAlphaArgs(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
 
