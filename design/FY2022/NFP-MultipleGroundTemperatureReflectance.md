@@ -254,7 +254,7 @@ Demonstrate that the new approach duplicates the current results using exact set
 
 This object is used for calculating building exterior surfaces long-wave radation exchange with the ground, and calculation of solar radiation reflection from ground surfaces to a building exterior surface. A given exterior surface can view multiple ground surfaces with different surface properties and view factors. Thus, this object allows to specify multiple ground view factors, ground surfaces temperature, and ground surfaces refelectance properties viewed by a given exterior surface. View factors are assumed to be constant values. The ground surface temperature and ground surface reflectance are specified using schedule object. At least one ground surface should be defined in this object.
 
-The sum of all defined view factors that includes sky virew factor, ground surfaces view factors and surrounding surfaces view factors seen by a given building exterior surface should be 1.0, or the sum of the ground view factors for a given exterior surface should not exceed 1 minus the sky view plus the sum of view factors of surrounding surfaces defined in SurfaceProperty:GroundSurfaces object.
+The sum of all defined view factors that includes sky virew factor, ground surfaces view factors and surrounding surfaces view factors seen by a given building exterior surface should be 1.0, or the sum of the ground view factors for a given exterior surface should not exceed 1 minus the sky view plus the sum of view factors of surrounding surfaces defined in SurfaceProperty:SurroundingSurfaces object.
 
 \subsubsection{Field: Name}\label{field-name}
 
