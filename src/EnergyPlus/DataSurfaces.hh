@@ -1320,14 +1320,14 @@ namespace DataSurfaces {
         Real64 GroundViewFactor;
         int GroundTempSchNum;         // schedule pointer
         int TotSurroundingSurface;    // Total number of surrounding surfaces defined for an exterior surface
-        bool IsSkyViewFactorBlank;    // false if the sky view factor field is not blank
-        bool IsGroundViewFactorBlank; // false if the ground view factor field is not blank
+        bool IsSkyViewFactorSet;      // false if the sky view factor field is blank
+        bool IsGroundViewFactorSet; // false if the ground view factor field is blank
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
 
         // Default Constructor
         SurroundingSurfacesProperty()
-            : SkyViewFactor(0.0), SkyTempSchNum(0), GroundViewFactor(0.0), GroundTempSchNum(0), TotSurroundingSurface(0), IsSkyViewFactorBlank(true),
-              IsGroundViewFactorBlank(true)
+            : SkyViewFactor(0.0), SkyTempSchNum(0), GroundViewFactor(0.0), GroundTempSchNum(0), TotSurroundingSurface(0), IsSkyViewFactorSet(false),
+              IsGroundViewFactorSet(false)
         {
         }
     };
