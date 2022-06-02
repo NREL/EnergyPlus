@@ -2502,11 +2502,11 @@
   SurfaceProperty:GroundSurfaces,
     GndSurfs:Zn005:Wall003,  !- Name
     GndSurfs:Grass,          !- Ground Surface 1 Name
-    0.4,                     !- Ground Surface 1 View Factor
+    0.35,                    !- Ground Surface 1 View Factor
     GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
 	GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
     GndSurfs:Parking,        !- Ground Surface 2 Name
-    0.1,                     !- Ground Surface 2 View Factor
+    0.15,                    !- Ground Surface 2 View Factor
     GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
 	GndSurfs:ParkingRefl;    !- Ground Surface 2 Reflectance Schedule Name
 
