@@ -10447,10 +10447,9 @@ void SkyDifSolarShading(EnergyPlusData &state)
         }
         if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
             int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
-            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
-            //if (state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum)) {
-            //    state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
-            //}
+            if (state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet) {
+                state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
+            }
         }
     }
 

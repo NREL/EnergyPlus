@@ -344,6 +344,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     Surface(SurfNum).ViewFactorSkyIR = SurfsSkyViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
                     SetGroundViewFactorObject = true;
+                    state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
                 } else if (SurfsSkyViewFactor < 0 && state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet) {
                     // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
@@ -353,6 +354,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     Surface(SurfNum).ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
                     SetGroundViewFactorObject = true;
+                    state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
                 }
                 if (SetGroundViewFactorObject) {
                     ReSetGroundSurfacesViewFactor(state, SurfNum);
