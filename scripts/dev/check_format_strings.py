@@ -56,6 +56,11 @@
 import os
 import sys
 from pathlib import Path
+from typing import List
+import unittest
+
+
+verbose = True
 
 
 def process_all_format_lines(f_path: Path, lines: list, fmt_line_nos: list) -> int:
@@ -122,7 +127,7 @@ def process_all_format_lines(f_path: Path, lines: list, fmt_line_nos: list) -> i
                 args = []
                 args_idx = 0
 
-                # partiall process args
+                # partial process args
                 for a in args_str:
                     if (a == "\"") and (num_quote > 0):
                         num_quote -= 1
@@ -157,37 +162,29 @@ def process_all_format_lines(f_path: Path, lines: list, fmt_line_nos: list) -> i
             if all([y == 0 for y in [x.count("(") - x.count(")") for x in args]]):
                 break
 
-        # finally, we can do some error checking
+        # Finally, we can do some error checking.
         # check for unbalanced curly braces
         if fmt_str.count("{") != fmt_str.count("}"):
-            print(
-                f"File: {str(f_path)}, line: {line_no + 1}, Format string '{fmt_str}' has unbalanced curly braces.")
+            if verbose:
+                print(f"File: {str(f_path)}, line: {line_no + 1}, Format '{fmt_str}' has unbalanced curly braces.")
             num_errors += 1
 
         # check for unbalanced curly braces placeholders and arguments
         if fmt_str.count("{") != len(args):
-            print(
-                f"File: {str(f_path)}, line: {line_no + 1}, Format string '{fmt_str}' "
-                f"placeholders and args {args} are not matched.")
+            if verbose:
+                print(f"File: {str(f_path)}, line: {line_no + 1}, Format '{fmt_str}' arg count {args} is not matched.")
             num_errors += 1
 
         # check for when no args are parsed
         if len(args) == 0:
-            print(
-                f"File: {str(f_path)}, line: {line_no + 1}, Format string '{fmt_str}' "
-                f"has no arguments. Remove format."
-            )
-
+            if verbose:
+                print(f"File: {str(f_path)}, line: {line_no + 1}, Format '{fmt_str}' has no arguments. Remove format.")
             num_errors += 1
 
     return num_errors
 
 
-
-def check_format_strings(search_path: Path) -> int:
-
-    num_errors = 0
-
+def get_sorted_file_list(search_path: Path) -> List[Path]:
     files_to_search = []
     for p in [search_path]:
         for root, _, files in os.walk(p):
@@ -198,56 +195,94 @@ def check_format_strings(search_path: Path) -> int:
                     files_to_search.append(f_path)
                 elif f_extension == ".cc":
                     files_to_search.append(f_path)
-
     files_to_search.sort()
+    return files_to_search
 
+
+def get_format_line_numbers_from_lines(lines: List[str]) -> List[int]:
+    format_line_nos = []
+    for idx, line in enumerate(lines):
+        # skip blank lines
+        if line == "":
+            continue
+        # skip comment lines
+        if line[0:2] == "//":
+            continue
+        # strip trailing comments
+        if "//" in line:
+            tokens = line.split("//")
+            line = tokens[0].strip()
+        # find 'format' line numbers first
+        if "format(\"" in line:
+            format_line_nos.append(idx)
+    return format_line_nos
+
+
+def check_format_strings(search_path: Path) -> int:
+    num_errors = 0
+    files_to_search = get_sorted_file_list(search_path)
     for f_path in files_to_search:
-
-        format_line_nos = []
-
         with open(f_path, "r") as f:
             lines = f.readlines()
-
-        lines = [x.strip() for x in lines]
-
-        for idx, line in enumerate(lines):
-
-            # skip blank lines
-            if line == "":
-                continue
-
-            # skip comment lines
-            if line[0:2] == "//":
-                continue
-
-            # strip trailing comments
-            if "//" in line:
-                tokens = line.split("//")
-                line = tokens[0].strip()
-
-            # find 'format' line numbers first
-            if "format(\"" in line:
-                format_line_nos.append(idx)
-
+            lines = [x.strip() for x in lines]
+        format_line_nos = get_format_line_numbers_from_lines(lines)
         num_errors += process_all_format_lines(f_path, lines, format_line_nos)
-
     return num_errors
 
 
+class TestFormatCheck(unittest.TestCase):
+    def test_valid_format_chunk(self):
+        self.assertEqual(
+            0,  # number of errors encountered
+            process_all_format_lines(
+                Path('/dummy/path'),
+                [  # actual file content lines
+                    'line 1',
+                    'line 2',
+                    'format(\"hi{}\", varName);'
+                ],
+                [  # lines containing actual format statements
+                    2
+                ]
+            )
+        )
+
+    def test_invalid_format_chunk(self):
+        self.assertEqual(
+            1,  # number of errors encountered
+            process_all_format_lines(
+                Path('/dummy/path'),
+                [  # actual file content lines
+                    'line 1',
+                    'line 2',
+                    'format(\"hi{\", varName);'
+                ],
+                [  # lines containing actual format statements
+                    2
+                ]
+            )
+        )
+
+
 if __name__ == "__main__":
+    print("**** Verifying script integrity ****")
+    verbose = False
+    unittest.main(exit=False)
+    verbose = True
+    print("**** DONE ***")
+    print("")
 
     root_path = Path(__file__).parent.parent.parent
-    src_path = root_path / "src" / "EnergyPlus"
-    tst_path = root_path / "tst" / "EnergyPlus"
 
     print("**** Checking EnergyPlus code for malformed fmt strings ****")
+    src_path = root_path / "src" / "EnergyPlus"
     errors_found = check_format_strings(src_path)
     print("**** DONE ****")
     print("")
 
     print("**** Checking EnergyPlus unit test code for malformed fmt strings ****")
+    tst_path = root_path / "tst" / "EnergyPlus"
     errors_found += check_format_strings(tst_path)
     print("**** DONE ****")
 
-    if errors_found > 0:
-        raise sys.exit(1)
+    sys.exit(errors_found)
