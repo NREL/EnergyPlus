@@ -1287,7 +1287,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     if (this->cycRatioCurveIndex > 0) {
         CRF = CurveManager::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
-    // if (CRF <= 0.0) CRF = 0.5833;
+    if (CRF <= DataGlobalConstants::rTinyValue) CRF = 0.5833; // 2022-06-02: what could a proper default for too tiny CRF?
 
     // aux elec
     Real64 eirAuxElecFuncTemp = 0.0;
@@ -1304,8 +1304,10 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->powerUsage = 0.0;
     } else {
         this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
-        this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR; + this->standbyElecPower;
+        this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR;
     }
+    this->powerUsage += +this->standbyElecPower;
+
     this->fuelEnergy = this->fuelUsage * reportingInterval;
     this->powerEnergy = this->powerEnergy * reportingInterval;
 
