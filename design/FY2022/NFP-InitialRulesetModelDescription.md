@@ -250,26 +250,39 @@ None required.
 
 ## Design Document ##
 
-A new Python utility will be created separate from EnergyPlus that can
-eventually be packaged with the EnergyPlus installer. It will be developed in
-its own repository but eventually this may be merged or linked from the
-EnergyPlus repository. The new Python utility will read the JSON files that
-EnergyPlus produces when the output:JSON input object is used as the primary
-source of information. As a secondary source of information, the epJSON input
-file will be read. It is possible that the EIO file will be read as part of this
-effort. The Ruleset Model Description (RMD) format will be produced by the
-utilty and is also a JSON format. Verification that the  RMD output produced by
-the new utility is consistent with the RMD schema will be performed by using the
-jsonschema Python library "validate" method. The PathLib library is expected to
-be used for accessing files. The unittest library is expected to be used for
-providing unit testing. The goal is to have tests for almost all of the methods.
-At this point no changes to EnergyPlus are expected as part of this but issues
-may be added for features that are not working or are needed. For example, #9419
-was added due to the initialization summary not being produced in the
-output:JSON file. Only a subset of data groups from the RMD schema will be
-generated and only data elements that are most direct will be implemented. This
-is expected to be the first step in an ongoing effort to fully implement the RMD
-schema as an output format.
+The following describes the design:
+
+ - A new Python utility will be created separate from EnergyPlus that can
+ eventually be packaged with the EnergyPlus installer. It will be developed in
+ its own repository but eventually this may be merged or linked from the
+ EnergyPlus repository.
+
+ - The new Python utility will read the JSON files that EnergyPlus produces when
+ the output:JSON input object is used as the primary source of information. As a
+ secondary source of information, the epJSON input file will be read. It is
+ possible that the EIO file will be read as part of this effort. 
+
+ - The Ruleset Model Description (RMD) format will be produced by the utility and
+ is also a JSON format.
+
+ - Verification that the RMD output produced by the new utility is consistent
+ with the RMD schema will be performed by using the jsonschema Python library
+ "validate" method.
+
+ - The PathLib library is expected to be used for accessing files.
+
+ - The unittest library is expected to be used for providing unit testing. The
+ goal is to have tests for almost all of the methods.
+
+ - At this point no changes to EnergyPlus are expected as part of this but
+ issues may be added for features that are not working or are needed. For
+ example, #9419 was added due to the initialization summary not being produced
+ in the output:JSON file. 
+
+ - Only a subset of data groups from the RMD schema will be generated and only
+ data elements that are most direct will be implemented. This is expected to be
+ the first step in an ongoing effort to fully implement the RMD schema as an
+ output format.
 
 ## References ##
 
