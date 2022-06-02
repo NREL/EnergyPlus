@@ -372,7 +372,7 @@ namespace FaultsManager {
                     EvapCoolerNum =
                         UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
                                                         state.dataEvapCoolers->EvapCond,
-                                                        &EvaporativeCoolers::EvapConditions::EvapCoolerName);
+                                                        &EvaporativeCoolers::EvapConditions::Name);
                     if (EvapCoolerNum <= 0) {
                         ShowSevereError(state,
                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
@@ -859,7 +859,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != SteamCoils::TemperatureSetPointControl) {
+                        if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != SteamCoils::CoilControlType::TemperatureSetPoint) {
                             // The fault model is only applicable to the coils controlled on leaving air temperature
                             ShowWarningError(
                                 state,

@@ -1821,7 +1821,8 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
             state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = false;
         }
         if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
-            if (state.dataHeatBalFanSys->ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
+            if (state.dataHeatBalFanSys->ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) !=
+                DataHVACGlobals::ThermostatType::Uncontrolled) {
                 if (Action == DemandAction::CheckCanReduce) {
                     if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) >
                             DemandMgr(MgrNum).LowerLimit ||
