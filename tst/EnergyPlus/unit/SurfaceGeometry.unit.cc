@@ -8806,7 +8806,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     EXPECT_NEAR(state->dataHeatBal->space(4).floorArea, 20.0, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsData)
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
 {
     bool ErrorsFound(false);
     std::string const idf_objects = delimited_string({
@@ -9004,6 +9004,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsData)
     EXPECT_EQ("GNDSURFS PARKINGAREA", GndSurfsProperty.GndSurfs(2).Name);
     EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(2).ViewFactor);
     EXPECT_EQ("GNDSURFS LAKEAREA", GndSurfsProperty.GndSurfs(3).Name);
-    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs[2].ViewFactor);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(3).ViewFactor);
     EXPECT_DOUBLE_EQ(0.4, GndSurfsProperty.SurfsViewFactorSum);
 }

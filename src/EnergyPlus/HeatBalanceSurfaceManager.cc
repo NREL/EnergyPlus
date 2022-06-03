@@ -355,10 +355,16 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
                     Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
                     Surface(SurfNum).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
+                    if (SrdSurfsNum > 0) {
+                        state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface(SurfNum).ViewFactorSkyIR;
+                    }
                 } else {
                     // If neither ground or sky view factor define, continue to use the original proportion.
                     Surface(SurfNum).ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
                     Surface(SurfNum).ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
+                    if (SrdSurfsNum > 0) {
+                        state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface(SurfNum).ViewFactorSkyIR;
+                    }
                     if (GndSurfsNum > 0) {
                         SetGroundViewFactorObject = true;
                         state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
