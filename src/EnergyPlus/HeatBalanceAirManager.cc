@@ -821,9 +821,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
             for (Item1 = 1; Item1 <= state.dataHeatBal->InfiltrationObjects(Item).NumOfZones; ++Item1) {
                 ++Loop;
+                auto &thisInfiltration = state.dataHeatBal->Infiltration(Loop);
                 if (!state.dataHeatBal->InfiltrationObjects(Item).ZoneListActive) {
-                    state.dataHeatBal->Infiltration(Loop).Name = cAlphaArgs(1);
-                    state.dataHeatBal->Infiltration(Loop).ZonePtr = state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr;
+                    thisInfiltration.Name = cAlphaArgs(1);
+                    thisInfiltration.ZonePtr = state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr;
                 } else {
                     CheckCreatedZoneItemName(
                         state,
@@ -836,16 +837,16 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                         state.dataHeatBal->InfiltrationObjects(Item).Name,
                         state.dataHeatBal->Infiltration,
                         Loop - 1,
-                        state.dataHeatBal->Infiltration(Loop).Name,
+                        thisInfiltration.Name,
                         errFlag);
-                    state.dataHeatBal->Infiltration(Loop).ZonePtr =
+                    thisInfiltration.ZonePtr =
                         state.dataHeatBal->ZoneList(state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
                     if (errFlag) ErrorsFound = true;
                 }
 
-                state.dataHeatBal->Infiltration(Loop).ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
-                state.dataHeatBal->Infiltration(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                if (state.dataHeatBal->Infiltration(Loop).SchedPtr == 0) {
+                thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
+                thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (thisInfiltration.SchedPtr == 0) {
                     if (Item1 == 1) {
                         if (lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
@@ -861,12 +862,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // setup a flag if the outdoor air balance method is applied
-                if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
+                if (thisInfiltration.ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
                     for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
-                        if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
+                        if (thisInfiltration.ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
                             if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
-                                state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
-                                state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
+                                thisInfiltration.QuadratureSum = true;
+                                thisInfiltration.OABalancePtr = i;
                                 break;
                             }
                         }
@@ -874,166 +875,185 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Infiltration equipment design level calculation method.
+                enum class AirflowSpec
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(4));
-                    if ((SELECT_CASE_var == "FLOW") || (SELECT_CASE_var == "FLOW/ZONE")) {
-                        state.dataHeatBal->Infiltration(Loop).DesignLevel = rNumericArgs(1);
-                        if (lAlphaFieldBlanks(1)) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name +
-                                                 "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(1) +
-                                                 ", but that field is blank.  0 Infiltration will result.");
-                        }
+                    Invalid = -1,
+                    Flow,
+                    FlowPerZone,
+                    FlowPerArea,
+                    FlowPerExteriorArea,
+                    FlowPerExteriorWallArea,
+                    AirChanges,
+                    Num
+                };
+                std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
+                    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "AIRCHANGES/HOUR"};
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                switch (flow) {
+                case AirflowSpec::Flow:
+                case AirflowSpec::FlowPerZone:
+                    thisInfiltration.DesignLevel = rNumericArgs(1);
+                    if (lAlphaFieldBlanks(1)) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name +
+                                             "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(1) +
+                                             ", but that field is blank.  0 Infiltration will result.");
+                    }
+                    break;
 
-                    } else if (SELECT_CASE_var == "FLOW/AREA") {
-                        if (state.dataHeatBal->Infiltration(Loop).ZonePtr != 0) {
-                            if (rNumericArgs(2) >= 0.0) {
-                                state.dataHeatBal->Infiltration(Loop).DesignLevel =
-                                    rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).FloorArea;
-                                if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0) {
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(state,
-                                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                                             state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) +
-                                                             " specifies " + cNumericFieldNames(2) +
-                                                             ", but Zone Floor Area = 0.  0 Infiltration will result.");
-                                    }
-                                }
-                            } else {
-                                ShowSevereError(state,
-                                                format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}",
-                                                       RoutineName,
-                                                       cCurrentModuleObject,
-                                                       state.dataHeatBal->Infiltration(Loop).Name,
-                                                       rNumericArgs(2)));
-                                ErrorsFound = true;
-                            }
-                        }
-                        if (lAlphaFieldBlanks(2)) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name +
-                                                 "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
-                                                 ", but that field is blank.  0 Infiltration will result.");
-                        }
-
-                    } else if (SELECT_CASE_var == "FLOW/EXTERIORAREA") {
-                        if (state.dataHeatBal->Infiltration(Loop).ZonePtr != 0) {
-                            if (rNumericArgs(3) >= 0.0) {
-                                state.dataHeatBal->Infiltration(Loop).DesignLevel =
-                                    rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).ExteriorTotalSurfArea;
-                                if (state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).ExteriorTotalSurfArea <= 0.0) {
+                case AirflowSpec::FlowPerArea:
+                    if (thisInfiltration.ZonePtr != 0) {
+                        if (rNumericArgs(2) >= 0.0) {
+                            thisInfiltration.DesignLevel =
+                                rNumericArgs(2) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea;
+                            if (thisInfiltration.ZonePtr > 0) {
+                                if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea <= 0.0) {
                                     ShowWarningError(state,
                                                      std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                                         state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                                         cNumericFieldNames(3) + ", but Exterior Surface Area = 0.  0 Infiltration will result.");
+                                                         thisInfiltration.Name + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                                         cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Infiltration will result.");
                                 }
-                            } else {
-                                ShowSevereError(state,
-                                                format("{}{} = \"{}\", invalid flow/exteriorarea specification [<0.0]={:.3R}",
-                                                       RoutineName,
-                                                       cCurrentModuleObject,
-                                                       state.dataHeatBal->Infiltration(Loop).Name,
-                                                       rNumericArgs(3)));
-                                ErrorsFound = true;
                             }
-                        }
-                        if (lAlphaFieldBlanks(3)) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name +
-                                                 "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
-                                                 ", but that field is blank.  0 Infiltration will result.");
-                        }
-                    } else if (SELECT_CASE_var == "FLOW/EXTERIORWALLAREA") {
-                        if (state.dataHeatBal->Infiltration(Loop).ZonePtr != 0) {
-                            if (rNumericArgs(3) >= 0.0) {
-                                state.dataHeatBal->Infiltration(Loop).DesignLevel =
-                                    rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).ExtGrossWallArea;
-                                if (state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).ExtGrossWallArea <= 0.0) {
-                                    ShowWarningError(state,
-                                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                                         state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                                         cNumericFieldNames(3) + ", but Exterior Wall Area = 0.  0 Infiltration will result.");
-                                }
-                            } else {
-                                ShowSevereError(state,
-                                                format("{}{} = \"{}\", invalid flow/exteriorwallarea specification [<0.0]={:.3R}",
-                                                       RoutineName,
-                                                       cCurrentModuleObject,
-                                                       state.dataHeatBal->Infiltration(Loop).Name,
-                                                       rNumericArgs(3)));
-                                ErrorsFound = true;
-                            }
-                        }
-                        if (lAlphaFieldBlanks(3)) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name +
-                                                 "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
-                                                 ", but that field is blank.  0 Infiltration will result.");
-                        }
-                    } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
-                        if (state.dataHeatBal->Infiltration(Loop).ZonePtr != 0) {
-                            if (rNumericArgs(4) >= 0.0) {
-                                state.dataHeatBal->Infiltration(Loop).DesignLevel =
-                                    rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Volume /
-                                    DataGlobalConstants::SecInHour;
-                                if (state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Volume <= 0.0) {
-                                    ShowWarningError(state,
-                                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                                         state.dataHeatBal->Infiltration(Loop).Name + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                                         cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Infiltration will result.");
-                                }
-                            } else {
-                                ShowSevereError(state,
-                                                format("{}In {} = \"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}",
-                                                       RoutineName,
-                                                       cCurrentModuleObject,
-                                                       state.dataHeatBal->Infiltration(Loop).Name,
-                                                       rNumericArgs(4)));
-                                ErrorsFound = true;
-                            }
-                        }
-                        if (lAlphaFieldBlanks(4)) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHeatBal->Infiltration(Loop).Name +
-                                                 "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
-                                                 ", but that field is blank.  0 Infiltration will result.");
-                        }
-
-                    } else {
-                        if (Item1 == 1) {
+                        } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                                "\", invalid calculation method=" + cAlphaArgs(4));
+                                            format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisInfiltration.Name,
+                                                   rNumericArgs(2)));
                             ErrorsFound = true;
                         }
+                    }
+                    if (lAlphaFieldBlanks(2)) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name +
+                                             "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
+                                             ", but that field is blank.  0 Infiltration will result.");
+                    }
+                    break;
+
+                case AirflowSpec::FlowPerExteriorArea:
+                    if (thisInfiltration.ZonePtr != 0) {
+                        if (rNumericArgs(3) >= 0.0) {
+                            thisInfiltration.DesignLevel =
+                                rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea;
+                            if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea <= 0.0) {
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" +
+                                                     thisInfiltration.Name + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                                     cNumericFieldNames(3) + ", but Exterior Surface Area = 0.  0 Infiltration will result.");
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{} = \"{}\", invalid flow/exteriorarea specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisInfiltration.Name,
+                                                   rNumericArgs(3)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lAlphaFieldBlanks(3)) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name +
+                                             "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
+                                             ", but that field is blank.  0 Infiltration will result.");
+                    }
+                    break;
+
+                case AirflowSpec::FlowPerExteriorWallArea:
+                    if (thisInfiltration.ZonePtr != 0) {
+                        if (rNumericArgs(3) >= 0.0) {
+                            thisInfiltration.DesignLevel =
+                                rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea;
+                            if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea <= 0.0) {
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" +
+                                                     thisInfiltration.Name + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                                     cNumericFieldNames(3) + ", but Exterior Wall Area = 0.  0 Infiltration will result.");
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{} = \"{}\", invalid flow/exteriorwallarea specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisInfiltration.Name,
+                                                   rNumericArgs(3)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lAlphaFieldBlanks(3)) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name +
+                                             "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
+                                             ", but that field is blank.  0 Infiltration will result.");
+                    }
+                    break;
+
+                case AirflowSpec::AirChanges:
+                    if (thisInfiltration.ZonePtr != 0) {
+                        if (rNumericArgs(4) >= 0.0) {
+                            thisInfiltration.DesignLevel =
+                                rNumericArgs(4) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume /
+                                DataGlobalConstants::SecInHour;
+                            if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume <= 0.0) {
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" +
+                                                     thisInfiltration.Name + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                                     cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Infiltration will result.");
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}In {} = \"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisInfiltration.Name,
+                                                   rNumericArgs(4)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lAlphaFieldBlanks(4)) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name +
+                                             "\", " + cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
+                                             ", but that field is blank.  0 Infiltration will result.");
+                    }
+                    break;
+
+                default:
+                    if (Item1 == 1) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                            "\", invalid calculation method=" + cAlphaArgs(4));
+                        ErrorsFound = true;
                     }
                 }
 
                 if (!lNumericFieldBlanks(5)) {
-                    state.dataHeatBal->Infiltration(Loop).ConstantTermCoef = rNumericArgs(5);
+                    thisInfiltration.ConstantTermCoef = rNumericArgs(5);
                 } else {
-                    state.dataHeatBal->Infiltration(Loop).ConstantTermCoef = 1.0;
+                    thisInfiltration.ConstantTermCoef = 1.0;
                 }
                 if (!lNumericFieldBlanks(6)) {
-                    state.dataHeatBal->Infiltration(Loop).TemperatureTermCoef = rNumericArgs(6);
+                    thisInfiltration.TemperatureTermCoef = rNumericArgs(6);
                 } else {
-                    state.dataHeatBal->Infiltration(Loop).TemperatureTermCoef = 0.0;
+                    thisInfiltration.TemperatureTermCoef = 0.0;
                 }
                 if (!lNumericFieldBlanks(7)) {
-                    state.dataHeatBal->Infiltration(Loop).VelocityTermCoef = rNumericArgs(7);
+                    thisInfiltration.VelocityTermCoef = rNumericArgs(7);
                 } else {
-                    state.dataHeatBal->Infiltration(Loop).VelocityTermCoef = 0.0;
+                    thisInfiltration.VelocityTermCoef = 0.0;
                 }
                 if (!lNumericFieldBlanks(8)) {
-                    state.dataHeatBal->Infiltration(Loop).VelocitySQTermCoef = rNumericArgs(8);
+                    thisInfiltration.VelocitySQTermCoef = rNumericArgs(8);
                 } else {
-                    state.dataHeatBal->Infiltration(Loop).VelocitySQTermCoef = 0.0;
+                    thisInfiltration.VelocitySQTermCoef = 0.0;
                 }
 
-                if (state.dataHeatBal->Infiltration(Loop).ConstantTermCoef == 0.0 &&
-                    state.dataHeatBal->Infiltration(Loop).TemperatureTermCoef == 0.0 &&
-                    state.dataHeatBal->Infiltration(Loop).VelocityTermCoef == 0.0 &&
-                    state.dataHeatBal->Infiltration(Loop).VelocitySQTermCoef == 0.0) {
+                if (thisInfiltration.ConstantTermCoef == 0.0 &&
+                    thisInfiltration.TemperatureTermCoef == 0.0 &&
+                    thisInfiltration.VelocityTermCoef == 0.0 &&
+                    thisInfiltration.VelocitySQTermCoef == 0.0) {
                     if (Item1 == 1) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", in " + cAlphaFieldNames(2) +
