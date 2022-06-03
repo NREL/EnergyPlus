@@ -345,7 +345,7 @@ namespace FileSystem {
         } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
             fopen_mode = "rb";
         } else {
-            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+            throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
@@ -392,7 +392,7 @@ namespace FileSystem {
         } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
             fopen_mode = "rb";
         } else {
-            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+            throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
