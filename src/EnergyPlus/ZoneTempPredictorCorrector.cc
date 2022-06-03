@@ -2371,11 +2371,12 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 StageControlledZone(StageControlledZoneNum).HeatThroRange = rNumericArgs(2);
                 if (rNumericArgs(1) < 0.0) {
                     ShowSevereError(state,
-                                    format("{}=\"" + cAlphaArgs(1) + "\" negative value is found at {}=\"{:.1R}\"",
+                                    format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
+                                           cAlphaArgs(1),
                                            cCurrentModuleObject,
                                            cNumericFieldNames(2),
                                            rNumericArgs(2)));
-                    ShowContinueError(state, ".. The minumum value is 0.");
+                    ShowContinueError(state, ".. The minimum value is 0.");
                     ErrorsFound = true;
                 }
 
@@ -2399,7 +2400,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         if (i > 1) {
                             if (rNumericArgs(2 + i) >= rNumericArgs(1 + i)) {
                                 ShowSevereError(state,
-                                                format("{}=\"{}\" The value at {}=\"{:.1R}\" has to be less than ",
+                                                format(R"({}="{}" The value at {}="{:.1R}" has to be less than )",
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
                                                        cNumericFieldNames(2 + i),
