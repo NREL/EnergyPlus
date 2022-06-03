@@ -2207,7 +2207,7 @@ namespace AirflowNetwork {
                 ShowContinueError(m_state, "..Default value \"SkylineLU\" will be used.");
             }
 
-                        // Get inputs for duct sizing
+            // Get inputs for duct sizing
             if (lAlphaBlanks(10) || UtilityRoutines::SameString(Alphas(10), "None")) {
                 AirflowNetworkSimu.AFNDuctAutoSize = false;
             } else {
@@ -2222,8 +2222,7 @@ namespace AirflowNetwork {
                                     format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(10) + " = " + Alphas(10) + " is invalid.");
                     ShowContinueError(m_state,
                                       "Valid choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. " +
-                                          CurrentModuleObject + ": " + cAlphaFields(1) + " = " +
-                                          AirflowNetworkSimu.AirflowNetworkSimuName);
+                                          CurrentModuleObject + ": " + cAlphaFields(1) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName);
                     ErrorsFound = true;
                     SimObjectError = true;
                 }

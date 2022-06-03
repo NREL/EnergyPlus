@@ -312,7 +312,7 @@ namespace AirflowNetwork {
         Real64 DuctSizePLossRTrunk;    // Pressure loss across return trunk
         Real64 DuctSizePLossRBranch;   // Pressure loss across return branch
         int ErrCountDuct;
-        int ErrIndexDuct; 
+        int ErrIndexDuct;
 
         // Default Constructor
         AirflowNetworkSimuProp()
