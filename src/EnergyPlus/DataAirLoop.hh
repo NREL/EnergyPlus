@@ -207,7 +207,6 @@ namespace DataAirLoop {
         Array1D_int OutletNodeNum;      // component outlet node number
         bool HeatExchangerFlag = false; // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum = -1;        // AirLoopHVAC:DedicatedOutdoorAirSystem number
-        bool DXCoolingCoilFlag = false; // True with DX cooling coil, not used
     };
 
     struct AirLoopAFNData

@@ -485,46 +485,43 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         }
         if (Pos != std::string::npos) LineResult.data.erase(0, Pos + 1);
 
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(Header(HdLine)));
-
-            if (SELECT_CASE_var == "DATA PERIODS") {
-                bool IOStatus;
-                uppercase(LineResult.data);
-                int NumHdArgs = 2;
-                int Count = 1;
-                while (Count <= NumHdArgs) {
-                    strip(LineResult.data);
-                    Pos = index(LineResult.data, ',');
-                    if (Pos == std::string::npos) {
-                        if (len(LineResult.data) == 0) {
-                            while (Pos == std::string::npos) {
-                                LineResult.update(kivaWeatherFile.readLine());
-                                strip(LineResult.data);
-                                uppercase(LineResult.data);
-                                Pos = index(LineResult.data, ',');
-                            }
-                        } else {
-                            Pos = len(LineResult.data);
+        if (UtilityRoutines::MakeUPPERCase(Header(HdLine)) == "DATA PERIODS") {
+            bool IOStatus;
+            uppercase(LineResult.data);
+            int NumHdArgs = 2;
+            int Count = 1;
+            while (Count <= NumHdArgs) {
+                strip(LineResult.data);
+                Pos = index(LineResult.data, ',');
+                if (Pos == std::string::npos) {
+                    if (len(LineResult.data) == 0) {
+                        while (Pos == std::string::npos) {
+                            LineResult.update(kivaWeatherFile.readLine());
+                            strip(LineResult.data);
+                            uppercase(LineResult.data);
+                            Pos = index(LineResult.data, ',');
                         }
+                    } else {
+                        Pos = len(LineResult.data);
                     }
-
-                    {
-                        auto const SELECT_CASE_var1(Count);
-
-                        if (SELECT_CASE_var1 == 1) {
-                            int NumDataPeriods = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
-                            NumHdArgs += 4 * NumDataPeriods;
-                            // TODO: Error if more than one period? Less than full year?
-                        } else if (SELECT_CASE_var1 == 2) {
-                            kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
-                        }
-                    }
-                    LineResult.data.erase(0, Pos + 1);
-                    ++Count;
                 }
+
+                switch (Count) {
+                case 1:
+                    NumHdArgs += 4 * UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
+                    // TODO: Error if more than one period? Less than full year?
+                    break;
+                case 2:
+                    kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
+                    break;
+                default:
+                    break;
+                }
+                LineResult.data.erase(0, Pos + 1);
+                ++Count;
             }
         }
+
         ++HdLine;
         if (HdLine == 9) StillLooking = false;
     }

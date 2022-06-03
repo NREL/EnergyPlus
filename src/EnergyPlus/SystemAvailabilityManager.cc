@@ -56,7 +56,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -4247,8 +4247,7 @@ namespace SystemAvailabilityManager {
                 }
             }
 
-            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 &&
-                state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                 ShowContinueError(state, "The simple airflow objects are used for natural ventilation calculation.");
                 ShowContinueError(state,
@@ -4257,10 +4256,10 @@ namespace SystemAvailabilityManager {
             }
 
             if (hybridVentMgr.SimpleControlTypeSchedPtr == 0) {
-                if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                if (state.afn->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                     ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "The Airflow Network model is not available for Hybrid Ventilation Control.");
-                } else if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                } else if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                     ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, hybridVentMgr.Name));
                     ShowContinueError(state, "Please check the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.");
                     ShowContinueError(state, "The suggested choices are MultizoneWithDistribution or MultizoneWithoutDistribution.");
@@ -4681,8 +4680,6 @@ namespace SystemAvailabilityManager {
         // on and open windows or doors.
 
         using namespace DataAirLoop;
-        using AirflowNetworkBalanceManager::GetZoneOutdoorAirChangeRate;
-        using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using Psychrometrics::PsyHFnTdbW;
@@ -4774,14 +4771,14 @@ namespace SystemAvailabilityManager {
                 ACH = 0.0;
                 HybridVentModeOA = true;
                 if (!hybridVentMgr.HybridVentMgrConnectedToAirLoop) {
-                    if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                    if (state.afn->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
                         HybridVentModeOA = false;
                     }
                 }
 
                 if (hybridVentMgr.ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
-                    ManageAirflowNetworkBalance(state, true);
-                    ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum);
+                    state.afn->manage_balance(true);
+                    ACH = state.afn->zone_OA_change_rate(ZoneNum);
                 }
                 if (ACH > OASetPoint) {
                     hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;

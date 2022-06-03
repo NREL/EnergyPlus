@@ -46,8 +46,6 @@ set(SRC
     AirLoopHVACDOAS.cc
     AirLoopHVACDOAS.hh
     AirTerminalUnit.hh
-    AirflowNetworkBalanceManager.cc
-    AirflowNetworkBalanceManager.hh
     Autosizing/All_Simple_Sizing.cc
     Autosizing/All_Simple_Sizing.hh
     Autosizing/Base.cc
