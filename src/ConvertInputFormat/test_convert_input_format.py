@@ -114,13 +114,15 @@ def run_convertinputformat(
 ):
     """Run the program."""
     if not convertinputformat_exe.exists():
-        raise ValueError(f"{convertinputformat_exe=} does not exist")
+        raise ValueError(
+            f"ConvertInputFormat exe '{convertinputformat_exe}' does not exist"
+        )
 
     if not out_dir.exists() or not out_dir.is_dir():
-        raise ValueError(f"{out_dir=} is not a valid directory")
+        raise ValueError(f"out_dir '{out_dir}' is not a valid directory")
 
     if not input_file.exists() or not input_file.is_file():
-        raise ValueError(f"{input_file=} is not a valid file")
+        raise ValueError(f"input_file '{input_file}' is not a valid file")
 
     cmd = f"{convertinputformat_exe} --output {out_dir} {input_file}"
     print(f"Running: {cmd}")
@@ -140,4 +142,6 @@ if __name__ == "__main__":
     )
     out_file = args.out_dir / args.expected_filename
     if not out_file.exists() or not out_file.is_file():
-        raise ValueError(f"{out_file=} does not exist!")
+        raise ValueError(
+            f"Test Failed: output file '{out_file}' does not exist!"
+        )
