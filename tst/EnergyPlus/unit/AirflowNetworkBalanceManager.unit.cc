@@ -24144,7 +24144,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestReferenceConditionsLeftBlank)
     EXPECT_EQ(expected_viscosity2, state->afn->MultizoneSurfaceCrackData(2).reference_viscosity);
 }
 
-
 TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
 {
 
@@ -26101,7 +26100,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
         state->afn->AirflowNetworkNodeSimu(i).TZ = 23.0;
         state->afn->AirflowNetworkNodeSimu(i).WZ = 0.0008400;
         if ((i >= 4 && i <= 7)) {
-            state->afn->AirflowNetworkNodeSimu(i).TZ = DataEnvironment::OutDryBulbTempAt(*state, state->afn->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
+            state->afn->AirflowNetworkNodeSimu(i).TZ =
+                DataEnvironment::OutDryBulbTempAt(*state, state->afn->AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
             state->afn->AirflowNetworkNodeSimu(i).WZ = state->dataEnvrn->OutHumRat;
         }
     }

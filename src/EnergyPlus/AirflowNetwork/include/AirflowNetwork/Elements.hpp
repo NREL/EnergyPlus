@@ -94,7 +94,7 @@ namespace AirflowNetwork {
         UserAspectRatio  // Effective rectangle user input aspect ratio selection
     };
 
-    enum class DuctLineType
+    enum class iDuctLineType
     {
         None = 0,
         SupplyTrunk,  // Supply trunk
@@ -1491,7 +1491,7 @@ namespace AirflowNetwork {
         bool VAVTermDamper;                 // True if this component is a damper for a VAV terminal
         int LinkageViewFactorObjectNum;
         int AirLoopNum; // Airloop number
-        DuctLineType DuctLineType;
+        iDuctLineType DuctLineType;
 
         // Default Constructor
         AirflowNetworkLinkageProp()
