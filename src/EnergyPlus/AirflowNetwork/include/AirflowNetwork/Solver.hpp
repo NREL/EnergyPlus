@@ -107,7 +107,7 @@ namespace AirflowNetwork {
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     Real64 DuctDResidual(EnergyPlusData &state,
-                         Real64 const D, // duct diameter
+                         Real64 D, // duct diameter
                          Array1D<Real64> const &Par);
     // derived class or struct
     struct OccupantVentilationControlProp

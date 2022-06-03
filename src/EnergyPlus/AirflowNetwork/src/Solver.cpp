@@ -12892,7 +12892,7 @@ namespace AirflowNetwork {
     }
 
     Real64 DuctDResidual(EnergyPlusData &state,
-                         Real64 const D, // duct diameter
+                         Real64 D, // duct diameter
                          Array1D<Real64> const &Par)
     {
         Real64 DuctDResidual;
