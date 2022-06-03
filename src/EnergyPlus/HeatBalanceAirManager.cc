@@ -114,6 +114,36 @@ using Psychrometrics::PsyHFnTdbW;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
 using Psychrometrics::PsyTdbFnHW;
 
+enum class AirflowSpec
+{
+    Invalid = -1,
+    Flow,
+    FlowPerZone,
+    FlowPerArea,
+    FlowPerPerson,
+    AirChanges,
+    Num
+};
+std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
+    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/PERSON", "AIRCHANGES/HOUR"};
+
+enum class AirflowSpecAlt
+{
+    Invalid = -1,
+    Flow,
+    FlowPerZone,
+    FlowPerArea,
+    FlowPerExteriorArea,
+    FlowPerExteriorWallArea,
+    AirChanges,
+    Num
+};
+std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> airflowAltNamesUC = {
+    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "AIRCHANGES/HOUR"};
+
+
+std::array<std::string_view, static_cast<int>(VentilationType::Num)> ventilationTypeNamesUC = {"NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
+
 void ManageAirHeatBalance(EnergyPlusData &state)
 {
 
@@ -875,23 +905,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Infiltration equipment design level calculation method.
-                enum class AirflowSpec
-                {
-                    Invalid = -1,
-                    Flow,
-                    FlowPerZone,
-                    FlowPerArea,
-                    FlowPerExteriorArea,
-                    FlowPerExteriorWallArea,
-                    AirChanges,
-                    Num
-                };
-                std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
-                    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "AIRCHANGES/HOUR"};
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpecAlt flow =
+                    static_cast<AirflowSpecAlt>(getEnumerationValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
-                case AirflowSpec::Flow:
-                case AirflowSpec::FlowPerZone:
+                case AirflowSpecAlt::Flow:
+                case AirflowSpecAlt::FlowPerZone:
                     thisInfiltration.DesignLevel = rNumericArgs(1);
                     if (lAlphaFieldBlanks(1)) {
                         ShowWarningError(state,
@@ -901,7 +919,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpec::FlowPerArea:
+                case AirflowSpecAlt::FlowPerArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(2) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea;
@@ -931,7 +949,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpec::FlowPerExteriorArea:
+                case AirflowSpecAlt::FlowPerExteriorArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea;
@@ -959,7 +977,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpec::FlowPerExteriorWallArea:
+                case AirflowSpecAlt::FlowPerExteriorWallArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea;
@@ -987,7 +1005,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     break;
 
-                case AirflowSpec::AirChanges:
+                case AirflowSpecAlt::AirChanges:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(4) >= 0.0) {
                             thisInfiltration.DesignLevel =
@@ -1538,18 +1556,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Ventilation equipment design level calculation method
-                enum class AirflowSpec
-                {
-                    Invalid = -1,
-                    Flow,
-                    FlowPerZone,
-                    FlowPerArea,
-                    FlowPerPerson,
-                    AirChanges,
-                    Num
-                };
-                std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
-                    "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/PERSON", "AIRCHANGES/HOUR"};
                 AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
                 case AirflowSpec::Flow:
@@ -1657,23 +1663,15 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                {
-                    auto const SELECT_CASE_var(cAlphaArgs(5)); // Fan type character input-->convert to integer
-                    if (SELECT_CASE_var == "EXHAUST") {
-                        thisVentilation.FanType = DataHeatBalance::VentilationType::Exhaust;
-                    } else if (SELECT_CASE_var == "INTAKE") {
-                        thisVentilation.FanType = DataHeatBalance::VentilationType::Intake;
-                    } else if ((SELECT_CASE_var == "NATURAL") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var.empty())) {
-                        thisVentilation.FanType = DataHeatBalance::VentilationType::Natural;
-                    } else if (SELECT_CASE_var == "BALANCED") {
-                        thisVentilation.FanType = DataHeatBalance::VentilationType::Balanced;
-                    } else {
-                        if (Item1 == 1) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\". invalid " +
-                                                cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
-                            ErrorsFound = true;
-                        }
+                if (cAlphaArgs(5).empty()) {
+                    thisVentilation.FanType = DataHeatBalance::VentilationType::Natural;
+                } else {
+                    thisVentilation.FanType = static_cast<VentilationType>(getEnumerationValue(ventilationTypeNamesUC, cAlphaArgs(5)));
+                    if (thisVentilation.FanType == VentilationType::Invalid) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\". invalid " +
+                                            cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
+                        ErrorsFound = true;
                     }
                 }
 
@@ -2692,101 +2690,103 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         // Mixing equipment design level calculation method
-        {
-            auto const SELECT_CASE_var(cAlphaArgs(4));
-            if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
-                state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(1);
-                if (lAlphaFieldBlanks(1)) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Mixing will result.");
-                }
-
-            } else if (SELECT_CASE_var == "FLOW/AREA") {
-                if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
-                    if (rNumericArgs(2) >= 0.0) {
-                        state.dataHeatBal->Mixing(Loop).DesignLevel =
-                            rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea;
-                        if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea <= 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Mixing will result.");
-                        }
-                    } else {
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               rNumericArgs(2)));
-                        ErrorsFound = true;
-                    }
-                }
-                if (lAlphaFieldBlanks(2)) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Mixing will result.");
-                }
-
-            } else if (SELECT_CASE_var == "FLOW/PERSON") {
-                if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
-                    if (rNumericArgs(3) >= 0.0) {
-                        state.dataHeatBal->Mixing(Loop).DesignLevel =
-                            rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants;
-                        if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants <= 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(3) + ", but Zone Total Occupants = 0.  0 Mixing will result.");
-                        }
-                    } else {
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               rNumericArgs(3)));
-                        ErrorsFound = true;
-                    }
-                }
-                if (lAlphaFieldBlanks(3)) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Mixing will result.");
-                }
-
-            } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
-                if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
-                    if (rNumericArgs(4) >= 0.0) {
-                        state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(4) *
-                                                                      state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume /
-                                                                      DataGlobalConstants::SecInHour;
-                        if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume <= 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Mixing will result.");
-                        }
-                    } else {
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               rNumericArgs(4)));
-                        ErrorsFound = true;
-                    }
-                }
-                if (lAlphaFieldBlanks(4)) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Mixing will result.");
-                }
-
-            } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                    "\", invalid calculation method=" + cAlphaArgs(4));
-                ErrorsFound = true;
+        AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+        switch (flow) {
+        case AirflowSpec::Flow:
+        case AirflowSpec::FlowPerZone:
+            state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(1);
+            if (lAlphaFieldBlanks(1)) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                     " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Mixing will result.");
             }
+            break;
+
+        case AirflowSpec::FlowPerArea:
+            if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
+                if (rNumericArgs(2) >= 0.0) {
+                    state.dataHeatBal->Mixing(Loop).DesignLevel =
+                        rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea;
+                    if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea <= 0.0) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                             " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Mixing will result.");
+                    }
+                } else {
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           rNumericArgs(2)));
+                    ErrorsFound = true;
+                }
+            }
+            if (lAlphaFieldBlanks(2)) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                     " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Mixing will result.");
+            }
+            break;
+
+        case AirflowSpec::FlowPerPerson:
+            if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
+                if (rNumericArgs(3) >= 0.0) {
+                    state.dataHeatBal->Mixing(Loop).DesignLevel =
+                        rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants;
+                    if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants <= 0.0) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                             " specifies " + cNumericFieldNames(3) + ", but Zone Total Occupants = 0.  0 Mixing will result.");
+                    }
+                } else {
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           rNumericArgs(3)));
+                    ErrorsFound = true;
+                }
+            }
+            if (lAlphaFieldBlanks(3)) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                     " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Mixing will result.");
+            }
+            break;
+
+        case AirflowSpec::AirChanges:
+            if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
+                if (rNumericArgs(4) >= 0.0) {
+                    state.dataHeatBal->Mixing(Loop).DesignLevel =
+                        rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
+                    if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume <= 0.0) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                             " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Mixing will result.");
+                    }
+                } else {
+                    ShowSevereError(state,
+                                    format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           rNumericArgs(4)));
+                    ErrorsFound = true;
+                }
+            }
+            if (lAlphaFieldBlanks(4)) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                     " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Mixing will result.");
+            }
+            break;
+
+        default:
+            ShowSevereError(
+                state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid calculation method=" + cAlphaArgs(4));
+            ErrorsFound = true;
         }
 
         state.dataHeatBal->Mixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
@@ -3207,104 +3207,106 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             }
 
             // Mixing equipment design level calculation method.
-            {
-                auto const SELECT_CASE_var(cAlphaArgs(4));
-                if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
-                    state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(1);
-                    if (lAlphaFieldBlanks(1)) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                             " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "FLOW/AREA") {
-                    if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(2) >= 0.0) {
-                            state.dataHeatBal->CrossMixing(Loop).DesignLevel =
-                                rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea;
-                            if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
-                                ShowWarningError(state,
-                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " +
-                                                     cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
-                                                     ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(state,
-                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                                   RoutineName,
-                                                   cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   rNumericArgs(2)));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lAlphaFieldBlanks(2)) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                             " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "FLOW/PERSON") {
-                    if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(3) >= 0.0) {
-                            state.dataHeatBal->CrossMixing(Loop).DesignLevel =
-                                rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants;
-                            if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                ShowWarningError(state,
-                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " +
-                                                     cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
-                                                     ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(state,
-                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                                   RoutineName,
-                                                   cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   rNumericArgs(3)));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lAlphaFieldBlanks(3)) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                             " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
-                    if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(4) >= 0.0) {
-                            state.dataHeatBal->CrossMixing(Loop).DesignLevel =
-                                rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume /
-                                DataGlobalConstants::SecInHour;
-                            if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
-                                ShowWarningError(state,
-                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " +
-                                                     cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
-                                                     ", but Zone Volume = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(state,
-                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                                   RoutineName,
-                                                   cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   rNumericArgs(4)));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lAlphaFieldBlanks(4)) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                             " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                        "\", invalid calculation method=" + cAlphaArgs(4));
-                    ErrorsFound = true;
+            AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+            switch (flow) {
+            case AirflowSpec::Flow:
+            case AirflowSpec::FlowPerZone:
+                state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(1);
+                if (lAlphaFieldBlanks(1)) {
+                    ShowWarningError(state,
+                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                         " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
                 }
+                break;
+
+            case AirflowSpec::FlowPerArea:
+                if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
+                    if (rNumericArgs(2) >= 0.0) {
+                        state.dataHeatBal->CrossMixing(Loop).DesignLevel =
+                            rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea;
+                        if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                                 " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
+                        }
+                    } else {
+                        ShowSevereError(state,
+                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               cAlphaArgs(1),
+                                               rNumericArgs(2)));
+                        ErrorsFound = true;
+                    }
+                }
+                if (lAlphaFieldBlanks(2)) {
+                    ShowWarningError(state,
+                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                         " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
+                }
+                break;
+
+            case AirflowSpec::FlowPerPerson:
+                if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
+                    if (rNumericArgs(3) >= 0.0) {
+                        state.dataHeatBal->CrossMixing(Loop).DesignLevel =
+                            rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants;
+                        if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                                 " specifies " + cNumericFieldNames(3) +
+                                                 ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
+                        }
+                    } else {
+                        ShowSevereError(state,
+                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               cAlphaArgs(1),
+                                               rNumericArgs(3)));
+                        ErrorsFound = true;
+                    }
+                }
+                if (lAlphaFieldBlanks(3)) {
+                    ShowWarningError(state,
+                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                         " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
+                }
+                break;
+
+            case AirflowSpec::AirChanges:
+                if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
+                    if (rNumericArgs(4) >= 0.0) {
+                        state.dataHeatBal->CrossMixing(Loop).DesignLevel =
+                            rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume /
+                            DataGlobalConstants::SecInHour;
+                        if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                                 " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
+                        }
+                    } else {
+                        ShowSevereError(state,
+                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               cAlphaArgs(1),
+                                               rNumericArgs(4)));
+                        ErrorsFound = true;
+                    }
+                }
+                if (lAlphaFieldBlanks(4)) {
+                    ShowWarningError(state,
+                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                         " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
+                }
+                break;
+
+            default:
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\", invalid calculation method=" + cAlphaArgs(4));
+                ErrorsFound = true;
             }
 
             state.dataHeatBal->CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
@@ -4456,121 +4458,126 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
             state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
-                if (SELECT_CASE_var == "MIXING") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
-                } else if (SELECT_CASE_var == "ONENODEDISPLACEMENTVENTILATION") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mundt;
-                    state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    state.dataRoomAirMod->MundtModelUsed = true;
-                    IsNotOK = false;
-                    ValidateComponent(state,
-                                      "RoomAirSettings:OneNodeDisplacementVentilation",
-                                      "zone_name",
-                                      state.dataIPShortCut->cAlphaArgs(2),
-                                      IsNotOK,
-                                      "GetRoomAirModelParameters");
-                    if (IsNotOK) {
-                        ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == "THREENODEDISPLACEMENTVENTILATION") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
-                    state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    state.dataRoomAirMod->UCSDModelUsed = true;
-                    IsNotOK = false;
-                    ValidateComponent(state,
-                                      "RoomAirSettings:ThreeNodeDisplacementVentilation",
-                                      "zone_name",
-                                      state.dataIPShortCut->cAlphaArgs(2),
-                                      IsNotOK,
-                                      "GetRoomAirModelParameters");
-                    if (IsNotOK) {
-                        ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == "CROSSVENTILATION") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
-                    state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    state.dataRoomAirMod->UCSDModelUsed = true;
-                    IsNotOK = false;
-                    ValidateComponent(state,
-                                      "RoomAirSettings:CrossVentilation",
-                                      "zone_name",
-                                      state.dataIPShortCut->cAlphaArgs(2),
-                                      IsNotOK,
-                                      "GetRoomAirModelParameters");
-                    if (IsNotOK) {
-                        ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONINTERIOR") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDUFI;
-                    state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    state.dataRoomAirMod->UCSDModelUsed = true;
-                    ValidateComponent(state,
-                                      "RoomAirSettings:UnderFloorAirDistributionInterior",
-                                      "zone_name",
-                                      state.dataIPShortCut->cAlphaArgs(2),
-                                      IsNotOK,
-                                      "GetRoomAirModelParameters");
-                    if (IsNotOK) {
-                        ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONEXTERIOR") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDUFE;
-                    state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    state.dataRoomAirMod->UCSDModelUsed = true;
-                    ValidateComponent(state,
-                                      "RoomAirSettings:UnderFloorAirDistributionExterior",
-                                      "zone_name",
-                                      state.dataIPShortCut->cAlphaArgs(2),
-                                      IsNotOK,
-                                      "GetRoomAirModelParameters");
-                    if (IsNotOK) {
-                        ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == "USERDEFINED") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UserDefined;
-                    state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    state.dataRoomAirMod->UserDefinedUsed = true;
-                } else if (SELECT_CASE_var == "AIRFLOWNETWORK") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
-                    state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                    if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
-                        ShowSevereError(state,
-                                        "In " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " +
-                                            state.dataIPShortCut->cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
-                        ShowContinueError(state,
-                                          "This model requires AirflowNetwork:* objects to form a complete network, including "
-                                          "AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.");
-                        ShowContinueError(state, "AirflowNetwork:SimulationControl not found.");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "The mixing air model will be used for Zone =" + state.dataIPShortCut->cAlphaArgs(2));
-                    state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+            state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = static_cast<DataRoomAirModel::RoomAirModel>(
+                getEnumerationValue(DataRoomAirModel::roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType) {
+            case DataRoomAirModel::RoomAirModel::Mixing:
+                // nothing to do here actually
+                break;
+
+            case DataRoomAirModel::RoomAirModel::Mundt:
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                state.dataRoomAirMod->MundtModelUsed = true;
+                IsNotOK = false;
+                ValidateComponent(state,
+                                  "RoomAirSettings:OneNodeDisplacementVentilation",
+                                  "zone_name",
+                                  state.dataIPShortCut->cAlphaArgs(2),
+                                  IsNotOK,
+                                  "GetRoomAirModelParameters");
+                if (IsNotOK) {
+                    ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
+                    ErrorsFound = true;
                 }
+                break;
+
+            case DataRoomAirModel::RoomAirModel::UCSDDV:
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                state.dataRoomAirMod->UCSDModelUsed = true;
+                IsNotOK = false;
+                ValidateComponent(state,
+                                  "RoomAirSettings:ThreeNodeDisplacementVentilation",
+                                  "zone_name",
+                                  state.dataIPShortCut->cAlphaArgs(2),
+                                  IsNotOK,
+                                  "GetRoomAirModelParameters");
+                if (IsNotOK) {
+                    ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
+                    ErrorsFound = true;
+                }
+                break;
+
+            case DataRoomAirModel::RoomAirModel::UCSDCV:
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                state.dataRoomAirMod->UCSDModelUsed = true;
+                IsNotOK = false;
+                ValidateComponent(state,
+                                  "RoomAirSettings:CrossVentilation",
+                                  "zone_name",
+                                  state.dataIPShortCut->cAlphaArgs(2),
+                                  IsNotOK,
+                                  "GetRoomAirModelParameters");
+                if (IsNotOK) {
+                    ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
+                    ErrorsFound = true;
+                }
+                break;
+
+            case DataRoomAirModel::RoomAirModel::UCSDUFI:
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                state.dataRoomAirMod->UCSDModelUsed = true;
+                ValidateComponent(state,
+                                  "RoomAirSettings:UnderFloorAirDistributionInterior",
+                                  "zone_name",
+                                  state.dataIPShortCut->cAlphaArgs(2),
+                                  IsNotOK,
+                                  "GetRoomAirModelParameters");
+                if (IsNotOK) {
+                    ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
+                    ErrorsFound = true;
+                }
+                break;
+
+            case DataRoomAirModel::RoomAirModel::UCSDUFE:
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                state.dataRoomAirMod->UCSDModelUsed = true;
+                ValidateComponent(state,
+                                  "RoomAirSettings:UnderFloorAirDistributionExterior",
+                                  "zone_name",
+                                  state.dataIPShortCut->cAlphaArgs(2),
+                                  IsNotOK,
+                                  "GetRoomAirModelParameters");
+                if (IsNotOK) {
+                    ShowContinueError(state, "In " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1) + '.');
+                    ErrorsFound = true;
+                }
+                break;
+
+            case DataRoomAirModel::RoomAirModel::UserDefined:
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                state.dataRoomAirMod->UserDefinedUsed = true;
+                break;
+
+            case DataRoomAirModel::RoomAirModel::AirflowNetwork:
+                state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
+                    ShowSevereError(state,
+                                    "In " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
+                    ShowContinueError(state,
+                                      "This model requires AirflowNetwork:* objects to form a complete network, including "
+                                      "AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.");
+                    ShowContinueError(state, "AirflowNetwork:SimulationControl not found.");
+                    ErrorsFound = true;
+                }
+                break;
+
+            default:
+                ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "The mixing air model will be used for Zone =" + state.dataIPShortCut->cAlphaArgs(2));
+                state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
             }
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
-                if (SELECT_CASE_var == "DIRECT") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
-                } else if (SELECT_CASE_var == "INDIRECT") {
-                    state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Indirect;
-                } else {
-                    ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "The direct coupling scheme will be used for Zone =" + state.dataIPShortCut->cAlphaArgs(2));
-                    state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
-                }
+            state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = static_cast<DataRoomAirModel::CouplingScheme>(
+                getEnumerationValue(DataRoomAirModel::couplingSchemeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+            if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == DataRoomAirModel::CouplingScheme::Invalid) {
+                ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, "The direct coupling scheme will be used for Zone =" + state.dataIPShortCut->cAlphaArgs(2));
+                state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
             }
+
         } else { // Zone Not Found
             ShowSevereError(state, cCurrentModuleObject + ", Zone not found=" + state.dataIPShortCut->cAlphaArgs(2));
             ShowContinueError(state, "occurs in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
