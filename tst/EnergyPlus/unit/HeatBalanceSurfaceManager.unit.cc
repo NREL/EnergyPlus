@@ -5634,13 +5634,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
-    // test surface property sky and ground view factors inputs
-    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).GroundSurfsPtr);
-    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).SurroundingSurfsPtr);
+    // test surface property object inputs
+    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
+    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
     // set local derived data vars
-    int SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(3);
+    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(SurfNum);
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-    int GndSurfsNum = state->dataSurface->IsSurfPropertyGndSurfacesDefined(3);
+    GndSurfsNum = state->dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
     // check sky view factors
     EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
@@ -5950,13 +5953,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
-    // test surface property sky and ground view factors inputs
-    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).GroundSurfsPtr);
-    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(1).SurroundingSurfsPtr);
+    // test surface property object inputs
+    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
+    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
     // set local derived data vars
-    int SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(3);
+    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(SurfNum);
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-    int GndSurfsNum = state->dataSurface->IsSurfPropertyGndSurfacesDefined(3);
+    GndSurfsNum = state->dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
     // check sky view factors
     EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
@@ -5974,7 +5980,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
     ScheduleManager::UpdateScheduleValues(*state);
 
     // check ground temperature values
-    Real64 const Rgndsurf_grass = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(1).ReflSchPtr); 
+    Real64 const Rgndsurf_grass = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(1).ReflSchPtr);
     Real64 const Rgndsurf_parking = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(2).ReflSchPtr);
     Real64 const Rgndsurf_lake = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(3).ReflSchPtr);
     EXPECT_DOUBLE_EQ(0.25, Rgndsurf_grass);
@@ -6653,7 +6659,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     EXPECT_DOUBLE_EQ(0.4, SrdSurfsProperty_3.SurroundingSurfs(1).ViewFactor);
     EXPECT_DOUBLE_EQ(0.3, GndSurfsProperty_3.GndSurfs(1).ViewFactor);
     EXPECT_TRUE(GndSurfsProperty_3.IsGroundViewFactorSet);
-    // test surface view factors are reset correctly
+    // test surface view factors reset are correct
     EXPECT_DOUBLE_EQ(0.3, Surface_Living_North.ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorGroundIR);
     EXPECT_DOUBLE_EQ(0.2, Surface_Living_East.ViewFactorSkyIR);
