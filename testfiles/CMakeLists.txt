@@ -137,7 +137,7 @@ add_simulation_test(IDF_FILE AirflowNetworkOccupantVentilationControl.idf EPW_FI
 add_simulation_test(IDF_FILE AirflowNetwork_Attic_Duct.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE AirflowNetwork_MultiAirLoops.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE AirflowNetwork_MultiZone_House.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-add_simulation_test(IDF_FILE AirflowNetwork_MultiZone_House_DuctSizing.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE AirflowNetwork_MULTIZONE_House_DuctSizing.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE AirflowNetwork_MultiZone_House_FanModel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE AirflowNetwork_MultiZone_House_OvercoolDehumid.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE AirflowNetwork_MultiZone_House_TwoSpeed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

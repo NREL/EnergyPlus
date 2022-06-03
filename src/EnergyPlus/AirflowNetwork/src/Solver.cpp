@@ -2262,7 +2262,6 @@ namespace AirflowNetwork {
             AirflowNetworkSimu.AspectRatio = Numbers(6);
             AirflowNetworkSimu.MaxPressure = 500.0; // Maximum pressure difference by default
 
-
             if (AirflowNetworkSimu.AFNDuctAutoSize) {
                 AirflowNetworkSimu.DuctSizeFactor = Numbers(7);
                 AirflowNetworkSimu.DuctSizeMaxV = Numbers(8);
@@ -12261,12 +12260,10 @@ namespace AirflowNetwork {
             if (AirflowNetworkNodeData(AFNNodeNum).EPlusTypeNum == iEPlusNodeType::MIX) {
                 NodeMixer = AFNNodeNum;
             }
-            if (AirflowNetworkNodeData(AFNNodeNum).EPlusNodeNum ==
-                m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1)) {
+            if (AirflowNetworkNodeData(AFNNodeNum).EPlusNodeNum == m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1)) {
                 NodeLoopSupply = AFNNodeNum;
             }
-            if (AirflowNetworkNodeData(AFNNodeNum).EPlusNodeNum ==
-                m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipReturnNodeNum(1)) {
+            if (AirflowNetworkNodeData(AFNNodeNum).EPlusNodeNum == m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipReturnNodeNum(1)) {
                 NodeLoopReturn = AFNNodeNum;
             }
             if (AirflowNetworkNodeData(AFNNodeNum).EPlusTypeNum == iEPlusNodeType::ZIN) {
@@ -12354,8 +12351,7 @@ namespace AirflowNetwork {
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu
-                                          .ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Trunk size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
@@ -12468,8 +12464,7 @@ namespace AirflowNetwork {
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu
-                                          .ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Branch size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
@@ -12586,8 +12581,7 @@ namespace AirflowNetwork {
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu
-                                          .ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Trunk size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
@@ -12701,8 +12695,7 @@ namespace AirflowNetwork {
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu
-                                          .ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Branch size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
@@ -12755,50 +12748,34 @@ namespace AirflowNetwork {
             if (AirflowNetworkLinkageData(AFNLinkNum).DuctLineType == DuctLineType::SupplyTrunk) {
                 DisSysCompDuctData(TypeNum).hydraulicDiameter = SupplyTrunkD;
                 DisSysCompDuctData(TypeNum).A = SupplyTrunkArea;
-                DisSysCompDuctData(TypeNum).RelRough =
-                    DisSysCompDuctData(TypeNum).roughness / SupplyTrunkD; // e/D: relative roughness
-                DisSysCompDuctData(TypeNum).RelL =
-                    DisSysCompDuctData(TypeNum).L / SupplyTrunkD; // L/D: relative length
-                DisSysCompDuctData(TypeNum).A1 =
-                    1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
-                DisSysCompDuctData(TypeNum).g =
-                    DisSysCompDuctData(TypeNum).A1; // 1/sqrt(Darcy friction factor)
+                DisSysCompDuctData(TypeNum).RelRough = DisSysCompDuctData(TypeNum).roughness / SupplyTrunkD;       // e/D: relative roughness
+                DisSysCompDuctData(TypeNum).RelL = DisSysCompDuctData(TypeNum).L / SupplyTrunkD;                   // L/D: relative length
+                DisSysCompDuctData(TypeNum).A1 = 1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
+                DisSysCompDuctData(TypeNum).g = DisSysCompDuctData(TypeNum).A1;                                    // 1/sqrt(Darcy friction factor)
             }
             if (AirflowNetworkLinkageData(AFNLinkNum).DuctLineType == DuctLineType::SupplyBranch) {
                 DisSysCompDuctData(TypeNum).hydraulicDiameter = SupplyBranchD;
                 DisSysCompDuctData(TypeNum).A = SupplyBranchArea;
-                DisSysCompDuctData(TypeNum).RelRough =
-                    DisSysCompDuctData(TypeNum).roughness / SupplyBranchD; // e/D: relative roughness
-                DisSysCompDuctData(TypeNum).RelL =
-                    DisSysCompDuctData(TypeNum).L / SupplyBranchD; // L/D: relative length
-                DisSysCompDuctData(TypeNum).A1 =
-                    1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
-                DisSysCompDuctData(TypeNum).g =
-                    DisSysCompDuctData(TypeNum).A1; // 1/sqrt(Darcy friction factor)
+                DisSysCompDuctData(TypeNum).RelRough = DisSysCompDuctData(TypeNum).roughness / SupplyBranchD;      // e/D: relative roughness
+                DisSysCompDuctData(TypeNum).RelL = DisSysCompDuctData(TypeNum).L / SupplyBranchD;                  // L/D: relative length
+                DisSysCompDuctData(TypeNum).A1 = 1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
+                DisSysCompDuctData(TypeNum).g = DisSysCompDuctData(TypeNum).A1;                                    // 1/sqrt(Darcy friction factor)
             }
             if (AirflowNetworkLinkageData(AFNLinkNum).DuctLineType == DuctLineType::ReturnTrunk) {
                 DisSysCompDuctData(TypeNum).hydraulicDiameter = ReturnTrunkD;
                 DisSysCompDuctData(TypeNum).A = ReturnTrunkArea;
-                DisSysCompDuctData(TypeNum).RelRough =
-                    DisSysCompDuctData(TypeNum).roughness / ReturnTrunkD; // e/D: relative roughness
-                DisSysCompDuctData(TypeNum).RelL =
-                    DisSysCompDuctData(TypeNum).L / ReturnTrunkD; // L/D: relative length
-                DisSysCompDuctData(TypeNum).A1 =
-                    1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
-                DisSysCompDuctData(TypeNum).g =
-                    DisSysCompDuctData(TypeNum).A1; // 1/sqrt(Darcy friction factor)
+                DisSysCompDuctData(TypeNum).RelRough = DisSysCompDuctData(TypeNum).roughness / ReturnTrunkD;       // e/D: relative roughness
+                DisSysCompDuctData(TypeNum).RelL = DisSysCompDuctData(TypeNum).L / ReturnTrunkD;                   // L/D: relative length
+                DisSysCompDuctData(TypeNum).A1 = 1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
+                DisSysCompDuctData(TypeNum).g = DisSysCompDuctData(TypeNum).A1;                                    // 1/sqrt(Darcy friction factor)
             }
             if (AirflowNetworkLinkageData(AFNLinkNum).DuctLineType == DuctLineType::ReturnBranch) {
                 DisSysCompDuctData(TypeNum).hydraulicDiameter = ReturnBranchD;
                 DisSysCompDuctData(TypeNum).A = ReturnBranchArea;
-                DisSysCompDuctData(TypeNum).RelRough =
-                    DisSysCompDuctData(TypeNum).roughness / ReturnBranchD; // e/D: relative roughness
-                DisSysCompDuctData(TypeNum).RelL =
-                    DisSysCompDuctData(TypeNum).L / ReturnBranchD; // L/D: relative length
-                DisSysCompDuctData(TypeNum).A1 =
-                    1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
-                DisSysCompDuctData(TypeNum).g =
-                    DisSysCompDuctData(TypeNum).A1; // 1/sqrt(Darcy friction factor)
+                DisSysCompDuctData(TypeNum).RelRough = DisSysCompDuctData(TypeNum).roughness / ReturnBranchD;      // e/D: relative roughness
+                DisSysCompDuctData(TypeNum).RelL = DisSysCompDuctData(TypeNum).L / ReturnBranchD;                  // L/D: relative length
+                DisSysCompDuctData(TypeNum).A1 = 1.14 - 0.868589 * std::log(DisSysCompDuctData(TypeNum).RelRough); // 1.14 - 0.868589*ln(e/D)
+                DisSysCompDuctData(TypeNum).g = DisSysCompDuctData(TypeNum).A1;                                    // 1/sqrt(Darcy friction factor)
             }
         }
 
@@ -12841,8 +12818,7 @@ namespace AirflowNetwork {
         }
     }
 
-    Real64 Solver::CalcDuctDiameter(
-        Real64 hydraulicDiameter, Real64 DeltaP, Real64 MassFlowrate, Real64 TotalL, Real64 TotalLossCoe, Real64 MaxRough)
+    Real64 Solver::CalcDuctDiameter(Real64 hydraulicDiameter, Real64 DeltaP, Real64 MassFlowrate, Real64 TotalL, Real64 TotalLossCoe, Real64 MaxRough)
     {
         Real64 CalcDeltaP = 0.0;
 
@@ -12862,7 +12838,6 @@ namespace AirflowNetwork {
         Real64 ld;
         Real64 g;
         Real64 AA1;
-        //Real64 V2;
         Real64 velocity;
         Real64 constexpr LamDynCoef(64.0);
         Real64 constexpr LamFriCoef(0.001);
