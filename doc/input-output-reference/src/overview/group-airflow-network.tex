@@ -333,6 +333,46 @@ This is an optional field. Input is Yes or No. The default is No. Yes is that ex
 
 This is an optional field. Input is Yes or No. The default is No. Set this input to Yes to have zone equipment that are currently unsupported in the AirflowNetwork model allowed in the simulation. Setting this field to Yes, allows the following equipment to be modeled along an AirflowNetwork model: ZoneHVAC:Dehumidifier, ZoneHVAC:EnergyRecoveryVentilator, WaterHeater:HeatPump:*. The AirflowNetwork model will exclude mass balance in these equipment objects and assume the mass flows are self-balanced in the equipment objects.
 
+\paragraph{Field: Duct Sizing Method}\label{duct-sizing-method}
+
+This is an optional field. The allowed choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity, with the default being None.
+
+None: No duct sizing is performed.
+
+MaximumVelocity: The duct diameter is calculated based on entered velocity as D_h = sqrt(4Q/(V*pi))
+
+where Q = volumetric flow rate {m3}
+
+      V = maximum velocity {m/s}
+
+PressureLoss: Colebrook's equation is used to calculate duct diameter. Please see detailed description of calculation procedure in Engineering Reference.
+
+PressureLossWithMaximumVelocity: When PressureLossWithMaximumVelocity is entered, duct diameter is calculated based on PressureLoss first. The value will be used to calculate flow velocity to ensure the final velocity is less than the maximum value. If greater, final value will be obtained from MaximumVelocity.
+
+\paragraph{Field: Duct Sizing Factor}\label{duct-sizing-factor}
+
+The global duct sizing ratio applied to all of the duct component diameter.
+
+\paragraph{Field: Maximum Airflow Velocity}\label{maximum-airflow-velocity}
+
+This is an optional field to represent the maximum velopcity in trunk ducts with units m/s. The default value is 5 m/s. The value is used when the choice of Duct Sizing Method is either MaximumVelocity or PressureLossWithMaximumVelocity. The duct diameter is calculated at D = flow rate / Cross section area.
+
+\paragraph{Field: Total Pressure Loss Across Supply Truck}\label{total-pressure-loss-across-supply-truck}
+
+This optional field is used if Duct Sizing Method is PressureLoss or PressureLossWithMaximumVelocity. When PressureLoss is entered, duct diameter is calculated using Colebrook's equation.  When PressureLossWithMaximumVelocity is entered, duct diameter is calculated based on PressureLoss first. The value is used to calculate flow velocity to ensure the final velocity is less than the maximum value. If greater, final value will be obtained from the MaximumVelocity method.
+
+\paragraph{Field: Total Pressure Loss Across Supply Branch}\label{total-pressure-loss-across-supply-branch}
+
+This optional field with units Pa is used to calculate supply branch duct diameter based on Colesbrook's equation. 
+
+\paragraph{Field: Total Pressure Loss Across Return Truck}\label{total-pressure-loss-across-return-truck}
+
+This optional field with units Pa is used to calculate return trunk duct diameter based on Colesbrook's equation. 
+
+\paragraph{Field: Total Pressure Loss Across Return Branch}\label{total-pressure-loss-across-return-branch}
+ 
+This optional field with units Pa is used to calculate return branch duct diameter based on Colesbrook's equation. 
+
 An IDF example is shown below:
 
 \begin{lstlisting}
