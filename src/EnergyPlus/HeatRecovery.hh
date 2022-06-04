@@ -94,32 +94,23 @@ namespace HeatRecovery {
         Num
     };
 
-    // Economizer lockout operation
-    enum class EconomizerLockout
-    {
-        Invalid = -1,
-        No,
-        Yes,
-        Num
-    };
-
     struct HeatExchCond
     {
         // Members
-        std::string Name;               // name of component
-        int ExchTypeNum;                // Integer equivalent to ExchType
-        int HeatExchPerfTypeNum;        // Desiccant balanced heat exchanger performance data type num
-        std::string HeatExchPerfName;   // Desiccant balanced heat exchanger performance data name
-        int SchedPtr;                   // index of schedule
-        HXConfiguration FlowArr;        // flow Arrangement:
-        EconomizerLockout EconoLockOut; // 1: Yes;  0: No
-        Real64 hARatio;                 // ratio of supply side h*A to secondary side h*A
-        Real64 NomSupAirVolFlow;        // nominal supply air volume flow rate (m3/s)
-        Real64 NomSupAirInTemp;         // nominal supply air inlet temperature (C)
-        Real64 NomSupAirOutTemp;        // nominal supply air outlet temperature (C)
-        Real64 NomSecAirVolFlow;        // nominal secondary air volume flow rate (m3/s)
-        Real64 NomSecAirInTemp;         // nominal secondary air inlet temperature (C)
-        Real64 NomElecPower;            // nominal electric power consumption [W]
+        std::string Name;             // name of component
+        int ExchTypeNum;              // Integer equivalent to ExchType
+        int HeatExchPerfTypeNum;      // Desiccant balanced heat exchanger performance data type num
+        std::string HeatExchPerfName; // Desiccant balanced heat exchanger performance data name
+        int SchedPtr;                 // index of schedule
+        HXConfiguration FlowArr;      // flow Arrangement:
+        BooleanSwitch EconoLockOut;   // 1: Yes;  0: No
+        Real64 hARatio;               // ratio of supply side h*A to secondary side h*A
+        Real64 NomSupAirVolFlow;      // nominal supply air volume flow rate (m3/s)
+        Real64 NomSupAirInTemp;       // nominal supply air inlet temperature (C)
+        Real64 NomSupAirOutTemp;      // nominal supply air outlet temperature (C)
+        Real64 NomSecAirVolFlow;      // nominal secondary air volume flow rate (m3/s)
+        Real64 NomSecAirInTemp;       // nominal secondary air inlet temperature (C)
+        Real64 NomElecPower;          // nominal electric power consumption [W]
         // values describing nominal condition (derived from input parameters)
         Real64 UA0;               // (Uavg*A) at nominal condition
         Real64 mTSup0;            // product mDot*Tabs, supply  air, nominal cond.
@@ -201,7 +192,7 @@ namespace HeatRecovery {
 
         // Default Constructor
         HeatExchCond()
-            : ExchTypeNum(0), HeatExchPerfTypeNum(0), SchedPtr(0), FlowArr(HXConfiguration::Invalid), EconoLockOut(EconomizerLockout::Invalid),
+            : ExchTypeNum(0), HeatExchPerfTypeNum(0), SchedPtr(0), FlowArr(HXConfiguration::Invalid), EconoLockOut(BooleanSwitch::Invalid),
               hARatio(0.0), NomSupAirVolFlow(0.0), NomSupAirInTemp(0.0), NomSupAirOutTemp(0.0), NomSecAirVolFlow(0.0), NomSecAirInTemp(0.0),
               NomElecPower(0.0), UA0(0.0), mTSup0(0.0), mTSec0(0.0), NomSupAirMassFlow(0.0), NomSecAirMassFlow(0.0), SupInletNode(0),
               SupOutletNode(0), SecInletNode(0), SecOutletNode(0), SupInTemp(0.0), SupInHumRat(0.0), SupInEnth(0.0), SupInMassFlow(0.0),

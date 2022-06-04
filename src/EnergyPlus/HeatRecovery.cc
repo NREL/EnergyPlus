@@ -237,43 +237,38 @@ namespace HeatRecovery {
         InitHeatRecovery(state, HeatExchNum, CompanionCoilNum, companionCoilType);
 
         // call the correct heat exchanger calculation routine
-        {
-            auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(HeatExchNum).ExchTypeNum);
+        switch (state.dataHeatRecovery->ExchCond(HeatExchNum).ExchTypeNum) {
+        case HX_AIRTOAIR_FLATPLATE:
+            CalcAirToAirPlateHeatExch(state, HeatExchNum, HXUnitOn, EconomizerFlag, HighHumCtrlFlag);
+            break;
 
-            if (SELECT_CASE_var == HX_AIRTOAIR_FLATPLATE) {
+        case HX_AIRTOAIR_GENERIC:
+            CalcAirToAirGenericHeatExch(
+                state, HeatExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
+            break;
 
-                CalcAirToAirPlateHeatExch(state, HeatExchNum, HXUnitOn, EconomizerFlag, HighHumCtrlFlag);
-
-            } else if (SELECT_CASE_var == HX_AIRTOAIR_GENERIC) {
-
-                CalcAirToAirGenericHeatExch(
-                    state, HeatExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
-
-            } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
-
-                if (present(HXPartLoadRatio)) {
-                    PartLoadRatio = HXPartLoadRatio;
-                } else {
-                    PartLoadRatio = 1.0;
-                }
-
-                if (present(RegenInletIsOANode)) {
-                    RegInIsOANode = RegenInletIsOANode;
-                } else {
-                    RegInIsOANode = false;
-                }
-
-                CalcDesiccantBalancedHeatExch(state,
-                                              HeatExchNum,
-                                              HXUnitOn,
-                                              FirstHVACIteration,
-                                              FanOpMode,
-                                              PartLoadRatio,
-                                              CompanionCoilNum,
-                                              RegInIsOANode,
-                                              EconomizerFlag,
-                                              HighHumCtrlFlag);
+        case HX_DESICCANT_BALANCED:
+            if (present(HXPartLoadRatio)) {
+                PartLoadRatio = HXPartLoadRatio;
+            } else {
+                PartLoadRatio = 1.0;
             }
+            if (present(RegenInletIsOANode)) {
+                RegInIsOANode = RegenInletIsOANode;
+            } else {
+                RegInIsOANode = false;
+            }
+            CalcDesiccantBalancedHeatExch(state,
+                                          HeatExchNum,
+                                          HXUnitOn,
+                                          FirstHVACIteration,
+                                          FanOpMode,
+                                          PartLoadRatio,
+                                          CompanionCoilNum,
+                                          RegInIsOANode,
+                                          EconomizerFlag,
+                                          HighHumCtrlFlag);
+            break;
         }
 
         UpdateHeatRecovery(state, HeatExchNum);
@@ -378,28 +373,21 @@ namespace HeatRecovery {
                     ErrorsFound = true;
                 }
             }
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
-                if (SELECT_CASE_var == "COUNTERFLOW") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::CounterFlow;
-                } else if (SELECT_CASE_var == "PARALLELFLOW") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::ParallelFlow;
-                } else if (SELECT_CASE_var == "CROSSFLOWBOTHUNMIXED") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).FlowArr = HXConfiguration::CrossFlowBothUnmixed;
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + state.dataIPShortCut->cAlphaArgs(3));
-                    ErrorsFound = true;
-                }
+
+            constexpr std::array<std::string_view, static_cast<int>(HXConfiguration::Num)> hxConfigurationNamesUC = {
+                "COUNTERFLOW", "PARALLELFLOW", "CROSSFLOWBOTHUNMIXED", "CROSS_FLOW_OTHER_NOT_USED"};
+            state.dataHeatRecovery->ExchCond(ExchNum).FlowArr =
+                static_cast<HXConfiguration>(getEnumerationValue(hxConfigurationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            if (state.dataHeatRecovery->ExchCond(ExchNum).FlowArr == HXConfiguration::Invalid) {
+                ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + state.dataIPShortCut->cAlphaArgs(3));
+                ErrorsFound = true;
             }
+
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
-                if (SELECT_CASE_var == "YES") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
-                } else if (SELECT_CASE_var == "NO") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
-                } else {
+                state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = getYesNoValue(state.dataIPShortCut->cAlphaArgs(4));
+                if (state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut == BooleanSwitch::Invalid) {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
+                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = BooleanSwitch::Yes;
                     } else {
                         ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(4));
                         ErrorsFound = true;
@@ -622,19 +610,13 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(13);
             }
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(10));
-                if (SELECT_CASE_var == "YES") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
-                } else if (SELECT_CASE_var == "NO") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
+            state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = getYesNoValue(state.dataIPShortCut->cAlphaArgs(10));
+            if (state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut == BooleanSwitch::Invalid) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = BooleanSwitch::Yes;
                 } else {
-                    if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(10));
-                        ErrorsFound = true;
-                    }
+                    ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(10));
+                    ErrorsFound = true;
                 }
             }
 
@@ -752,20 +734,13 @@ namespace HeatRecovery {
             }
 
             state.dataHeatRecovery->ExchCond(ExchNum).HeatExchPerfName = state.dataIPShortCut->cAlphaArgs(8);
-
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
-                if (SELECT_CASE_var == "YES") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::Yes;
-                } else if (SELECT_CASE_var == "NO") {
-                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
+            state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = getYesNoValue(state.dataIPShortCut->cAlphaArgs(9));
+            if (state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut == BooleanSwitch::Invalid) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                    state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = BooleanSwitch::No;
                 } else {
-                    if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                        state.dataHeatRecovery->ExchCond(ExchNum).EconoLockOut = EconomizerLockout::No;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(9));
-                        ErrorsFound = true;
-                    }
+                    ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(9));
+                    ErrorsFound = true;
                 }
             }
 
@@ -1521,169 +1496,161 @@ namespace HeatRecovery {
 
             ExIndex = ExchNum; // this replaces the loop that went over multiple at once
 
-            {
-                auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum);
+            switch (state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum) {
+            case HX_AIRTOAIR_FLATPLATE:
+                state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow = RhoAir * state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow;
+                state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow = RhoAir * state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow;
+                // Note: the capacity stream is here simply the mass flow
+                //       since the thermal capacity can be assumed to be
+                //       equal for both streams
+                if (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow > state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow) {
+                    CMin0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow;
+                    CMax0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow;
+                } else {
+                    CMin0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow;
+                    CMax0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow;
+                }
 
-                if (SELECT_CASE_var == HX_AIRTOAIR_FLATPLATE) {
+                Eps0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow *
+                       SafeDiv(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirOutTemp - state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp,
+                               CMin0 * (state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirInTemp -
+                                        state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp));
+                Z = CMin0 / CMax0;
 
-                    state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow = RhoAir * state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow;
-                    state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow = RhoAir * state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow;
-                    // Note: the capacity stream is here simply the mass flow
-                    //       since the thermal capacity can be assumed to be
-                    //       equal for both streams
-                    if (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow > state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow) {
-                        CMin0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow;
-                        CMax0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow;
-                    } else {
-                        CMin0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow;
-                        CMax0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow;
-                    }
+                ErrStat = 0;
+                CalculateNTUfromEpsAndZ(state, NTU0, ErrStat, Z, state.dataHeatRecovery->ExchCond(ExIndex).FlowArr, Eps0);
 
-                    Eps0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow *
-                           SafeDiv(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirOutTemp -
-                                       state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp,
-                                   CMin0 * (state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirInTemp -
-                                            state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp));
-                    Z = CMin0 / CMax0;
+                if (ErrStat == 1) {
 
-                    ErrStat = 0;
-                    CalculateNTUfromEpsAndZ(state, NTU0, ErrStat, Z, state.dataHeatRecovery->ExchCond(ExIndex).FlowArr, Eps0);
+                    FatalError = true;
+                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
+                    ShowContinueError(state, "  the mass flow ratio is out of bounds");
+                    ShowContinueError(state, format("The mass flow ratio is (Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) = {:.2R}", Z));
+                    ShowContinueError(state, "The mass flow ratio should be >= 0.0 and <= 1.0");
+                    ShowContinueError(state,
+                                      format("Min_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Min_Vol_Flow_Rate]",
+                                             RhoAir,
+                                             min(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow,
+                                                 state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow)));
+                    ShowContinueError(state,
+                                      format("Max_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Max_Vol_Flow_Rate]",
+                                             RhoAir,
+                                             max(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow,
+                                                 state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow)));
+                } else if (ErrStat == 2) {
+                    FatalError = true;
+                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
+                    ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
+                    ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
+                    ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", 1.0 / (1.0 + Z)));
+                    ShowContinueError(state,
+                                      "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
+                    ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
+                    ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
+                    ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
+                } else if (ErrStat == 3) {
+                    FatalError = true;
+                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
+                    ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
+                    ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
+                    ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", (1.0 - std::exp(-Z)) / Z));
+                    ShowContinueError(state,
+                                      "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
+                    ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
+                    ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
+                    ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
+                } else if (ErrStat == 4) {
+                    FatalError = true;
+                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
+                    ShowContinueError(state, "  the quantity Eff_nom*(Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) is out of bounds");
+                    ShowContinueError(state, format("The value is {:.3R}", Eps0 * Z));
+                    ShowContinueError(state, format("The value should be >= 0.0 and <= {:.3R}", 1.0 - std::exp(Z * (SMALL - 1.0))));
+                    ShowContinueError(
+                        state,
+                        "Eff_nom = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate) * (T_nom_sup_out - T_nom_sup_in)/(T_nom_sec_in - T_nom_sup_in)");
+                    ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
+                    ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
+                    ShowContinueError(state,
+                                      "Change these inputs to obtain a physically realizable product of effectiveness times min/max mass ratio "
+                                      "for this heat exchanger");
+                } else if (ErrStat == 5) {
+                    FatalError = true;
+                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
+                    ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
+                    ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
+                    ShowContinueError(state, "The effectiveness should be >= 0.0 and <= 1.0");
+                    ShowContinueError(state,
+                                      "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
+                    ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
+                    ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
+                    ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
+                }
 
-                    if (ErrStat == 1) {
+                if (FatalError) {
+                    ShowFatalError(state, "Heat exchanger design calculation caused fatal error: program terminated.");
+                }
 
-                        FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
-                        ShowContinueError(state, "  the mass flow ratio is out of bounds");
-                        ShowContinueError(state, format("The mass flow ratio is (Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) = {:.2R}", Z));
-                        ShowContinueError(state, "The mass flow ratio should be >= 0.0 and <= 1.0");
-                        ShowContinueError(state,
-                                          format("Min_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Min_Vol_Flow_Rate]",
-                                                 RhoAir,
-                                                 min(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow,
-                                                     state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow)));
-                        ShowContinueError(state,
-                                          format("Max_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Max_Vol_Flow_Rate]",
-                                                 RhoAir,
-                                                 max(state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirVolFlow,
-                                                     state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirVolFlow)));
-                    } else if (ErrStat == 2) {
-                        FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
-                        ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
-                        ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
-                        ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", 1.0 / (1.0 + Z)));
-                        ShowContinueError(
-                            state, "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
-                        ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
-                        ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
-                        ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
-                    } else if (ErrStat == 3) {
-                        FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
-                        ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
-                        ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
-                        ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", (1.0 - std::exp(-Z)) / Z));
-                        ShowContinueError(
-                            state, "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
-                        ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
-                        ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
-                        ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
-                    } else if (ErrStat == 4) {
-                        FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
-                        ShowContinueError(state, "  the quantity Eff_nom*(Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) is out of bounds");
-                        ShowContinueError(state, format("The value is {:.3R}", Eps0 * Z));
-                        ShowContinueError(state, format("The value should be >= 0.0 and <= {:.3R}", 1.0 - std::exp(Z * (SMALL - 1.0))));
-                        ShowContinueError(
-                            state,
-                            "Eff_nom = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate) * (T_nom_sup_out - T_nom_sup_in)/(T_nom_sec_in - T_nom_sup_in)");
-                        ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
-                        ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
-                        ShowContinueError(state,
-                                          "Change these inputs to obtain a physically realizable product of effectiveness times min/max mass ratio "
-                                          "for this heat exchanger");
-                    } else if (ErrStat == 5) {
-                        FatalError = true;
-                        ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + state.dataHeatRecovery->ExchCond(ExIndex).Name);
-                        ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
-                        ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
-                        ShowContinueError(state, "The effectiveness should be >= 0.0 and <= 1.0");
-                        ShowContinueError(
-                            state, "Eff = (Nom_Sup_Mass_Flow_Rate/Min_Mass_Flow_Rate)*(T_nom_sup_out-T_nom_sup_in)/(T_nom_sec_in-T_nom_sup_in)");
-                        ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
-                        ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
-                        ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
-                    }
+                state.dataHeatRecovery->ExchCond(ExIndex).UA0 = NTU0 * CMin0 * CpAir;
+                state.dataHeatRecovery->ExchCond(ExIndex).mTSup0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow *
+                                                                   (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp + KELVZERO);
+                state.dataHeatRecovery->ExchCond(ExIndex).mTSec0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow *
+                                                                   (state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirInTemp + KELVZERO);
 
-                    if (FatalError) {
-                        ShowFatalError(state, "Heat exchanger design calculation caused fatal error: program terminated.");
-                    }
+                // check validity
+                if (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow * state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow <
+                    SmallMassFlow * SmallMassFlow) {
+                    ShowFatalError(state, "Mass flow in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
+                }
 
-                    state.dataHeatRecovery->ExchCond(ExIndex).UA0 = NTU0 * CMin0 * CpAir;
-                    state.dataHeatRecovery->ExchCond(ExIndex).mTSup0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow *
-                                                                       (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirInTemp + KELVZERO);
-                    state.dataHeatRecovery->ExchCond(ExIndex).mTSec0 = state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow *
-                                                                       (state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirInTemp + KELVZERO);
+                if (state.dataHeatRecovery->ExchCond(ExIndex).mTSup0 < SmallMassFlow) {
+                    ShowFatalError(state, "(m*T)Sup,in in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
+                }
 
-                    // check validity
-                    if (state.dataHeatRecovery->ExchCond(ExIndex).NomSupAirMassFlow * state.dataHeatRecovery->ExchCond(ExIndex).NomSecAirMassFlow <
-                        SmallMassFlow * SmallMassFlow) {
-                        ShowFatalError(state, "Mass flow in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
-                    }
+                if (state.dataHeatRecovery->ExchCond(ExIndex).mTSec0 < SmallMassFlow) {
+                    ShowFatalError(state, "(m*T)Sec,in in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
+                }
 
-                    if (state.dataHeatRecovery->ExchCond(ExIndex).mTSup0 < SmallMassFlow) {
-                        ShowFatalError(state, "(m*T)Sup,in in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
-                    }
+                if (CMin0 < SmallMassFlow) {
+                    ShowFatalError(state, "CMin0 in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
+                }
+                break;
 
-                    if (state.dataHeatRecovery->ExchCond(ExIndex).mTSec0 < SmallMassFlow) {
-                        ShowFatalError(state, "(m*T)Sec,in in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
-                    }
-
-                    if (CMin0 < SmallMassFlow) {
-                        ShowFatalError(state, "CMin0 in HeatExchanger:AirToAir:FlatPlate too small in initialization.");
-                    }
-
-                } else if (SELECT_CASE_var == HX_AIRTOAIR_GENERIC) {
-
-                    if (state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode > 0 &&
-                        state.dataHeatRecovery->ExchCond(ExIndex).ControlToTemperatureSetPoint) {
-                        if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+            case HX_AIRTOAIR_GENERIC:
+                if (state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode > 0 &&
+                    state.dataHeatRecovery->ExchCond(ExIndex).ControlToTemperatureSetPoint) {
+                    if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode).TempSetPoint == SensedNodeFlagValue) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                            ShowSevereError(state,
+                                            "Missing temperature setpoint for " + cHXTypes(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum) +
+                                                " \"" + state.dataHeatRecovery->ExchCond(ExIndex).Name + "\" :");
+                            ShowContinueError(
+                                state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
+                            ShowFatalError(state, " Previous condition causes program termination.");
+                        } else {
+                            // need call to EMS to check node
+                            CheckIfNodeSetPointManagedByEMS(state,
+                                                            state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode,
+                                                            EMSManager::SPControlType::TemperatureSetPoint,
+                                                            FatalError);
+                            if (FatalError) {
                                 ShowSevereError(state,
                                                 "Missing temperature setpoint for " +
                                                     cHXTypes(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum) + " \"" +
                                                     state.dataHeatRecovery->ExchCond(ExIndex).Name + "\" :");
                                 ShowContinueError(
                                     state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
+                                ShowContinueError(
+                                    state, "  or use an EMS actuator to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                                 ShowFatalError(state, " Previous condition causes program termination.");
-                            } else {
-                                // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state,
-                                                                state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode,
-                                                                EMSManager::SPControlType::TemperatureSetPoint,
-                                                                FatalError);
-                                if (FatalError) {
-                                    ShowSevereError(state,
-                                                    "Missing temperature setpoint for " +
-                                                        cHXTypes(state.dataHeatRecovery->ExchCond(ExIndex).ExchTypeNum) + " \"" +
-                                                        state.dataHeatRecovery->ExchCond(ExIndex).Name + "\" :");
-                                    ShowContinueError(
-                                        state,
-                                        "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
-                                    ShowContinueError(
-                                        state,
-                                        "  or use an EMS actuator to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
-                                    ShowFatalError(state, " Previous condition causes program termination.");
-                                }
                             }
                         }
                     }
-
-                } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
-
-                } else {
-                    //       Will never get here
                 }
+                break;
+
+            default:
+                // nothing
+                break;
             }
 
             state.dataHeatRecovery->ExchCond(ExchNum).myEnvrnFlag = false;
@@ -1730,90 +1697,88 @@ namespace HeatRecovery {
 
         //  Initialize inlet conditions
 
-        {
-            auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum);
+        switch (state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) {
+        case HX_AIRTOAIR_FLATPLATE:
+        case HX_AIRTOAIR_GENERIC:
+            break;
 
-            if (SELECT_CASE_var == HX_AIRTOAIR_FLATPLATE) {
-
-            } else if (SELECT_CASE_var == HX_AIRTOAIR_GENERIC) {
-
-            } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
-
-                if (state.dataHeatRecovery->MySetPointTest(ExchNum)) {
-                    if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
-                        if (!state.dataHeatRecovery->CalledFromParentObject) {
-                            if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
-                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+        case HX_DESICCANT_BALANCED:
+            if (state.dataHeatRecovery->MySetPointTest(ExchNum)) {
+                if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
+                    if (!state.dataHeatRecovery->CalledFromParentObject) {
+                        if (state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                                ShowWarningError(state,
+                                                 "Missing optional HumRatMax setpoint for " +
+                                                     cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" +
+                                                     state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
+                                ShowContinueError(state,
+                                                  "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
+                                                  "humidity ratio setpoint.");
+                                ShowContinueError(state,
+                                                  "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
+                                                  "desiccant Heat Exchanger if control is desired.");
+                            } else {
+                                // need call to EMS to check node
+                                CheckIfNodeSetPointManagedByEMS(state,
+                                                                state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode,
+                                                                EMSManager::SPControlType::HumidityRatioMaxSetPoint,
+                                                                LocalWarningError);
+                                state.dataLoopNodes->NodeSetpointCheck(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode)
+                                    .needsSetpointChecking = false;
+                                if (LocalWarningError) {
                                     ShowWarningError(state,
                                                      "Missing optional HumRatMax setpoint for " +
                                                          cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" +
                                                          state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
                                     ShowContinueError(state,
-                                                      "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
-                                                      "humidity ratio setpoint.");
+                                                      "...the simulation will continue without control of the desiccant heat exchanger to a "
+                                                      "maximum humidity ratio setpoint.");
                                     ShowContinueError(state,
                                                       "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
                                                       "desiccant Heat Exchanger if control is desired.");
-                                } else {
-                                    // need call to EMS to check node
-                                    CheckIfNodeSetPointManagedByEMS(state,
-                                                                    state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode,
-                                                                    EMSManager::SPControlType::HumidityRatioMaxSetPoint,
-                                                                    LocalWarningError);
-                                    state.dataLoopNodes->NodeSetpointCheck(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode)
-                                        .needsSetpointChecking = false;
-                                    if (LocalWarningError) {
-                                        ShowWarningError(state,
-                                                         "Missing optional HumRatMax setpoint for " +
-                                                             cHXTypes(state.dataHeatRecovery->ExchCond(ExchNum).ExchTypeNum) + " \"" +
-                                                             state.dataHeatRecovery->ExchCond(ExchNum).Name + "\"");
-                                        ShowContinueError(state,
-                                                          "...the simulation will continue without control of the desiccant heat exchanger to a "
-                                                          "maximum humidity ratio setpoint.");
-                                        ShowContinueError(state,
-                                                          "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
-                                                          "desiccant Heat Exchanger if control is desired.");
-                                        ShowContinueError(state,
-                                                          "...or use an EMS Actuator to establish a maximum humidity ratio setpoint at the process "
-                                                          "air outlet node of the desiccant Heat Exchanger if control is desired.");
-                                    }
+                                    ShowContinueError(state,
+                                                      "...or use an EMS Actuator to establish a maximum humidity ratio setpoint at the process "
+                                                      "air outlet node of the desiccant Heat Exchanger if control is desired.");
                                 }
                             }
                         }
-                        state.dataHeatRecovery->MySetPointTest(ExchNum) = false;
                     }
+                    state.dataHeatRecovery->MySetPointTest(ExchNum) = false;
                 }
+            }
 
-                if (CompanionCoilIndex > 0) {
+            if (CompanionCoilIndex > 0) {
 
-                    if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-                        CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                        if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 ||
-                            state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
-                            //       DX Coil is OFF, read actual inlet conditions
-                            state.dataHeatRecovery->FullLoadOutAirTemp = state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
-                            state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
-                        } else {
-                            //       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
-                            state.dataHeatRecovery->FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
-                            state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
-                        }
-                    } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        // how to support VS dx coil here?
-                        state.dataHeatRecovery->FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
-                        state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
+                if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
+                    CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                    if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 ||
+                        state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
+                        //       DX Coil is OFF, read actual inlet conditions
+                        state.dataHeatRecovery->FullLoadOutAirTemp = state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
+                        state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
+                    } else {
+                        //       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
+                        state.dataHeatRecovery->FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
+                        state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
                     }
-
-                } else {
-
-                    //     HX only (not used in conjunction with DX coil), read inlet conditions
-                    state.dataHeatRecovery->FullLoadOutAirTemp = state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
-                    state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
+                } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    // how to support VS dx coil here?
+                    state.dataHeatRecovery->FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
+                    state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
                 }
 
             } else {
-                //   Will never get here
+
+                //     HX only (not used in conjunction with DX coil), read inlet conditions
+                state.dataHeatRecovery->FullLoadOutAirTemp = state.dataHeatRecovery->ExchCond(ExchNum).SecInTemp;
+                state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataHeatRecovery->ExchCond(ExchNum).SecInHumRat;
             }
+            break;
+
+        default:
+            //   Will never get here
+            break;
         }
     }
 
@@ -2065,7 +2030,7 @@ namespace HeatRecovery {
             HighHumCtrlActiveFlag = false;
         }
 
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == BooleanSwitch::Yes) {
             UnitSupMassFlow = 0.0; // set HX supply flow to 0, all supply air will go through supply bypass
             UnitSecMassFlow = 0.0; // set HX secondary flow to 0, all secondary air will got through secondary bypass
             UnitOn = false;        // turn off HX calculations when in economizer mode
@@ -2312,7 +2277,7 @@ namespace HeatRecovery {
         }
 
         // Determine mass flow through heat exchanger and mass flow being bypassed (only flat plate bypasses flow)
-        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) &&
+        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == BooleanSwitch::Yes) &&
             state.dataHeatRecovery->ExchCond(ExNum).ExchConfig == HXConfigurationType::Plate) {
             state.dataHeatRecovery->ExchCond(ExNum).SupBypassMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
             state.dataHeatRecovery->ExchCond(ExNum).SupOutMassFlow = state.dataHeatRecovery->ExchCond(ExNum).SupInMassFlow;
@@ -2327,7 +2292,7 @@ namespace HeatRecovery {
         // Unit is scheduled OFF, so bypass heat exchange calcs
         if (GetCurrentScheduleValue(state, state.dataHeatRecovery->ExchCond(ExNum).SchedPtr) <= 0.0) UnitOn = false;
         //! Economizer is active, so bypass heat exchange calcs. This applies to both flat plate and rotary HX's
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == BooleanSwitch::Yes) {
             UnitOn = false;
         }
         // Determine if unit is ON or OFF based on air mass flow through the supply and secondary airstreams and operation flag
@@ -2979,7 +2944,7 @@ namespace HeatRecovery {
         if (state.dataHeatRecovery->ExchCond(ExNum).SecInMassFlow <= SmallMassFlow) UnitOn = false;
         if (HXPartLoadRatio == 0.0) UnitOn = false;
         if (!HXUnitOn) UnitOn = false;
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == EconomizerLockout::Yes)
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && state.dataHeatRecovery->ExchCond(ExNum).EconoLockOut == BooleanSwitch::Yes)
             UnitOn = false;
 
         if (UnitOn) {
@@ -3003,194 +2968,185 @@ namespace HeatRecovery {
             // Check for balanced flow condition
             CheckForBalancedFlow(state, ExNum, SecInMassFlow, SupInMassFlow, FirstHVACIteration);
 
-            {
-                auto const SELECT_CASE_var(state.dataHeatRecovery->ExchCond(ExNum).HeatExchPerfTypeNum);
+            if (state.dataHeatRecovery->ExchCond(ExNum).HeatExchPerfTypeNum == BALANCEDHX_PERFDATATYPE1) {
+                Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B1;
+                Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B2;
+                Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B3;
+                Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B4;
+                Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B5;
+                Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B6;
+                Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B7;
+                Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B8;
 
-                if (SELECT_CASE_var == BALANCEDHX_PERFDATATYPE1) {
+                T_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
+                T_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
+                T_RegenInTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                T_RegenInHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
 
-                    Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B1;
-                    Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B2;
-                    Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B3;
-                    Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B4;
-                    Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B5;
-                    Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B6;
-                    Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B7;
-                    Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).B8;
+                // Must use the same density used to convert volumetric flow rate to mass flow rate to get back to velocity
+                RhoStd = state.dataEnvrn->StdRhoAir; // PsyRhoAirFnPbTdbW(StdBaroPress,20.0d0, 0.0d0)
+                BalFaceVelActual = SupInMassFlow / (RhoStd * state.dataHeatRecovery->ExchCond(ExNum).FaceArea);
 
-                    T_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
-                    T_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
-                    T_RegenInTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
-                    T_RegenInHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+                T_FaceVel = BalFaceVelActual;
 
-                    // Must use the same density used to convert volumetric flow rate to mass flow rate to get back to velocity
-                    RhoStd = state.dataEnvrn->StdRhoAir; // PsyRhoAirFnPbTdbW(StdBaroPress,20.0d0, 0.0d0)
-                    BalFaceVelActual = SupInMassFlow / (RhoStd * state.dataHeatRecovery->ExchCond(ExNum).FaceArea);
+                //     Call model check routines only when HX is active, if coil is off these checks do not apply (no potential for heat transfer)
+                //     Check RH limits and warn user if out of bounds (T_* not modified in subroutine)
 
-                    T_FaceVel = BalFaceVelActual;
+                CheckModelBoundsRH_TempEq(state, ExNum, T_RegenInTemp, T_RegenInHumRat, T_ProcInTemp, T_ProcInHumRat, FirstHVACIteration);
+                //     Check model boundaries and cap empirical model independent variables as needed (T_* may be modified on return from sub)
+                CheckModelBoundsTempEq(state, ExNum, T_RegenInTemp, T_RegenInHumRat, T_ProcInTemp, T_ProcInHumRat, T_FaceVel, FirstHVACIteration);
 
-                    //     Call model check routines only when HX is active, if coil is off these checks do not apply (no potential for heat transfer)
-                    //     Check RH limits and warn user if out of bounds (T_* not modified in subroutine)
+                if (T_ProcInTemp != 0.0 && T_RegenInTemp != 0.0) {
+                    FullLoadSupOutTemp = Coeff1 + Coeff2 * T_RegenInHumRat + Coeff3 * T_RegenInTemp + Coeff4 * (T_RegenInHumRat / T_RegenInTemp) +
+                                         Coeff5 * T_ProcInHumRat + Coeff6 * T_ProcInTemp + Coeff7 * (T_ProcInHumRat / T_ProcInTemp) +
+                                         Coeff8 * T_FaceVel;
 
-                    CheckModelBoundsRH_TempEq(state, ExNum, T_RegenInTemp, T_RegenInHumRat, T_ProcInTemp, T_ProcInHumRat, FirstHVACIteration);
-                    //     Check model boundaries and cap empirical model independent variables as needed (T_* may be modified on return from sub)
-                    CheckModelBoundsTempEq(state, ExNum, T_RegenInTemp, T_RegenInHumRat, T_ProcInTemp, T_ProcInHumRat, T_FaceVel, FirstHVACIteration);
+                    // Check model boundary for supply (regen) temp and do not cap value if out of bounds, check that supply in temp > out temp
+                    CheckModelBoundOutput_Temp(
+                        state, ExNum, state.dataHeatRecovery->ExchCond(ExNum).SupInTemp, FullLoadSupOutTemp, FirstHVACIteration);
+                    FullLoadDeltaT = FullLoadSupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                } else {
+                    FullLoadDeltaT = 0.0;
+                }
 
-                    if (T_ProcInTemp != 0.0 && T_RegenInTemp != 0.0) {
-                        FullLoadSupOutTemp = Coeff1 + Coeff2 * T_RegenInHumRat + Coeff3 * T_RegenInTemp + Coeff4 * (T_RegenInHumRat / T_RegenInTemp) +
-                                             Coeff5 * T_ProcInHumRat + Coeff6 * T_ProcInTemp + Coeff7 * (T_ProcInHumRat / T_ProcInTemp) +
-                                             Coeff8 * T_FaceVel;
+                Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C1;
+                Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C2;
+                Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C3;
+                Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C4;
+                Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C5;
+                Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C6;
+                Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C7;
+                Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C8;
 
-                        // Check model boundary for supply (regen) temp and do not cap value if out of bounds, check that supply in temp > out temp
-                        CheckModelBoundOutput_Temp(
-                            state, ExNum, state.dataHeatRecovery->ExchCond(ExNum).SupInTemp, FullLoadSupOutTemp, FirstHVACIteration);
-                        FullLoadDeltaT = FullLoadSupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
-                    } else {
-                        FullLoadDeltaT = 0.0;
-                    }
+                H_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
+                H_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
+                H_RegenInTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                H_RegenInHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+                H_FaceVel = BalFaceVelActual;
 
-                    Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C1;
-                    Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C2;
-                    Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C3;
-                    Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C4;
-                    Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C5;
-                    Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C6;
-                    Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C7;
-                    Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).C8;
+                //     Call model check routines only when HX is active, if coil is off these checks do not apply (no potential for heat transfer)
+                //     Check RH limits and warn user if out of bounds (H_* not modified in subroutine)
 
-                    H_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
-                    H_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
-                    H_RegenInTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
-                    H_RegenInHumRat = state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
-                    H_FaceVel = BalFaceVelActual;
+                CheckModelBoundsRH_HumRatEq(state, ExNum, H_RegenInTemp, H_RegenInHumRat, H_ProcInTemp, H_ProcInHumRat, FirstHVACIteration);
+                //     Check model boundaries and cap empirical model independent variables as needed (H_* may be modified on return from sub)
+                CheckModelBoundsHumRatEq(state, ExNum, H_RegenInTemp, H_RegenInHumRat, H_ProcInTemp, H_ProcInHumRat, H_FaceVel, FirstHVACIteration);
 
-                    //     Call model check routines only when HX is active, if coil is off these checks do not apply (no potential for heat transfer)
-                    //     Check RH limits and warn user if out of bounds (H_* not modified in subroutine)
+                //     Calc curve
+                if (H_ProcInTemp != 0.0 && H_RegenInTemp != 0.0) {
+                    FullLoadSupOutHumRat = Coeff1 + Coeff2 * H_RegenInHumRat + Coeff3 * H_RegenInTemp + Coeff4 * (H_RegenInHumRat / H_RegenInTemp) +
+                                           Coeff5 * H_ProcInHumRat + Coeff6 * H_ProcInTemp + Coeff7 * (H_ProcInHumRat / H_ProcInTemp) +
+                                           Coeff8 * H_FaceVel;
 
-                    CheckModelBoundsRH_HumRatEq(state, ExNum, H_RegenInTemp, H_RegenInHumRat, H_ProcInTemp, H_ProcInHumRat, FirstHVACIteration);
-                    //     Check model boundaries and cap empirical model independent variables as needed (H_* may be modified on return from sub)
-                    CheckModelBoundsHumRatEq(
-                        state, ExNum, H_RegenInTemp, H_RegenInHumRat, H_ProcInTemp, H_ProcInHumRat, H_FaceVel, FirstHVACIteration);
+                    // Check model boundary for supply (regen) hum rat and do not cap value if out of bounds, check that supply in HR < out HR
+                    CheckModelBoundOutput_HumRat(
+                        state, ExNum, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat, FullLoadSupOutHumRat, FirstHVACIteration);
+                    FullLoadDeltaW = FullLoadSupOutHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+                } else {
+                    FullLoadDeltaW = 0.0;
+                }
 
-                    //     Calc curve
-                    if (H_ProcInTemp != 0.0 && H_RegenInTemp != 0.0) {
-                        FullLoadSupOutHumRat = Coeff1 + Coeff2 * H_RegenInHumRat + Coeff3 * H_RegenInTemp +
-                                               Coeff4 * (H_RegenInHumRat / H_RegenInTemp) + Coeff5 * H_ProcInHumRat + Coeff6 * H_ProcInTemp +
-                                               Coeff7 * (H_ProcInHumRat / H_ProcInTemp) + Coeff8 * H_FaceVel;
+                //     Check for saturation in the model's calculated supply outlet and reset temp, then humidity ratio at constant enthalpy
+                //     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
+                TestSaturationEnthalpy = PsyHFnTdbW(FullLoadSupOutTemp, FullLoadSupOutHumRat);
+                if (PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSat) > FullLoadSupOutTemp) {
+                    FullLoadSupOutTemp = PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSatFullLoadOutTemp);
+                    FullLoadSupOutHumRat = PsyWFnTdbH(state, FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat);
+                    FullLoadDeltaT = FullLoadSupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
+                    FullLoadDeltaW = FullLoadSupOutHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
+                }
 
-                        // Check model boundary for supply (regen) hum rat and do not cap value if out of bounds, check that supply in HR < out HR
-                        CheckModelBoundOutput_HumRat(
-                            state, ExNum, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat, FullLoadSupOutHumRat, FirstHVACIteration);
-                        FullLoadDeltaW = FullLoadSupOutHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
-                    } else {
-                        FullLoadDeltaW = 0.0;
-                    }
+                if (!state.dataHeatRecovery->CalledFromParentObject) {
+                    //       calculate part-load ratio for HX
+                    MaxHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMax;
+                    MinHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMin;
+                    // Calculate partload fraction of dehumidification capacity required to meet setpoint
 
-                    //     Check for saturation in the model's calculated supply outlet and reset temp, then humidity ratio at constant enthalpy
-                    //     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
-                    TestSaturationEnthalpy = PsyHFnTdbW(FullLoadSupOutTemp, FullLoadSupOutHumRat);
-                    if (PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSat) > FullLoadSupOutTemp) {
-                        FullLoadSupOutTemp = PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSatFullLoadOutTemp);
-                        FullLoadSupOutHumRat = PsyWFnTdbH(state, FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat);
-                        FullLoadDeltaT = FullLoadSupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp;
-                        FullLoadDeltaW = FullLoadSupOutHumRat - state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat;
-                    }
-
-                    if (!state.dataHeatRecovery->CalledFromParentObject) {
-                        //       calculate part-load ratio for HX
-                        MaxHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMax;
-                        MinHumRatNeeded = state.dataLoopNodes->Node(state.dataHeatRecovery->ExchCond(ExNum).SecOutletNode).HumRatMin;
-                        // Calculate partload fraction of dehumidification capacity required to meet setpoint
-
-                        //       check the model output, if the regen delta W is positive, the process air stream is dehumidified
-                        if (FullLoadDeltaW > 0) {
-                            //         check for a setpoint, if no setpoint then PLR remains at 1
-                            if (MaxHumRatNeeded != SensedNodeFlagValue) {
-                                if (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat > MaxHumRatNeeded && MaxHumRatNeeded > 0.0) {
-                                    HXPartLoadRatio = (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - MaxHumRatNeeded) / FullLoadDeltaW;
-                                } else {
-                                    HXPartLoadRatio = 0.0;
-                                }
-                            }
-                            //       check the model output, if the regen delta W is negative, the process air stream is humidified
-                        } else if (FullLoadDeltaW < 0) {
-                            //         check for a setpoint, if no setpoint then PLR remains at 1
-                            if (MinHumRatNeeded != SensedNodeFlagValue) {
-                                if (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat < MinHumRatNeeded && MinHumRatNeeded > 0.0) {
-                                    HXPartLoadRatio = (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - MinHumRatNeeded) / FullLoadDeltaW;
-                                } else {
-                                    HXPartLoadRatio = 0.0;
-                                }
+                    //       check the model output, if the regen delta W is positive, the process air stream is dehumidified
+                    if (FullLoadDeltaW > 0) {
+                        //         check for a setpoint, if no setpoint then PLR remains at 1
+                        if (MaxHumRatNeeded != SensedNodeFlagValue) {
+                            if (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat > MaxHumRatNeeded && MaxHumRatNeeded > 0.0) {
+                                HXPartLoadRatio = (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - MaxHumRatNeeded) / FullLoadDeltaW;
+                            } else {
+                                HXPartLoadRatio = 0.0;
                             }
                         }
-
-                        HXPartLoadRatio = max(0.0, HXPartLoadRatio);
-                        HXPartLoadRatio = min(1.0, HXPartLoadRatio);
-
-                    } else if (CompanionCoilIndex > 0) {
-                        // VS coil issue here?
-                        HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
+                        //       check the model output, if the regen delta W is negative, the process air stream is humidified
+                    } else if (FullLoadDeltaW < 0) {
+                        //         check for a setpoint, if no setpoint then PLR remains at 1
+                        if (MinHumRatNeeded != SensedNodeFlagValue) {
+                            if (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat < MinHumRatNeeded && MinHumRatNeeded > 0.0) {
+                                HXPartLoadRatio = (state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat - MinHumRatNeeded) / FullLoadDeltaW;
+                            } else {
+                                HXPartLoadRatio = 0.0;
+                            }
+                        }
                     }
 
-                    if (FanOpMode == CycFanCycCoil || RegenInletIsOANode) {
-                        //       Supply (regen) air stream mass flow rate is cycling and proportional to PLR, outlet conditions are full load
-                        //       conditions
-                        state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp + FullLoadDeltaT;
-                        state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
-                            min(1.0, max(1.e-5, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat + FullLoadDeltaW));
-                    } else {
-                        //       Supply (regen) air stream mass flow rate is constant and outlet conditions are averaged
-                        state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
-                            state.dataHeatRecovery->ExchCond(ExNum).SupInTemp + (FullLoadDeltaT * HXPartLoadRatio);
-                        state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
-                            min(1.0, max(1.e-5, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat + (FullLoadDeltaW * HXPartLoadRatio)));
-                    }
+                    HXPartLoadRatio = max(0.0, HXPartLoadRatio);
+                    HXPartLoadRatio = min(1.0, HXPartLoadRatio);
 
-                    //     for a balanced flow HX, use average mass flow rate and actual node conditions to calculate CSup and CSec
-                    //     the mass flow rate on the process and secondary side of HX may be imbalanced when the HX is used in the OA branch
-                    //     use the average mass flow rate to avoid psych warnings, mass flow rates will converge at the end of the iteration
-                    //     if the air mass flow rates do not converge, this model should not be used
-                    CSup = AverageMassFlowRate * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
-                    CSec = AverageMassFlowRate * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
+                } else if (CompanionCoilIndex > 0) {
+                    // VS coil issue here?
+                    HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
+                }
 
-                    state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
-                        PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
+                if (FanOpMode == CycFanCycCoil || RegenInletIsOANode) {
+                    //       Supply (regen) air stream mass flow rate is cycling and proportional to PLR, outlet conditions are full load
+                    //       conditions
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SupInTemp + FullLoadDeltaT;
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                        min(1.0, max(1.e-5, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat + FullLoadDeltaW));
+                } else {
+                    //       Supply (regen) air stream mass flow rate is constant and outlet conditions are averaged
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp =
+                        state.dataHeatRecovery->ExchCond(ExNum).SupInTemp + (FullLoadDeltaT * HXPartLoadRatio);
+                    state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat =
+                        min(1.0, max(1.e-5, state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat + (FullLoadDeltaW * HXPartLoadRatio)));
+                }
 
-                    SensHeatRecRate = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
+                //     for a balanced flow HX, use average mass flow rate and actual node conditions to calculate CSup and CSec
+                //     the mass flow rate on the process and secondary side of HX may be imbalanced when the HX is used in the OA branch
+                //     use the average mass flow rate to avoid psych warnings, mass flow rates will converge at the end of the iteration
+                //     if the air mass flow rates do not converge, this model should not be used
+                CSup = AverageMassFlowRate * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SupInHumRat);
+                CSec = AverageMassFlowRate * PsyCpAirFnW(state.dataHeatRecovery->ExchCond(ExNum).SecInHumRat);
 
-                    TotHeatRecRate = AverageMassFlowRate *
-                                     (state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth - state.dataHeatRecovery->ExchCond(ExNum).SupInEnth);
+                state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth =
+                    PsyHFnTdbW(state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp, state.dataHeatRecovery->ExchCond(ExNum).SupOutHumRat);
 
-                    //     now calculate process side heat transfer
+                SensHeatRecRate = CSup * (state.dataHeatRecovery->ExchCond(ExNum).SupOutTemp - state.dataHeatRecovery->ExchCond(ExNum).SupInTemp);
 
-                    state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
-                        state.dataHeatRecovery->ExchCond(ExNum).SecInEnth - TotHeatRecRate / AverageMassFlowRate;
+                TotHeatRecRate =
+                    AverageMassFlowRate * (state.dataHeatRecovery->ExchCond(ExNum).SupOutEnth - state.dataHeatRecovery->ExchCond(ExNum).SupInEnth);
 
-                    state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - SensHeatRecRate / CSec;
+                //     now calculate process side heat transfer
 
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth =
+                    state.dataHeatRecovery->ExchCond(ExNum).SecInEnth - TotHeatRecRate / AverageMassFlowRate;
+
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = state.dataHeatRecovery->ExchCond(ExNum).SecInTemp - SensHeatRecRate / CSec;
+
+                state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state,
+                                                                                  state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp,
+                                                                                  state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth,
+                                                                                  ThisSubSecOutHumRat);
+
+                // check for saturation in process (secondary) outlet
+                // The process outlet conditions should never be over the saturation curve for the balanced desiccant model
+                // although this may occur during warmup. This check is included here for consistency.
+                TempSecOutSat =
+                    PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress, ThisSubTestSatSec);
+                if (TempSecOutSat > state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp) {
+                    state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = TempSecOutSat;
                     state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state,
                                                                                       state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp,
                                                                                       state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth,
-                                                                                      ThisSubSecOutHumRat);
-
-                    // check for saturation in process (secondary) outlet
-                    // The process outlet conditions should never be over the saturation curve for the balanced desiccant model
-                    // although this may occur during warmup. This check is included here for consistency.
-                    TempSecOutSat =
-                        PsyTsatFnHPb(state, state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress, ThisSubTestSatSec);
-                    if (TempSecOutSat > state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp) {
-                        state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp = TempSecOutSat;
-                        state.dataHeatRecovery->ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state,
-                                                                                          state.dataHeatRecovery->ExchCond(ExNum).SecOutTemp,
-                                                                                          state.dataHeatRecovery->ExchCond(ExNum).SecOutEnth,
-                                                                                          ThisSubTSatSecOutHumRat);
-                    }
-
-                    state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate =
-                        state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).NomElecPower *
-                        HXPartLoadRatio;
-
-                } else {
+                                                                                      ThisSubTSatSecOutHumRat);
                 }
+
+                state.dataHeatRecovery->ExchCond(ExNum).ElecUseRate =
+                    state.dataHeatRecovery->BalDesDehumPerfData(state.dataHeatRecovery->ExchCond(ExNum).PerfDataIndex).NomElecPower * HXPartLoadRatio;
             }
 
         } // ENDIF for "IF (UnitOn) THEN"

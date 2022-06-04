@@ -305,19 +305,15 @@ namespace CommandLineInterface {
             case FileSystem::FileTypes::JSON:
                 break;
             case FileSystem::FileTypes::CBOR:
-                state.dataGlobal->isCBOR = true;
                 DisplayString(state, "CBOR input format is experimental and unsupported.");
                 break;
             case FileSystem::FileTypes::MsgPack:
-                state.dataGlobal->isMsgPack = true;
                 DisplayString(state, "MsgPack input format is experimental and unsupported.");
                 break;
             case FileSystem::FileTypes::UBJSON:
-                state.dataGlobal->isUBJSON = true;
                 DisplayString(state, "UBJSON input format is experimental and unsupported.");
                 break;
             case FileSystem::FileTypes::BSON:
-                state.dataGlobal->isBSON = true;
                 DisplayString(state, "BSON input format is experimental and unsupported.");
                 break;
             default:

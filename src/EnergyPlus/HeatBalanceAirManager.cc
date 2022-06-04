@@ -141,7 +141,6 @@ enum class AirflowSpecAlt
 std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> airflowAltNamesUC = {
     "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "AIRCHANGES/HOUR"};
 
-
 std::array<std::string_view, static_cast<int>(VentilationType::Num)> ventilationTypeNamesUC = {"NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
 
 void ManageAirHeatBalance(EnergyPlusData &state)
