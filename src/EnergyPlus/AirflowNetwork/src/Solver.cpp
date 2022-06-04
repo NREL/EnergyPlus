@@ -2212,11 +2212,11 @@ namespace AirflowNetwork {
             if (NumAlphas == 10) {
                 if (!UtilityRoutines::SameString(Alphas(10), "None")) {
                     if (UtilityRoutines::SameString(Alphas(10), "MaximumVelocity")) {
-                        AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity;
+                        AirflowNetworkSimu.ductSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity;
                     } else if (UtilityRoutines::SameString(Alphas(10), "PressureLoss")) {
-                        AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::PressureLoss;
+                        AirflowNetworkSimu.ductSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::PressureLoss;
                     } else if (UtilityRoutines::SameString(Alphas(10), "PressureLossWithMaximumVelocity")) {
-                        AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss;
+                        AirflowNetworkSimu.ductSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss;
                     } else {
                         ShowSevereError(m_state,
                                         format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(10) + " = " + Alphas(10) +
@@ -12336,7 +12336,7 @@ namespace AirflowNetwork {
                 if (DuctSizingSTFlag) {
                     Real64 Velocity = 0.0;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
                         SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                         SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * 3.1415926;
                     } else {
@@ -12381,7 +12381,7 @@ namespace AirflowNetwork {
                         SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * 3.1415926;
                         Velocity = flowrate / SupplyTrunkArea;
                     }
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
                         if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
                             SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                             SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * 3.1415926;
@@ -12449,7 +12449,7 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
                         SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                         SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * 3.1415926;
                     } else {
@@ -12494,7 +12494,7 @@ namespace AirflowNetwork {
                         SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * 3.1415926;
                         Velocity = flowrate / SupplyBranchArea;
                     }
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
                         if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
                             SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                             SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * 3.1415926;
@@ -12566,7 +12566,7 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
                         ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                         ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * 3.1415926;
                     } else {
@@ -12611,7 +12611,7 @@ namespace AirflowNetwork {
                         ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * 3.1415926;
                         Velocity = flowrate / SupplyBranchArea;
                     }
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
                         if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
                             ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                             ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * 3.1415926;
@@ -12680,7 +12680,7 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
                         ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                         ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * 3.1415926;
                     } else {
@@ -12725,7 +12725,7 @@ namespace AirflowNetwork {
                         ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * 3.1415926;
                         Velocity = flowrate / ReturnBranchArea;
                     }
-                    if (AirflowNetworkSimu.DuctSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
+                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
                         if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
                             ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / 3.1415926);
                             ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * 3.1415926;
