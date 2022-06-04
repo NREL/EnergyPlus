@@ -2208,41 +2208,43 @@ namespace AirflowNetwork {
             }
 
             // Get inputs for duct sizing
-            if (lAlphaBlanks(10) || UtilityRoutines::SameString(Alphas(10), "None")) {
-                AirflowNetworkSimu.AFNDuctAutoSize = false;
-            } else {
-                if (UtilityRoutines::SameString(Alphas(10), "MaximumVelocity")) {
-                    AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity;
-                } else if (UtilityRoutines::SameString(Alphas(10), "PressureLoss")) {
-                    AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::PressureLoss;
-                } else if (UtilityRoutines::SameString(Alphas(10), "PressureLossWithMaximumVelocity")) {
-                    AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss;
-                } else {
-                    ShowSevereError(m_state,
-                                    format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(10) + " = " + Alphas(10) + " is invalid.");
-                    ShowContinueError(m_state,
-                                      "Valid choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. " +
-                                          CurrentModuleObject + ": " + cAlphaFields(1) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName);
-                    ErrorsFound = true;
-                    SimObjectError = true;
-                }
-                AirflowNetworkSimu.AFNDuctAutoSize = true;
-                if (SimulateAirflowNetwork != AirflowNetworkControlMultiADS) {
-                    ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
-                    ShowContinueError(m_state,
-                                      "Although " + cAlphaFields(10) + " = \"" + Alphas(10) + "\" is entered, but " + cAlphaFields(2) +
-                                          " is not MultizoneWithoutDistribution.");
-                    ShowContinueError(m_state, "..Duct sizing is not performed");
-                    AirflowNetworkSimu.AFNDuctAutoSize = false;
-                }
-                if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
-                    if (NumAPL > 1) {
+            AirflowNetworkSimu.AFNDuctAutoSize = false;
+            if (NumAlphas == 10) {
+                if (!UtilityRoutines::SameString(Alphas(10), "None")) {
+                    if (UtilityRoutines::SameString(Alphas(10), "MaximumVelocity")) {
+                        AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity;
+                    } else if (UtilityRoutines::SameString(Alphas(10), "PressureLoss")) {
+                        AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::PressureLoss;
+                    } else if (UtilityRoutines::SameString(Alphas(10), "PressureLossWithMaximumVelocity")) {
+                        AirflowNetworkSimu.DuctSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss;
+                    } else {
+                        ShowSevereError(m_state,
+                                        format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(10) + " = " + Alphas(10) +
+                                            " is invalid.");
+                        ShowContinueError(m_state,
+                                          "Valid choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. " +
+                                              CurrentModuleObject + ": " + cAlphaFields(1) + " = " + AirflowNetworkSimu.AirflowNetworkSimuName);
+                        ErrorsFound = true;
+                        SimObjectError = true;
+                    }
+                    AirflowNetworkSimu.AFNDuctAutoSize = true;
+                    if (SimulateAirflowNetwork != AirflowNetworkControlMultiADS) {
                         ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
-                        ShowContinueError(
-                            m_state,
-                            "The number of AirLoopHAVC is greater than 1. The current requirement for Duct Sizing requires a single AirLoopHVAC.");
+                        ShowContinueError(m_state,
+                                          "Although " + cAlphaFields(10) + " = \"" + Alphas(10) + "\" is entered, but " + cAlphaFields(2) +
+                                              " is not MultizoneWithoutDistribution.");
                         ShowContinueError(m_state, "..Duct sizing is not performed");
                         AirflowNetworkSimu.AFNDuctAutoSize = false;
+                    }
+                    if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
+                        if (NumAPL > 1) {
+                            ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                            ShowContinueError(m_state,
+                                              "The number of AirLoopHAVC is greater than 1. The current requirement for Duct Sizing requires a "
+                                              "single AirLoopHVAC.");
+                            ShowContinueError(m_state, "..Duct sizing is not performed");
+                            AirflowNetworkSimu.AFNDuctAutoSize = false;
+                        }
                     }
                 }
             }
