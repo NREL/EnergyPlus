@@ -2603,7 +2603,8 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
     EXPECT_NEAR(calculatedResult4, expectedResult4, tol);
 }
 
-TEST_F(EnergyPlusFixture, InternalHeatGains_GetHeatColdStressTemp){
+TEST_F(EnergyPlusFixture, InternalHeatGains_GetHeatColdStressTemp)
+{
     std::string const idf_objects = delimited_string({
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
