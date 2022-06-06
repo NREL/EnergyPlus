@@ -1291,11 +1291,6 @@ namespace DataSurfaces {
         Real64 ViewFactor = 0.0; // view factor to a ground surface
         int TempSchPtr = 0;      // pointer to a ground surface temperature schedule object
         int ReflSchPtr = 0;      // pointer to a ground Surface reflectance schedule object
-
-        // Default Constructor
-        GroundSurfacesData() : ViewFactor(0.0), TempSchPtr(0), ReflSchPtr(0)
-        {
-        }
     };
 
     struct GroundSurfacesProperty
@@ -1308,11 +1303,6 @@ namespace DataSurfaces {
         Real64 SurfsReflAvg = 0.0;            // ground Surfaces average reflectance at each time step
         Real64 SurfsViewFactorSum = 0.0;      // sum of view factors of ground surfaces seen by an exterior surface
         bool IsGroundViewFactorSet = false;   // true if the ground view factor field is not blank
-
-        // Default Constructor
-        GroundSurfacesProperty() : NumGndSurfs(0), SurfsTempAvg(0.0), SurfsReflAvg(0.0), SurfsViewFactorSum(0.0), IsGroundViewFactorSet(false)
-        {
-        }
     };
 
     struct SurfaceLocalEnvironment
@@ -1950,11 +1940,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIntConvWindowLocation.deallocate();
         this->SurfIntConvSurfGetsRadiantHeat.deallocate();
         this->SurfIntConvSurfHasActiveInIt.deallocate();
-        this->IsSurfPropertyGndSurfacesDefined.deallocate();
-        this->GroundSurfsPropertyNum.deallocate();
-        this->UseSurfPropertyGndSurfTemp.deallocate();
-        this->UseSurfPropertyGndSurfRefl.deallocate();
-        this->GndReflSolarRad.deallocate();
 
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
@@ -2157,6 +2142,12 @@ struct SurfacesData : BaseGlobalStruct
         this->SurroundingSurfsProperty.deallocate();
         this->IntMassObjects.deallocate();
         this->actualMaxSlatAngs = DataSurfaces::MaxSlatAngs;
+        this->GroundSurfsProperty.deallocate();
+        this->GroundSurfsPropertyNum.deallocate();
+        this->UseSurfPropertyGndSurfTemp.deallocate();
+        this->UseSurfPropertyGndSurfRefl.deallocate();
+        this->IsSurfPropertyGndSurfacesDefined.deallocate();
+        this->GndReflSolarRad.deallocate();
     }
 };
 
