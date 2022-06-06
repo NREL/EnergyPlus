@@ -2897,7 +2897,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                 // Incident diffuse solar from sky diffuse reflection from ground
                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
                 // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                 // in SkySolarInc.
                 // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
