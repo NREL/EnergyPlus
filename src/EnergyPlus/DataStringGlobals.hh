@@ -113,19 +113,15 @@ struct DataStringGlobalsData : BaseGlobalStruct
 
     fs::path outputErrFilePath;
     fs::path eplusADSFilePath;
-    fs::path weatherFilePathNameOnly;
-    fs::path inputFilePath;
+    fs::path inputFilePath; // Full name of file to open, including path `/path/to/myfile.idf`
     fs::path inputIddFilePath;
     fs::path inputEpJSONSchemaFilePath;
-    fs::path idfDirPath;
     fs::path outDirPath;
-    fs::path idfFilePathNameOnly;
-    fs::path inputDirPath;
-    fs::path inputFilePathNameOnly;
+    fs::path inputDirPath;          // `/path/to/`
+    fs::path inputFilePathNameOnly; // `myfile.idf`
     fs::path exeDirectoryPath;
     fs::path ProgramPath;          // Path for Program from INI file
     fs::path CurrentWorkingFolder; // Current working directory for run
-    fs::path FullPath;             // Full name of file to open, including path
 
     std::string IDDVerString;    // Version information from the IDD (line 1)
     std::string CurrentDateTime; // For printing current date and time at start of run
@@ -135,8 +131,6 @@ struct DataStringGlobalsData : BaseGlobalStruct
     {
         outputErrFilePath.clear();
         eplusADSFilePath.clear();
-        idfFilePathNameOnly.clear();
-        idfDirPath.clear();
         outDirPath.clear();
         inputFilePathNameOnly.clear();
         inputDirPath.clear();
@@ -144,8 +138,6 @@ struct DataStringGlobalsData : BaseGlobalStruct
         inputFilePath.clear();
         inputIddFilePath.clear();
         inputEpJSONSchemaFilePath.clear();
-        FullPath.clear();
-        weatherFilePathNameOnly.clear();
         ProgramPath.clear();
         CurrentWorkingFolder.clear();
         CurrentDateTime.clear();
