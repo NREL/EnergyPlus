@@ -2551,6 +2551,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             state.dataSurface->SurfSkySolarInc(SurfNum) = 0.0;
             state.dataSurface->SurfGndSolarInc(SurfNum) = 0.0;
+            state.dataSurface->GndReflSolarRad(SurfNum) = 0.0;
         }
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
             state.dataHeatBal->ZoneTransSolar(enclNum) = 0.0;
@@ -2690,9 +2691,18 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 state.dataSurface->SurfReflFacBmToDiffSolObs)); // For linear indexing
         assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs,
                                 state.dataSurface->SurfReflFacBmToDiffSolGnd)); // For linear indexing
+        Real64 GndReflSolarRad = 0.0;
+        Real64 GndSolarRadInc = max(state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad, 0.0);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
-            state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround;
+            if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
+                GndReflSolarRad =
+                    GndSolarRadInc * state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum)).SurfsReflAvg;
+            } else {
+                GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+            }
+            state.dataSurface->GndReflSolarRad(SurfNum) = GndReflSolarRad;
+            state.dataSurface->SurfGndSolarInc(SurfNum) = GndReflSolarRad * Surface(SurfNum).ViewFactorGround;
             state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
             state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = 0.0;
         }
@@ -2970,10 +2980,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
+            Real64 GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum);
             // Add all reflected solar from the outside shelf to the ground solar
             // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
-            state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround +
-                                                          ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
+            state.dataSurface->SurfGndSolarInc(SurfNum) =
+                GndReflSolarRad * Surface(SurfNum).ViewFactorGround + ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
         }
 
         // Calculate Exterior and Interior Absorbed Short Wave Radiation

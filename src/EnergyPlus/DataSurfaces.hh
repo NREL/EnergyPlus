@@ -1544,6 +1544,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
     Array1D<bool> UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
     Array1D<bool> UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
+    Array1D<Real64> GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
@@ -1953,6 +1954,7 @@ struct SurfacesData : BaseGlobalStruct
         this->GroundSurfsPropertyNum.deallocate();
         this->UseSurfPropertyGndSurfTemp.deallocate();
         this->UseSurfPropertyGndSurfRefl.deallocate();
+        this->GndReflSolarRad.deallocate();
 
         this->SurfWinA.deallocate();
         this->SurfWinADiffFront.deallocate();
