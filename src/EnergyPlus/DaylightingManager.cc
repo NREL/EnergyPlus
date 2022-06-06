@@ -4435,7 +4435,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataIPShortCut->rNumericArgs(2) > state.dataIPShortCut->rNumericArgs(3)) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state,
-                                  format("...{}[:.2R] must be <= {} [:.2R].",
+                                  format("...{} {:.2R} must be <= {} {:.2R}.",
                                          state.dataIPShortCut->cNumericFieldNames(2),
                                          state.dataIPShortCut->rNumericArgs(2),
                                          state.dataIPShortCut->cNumericFieldNames(3),
@@ -4456,7 +4456,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataIPShortCut->rNumericArgs(5) > state.dataIPShortCut->rNumericArgs(6)) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state,
-                                  format("...{}[:.2R] must be <= {} [:.2R].",
+                                  format("...{} {:.2R} must be <= {} {:.2R}.",
                                          state.dataIPShortCut->cNumericFieldNames(5),
                                          state.dataIPShortCut->rNumericArgs(5),
                                          state.dataIPShortCut->cNumericFieldNames(6),

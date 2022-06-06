@@ -4580,7 +4580,7 @@ namespace SystemAvailabilityManager {
                 }
                 if (AirLoopCount > 1) {
                     ShowSevereError(state,
-                                    format("{}, The AirLoopHVAC name found more than once=",
+                                    format("{}, The AirLoopHVAC name found more than once={}",
                                            SystemAvailabilityTypeNamesUC[static_cast<int>(
                                                state.dataSystemAvailabilityManager->HybridVentData(SysAvailIndex).MgrType)],
                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name));
