@@ -388,7 +388,7 @@ void ManageSizing(EnergyPlusData &state)
 
                     } // ... End hour loop.
 
-                    if (state.dataGlobal->EndDayFlag) {
+                    if (state.dataGlobal->EndDayFlag && !state.dataGlobal->WarmupFlag) {
                         UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                     }
