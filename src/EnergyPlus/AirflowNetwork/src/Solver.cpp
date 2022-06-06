@@ -2220,9 +2220,12 @@ namespace AirflowNetwork {
                     } else {
                         ShowSevereError(m_state,
                                         format("{} {} object, {} = {}  is invalid.", RoutineName, CurrentModuleObject, cAlphaFields(10), Alphas(10)));
-                        ShowContinueError(m_state,
-                                          format("Valid choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. {}: {} = {}",
-                                              CurrentModuleObject, cAlphaFields(1), AirflowNetworkSimu.AirflowNetworkSimuName));
+                        ShowContinueError(
+                            m_state,
+                            format("Valid choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. {}: {} = {}",
+                                   CurrentModuleObject,
+                                   cAlphaFields(1),
+                                   AirflowNetworkSimu.AirflowNetworkSimuName));
                         ErrorsFound = true;
                         SimObjectError = true;
                     }
@@ -2240,9 +2243,10 @@ namespace AirflowNetwork {
                     if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
                         if (NumAPL > 1) {
                             ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
-                            ShowContinueError(m_state,
-                                              format("The number of AirLoopHAVC is greater than 1. The current requirement for Duct Sizing requires a "
-                                              "single AirLoopHVAC."));
+                            ShowContinueError(
+                                m_state,
+                                format("The number of AirLoopHAVC is greater than 1. The current requirement for Duct Sizing requires a "
+                                       "single AirLoopHVAC."));
                             ShowContinueError(m_state, format("..Duct sizing is not performed"));
                             AirflowNetworkSimu.AFNDuctAutoSize = false;
                         }
