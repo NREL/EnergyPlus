@@ -375,6 +375,9 @@ namespace SurfaceGeometry {
         state.dataSurface->ShadingSurfaceFirst = -1;
         state.dataSurface->ShadingSurfaceLast = -1;
 
+        // Reserve space to avoid excess allocations
+        state.dataSurface->AllExtSolAndShadingSurfaceList.reserve(state.dataSurface->TotSurfaces);
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
             state.dataSurface->SurfAirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + state.dataSurface->Surface(SurfNum).CosTilt));
@@ -2681,6 +2684,12 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
         }
+
+        // Reserve space to avoid excess allocations
+        state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllShadowPossObstrSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
+        state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
 
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
