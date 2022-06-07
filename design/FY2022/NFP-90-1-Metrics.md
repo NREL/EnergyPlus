@@ -36,45 +36,43 @@ capacities less than 65,000 Btu/h
 
 *For single stage system*
 
-![grafik](https://user-images.githubusercontent.com/49325382/172474972-a5ec3613-4f3c-40c1-aee6-e5d3cb3c1030.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172479575-decc82f9-f849-49a5-8c78-cfb8c5543883.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172475143-6496d51c-be24-4caf-9806-16b516ca5cc8.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172479689-e6e9fc45-cad9-48e0-8967-fc868ec50113.png)
 
-*For multi stage system*
+*For two space system*
 
-![grafik](https://user-images.githubusercontent.com/49325382/172475259-391b7a73-751b-4673-9a80-83161bd5e9c7.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172479815-28222eae-82fa-4173-851d-ca2e954ffea8.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172476659-22c32ef3-37e8-4d0e-b663-14a0fc47ca72.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172479963-1cc6958b-d26d-430a-be8c-4ab72b65496c.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172476724-8bfdfe3b-f3d2-4c01-a064-dc34d3816876.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480013-4891ec3e-674c-457e-a508-5ef224b426f0.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172476784-d0c4e95c-a9e3-4642-8d52-ab33ad3f7ced.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480066-e1b8d5ea-7717-41c3-9314-32ea6481d11f.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172476837-3d28bdfd-147b-4046-947b-8f9a8c225c2e.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480104-85ffdfb5-cb27-42bc-84d8-4d1cc1dbdab8.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172480159-9ebaa6e0-a48a-4bf9-a6cb-8c6a163161ba.png)
 
 *For variable speed system*
 
-![grafik](https://user-images.githubusercontent.com/49325382/172477094-3c09b858-5011-471c-aa8c-5de1845fbfb4.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480279-14b2e39b-f23a-4be7-88d1-1429ff94812d.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172477134-dba3a73a-4f05-4ecc-a5de-b91783db13b5.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480347-a5b2974c-4fa7-4986-89dc-f74cc1a97c05.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172477183-065570dd-0f27-4b95-a6b3-7a3967e5a549.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480383-a0029b39-fb23-498b-90c7-ce5ed6aa557c.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172477259-3b070491-f591-479e-99ad-c53f6e73bcf3.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480433-31e57201-4845-40ed-a543-e15703b277e6.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172477328-ce00903e-0073-4122-a72a-7b71a0d7fd04.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480471-7fc56c8a-04c6-4b16-9532-2c562f79f894.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172477377-2f86f5a2-5884-4765-b5ff-19910bb7abb7.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480515-87f68ed2-93e0-4319-9d1b-06691b4392af.png)
 
 
 based on the following temperature bin values
 
-![image](https://user-images.githubusercontent.com/49325382/165989393-bfe2b1f7-940c-4b6b-85dd-3ab1ea947fb0.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480683-d9c856c8-552f-48ac-b28a-8c96f68f2d7d.png)
 
-
-ERR2 Calculation:
-
-![grafik](https://user-images.githubusercontent.com/49325382/172477844-0ccebba4-88ea-48c9-a47e-0b62e0d14631.png)
 
 
 2. HSPF2
@@ -82,16 +80,17 @@ ERR2 Calculation:
 HSPF2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
 capacities less than 65,000 Btu/h
 
-Calculation is done as follows (more details in ANSI/AHRI 210/240:
+Calculation is done as follows (more details in ANSI/AHRI 210/240):
 
-![image](https://user-images.githubusercontent.com/49325382/165988448-6c29f39c-cb7b-447d-8942-0b8eeaf61b28.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480799-8f0fadc9-30ff-4339-9fa3-6df32cd14611.png)
 
-![grafik](https://user-images.githubusercontent.com/49325382/172473864-d9662d4e-0099-4969-9af0-e12502285f20.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480916-a795389b-2a03-45be-b07f-8abfbc55d2c1.png)
 
+![grafik](https://user-images.githubusercontent.com/49325382/172482051-43528104-e044-419d-b3c1-e1f93856c6df.png)
 
 based on the following temperature bin values
 
-![image](https://user-images.githubusercontent.com/49325382/165988518-3237a3b7-8a1b-4a41-ae6f-38fc5ec5dc6a.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172480836-a70565ce-130e-43f0-ba11-10254a894054.png)
 
 
 These temperature bin values changes in the newer version, thus we need to define two arrays one for the older and one for the newer version. 
