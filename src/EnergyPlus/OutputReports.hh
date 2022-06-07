@@ -68,11 +68,9 @@ void DXFOut(EnergyPlusData &state,
             std::string const &ColorScheme // Name from user for color scheme or blank
 );
 
-void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme);
-
 void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme);
 
-void DetailsForSurfaces(EnergyPlusData &state, int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(EnergyPlusData &state, int RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
 
 void CostInfoOut(EnergyPlusData &state);
 
