@@ -34,13 +34,47 @@ In the current workorder, we would focus on two metrics only and propose to focu
 SEER2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
 capacities less than 65,000 Btu/h
 
-SEER2 = PLF(0.5) * EER2 
+*For single stage system*
 
-![image](https://user-images.githubusercontent.com/49325382/165989369-12ff95cd-3e8d-4b4d-8bc5-d29a7c260687.png)
+![grafik](https://user-images.githubusercontent.com/49325382/172474972-a5ec3613-4f3c-40c1-aee6-e5d3cb3c1030.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172475143-6496d51c-be24-4caf-9806-16b516ca5cc8.png)
+
+*For multi stage system*
+
+![grafik](https://user-images.githubusercontent.com/49325382/172475259-391b7a73-751b-4673-9a80-83161bd5e9c7.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172476659-22c32ef3-37e8-4d0e-b663-14a0fc47ca72.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172476724-8bfdfe3b-f3d2-4c01-a064-dc34d3816876.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172476784-d0c4e95c-a9e3-4642-8d52-ab33ad3f7ced.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172476837-3d28bdfd-147b-4046-947b-8f9a8c225c2e.png)
+
+*For variable speed system*
+
+![grafik](https://user-images.githubusercontent.com/49325382/172477094-3c09b858-5011-471c-aa8c-5de1845fbfb4.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172477134-dba3a73a-4f05-4ecc-a5de-b91783db13b5.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172477183-065570dd-0f27-4b95-a6b3-7a3967e5a549.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172477259-3b070491-f591-479e-99ad-c53f6e73bcf3.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172477328-ce00903e-0073-4122-a72a-7b71a0d7fd04.png)
+
+![grafik](https://user-images.githubusercontent.com/49325382/172477377-2f86f5a2-5884-4765-b5ff-19910bb7abb7.png)
+
 
 based on the following temperature bin values
 
 ![image](https://user-images.githubusercontent.com/49325382/165989393-bfe2b1f7-940c-4b6b-85dd-3ab1ea947fb0.png)
+
+
+ERR2 Calculation:
+
+![grafik](https://user-images.githubusercontent.com/49325382/172477844-0ccebba4-88ea-48c9-a47e-0b62e0d14631.png)
 
 
 2. HSPF2
@@ -52,9 +86,13 @@ Calculation is done as follows (more details in ANSI/AHRI 210/240:
 
 ![image](https://user-images.githubusercontent.com/49325382/165988448-6c29f39c-cb7b-447d-8942-0b8eeaf61b28.png)
 
+![grafik](https://user-images.githubusercontent.com/49325382/172473864-d9662d4e-0099-4969-9af0-e12502285f20.png)
+
+
 based on the following temperature bin values
 
 ![image](https://user-images.githubusercontent.com/49325382/165988518-3237a3b7-8a1b-4a41-ae6f-38fc5ec5dc6a.png)
+
 
 These temperature bin values changes in the newer version, thus we need to define two arrays one for the older and one for the newer version. 
 
