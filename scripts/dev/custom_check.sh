@@ -20,5 +20,6 @@ python3 "$REPO_ROOT"/scripts/dev/check_for_c_style_comments.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/check_constexpr.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/check_for_switch_case_parentheses.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/check_for_malformed_enums.py || EXIT_STATUS=$?
+python3 "$REPO_ROOT"/scripts/dev/check_format_strings.py || EXIT_STATUS=$?
 
 exit $EXIT_STATUS
