@@ -8259,6 +8259,7 @@ namespace SurfaceGeometry {
         state.dataSurface->TotSurfPropGndSurfs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            if (state.dataSurface->TotSurfPropGndSurfs > 0) ErrorsFound = true;
             return;
         } else {
             auto &instancesValue = instances.value();

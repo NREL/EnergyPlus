@@ -5990,7 +5990,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
     // test 1: surface viewing grass, parking and lake areas
     // calculate ground surfaces average reflectance
     GetGroundSurfacesReflectanceAverage(*state);
-    Real64 dTK = DataGlobalConstants::KelvinConv;
     Real64 results_gndSurfsAvgRefl = 0.0;
     results_gndSurfsAvgRefl = (0.2 * Rgndsurf_grass + 0.1 * Rgndsurf_parking + 0.1 * Rgndsurf_lake) / (0.2 + 0.1 + 0.1);
     // check ground surfaces average reflectance
