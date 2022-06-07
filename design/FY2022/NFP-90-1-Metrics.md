@@ -6,7 +6,7 @@ Update output reporting of mechanical equipment using 90.1-2019 metrics
 **Digital Alchemy**
 
  - Original Date: April 14, 2022
- - Updated Date: XXX, 2022
+ - Updated Date: June 7, 2022
 
 ## Justification for New Feature ##
 
