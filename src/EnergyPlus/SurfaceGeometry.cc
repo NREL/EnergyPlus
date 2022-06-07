@@ -12060,8 +12060,7 @@ namespace SurfaceGeometry {
                             ShowContinueError(
                                 state,
                                 fmt::format("  The surface \"{}\" has an edge that was used only once: it is not an edge on another surface",
-                                            state.dataSurface->Surface(edge.surfNum).Name,
-                                            edge.count));
+                                            state.dataSurface->Surface(edge.surfNum).Name));
 
                         } else {
                             ShowContinueError(
