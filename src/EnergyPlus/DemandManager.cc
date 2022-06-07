@@ -83,6 +83,11 @@ namespace EnergyPlus::DemandManager {
 // times through ManageDemand before the final demand managers are established and the timestep can be
 // completed.
 
+constexpr std::array<std::string_view, static_cast<int>(ManagePriorityType::Num)> ManagePriorityNamesUC{"SEQUENTIAL", "OPTIMAL", "ALL"};
+constexpr std::array<std::string_view, static_cast<int>(ManagerLimit::Num)> ManagerLimitNamesUC{"OFF", "FIXED", "VARIABLE", "REDUCTIONRATIO"};
+constexpr std::array<std::string_view, static_cast<int>(ManagerLimit::Num)> ManagerLimitVentNamesUC{"OFF", "FIXEDRATE", "VARIABLE", "REDUCTIONRATIO"};
+constexpr std::array<std::string_view, static_cast<int>(ManagerSelection::Num)> ManagerSelectionNamesUC{"ALL", "ROTATEMANY", "ROTATEONE"};
+
 void ManageDemand(EnergyPlusData &state)
 {
 
@@ -375,212 +380,195 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                 ErrorsFound = true;
 
             } else {
-                {
-                    auto const SELECT_CASE_var(state.dataOutputProcessor->EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType);
-                    if ((SELECT_CASE_var == "Electricity") || (SELECT_CASE_var == "ElectricityNet")) {
-                        Units = "[W]"; // For setup of report variables
-
-                    } else {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\".");
-                        ShowContinueError(state, "Only Electricity and ElectricityNet meters are currently allowed.");
-                        ErrorsFound = true;
-                    }
-                }
-            }
-
-            // Further checking for conflicting DEMAND MANAGER LISTs
-
-            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(state, AlphArray(3));
-
-                if (DemandManagerList(ListNum).LimitSchedule == 0) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" not found.");
-                    ErrorsFound = true;
-                }
-            }
-
-            DemandManagerList(ListNum).SafetyFraction = NumArray(1);
-
-            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(state, AlphArray(4));
-
-                if (DemandManagerList(ListNum).BillingSchedule == 0) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\" not found.");
-                    ErrorsFound = true;
-                }
-            }
-
-            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(state, AlphArray(5));
-
-                if (DemandManagerList(ListNum).PeakSchedule == 0) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + AlphArray(5) + "\" not found.");
-                    ErrorsFound = true;
-                }
-            }
-
-            DemandManagerList(ListNum).AveragingWindow = max(int(NumArray(2) / state.dataGlobal->MinutesPerTimeStep), 1);
-            // Round to nearest timestep
-            // Can make this fancier to include windows that do not fit the timesteps
-            DemandManagerList(ListNum).History.allocate(DemandManagerList(ListNum).AveragingWindow);
-            DemandManagerList(ListNum).History = 0.0;
-
-            // Validate Demand Manager Priority
-            {
-                auto const SELECT_CASE_var(AlphArray(6));
-                if (SELECT_CASE_var == "SEQUENTIAL") {
-                    DemandManagerList(ListNum).ManagerPriority = ManagePriorityType::Sequential;
-
-                } else if (SELECT_CASE_var == "OPTIMAL") {
-                    DemandManagerList(ListNum).ManagerPriority = ManagePriorityType::Optimal;
-
-                } else if (SELECT_CASE_var == "ALL") {
-                    DemandManagerList(ListNum).ManagerPriority = ManagePriorityType::All;
+                if ((state.dataOutputProcessor->EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType == "Electricity") ||
+                    (state.dataOutputProcessor->EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType == "ElectricityNet")) {
+                    Units = "[W]"; // For setup of report variables
 
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                        state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphArray(6) + "\" not found.");
+                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\".");
+                    ShowContinueError(state, "Only Electricity and ElectricityNet meters are currently allowed.");
                     ErrorsFound = true;
                 }
-            }
 
-            // Get DEMAND MANAGER Type and Name pairs
-            DemandManagerList(ListNum).NumOfManager = int((NumAlphas - 6) / 2.0);
+                // Further checking for conflicting DEMAND MANAGER LISTs
 
-            if (DemandManagerList(ListNum).NumOfManager > 0) {
-                DemandManagerList(ListNum).Manager.allocate(DemandManagerList(ListNum).NumOfManager);
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(state, AlphArray(3));
 
-                for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
+                    if (DemandManagerList(ListNum).LimitSchedule == 0) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" not found.");
+                        ErrorsFound = true;
+                    }
+                }
 
-                    // Validate DEMAND MANAGER Type
-                    {
-                        auto const SELECT_CASE_var(AlphArray(MgrNum * 2 + 5));
-                        if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") ||
-                            (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") ||
-                            (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
+                DemandManagerList(ListNum).SafetyFraction = NumArray(1);
 
-                            DemandManagerList(ListNum).Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                    DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(state, AlphArray(4));
 
-                            if (DemandManagerList(ListNum).Manager(MgrNum) == 0) {
+                    if (DemandManagerList(ListNum).BillingSchedule == 0) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\" not found.");
+                        ErrorsFound = true;
+                    }
+                }
+
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                    DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(state, AlphArray(5));
+
+                    if (DemandManagerList(ListNum).PeakSchedule == 0) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + AlphArray(5) + "\" not found.");
+                        ErrorsFound = true;
+                    }
+                }
+
+                DemandManagerList(ListNum).AveragingWindow = max(int(NumArray(2) / state.dataGlobal->MinutesPerTimeStep), 1);
+                // Round to nearest timestep
+                // Can make this fancier to include windows that do not fit the timesteps
+                DemandManagerList(ListNum).History.allocate(DemandManagerList(ListNum).AveragingWindow);
+                DemandManagerList(ListNum).History = 0.0;
+
+                // Validate Demand Manager Priority
+                DemandManagerList(ListNum).ManagerPriority =
+                    static_cast<ManagePriorityType>(getEnumerationValue(ManagePriorityNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+
+                // Get DEMAND MANAGER Type and Name pairs
+                DemandManagerList(ListNum).NumOfManager = int((NumAlphas - 6) / 2.0);
+
+                if (DemandManagerList(ListNum).NumOfManager > 0) {
+                    DemandManagerList(ListNum).Manager.allocate(DemandManagerList(ListNum).NumOfManager);
+
+                    for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
+
+                        // Validate DEMAND MANAGER Type
+                        {
+                            auto const SELECT_CASE_var(AlphArray(MgrNum * 2 + 5));
+                            if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") ||
+                                (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") ||
+                                (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
+
+                                DemandManagerList(ListNum).Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
+
+                                if (DemandManagerList(ListNum).Manager(MgrNum) == 0) {
+                                    ShowSevereError(state,
+                                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" + AlphArray(MgrNum * 2 + 6) +
+                                                        "\" not found.");
+                                    ErrorsFound = true;
+                                }
+
+                            } else {
                                 ShowSevereError(state,
-                                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" + AlphArray(MgrNum * 2 + 6) +
-                                                    "\" not found.");
+                                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5) + "=\"" + AlphArray(MgrNum * 2 + 5) +
+                                                    "\".");
                                 ErrorsFound = true;
                             }
-
-                        } else {
-                            ShowSevereError(state,
-                                            CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                                state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5) + "=\"" + AlphArray(MgrNum * 2 + 5) + "\".");
-                            ErrorsFound = true;
                         }
-                    }
 
-                    // Check that each is not already referenced using %DemandManagerList field
+                        // Check that each is not already referenced using %DemandManagerList field
 
-                } // MgrNum
-            }
+                    } // MgrNum
+                }
 
-            // Setup report variables
+                // Setup report variables
+                SetupOutputVariable(state,
+                                    "Demand Manager Meter Demand Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).MeterDemand,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    DemandManagerList(ListNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Demand Manager Average Demand Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).AverageDemand,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    DemandManagerList(ListNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Demand Manager Peak Demand Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).PeakDemand,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    DemandManagerList(ListNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Demand Manager Scheduled Limit Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).ScheduledLimit,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    DemandManagerList(ListNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Demand Manager Demand Limit Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).DemandLimit,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    DemandManagerList(ListNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Demand Manager Over Limit Power",
+                                    OutputProcessor::Unit::W,
+                                    DemandManagerList(ListNum).OverLimit,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    DemandManagerList(ListNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Demand Manager Over Limit Time",
+                                    OutputProcessor::Unit::hr,
+                                    DemandManagerList(ListNum).OverLimitDuration,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    DemandManagerList(ListNum).Name);
+
+                if (ErrorsFound) {
+                    ShowFatalError(state, "Errors found in processing input for " + CurrentModuleObject);
+                }
+
+            } // ListNum
+
+            AlphArray.deallocate();
+            NumArray.deallocate();
+
+            // Iteration diagnostic reporting for all DEMAND MANAGER LISTs
             SetupOutputVariable(state,
-                                "Demand Manager Meter Demand Power",
-                                OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).MeterDemand,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
-
-            SetupOutputVariable(state,
-                                "Demand Manager Average Demand Power",
-                                OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).AverageDemand,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
-
-            SetupOutputVariable(state,
-                                "Demand Manager Peak Demand Power",
-                                OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).PeakDemand,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
-
-            SetupOutputVariable(state,
-                                "Demand Manager Scheduled Limit Power",
-                                OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).ScheduledLimit,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
-
-            SetupOutputVariable(state,
-                                "Demand Manager Demand Limit Power",
-                                OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).DemandLimit,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
-
-            SetupOutputVariable(state,
-                                "Demand Manager Over Limit Power",
-                                OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).OverLimit,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
-
-            SetupOutputVariable(state,
-                                "Demand Manager Over Limit Time",
-                                OutputProcessor::Unit::hr,
-                                DemandManagerList(ListNum).OverLimitDuration,
+                                "Demand Manager Exterior Energy Iteration Count",
+                                OutputProcessor::Unit::None,
+                                state.dataDemandManager->DemandManagerExtIterations,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
-                                DemandManagerList(ListNum).Name);
+                                "ManageDemand");
 
-            if (ErrorsFound) {
-                ShowFatalError(state, "Errors found in processing input for " + CurrentModuleObject);
-            }
+            SetupOutputVariable(state,
+                                "Demand Manager Heat Balance Iteration Count",
+                                OutputProcessor::Unit::None,
+                                state.dataDemandManager->DemandManagerHBIterations,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "ManageDemand");
 
-        } // ListNum
-
-        AlphArray.deallocate();
-        NumArray.deallocate();
-
-        // Iteration diagnostic reporting for all DEMAND MANAGER LISTs
-        SetupOutputVariable(state,
-                            "Demand Manager Exterior Energy Iteration Count",
-                            OutputProcessor::Unit::None,
-                            state.dataDemandManager->DemandManagerExtIterations,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
-                            "ManageDemand");
-
-        SetupOutputVariable(state,
-                            "Demand Manager Heat Balance Iteration Count",
-                            OutputProcessor::Unit::None,
-                            state.dataDemandManager->DemandManagerHBIterations,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
-                            "ManageDemand");
-
-        SetupOutputVariable(state,
-                            "Demand Manager HVAC Iteration Count",
-                            OutputProcessor::Unit::None,
-                            state.dataDemandManager->DemandManagerHVACIterations,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
-                            "ManageDemand");
+            SetupOutputVariable(state,
+                                "Demand Manager HVAC Iteration Count",
+                                OutputProcessor::Unit::None,
+                                state.dataDemandManager->DemandManagerHVACIterations,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "ManageDemand");
+        }
     }
 }
 
@@ -719,17 +707,10 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             // Validate Limiting Control
             {
-                auto const SELECT_CASE_var(AlphArray(3));
-                if (SELECT_CASE_var == "OFF") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Off;
+                DemandMgr(MgrNum).LimitControl =
+                    static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
 
-                } else if (SELECT_CASE_var == "FIXED") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Fixed;
-
-                } else if (SELECT_CASE_var == "VARIABLE") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Variable;
-
-                } else {
+                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
                                         state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
@@ -746,25 +727,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).LowerLimit = NumArray(2);
 
             // Validate Selection Control
-            {
-                auto const SELECT_CASE_var(AlphArray(4));
-                if (SELECT_CASE_var == "ALL") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::All;
-
-                } else if (SELECT_CASE_var == "ROTATEONE") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::One;
-
-                } else if (SELECT_CASE_var == "ROTATEMANY") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::Many;
-
-                } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
-                    ErrorsFound = true;
-                }
-            }
+            DemandMgr(MgrNum).SelectionControl =
+                static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
 
             if (NumArray(4) == 0.0)
                 DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -842,17 +806,9 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             // Validate Limiting Control
             {
-                auto const SELECT_CASE_var(AlphArray(3));
-                if (SELECT_CASE_var == "OFF") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Off;
-
-                } else if (SELECT_CASE_var == "FIXED") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Fixed;
-
-                } else if (SELECT_CASE_var == "VARIABLE") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Variable;
-
-                } else {
+                DemandMgr(MgrNum).LimitControl =
+                    static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
+                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
                                         state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
@@ -869,25 +825,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).LowerLimit = NumArray(2);
 
             // Validate Selection Control
-            {
-                auto const SELECT_CASE_var(AlphArray(4));
-                if (SELECT_CASE_var == "ALL") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::All;
-
-                } else if (SELECT_CASE_var == "ROTATEONE") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::One;
-
-                } else if (SELECT_CASE_var == "ROTATEMANY") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::Many;
-
-                } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
-                    ErrorsFound = true;
-                }
-            }
+            DemandMgr(MgrNum).SelectionControl =
+                static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
 
             if (NumArray(4) == 0.0)
                 DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -986,403 +925,321 @@ void GetDemandManagerInput(EnergyPlusData &state)
 
             // Validate Limiting Control
             {
-                auto const SELECT_CASE_var(AlphArray(3));
-                if (SELECT_CASE_var == "OFF") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Off;
-
-                } else if (SELECT_CASE_var == "FIXED") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Fixed;
-
-                } else if (SELECT_CASE_var == "VARIABLE") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Variable;
-
-                } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
-                    ErrorsFound = true;
-                }
-            }
-
-            if (NumArray(1) == 0.0)
-                DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
-            else
-                DemandMgr(MgrNum).LimitDuration = NumArray(1);
-
-            DemandMgr(MgrNum).LowerLimit = NumArray(2);
-
-            // Validate Selection Control
-            {
-                auto const SELECT_CASE_var(AlphArray(4));
-                if (SELECT_CASE_var == "ALL") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::All;
-
-                } else if (SELECT_CASE_var == "ROTATEONE") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::One;
-
-                } else if (SELECT_CASE_var == "ROTATEMANY") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::Many;
-
-                } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
-                    ErrorsFound = true;
-                }
-            }
-
-            if (NumArray(4) == 0.0)
-                DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
-            else
-                DemandMgr(MgrNum).RotationDuration = NumArray(4);
-
-            // Count actual pointers to controlled zones
-            DemandMgr(MgrNum).NumOfLoads = 0;
-            for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectricObjects);
-                if (LoadPtr > 0) {
-                    DemandMgr(MgrNum).NumOfLoads += state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones;
-                } else {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectric);
-                    if (LoadPtr > 0) {
-                        ++DemandMgr(MgrNum).NumOfLoads;
-                    } else {
+                DemandMgr(MgrNum).LimitControl =
+                    static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
+                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
+                    {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) + "\" not found.");
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                            state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
+                        ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
                         ErrorsFound = true;
                     }
                 }
-            }
 
-            //      DemandMgr(MgrNum)%NumOfLoads = NumAlphas - 4
+                if (NumArray(1) == 0.0)
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
+                else
+                    DemandMgr(MgrNum).LimitDuration = NumArray(1);
 
-            if (DemandMgr(MgrNum).NumOfLoads > 0) {
-                DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-                LoadNum = 0;
-                for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectricObjects);
+                DemandMgr(MgrNum).LowerLimit = NumArray(2);
+
+                // Validate Selection Control
+                DemandMgr(MgrNum).SelectionControl =
+                    static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+
+                if (NumArray(4) == 0.0)
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
+                else
+                    DemandMgr(MgrNum).RotationDuration = NumArray(4);
+
+                // Count actual pointers to controlled zones
+                DemandMgr(MgrNum).NumOfLoads = 0;
+                for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectricObjects);
                     if (LoadPtr > 0) {
-                        for (Item1 = 1; Item1 <= state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones; ++Item1) {
-                            ++LoadNum;
-                            DemandMgr(MgrNum).Load(LoadNum) = state.dataHeatBal->ZoneElectricObjects(LoadPtr).StartPtr + Item1 - 1;
-                        }
+                        DemandMgr(MgrNum).NumOfLoads += state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones;
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectric);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectric);
                         if (LoadPtr > 0) {
-                            ++LoadNum;
-                            DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
+                            ++DemandMgr(MgrNum).NumOfLoads;
+                        } else {
+                            ShowSevereError(state,
+                                            CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) +
+                                                "\" not found.");
+                            ErrorsFound = true;
                         }
                     }
-                } // LoadNum
-            } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
-                ErrorsFound = true;
-            }
-
-        } // MgrNum
-
-        // Get input for DemandManager:Thermostats
-        StartIndex = EndIndex + 1;
-        EndIndex += NumDemandMgrThermostats;
-
-        CurrentModuleObject = "DemandManager:Thermostats";
-
-        for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
-
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     MgrNum - StartIndex + 1,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataDemandManager->UniqueDemandMgrNames,
-                                                     AlphArray(1),
-                                                     CurrentModuleObject,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
-                                                     ErrorsFound);
-            DemandMgr(MgrNum).Name = AlphArray(1);
-
-            DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::Thermostats;
-
-            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
-
-                if (DemandMgr(MgrNum).AvailSchedule == 0) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
-                    ErrorsFound = true;
                 }
-            } else {
-                DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
-            }
 
-            // Validate Limiting Control
-            {
-                auto const SELECT_CASE_var(AlphArray(3));
-                if (SELECT_CASE_var == "OFF") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Off;
+                //      DemandMgr(MgrNum)%NumOfLoads = NumAlphas - 4
 
-                } else if (SELECT_CASE_var == "FIXED") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Fixed;
-
-                } else if (SELECT_CASE_var == "VARIABLE") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Variable;
-
+                if (DemandMgr(MgrNum).NumOfLoads > 0) {
+                    DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
+                    LoadNum = 0;
+                    for (Item = 1; Item <= NumAlphas - 4; ++Item) {
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectricObjects);
+                        if (LoadPtr > 0) {
+                            for (Item1 = 1; Item1 <= state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones; ++Item1) {
+                                ++LoadNum;
+                                DemandMgr(MgrNum).Load(LoadNum) = state.dataHeatBal->ZoneElectricObjects(LoadPtr).StartPtr + Item1 - 1;
+                            }
+                        } else {
+                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectric);
+                            if (LoadPtr > 0) {
+                                ++LoadNum;
+                                DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
+                            }
+                        }
+                    } // LoadNum
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError(state,
+                                      "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                     ErrorsFound = true;
                 }
-            }
 
-            if (NumArray(1) == 0.0)
-                DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
-            else
-                DemandMgr(MgrNum).LimitDuration = NumArray(1);
+            } // MgrNum
 
-            DemandMgr(MgrNum).LowerLimit = NumArray(2);
-            DemandMgr(MgrNum).UpperLimit = NumArray(3);
+            // Get input for DemandManager:Thermostats
+            StartIndex = EndIndex + 1;
+            EndIndex += NumDemandMgrThermostats;
 
-            if (DemandMgr(MgrNum).LowerLimit > DemandMgr(MgrNum).UpperLimit) {
-                ShowSevereError(state, "Invalid input for " + CurrentModuleObject + " = " + AlphArray(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
-                                         state.dataIPShortCut->cNumericFieldNames(2),
-                                         NumArray(2),
-                                         state.dataIPShortCut->cNumericFieldNames(3),
-                                         NumArray(3)));
-                ShowContinueError(
-                    state, state.dataIPShortCut->cNumericFieldNames(2) + " cannot be greater than " + state.dataIPShortCut->cNumericFieldNames(3));
-                ErrorsFound = true;
-            }
+            CurrentModuleObject = "DemandManager:Thermostats";
 
-            // Validate Selection Control
-            {
-                auto const SELECT_CASE_var(AlphArray(4));
-                if (SELECT_CASE_var == "ALL") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::All;
+            for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                } else if (SELECT_CASE_var == "ROTATEONE") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::One;
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         MgrNum - StartIndex + 1,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         _,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
-                } else if (SELECT_CASE_var == "ROTATEMANY") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::Many;
+                GlobalNames::VerifyUniqueInterObjectName(state,
+                                                         state.dataDemandManager->UniqueDemandMgrNames,
+                                                         AlphArray(1),
+                                                         CurrentModuleObject,
+                                                         state.dataIPShortCut->cAlphaFieldNames(1),
+                                                         ErrorsFound);
+                DemandMgr(MgrNum).Name = AlphArray(1);
 
-                } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
-                    ErrorsFound = true;
-                }
-            }
+                DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::Thermostats;
 
-            if (NumArray(5) == 0.0)
-                DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
-            else
-                DemandMgr(MgrNum).RotationDuration = NumArray(5);
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
 
-            // Count actual pointers to controlled zones
-            DemandMgr(MgrNum).NumOfLoads = 0;
-            for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
-                if (LoadPtr > 0) {
-                    DemandMgr(MgrNum).NumOfLoads += state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones;
-                } else {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TempControlledZone);
-                    if (LoadPtr > 0) {
-                        ++DemandMgr(MgrNum).NumOfLoads;
-                    } else {
+                    if (DemandMgr(MgrNum).AvailSchedule == 0) {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) + "\" not found.");
+                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
                         ErrorsFound = true;
                     }
+                } else {
+                    DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
                 }
-            }
 
-            if (DemandMgr(MgrNum).NumOfLoads > 0) {
-                DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
-                LoadNum = 0;
-                for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
+                // Validate Limiting Control
+                DemandMgr(MgrNum).LimitControl =
+                    static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
+
+                if (NumArray(1) == 0.0)
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
+                else
+                    DemandMgr(MgrNum).LimitDuration = NumArray(1);
+
+                DemandMgr(MgrNum).LowerLimit = NumArray(2);
+                DemandMgr(MgrNum).UpperLimit = NumArray(3);
+
+                if (DemandMgr(MgrNum).LowerLimit > DemandMgr(MgrNum).UpperLimit) {
+                    ShowSevereError(state, "Invalid input for " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowContinueError(state,
+                                      format("{} [{:.R2}] > {} [{.R2}]",
+                                             state.dataIPShortCut->cNumericFieldNames(2),
+                                             NumArray(2),
+                                             state.dataIPShortCut->cNumericFieldNames(3),
+                                             NumArray(3)));
+                    ShowContinueError(state,
+                                      state.dataIPShortCut->cNumericFieldNames(2) + " cannot be greater than " +
+                                          state.dataIPShortCut->cNumericFieldNames(3));
+                    ErrorsFound = true;
+                }
+
+                // Validate Selection Control
+                DemandMgr(MgrNum).SelectionControl =
+                    static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+
+                if (NumArray(5) == 0.0)
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
+                else
+                    DemandMgr(MgrNum).RotationDuration = NumArray(5);
+
+                // Count actual pointers to controlled zones
+                DemandMgr(MgrNum).NumOfLoads = 0;
+                for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
                     if (LoadPtr > 0) {
-                        for (Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones; ++Item1) {
-                            ++LoadNum;
-                            DemandMgr(MgrNum).Load(LoadNum) = state.dataZoneCtrls->TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
-                        }
+                        DemandMgr(MgrNum).NumOfLoads += state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones;
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TempControlledZone);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TempControlledZone);
                         if (LoadPtr > 0) {
-                            ++LoadNum;
-                            DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
+                            ++DemandMgr(MgrNum).NumOfLoads;
+                        } else {
+                            ShowSevereError(state,
+                                            CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(LoadNum + 4) + "=\"" + AlphArray(LoadNum + 4) +
+                                                "\" not found.");
+                            ErrorsFound = true;
                         }
                     }
-                } // LoadNum
-            } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
-                ErrorsFound = true;
-            }
-
-        } // MgrNum
-
-        // Get input for DemandManager:Ventilation
-        StartIndex = EndIndex + 1;
-        EndIndex += NumDemandMgrVentilation;
-
-        CurrentModuleObject = "DemandManager:Ventilation";
-
-        for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
-
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     MgrNum - StartIndex + 1,
-                                                                     AlphArray,
-                                                                     NumAlphas,
-                                                                     NumArray,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     _,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataDemandManager->UniqueDemandMgrNames,
-                                                     AlphArray(1),
-                                                     CurrentModuleObject,
-                                                     state.dataIPShortCut->cAlphaFieldNames(1),
-                                                     ErrorsFound);
-            DemandMgr(MgrNum).Name = AlphArray(1);
-
-            DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::Ventilation;
-
-            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
-
-                if (DemandMgr(MgrNum).AvailSchedule == 0) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
-                    ErrorsFound = true;
                 }
-            } else {
-                DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
-            }
 
-            // Validate Limiting Control
-            {
-                auto const SELECT_CASE_var(AlphArray(3));
-                if (SELECT_CASE_var == "OFF") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Off;
-
-                } else if (SELECT_CASE_var == "FIXEDRATE") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::Fixed;
-
-                } else if (SELECT_CASE_var == "REDUCTIONRATIO") {
-                    DemandMgr(MgrNum).LimitControl = ManagerLimit::ReductionRatio;
-
+                if (DemandMgr(MgrNum).NumOfLoads > 0) {
+                    DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
+                    LoadNum = 0;
+                    for (Item = 1; Item <= NumAlphas - 4; ++Item) {
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
+                        if (LoadPtr > 0) {
+                            for (Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones; ++Item1) {
+                                ++LoadNum;
+                                DemandMgr(MgrNum).Load(LoadNum) = state.dataZoneCtrls->TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
+                            }
+                        } else {
+                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TempControlledZone);
+                            if (LoadPtr > 0) {
+                                ++LoadNum;
+                                DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
+                            }
+                        }
+                    } // LoadNum
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, FixedRate, or ReductionRatio.");
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError(state,
+                                      "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                     ErrorsFound = true;
                 }
-            }
 
-            if (NumArray(1) == 0.0)
-                DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
-            else
-                DemandMgr(MgrNum).LimitDuration = NumArray(1);
+            } // MgrNum
 
-            if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Fixed) DemandMgr(MgrNum).FixedRate = NumArray(2);
-            if (DemandMgr(MgrNum).LimitControl == ManagerLimit::ReductionRatio) DemandMgr(MgrNum).ReductionRatio = NumArray(3);
+            // Get input for DemandManager:Ventilation
+            StartIndex = EndIndex + 1;
+            EndIndex += NumDemandMgrVentilation;
 
-            DemandMgr(MgrNum).LowerLimit = NumArray(4);
+            CurrentModuleObject = "DemandManager:Ventilation";
 
-            // Validate Selection Control
-            {
-                auto const SELECT_CASE_var(AlphArray(4));
-                if (SELECT_CASE_var == "ALL") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::All;
+            for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                } else if (SELECT_CASE_var == "ROTATEONE") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::One;
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         MgrNum - StartIndex + 1,
+                                                                         AlphArray,
+                                                                         NumAlphas,
+                                                                         NumArray,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         _,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
-                } else if (SELECT_CASE_var == "ROTATEMANY") {
-                    DemandMgr(MgrNum).SelectionControl = ManagerSelection::Many;
+                GlobalNames::VerifyUniqueInterObjectName(state,
+                                                         state.dataDemandManager->UniqueDemandMgrNames,
+                                                         AlphArray(1),
+                                                         CurrentModuleObject,
+                                                         state.dataIPShortCut->cAlphaFieldNames(1),
+                                                         ErrorsFound);
+                DemandMgr(MgrNum).Name = AlphArray(1);
 
+                DemandMgr(MgrNum).Type = DemandMgr(MgrNum).Type = ManagerType::Ventilation;
+
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
+
+                    if (DemandMgr(MgrNum).AvailSchedule == 0) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\" not found.");
+                        ErrorsFound = true;
+                    }
                 } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
-                    ErrorsFound = true;
+                    DemandMgr(MgrNum).AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
                 }
-            }
 
-            if (NumArray(5) == 0.0)
-                DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
-            else
-                DemandMgr(MgrNum).RotationDuration = NumArray(5);
+                // Validate Limiting Control
+                DemandMgr(MgrNum).LimitControl =
+                    static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitVentNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
 
-            // Count number of string fields for loading Controller:OutdoorAir names. This number must be increased in case if
-            // new string field is added or decreased if string fields are removed.
-            int AlphaShift = 4;
+                if (NumArray(1) == 0.0)
+                    DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
+                else
+                    DemandMgr(MgrNum).LimitDuration = NumArray(1);
 
-            // Count actual pointers to air controllers
-            DemandMgr(MgrNum).NumOfLoads = 0;
-            for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-                LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
-                if (LoadPtr > 0) {
-                    ++DemandMgr(MgrNum).NumOfLoads;
-                } else {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(LoadNum + AlphaShift) + "=\"" + AlphArray(LoadNum + AlphaShift) +
-                                        "\" not found.");
-                    ErrorsFound = true;
-                }
-            }
+                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Fixed) DemandMgr(MgrNum).FixedRate = NumArray(2);
+                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::ReductionRatio) DemandMgr(MgrNum).ReductionRatio = NumArray(3);
 
-            if (DemandMgr(MgrNum).NumOfLoads > 0) {
-                DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
+                DemandMgr(MgrNum).LowerLimit = NumArray(4);
+
+                // Validate Selection Control
+                DemandMgr(MgrNum).SelectionControl =
+                    static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+
+                if (NumArray(5) == 0.0)
+                    DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
+                else
+                    DemandMgr(MgrNum).RotationDuration = NumArray(5);
+
+                // Count number of string fields for loading Controller:OutdoorAir names. This number must be increased in case if
+                // new string field is added or decreased if string fields are removed.
+                int AlphaShift = 4;
+
+                // Count actual pointers to air controllers
+                DemandMgr(MgrNum).NumOfLoads = 0;
                 for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
                     LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
                     if (LoadPtr > 0) {
-                        DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
+                        ++DemandMgr(MgrNum).NumOfLoads;
+                    } else {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(LoadNum + AlphaShift) + "=\"" + AlphArray(LoadNum + AlphaShift) +
+                                            "\" not found.");
+                        ErrorsFound = true;
                     }
                 }
-            } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
-                ErrorsFound = true;
-            }
-        } // MgrNum
 
-        AlphArray.deallocate();
-        NumArray.deallocate();
-    }
+                if (DemandMgr(MgrNum).NumOfLoads > 0) {
+                    DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
+                    for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
+                        LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
+                        if (LoadPtr > 0) {
+                            DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
+                        }
+                    }
+                } else {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
+                    ShowContinueError(state,
+                                      "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                    ErrorsFound = true;
+                }
+            } // MgrNum
 
-    if (ErrorsFound) {
-        ShowFatalError(state, "Errors found in processing input for demand managers. Preceding condition causes termination.");
+            AlphArray.deallocate();
+            NumArray.deallocate();
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "Errors found in processing input for demand managers. Preceding condition causes termination.");
+        }
     }
 }
 

@@ -87,6 +87,8 @@ namespace DemandManager {
         Num
     };
 
+    extern const std::array<std::string_view, static_cast<int>(ManagePriorityType::Num)> ManagePriorityNamesUC;
+
     enum class ManagerLimit
     {
         Invalid = -1,
@@ -97,6 +99,9 @@ namespace DemandManager {
         Num
     };
 
+    extern const std::array<std::string_view, static_cast<int>(ManagerLimit::Num)> ManagerLimitNamesUC;
+    extern const std::array<std::string_view, static_cast<int>(ManagerLimit::Num)> ManagerLimitVentNamesUC;
+
     enum class ManagerSelection
     {
         Invalid = -1,
@@ -105,6 +110,8 @@ namespace DemandManager {
         One,
         Num
     };
+
+    extern const std::array<std::string_view, static_cast<int>(ManagerSelection::Num)> ManagerSelectionNamesUC;
 
     enum class DemandAction
     {
