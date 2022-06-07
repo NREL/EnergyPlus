@@ -66,7 +66,6 @@ cf: https://github.com/NREL/EnergyPlus/issues/9419
 
 import argparse
 from pathlib import Path
-import shlex
 import shutil
 import subprocess
 
@@ -126,7 +125,8 @@ def run_convertinputformat(
 
     cmd = f"{convertinputformat_exe} --output {out_dir} {input_file}"
     print(f"Running: {cmd}")
-    subprocess.check_call(shlex.split(cmd))
+    subprocess.check_call([convertinputformat_exe, '--output', out_dir,
+                           input_file])
 
 
 if __name__ == "__main__":
