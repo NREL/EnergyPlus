@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -164,9 +164,9 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    state->dataAirflowNetwork->AirflowNetworkNumOfExhFan = 0;
-    state->dataHeatBalFanSys->TempControlType(1) = 4;
-    state->dataHeatBalFanSys->TempControlType(2) = 4;
+    state->afn->AirflowNetworkNumOfExhFan = 0;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(2) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 0.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(2) = 0.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;

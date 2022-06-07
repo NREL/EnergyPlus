@@ -199,8 +199,6 @@ namespace ZoneAirLoopEquipmentManager {
         int NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataDefineEquipment->AirDistUnit.allocate(NumAirDistUnits);
-        state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(NumAirDistUnits);
-        state.dataZoneAirLoopEquipmentManager->EachOnceFlag = true;
 
         if (NumAirDistUnits > 0) {
 
@@ -553,7 +551,7 @@ namespace ZoneAirLoopEquipmentManager {
         if (!state.dataZoneAirLoopEquipmentManager->InitAirDistUnitsFlag) {
             return;
         }
-        if (state.dataZoneAirLoopEquipmentManager->EachOnceFlag(AirDistUnitNum) &&
+        if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EachOnceFlag &&
             (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum > 0)) {
 
             {
@@ -599,7 +597,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 }
             }
-            state.dataZoneAirLoopEquipmentManager->EachOnceFlag(AirDistUnitNum) = false;
+            state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EachOnceFlag = false;
             ++state.dataZoneAirLoopEquipmentManager->numADUInitialized;
             if (state.dataZoneAirLoopEquipmentManager->numADUInitialized == (int)state.dataDefineEquipment->AirDistUnit.size()) {
                 // If all ADUs are initialized, set InitAirDistUnitsFlag to false

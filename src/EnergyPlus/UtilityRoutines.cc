@@ -194,8 +194,6 @@ namespace UtilityRoutines {
         // for most inputs -- they are automatically turned to UPPERCASE.
         // If you need case insensitivity use FindItem.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
         }
@@ -217,8 +215,6 @@ namespace UtilityRoutines {
         // found.  This routine is not case insensitive and doesn't need
         // for most inputs -- they are automatically turned to UPPERCASE.
         // If you need case insensitivity use FindItem.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
@@ -403,12 +399,9 @@ namespace UtilityRoutines {
         // list of names for this item (i.e., that there isn't one of that
         // name already and that this name is not blank).
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Found;
-
         ErrorFound = false;
         if (NumOfNames > 0) {
-            Found = FindItem(NameToVerify, NamesList, NumOfNames);
+            int Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
                 ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
@@ -458,7 +451,7 @@ namespace UtilityRoutines {
             return;
         }
 
-        // accumuate the row until ready to be written to the file.
+        // accumulate the row until ready to be written to the file.
         state.dataUtilityRoutines->appendPerfLog_headerRow = state.dataUtilityRoutines->appendPerfLog_headerRow + colHeader + ",";
         state.dataUtilityRoutines->appendPerfLog_valuesRow = state.dataUtilityRoutines->appendPerfLog_valuesRow + colValue + ",";
 

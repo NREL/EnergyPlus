@@ -2299,11 +2299,44 @@ namespace HVACUnitaryBypassVAV {
         // Simulate cooling coil if zone load is negative (cooling load)
         if (CBVAV(CBVAVNum).HeatCoolMode == CoolingMode) {
             if (OutdoorDryBulbTemp >= CBVAV(CBVAVNum).MinOATCompressor) {
-
-                {
-                    auto const SELECT_CASE_var(CBVAV(CBVAVNum).DXCoolCoilType_Num);
-
-                    if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
+                switch (CBVAV(CBVAVNum).DXCoolCoilType_Num) {
+                case DataHVACGlobals::CoilDX_CoolingHXAssisted: {
+                    HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
+                                                                        CBVAV(CBVAVNum).DXCoolCoilName,
+                                                                        FirstHVACIteration,
+                                                                        DataHVACGlobals::CompressorOperation::On,
+                                                                        PartLoadFrac,
+                                                                        CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                                        DataHVACGlobals::ContFanCycCoil,
+                                                                        HXUnitOn);
+                    if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        //         If coil inlet temp is already below the setpoint, simulated with coil off
+                        PartLoadFrac = 0.0;
+                        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
+                                                                            CBVAV(CBVAVNum).DXCoolCoilName,
+                                                                            FirstHVACIteration,
+                                                                            DataHVACGlobals::CompressorOperation::Off,
+                                                                            PartLoadFrac,
+                                                                            CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                                            DataHVACGlobals::ContFanCycCoil,
+                                                                            HXUnitOn);
+                    } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                        Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
+                        Par(3) = OnOffAirFlowRatio;
+                        Par(4) = double(CBVAVNum);
+                        if (FirstHVACIteration) {
+                            Par(5) = 1.0;
+                        } else {
+                            Par(5) = 0.0;
+                        }
+                        if (HXUnitOn) {
+                            Par(6) = 1.0;
+                        } else {
+                            Par(6) = 0.0;
+                        }
+                        General::SolveRoot(
+                            state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, HXAssistDXCoilResidual, 0.0, 1.0, Par);
                         HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                             CBVAV(CBVAVNum).DXCoolCoilName,
                                                                             FirstHVACIteration,
@@ -2312,87 +2345,63 @@ namespace HVACUnitaryBypassVAV {
                                                                             CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                             DataHVACGlobals::ContFanCycCoil,
                                                                             HXUnitOn);
-                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
-                            //         If coil inlet temp is already below the setpoint, simulated with coil off
-                            PartLoadFrac = 0.0;
-                            HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
-                                                                                CBVAV(CBVAVNum).DXCoolCoilName,
-                                                                                FirstHVACIteration,
-                                                                                DataHVACGlobals::CompressorOperation::Off,
-                                                                                PartLoadFrac,
-                                                                                CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                                                DataHVACGlobals::ContFanCycCoil,
-                                                                                HXUnitOn);
-                        } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
-                            Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                            Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
-                            Par(3) = OnOffAirFlowRatio;
-                            Par(4) = double(CBVAVNum);
-                            if (FirstHVACIteration) {
-                                Par(5) = 1.0;
+                        if (SolFla == -1 && !state.dataGlobal->WarmupFlag) {
+                            if (CBVAV(CBVAVNum).HXDXIterationExceeded < 1) {
+                                ++CBVAV(CBVAVNum).HXDXIterationExceeded;
+                                ShowWarningError(state,
+                                                 "Iteration limit exceeded calculating HX assisted DX unit part-load ratio, for unit = " +
+                                                     CBVAV(CBVAVNum).DXCoolCoilName);
+                                ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(
+                                    state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                             } else {
-                                Par(5) = 0.0;
+                                ShowRecurringWarningErrorAtEnd(
+                                    state,
+                                    CBVAV(CBVAVNum).Name + ", Iteration limit exceeded for HX assisted DX unit part-load ratio error continues.",
+                                    CBVAV(CBVAVNum).HXDXIterationExceededIndex,
+                                    PartLoadFrac,
+                                    PartLoadFrac);
                             }
-                            if (HXUnitOn) {
-                                Par(6) = 1.0;
+                        } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
+                            PartLoadFrac =
+                                max(0.0,
+                                    min(1.0,
+                                        (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                             state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                            if (CBVAV(CBVAVNum).HXDXIterationFailed < 1) {
+                                ++CBVAV(CBVAVNum).HXDXIterationFailed;
+                                ShowSevereError(
+                                    state,
+                                    "HX assisted DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
+                                        CBVAV(CBVAVNum).DXCoolCoilName);
+                                ShowContinueErrorTimeStamp(
+                                    state,
+                                    format("An estimated part-load ratio of {:.3R}will be used and the simulation continues. Occurrence info:",
+                                           PartLoadFrac));
                             } else {
-                                Par(6) = 0.0;
-                            }
-                            General::SolveRoot(
-                                state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, HXAssistDXCoilResidual, 0.0, 1.0, Par);
-                            HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
-                                                                                CBVAV(CBVAVNum).DXCoolCoilName,
-                                                                                FirstHVACIteration,
-                                                                                DataHVACGlobals::CompressorOperation::On,
-                                                                                PartLoadFrac,
-                                                                                CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                                                DataHVACGlobals::ContFanCycCoil,
-                                                                                HXUnitOn);
-                            if (SolFla == -1 && !state.dataGlobal->WarmupFlag) {
-                                if (CBVAV(CBVAVNum).HXDXIterationExceeded < 1) {
-                                    ++CBVAV(CBVAVNum).HXDXIterationExceeded;
-                                    ShowWarningError(state,
-                                                     "Iteration limit exceeded calculating HX assisted DX unit part-load ratio, for unit = " +
-                                                         CBVAV(CBVAVNum).DXCoolCoilName);
-                                    ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                    ShowContinueErrorTimeStamp(
-                                        state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                } else {
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        CBVAV(CBVAVNum).Name + ", Iteration limit exceeded for HX assisted DX unit part-load ratio error continues.",
-                                        CBVAV(CBVAVNum).HXDXIterationExceededIndex,
-                                        PartLoadFrac,
-                                        PartLoadFrac);
-                                }
-                            } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
-                                PartLoadFrac =
-                                    max(0.0,
-                                        min(1.0,
-                                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                 state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
-                                if (CBVAV(CBVAVNum).HXDXIterationFailed < 1) {
-                                    ++CBVAV(CBVAVNum).HXDXIterationFailed;
-                                    ShowSevereError(
-                                        state,
-                                        "HX assisted DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                            CBVAV(CBVAVNum).DXCoolCoilName);
-                                    ShowContinueErrorTimeStamp(
-                                        state,
-                                        format("An estimated part-load ratio of {:.3R}will be used and the simulation continues. Occurrence info:",
-                                               PartLoadFrac));
-                                } else {
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        CBVAV(CBVAVNum).Name + ", Part-load ratio calculation failed for HX assisted DX unit error continues.",
-                                        CBVAV(CBVAVNum).HXDXIterationFailedIndex,
-                                        PartLoadFrac,
-                                        PartLoadFrac);
-                                }
+                                ShowRecurringWarningErrorAtEnd(state,
+                                                               CBVAV(CBVAVNum).Name +
+                                                                   ", Part-load ratio calculation failed for HX assisted DX unit error continues.",
+                                                               CBVAV(CBVAVNum).HXDXIterationFailedIndex,
+                                                               PartLoadFrac,
+                                                               PartLoadFrac);
                             }
                         }
-                    } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+                    }
+                } break;
+                case DataHVACGlobals::CoilDX_CoolingSingleSpeed: {
+                    DXCoils::SimDXCoil(state,
+                                       CBVAV(CBVAVNum).DXCoolCoilName,
+                                       DataHVACGlobals::CompressorOperation::On,
+                                       FirstHVACIteration,
+                                       CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                       DataHVACGlobals::ContFanCycCoil,
+                                       PartLoadFrac,
+                                       OnOffAirFlowRatio);
+                    if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        //         If coil inlet temp is already below the setpoint, simulated with coil off
+                        PartLoadFrac = 0.0;
                         DXCoils::SimDXCoil(state,
                                            CBVAV(CBVAVNum).DXCoolCoilName,
                                            DataHVACGlobals::CompressorOperation::On,
@@ -2401,89 +2410,135 @@ namespace HVACUnitaryBypassVAV {
                                            DataHVACGlobals::ContFanCycCoil,
                                            PartLoadFrac,
                                            OnOffAirFlowRatio);
-                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
-                            //         If coil inlet temp is already below the setpoint, simulated with coil off
-                            PartLoadFrac = 0.0;
-                            DXCoils::SimDXCoil(state,
-                                               CBVAV(CBVAVNum).DXCoolCoilName,
-                                               DataHVACGlobals::CompressorOperation::On,
-                                               FirstHVACIteration,
-                                               CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                               DataHVACGlobals::ContFanCycCoil,
-                                               PartLoadFrac,
-                                               OnOffAirFlowRatio);
-                        } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
-                            Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                            Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
-                            Par(3) = OnOffAirFlowRatio;
-                            General::SolveRoot(
-                                state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
-                            DXCoils::SimDXCoil(state,
-                                               CBVAV(CBVAVNum).DXCoolCoilName,
-                                               DataHVACGlobals::CompressorOperation::On,
-                                               FirstHVACIteration,
-                                               CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                               DataHVACGlobals::ContFanCycCoil,
-                                               PartLoadFrac,
-                                               OnOffAirFlowRatio);
-                            if (SolFla == -1 && !state.dataGlobal->WarmupFlag) {
-                                if (CBVAV(CBVAVNum).DXIterationExceeded < 1) {
-                                    ++CBVAV(CBVAVNum).DXIterationExceeded;
-                                    ShowWarningError(state,
-                                                     "Iteration limit exceeded calculating DX unit part-load ratio, for unit = " +
-                                                         CBVAV(CBVAVNum).DXCoolCoilName);
-                                    ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                    ShowContinueErrorTimeStamp(
-                                        state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                } else {
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        CBVAV(CBVAVNum).Name + ", Iteration limit exceeded for DX unit part-load ratio calculation error continues.",
-                                        CBVAV(CBVAVNum).DXIterationExceededIndex,
-                                        PartLoadFrac,
-                                        PartLoadFrac);
-                                }
-                            } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
-                                PartLoadFrac =
-                                    max(0.0,
-                                        min(1.0,
-                                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                 state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
-                                if (CBVAV(CBVAVNum).DXIterationFailed < 1) {
-                                    ++CBVAV(CBVAVNum).DXIterationFailed;
-                                    ShowSevereError(state,
-                                                    "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                                        CBVAV(CBVAVNum).DXCoolCoilName);
-                                    ShowContinueErrorTimeStamp(
-                                        state,
-                                        format("An estimated part-load ratio of {:.3R}will be used and the simulation continues. Occurrence info:",
-                                               PartLoadFrac));
-                                } else {
-                                    ShowRecurringWarningErrorAtEnd(state,
-                                                                   CBVAV(CBVAVNum).Name +
-                                                                       ", Part-load ratio calculation failed for DX unit error continues.",
-                                                                   CBVAV(CBVAVNum).DXIterationFailedIndex,
-                                                                   PartLoadFrac,
-                                                                   PartLoadFrac);
-                                }
+                    } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                        Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
+                        Par(3) = OnOffAirFlowRatio;
+                        General::SolveRoot(state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
+                        DXCoils::SimDXCoil(state,
+                                           CBVAV(CBVAVNum).DXCoolCoilName,
+                                           DataHVACGlobals::CompressorOperation::On,
+                                           FirstHVACIteration,
+                                           CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                           DataHVACGlobals::ContFanCycCoil,
+                                           PartLoadFrac,
+                                           OnOffAirFlowRatio);
+                        if (SolFla == -1 && !state.dataGlobal->WarmupFlag) {
+                            if (CBVAV(CBVAVNum).DXIterationExceeded < 1) {
+                                ++CBVAV(CBVAVNum).DXIterationExceeded;
+                                ShowWarningError(state,
+                                                 "Iteration limit exceeded calculating DX unit part-load ratio, for unit = " +
+                                                     CBVAV(CBVAVNum).DXCoolCoilName);
+                                ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(
+                                    state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                            } else {
+                                ShowRecurringWarningErrorAtEnd(
+                                    state,
+                                    CBVAV(CBVAVNum).Name + ", Iteration limit exceeded for DX unit part-load ratio calculation error continues.",
+                                    CBVAV(CBVAVNum).DXIterationExceededIndex,
+                                    PartLoadFrac,
+                                    PartLoadFrac);
+                            }
+                        } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
+                            PartLoadFrac =
+                                max(0.0,
+                                    min(1.0,
+                                        (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                             state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                            if (CBVAV(CBVAVNum).DXIterationFailed < 1) {
+                                ++CBVAV(CBVAVNum).DXIterationFailed;
+                                ShowSevereError(state,
+                                                "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
+                                                    CBVAV(CBVAVNum).DXCoolCoilName);
+                                ShowContinueErrorTimeStamp(
+                                    state,
+                                    format("An estimated part-load ratio of {:.3R}will be used and the simulation continues. Occurrence info:",
+                                           PartLoadFrac));
+                            } else {
+                                ShowRecurringWarningErrorAtEnd(state,
+                                                               CBVAV(CBVAVNum).Name +
+                                                                   ", Part-load ratio calculation failed for DX unit error continues.",
+                                                               CBVAV(CBVAVNum).DXIterationFailedIndex,
+                                                               PartLoadFrac,
+                                                               PartLoadFrac);
                             }
                         }
-                        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
-                            state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
-                    } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
-                        Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-                        Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-                        Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
-                        Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-                        Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-                        Real64 PartLoadFrac(0.0);
-                        Real64 SpeedRatio(0.0);
-                        int SpeedNum(1);
-                        bool errorFlag(false);
-                        int maxNumSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, CBVAV(CBVAVNum).DXCoolCoilName, errorFlag);
-                        Real64 DesOutTemp = CBVAV(CBVAVNum).CoilTempSetPoint;
+                    }
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                } break;
+                case DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed: {
+                    Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
+                    Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
+                    Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
+                    Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
+                    Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
+                    Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
+                    Real64 PartLoadFrac(0.0);
+                    Real64 SpeedRatio(0.0);
+                    int SpeedNum(1);
+                    bool errorFlag(false);
+                    int maxNumSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, CBVAV(CBVAVNum).DXCoolCoilName, errorFlag);
+                    Real64 DesOutTemp = CBVAV(CBVAVNum).CoilTempSetPoint;
+                    // Get no load result
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              CBVAV(CBVAVNum).DXCoolCoilName,
+                                                              CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                              DataHVACGlobals::ContFanCycCoil,
+                                                              MaxONOFFCyclesperHour,
+                                                              HPTimeConstant,
+                                                              FanDelayTime,
+                                                              DataHVACGlobals::CompressorOperation::Off,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq);
+
+                    Real64 NoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                      (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                  state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                       Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                  state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+
+                    // Get full load result
+                    PartLoadFrac = 1.0;
+                    SpeedNum = maxNumSpeeds;
+                    SpeedRatio = 1.0;
+                    QZnReq = 0.001; // to indicate the coil is running
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              CBVAV(CBVAVNum).DXCoolCoilName,
+                                                              CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                              DataHVACGlobals::ContFanCycCoil,
+                                                              MaxONOFFCyclesperHour,
+                                                              HPTimeConstant,
+                                                              FanDelayTime,
+                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq);
+
+                    Real64 FullOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                        (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                    state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                         Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                    state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                    Real64 ReqOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                       (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                        Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                   state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+
+                    Real64 loadAccuracy(0.001);                  // Watts, power
+                    Real64 tempAccuracy(0.001);                  // delta C, temperature
+                    if ((NoOutput - ReqOutput) < loadAccuracy) { //         IF NoOutput is lower than (more cooling than required) or very near
+                                                                 //         the ReqOutput, do not run the compressor
+                        PartLoadFrac = 0.0;
+                        SpeedNum = 1;
+                        SpeedRatio = 0.0;
+                        QZnReq = 0.0;
                         // Get no load result
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2499,51 +2554,28 @@ namespace HVACUnitaryBypassVAV {
                                                                   QZnReq,
                                                                   QLatReq);
 
-                        Real64 NoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                          (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                      state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                           Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                      state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
-
-                        // Get full load result
+                    } else if ((FullOutput - ReqOutput) > loadAccuracy) {
+                        //         If the FullOutput is greater than (insufficient cooling) or very near the ReqOutput,
+                        //         run the compressor at PartLoadFrac = 1.
                         PartLoadFrac = 1.0;
                         SpeedNum = maxNumSpeeds;
                         SpeedRatio = 1.0;
-                        QZnReq = 0.001; // to indicate the coil is running
-                        VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                                  CBVAV(CBVAVNum).DXCoolCoilName,
-                                                                  CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                                  DataHVACGlobals::ContFanCycCoil,
-                                                                  MaxONOFFCyclesperHour,
-                                                                  HPTimeConstant,
-                                                                  FanDelayTime,
-                                                                  DataHVACGlobals::CompressorOperation::On,
-                                                                  PartLoadFrac,
-                                                                  SpeedNum,
-                                                                  SpeedRatio,
-                                                                  QZnReq,
-                                                                  QLatReq);
-
-                        Real64 FullOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                            (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
-                        Real64 ReqOutput =
-                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
-
-                        Real64 loadAccuracy(0.001);                  // Watts, power
-                        Real64 tempAccuracy(0.001);                  // delta C, temperature
-                        if ((NoOutput - ReqOutput) < loadAccuracy) { //         IF NoOutput is lower than (more cooling than required) or very near
-                                                                     //         the ReqOutput, do not run the compressor
-                            PartLoadFrac = 0.0;
+                        //         Else find the PLR to meet the load
+                    } else {
+                        //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
+                        //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
+                        //           operating PLR.
+                        Real64 OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(CBVAV(CBVAVNum).CoolCoilCompIndex).OutletAirDBTemp;
+                        if (OutletTempDXCoil > DesOutTemp) {
+                            PartLoadFrac = 1.0;
+                            SpeedNum = maxNumSpeeds;
+                            SpeedRatio = 1.0;
+                        } else {
+                            // run at lowest speed
+                            PartLoadFrac = 1.0;
                             SpeedNum = 1;
-                            SpeedRatio = 0.0;
-                            QZnReq = 0.0;
-                            // Get no load result
+                            SpeedRatio = 1.0;
+                            QZnReq = 0.001; // to indicate the coil is running
                             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                       CBVAV(CBVAVNum).DXCoolCoilName,
                                                                       CBVAV(CBVAVNum).CoolCoilCompIndex,
@@ -2551,236 +2583,363 @@ namespace HVACUnitaryBypassVAV {
                                                                       MaxONOFFCyclesperHour,
                                                                       HPTimeConstant,
                                                                       FanDelayTime,
-                                                                      DataHVACGlobals::CompressorOperation::Off,
+                                                                      DataHVACGlobals::CompressorOperation::On,
                                                                       PartLoadFrac,
                                                                       SpeedNum,
                                                                       SpeedRatio,
                                                                       QZnReq,
-                                                                      QLatReq);
+                                                                      QLatReq,
+                                                                      OnOffAirFlowRatio);
 
-                        } else if ((FullOutput - ReqOutput) > loadAccuracy) {
-                            //         If the FullOutput is greater than (insufficient cooling) or very near the ReqOutput,
-                            //         run the compressor at PartLoadFrac = 1.
-                            PartLoadFrac = 1.0;
-                            SpeedNum = maxNumSpeeds;
-                            SpeedRatio = 1.0;
-                            //         Else find the PLR to meet the load
-                        } else {
-                            //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
-                            //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
-                            //           operating PLR.
-                            Real64 OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(CBVAV(CBVAVNum).CoolCoilCompIndex).OutletAirDBTemp;
-                            if (OutletTempDXCoil > DesOutTemp) {
+                            Real64 TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                                  (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                              state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                                   Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                              state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                            Real64 TempSpeedReqst =
+                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                 Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+
+                            if ((TempSpeedOut - TempSpeedReqst) > tempAccuracy) {
+                                // Check to see which speed to meet the load
                                 PartLoadFrac = 1.0;
-                                SpeedNum = maxNumSpeeds;
                                 SpeedRatio = 1.0;
-                            } else {
-                                // run at lowest speed
-                                PartLoadFrac = 1.0;
-                                SpeedNum = 1;
-                                SpeedRatio = 1.0;
-                                QZnReq = 0.001; // to indicate the coil is running
-                                VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                                          CBVAV(CBVAVNum).DXCoolCoilName,
-                                                                          CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                                          DataHVACGlobals::ContFanCycCoil,
-                                                                          MaxONOFFCyclesperHour,
-                                                                          HPTimeConstant,
-                                                                          FanDelayTime,
-                                                                          DataHVACGlobals::CompressorOperation::On,
-                                                                          PartLoadFrac,
-                                                                          SpeedNum,
-                                                                          SpeedRatio,
-                                                                          QZnReq,
-                                                                          QLatReq,
-                                                                          OnOffAirFlowRatio);
+                                for (int I = 2; I <= maxNumSpeeds; ++I) {
+                                    SpeedNum = I;
+                                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                              CBVAV(CBVAVNum).DXCoolCoilName,
+                                                                              CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                                              DataHVACGlobals::ContFanCycCoil,
+                                                                              MaxONOFFCyclesperHour,
+                                                                              HPTimeConstant,
+                                                                              FanDelayTime,
+                                                                              DataHVACGlobals::CompressorOperation::On,
+                                                                              PartLoadFrac,
+                                                                              SpeedNum,
+                                                                              SpeedRatio,
+                                                                              QZnReq,
+                                                                              QLatReq,
+                                                                              OnOffAirFlowRatio);
 
-                                Real64 TempSpeedOut =
-                                    state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
-                                Real64 TempSpeedReqst =
-                                    state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                                    TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                                   (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
+                                                                               state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                                    Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                               state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
+                                    TempSpeedReqst =
+                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
+                                        (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
+                                         Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
+                                                                    state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
 
-                                if ((TempSpeedOut - TempSpeedReqst) > tempAccuracy) {
-                                    // Check to see which speed to meet the load
-                                    PartLoadFrac = 1.0;
-                                    SpeedRatio = 1.0;
-                                    for (int I = 2; I <= maxNumSpeeds; ++I) {
+                                    if ((TempSpeedOut - TempSpeedReqst) < tempAccuracy) {
                                         SpeedNum = I;
-                                        VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                                                  CBVAV(CBVAVNum).DXCoolCoilName,
-                                                                                  CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                                                  DataHVACGlobals::ContFanCycCoil,
-                                                                                  MaxONOFFCyclesperHour,
-                                                                                  HPTimeConstant,
-                                                                                  FanDelayTime,
-                                                                                  DataHVACGlobals::CompressorOperation::On,
-                                                                                  PartLoadFrac,
-                                                                                  SpeedNum,
-                                                                                  SpeedRatio,
-                                                                                  QZnReq,
-                                                                                  QLatReq,
-                                                                                  OnOffAirFlowRatio);
-
-                                        TempSpeedOut =
-                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                            (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp,
-                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
-                                        TempSpeedReqst =
-                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).MassFlowRate *
-                                            (Psychrometrics::PsyHFnTdbW(DesOutTemp,
-                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat) -
-                                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp,
-                                                                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat));
-
-                                        if ((TempSpeedOut - TempSpeedReqst) < tempAccuracy) {
-                                            SpeedNum = I;
-                                            break;
-                                        }
+                                        break;
                                     }
-                                    // now find the speed ratio for the found speednum
-                                    Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                                    Par(2) = DesOutTemp;
-                                    Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                                    Par(3) = double(SpeedNum);
-                                    Par(4) = double(CBVAVNum);
-                                    General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                }
+                                // now find the speed ratio for the found speednum
+                                Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                                Par(2) = DesOutTemp;
+                                Par(5) = double(DataHVACGlobals::ContFanCycCoil);
+                                Par(3) = double(SpeedNum);
+                                Par(4) = double(CBVAVNum);
+                                General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
-                                    if (SolFla == -1) {
-                                        if (!state.dataGlobal->WarmupFlag) {
-                                            if (CBVAV(CBVAVNum).DXIterationExceeded < 4) {
-                                                ++CBVAV(CBVAVNum).DXIterationExceeded;
-                                                ShowWarningError(
-                                                    state,
-                                                    CBVAV(CBVAVNum).DXCoolCoilType +
-                                                        " - Iteration limit exceeded calculating VS DX coil speed ratio for coil named " +
-                                                        CBVAV(CBVAVNum).DXCoolCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
-                                                ShowContinueError(state, format("Calculated speed ratio = {:.4R}", SpeedRatio));
-                                                ShowContinueErrorTimeStamp(
-                                                    state, "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
-                                            }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                                           CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
-                                                                               "\" - Iteration limit exceeded calculating speed ratio error "
-                                                                               "continues. Speed Ratio statistics follow.",
-                                                                           CBVAV(CBVAVNum).DXIterationExceededIndex,
-                                                                           PartLoadFrac,
-                                                                           PartLoadFrac);
+                                if (SolFla == -1) {
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (CBVAV(CBVAVNum).DXIterationExceeded < 4) {
+                                            ++CBVAV(CBVAVNum).DXIterationExceeded;
+                                            ShowWarningError(state,
+                                                             CBVAV(CBVAVNum).DXCoolCoilType +
+                                                                 " - Iteration limit exceeded calculating VS DX coil speed ratio for coil named " +
+                                                                 CBVAV(CBVAVNum).DXCoolCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
+                                            ShowContinueError(state, format("Calculated speed ratio = {:.4R}", SpeedRatio));
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                    } else if (SolFla == -2) {
-                                        if (!state.dataGlobal->WarmupFlag) {
-                                            if (CBVAV(CBVAVNum).DXIterationFailed < 4) {
-                                                ++CBVAV(CBVAVNum).DXIterationFailed;
-                                                ShowWarningError(
-                                                    state,
-                                                    CBVAV(CBVAVNum).DXCoolCoilType +
-                                                        " - DX unit speed ratio calculation failed: solver limits exceeded, for coil named " +
-                                                        CBVAV(CBVAVNum).DXCoolCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
-                                                ShowContinueError(state, format("Estimated speed ratio = {:.3R}", TempSpeedReqst / TempSpeedOut));
-                                                ShowContinueErrorTimeStamp(
-                                                    state,
-                                                    "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                            }
-                                            ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
+                                                                       CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
+                                                                           "\" - Iteration limit exceeded calculating speed ratio error "
+                                                                           "continues. Speed Ratio statistics follow.",
+                                                                       CBVAV(CBVAVNum).DXIterationExceededIndex,
+                                                                       PartLoadFrac,
+                                                                       PartLoadFrac);
+                                    }
+                                } else if (SolFla == -2) {
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (CBVAV(CBVAVNum).DXIterationFailed < 4) {
+                                            ++CBVAV(CBVAVNum).DXIterationFailed;
+                                            ShowWarningError(
                                                 state,
-                                                CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
-                                                    "\" - DX unit speed ratio calculation failed error continues. speed ratio statistics follow.",
-                                                CBVAV(CBVAVNum).DXIterationFailedIndex,
-                                                SpeedRatio,
-                                                SpeedRatio);
+                                                CBVAV(CBVAVNum).DXCoolCoilType +
+                                                    " - DX unit speed ratio calculation failed: solver limits exceeded, for coil named " +
+                                                    CBVAV(CBVAVNum).DXCoolCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
+                                            ShowContinueError(state, format("Estimated speed ratio = {:.3R}", TempSpeedReqst / TempSpeedOut));
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        SpeedRatio = TempSpeedReqst / TempSpeedOut;
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
+                                                "\" - DX unit speed ratio calculation failed error continues. speed ratio statistics follow.",
+                                            CBVAV(CBVAVNum).DXIterationFailedIndex,
+                                            SpeedRatio,
+                                            SpeedRatio);
                                     }
-                                } else {
-                                    // cycling compressor at lowest speed number, find part load fraction
-                                    Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                                    Par(2) = DesOutTemp;
-                                    Par(4) = double(CBVAVNum);
-                                    Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                                    General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
-                                    if (SolFla == -1) {
-                                        if (!state.dataGlobal->WarmupFlag) {
-                                            if (CBVAV(CBVAVNum).DXCyclingIterationExceeded < 4) {
-                                                ++CBVAV(CBVAVNum).DXCyclingIterationExceeded;
-                                                ShowWarningError(state,
-                                                                 CBVAV(CBVAVNum).DXCoolCoilType +
-                                                                     " - Iteration limit exceeded calculating VS DX unit low speed cycling ratio, "
-                                                                     "for coil named " +
-                                                                     CBVAV(CBVAVNum).DXCoolCoilName + ", in Unitary system named" +
-                                                                     CBVAV(CBVAVNum).Name);
-                                                ShowContinueError(state,
-                                                                  format("Estimated cycling ratio  = {:.3R}", (TempSpeedReqst / TempSpeedOut)));
-                                                ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", PartLoadFrac));
-                                                ShowContinueErrorTimeStamp(
-                                                    state,
-                                                    "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
-                                            }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                                           CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
-                                                                               "\" - Iteration limit exceeded calculating low speed cycling ratio "
-                                                                               "error continues. Sensible PLR statistics follow.",
-                                                                           CBVAV(CBVAVNum).DXCyclingIterationExceededIndex,
-                                                                           PartLoadFrac,
-                                                                           PartLoadFrac);
+                                    SpeedRatio = TempSpeedReqst / TempSpeedOut;
+                                }
+                            } else {
+                                // cycling compressor at lowest speed number, find part load fraction
+                                Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                                Par(2) = DesOutTemp;
+                                Par(4) = double(CBVAVNum);
+                                Par(5) = double(DataHVACGlobals::ContFanCycCoil);
+                                General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                if (SolFla == -1) {
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (CBVAV(CBVAVNum).DXCyclingIterationExceeded < 4) {
+                                            ++CBVAV(CBVAVNum).DXCyclingIterationExceeded;
+                                            ShowWarningError(state,
+                                                             CBVAV(CBVAVNum).DXCoolCoilType +
+                                                                 " - Iteration limit exceeded calculating VS DX unit low speed cycling ratio, "
+                                                                 "for coil named " +
+                                                                 CBVAV(CBVAVNum).DXCoolCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
+                                            ShowContinueError(state, format("Estimated cycling ratio  = {:.3R}", (TempSpeedReqst / TempSpeedOut)));
+                                            ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", PartLoadFrac));
+                                            ShowContinueErrorTimeStamp(
+                                                state, "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                    } else if (SolFla == -2) {
+                                        ShowRecurringWarningErrorAtEnd(state,
+                                                                       CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
+                                                                           "\" - Iteration limit exceeded calculating low speed cycling ratio "
+                                                                           "error continues. Sensible PLR statistics follow.",
+                                                                       CBVAV(CBVAVNum).DXCyclingIterationExceededIndex,
+                                                                       PartLoadFrac,
+                                                                       PartLoadFrac);
+                                    }
+                                } else if (SolFla == -2) {
 
-                                        if (!state.dataGlobal->WarmupFlag) {
-                                            if (CBVAV(CBVAVNum).DXCyclingIterationFailed < 4) {
-                                                ++CBVAV(CBVAVNum).DXCyclingIterationFailed;
-                                                ShowWarningError(
-                                                    state,
-                                                    CBVAV(CBVAVNum).DXCoolCoilType +
-                                                        " - DX unit low speed cycling ratio calculation failed: limits exceeded, for unit = " +
-                                                        CBVAV(CBVAVNum).Name);
-                                                ShowContinueError(
-                                                    state, format("Estimated low speed cycling ratio = {:.3R}", TempSpeedReqst / TempSpeedOut));
-                                                ShowContinueErrorTimeStamp(state,
-                                                                           "The estimated low speed cycling ratio will be used and the simulation "
-                                                                           "continues. Occurrence info:");
-                                            }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                                           CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
-                                                                               "\" - DX unit low speed cycling ratio calculation failed error "
-                                                                               "continues. cycling ratio statistics follow.",
-                                                                           CBVAV(CBVAVNum).DXCyclingIterationFailedIndex,
-                                                                           PartLoadFrac,
-                                                                           PartLoadFrac);
+                                    if (!state.dataGlobal->WarmupFlag) {
+                                        if (CBVAV(CBVAVNum).DXCyclingIterationFailed < 4) {
+                                            ++CBVAV(CBVAVNum).DXCyclingIterationFailed;
+                                            ShowWarningError(
+                                                state,
+                                                CBVAV(CBVAVNum).DXCoolCoilType +
+                                                    " - DX unit low speed cycling ratio calculation failed: limits exceeded, for unit = " +
+                                                    CBVAV(CBVAVNum).Name);
+                                            ShowContinueError(state,
+                                                              format("Estimated low speed cycling ratio = {:.3R}", TempSpeedReqst / TempSpeedOut));
+                                            ShowContinueErrorTimeStamp(state,
+                                                                       "The estimated low speed cycling ratio will be used and the simulation "
+                                                                       "continues. Occurrence info:");
                                         }
-                                        PartLoadFrac = TempSpeedReqst / TempSpeedOut;
+                                        ShowRecurringWarningErrorAtEnd(state,
+                                                                       CBVAV(CBVAVNum).DXCoolCoilType + " \"" + CBVAV(CBVAVNum).DXCoolCoilName +
+                                                                           "\" - DX unit low speed cycling ratio calculation failed error "
+                                                                           "continues. cycling ratio statistics follow.",
+                                                                       CBVAV(CBVAVNum).DXCyclingIterationFailedIndex,
+                                                                       PartLoadFrac,
+                                                                       PartLoadFrac);
                                     }
+                                    PartLoadFrac = TempSpeedReqst / TempSpeedOut;
                                 }
                             }
                         }
+                    }
 
-                        if (PartLoadFrac > 1.0) {
-                            PartLoadFrac = 1.0;
-                        } else if (PartLoadFrac < 0.0) {
-                            PartLoadFrac = 0.0;
+                    if (PartLoadFrac > 1.0) {
+                        PartLoadFrac = 1.0;
+                    } else if (PartLoadFrac < 0.0) {
+                        PartLoadFrac = 0.0;
+                    }
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
+                        VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
+                    // variable-speed air-to-air cooling coil, end -------------------------
+                } break;
+                case DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl: {
+                    // Coil:Cooling:DX:TwoStageWithHumidityControlMode
+                    // formerly (v3 and beyond) Coil:DX:MultiMode:CoolingEmpirical
+
+                    // If DXCoolingSystem runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
+                    // Multimode coil will switch to enhanced dehumidification if available and needed, but it
+                    // still runs to meet the sensible load
+
+                    // Determine required part load for normal mode
+
+                    // Get full load result
+                    DehumidMode = 0;
+                    CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
+                    DXCoils::SimDXCoilMultiMode(state,
+                                                CBVAV(CBVAVNum).DXCoolCoilName,
+                                                DataHVACGlobals::CompressorOperation::On,
+                                                FirstHVACIteration,
+                                                PartLoadFrac,
+                                                DehumidMode,
+                                                CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                DataHVACGlobals::ContFanCycCoil);
+                    if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        PartLoadFrac = 0.0;
+                        DXCoils::SimDXCoilMultiMode(state,
+                                                    CBVAV(CBVAVNum).DXCoolCoilName,
+                                                    DataHVACGlobals::CompressorOperation::On,
+                                                    FirstHVACIteration,
+                                                    PartLoadFrac,
+                                                    DehumidMode,
+                                                    CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                    DataHVACGlobals::ContFanCycCoil);
+                    } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        PartLoadFrac = 1.0;
+                    } else {
+                        Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                        Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
+                        // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                        Par(3) = double(DehumidMode);
+                        General::SolveRoot(
+                            state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
+                        if (SolFla == -1) {
+                            if (CBVAV(CBVAVNum).MMDXIterationExceeded < 1) {
+                                ++CBVAV(CBVAVNum).MMDXIterationExceeded;
+                                ShowWarningError(state,
+                                                 "Iteration limit exceeded calculating DX unit part-load ratio, for unit=" + CBVAV(CBVAVNum).Name);
+                                ShowContinueErrorTimeStamp(state, format("Part-load ratio returned = {:.2R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(
+                                    state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                            } else {
+                                ShowRecurringWarningErrorAtEnd(state,
+                                                               CBVAV(CBVAVNum).Name +
+                                                                   ", Iteration limit exceeded calculating DX unit part-load ratio error continues.",
+                                                               CBVAV(CBVAVNum).MMDXIterationExceededIndex,
+                                                               PartLoadFrac,
+                                                               PartLoadFrac);
+                            }
+                        } else if (SolFla == -2) {
+                            PartLoadFrac =
+                                max(0.0,
+                                    min(1.0,
+                                        (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                             state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                            if (CBVAV(CBVAVNum).MMDXIterationFailed < 1) {
+                                ++CBVAV(CBVAVNum).MMDXIterationFailed;
+                                ShowSevereError(state,
+                                                "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
+                                                    CBVAV(CBVAVNum).Name);
+                                ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(
+                                    state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                            } else {
+                                ShowRecurringWarningErrorAtEnd(state,
+                                                               CBVAV(CBVAVNum).Name +
+                                                                   ", Part-load ratio calculation failed for DX unit error continues.",
+                                                               CBVAV(CBVAVNum).MMDXIterationFailedIndex,
+                                                               PartLoadFrac,
+                                                               PartLoadFrac);
+                            }
                         }
-                        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
-                            VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
-                        // variable-speed air-to-air cooling coil, end -------------------------
+                    }
 
-                    } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                        // Coil:Cooling:DX:TwoStageWithHumidityControlMode
-                        // formerly (v3 and beyond) Coil:DX:MultiMode:CoolingEmpirical
+                    // If humidity setpoint is not satisfied and humidity control type is Multimode,
+                    // then turn on enhanced dehumidification mode 1
 
-                        // If DXCoolingSystem runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
-                        // Multimode coil will switch to enhanced dehumidification if available and needed, but it
-                        // still runs to meet the sensible load
+                    if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                        (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                        (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::Multimode) && state.dataLoopNodes->Node(OutletNode).HumRatMax > 0.0) {
 
-                        // Determine required part load for normal mode
+                        // Determine required part load for enhanced dehumidification mode 1
 
                         // Get full load result
+                        PartLoadFrac = 1.0;
+                        DehumidMode = 1;
+                        CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
+                        DXCoils::SimDXCoilMultiMode(state,
+                                                    CBVAV(CBVAVNum).DXCoolCoilName,
+                                                    DataHVACGlobals::CompressorOperation::On,
+                                                    FirstHVACIteration,
+                                                    PartLoadFrac,
+                                                    DehumidMode,
+                                                    CBVAV(CBVAVNum).CoolCoilCompIndex,
+                                                    DataHVACGlobals::ContFanCycCoil);
+                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
+                            PartLoadFrac = 0.0;
+                        } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
+                            PartLoadFrac = 1.0;
+                        } else {
+                            Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                            Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
+                            // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                            Par(3) = double(DehumidMode);
+                            General::SolveRoot(
+                                state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
+                            if (SolFla == -1) {
+                                if (CBVAV(CBVAVNum).DMDXIterationExceeded < 1) {
+                                    ++CBVAV(CBVAVNum).DMDXIterationExceeded;
+                                    ShowWarningError(state,
+                                                     "Iteration limit exceeded calculating DX unit dehumidifying part-load ratio, for unit = " +
+                                                         CBVAV(CBVAVNum).Name);
+                                    ShowContinueErrorTimeStamp(state, format("Part-load ratio returned={:.2R}", PartLoadFrac));
+                                    ShowContinueErrorTimeStamp(
+                                        state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                } else {
+                                    ShowRecurringWarningErrorAtEnd(
+                                        state,
+                                        CBVAV(CBVAVNum).Name +
+                                            ", Iteration limit exceeded calculating DX unit dehumidifying part-load ratio error continues.",
+                                        CBVAV(CBVAVNum).DMDXIterationExceededIndex,
+                                        PartLoadFrac,
+                                        PartLoadFrac);
+                                }
+                            } else if (SolFla == -2) {
+                                PartLoadFrac =
+                                    max(0.0,
+                                        min(1.0,
+                                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
+                                                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
+                                                 state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
+                                if (CBVAV(CBVAVNum).DMDXIterationFailed < 1) {
+                                    ++CBVAV(CBVAVNum).DMDXIterationFailed;
+                                    ShowSevereError(
+                                        state,
+                                        "DX unit dehumidifying part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
+                                            CBVAV(CBVAVNum).Name);
+                                    ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
+                                    ShowContinueErrorTimeStamp(
+                                        state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                } else {
+                                    ShowRecurringWarningErrorAtEnd(
+                                        state,
+                                        CBVAV(CBVAVNum).Name + ", Dehumidifying part-load ratio calculation failed for DX unit error continues.",
+                                        CBVAV(CBVAVNum).DMDXIterationFailedIndex,
+                                        PartLoadFrac,
+                                        PartLoadFrac);
+                                }
+                            }
+                        }
+                    } // End if humidity ratio setpoint not met - multimode humidity control
+
+                    // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
+                    // then run to meet latent load
+
+                    if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                        (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
+                        (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::CoolReheat) && state.dataLoopNodes->Node(OutletNode).HumRatMax > 0.0) {
+
+                        // Determine revised desired outlet temperature  - use approach temperature control strategy
+                        // based on CONTROLLER:SIMPLE TEMPANDHUMRAT control type.
+
+                        // Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
+                        ApproachTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp -
+                                       Psychrometrics::PsyTdpFnWPb(state, state.dataLoopNodes->Node(OutletNode).HumRat, OutdoorBaroPress);
+                        // Calculate the dew point temperature at the SA humidity ratio setpoint
+                        DesiredDewPoint = Psychrometrics::PsyTdpFnWPb(state, state.dataLoopNodes->Node(OutletNode).HumRatMax, OutdoorBaroPress);
+                        // Adjust the calculated dew point temperature by the approach temp
+                        CBVAV(CBVAVNum).CoilTempSetPoint = min(CBVAV(CBVAVNum).CoilTempSetPoint, (DesiredDewPoint + ApproachTemp));
+
+                        // Determine required part load for cool reheat at adjusted DesiredOutletTemp
+
+                        // Get full load result
+                        PartLoadFrac = 1.0;
                         DehumidMode = 0;
                         CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
                         DXCoils::SimDXCoilMultiMode(state,
@@ -2793,14 +2952,6 @@ namespace HVACUnitaryBypassVAV {
                                                     DataHVACGlobals::ContFanCycCoil);
                         if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
                             PartLoadFrac = 0.0;
-                            DXCoils::SimDXCoilMultiMode(state,
-                                                        CBVAV(CBVAVNum).DXCoolCoilName,
-                                                        DataHVACGlobals::CompressorOperation::On,
-                                                        FirstHVACIteration,
-                                                        PartLoadFrac,
-                                                        DehumidMode,
-                                                        CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                        DataHVACGlobals::ContFanCycCoil);
                         } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
                             PartLoadFrac = 1.0;
                         } else {
@@ -2811,18 +2962,20 @@ namespace HVACUnitaryBypassVAV {
                             General::SolveRoot(
                                 state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
-                                if (CBVAV(CBVAVNum).MMDXIterationExceeded < 1) {
-                                    ++CBVAV(CBVAVNum).MMDXIterationExceeded;
-                                    ShowWarningError(
-                                        state, "Iteration limit exceeded calculating DX unit part-load ratio, for unit=" + CBVAV(CBVAVNum).Name);
+                                if (CBVAV(CBVAVNum).CRDXIterationExceeded < 1) {
+                                    ++CBVAV(CBVAVNum).CRDXIterationExceeded;
+                                    ShowWarningError(state,
+                                                     "Iteration limit exceeded calculating DX unit cool reheat part-load ratio, for unit = " +
+                                                         CBVAV(CBVAVNum).Name);
                                     ShowContinueErrorTimeStamp(state, format("Part-load ratio returned = {:.2R}", PartLoadFrac));
                                     ShowContinueErrorTimeStamp(
                                         state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
                                         state,
-                                        CBVAV(CBVAVNum).Name + ", Iteration limit exceeded calculating DX unit part-load ratio error continues.",
-                                        CBVAV(CBVAVNum).MMDXIterationExceededIndex,
+                                        CBVAV(CBVAVNum).Name +
+                                            ", Iteration limit exceeded calculating cool reheat part-load ratio DX unit error continues.",
+                                        CBVAV(CBVAVNum).CRDXIterationExceededIndex,
                                         PartLoadFrac,
                                         PartLoadFrac);
                                 }
@@ -2833,205 +2986,37 @@ namespace HVACUnitaryBypassVAV {
                                             (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
                                                 (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
                                                  state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
-                                if (CBVAV(CBVAVNum).MMDXIterationFailed < 1) {
-                                    ++CBVAV(CBVAVNum).MMDXIterationFailed;
-                                    ShowSevereError(state,
-                                                    "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
-                                                        CBVAV(CBVAVNum).Name);
+                                if (CBVAV(CBVAVNum).CRDXIterationFailed < 1) {
+                                    ++CBVAV(CBVAVNum).CRDXIterationFailed;
+                                    ShowSevereError(
+                                        state,
+                                        "DX unit cool reheat part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
+                                            CBVAV(CBVAVNum).Name);
                                     ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
                                     ShowContinueErrorTimeStamp(
                                         state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd(state,
-                                                                   CBVAV(CBVAVNum).Name +
-                                                                       ", Part-load ratio calculation failed for DX unit error continues.",
-                                                                   CBVAV(CBVAVNum).MMDXIterationFailedIndex,
-                                                                   PartLoadFrac,
-                                                                   PartLoadFrac);
+                                    ShowRecurringWarningErrorAtEnd(
+                                        state,
+                                        CBVAV(CBVAVNum).Name + ", Dehumidifying part-load ratio calculation failed for DX unit error continues.",
+                                        CBVAV(CBVAVNum).DMDXIterationFailedIndex,
+                                        PartLoadFrac,
+                                        PartLoadFrac);
                                 }
                             }
                         }
+                    } // End if humidity ratio setpoint not met - CoolReheat humidity control
 
-                        // If humidity setpoint is not satisfied and humidity control type is Multimode,
-                        // then turn on enhanced dehumidification mode 1
-
-                        if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
-                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
-                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::Multimode) &&
-                            state.dataLoopNodes->Node(OutletNode).HumRatMax > 0.0) {
-
-                            // Determine required part load for enhanced dehumidification mode 1
-
-                            // Get full load result
-                            PartLoadFrac = 1.0;
-                            DehumidMode = 1;
-                            CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
-                            DXCoils::SimDXCoilMultiMode(state,
-                                                        CBVAV(CBVAVNum).DXCoolCoilName,
-                                                        DataHVACGlobals::CompressorOperation::On,
-                                                        FirstHVACIteration,
-                                                        PartLoadFrac,
-                                                        DehumidMode,
-                                                        CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                        DataHVACGlobals::ContFanCycCoil);
-                            if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
-                                PartLoadFrac = 0.0;
-                            } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
-                                PartLoadFrac = 1.0;
-                            } else {
-                                Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                                Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
-                                // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                Par(3) = double(DehumidMode);
-                                General::SolveRoot(
-                                    state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
-                                if (SolFla == -1) {
-                                    if (CBVAV(CBVAVNum).DMDXIterationExceeded < 1) {
-                                        ++CBVAV(CBVAVNum).DMDXIterationExceeded;
-                                        ShowWarningError(state,
-                                                         "Iteration limit exceeded calculating DX unit dehumidifying part-load ratio, for unit = " +
-                                                             CBVAV(CBVAVNum).Name);
-                                        ShowContinueErrorTimeStamp(state, format("Part-load ratio returned={:.2R}", PartLoadFrac));
-                                        ShowContinueErrorTimeStamp(
-                                            state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(
-                                            state,
-                                            CBVAV(CBVAVNum).Name +
-                                                ", Iteration limit exceeded calculating DX unit dehumidifying part-load ratio error continues.",
-                                            CBVAV(CBVAVNum).DMDXIterationExceededIndex,
-                                            PartLoadFrac,
-                                            PartLoadFrac);
-                                    }
-                                } else if (SolFla == -2) {
-                                    PartLoadFrac =
-                                        max(0.0,
-                                            min(1.0,
-                                                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                    (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                     state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
-                                    if (CBVAV(CBVAVNum).DMDXIterationFailed < 1) {
-                                        ++CBVAV(CBVAVNum).DMDXIterationFailed;
-                                        ShowSevereError(
-                                            state,
-                                            "DX unit dehumidifying part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                                CBVAV(CBVAVNum).Name);
-                                        ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                        ShowContinueErrorTimeStamp(
-                                            state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(
-                                            state,
-                                            CBVAV(CBVAVNum).Name + ", Dehumidifying part-load ratio calculation failed for DX unit error continues.",
-                                            CBVAV(CBVAVNum).DMDXIterationFailedIndex,
-                                            PartLoadFrac,
-                                            PartLoadFrac);
-                                    }
-                                }
-                            }
-                        } // End if humidity ratio setpoint not met - multimode humidity control
-
-                        // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
-                        // then run to meet latent load
-
-                        if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
-                            (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > state.dataLoopNodes->Node(OutletNode).HumRatMax) &&
-                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::CoolReheat) &&
-                            state.dataLoopNodes->Node(OutletNode).HumRatMax > 0.0) {
-
-                            // Determine revised desired outlet temperature  - use approach temperature control strategy
-                            // based on CONTROLLER:SIMPLE TEMPANDHUMRAT control type.
-
-                            // Calculate the approach temperature (difference between SA dry-bulb temp and SA dew point temp)
-                            ApproachTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp -
-                                           Psychrometrics::PsyTdpFnWPb(state, state.dataLoopNodes->Node(OutletNode).HumRat, OutdoorBaroPress);
-                            // Calculate the dew point temperature at the SA humidity ratio setpoint
-                            DesiredDewPoint = Psychrometrics::PsyTdpFnWPb(state, state.dataLoopNodes->Node(OutletNode).HumRatMax, OutdoorBaroPress);
-                            // Adjust the calculated dew point temperature by the approach temp
-                            CBVAV(CBVAVNum).CoilTempSetPoint = min(CBVAV(CBVAVNum).CoilTempSetPoint, (DesiredDewPoint + ApproachTemp));
-
-                            // Determine required part load for cool reheat at adjusted DesiredOutletTemp
-
-                            // Get full load result
-                            PartLoadFrac = 1.0;
-                            DehumidMode = 0;
-                            CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
-                            DXCoils::SimDXCoilMultiMode(state,
-                                                        CBVAV(CBVAVNum).DXCoolCoilName,
-                                                        DataHVACGlobals::CompressorOperation::On,
-                                                        FirstHVACIteration,
-                                                        PartLoadFrac,
-                                                        DehumidMode,
-                                                        CBVAV(CBVAVNum).CoolCoilCompIndex,
-                                                        DataHVACGlobals::ContFanCycCoil);
-                            if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp <= CBVAV(CBVAVNum).CoilTempSetPoint) {
-                                PartLoadFrac = 0.0;
-                            } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
-                                PartLoadFrac = 1.0;
-                            } else {
-                                Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                                Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
-                                // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                Par(3) = double(DehumidMode);
-                                General::SolveRoot(
-                                    state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
-                                if (SolFla == -1) {
-                                    if (CBVAV(CBVAVNum).CRDXIterationExceeded < 1) {
-                                        ++CBVAV(CBVAVNum).CRDXIterationExceeded;
-                                        ShowWarningError(state,
-                                                         "Iteration limit exceeded calculating DX unit cool reheat part-load ratio, for unit = " +
-                                                             CBVAV(CBVAVNum).Name);
-                                        ShowContinueErrorTimeStamp(state, format("Part-load ratio returned = {:.2R}", PartLoadFrac));
-                                        ShowContinueErrorTimeStamp(
-                                            state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(
-                                            state,
-                                            CBVAV(CBVAVNum).Name +
-                                                ", Iteration limit exceeded calculating cool reheat part-load ratio DX unit error continues.",
-                                            CBVAV(CBVAVNum).CRDXIterationExceededIndex,
-                                            PartLoadFrac,
-                                            PartLoadFrac);
-                                    }
-                                } else if (SolFla == -2) {
-                                    PartLoadFrac =
-                                        max(0.0,
-                                            min(1.0,
-                                                (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp - CBVAV(CBVAVNum).CoilTempSetPoint) /
-                                                    (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilInletNode).Temp -
-                                                     state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp)));
-                                    if (CBVAV(CBVAVNum).CRDXIterationFailed < 1) {
-                                        ++CBVAV(CBVAVNum).CRDXIterationFailed;
-                                        ShowSevereError(
-                                            state,
-                                            "DX unit cool reheat part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                                CBVAV(CBVAVNum).Name);
-                                        ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                                        ShowContinueErrorTimeStamp(
-                                            state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(
-                                            state,
-                                            CBVAV(CBVAVNum).Name + ", Dehumidifying part-load ratio calculation failed for DX unit error continues.",
-                                            CBVAV(CBVAVNum).DMDXIterationFailedIndex,
-                                            PartLoadFrac,
-                                            PartLoadFrac);
-                                    }
-                                }
-                            }
-                        } // End if humidity ratio setpoint not met - CoolReheat humidity control
-
-                        if (PartLoadFrac > 1.0) {
-                            PartLoadFrac = 1.0;
-                        } else if (PartLoadFrac < 0.0) {
-                            PartLoadFrac = 0.0;
-                        }
-                        state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
-                            state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
-
-                    } else {
-                        ShowFatalError(state, "SimCBVAV System: Invalid DX Cooling Coil=" + CBVAV(CBVAVNum).DXCoolCoilType);
+                    if (PartLoadFrac > 1.0) {
+                        PartLoadFrac = 1.0;
+                    } else if (PartLoadFrac < 0.0) {
+                        PartLoadFrac = 0.0;
                     }
+                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXCoolCoilIndexNum);
+                } break;
+                default: {
+                    ShowFatalError(state, "SimCBVAV System: Invalid DX Cooling Coil=" + CBVAV(CBVAVNum).DXCoolCoilType);
+                } break;
                 }
             } else { // IF(OutdoorDryBulbTemp .GE. CBVAV(CBVAVNum)%MinOATCompressor)THEN
                 //     Simulate DX cooling coil with compressor off
@@ -3150,16 +3135,29 @@ namespace HVACUnitaryBypassVAV {
         }
 
         // Simulate the heating coil based on coil type
-        {
-            auto const SELECT_CASE_var(CBVAV(CBVAVNum).HeatCoilType_Num);
+        switch (CBVAV(CBVAVNum).HeatCoilType_Num) {
+        case DataHVACGlobals::CoilDX_HeatingEmpirical: {
+            //   Simulate DX heating coil if zone load is positive (heating load)
+            if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
+                if (OutdoorDryBulbTemp > CBVAV(CBVAVNum).MinOATCompressor) {
+                    //       simulate the DX heating coil
+                    // vs coil issue
 
-            if (SELECT_CASE_var == DataHVACGlobals::CoilDX_HeatingEmpirical) {
-                //   Simulate DX heating coil if zone load is positive (heating load)
-                if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
-                    if (OutdoorDryBulbTemp > CBVAV(CBVAVNum).MinOATCompressor) {
-                        //       simulate the DX heating coil
-                        // vs coil issue
-
+                    DXCoils::SimDXCoil(state,
+                                       CBVAV(CBVAVNum).HeatCoilName,
+                                       DataHVACGlobals::CompressorOperation::On,
+                                       FirstHVACIteration,
+                                       CBVAV(CBVAVNum).HeatCoilIndex,
+                                       DataHVACGlobals::ContFanCycCoil,
+                                       PartLoadFrac,
+                                       OnOffAirFlowRatio);
+                    if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint &&
+                        state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
+                        // iterate to find PLR at CoilTempSetPoint
+                        Par(1) = double(CBVAV(CBVAVNum).HeatCoilIndex);
+                        Par(2) = min(CBVAV(CBVAVNum).CoilTempSetPoint, CBVAV(CBVAVNum).MaxLATHeating);
+                        Par(3) = OnOffAirFlowRatio;
+                        General::SolveRoot(state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
                         DXCoils::SimDXCoil(state,
                                            CBVAV(CBVAVNum).HeatCoilName,
                                            DataHVACGlobals::CompressorOperation::On,
@@ -3168,53 +3166,24 @@ namespace HVACUnitaryBypassVAV {
                                            DataHVACGlobals::ContFanCycCoil,
                                            PartLoadFrac,
                                            OnOffAirFlowRatio);
-                        if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint &&
-                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
-                            // iterate to find PLR at CoilTempSetPoint
-                            Par(1) = double(CBVAV(CBVAVNum).HeatCoilIndex);
-                            Par(2) = min(CBVAV(CBVAVNum).CoilTempSetPoint, CBVAV(CBVAVNum).MaxLATHeating);
-                            Par(3) = OnOffAirFlowRatio;
-                            General::SolveRoot(
-                                state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
-                            DXCoils::SimDXCoil(state,
-                                               CBVAV(CBVAVNum).HeatCoilName,
-                                               DataHVACGlobals::CompressorOperation::On,
-                                               FirstHVACIteration,
-                                               CBVAV(CBVAVNum).HeatCoilIndex,
-                                               DataHVACGlobals::ContFanCycCoil,
-                                               PartLoadFrac,
-                                               OnOffAirFlowRatio);
-                            if (SolFla == -1 && !state.dataGlobal->WarmupFlag) {
-                                ShowWarningError(state,
-                                                 "Iteration limit exceeded calculating DX unit part-load ratio, for unit = " +
-                                                     CBVAV(CBVAVNum).HeatCoilName);
-                                ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                                ShowContinueErrorTimeStamp(
-                                    state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                            } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
-                                ShowSevereError(state,
-                                                "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
-                                                    CBVAV(CBVAVNum).HeatCoilName);
-                                ShowContinueErrorTimeStamp(
-                                    state,
-                                    format("A part-load ratio of {:.3R}will be used and the simulation continues. Occurrence info:", PartLoadFrac));
-                                ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
-                            }
+                        if (SolFla == -1 && !state.dataGlobal->WarmupFlag) {
+                            ShowWarningError(
+                                state, "Iteration limit exceeded calculating DX unit part-load ratio, for unit = " + CBVAV(CBVAVNum).HeatCoilName);
+                            ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                            ShowContinueErrorTimeStamp(state,
+                                                       "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                        } else if (SolFla == -2 && !state.dataGlobal->WarmupFlag) {
+                            ShowSevereError(state,
+                                            "DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
+                                                CBVAV(CBVAVNum).HeatCoilName);
+                            ShowContinueErrorTimeStamp(
+                                state,
+                                format("A part-load ratio of {:.3R}will be used and the simulation continues. Occurrence info:", PartLoadFrac));
+                            ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
                         }
-                    } else { // OAT .LT. MinOATCompressor
-                        //       simulate DX heating coil with compressor off
-                        DXCoils::SimDXCoil(state,
-                                           CBVAV(CBVAVNum).HeatCoilName,
-                                           DataHVACGlobals::CompressorOperation::Off,
-                                           FirstHVACIteration,
-                                           CBVAV(CBVAVNum).HeatCoilIndex,
-                                           DataHVACGlobals::ContFanCycCoil,
-                                           0.0,
-                                           OnOffAirFlowRatio);
                     }
-                    state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
-                } else { // HeatCoolMode = CoolingMode
-                    //     simulate DX heating coil with compressor off when cooling load is required
+                } else { // OAT .LT. MinOATCompressor
+                    //       simulate DX heating coil with compressor off
                     DXCoils::SimDXCoil(state,
                                        CBVAV(CBVAVNum).HeatCoilName,
                                        DataHVACGlobals::CompressorOperation::Off,
@@ -3224,20 +3193,94 @@ namespace HVACUnitaryBypassVAV {
                                        0.0,
                                        OnOffAirFlowRatio);
                 }
-            } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-                Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
-                Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-                Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-                Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
-                Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-                Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-                Real64 PartLoadFrac(0.0);
-                Real64 SpeedRatio(0.0);
-                int SpeedNum(1);
-                bool errorFlag(false);
-                int maxNumSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, CBVAV(CBVAVNum).HeatCoilName, errorFlag);
-                Real64 DesOutTemp = CBVAV(CBVAVNum).CoilTempSetPoint;
-                // Get no load result
+                state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+            } else { // HeatCoolMode = CoolingMode
+                //     simulate DX heating coil with compressor off when cooling load is required
+                DXCoils::SimDXCoil(state,
+                                   CBVAV(CBVAVNum).HeatCoilName,
+                                   DataHVACGlobals::CompressorOperation::Off,
+                                   FirstHVACIteration,
+                                   CBVAV(CBVAVNum).HeatCoilIndex,
+                                   DataHVACGlobals::ContFanCycCoil,
+                                   0.0,
+                                   OnOffAirFlowRatio);
+            }
+        } break;
+        case DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed: {
+            Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
+            Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
+            Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
+            Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
+            Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
+            Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
+            Real64 PartLoadFrac(0.0);
+            Real64 SpeedRatio(0.0);
+            int SpeedNum(1);
+            bool errorFlag(false);
+            int maxNumSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, CBVAV(CBVAVNum).HeatCoilName, errorFlag);
+            Real64 DesOutTemp = CBVAV(CBVAVNum).CoilTempSetPoint;
+            // Get no load result
+            VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                      CBVAV(CBVAVNum).HeatCoilName,
+                                                      CBVAV(CBVAVNum).DXHeatCoilIndexNum,
+                                                      DataHVACGlobals::ContFanCycCoil,
+                                                      MaxONOFFCyclesperHour,
+                                                      HPTimeConstant,
+                                                      FanDelayTime,
+                                                      DataHVACGlobals::CompressorOperation::Off,
+                                                      PartLoadFrac,
+                                                      SpeedNum,
+                                                      SpeedRatio,
+                                                      QZnReq,
+                                                      QLatReq);
+
+            Real64 NoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
+                              (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
+                                                          state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat) -
+                               Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
+                                                          state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
+            Real64 TempNoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
+            // Real64 NoLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
+
+            // Get full load result
+            PartLoadFrac = 1.0;
+            SpeedNum = maxNumSpeeds;
+            SpeedRatio = 1.0;
+            QZnReq = 0.001; // to indicate the coil is running
+            VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                      CBVAV(CBVAVNum).HeatCoilName,
+                                                      CBVAV(CBVAVNum).DXHeatCoilIndexNum,
+                                                      DataHVACGlobals::ContFanCycCoil,
+                                                      MaxONOFFCyclesperHour,
+                                                      HPTimeConstant,
+                                                      FanDelayTime,
+                                                      DataHVACGlobals::CompressorOperation::On,
+                                                      PartLoadFrac,
+                                                      SpeedNum,
+                                                      SpeedRatio,
+                                                      QZnReq,
+                                                      QLatReq);
+
+            // Real64 FullLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
+            Real64 FullOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
+                                (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
+                                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
+                                 Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
+                                                            state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
+            Real64 ReqOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
+                               (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
+                                Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
+                                                           state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
+
+            Real64 loadAccuracy(0.001);                   // Watts, power
+            Real64 tempAccuracy(0.001);                   // delta C, temperature
+            if ((NoOutput - ReqOutput) > -loadAccuracy) { //         IF NoOutput is higher than (more heating than required) or very near the
+                                                          //         ReqOutput, do not run the compressor
+                PartLoadFrac = 0.0;
+                SpeedNum = 1;
+                SpeedRatio = 0.0;
+                QZnReq = 0.0;
+                // call again with coil off
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           CBVAV(CBVAVNum).HeatCoilName,
                                                           CBVAV(CBVAVNum).DXHeatCoilIndexNum,
@@ -3252,53 +3295,18 @@ namespace HVACUnitaryBypassVAV {
                                                           QZnReq,
                                                           QLatReq);
 
-                Real64 NoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
-                                  (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
-                                                              state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat) -
-                                   Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
-                                                              state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
-                Real64 TempNoOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
-                // Real64 NoLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
+            } else if ((FullOutput - ReqOutput) < loadAccuracy) { //         If the FullOutput is less than (insufficient cooling) or very near
+                                                                  //         the ReqOutput, run the compressor at PartLoadFrac = 1.
+                                                                  // which we just did so nothing to be done
 
-                // Get full load result
-                PartLoadFrac = 1.0;
-                SpeedNum = maxNumSpeeds;
-                SpeedRatio = 1.0;
-                QZnReq = 0.001; // to indicate the coil is running
-                VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                          CBVAV(CBVAVNum).HeatCoilName,
-                                                          CBVAV(CBVAVNum).DXHeatCoilIndexNum,
-                                                          DataHVACGlobals::ContFanCycCoil,
-                                                          MaxONOFFCyclesperHour,
-                                                          HPTimeConstant,
-                                                          FanDelayTime,
-                                                          DataHVACGlobals::CompressorOperation::On,
-                                                          PartLoadFrac,
-                                                          SpeedNum,
-                                                          SpeedRatio,
-                                                          QZnReq,
-                                                          QLatReq);
-
-                // Real64 FullLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
-                Real64 FullOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp,
-                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
-                                                                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
-                Real64 ReqOutput = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate *
-                                   (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat) -
-                                    Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp,
-                                                               state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).HumRat));
-
-                Real64 loadAccuracy(0.001);                   // Watts, power
-                Real64 tempAccuracy(0.001);                   // delta C, temperature
-                if ((NoOutput - ReqOutput) > -loadAccuracy) { //         IF NoOutput is higher than (more heating than required) or very near the
-                                                              //         ReqOutput, do not run the compressor
-                    PartLoadFrac = 0.0;
-                    SpeedNum = 1;
-                    SpeedRatio = 0.0;
-                    QZnReq = 0.0;
-                    // call again with coil off
+            } else { //  Else find how the coil is modulating (speed level and speed ratio or part load between off and speed 1) to meet the load
+                //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this temp is
+                //           greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the operating PLR.
+                Real64 OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(CBVAV(CBVAVNum).DXHeatCoilIndexNum).OutletAirDBTemp;
+                if (OutletTempDXCoil < DesOutTemp) {
+                    PartLoadFrac = 1.0;
+                    SpeedNum = maxNumSpeeds;
+                    SpeedRatio = 1.0;
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               CBVAV(CBVAVNum).HeatCoilName,
                                                               CBVAV(CBVAVNum).DXHeatCoilIndexNum,
@@ -3306,25 +3314,115 @@ namespace HVACUnitaryBypassVAV {
                                                               MaxONOFFCyclesperHour,
                                                               HPTimeConstant,
                                                               FanDelayTime,
-                                                              DataHVACGlobals::CompressorOperation::Off,
+                                                              DataHVACGlobals::CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
                                                               QZnReq,
-                                                              QLatReq);
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
+                } else {
+                    // run at lowest speed
+                    PartLoadFrac = 1.0;
+                    SpeedNum = 1;
+                    SpeedRatio = 1.0;
+                    QZnReq = 0.001; // to indicate the coil is running
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              CBVAV(CBVAVNum).HeatCoilName,
+                                                              CBVAV(CBVAVNum).DXHeatCoilIndexNum,
+                                                              DataHVACGlobals::ContFanCycCoil,
+                                                              MaxONOFFCyclesperHour,
+                                                              HPTimeConstant,
+                                                              FanDelayTime,
+                                                              DataHVACGlobals::CompressorOperation::On,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
 
-                } else if ((FullOutput - ReqOutput) < loadAccuracy) { //         If the FullOutput is less than (insufficient cooling) or very near
-                                                                      //         the ReqOutput, run the compressor at PartLoadFrac = 1.
-                                                                      // which we just did so nothing to be done
+                    Real64 TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
+                    Real64 TempSpeedOutSpeed1 = TempSpeedOut;
 
-                } else { //  Else find how the coil is modulating (speed level and speed ratio or part load between off and speed 1) to meet the load
-                    //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this temp is
-                    //           greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the operating PLR.
-                    Real64 OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(CBVAV(CBVAVNum).DXHeatCoilIndexNum).OutletAirDBTemp;
-                    if (OutletTempDXCoil < DesOutTemp) {
+                    if ((TempSpeedOut - DesOutTemp) < tempAccuracy) {
+                        // Check to see which speed to meet the load
                         PartLoadFrac = 1.0;
-                        SpeedNum = maxNumSpeeds;
                         SpeedRatio = 1.0;
+                        for (int I = 2; I <= maxNumSpeeds; ++I) {
+                            SpeedNum = I;
+                            VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                      CBVAV(CBVAVNum).HeatCoilName,
+                                                                      CBVAV(CBVAVNum).DXHeatCoilIndexNum,
+                                                                      DataHVACGlobals::ContFanCycCoil,
+                                                                      MaxONOFFCyclesperHour,
+                                                                      HPTimeConstant,
+                                                                      FanDelayTime,
+                                                                      DataHVACGlobals::CompressorOperation::On,
+                                                                      PartLoadFrac,
+                                                                      SpeedNum,
+                                                                      SpeedRatio,
+                                                                      QZnReq,
+                                                                      QLatReq,
+                                                                      OnOffAirFlowRatio);
+
+                            TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
+
+                            if ((TempSpeedOut - DesOutTemp) > tempAccuracy) {
+                                SpeedNum = I;
+                                break;
+                            }
+                        }
+                        // now find the speed ratio for the found speednum
+                        Par(1) = double(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+                        Par(2) = DesOutTemp;
+                        Par(5) = double(DataHVACGlobals::ContFanCycCoil);
+                        Par(3) = double(SpeedNum);
+                        General::SolveRoot(
+                            state, tempAccuracy, MaxIte, SolFla, SpeedRatio, HVACDXHeatPumpSystem::VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+
+                        if (SolFla == -1) {
+                            if (!state.dataGlobal->WarmupFlag) {
+                                if (CBVAV(CBVAVNum).DXHeatIterationExceeded < 4) {
+                                    ++CBVAV(CBVAVNum).DXHeatIterationExceeded;
+                                    ShowWarningError(state,
+                                                     CBVAV(CBVAVNum).HeatCoilType +
+                                                         " - Iteration limit exceeded calculating VS DX coil speed ratio for coil named " +
+                                                         CBVAV(CBVAVNum).HeatCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
+                                    ShowContinueError(state, format("Calculated speed ratio = {:.4R}", SpeedRatio));
+                                    ShowContinueErrorTimeStamp(
+                                        state, "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
+                                }
+                                ShowRecurringWarningErrorAtEnd(
+                                    state,
+                                    CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
+                                        "\" - Iteration limit exceeded calculating speed ratio error continues. Speed Ratio statistics follow.",
+                                    CBVAV(CBVAVNum).DXHeatIterationExceededIndex,
+                                    PartLoadFrac,
+                                    PartLoadFrac);
+                            }
+                        } else if (SolFla == -2) {
+
+                            if (!state.dataGlobal->WarmupFlag) {
+                                if (CBVAV(CBVAVNum).DXHeatIterationFailed < 4) {
+                                    ++CBVAV(CBVAVNum).DXHeatIterationFailed;
+                                    ShowWarningError(state,
+                                                     CBVAV(CBVAVNum).HeatCoilType +
+                                                         " - DX unit speed ratio calculation failed: solver limits exceeded, for coil named " +
+                                                         CBVAV(CBVAVNum).HeatCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
+                                    ShowContinueErrorTimeStamp(state,
+                                                               " Speed ratio will be set to 0.5, and the simulation continues. Occurrence info:");
+                                }
+                                ShowRecurringWarningErrorAtEnd(
+                                    state,
+                                    CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
+                                        "\" - DX unit speed ratio calculation failed error continues. speed ratio statistics follow.",
+                                    CBVAV(CBVAVNum).DXHeatIterationFailedIndex,
+                                    SpeedRatio,
+                                    SpeedRatio);
+                            }
+                            SpeedRatio = 0.5;
+                        }
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   CBVAV(CBVAVNum).HeatCoilName,
                                                                   CBVAV(CBVAVNum).DXHeatCoilIndexNum,
@@ -3340,11 +3438,60 @@ namespace HVACUnitaryBypassVAV {
                                                                   QLatReq,
                                                                   OnOffAirFlowRatio);
                     } else {
-                        // run at lowest speed
-                        PartLoadFrac = 1.0;
-                        SpeedNum = 1;
-                        SpeedRatio = 1.0;
-                        QZnReq = 0.001; // to indicate the coil is running
+                        // cycling compressor at lowest speed number, find part load fraction
+                        Par(1) = double(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+                        Par(2) = DesOutTemp;
+                        Par(4) = double(CBVAVNum);
+                        Par(5) = double(DataHVACGlobals::ContFanCycCoil);
+                        General::SolveRoot(
+                            state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, HVACDXHeatPumpSystem::VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                        if (SolFla == -1) {
+                            if (!state.dataGlobal->WarmupFlag) {
+                                if (CBVAV(CBVAVNum).DXHeatCyclingIterationExceeded < 4) {
+                                    ++CBVAV(CBVAVNum).DXHeatCyclingIterationExceeded;
+                                    ShowWarningError(
+                                        state,
+                                        CBVAV(CBVAVNum).HeatCoilType +
+                                            " - Iteration limit exceeded calculating VS DX unit low speed cycling ratio, for coil named " +
+                                            CBVAV(CBVAVNum).HeatCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
+                                    ShowContinueError(state, format("Estimated cycling ratio  = {:.3R}", (DesOutTemp / TempSpeedOut)));
+                                    ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", PartLoadFrac));
+                                    ShowContinueErrorTimeStamp(
+                                        state, "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
+                                }
+                                ShowRecurringWarningErrorAtEnd(state,
+                                                               CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
+                                                                   "\" - Iteration limit exceeded calculating low speed cycling ratio error "
+                                                                   "continues. Sensible PLR statistics follow.",
+                                                               CBVAV(CBVAVNum).DXHeatCyclingIterationExceededIndex,
+                                                               PartLoadFrac,
+                                                               PartLoadFrac);
+                            }
+                        } else if (SolFla == -2) {
+
+                            if (!state.dataGlobal->WarmupFlag) {
+                                if (CBVAV(CBVAVNum).DXHeatCyclingIterationFailed < 4) {
+                                    ++CBVAV(CBVAVNum).DXHeatCyclingIterationFailed;
+                                    ShowWarningError(state,
+                                                     CBVAV(CBVAVNum).HeatCoilType +
+                                                         " - DX unit low speed cycling ratio calculation failed: limits exceeded, for unit = " +
+                                                         CBVAV(CBVAVNum).Name);
+                                    ShowContinueError(state,
+                                                      format("Estimated low speed cycling ratio = {:.3R}",
+                                                             (DesOutTemp - TempNoOutput) / (TempSpeedOutSpeed1 - TempNoOutput)));
+                                    ShowContinueErrorTimeStamp(
+                                        state, "The estimated low speed cycling ratio will be used and the simulation continues. Occurrence info:");
+                                }
+                                ShowRecurringWarningErrorAtEnd(state,
+                                                               CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
+                                                                   "\" - DX unit low speed cycling ratio calculation failed error continues. "
+                                                                   "cycling ratio statistics follow.",
+                                                               CBVAV(CBVAVNum).DXHeatCyclingIterationFailedIndex,
+                                                               PartLoadFrac,
+                                                               PartLoadFrac);
+                            }
+                            PartLoadFrac = (DesOutTemp - TempNoOutput) / (TempSpeedOutSpeed1 - TempNoOutput);
+                        }
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   CBVAV(CBVAVNum).HeatCoilName,
                                                                   CBVAV(CBVAVNum).DXHeatCoilIndexNum,
@@ -3359,199 +3506,36 @@ namespace HVACUnitaryBypassVAV {
                                                                   QZnReq,
                                                                   QLatReq,
                                                                   OnOffAirFlowRatio);
-
-                        Real64 TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
-                        Real64 TempSpeedOutSpeed1 = TempSpeedOut;
-
-                        if ((TempSpeedOut - DesOutTemp) < tempAccuracy) {
-                            // Check to see which speed to meet the load
-                            PartLoadFrac = 1.0;
-                            SpeedRatio = 1.0;
-                            for (int I = 2; I <= maxNumSpeeds; ++I) {
-                                SpeedNum = I;
-                                VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                                          CBVAV(CBVAVNum).HeatCoilName,
-                                                                          CBVAV(CBVAVNum).DXHeatCoilIndexNum,
-                                                                          DataHVACGlobals::ContFanCycCoil,
-                                                                          MaxONOFFCyclesperHour,
-                                                                          HPTimeConstant,
-                                                                          FanDelayTime,
-                                                                          DataHVACGlobals::CompressorOperation::On,
-                                                                          PartLoadFrac,
-                                                                          SpeedNum,
-                                                                          SpeedRatio,
-                                                                          QZnReq,
-                                                                          QLatReq,
-                                                                          OnOffAirFlowRatio);
-
-                                TempSpeedOut = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).Temp;
-
-                                if ((TempSpeedOut - DesOutTemp) > tempAccuracy) {
-                                    SpeedNum = I;
-                                    break;
-                                }
-                            }
-                            // now find the speed ratio for the found speednum
-                            Par(1) = double(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
-                            Par(2) = DesOutTemp;
-                            Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                            Par(3) = double(SpeedNum);
-                            General::SolveRoot(
-                                state, tempAccuracy, MaxIte, SolFla, SpeedRatio, HVACDXHeatPumpSystem::VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
-
-                            if (SolFla == -1) {
-                                if (!state.dataGlobal->WarmupFlag) {
-                                    if (CBVAV(CBVAVNum).DXHeatIterationExceeded < 4) {
-                                        ++CBVAV(CBVAVNum).DXHeatIterationExceeded;
-                                        ShowWarningError(state,
-                                                         CBVAV(CBVAVNum).HeatCoilType +
-                                                             " - Iteration limit exceeded calculating VS DX coil speed ratio for coil named " +
-                                                             CBVAV(CBVAVNum).HeatCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
-                                        ShowContinueError(state, format("Calculated speed ratio = {:.4R}", SpeedRatio));
-                                        ShowContinueErrorTimeStamp(
-                                            state, "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
-                                    }
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
-                                            "\" - Iteration limit exceeded calculating speed ratio error continues. Speed Ratio statistics follow.",
-                                        CBVAV(CBVAVNum).DXHeatIterationExceededIndex,
-                                        PartLoadFrac,
-                                        PartLoadFrac);
-                                }
-                            } else if (SolFla == -2) {
-
-                                if (!state.dataGlobal->WarmupFlag) {
-                                    if (CBVAV(CBVAVNum).DXHeatIterationFailed < 4) {
-                                        ++CBVAV(CBVAVNum).DXHeatIterationFailed;
-                                        ShowWarningError(state,
-                                                         CBVAV(CBVAVNum).HeatCoilType +
-                                                             " - DX unit speed ratio calculation failed: solver limits exceeded, for coil named " +
-                                                             CBVAV(CBVAVNum).HeatCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
-                                        ShowContinueErrorTimeStamp(state,
-                                                                   " Speed ratio will be set to 0.5, and the simulation continues. Occurrence info:");
-                                    }
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
-                                            "\" - DX unit speed ratio calculation failed error continues. speed ratio statistics follow.",
-                                        CBVAV(CBVAVNum).DXHeatIterationFailedIndex,
-                                        SpeedRatio,
-                                        SpeedRatio);
-                                }
-                                SpeedRatio = 0.5;
-                            }
-                            VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                                      CBVAV(CBVAVNum).HeatCoilName,
-                                                                      CBVAV(CBVAVNum).DXHeatCoilIndexNum,
-                                                                      DataHVACGlobals::ContFanCycCoil,
-                                                                      MaxONOFFCyclesperHour,
-                                                                      HPTimeConstant,
-                                                                      FanDelayTime,
-                                                                      DataHVACGlobals::CompressorOperation::On,
-                                                                      PartLoadFrac,
-                                                                      SpeedNum,
-                                                                      SpeedRatio,
-                                                                      QZnReq,
-                                                                      QLatReq,
-                                                                      OnOffAirFlowRatio);
-                        } else {
-                            // cycling compressor at lowest speed number, find part load fraction
-                            Par(1) = double(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
-                            Par(2) = DesOutTemp;
-                            Par(4) = double(CBVAVNum);
-                            Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                            General::SolveRoot(
-                                state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, HVACDXHeatPumpSystem::VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
-                            if (SolFla == -1) {
-                                if (!state.dataGlobal->WarmupFlag) {
-                                    if (CBVAV(CBVAVNum).DXHeatCyclingIterationExceeded < 4) {
-                                        ++CBVAV(CBVAVNum).DXHeatCyclingIterationExceeded;
-                                        ShowWarningError(
-                                            state,
-                                            CBVAV(CBVAVNum).HeatCoilType +
-                                                " - Iteration limit exceeded calculating VS DX unit low speed cycling ratio, for coil named " +
-                                                CBVAV(CBVAVNum).HeatCoilName + ", in Unitary system named" + CBVAV(CBVAVNum).Name);
-                                        ShowContinueError(state, format("Estimated cycling ratio  = {:.3R}", (DesOutTemp / TempSpeedOut)));
-                                        ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", PartLoadFrac));
-                                        ShowContinueErrorTimeStamp(
-                                            state, "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
-                                    }
-                                    ShowRecurringWarningErrorAtEnd(state,
-                                                                   CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
-                                                                       "\" - Iteration limit exceeded calculating low speed cycling ratio error "
-                                                                       "continues. Sensible PLR statistics follow.",
-                                                                   CBVAV(CBVAVNum).DXHeatCyclingIterationExceededIndex,
-                                                                   PartLoadFrac,
-                                                                   PartLoadFrac);
-                                }
-                            } else if (SolFla == -2) {
-
-                                if (!state.dataGlobal->WarmupFlag) {
-                                    if (CBVAV(CBVAVNum).DXHeatCyclingIterationFailed < 4) {
-                                        ++CBVAV(CBVAVNum).DXHeatCyclingIterationFailed;
-                                        ShowWarningError(state,
-                                                         CBVAV(CBVAVNum).HeatCoilType +
-                                                             " - DX unit low speed cycling ratio calculation failed: limits exceeded, for unit = " +
-                                                             CBVAV(CBVAVNum).Name);
-                                        ShowContinueError(state,
-                                                          format("Estimated low speed cycling ratio = {:.3R}",
-                                                                 (DesOutTemp - TempNoOutput) / (TempSpeedOutSpeed1 - TempNoOutput)));
-                                        ShowContinueErrorTimeStamp(
-                                            state,
-                                            "The estimated low speed cycling ratio will be used and the simulation continues. Occurrence info:");
-                                    }
-                                    ShowRecurringWarningErrorAtEnd(state,
-                                                                   CBVAV(CBVAVNum).HeatCoilType + " \"" + CBVAV(CBVAVNum).HeatCoilName +
-                                                                       "\" - DX unit low speed cycling ratio calculation failed error continues. "
-                                                                       "cycling ratio statistics follow.",
-                                                                   CBVAV(CBVAVNum).DXHeatCyclingIterationFailedIndex,
-                                                                   PartLoadFrac,
-                                                                   PartLoadFrac);
-                                }
-                                PartLoadFrac = (DesOutTemp - TempNoOutput) / (TempSpeedOutSpeed1 - TempNoOutput);
-                            }
-                            VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                                      CBVAV(CBVAVNum).HeatCoilName,
-                                                                      CBVAV(CBVAVNum).DXHeatCoilIndexNum,
-                                                                      DataHVACGlobals::ContFanCycCoil,
-                                                                      MaxONOFFCyclesperHour,
-                                                                      HPTimeConstant,
-                                                                      FanDelayTime,
-                                                                      DataHVACGlobals::CompressorOperation::On,
-                                                                      PartLoadFrac,
-                                                                      SpeedNum,
-                                                                      SpeedRatio,
-                                                                      QZnReq,
-                                                                      QLatReq,
-                                                                      OnOffAirFlowRatio);
-                        }
                     }
                 }
-
-                if (PartLoadFrac > 1.0) {
-                    PartLoadFrac = 1.0;
-                } else if (PartLoadFrac < 0.0) {
-                    PartLoadFrac = 0.0;
-                }
-                state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
-                    VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum);
-            } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
-                       (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
-                       (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam)) { // not a DX heating coil
-                if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
-                    CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
-                    QHeater = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate * CpAir *
-                              (CBVAV(CBVAVNum).CoilTempSetPoint - state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
-                } else {
-                    QHeater = 0.0;
-                }
-                // Added None DX heating coils calling point
-                state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).TempSetPoint = CBVAV(CBVAVNum).CoilTempSetPoint;
-                CalcNonDXHeatingCoils(state, CBVAVNum, FirstHVACIteration, QHeater, CBVAV(CBVAVNum).OpMode, QHeaterActual);
-            } else {
-                ShowFatalError(state, "SimCBVAV System: Invalid Heating Coil=" + CBVAV(CBVAVNum).HeatCoilType);
             }
+
+            if (PartLoadFrac > 1.0) {
+                PartLoadFrac = 1.0;
+            } else if (PartLoadFrac < 0.0) {
+                PartLoadFrac = 0.0;
+            }
+            state.dataHVACUnitaryBypassVAV->SaveCompressorPLR =
+                VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+        } break;
+        case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
+        case DataHVACGlobals::Coil_HeatingElectric:
+        case DataHVACGlobals::Coil_HeatingWater:
+        case DataHVACGlobals::Coil_HeatingSteam: { // not a DX heating coil
+            if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
+                CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
+                QHeater = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate * CpAir *
+                          (CBVAV(CBVAVNum).CoilTempSetPoint - state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
+            } else {
+                QHeater = 0.0;
+            }
+            // Added None DX heating coils calling point
+            state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilOutletNode).TempSetPoint = CBVAV(CBVAVNum).CoilTempSetPoint;
+            CalcNonDXHeatingCoils(state, CBVAVNum, FirstHVACIteration, QHeater, CBVAV(CBVAVNum).OpMode, QHeaterActual);
+        } break;
+        default: {
+            ShowFatalError(state, "SimCBVAV System: Invalid Heating Coil=" + CBVAV(CBVAVNum).HeatCoilType);
+        } break;
         }
 
         if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
@@ -4169,117 +4153,124 @@ namespace HVACUnitaryBypassVAV {
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
         if (HeatCoilLoad > DataHVACGlobals::SmallLoad) {
-            {
-                auto const SELECT_CASE_var(CBVAV(CBVAVNum).HeatCoilType_Num);
-                if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-                    HeatingCoils::SimulateHeatingCoilComponents(state,
-                                                                CBVAV(CBVAVNum).HeatCoilName,
-                                                                FirstHVACIteration,
-                                                                HeatCoilLoad,
-                                                                CBVAV(CBVAVNum).HeatCoilIndex,
-                                                                QCoilActual,
-                                                                false,
-                                                                FanMode);
-                } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
-                    // simulate the heating coil at maximum hot water flow rate
-                    MaxHotWaterFlow = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(
-                        state, MaxHotWaterFlow, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
-                    WaterCoils::SimulateWaterCoilComponents(
-                        state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
-                    if (QCoilActual > (HeatCoilLoad + DataHVACGlobals::SmallLoad)) {
-                        // control water flow to obtain output matching HeatCoilLoad
-                        SolFlag = 0;
-                        MinWaterFlow = 0.0;
-                        Par(1) = double(CBVAVNum);
-                        if (FirstHVACIteration) {
-                            Par(2) = 1.0;
-                        } else {
-                            Par(2) = 0.0;
-                        }
-                        Par(3) = HeatCoilLoad;
-                        General::SolveRoot(
-                            state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
-                        if (SolFlag == -1) {
-                            if (CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex == 0) {
-                                ShowWarningMessage(state,
-                                                   "CalcNonDXHeatingCoils: Hot water coil control failed for " + CBVAV(CBVAVNum).UnitType + "=\"" +
-                                                       CBVAV(CBVAVNum).Name + "\"");
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state,
-                                                  format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
-                            }
-                            ShowRecurringWarningErrorAtEnd(
-                                state,
-                                format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
-                                       SolveMaxIter,
-                                       CBVAV(CBVAVNum).UnitType,
-                                       CBVAV(CBVAVNum).Name),
-                                CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex);
-                        } else if (SolFlag == -2) {
-                            if (CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex2 == 0) {
-                                ShowWarningMessage(state,
-                                                   "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
-                                                       CBVAV(CBVAVNum).UnitType + "=\"" + CBVAV(CBVAVNum).Name + "\"");
-                                ShowContinueErrorTimeStamp(state, "");
-                                ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
-                                ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
-                            }
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
-                                                               CBVAV(CBVAVNum).UnitType + "=\"" + CBVAV(CBVAVNum).Name + "\"",
-                                                           CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex2,
-                                                           MaxHotWaterFlow,
-                                                           MinWaterFlow,
-                                                           _,
-                                                           "[kg/s]",
-                                                           "[kg/s]");
-                        }
-                        // simulate the hot water heating coil
-                        QCoilActual = HeatCoilLoad;
-                        // simulate the hot water heating coil
-                        WaterCoils::SimulateWaterCoilComponents(
-                            state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
+            switch (CBVAV(CBVAVNum).HeatCoilType_Num) {
+            case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
+            case DataHVACGlobals::Coil_HeatingElectric: {
+                HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                            CBVAV(CBVAVNum).HeatCoilName,
+                                                            FirstHVACIteration,
+                                                            HeatCoilLoad,
+                                                            CBVAV(CBVAVNum).HeatCoilIndex,
+                                                            QCoilActual,
+                                                            false,
+                                                            FanMode);
+            } break;
+            case DataHVACGlobals::Coil_HeatingWater: {
+                // simulate the heating coil at maximum hot water flow rate
+                MaxHotWaterFlow = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
+                PlantUtilities::SetComponentFlowRate(
+                    state, MaxHotWaterFlow, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
+                WaterCoils::SimulateWaterCoilComponents(
+                    state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
+                if (QCoilActual > (HeatCoilLoad + DataHVACGlobals::SmallLoad)) {
+                    // control water flow to obtain output matching HeatCoilLoad
+                    SolFlag = 0;
+                    MinWaterFlow = 0.0;
+                    Par(1) = double(CBVAVNum);
+                    if (FirstHVACIteration) {
+                        Par(2) = 1.0;
+                    } else {
+                        Par(2) = 0.0;
                     }
-                } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
-                    mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(
-                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
-
-                    // simulate the steam heating coil
-                    SteamCoils::SimulateSteamCoilComponents(
-                        state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
-                }
-            }
-        } else {
-            {
-                auto const SELECT_CASE_var(CBVAV(CBVAVNum).HeatCoilType_Num);
-                if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-                    HeatingCoils::SimulateHeatingCoilComponents(state,
-                                                                CBVAV(CBVAVNum).HeatCoilName,
-                                                                FirstHVACIteration,
-                                                                HeatCoilLoad,
-                                                                CBVAV(CBVAVNum).HeatCoilIndex,
-                                                                QCoilActual,
-                                                                false,
-                                                                FanMode);
-                } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
-                    mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(
-                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
+                    Par(3) = HeatCoilLoad;
+                    General::SolveRoot(
+                        state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                    if (SolFlag == -1) {
+                        if (CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex == 0) {
+                            ShowWarningMessage(state,
+                                               "CalcNonDXHeatingCoils: Hot water coil control failed for " + CBVAV(CBVAVNum).UnitType + "=\"" +
+                                                   CBVAV(CBVAVNum).Name + "\"");
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
+                        }
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                   SolveMaxIter,
+                                   CBVAV(CBVAVNum).UnitType,
+                                   CBVAV(CBVAVNum).Name),
+                            CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex);
+                    } else if (SolFlag == -2) {
+                        if (CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex2 == 0) {
+                            ShowWarningMessage(state,
+                                               "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
+                                                   CBVAV(CBVAVNum).UnitType + "=\"" + CBVAV(CBVAVNum).Name + "\"");
+                            ShowContinueErrorTimeStamp(state, "");
+                            ShowContinueError(state, "...Bad hot water maximum flow rate limits");
+                            ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
+                            ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
+                        }
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
+                                                           CBVAV(CBVAVNum).UnitType + "=\"" + CBVAV(CBVAVNum).Name + "\"",
+                                                       CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex2,
+                                                       MaxHotWaterFlow,
+                                                       MinWaterFlow,
+                                                       _,
+                                                       "[kg/s]",
+                                                       "[kg/s]");
+                    }
+                    // simulate the hot water heating coil
                     QCoilActual = HeatCoilLoad;
                     // simulate the hot water heating coil
                     WaterCoils::SimulateWaterCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
-                } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
-                    mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(
-                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
-                    // simulate the steam heating coil
-                    SteamCoils::SimulateSteamCoilComponents(
-                        state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
                 }
+            } break;
+            case DataHVACGlobals::Coil_HeatingSteam: {
+                mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
+
+                // simulate the steam heating coil
+                SteamCoils::SimulateSteamCoilComponents(
+                    state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
+            } break;
+            default:
+                break;
+            }
+        } else {
+            switch (CBVAV(CBVAVNum).HeatCoilType_Num) {
+            case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
+            case DataHVACGlobals::Coil_HeatingElectric: {
+                HeatingCoils::SimulateHeatingCoilComponents(state,
+                                                            CBVAV(CBVAVNum).HeatCoilName,
+                                                            FirstHVACIteration,
+                                                            HeatCoilLoad,
+                                                            CBVAV(CBVAVNum).HeatCoilIndex,
+                                                            QCoilActual,
+                                                            false,
+                                                            FanMode);
+            } break;
+            case DataHVACGlobals::Coil_HeatingWater: {
+                mdot = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
+                QCoilActual = HeatCoilLoad;
+                // simulate the hot water heating coil
+                WaterCoils::SimulateWaterCoilComponents(
+                    state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
+            } break;
+            case DataHVACGlobals::Coil_HeatingSteam: {
+                mdot = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
+                // simulate the steam heating coil
+                SteamCoils::SimulateSteamCoilComponents(
+                    state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
+            } break;
+            default:
+                break;
             }
         }
         HeatCoilLoadmet = QCoilActual;
