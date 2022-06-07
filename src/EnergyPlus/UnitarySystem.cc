@@ -49,7 +49,7 @@
 #include <string>
 
 // EnergyPlus headers
-#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
@@ -10776,7 +10776,7 @@ namespace UnitarySystems {
 
         // Calcuate air distribution losses
         //  IF (.NOT. FirstHVACIteration .AND. AirLoopPass .EQ. 1 .AND. AirflowNetworkFanActivated) THEN
-        if (!FirstHVACIteration && state.dataAirflowNetwork->AirflowNetworkFanActivated) {
+        if (!FirstHVACIteration && state.afn->AirflowNetworkFanActivated) {
             Real64 DeltaMassRate = 0.0;
             Real64 TotalOutput = 0.0;         // total output rate, {W}
             Real64 SensibleOutputDelta = 0.0; // delta sensible output rate, {W}
@@ -10784,7 +10784,7 @@ namespace UnitarySystems {
             Real64 TotalOutputDelta = 0.0;    // delta total output rate, {W}
             int ZoneInNode = this->m_ZoneInletNode;
             Real64 MassFlowRate = state.dataLoopNodes->Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 DeltaMassRate = state.dataLoopNodes->Node(this->AirOutNode).MassFlowRate -
                                 state.dataLoopNodes->Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
                 if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -11790,6 +11790,8 @@ namespace UnitarySystems {
         }
         if (this->OAMixerExists) {
             // the PTHP does one or the other, but why can't an OA Mixer exist with the AT Mixer?
+            // use of a blank std::string is not great here, but I'm not ready to change this API at the moment, so passing a static blank string is
+            // at least better than constructing a new string each time to call this function
             MixedAir::SimOAMixer(state, blankStdString, FirstHVACIteration, this->OAMixerIndex);
         }
 
@@ -12687,7 +12689,7 @@ namespace UnitarySystems {
         Real64 DesOutHumRat = this->m_DesiredOutletHumRat;
         int CoilType_Num = this->m_CoolingCoilType_Num;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             LoopDXCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
@@ -13294,8 +13296,8 @@ namespace UnitarySystems {
 
                         // TES coil simulated above with PLR=0. Operating mode is known here, no need to simulate again to determine operating
                         // mode.
-                        if (this->m_TESOpMode == PackagedThermalStorageCoil::OffMode ||
-                            this->m_TESOpMode == PackagedThermalStorageCoil::ChargeOnlyMode) { // cannot cool
+                        if (this->m_TESOpMode == PackagedThermalStorageCoil::PTSCOperatingMode::Off ||
+                            this->m_TESOpMode == PackagedThermalStorageCoil::PTSCOperatingMode::ChargeOnly) { // cannot cool
                             PartLoadFrac = 0.0;
                         } else {
                             // Get full load result
@@ -13332,13 +13334,13 @@ namespace UnitarySystems {
                     if (unitSys && state.dataLoopNodes->Node(OutletNode).Temp > DesOutTemp - tempAcc) {
                         PartLoadFrac = 1.0;
                         if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling &&
-                            (this->m_TESOpMode == PackagedThermalStorageCoil::OffMode ||
-                             this->m_TESOpMode == PackagedThermalStorageCoil::ChargeOnlyMode)) {
+                            (this->m_TESOpMode == PackagedThermalStorageCoil::PTSCOperatingMode::Off ||
+                             this->m_TESOpMode == PackagedThermalStorageCoil::PTSCOperatingMode::ChargeOnly)) {
                             PartLoadFrac = 0.0;
                         }
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling &&
-                               (this->m_TESOpMode == PackagedThermalStorageCoil::OffMode ||
-                                this->m_TESOpMode == PackagedThermalStorageCoil::ChargeOnlyMode)) {
+                               (this->m_TESOpMode == PackagedThermalStorageCoil::PTSCOperatingMode::Off ||
+                                this->m_TESOpMode == PackagedThermalStorageCoil::PTSCOperatingMode::ChargeOnly)) {
                         PartLoadFrac = 0.0;
                     } else if (!SensibleLoad) {
                         PartLoadFrac = 0.0;
@@ -14227,8 +14229,8 @@ namespace UnitarySystems {
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
 
                         if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling &&
-                            (this->m_TESOpMode != PackagedThermalStorageCoil::OffMode &&
-                             this->m_TESOpMode != PackagedThermalStorageCoil::ChargeOnlyMode)) {
+                            (this->m_TESOpMode != PackagedThermalStorageCoil::PTSCOperatingMode::Off &&
+                             this->m_TESOpMode != PackagedThermalStorageCoil::PTSCOperatingMode::ChargeOnly)) {
                             Par[1] = double(this->m_UnitarySysNum);
                             Par[2] = 0.0; // DesOutTemp; set to 0 if humrat controlled
                             Par[3] = DesOutHumRat;
@@ -14335,7 +14337,7 @@ namespace UnitarySystems {
         this->m_CoolingCycRatio = CycRatio;
         this->m_DehumidificationMode = DehumidMode;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
                 max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
         }
@@ -14397,7 +14399,7 @@ namespace UnitarySystems {
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             LoopHeatingCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
             LoopDXCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
@@ -15018,7 +15020,7 @@ namespace UnitarySystems {
         this->m_HeatingSpeedRatio = SpeedRatio;
         this->m_HeatingCycRatio = CycRatio;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF =
                 max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
@@ -15080,7 +15082,7 @@ namespace UnitarySystems {
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             LoopHeatingCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
             LoopDXCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
@@ -15361,7 +15363,7 @@ namespace UnitarySystems {
         this->m_SuppHeatPartLoadFrac = PartLoadFrac;
 
         // LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF =
                 max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
@@ -16048,8 +16050,8 @@ namespace UnitarySystems {
         this->m_ElecPower = locFanElecPower + elecCoolingPower + elecHeatingPower + suppHeatingPower + this->m_TotalAuxElecPower;
         this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
+            state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = state.dataUnitarySystems->CompOnMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = state.dataUnitarySystems->CompOffMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = this->m_FanOpMode;

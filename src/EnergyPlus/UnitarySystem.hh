@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
@@ -443,7 +444,7 @@ namespace UnitarySystems {
         int m_FaultyCoilSATIndex = 0;       // Index of the fault object corresponding to the coil
         Real64 m_FaultyCoilSATOffset = 0.0; // Coil SAT sensor offset
 
-        int m_TESOpMode = 0; // operating mode of TES DX cooling coil
+        PackagedThermalStorageCoil::PTSCOperatingMode m_TESOpMode; // operating mode of TES DX cooling coil
         bool m_initLoadBasedControlAirLoopPass = false;
         int m_airLoopPassCounter = 0;
         int m_airLoopReturnCounter = 0;

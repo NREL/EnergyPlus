@@ -288,10 +288,12 @@ namespace SurfaceGeometry {
 
     struct EdgeOfSurf
     {
-        int surfNum;
+        int surfNum = 0;
         Vector start;
         Vector end;
-        EdgeOfSurf() : surfNum(0), start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
+        std::vector<int> otherSurfNums;
+        int count = 0;
+        EdgeOfSurf() : start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
         {
         }
     };
@@ -304,12 +306,10 @@ namespace SurfaceGeometry {
 
     std::vector<EdgeOfSurf> edgesNotTwoForEnclosedVolumeTest(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> const &uniqueVertices);
 
-    void makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> &uniqVertices);
+    std::vector<Vector> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly);
 
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
                                                                            std::vector<Vector> const &uniqVertices);
-
-    void insertVertexOnFace(DataVectorTypes::Face &face, int indexBefore, DataVectorTypes::Vector const &vertexToInsert);
 
     bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
@@ -335,6 +335,8 @@ namespace SurfaceGeometry {
     int findIndexOfVertex(DataVectorTypes::Vector vertexToFind, std::vector<DataVectorTypes::Vector> listOfVertices);
 
     Real64 distance(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
+
+    Real64 distanceFromPointToLine(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
