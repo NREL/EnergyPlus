@@ -2,7 +2,7 @@
 ! Basic file description:  2 story building divided into 9 zones, overhangs, reveal,
 !
 ! Highlights:              Demonstrates long wave radiation exchange calculation between exterior surfaces and the ground surfaces.
-!                          One exterior surface of the four perimeters zones views multiple ground surfaces. The ground surfaces 
+!                          One exterior surface of the four perimeters zones views multiple ground surfaces. The ground surfaces
 !                          represent grass area, vehicle parking area and pond area.
 !
 ! Simulation Location/Run: PHOENIX_AZ_USA_WMO_722780, 2 design days, 1 run periods.
@@ -428,7 +428,7 @@
     -60,                     !- Lower Limit Value
     200,                     !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
-	
+
   Schedule:Compact,
     Activity Sch,            !- Name
     Any Number,              !- Schedule Type Limits Name
@@ -2314,7 +2314,7 @@
     ,                        !- External Shading Fraction Schedule Name
     SrdSurfs:Zn005:Wall002:Win001,  !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn005:Wall002:Win001;  !- Ground Surfaces Object Name
+    GndSurfs:Zn005:Wall002:Win001;  !- Ground Surfaces Object Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn003:Roof001,    !- Name
@@ -2368,7 +2368,7 @@
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
+    GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn004:Wall001:Win001, !- Name
@@ -2376,46 +2376,46 @@
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
+
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn004:Wall001:Win002, !- Name
     Zn004:Wall001:Win002,    !- Exterior Surface Name
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
+
   SurfaceProperty:GroundSurfaces,
     GndSurfs:Zn004:Wall001,  !- Name
     GndSurfs:Grass,          !- Ground Surface 1 Name
     0.2,                     !- Ground Surface 1 View Factor
     GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-	GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
+    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
     GndSurfs:Parking,        !- Ground Surface 2 Name
     0.2,                     !- Ground Surface 2 View Factor
     GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-	GndSurfs:ParkingRefl,    !- Ground Surface 2 Reflectance Schedule Name
+    GndSurfs:ParkingRefl,    !- Ground Surface 2 Reflectance Schedule Name
     GndSurfs:Pond,           !- Ground Surface 3 Name
     0.1,                     !- Ground Surface 3 View Factor
     GndSurfs:PondTemp,       !- Ground Surface 3 Temperature Schedule Name
-	GndSurfs:PondRefl;       !- Ground Surface 3 Reflectance Schedule Name	
-	
+    GndSurfs:PondRefl;       !- Ground Surface 3 Reflectance Schedule Name
+
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn003:Wall001,    !- Name
     Zn003:Wall001,           !- Exterior Surface Name
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
+
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn003:Wall001:Win001, !- Name
     Zn003:Wall001:Win001,    !- Exterior Surface Name
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
+    GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn003:Wall001:Win002, !- Name
@@ -2423,22 +2423,22 @@
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
+
   SurfaceProperty:GroundSurfaces,
     GndSurfs:Zn003:Wall001,  !- Name
     GndSurfs:Grass,          !- Ground Surface 1 Name
     0.2,                     !- Ground Surface 1 View Factor
     GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-	GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
+    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
     GndSurfs:Parking,        !- Ground Surface 2 Name
     0.1,                     !- Ground Surface 2 View Factor
     GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-	GndSurfs:ParkingRefl,    !- Ground Surface 2 Reflectance Schedule Name
+    GndSurfs:ParkingRefl,    !- Ground Surface 2 Reflectance Schedule Name
     GndSurfs:Pond,           !- Ground Surface 3 Name
     0.2,                     !- Ground Surface 3 View Factor
     GndSurfs:PondTemp,       !- Ground Surface 3 Temperature Schedule Name
-	GndSurfs:PondRefl;       !- Ground Surface 3 Reflectance Schedule Name
+    GndSurfs:PondRefl;       !- Ground Surface 3 Reflectance Schedule Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn002:Wall003,    !- Name
@@ -2446,34 +2446,34 @@
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
+
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn002:Wall003:Win001, !- Name
     Zn002:Wall003:Win001,    !- Exterior Surface Name
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
+
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn002:Wall003:Win002, !- Name
     Zn002:Wall003:Win002,    !- Exterior Surface Name
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
+
   SurfaceProperty:GroundSurfaces,
     GndSurfs:Zn002:Wall003,  !- Name
     GndSurfs:Grass,          !- Ground Surface 1 Name
     0.3,                     !- Ground Surface 1 View Factor
     GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-	GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
+    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
     GndSurfs:Parking,        !- Ground Surface 2 Name
     0.2,                     !- Ground Surface 2 View Factor
     GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-	GndSurfs:ParkingRefl;    !- Ground Surface 2 Reflectance Schedule Name
+    GndSurfs:ParkingRefl;    !- Ground Surface 2 Reflectance Schedule Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn005:Wall003,    !- Name
@@ -2481,7 +2481,7 @@
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
+    GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn005:Wall003:Door001, !- Name
@@ -2489,7 +2489,7 @@
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
+    GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn005:Wall003:Door002, !- Name
@@ -2497,18 +2497,18 @@
     ,                        !- External Shading Fraction Schedule Name
     ,                        !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
-	
+    GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
+
   SurfaceProperty:GroundSurfaces,
     GndSurfs:Zn005:Wall003,  !- Name
     GndSurfs:Grass,          !- Ground Surface 1 Name
     0.35,                    !- Ground Surface 1 View Factor
     GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-	GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
+    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
     GndSurfs:Parking,        !- Ground Surface 2 Name
     0.15,                    !- Ground Surface 2 View Factor
     GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-	GndSurfs:ParkingRefl;    !- Ground Surface 2 Reflectance Schedule Name
+    GndSurfs:ParkingRefl;    !- Ground Surface 2 Reflectance Schedule Name
 
   Schedule:File,
     GndSurfs:GrassTemp,      !- Name
@@ -2551,13 +2551,13 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.10;       !- Field 3
-	
+
   Output:VariableDictionary,Regular;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
-  
+
   Output:Variable,*,Site Outdoor Air Dewpoint Temperature,hourly;
-  
+
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,hourly;
 
   Output:Variable,Zn004:Wall001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
@@ -2571,15 +2571,15 @@
   Output:Variable,Zn004:Wall001:Win001,Surface Outside Face Temperature,hourly;
 
   Output:Variable,Zn004:Wall001:Win002,Surface Outside Face Temperature,hourly;
-  
+
   Output:Variable,Zn004:Wall001,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,hourly;
 
   Output:Variable,Zn004:Wall001:Win001,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,hourly;
 
-  Output:Variable,Zn004:Wall001:Win002,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,hourly;  
-  
+  Output:Variable,Zn004:Wall001:Win002,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,hourly;
+
   Output:Variable,GndSurfs:Zn004:Wall001,Surfaces Property Ground Surfaces Average Temperature,hourly;
-  
+
   Output:Variable,GndSurfs:Zn004:Wall001,Surfaces Property Ground Surfaces Average Reflectance,hourly;
 
   Output:Variable,Zn003:Wall001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
@@ -2598,12 +2598,12 @@
 
   Output:Variable,Zn003:Wall001:Win001,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,hourly;
 
-  Output:Variable,Zn003:Wall001:Win002,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,hourly;  
+  Output:Variable,Zn003:Wall001:Win002,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient,hourly;
 
   Output:Variable,GndSurfs:Zn003:Wall001,Surfaces Property Ground Surfaces Average Temperature,hourly;
-  
+
   Output:Variable,GndSurfs:Zn003:Wall001,Surfaces Property Ground Surfaces Average Reflectance,hourly;
- 
+
   Output:Variable,Zn002:Wall003,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
 
   Output:Variable,Zn002:Wall003:Win001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
@@ -2625,7 +2625,7 @@
   Output:Variable,GndSurfs:Zn002:Wall003,Surfaces Property Ground Surfaces Average Temperature,hourly;
 
   Output:Variable,GndSurfs:Zn002:Wall003,Surfaces Property Ground Surfaces Average Reflectance,hourly;
-	
+
   Output:Variable,Zn005:Wall003,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
 
   Output:Variable,Zn005:Wall003:Door001,Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area,hourly;
@@ -2647,7 +2647,7 @@
   Output:Variable,GndSurfs:Zn005:Wall003,Surfaces Property Ground Surfaces Average Temperature,hourly;
 
   Output:Variable,GndSurfs:Zn005:Wall003,Surfaces Property Ground Surfaces Average Reflectance,hourly;
-  
+
   Output:Meter,Electricity:Building,hourly;
 
   Output:Surfaces:Drawing,dxf,Triangulate3DFace;
