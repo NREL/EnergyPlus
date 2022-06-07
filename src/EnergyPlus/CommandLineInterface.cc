@@ -292,7 +292,7 @@ namespace CommandLineInterface {
             }
         }
 
-        state.dataStrGlobals->inputFilePathNameOnly = FileSystem::removeFileExtension(FileSystem::getFileName(state.dataStrGlobals->inputFilePath));
+        state.dataStrGlobals->inputFilePathNameOnly = FileSystem::getFileName(state.dataStrGlobals->inputFilePath);
         state.dataStrGlobals->inputDirPath = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFilePath);
 
         {
