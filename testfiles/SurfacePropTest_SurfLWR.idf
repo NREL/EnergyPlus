@@ -2303,7 +2303,7 @@
     ,                        !- External Shading Fraction Schedule Name
     SrdSurfs:Zn005:Wall002:Win001,  !- Surrounding Surfaces Object Name
     ,                        !- Outdoor Air Node Name
-	GndSurfs:Zn005:Wall002:Win001;  !- Ground Surfaces Object Name
+    GndSurfs:Zn005:Wall002:Win001;  !- Ground Surfaces Object Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn003:Roof001,    !- Name
