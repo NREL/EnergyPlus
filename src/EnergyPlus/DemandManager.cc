@@ -448,29 +448,27 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                     for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
 
                         // Validate DEMAND MANAGER Type
-                        {
-                            auto const SELECT_CASE_var(AlphArray(MgrNum * 2 + 5));
-                            if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") ||
-                                (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") ||
-                                (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
-                                DemandManagerList(ListNum).Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
+                        if ((AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:LIGHTS") || (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:EXTERIORLIGHTS") ||
+                            (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:ELECTRICEQUIPMENT") ||
+                            (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:THERMOSTATS") ||
+                            (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:VENTILATION")) {
 
-                                if (DemandManagerList(ListNum).Manager(MgrNum) == 0) {
-                                    ShowSevereError(state,
-                                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" + AlphArray(MgrNum * 2 + 6) +
-                                                        "\" not found.");
-                                    ErrorsFound = true;
-                                }
+                            DemandManagerList(ListNum).Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
 
-                            } else {
+                            if (DemandManagerList(ListNum).Manager(MgrNum) == 0) {
                                 ShowSevereError(state,
-                                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5) + "=\"" + AlphArray(MgrNum * 2 + 5) +
-                                                    "\".");
+                                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" + AlphArray(MgrNum * 2 + 6) +
+                                                    "\" not found.");
                                 ErrorsFound = true;
                             }
+
+                        } else {
+                            ShowSevereError(state,
+                                            CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
+                                                state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5) + "=\"" + AlphArray(MgrNum * 2 + 5) + "\".");
+                            ErrorsFound = true;
                         }
 
                         // Check that each is not already referenced using %DemandManagerList field
