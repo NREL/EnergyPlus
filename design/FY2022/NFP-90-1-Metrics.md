@@ -40,7 +40,7 @@ capacities less than 65,000 Btu/h
 
 ![grafik](https://user-images.githubusercontent.com/49325382/172479689-e6e9fc45-cad9-48e0-8967-fc868ec50113.png)
 
-*For two space system*
+*For two stage system*
 
 ![grafik](https://user-images.githubusercontent.com/49325382/172479815-28222eae-82fa-4173-851d-ca2e954ffea8.png)
 
