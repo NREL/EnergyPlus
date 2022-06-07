@@ -200,7 +200,7 @@ namespace HeatBalanceSurfaceManager {
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
     void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state);
-    
+
     void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state);
 
     void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum);
