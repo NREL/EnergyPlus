@@ -433,7 +433,7 @@ namespace AirflowNetwork {
         Array1D<AirflowNetwork::AirflowNetworkCompProp> AirflowNetworkCompData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
         Array1D<AirflowNetwork::MultizoneZoneProp> MultizoneZoneData;
-        Array1D<AirflowNetwork::MultizoneSurfaceProp> MultizoneSurfaceData;
+        EPVector<AirflowNetwork::MultizoneSurfaceProp> MultizoneSurfaceData;
         Array1D<AirflowNetwork::DetailedOpening> MultizoneCompDetOpeningData;
         Array1D<AirflowNetwork::SimpleOpening> MultizoneCompSimpleOpeningData;
         Array1D<AirflowNetwork::HorizontalOpening> MultizoneCompHorOpeningData;
@@ -441,7 +441,7 @@ namespace AirflowNetwork {
         Array1D<AirflowNetwork::EffectiveLeakageArea> MultizoneSurfaceELAData;
         Array1D<AirflowNetwork::SpecifiedMassFlow> SpecifiedMassFlowData;
         Array1D<AirflowNetwork::SpecifiedVolumeFlow> SpecifiedVolumeFlowData;
-        Array1D<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
+        EPVector<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
         Array1D<AirflowNetwork::DeltaCpProp> DeltaCp;
         Array1D<AirflowNetwork::DeltaCpProp> EPDeltaCP;
         Array1D<AirflowNetwork::ZoneExhaustFan> MultizoneCompExhaustFanData;
