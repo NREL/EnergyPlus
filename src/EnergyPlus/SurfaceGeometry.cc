@@ -2686,10 +2686,16 @@ namespace SurfaceGeometry {
         }
 
         // Reserve space to avoid excess allocations
+        state.dataSurface->AllHTSurfaceList.reserve(state.dataSurface->TotSurfaces);
         state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
         state.dataSurface->AllShadowPossObstrSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllIZSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllHTNonWindowSurfaceList.reserve(state.dataSurface->TotSurfaces - state.dataSurface->TotWindows);
+        state.dataSurface->AllHTWindowSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
+        state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
+        state.dataSurface->AllSurfaceListReportOrder.reserve(state.dataSurface->TotSurfaces);
 
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
