@@ -11491,7 +11491,8 @@ namespace UnitarySystems {
                                                         PartLoadRatio,
                                                         this->m_HeatingSpeedNum,
                                                         this->m_HeatingSpeedRatio);
-            this->m_HeatingCycRatio = PartLoadRatio;
+            //This doesn't look right when it was at higher speed
+            //this->m_HeatingCycRatio = PartLoadRatio;
         } break;
         case DataHVACGlobals::Coil_HeatingWater: {
             if (this->HeatCoilWaterFlowRatio == 0.0) {
@@ -14143,7 +14144,7 @@ namespace UnitarySystems {
         Real64 FullOutput = 0.0;      // Sensible capacity (outlet - inlet) when the compressor is on
         Real64 ReqOutput = 0.0;       // Sensible capacity (outlet - inlet) required to meet load or set point temperature
         Real64 QCoilActual = 0.0;     // Heating coil operating capacity [W]
-        std::vector<Real64> Par(9);   // Parameter array passed to solver
+        std::vector<Real64> Par(10);   // Parameter array passed to solver
         Real64 NoLoadTempOut = 0.0;   // save outlet temp when coil is off (C)
         bool HeatingActive = false;   // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
         bool CoolingActive = false;   // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
