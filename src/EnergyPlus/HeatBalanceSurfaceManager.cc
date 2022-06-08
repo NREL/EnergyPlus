@@ -439,6 +439,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     // There are no hourly initializations done in this portion of the surface heat balance
 
+    GetGroundSurfacesReflectanceAverage(state);
+
     // Need to be called each timestep in order to check if surface points to new construction (EMS) and if does then
     // complex fenestration needs to be initialized for additional states
     TimestepInitComplexFenestration(state);
@@ -2526,10 +2528,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
                       sunset; // Reset at (1) Beginning of simulation (2) sunset time, and SunIsUp but not solar time.
     state.dataEnvrn->PreviousSolRadPositive = currSolRadPositive;
 
-    if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime || currSolRadPositive) {
-        GetGroundSurfacesReflectanceAverage(state);
-    }
-
     if (currSolRadPositive || resetSolar) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) = 0.0;
@@ -2685,7 +2683,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataSurface->SurfWinSysSolAbsorptance(SurfNum) = 0.0;
         }
     }
-
     if (currSolRadPositive) { // Sun is up, calculate solar quantities
         assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs,
                                 state.dataSurface->SurfReflFacBmToDiffSolObs)); // For linear indexing
@@ -2698,10 +2695,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
             if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
                 GndReflSolarRad =
                     GndSolarRadInc * state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum)).SurfsReflAvg;
+                state.dataSurface->GndReflSolarRad(SurfNum) = GndReflSolarRad;
             } else {
                 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
             }
-            state.dataSurface->GndReflSolarRad(SurfNum) = GndReflSolarRad;
             state.dataSurface->SurfGndSolarInc(SurfNum) = GndReflSolarRad * Surface(SurfNum).ViewFactorGround;
             state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
             state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = 0.0;
@@ -2980,7 +2977,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-            Real64 GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum);
+            Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+            if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
+                GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum);
+            }
             // Add all reflected solar from the outside shelf to the ground solar
             // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
             state.dataSurface->SurfGndSolarInc(SurfNum) =
@@ -8950,6 +8950,10 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
     Real64 GndSurfViewFactor;
     Real64 GndSurfaceTempSum;
 
+    if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
+        return;
+    }
+
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) continue;
         auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum));
@@ -8986,6 +8990,9 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
     Real64 GndSurfRefl;
     Real64 GndSurfsReflSum;
 
+    if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
+        return;
+    }
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
         if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) continue;

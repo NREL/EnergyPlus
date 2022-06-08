@@ -8404,7 +8404,10 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         int PipeNum = state.dataSurface->SurfWinTDDPipeNum(SurfNum);
                         int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                         Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
-                        Real64 GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum2);
+                        Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+                        if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum2)) {
+                            GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum2);
+                        }
                         // Exterior diffuse solar incident on window (W/m2)
                         Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) +
                                              GndReflSolarRad * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
@@ -8446,7 +8449,10 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                              state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                             state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-                        Real64 GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum);
+                        Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+                        if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
+                            GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum);
+                        }
                         Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum) +
                                              GndReflSolarRad * state.dataSurface->Surface(SurfNum).ViewFactorGround +
                                              ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
@@ -9617,7 +9623,10 @@ void WindowShadingManager(EnergyPlusData &state)
                 BeamSolarOnWindow = state.dataEnvrn->BeamSolarRad *
                                     state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, ISurf) *
                                     state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, ISurf);
-                Real64 GndReflSolarRad = state.dataSurface->GndReflSolarRad(ISurf);
+                Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+                if (state.dataSurface->UseSurfPropertyGndSurfRefl(ISurf)) {
+                    GndReflSolarRad = state.dataSurface->GndReflSolarRad(ISurf);
+                }
                 SolarOnWindow = BeamSolarOnWindow + SkySolarOnWindow + GndReflSolarRad * state.dataSurface->Surface(ISurf).ViewFactorGround;
                 HorizSolar = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad;
             }
