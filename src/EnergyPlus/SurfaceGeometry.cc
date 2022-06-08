@@ -12055,11 +12055,25 @@ namespace SurfaceGeometry {
                     default:
                         assert(false);
                     }
-                    for (auto edge : listOfedgeNotUsedTwice) {
-                        ShowContinueError(
-                            state,
-                            "  The surface    \"" + state.dataSurface->Surface(edge.surfNum).Name +
-                                "\" has an edge that is either not an edge on another surface or is an edge on three or more surfaces: ");
+                    for (auto &edge : listOfedgeNotUsedTwice) {
+                        if (edge.count < 2) {
+                            ShowContinueError(
+                                state,
+                                fmt::format("  The surface \"{}\" has an edge that was used only once: it is not an edge on another surface",
+                                            state.dataSurface->Surface(edge.surfNum).Name));
+
+                        } else {
+                            ShowContinueError(
+                                state,
+                                fmt::format("  The surface \"{}\" has an edge that was used {} times: it is an edge on three or more surfaces: ",
+                                            state.dataSurface->Surface(edge.surfNum).Name,
+                                            edge.count));
+                            std::string surfaceNames = "    It was found on the following Surfaces: ";
+                            for (int surfNum : edge.otherSurfNums) {
+                                surfaceNames += fmt::format("'{}' ", state.dataSurface->Surface(surfNum).Name);
+                            }
+                            ShowContinueError(state, surfaceNames);
+                        }
                         ShowContinueError(state, format("    Vertex start {{ {:.4R}, {:.4R}, {:.4R}}}", edge.start.x, edge.start.y, edge.start.z));
                         ShowContinueError(state, format("    Vertex end   {{ {:.4R}, {:.4R}, {:.4R}}}", edge.end.x, edge.end.y, edge.end.z));
                     }
@@ -12182,13 +12196,11 @@ namespace SurfaceGeometry {
     {
         // J. Glazer - March 2017
 
-        std::vector<Vector> uniqueVertices;
-        makeListOfUniqueVertices(zonePoly, uniqueVertices);
+        std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
         std::vector<EdgeOfSurf> edgeNot2orig = edgesNotTwoForEnclosedVolumeTest(zonePoly, uniqueVertices);
-
         // if all edges had two counts then it is fully enclosed
-        if (edgeNot2orig.size() == size_t(0)) {
+        if (edgeNot2orig.empty()) {
             edgeNot2 = edgeNot2orig;
             return true;
         } else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not
@@ -12197,7 +12209,7 @@ namespace SurfaceGeometry {
             DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints(
                 zonePoly, uniqueVertices); // this is done after initial test since it is computationally intensive.
             std::vector<EdgeOfSurf> edgeNot2again = edgesNotTwoForEnclosedVolumeTest(updatedZonePoly, uniqueVertices);
-            if (edgeNot2again.size() == size_t(0)) {
+            if (edgeNot2again.empty()) {
                 return true;
             } else {
                 edgeNot2 = edgesInBoth(edgeNot2orig,
@@ -12216,8 +12228,8 @@ namespace SurfaceGeometry {
         // this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20.
 
         std::vector<EdgeOfSurf> inBoth;
-        for (auto e1 : edges1) {
-            for (auto e2 : edges2) {
+        for (const auto &e1 : edges1) {
+            for (const auto &e2 : edges2) {
                 if (edgesEqualOnSameSurface(e1, e2)) {
                     inBoth.push_back(e1);
                     break;
@@ -12230,17 +12242,12 @@ namespace SurfaceGeometry {
     // returns true if the edges match - including the surface number
     bool edgesEqualOnSameSurface(EdgeOfSurf a, EdgeOfSurf b)
     {
-        if (a.surfNum == b.surfNum) {
-            if (a.start == b.start && a.end == b.end) { // vertex comparison
-                return true;
-            } else if (a.start == b.end && a.end == b.start) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+        if (a.surfNum != b.surfNum) {
             return false;
         }
+
+        // vertex comparison (we compare indices, so absolute equal)
+        return ((a.start == b.start && a.end == b.end) || (a.start == b.end && a.end == b.start));
     }
 
     // returns the number of times the edges of the polyhedron of the zone are not used twice by the sides
@@ -12256,6 +12263,7 @@ namespace SurfaceGeometry {
             int end;
             int count;
             int firstSurfNum;
+            std::vector<int> otherSurfNums;
             EdgeByPts() : start(0), end(0), count(0), firstSurfNum(0)
             {
             }
@@ -12278,16 +12286,12 @@ namespace SurfaceGeometry {
                     prevVertexIndex = curVertexIndex;
                 }
                 curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
-                curVertexIndex = findIndexOfVertex(curVertex, uniqueVertices);
-                int found = -1;
-                for (std::size_t i = 0; i < uniqueEdges.size(); i++) {
-                    if ((uniqueEdges[i].start == curVertexIndex && uniqueEdges[i].end == prevVertexIndex) ||
-                        (uniqueEdges[i].start == prevVertexIndex && uniqueEdges[i].end == curVertexIndex)) {
-                        found = i;
-                        break;
-                    }
-                }
-                if (found == -1) {
+                curVertexIndex = findIndexOfVertex(curVertex, uniqueVertices); // uses isAlmostEqual3dPt
+                auto it = std::find_if(uniqueEdges.begin(), uniqueEdges.end(), [&curVertexIndex, &prevVertexIndex](const auto &edge) {
+                    return ((edge.start == curVertexIndex && edge.end == prevVertexIndex) ||
+                            (edge.start == prevVertexIndex && edge.end == curVertexIndex));
+                });
+                if (it == uniqueEdges.end()) {
                     EdgeByPts curEdge;
                     curEdge.start = prevVertexIndex;
                     curEdge.end = curVertexIndex;
@@ -12295,19 +12299,22 @@ namespace SurfaceGeometry {
                     curEdge.firstSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
                     uniqueEdges.emplace_back(curEdge);
                 } else {
-                    ++uniqueEdges[found].count;
+                    ++(it->count);
+                    it->otherSurfNums.push_back(zonePoly.SurfaceFace(iFace).SurfNum);
                 }
             }
         }
         // All edges for an enclosed polyhedron should be shared by two (and only two) sides.
         // So if the count is not two for all edges, the polyhedron is not enclosed
         std::vector<EdgeOfSurf> edgesNotTwoCount;
-        for (auto anEdge : uniqueEdges) {
+        for (const auto &anEdge : uniqueEdges) {
             if (anEdge.count != 2) {
                 EdgeOfSurf curEdgeOne;
                 curEdgeOne.surfNum = anEdge.firstSurfNum;
                 curEdgeOne.start = uniqueVertices[anEdge.start];
                 curEdgeOne.end = uniqueVertices[anEdge.end];
+                curEdgeOne.count = anEdge.count;
+                curEdgeOne.otherSurfNums = anEdge.otherSurfNums;
                 edgesNotTwoCount.push_back(curEdgeOne);
             }
         }
@@ -12315,12 +12322,12 @@ namespace SurfaceGeometry {
     }
 
     // create a list of unique vertices given the polyhedron describing the zone
-    void makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> &uniqVertices)
+    std::vector<Vector> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly)
     {
         // J. Glazer - March 2017
 
         using DataVectorTypes::Vector;
-        uniqVertices.clear();
+        std::vector<Vector> uniqVertices;
         uniqVertices.reserve(zonePoly.NumSurfaceFaces * 6);
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
@@ -12330,7 +12337,7 @@ namespace SurfaceGeometry {
                     uniqVertices.emplace_back(curVertex);
                 } else {
                     bool found = false;
-                    for (auto unqV : uniqVertices) {
+                    for (const auto &unqV : uniqVertices) {
                         if (isAlmostEqual3dPt(curVertex, unqV)) {
                             found = true;
                             break;
@@ -12342,6 +12349,7 @@ namespace SurfaceGeometry {
                 }
             }
         }
+        return uniqVertices;
     }
 
     // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing
@@ -12355,66 +12363,40 @@ namespace SurfaceGeometry {
 
         DataVectorTypes::Polyhedron updZonePoly = zonePoly; // set the return value to the original polyhedron describing the zone
 
-        for (int iFace = 1; iFace <= updZonePoly.NumSurfaceFaces; ++iFace) {
-            bool faceUpdated = false;
-            DataVectorTypes::Face updFace = updZonePoly.SurfaceFace(iFace);
-            for (int iterationLimiter = 0; iterationLimiter < 20;
-                 ++iterationLimiter) { // could probably be while loop but want to make sure it does not get stuck
-                bool insertedVertext = false;
-                for (int curVertexIndex = updFace.NSides; curVertexIndex >= 1; --curVertexIndex) { // go through array from end
-                    Vector curVertex = updFace.FacePoints(curVertexIndex);
-                    Vector nextVertex;
-                    int nextVertexIndex;
-                    if (curVertexIndex == updFace.NSides) {
-                        nextVertexIndex = 1;
-                    } else {
-                        nextVertexIndex = curVertexIndex + 1;
+        for (auto &updFace : updZonePoly.SurfaceFace) {
+            bool insertedVertext = true;
+            while (insertedVertext) {
+                insertedVertext = false;
+                auto &vertices = updFace.FacePoints;
+                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+
+                    auto itnext = std::next(it);
+                    if (itnext == std::end(vertices)) {
+                        itnext = std::begin(vertices);
                     }
-                    nextVertex = updFace.FacePoints(nextVertexIndex);
+
+                    auto curVertex = *it;
+                    auto nextVertex = *itnext;
+
                     // now go through all the vertices and see if they are colinear with start and end vertices
-                    bool found = false;
-                    Vector foundIntermediateVertex;
-                    for (auto testVertex : uniqVertices) {
+                    for (const auto &testVertex : uniqVertices) {
                         if (!isAlmostEqual3dPt(curVertex, testVertex) && !isAlmostEqual3dPt(nextVertex, testVertex)) {
                             if (isPointOnLineBetweenPoints(curVertex, nextVertex, testVertex)) {
-                                foundIntermediateVertex = testVertex;
-                                found = true;
+                                vertices.insert(itnext, testVertex);
+                                ++updFace.NSides;
+                                insertedVertext = true;
+                                break;
                             }
                         }
                     }
-                    if (found) {
-                        insertVertexOnFace(updFace, nextVertexIndex, foundIntermediateVertex);
-                        faceUpdated = true;
-                        insertedVertext = true;
+                    // Break out of the loop on vertices of the surface too, and start again at the while
+                    if (insertedVertext) {
                         break;
                     }
                 }
-                if (!insertedVertext) break;
-            }
-            if (faceUpdated) {
-                updZonePoly.SurfaceFace(iFace) = updFace;
             }
         }
         return updZonePoly;
-    }
-
-    // inserts a vertex in the polygon describing the face (wall) of polyhedron (zone)
-    void insertVertexOnFace(DataVectorTypes::Face &face,
-                            int const indexAt, // index of where to insert new vertex - remaining vertices are moved later
-                            DataVectorTypes::Vector const &vertexToInsert)
-    {
-        // J. Glazer - March 2017
-
-        if (indexAt >= 1 && indexAt <= face.NSides) {
-            int origNumSides = face.NSides;
-            DataVectorTypes::Vector emptyVector(0., 0., 0.);
-            face.FacePoints.append(emptyVector); // just to add new item to the end of array
-            for (int i = origNumSides + 1; i > indexAt; --i) {
-                face.FacePoints(i) = face.FacePoints(i - 1); // move existing items one location further
-            }
-            face.FacePoints(indexAt) = vertexToInsert;
-            ++face.NSides;
-        }
     }
 
     // test if the ceiling and floor are the same except for their height difference by looking at the corners
@@ -12697,13 +12679,30 @@ namespace SurfaceGeometry {
         return sqrt(pow(v1.x - v2.x, 2) + pow(v1.y - v2.y, 2) + pow(v1.z - v2.z, 2));
     }
 
+    Real64 distanceFromPointToLine(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test)
+    {
+        // np.linalg.norm(np.cross(e-s,p-s)/np.linalg.norm(e-s))
+        DataVectorTypes::Vector t = end - start;
+        t.normalize(); // Unit vector of start to end
+
+        DataVectorTypes::Vector other = test - start;
+
+        DataVectorTypes::Vector projection = DataVectorTypes::cross(t, other); // normal unit vector, that's the distance component
+        return projection.length();
+    }
+
     // tests if a point in space lies on the line segment defined by two other points
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test)
     {
         // J. Glazer - March 2017
-
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        // The tolerance has to be low enough. Take for eg a plenum that has an edge that's 30meters long, you risk adding point from the floor to
+        // the roof, cf #7383
+        // compute the shortest distance from the point to the line first to avoid false positive
+        Real64 tol = 0.0127;
+        if (distanceFromPointToLine(start, end, test) < tol) { // distanceFromPointToLine always positive, it's calculated as norml_L2
+            return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        }
+        return false;
     }
 
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound)
