@@ -99,7 +99,6 @@ TEST_F(EnergyPlusFixture, BaseSizer_selectSizerOutput)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneSizingInput.allocate(state->dataSize->CurZoneEqNum);
     state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
-   
 
     // Test #1
     // Autosized value may be less than 0
@@ -116,7 +115,6 @@ TEST_F(EnergyPlusFixture, BaseSizer_selectSizerOutput)
 
     EXPECT_EQ(-1.0, autoSizedValue);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, thisSizer.errorType));
-
 }
 
 TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
