@@ -132,9 +132,8 @@ namespace HeatRecovery {
         Real64 SecInEnth;     // secondary air inlet enthalpy (J/kg)
         Real64 SecInMassFlow; // secondary air inlet mass flow rate (kg/s)
         // balanced desiccant inputs
-        int PerfDataIndex;          // Performance data index allocating performance data number to heat exchanger
-        Real64 FaceArea;            // face area of balanced desiccant heat exchangers to determine face velocity [m2]
-        bool UnbalancedWarningFlag; // Used to print one-time warning when unbalanced flow exists (then set to FALSE)
+        int PerfDataIndex; // Performance data index allocating performance data number to heat exchanger
+        Real64 FaceArea;   // face area of balanced desiccant heat exchangers to determine face velocity [m2]
         // generic hx performance inputs
         Real64 HeatEffectSensible100; // heating sensible effectiveness at 100% rated air flow
         Real64 HeatEffectSensible75;  // heating sensible effectiveness at 75% rated air flow
@@ -144,7 +143,6 @@ namespace HeatRecovery {
         Real64 CoolEffectSensible75;  // cooling sensible effectiveness at 75% rated air flow
         Real64 CoolEffectLatent100;   // cooling latent effectiveness at 100% rated air flow
         Real64 CoolEffectLatent75;    // cooling latent effectiveness at 75% rated air flow
-        int HeatExchEconoMode;        // generic heat exchanger economize mode option
         // 1 = None, 2 = Bypass, 3 = Stop Rotary HX Rotation
         HXConfigurationType ExchConfig; // parameter equivalent of HX configuration, plate or rotary
         // frost control parameters
@@ -197,18 +195,29 @@ namespace HeatRecovery {
               hARatio(0.0), NomSupAirVolFlow(0.0), NomSupAirInTemp(0.0), NomSupAirOutTemp(0.0), NomSecAirVolFlow(0.0), NomSecAirInTemp(0.0),
               NomElecPower(0.0), UA0(0.0), mTSup0(0.0), mTSec0(0.0), NomSupAirMassFlow(0.0), NomSecAirMassFlow(0.0), SupInletNode(0),
               SupOutletNode(0), SecInletNode(0), SecOutletNode(0), SupInTemp(0.0), SupInHumRat(0.0), SupInEnth(0.0), SupInMassFlow(0.0),
-              SecInTemp(0.0), SecInHumRat(0.0), SecInEnth(0.0), SecInMassFlow(0.0), PerfDataIndex(0), FaceArea(0.0), UnbalancedWarningFlag(true),
-              HeatEffectSensible100(0.0), HeatEffectSensible75(0.0), HeatEffectLatent100(0.0), HeatEffectLatent75(0.0), CoolEffectSensible100(0.0),
-              CoolEffectSensible75(0.0), CoolEffectLatent100(0.0), CoolEffectLatent75(0.0), HeatExchEconoMode(0),
-              ExchConfig(HXConfigurationType::Invalid), ThresholdTemperature(0.0), InitialDefrostTime(0.0), RateofDefrostTimeIncrease(0.0),
-              DefrostFraction(0.0), ControlToTemperatureSetPoint(false), SupOutTemp(0.0), SupOutHumRat(0.0), SupOutEnth(0.0), SupOutMassFlow(0.0),
-              SecOutTemp(0.0), SecOutHumRat(0.0), SecOutEnth(0.0), SecOutMassFlow(0.0), SensHeatingRate(0.0), SensHeatingEnergy(0.0),
-              LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0),
-              LatCoolingRate(0.0), LatCoolingEnergy(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0),
-              SensEffectiveness(0.0), LatEffectiveness(0.0), SupBypassMassFlow(0.0), SecBypassMassFlow(0.0), LowFlowErrCount(0), LowFlowErrIndex(0),
-              UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true), SensEffectivenessFlag(false), LatEffectivenessFlag(false)
+              SecInTemp(0.0), SecInHumRat(0.0), SecInEnth(0.0), SecInMassFlow(0.0), PerfDataIndex(0), FaceArea(0.0), HeatEffectSensible100(0.0),
+              HeatEffectSensible75(0.0), HeatEffectLatent100(0.0), HeatEffectLatent75(0.0), CoolEffectSensible100(0.0), CoolEffectSensible75(0.0),
+              CoolEffectLatent100(0.0), CoolEffectLatent75(0.0), ExchConfig(HXConfigurationType::Invalid), ThresholdTemperature(0.0),
+              InitialDefrostTime(0.0), RateofDefrostTimeIncrease(0.0), DefrostFraction(0.0), ControlToTemperatureSetPoint(false), SupOutTemp(0.0),
+              SupOutHumRat(0.0), SupOutEnth(0.0), SupOutMassFlow(0.0), SecOutTemp(0.0), SecOutHumRat(0.0), SecOutEnth(0.0), SecOutMassFlow(0.0),
+              SensHeatingRate(0.0), SensHeatingEnergy(0.0), LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0),
+              SensCoolingRate(0.0), SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0),
+              ElecUseEnergy(0.0), ElecUseRate(0.0), SensEffectiveness(0.0), LatEffectiveness(0.0), SupBypassMassFlow(0.0), SecBypassMassFlow(0.0),
+              LowFlowErrCount(0), LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true), SensEffectivenessFlag(false),
+              LatEffectivenessFlag(false)
         {
         }
+    };
+
+    struct Stuff
+    {
+        bool print = false;  // - flag to print regen in RH error message for temp eq
+        int index = 0;       // - index to recurring error struc for regen outlet hum rat
+        int count = 0;       // - counter if regen outlet temp limits are exceeded
+        std::string buffer1; // - buffer for RegenOutHumRat warn mess on following timestep
+        std::string buffer2; // - buffer for RegenOutHumRat warn mess on following timestep
+        std::string buffer3; // - buffer for RegenOutHumRat warn mess on following timestep
+        Real64 last = 0.0;   // - last value of regen outlet humidity ratio
     };
 
     struct BalancedDesDehumPerfData
@@ -272,13 +281,7 @@ namespace HeatRecovery {
         Real64 H_MaxProcAirInRelHum;  // max allowable process inlet air relative humidity [%]
         // for model bound checking
         // regen inlet relative humidity for temperature equation
-        bool PrintRegenInRelHumTempMess;      // - flag to print regen in RH error message for temp eq
-        int RegenInRelHumTempErrIndex;        // - index to recurring error struc for regen outlet hum rat
-        int RegenInRelHumTempErrorCount;      // - counter if regen outlet temp limits are exceeded
-        std::string RegenInRelHumTempBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string RegenInRelHumTempBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string RegenInRelHumTempBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
-        Real64 RegenInRelHumTempLast;         // - last value of regen outlet humidity ratio
+        Stuff regenInRelHumTempErr; // - index to recurring error struc for regen outlet hum rat
         // process inlet relative humidity for temperature equation
         bool PrintProcInRelHumTempMess;      // - flag to print regen in RH error message for temp eq
         int ProcInRelHumTempErrIndex;        // - index to recurring error struc for regen outlet hum rat
@@ -318,7 +321,6 @@ namespace HeatRecovery {
         bool PrintH_ProcInHumRatMessage;  // - flag for process hum rat error message for hum rat eq
         bool PrintH_FaceVelMessage;       // - flag for face velocity error message
         bool PrintRegenOutHumRatMessage;  // - flag for regen outlet hum rat error message
-        bool PrintRegenInHumRatMessage;   // - flag for regen outlet hum rat error message
         // used when regen outlet humrat is below regen inlet humrat, verify coefficients warning issued
         bool PrintRegenOutHumRatFailedMess;      // - flag for regen outlet hum rat error message
         int RegenOutHumRatFailedErrIndex;        // - index to recurring error struc for regen outlet hum rat
@@ -364,7 +366,6 @@ namespace HeatRecovery {
         int H_RegenInTempErrIndex;     // - index to recurring error structure for regen inlet temp
         int H_RegenInHumRatErrIndex;   // - index to recurring error struc for regen inlet humrat
         int H_ProcInTempErrIndex;      // - index to recurring error struc for process inlet temp
-        int H_ProcInHumRatErrIndex;    // - index to recurring error struc for process inlet hum rat
         int H_FaceVelocityErrIndex;    // - index to recurring err struc for proc and regen face vel
         int RegenOutHumRatErrorCount;  // - counter if regen outlet temp limits are exceeded
         int RegenOutHumRatErrIndex;    // - index to recurring error struc for regen outlet hum rat
@@ -442,14 +443,13 @@ namespace HeatRecovery {
               H_MinRegenAirInTemp(0.0), H_MaxRegenAirInTemp(0.0), H_MinRegenAirInHumRat(0.0), H_MaxRegenAirInHumRat(0.0), H_MinProcAirInTemp(0.0),
               H_MaxProcAirInTemp(0.0), H_MinProcAirInHumRat(0.0), H_MaxProcAirInHumRat(0.0), H_MinFaceVel(0.0), H_MaxFaceVel(0.0),
               MinRegenAirOutHumRat(0.0), MaxRegenAirOutHumRat(0.0), H_MinRegenAirInRelHum(0.0), H_MaxRegenAirInRelHum(0.0), H_MinProcAirInRelHum(0.0),
-              H_MaxProcAirInRelHum(0.0), PrintRegenInRelHumTempMess(false), RegenInRelHumTempErrIndex(0), RegenInRelHumTempErrorCount(0),
-              RegenInRelHumTempLast(0.0), PrintProcInRelHumTempMess(false), ProcInRelHumTempErrIndex(0), ProcInRelHumTempErrorCount(0),
+              H_MaxProcAirInRelHum(0.0), PrintProcInRelHumTempMess(false), ProcInRelHumTempErrIndex(0), ProcInRelHumTempErrorCount(0),
               ProcInRelHumTempLast(0.0), PrintRegenInRelHumHumRatMess(false), RegenInRelHumHumRatErrIndex(0), RegenInRelHumHumRatErrorCount(0),
               RegenInRelHumHumRatLast(0.0), PrintProcInRelHumHumRatMess(false), ProcInRelHumHumRatErrIndex(0), ProcInRelHumHumRatErrorCount(0),
               ProcInRelHumHumRatLast(0.0), PrintT_RegenInTempMessage(false), PrintT_RegenInHumRatMessage(false), PrintT_ProcInTempMessage(false),
               PrintT_ProcInHumRatMessage(false), PrintT_FaceVelMessage(false), PrintRegenOutTempMessage(false), PrintRegenOutTempFailedMessage(false),
               PrintH_RegenInTempMessage(false), PrintH_RegenInHumRatMessage(false), PrintH_ProcInTempMessage(false),
-              PrintH_ProcInHumRatMessage(false), PrintH_FaceVelMessage(false), PrintRegenOutHumRatMessage(false), PrintRegenInHumRatMessage(false),
+              PrintH_ProcInHumRatMessage(false), PrintH_FaceVelMessage(false), PrintRegenOutHumRatMessage(false),
               PrintRegenOutHumRatFailedMess(false), RegenOutHumRatFailedErrIndex(0), RegenOutHumRatFailedErrorCount(0), RegenOutHumRatFailedLast(0.0),
               PrintImbalancedMassFlowMess(false), ImbalancedFlowErrIndex(0), ImbalancedMassFlowErrorCount(0), ABSImbalancedFlow(0.0),
               T_RegenInTempErrorCount(0), T_RegenInHumRatErrorCount(0), T_ProcInTempErrorCount(0), T_ProcInHumRatErrorCount(0),
@@ -457,10 +457,10 @@ namespace HeatRecovery {
               T_FaceVelocityErrIndex(0), RegenOutTempErrorCount(0), RegenOutTempErrIndex(0), RegenOutTempFailedErrorCount(0),
               RegenOutTempFailedErrIndex(0), RegenOutTempFailedLast(0.0), H_RegenInTempErrorCount(0), H_RegenInHumRatErrorCount(0),
               H_ProcInTempErrorCount(0), H_ProcInHumRatErrorCount(0), H_FaceVelErrorCount(0), H_RegenInTempErrIndex(0), H_RegenInHumRatErrIndex(0),
-              H_ProcInTempErrIndex(0), H_ProcInHumRatErrIndex(0), H_FaceVelocityErrIndex(0), RegenOutHumRatErrorCount(0), RegenOutHumRatErrIndex(0),
-              RegenInHumRatErrorCount(0), RegenInHumRatErrIndex(0), T_RegenInTempLast(0.0), T_RegenInHumRatLast(0.0), T_ProcInTempLast(0.0),
-              T_ProcInHumRatLast(0.0), T_FaceVelLast(0.0), RegenOutTempLast(0.0), H_RegenInTempLast(0.0), H_RegenInHumRatLast(0.0),
-              H_ProcInTempLast(0.0), H_ProcInHumRatLast(0.0), H_FaceVelLast(0.0), RegenOutHumRatLast(0.0)
+              H_ProcInTempErrIndex(0), H_FaceVelocityErrIndex(0), RegenOutHumRatErrorCount(0), RegenOutHumRatErrIndex(0), RegenInHumRatErrorCount(0),
+              RegenInHumRatErrIndex(0), T_RegenInTempLast(0.0), T_RegenInHumRatLast(0.0), T_ProcInTempLast(0.0), T_ProcInHumRatLast(0.0),
+              T_FaceVelLast(0.0), RegenOutTempLast(0.0), H_RegenInTempLast(0.0), H_RegenInHumRatLast(0.0), H_ProcInTempLast(0.0),
+              H_ProcInHumRatLast(0.0), H_FaceVelLast(0.0), RegenOutHumRatLast(0.0)
         {
         }
     };
