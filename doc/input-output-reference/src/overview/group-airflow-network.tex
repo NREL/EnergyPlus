@@ -339,7 +339,11 @@ This is an optional field. The allowed choices are None, MaximumVelocity, Pressu
 
 None: No duct sizing is performed.
 
-MaximumVelocity: The duct diameter is calculated based on entered velocity as D_h = sqrt(4Q/(V*pi))
+MaximumVelocity: The duct diameter is calculated based on entered velocity as
+
+\begin{equation}
+D = \sqrt{\frac{4Q}{V \pi } } 
+\end{equation}
 
 where Q = volumetric flow rate {m3}
 
