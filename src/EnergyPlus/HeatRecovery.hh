@@ -211,13 +211,13 @@ namespace HeatRecovery {
 
     struct Stuff
     {
-        bool print = false;  // - flag to print regen in RH error message for temp eq
-        int index = 0;       // - index to recurring error struc for regen outlet hum rat
-        int count = 0;       // - counter if regen outlet temp limits are exceeded
-        std::string buffer1; // - buffer for RegenOutHumRat warn mess on following timestep
-        std::string buffer2; // - buffer for RegenOutHumRat warn mess on following timestep
-        std::string buffer3; // - buffer for RegenOutHumRat warn mess on following timestep
-        Real64 last = 0.0;   // - last value of regen outlet humidity ratio
+        bool print = false;  // - flag to print error message
+        int index = 0;       // - index to recurring error struct
+        int count = 0;       // - counter if limits are exceeded
+        std::string buffer1; // - buffer for warn mess on following timestep
+        std::string buffer2; // - buffer for warn mess on following timestep
+        std::string buffer3; // - buffer for warn mess on following timestep
+        Real64 last = 0.0;   // - last value
     };
 
     struct BalancedDesDehumPerfData
@@ -281,31 +281,13 @@ namespace HeatRecovery {
         Real64 H_MaxProcAirInRelHum;  // max allowable process inlet air relative humidity [%]
         // for model bound checking
         // regen inlet relative humidity for temperature equation
-        Stuff regenInRelHumTempErr; // - index to recurring error struc for regen outlet hum rat
+        Stuff regenInRelHumTempErr;
         // process inlet relative humidity for temperature equation
-        bool PrintProcInRelHumTempMess;      // - flag to print regen in RH error message for temp eq
-        int ProcInRelHumTempErrIndex;        // - index to recurring error struc for regen outlet hum rat
-        int ProcInRelHumTempErrorCount;      // - counter if regen outlet temp limits are exceeded
-        std::string ProcInRelHumTempBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string ProcInRelHumTempBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string ProcInRelHumTempBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
-        Real64 ProcInRelHumTempLast;         // - last value of regen outlet humidity ratio
+        Stuff procInRelHumTempErr;
         // regen inlet relative humidity for humidity ratio equation
-        bool PrintRegenInRelHumHumRatMess;      // - flag to print regen in RH error message for temp eq
-        int RegenInRelHumHumRatErrIndex;        // - index to recurring error struc for regen outlet hum rat
-        int RegenInRelHumHumRatErrorCount;      // - counter if regen outlet temp limits are exceeded
-        std::string RegenInRelHumHumRatBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string RegenInRelHumHumRatBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string RegenInRelHumHumRatBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
-        Real64 RegenInRelHumHumRatLast;         // - last value of regen outlet humidity ratio
+        Stuff regenInRelHumHumRatErr;
         // process inlet relative humidity for humidity ratio equation
-        bool PrintProcInRelHumHumRatMess;      // - flag to print regen in RH error message for temp eq
-        int ProcInRelHumHumRatErrIndex;        // - index to recurring error struc for regen outlet hum rat
-        int ProcInRelHumHumRatErrorCount;      // - counter if regen outlet temp limits are exceeded
-        std::string ProcInRelHumHumRatBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string ProcInRelHumHumRatBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string ProcInRelHumHumRatBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
-        Real64 ProcInRelHumHumRatLast;         // - last value of regen outlet humidity ratio
+        Stuff procInRelHumHumRatErr;
         // regen outlet temp variables
         bool PrintT_RegenInTempMessage;      // - flag to print regen in temp error message for temp eq
         bool PrintT_RegenInHumRatMessage;    // - flag to print regen in humrat err message for temp eq
@@ -322,21 +304,9 @@ namespace HeatRecovery {
         bool PrintH_FaceVelMessage;       // - flag for face velocity error message
         bool PrintRegenOutHumRatMessage;  // - flag for regen outlet hum rat error message
         // used when regen outlet humrat is below regen inlet humrat, verify coefficients warning issued
-        bool PrintRegenOutHumRatFailedMess;      // - flag for regen outlet hum rat error message
-        int RegenOutHumRatFailedErrIndex;        // - index to recurring error struc for regen outlet hum rat
-        int RegenOutHumRatFailedErrorCount;      // - counter if regen outlet temp limits are exceeded
-        std::string RegenOutHumRatFailedBuffer1; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string RegenOutHumRatFailedBuffer2; // - buffer for RegenOutHumRat warn mess on following timstep
-        std::string RegenOutHumRatFailedBuffer3; // - buffer for RegenOutHumRat warn mess on following timstep
-        Real64 RegenOutHumRatFailedLast;         // - last value of regen outlet humidity ratio
+        Stuff regenOutHumRatFailedErr;
         // used when regen and process mass flow rates are not equal to within 2%
-        bool PrintImbalancedMassFlowMess;      // - flag for imbalanced regen and process mass flow rate
-        int ImbalancedFlowErrIndex;            // - index to recurring error struc for imbalanced flow
-        int ImbalancedMassFlowErrorCount;      // - counter for imbalanced regen and process mass flow rate
-        std::string ImbalancedMassFlowBuffer1; // - buffer for imbalanced regen and process mass flow rate
-        std::string ImbalancedMassFlowBuffer2; // - buffer for imbalanced regen and process mass flow rate
-        std::string ImbalancedMassFlowBuffer3; // - buffer for imbalanced regen and process mass flow rate
-        Real64 ABSImbalancedFlow;              // - last value of heat exchanger mass flow rate imbalance
+        Stuff imbalancedFlowErr;
         // regen outlet temp eqn
         int T_RegenInTempErrorCount;   // - counter if regen inlet temp limits are exceeded
         int T_RegenInHumRatErrorCount; // - counter if regen inlet hum rat limits are exceeded
@@ -443,24 +413,19 @@ namespace HeatRecovery {
               H_MinRegenAirInTemp(0.0), H_MaxRegenAirInTemp(0.0), H_MinRegenAirInHumRat(0.0), H_MaxRegenAirInHumRat(0.0), H_MinProcAirInTemp(0.0),
               H_MaxProcAirInTemp(0.0), H_MinProcAirInHumRat(0.0), H_MaxProcAirInHumRat(0.0), H_MinFaceVel(0.0), H_MaxFaceVel(0.0),
               MinRegenAirOutHumRat(0.0), MaxRegenAirOutHumRat(0.0), H_MinRegenAirInRelHum(0.0), H_MaxRegenAirInRelHum(0.0), H_MinProcAirInRelHum(0.0),
-              H_MaxProcAirInRelHum(0.0), PrintProcInRelHumTempMess(false), ProcInRelHumTempErrIndex(0), ProcInRelHumTempErrorCount(0),
-              ProcInRelHumTempLast(0.0), PrintRegenInRelHumHumRatMess(false), RegenInRelHumHumRatErrIndex(0), RegenInRelHumHumRatErrorCount(0),
-              RegenInRelHumHumRatLast(0.0), PrintProcInRelHumHumRatMess(false), ProcInRelHumHumRatErrIndex(0), ProcInRelHumHumRatErrorCount(0),
-              ProcInRelHumHumRatLast(0.0), PrintT_RegenInTempMessage(false), PrintT_RegenInHumRatMessage(false), PrintT_ProcInTempMessage(false),
+              H_MaxProcAirInRelHum(0.0), PrintT_RegenInTempMessage(false), PrintT_RegenInHumRatMessage(false), PrintT_ProcInTempMessage(false),
               PrintT_ProcInHumRatMessage(false), PrintT_FaceVelMessage(false), PrintRegenOutTempMessage(false), PrintRegenOutTempFailedMessage(false),
               PrintH_RegenInTempMessage(false), PrintH_RegenInHumRatMessage(false), PrintH_ProcInTempMessage(false),
-              PrintH_ProcInHumRatMessage(false), PrintH_FaceVelMessage(false), PrintRegenOutHumRatMessage(false),
-              PrintRegenOutHumRatFailedMess(false), RegenOutHumRatFailedErrIndex(0), RegenOutHumRatFailedErrorCount(0), RegenOutHumRatFailedLast(0.0),
-              PrintImbalancedMassFlowMess(false), ImbalancedFlowErrIndex(0), ImbalancedMassFlowErrorCount(0), ABSImbalancedFlow(0.0),
-              T_RegenInTempErrorCount(0), T_RegenInHumRatErrorCount(0), T_ProcInTempErrorCount(0), T_ProcInHumRatErrorCount(0),
-              T_FaceVelErrorCount(0), T_RegenInTempErrIndex(0), T_RegenInHumRatErrIndex(0), T_ProcInTempErrIndex(0), T_ProcInHumRatErrIndex(0),
-              T_FaceVelocityErrIndex(0), RegenOutTempErrorCount(0), RegenOutTempErrIndex(0), RegenOutTempFailedErrorCount(0),
-              RegenOutTempFailedErrIndex(0), RegenOutTempFailedLast(0.0), H_RegenInTempErrorCount(0), H_RegenInHumRatErrorCount(0),
-              H_ProcInTempErrorCount(0), H_ProcInHumRatErrorCount(0), H_FaceVelErrorCount(0), H_RegenInTempErrIndex(0), H_RegenInHumRatErrIndex(0),
-              H_ProcInTempErrIndex(0), H_FaceVelocityErrIndex(0), RegenOutHumRatErrorCount(0), RegenOutHumRatErrIndex(0), RegenInHumRatErrorCount(0),
-              RegenInHumRatErrIndex(0), T_RegenInTempLast(0.0), T_RegenInHumRatLast(0.0), T_ProcInTempLast(0.0), T_ProcInHumRatLast(0.0),
-              T_FaceVelLast(0.0), RegenOutTempLast(0.0), H_RegenInTempLast(0.0), H_RegenInHumRatLast(0.0), H_ProcInTempLast(0.0),
-              H_ProcInHumRatLast(0.0), H_FaceVelLast(0.0), RegenOutHumRatLast(0.0)
+              PrintH_ProcInHumRatMessage(false), PrintH_FaceVelMessage(false), PrintRegenOutHumRatMessage(false), T_RegenInTempErrorCount(0),
+              T_RegenInHumRatErrorCount(0), T_ProcInTempErrorCount(0), T_ProcInHumRatErrorCount(0), T_FaceVelErrorCount(0), T_RegenInTempErrIndex(0),
+              T_RegenInHumRatErrIndex(0), T_ProcInTempErrIndex(0), T_ProcInHumRatErrIndex(0), T_FaceVelocityErrIndex(0), RegenOutTempErrorCount(0),
+              RegenOutTempErrIndex(0), RegenOutTempFailedErrorCount(0), RegenOutTempFailedErrIndex(0), RegenOutTempFailedLast(0.0),
+              H_RegenInTempErrorCount(0), H_RegenInHumRatErrorCount(0), H_ProcInTempErrorCount(0), H_ProcInHumRatErrorCount(0),
+              H_FaceVelErrorCount(0), H_RegenInTempErrIndex(0), H_RegenInHumRatErrIndex(0), H_ProcInTempErrIndex(0), H_FaceVelocityErrIndex(0),
+              RegenOutHumRatErrorCount(0), RegenOutHumRatErrIndex(0), RegenInHumRatErrorCount(0), RegenInHumRatErrIndex(0), T_RegenInTempLast(0.0),
+              T_RegenInHumRatLast(0.0), T_ProcInTempLast(0.0), T_ProcInHumRatLast(0.0), T_FaceVelLast(0.0), RegenOutTempLast(0.0),
+              H_RegenInTempLast(0.0), H_RegenInHumRatLast(0.0), H_ProcInTempLast(0.0), H_ProcInHumRatLast(0.0), H_FaceVelLast(0.0),
+              RegenOutHumRatLast(0.0)
         {
         }
     };
