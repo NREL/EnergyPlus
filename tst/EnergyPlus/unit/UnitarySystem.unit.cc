@@ -2887,7 +2887,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     // In the Fixture's SetUp: `DataSizing::DesDayWeath(1).Temp(1) = 35.0`
     Real64 RatedSourceTempCool = state->dataSize->DesDayWeath(1).Temp(1);
     EXPECT_EQ(RatedSourceTempCool, 35.0);
-    Real64 CoolCoolCapAtPeak = 32454.876753104443;
+    Real64 CoolCoolCapAtPeak = 33453.67913;
     Real64 TotCapTempModFac = CurveManager::CurveValue(
         *state,
         state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel),
@@ -2896,7 +2896,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
 
     EXPECT_NEAR(TotCapTempModFac, 0.930018048445091, 0.001);
     Real64 RatedCapCoolTotalDes = CoolCoolCapAtPeak / TotCapTempModFac;
-    EXPECT_NEAR(RatedCapCoolTotalDes, 34897.0396944, 0.001);
+    EXPECT_NEAR(RatedCapCoolTotalDes, 35971.0, 0.001);
 
     EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, RatedCapCoolTotalDes, 0.001);
     EXPECT_EQ(thisSys->m_DesignCoolingCapacity, state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedCapCoolTotal);
@@ -2906,7 +2906,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate,
               state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedCapCoolTotal *
                   state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(10));
-    Real64 fullFlow = 1.949442;
+    Real64 fullFlow = 2.009436;
     EXPECT_NEAR(
         state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate, fullFlow, 0.00001);  // different than unitary system air volume flow rate
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, 1.70, 0.01); // VS DX heating coil was not autosized

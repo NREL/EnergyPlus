@@ -2820,7 +2820,7 @@ namespace AirflowNetwork {
                     }
                     AirflowNetworkNumOfOutAirNode -= 1;
                     AirflowNetworkNumOfExtNode -= 1;
-                    MultizoneExternalNodeData.redimension(AirflowNetworkNumOfExtNode);
+                    MultizoneExternalNodeData.resize(AirflowNetworkNumOfExtNode);
                 }
             }
         }
