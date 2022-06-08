@@ -153,10 +153,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).MassFlowRate =
         state->dataHeatRecovery->ExchCond(ExchNum).SecInMassFlow;
 
-    state->dataHeatRecovery->HeatExchCondNumericFields.allocate(ExchNum);
-    state->dataHeatRecovery->HeatExchCondNumericFields(ExchNum).NumericFieldNames.allocate(5);
-    state->dataHeatRecovery->BalDesDehumPerfNumericFields.allocate(BalDesDehumPerfDataIndex);
-    state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
+    state->dataHeatRecovery->ExchCond(ExchNum).NumericFieldNames.allocate(5);
+    state->dataHeatRecovery->BalDesDehumPerfData.allocate(BalDesDehumPerfDataIndex);
+    state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
 
     // HXUnitOn is false so expect outlet = inlet
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
@@ -3926,14 +3925,13 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex = BalDesDehumPerfDataIndex;
 
     state->dataHeatRecovery->BalDesDehumPerfData.allocate(BalDesDehumPerfDataIndex);
-    state->dataHeatRecovery->BalDesDehumPerfNumericFields.allocate(BalDesDehumPerfDataIndex);
     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).Name = "DehumPerformanceData";
-    state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
+    state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NumericFieldNames.allocate(2);
 
     // autosize nominal vol flow and face velocity
-    state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames(1) = "Nominal Air Flow Rate";
+    state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NumericFieldNames(1) = "Nominal Air Flow Rate";
     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomSupAirVolFlow = AutoSize;
-    state->dataHeatRecovery->BalDesDehumPerfNumericFields(BalDesDehumPerfDataIndex).NumericFieldNames(2) = "Nominal Air Face Velocity";
+    state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NumericFieldNames(2) = "Nominal Air Face Velocity";
     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel = AutoSize;
 
     // initialize sizing variables
@@ -4133,7 +4131,6 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     GetHeatRecoveryInput(*state);
     int ExchNum = 1;
     auto &thisHX = state->dataHeatRecovery->ExchCond(ExchNum);
-    EXPECT_EQ(1, state->dataHeatRecovery->NumAirToAirGenericExchs);
     EXPECT_EQ(thisHX.Name, "HEATRECOVERY HX GENERIC");
     // initialize
     state->dataSize->CurSysNum = 1;
@@ -4281,7 +4278,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     SizeHeatRecovery(*state, ExchNum);
     // check autosized nominal supply flow
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20); // minimum flow
-    ;
+
     // test 3: the HX is on OA system but with economizer, and no-bypass
     thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb; // with economizer
     thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
