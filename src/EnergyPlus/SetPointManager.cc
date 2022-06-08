@@ -9426,9 +9426,9 @@ SPMLoop_exit:;
                                 RoutineName,
                                 managerTypeName[static_cast<int>(state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).SPMType)],
                                 state.dataSetPointManager->AllSetPtMgr(SetPtMgrNumPtr).Name));
-        ShowContinueError(state, format(" ..Humidity ratio control variable type specified is = HumidityRatio"));
-        ShowContinueError(state, format(" ..Humidity ratio control variable type allowed with water coils is = MaximumHumidityRatio"));
-        ShowContinueError(state, format(" ..Setpointmanager control variable type is reset to = MaximumHumidityRatio"));
+        ShowContinueError(state, " ..Humidity ratio control variable type specified is = HumidityRatio");
+        ShowContinueError(state, " ..Humidity ratio control variable type allowed with water coils is = MaximumHumidityRatio");
+        ShowContinueError(state, " ..Setpointmanager control variable type is reset to = MaximumHumidityRatio");
         ShowContinueError(state, " ..Simulation continues. ");
     }
 }
