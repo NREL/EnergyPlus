@@ -2931,8 +2931,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataEnvrn->OutDryBulbTemp = 5.0;
     state->dataEnvrn->OutHumRat = 0.0009;
     state->dataEnvrn->OutBaroPress = 99000.0;
+    state->dataEnvrn->OutWetBulbTemp =
+        Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 270.0;
+    state->dataEnvrn->StdRhoAir = 1.1;
     // set coil parameters
     int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
     int DXCoilNum = 1;
@@ -3001,8 +3004,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
         *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // check coil air outlet conditions
-    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, 5.79484, 0.00001);
+    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, 5.23333, 0.00001);
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, 0.00810, 0.00001);
-    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, 26170.26, 0.01);
+    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, 25597.58, 0.01);
 }
 } // namespace EnergyPlus
