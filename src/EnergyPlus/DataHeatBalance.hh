@@ -671,6 +671,12 @@ namespace DataHeatBalance {
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this zone
 
+        // People Thermal Resilience Related
+        Real64 ColdStressTempThresh;
+        Real64 HeatStressTempThresh;
+        Real64 PierceSET;
+        Real64 PMV;
+
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature = 0.0;               // Measured zone air temperature input by user
         Real64 ZoneMeasuredHumidityRatio = 0.0;             // Measured zone air humidity ratio by user
