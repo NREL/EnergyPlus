@@ -2650,6 +2650,23 @@ SurfaceProperty:LocalEnvironment,
     GndSurfs:South;            !- Ground Surfaces Object Name
 \end{lstlisting}
 
+\subsubsection{Outputs}\label{outputs-gndSrfs}
+
+\begin{itemize}
+\item
+  Zone,Average,Surfaces Property Ground Surfaces Average Temperature {[}C{]}
+\item
+  Zone,Average,Surfaces Property Ground Surfaces Average Reflectance {[]}
+\end{itemize}
+
+\paragraph{Surfaces Property Ground Surfaces Average Temperature {[}C{]}}\label{surfaces-property-ground-surfaces-average-temperature}
+
+This is an average surface temperature of multiple ground surfaces in deg C viewed by an exterior surface for each time step. If there is only one ground surface specified in a given \textit{SurfaceProperty:GroundSurfaces} object, then the average surface temperature will be the same as the specified ground surface temperature. This output variable is not generated when all ground surface temperature schedule name fields are blank.
+
+\paragraph{Surfaces Property Ground Surfaces Average Reflectance {[]}}\label{surfaces-property-ground-surfaces-average-reflectance}
+
+This is an average surface reflectance of multiple ground surfaces viewed by an exterior surface for each time step. If there is only one ground surface specified in a given \textit{SurfaceProperty:GroundSurfaces} object, then the average surface reflectance will be the same as the specified ground surface reflectance. This output variable is not generated when all ground surface reflectance schedule name fields are blank.
+
 \subsection{References}\label{references-gnd-srfs}
 
 Bill Marion. 2018. Ground Albedo Measurements and Modeling. Bifacial PV Workshop Lakewood, Colorado. September 11, 2018.
