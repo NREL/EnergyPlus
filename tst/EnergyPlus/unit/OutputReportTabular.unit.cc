@@ -10259,8 +10259,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
     state->dataOutRptTab->displayThermalResilienceSummary = true;
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
-    std::string error_string = delimited_string({"   ** Warning ** Zone 1 has multiple people objects with different Cold Stress Temperature Threshold.",
-    "   ** Warning ** Zone 1 has multiple people objects with different Heat Stress Temperature Threshold."});
+    std::string error_string =
+        delimited_string({"   ** Warning ** Zone 1 has multiple people objects with different Cold Stress Temperature Threshold.",
+                          "   ** Warning ** Zone 1 has multiple people objects with different Heat Stress Temperature Threshold."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
