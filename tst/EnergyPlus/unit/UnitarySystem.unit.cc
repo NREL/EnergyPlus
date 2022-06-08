@@ -1994,7 +1994,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
         "  1.0,                            !- Motor In Airstream Fraction",
         "  Zone Exhaust Node,              !- Air Inlet Node Name",
         "  Heating Coil Air Inlet Node;    !- Air Outlet Node Name",
-        
+
         "Coil:Heating:Electric:MultiStage,",
         "  Electric Heating Coil,               !- Name",
         "  AlwaysOne,                      !- Availability Schedule Name",
@@ -2104,7 +2104,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
     EXPECT_EQ(0.0, thisSys->m_HeatingCycRatio);
     EXPECT_EQ(thisSys->m_HeatingSpeedRatio, 0.0);
     EXPECT_EQ(0.0, thisSys->m_HeatingCoilSensDemand);
-    
+
     EXPECT_EQ(0, thisSys->m_SuppHeatingSpeedNum);
     EXPECT_EQ(0.0, thisSys->m_SuppHeatPartLoadFrac);
     EXPECT_EQ(0.0, thisSys->m_SuppHeatingCycRatio);
@@ -2129,7 +2129,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
-    
+
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 3000;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToHeatSP = 3000;
     // Heating mode
@@ -2160,7 +2160,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
     EXPECT_EQ(0.0, thisSys->m_SuppHeatPartLoadFrac);
     EXPECT_EQ(0.0, thisSys->m_SuppHeatingCycRatio);
     EXPECT_EQ(0.0, thisSys->m_SuppHeatingSpeedRatio);
-    
+
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 5500;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToHeatSP = 5500;
     // Heating mode
@@ -2177,7 +2177,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
                       sensOut,
                       latOut);
     // main heating coil is meeting demand
-    EXPECT_NEAR(sensOut, 5500, 0.001*7500);
+    EXPECT_NEAR(sensOut, 5500, 0.001 * 7500);
     EXPECT_EQ(sensOut, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(thisSys->m_SensHeatEnergyRate, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(5500.0, thisSys->m_HeatingCoilSensDemand);
@@ -2208,7 +2208,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
                       sensOut,
                       latOut);
     // main heating coil is meeting demand
-    EXPECT_NEAR(sensOut, 8000, 0.001*10000);
+    EXPECT_NEAR(sensOut, 8000, 0.001 * 10000);
     EXPECT_EQ(sensOut, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(thisSys->m_SensHeatEnergyRate, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(8000.0, thisSys->m_HeatingCoilSensDemand);
@@ -2222,7 +2222,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
     EXPECT_GT(thisSys->m_SuppHeatPartLoadFrac, 0.0);
     EXPECT_EQ(1.0, thisSys->m_SuppHeatingCycRatio);
     EXPECT_GT(thisSys->m_SuppHeatingSpeedRatio, 0.0);
-
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_SetpointBased)
@@ -2306,7 +2305,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Setp
         "  1.0,                            !- Motor In Airstream Fraction",
         "  Zone Exhaust Node,              !- Air Inlet Node Name",
         "  Heating Coil Air Inlet Node;    !- Air Outlet Node Name",
-        
+
         "Coil:Heating:Electric:MultiStage,",
         "  Electric Heating Coil,               !- Name",
         "  AlwaysOne,                      !- Availability Schedule Name",
