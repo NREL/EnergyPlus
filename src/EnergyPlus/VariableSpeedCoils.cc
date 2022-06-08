@@ -4695,12 +4695,7 @@ namespace VariableSpeedCoils {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
-                    // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
-                    if (varSpeedCoil.CondenserInletNodeNum != 0) {
-                        RatedSourceTempCool = RatedInletWaterTemp;
-                    } else {
-                        RatedSourceTempCool = OutTemp;
-                    }
+                    RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum, ErrorsFound);
                     TotCapTempModFac =
                         CurveManager::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
@@ -4774,12 +4769,7 @@ namespace VariableSpeedCoils {
                     }
 
                     MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
-                    // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
-                    if (varSpeedCoil.CondenserInletNodeNum != 0) {
-                        RatedSourceTempCool = RatedInletWaterTemp;
-                    } else {
-                        RatedSourceTempCool = OutTemp;
-                    }
+                    RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum, ErrorsFound);
                     TotCapTempModFac =
                         CurveManager::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
 
@@ -5308,13 +5298,8 @@ namespace VariableSpeedCoils {
             PlantUtilities::RegisterPlantCompDesignFlow(state, varSpeedCoil.WaterInletNodeNum, 0.5 * varSpeedCoil.RatedWaterVolFlowRate);
         }
 
+        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum, ErrorsFound);
         if (varSpeedCoil.VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit || varSpeedCoil.VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit) {
-
-            if (varSpeedCoil.VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit) {
-                RatedSourceTempCool = RatedInletWaterTemp;
-            } else {
-                RatedSourceTempCool = RatedInletWaterTempHeat;
-            }
 
             if (PltSizNum > 0) {
                 rhoW = rho;
@@ -5332,7 +5317,6 @@ namespace VariableSpeedCoils {
                 varSpeedCoil.MSRatedWaterMassFlowRate(Mode) = varSpeedCoil.MSRatedWaterVolFlowRate(Mode) * rhoW;
             }
         } else if (varSpeedCoil.VSCoilType == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterVariableSpeed) {
-            RatedSourceTempCool = varSpeedCoil.WHRatedInletWaterTemp;
             rhoW = RhoH2O(RatedSourceTempCool);
             varSpeedCoil.RatedWaterMassFlowRate = varSpeedCoil.RatedWaterVolFlowRate * rhoW;
             for (Mode = varSpeedCoil.NumOfSpeeds; Mode >= 1; --Mode) {
@@ -5340,8 +5324,6 @@ namespace VariableSpeedCoils {
                 varSpeedCoil.MSWHPumpPower(Mode) = varSpeedCoil.MSRatedTotCap(Mode) * varSpeedCoil.MSWHPumpPowerPerRatedTotCap(Mode);
                 varSpeedCoil.MSRatedWaterMassFlowRate(Mode) = varSpeedCoil.MSRatedWaterVolFlowRate(Mode) * rhoW;
             }
-        } else {
-            RatedSourceTempCool = RatedAmbAirTemp;
         }
 
         // Ensure air flow rate at lower speed must be lower or
@@ -8112,6 +8094,32 @@ namespace VariableSpeedCoils {
         }
 
         return Speeds;
+    }
+
+    Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state,
+                                    int const &CoilIndex, // index to cooling coil
+                                    bool &ErrorsFound     // set to true if problem
+    )
+    {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VSCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+            return RatedInletWaterTemp;
+        } else if (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VSCoilType == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
+            return RatedInletWaterTempHeat;
+        } else if (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VSCoilType == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterVariableSpeed) {
+            return state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).WHRatedInletWaterTemp;
+        } else if (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).CoolHeatType == "COOLING") { // ASHP
+            return RatedAmbAirTemp;
+        } else if (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).CoolHeatType == "HEATING") { // ASHP
+            return RatedAmbAirTempHeat;
+        } else if (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).CondenserInletNodeNum != 0) {
+            return state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
+        } else {
+            ShowSevereError(state,
+                            "GetVSCoilRatedSourceTemp: Could not find rated source temperature, Type= VS DX Coil Name=\"" +
+                                state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).Name + "\"");
+            ErrorsFound = true;
+            return 0.0;
+        }
     }
 
     void SetVarSpeedCoilData(EnergyPlusData &state,
