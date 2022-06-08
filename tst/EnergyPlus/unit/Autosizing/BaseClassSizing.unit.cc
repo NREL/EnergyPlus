@@ -54,7 +54,6 @@
 #include "AutosizingFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/DataAirSystems.hh>
