@@ -499,7 +499,7 @@ namespace AirflowNetwork {
         EPVector<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
         EPVector<AirflowNetwork::DeltaCpProp> DeltaCp;
         EPVector<AirflowNetwork::DeltaCpProp> EPDeltaCP;
-        EPVector<AirflowNetwork::ZoneExhaustFan> MultizoneCompExhaustFanData;
+        EPVector<AirflowNetwork::ZoneExhaustFan> exhaust_fans;
         EPVector<AirflowNetwork::IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
         EPVector<AirflowNetwork::IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
         EPVector<AirflowNetwork::DisSysNodeProp> DisSysNodeData;
@@ -507,7 +507,7 @@ namespace AirflowNetwork {
         EPVector<AirflowNetwork::EffectiveLeakageRatio> DisSysCompELRData;
         EPVector<AirflowNetwork::Duct> DisSysCompDuctData;
         EPVector<AirflowNetwork::Damper> DisSysCompDamperData;
-        EPVector<AirflowNetwork::ConstantVolumeFan> DisSysCompCVFData;
+        EPVector<AirflowNetwork::SimpleFan> DisSysCompCVFData;
         EPVector<AirflowNetwork::DetailedFan> DisSysCompDetFanData;
         EPVector<AirflowNetwork::DisSysCompCoilProp> DisSysCompCoilData;
         EPVector<AirflowNetwork::DisSysCompHXProp> DisSysCompHXData;
@@ -518,6 +518,11 @@ namespace AirflowNetwork {
         EPVector<AirflowNetwork::OutdoorAirFan> DisSysCompOutdoorAirData;
         EPVector<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
         EPVector<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
+
+        EPVector<AirflowNetwork::AirflowNetworkLinkageProp*> exhaust_links;
+        EPVector<AirflowNetwork::AirflowNetworkLinkageProp *> relief_links;
+        EPVector<AirflowNetwork::AirflowNetworkLinkageProp *> oa_links;
+        EPVector<AirflowNetwork::AirflowNetworkLinkageProp *> simple_fan_links;
 
         void clear_state() override
         {
@@ -673,7 +678,7 @@ namespace AirflowNetwork {
             MultizoneExternalNodeData.clear();
             DeltaCp.clear();
             EPDeltaCP.clear();
-            MultizoneCompExhaustFanData.clear();
+            exhaust_fans.clear();
             IntraZoneNodeData.clear();    // Intra zone data set
             IntraZoneLinkageData.clear(); // Intra zone linkage adat set
             DisSysNodeData.clear();
@@ -692,6 +697,11 @@ namespace AirflowNetwork {
             DisSysCompOutdoorAirData.clear();
             DisSysCompReliefAirData.clear();
             AirflowNetworkLinkageViewFactorData.clear();
+
+            exhaust_links.clear();
+            relief_links.clear();
+            oa_links.clear();
+            simple_fan_links.clear();
         }
 
     private:

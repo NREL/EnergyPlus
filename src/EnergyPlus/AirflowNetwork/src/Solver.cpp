@@ -457,7 +457,7 @@ namespace AirflowNetwork {
         instances = m_state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != m_state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i = 1;                                                       // Temporary workaround
-            MultizoneCompExhaustFanData.allocate(AirflowNetworkNumOfExhFan); // Temporary workaround
+            exhaust_fans.allocate(AirflowNetworkNumOfExhFan); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -525,21 +525,21 @@ namespace AirflowNetwork {
                     }
                 }
 
-                MultizoneCompExhaustFanData(i).name = thisObjectName; // Name of zone exhaust fan component
-                MultizoneCompExhaustFanData(i).FlowCoef = coeff;      // flow coefficient
-                MultizoneCompExhaustFanData(i).FlowExpo = expnt;      // Flow exponent
+                exhaust_fans(i).name = thisObjectName; // Name of zone exhaust fan component
+                exhaust_fans(i).FlowCoef = coeff;      // flow coefficient
+                exhaust_fans(i).FlowExpo = expnt;      // Flow exponent
 
-                MultizoneCompExhaustFanData(i).FlowRate = flowRate;
-                MultizoneCompExhaustFanData(i).InletNode = inletNode;
-                MultizoneCompExhaustFanData(i).OutletNode = outletNode;
+                exhaust_fans(i).FlowRate = flowRate;
+                exhaust_fans(i).InletNode = inletNode;
+                exhaust_fans(i).OutletNode = outletNode;
 
-                MultizoneCompExhaustFanData(i).StandardT = refT;
-                MultizoneCompExhaustFanData(i).StandardP = refP;
-                MultizoneCompExhaustFanData(i).StandardW = refW;
+                exhaust_fans(i).StandardT = refT;
+                exhaust_fans(i).StandardP = refP;
+                exhaust_fans(i).StandardW = refW;
 
                 // Add the element to the lookup table, check for name overlaps
                 if (elements.find(thisObjectName) == elements.end()) {
-                    elements[thisObjectName] = &MultizoneCompExhaustFanData(i); // Yet another workaround
+                    elements[thisObjectName] = &exhaust_fans(i); // Yet another workaround
                 } else {
                     ShowSevereError(
                         m_state,
@@ -4296,7 +4296,7 @@ namespace AirflowNetwork {
         j += AirflowNetworkNumOfSurELA;
         for (int i = 1 + j; i <= AirflowNetworkNumOfExhFan + j; ++i) { // Zone exhaust fan component
             n = i - j;
-            AirflowNetworkCompData(i).Name = MultizoneCompExhaustFanData(n).name;
+            AirflowNetworkCompData(i).Name = exhaust_fans(n).name;
             compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = iComponentTypeNum::EXF;
             AirflowNetworkCompData(i).TypeNum = n;
@@ -4600,7 +4600,6 @@ namespace AirflowNetwork {
                     }
                 } break;
                 case ComponentType::SOP: {
-                    // if (AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::SOP) {
                     MultizoneSurfaceData(count).Multiplier = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Multiplier;
                     if (m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt < 10.0 ||
                         m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Tilt > 170.0) {
@@ -4623,7 +4622,6 @@ namespace AirflowNetwork {
                     }
                 } break;
                 case ComponentType::HOP: {
-                    // if (AirflowNetworkCompData(i).CompTypeNum == iComponentTypeNum::HOP) {
                     MultizoneSurfaceData(count).Multiplier = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum).Multiplier;
                     // Get linkage height from upper and lower zones
                     if (MultizoneZoneData(AirflowNetworkLinkageData(count).indices[0]).ZoneNum > 0) {
@@ -4672,6 +4670,42 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     }
                 } break;
+                case ComponentType::CVF:
+                    simple_fan_links.push_back(&link);
+                    break;
+                case ComponentType::EXF: {
+                    exhaust_links.push_back(&link);
+                    int index;
+                    bool errors = false;
+                    GetFanIndex(m_state, link.element->name, index, errors);
+                    if (errors) {
+                        // Fatal?
+                    }
+                    link.inlet_node = m_state.dataFans->Fan(index).InletNodeNum;
+                    break;
+                }
+                case ComponentType::OAF: {
+                    oa_links.push_back(&link);
+                    int index;
+                    bool errors = false;
+                    GetFanIndex(m_state, link.element->name, index, errors);
+                    if (errors) {
+                        // Fatal?
+                    }
+                    link.inlet_node = m_state.dataFans->Fan(index).InletNodeNum;
+                    break;
+                }
+                case ComponentType::REL: {
+                    relief_links.push_back(&link);
+                    int index;
+                    bool errors = false;
+                    GetFanIndex(m_state, link.element->name, index, errors);
+                    if (errors) {
+                        // Fatal?
+                    }
+                    link.outlet_node = m_state.dataFans->Fan(index).OutletNodeNum;
+                    break;
+                }
                 default:
                     // Nothing to do here
                     break;
@@ -10263,8 +10297,8 @@ namespace AirflowNetwork {
         NodeFound.dimension(m_state.dataLoopNodes->NumOfNodes, false);
         // Validate inlet and outlet nodes for zone exhaust fans
         for (i = 1; i <= AirflowNetworkNumOfExhFan; ++i) {
-            NodeFound(MultizoneCompExhaustFanData(i).InletNode) = true;
-            NodeFound(MultizoneCompExhaustFanData(i).OutletNode) = true;
+            NodeFound(exhaust_fans(i).InletNode) = true;
+            NodeFound(exhaust_fans(i).OutletNode) = true;
         }
         // Validate EPlus Node names and types
         for (i = 1; i <= DisSysNumOfNodes; ++i) {
@@ -11100,8 +11134,8 @@ namespace AirflowNetwork {
                                 PressureControllerData(i).OANodeNum =
                                     m_state.dataZoneEquip->ZoneEquipConfig(PressureControllerData(i).ZoneNum).ExhaustNode(1);
                                 for (n = 1; n <= AirflowNetworkNumOfExhFan; ++n) {
-                                    if (MultizoneCompExhaustFanData(n).EPlusZoneNum == PressureControllerData(i).ZoneNum) {
-                                        MultizoneCompExhaustFanData(n).PressCtrlNum = i;
+                                    if (exhaust_fans(n).EPlusZoneNum == PressureControllerData(i).ZoneNum) {
+                                        exhaust_fans(n).PressCtrlNum = i;
                                     }
                                 }
                             }
@@ -11231,24 +11265,24 @@ namespace AirflowNetwork {
                 for (j = 1; j <= m_state.dataGlobal->NumOfZones; ++j) {
                     if (!m_state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
                     for (k = 1; k <= m_state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
-                        if (m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k) == MultizoneCompExhaustFanData(i).InletNode) {
-                            MultizoneCompExhaustFanData(i).EPlusZoneNum = m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum;
+                        if (m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k) == exhaust_fans(i).InletNode) {
+                            exhaust_fans(i).EPlusZoneNum = m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum;
                             break;
                         }
                     }
                 }
-                if (MultizoneCompExhaustFanData(i).EPlusZoneNum == 0) {
+                if (exhaust_fans(i).EPlusZoneNum == 0) {
                     ShowSevereError(m_state,
                                     format("{}Zone name in {} = {} does not match the zone name in ZoneHVAC:EquipmentConnections",
                                            RoutineName,
                                            CurrentModuleObject,
-                                           MultizoneCompExhaustFanData(i).name));
+                                           exhaust_fans(i).name));
                     ErrorsFound = true;
                 }
                 // Ensure a surface using zone exhaust fan to expose to the same zone
                 found = false;
                 for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
-                    if (UtilityRoutines::SameString(MultizoneSurfaceData(j).OpeningName, MultizoneCompExhaustFanData(i).name)) {
+                    if (UtilityRoutines::SameString(MultizoneSurfaceData(j).OpeningName, exhaust_fans(i).name)) {
                         found = true;
                         if (m_state.dataSurface->Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond != ExternalEnvironment &&
                             !(m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
@@ -11264,19 +11298,19 @@ namespace AirflowNetwork {
                     }
                 }
                 if (!found) {
-                    ShowSevereError(m_state, CurrentModuleObject + "  = " + MultizoneCompExhaustFanData(i).name + " is defined and never used.");
+                    ShowSevereError(m_state, CurrentModuleObject + "  = " + exhaust_fans(i).name + " is defined and never used.");
                     ErrorsFound = true;
                 } else {
-                    if (MultizoneCompExhaustFanData(i).EPlusZoneNum != m_state.dataSurface->Surface(MultizoneSurfaceData(j).SurfNum).Zone) {
+                    if (exhaust_fans(i).EPlusZoneNum != m_state.dataSurface->Surface(MultizoneSurfaceData(j).SurfNum).Zone) {
                         ShowSevereError(m_state,
                                         format("{}Zone name in {} = {} does not match the zone name",
                                                RoutineName,
                                                CurrentModuleObject,
-                                               MultizoneCompExhaustFanData(i).name));
+                                               exhaust_fans(i).name));
                         ShowContinueError(m_state, "the surface is exposed to " + m_state.dataSurface->Surface(MultizoneSurfaceData(j).SurfNum).Name);
                         ErrorsFound = true;
                     } else {
-                        AirflowNetworkZoneExhaustFan(MultizoneCompExhaustFanData(i).EPlusZoneNum) = true;
+                        AirflowNetworkZoneExhaustFan(exhaust_fans(i).EPlusZoneNum) = true;
                     }
                 }
             }
@@ -11289,8 +11323,8 @@ namespace AirflowNetwork {
                         found = false;
                         for (k = 1; k <= m_state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                             for (i = 1; i <= AirflowNetworkNumOfExhFan; ++i) {
-                                if (m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k) == MultizoneCompExhaustFanData(i).InletNode) {
-                                    MultizoneCompExhaustFanData(i).EPlusZoneNum = m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum;
+                                if (m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k) == exhaust_fans(i).InletNode) {
+                                    exhaust_fans(i).EPlusZoneNum = m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum;
                                     found = true;
                                 }
                             }
@@ -12425,7 +12459,7 @@ namespace AirflowNetwork {
                         //              WRITE(Unit11,904) state.afn->AirflowNetworkCompData(i)%CompNum,4,DisSysCompCVFData(j)%FlowRate
                     } else if (SELECT_CASE_var == CompTypeNum_EXF) { // 'EXF' Zone exhaust fan
                         ObjexxFCL::gio::write(Unit11, Format_904) << state.afn->AirflowNetworkCompData(i).CompNum << 4 <<
-        MultizoneCompExhaustFanData(j).FlowRate; } else {
+        exhaust_fans(j).FlowRate; } else {
                     }
                 }
             }
@@ -13024,6 +13058,53 @@ namespace AirflowNetwork {
             AU(n) = 0.0;
         }
         // Loop(s) to calculate control, etc.
+        for (auto link : exhaust_links) {
+            if (m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate > DataHVACGlobals::VerySmallMassFlow) {
+                // Treat the component as an exhaust fan
+                if (PressureSetFlag == PressureCtrlExhaust) {
+                    link->mass_flow = ExhaustFanMassFlowRate;
+                } else {
+                    link->mass_flow = m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate;
+                }
+            } else {
+                // Treat the component as a crack
+                link->mass_flow = {};
+            }
+        }
+        for (auto link : oa_links) {
+            if (m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate > DataHVACGlobals::VerySmallMassFlow) {
+                // Treat the component as an oa fan
+                F[0] = m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate;
+                DF[0] = 0.0;
+                constexpr int CycFanCycComp{1};
+                if (m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                    m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                    F[0] = F[0] / m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio;
+                }
+            } else {
+                // Treat the component as a crack
+                link->mass_flow = {};
+            }
+        }
+        for (auto link : relief_links) {
+            if (m_state.dataLoopNodes->Node(link->outlet_node).MassFlowRate > DataHVACGlobals::VerySmallMassFlow) {
+                // Treat the component as a relief fan
+                DF[0] = 0.0;
+                if (PressureSetFlag == PressureCtrlRelief) {
+                    F[0] = ReliefMassFlowRate;
+                } else {
+                    constexpr int CycFanCycComp{1};
+                    F[0] = m_state.dataLoopNodes->Node(link->outlet_node).MassFlowRate;
+                    if (m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                        m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                        F[0] = F[0] / m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio;
+                    }
+                }
+            } else {
+                // Treat the component as a crack
+                link->mass_flow = {};
+            }
+        }
         // Set up the Jacobian matrix.
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
             if (AirflowNetworkLinkageData(i).element == nullptr) {

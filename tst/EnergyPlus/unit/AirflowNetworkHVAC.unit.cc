@@ -2172,10 +2172,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     // Set up node values
     state->dataLoopNodes->Node.allocate(10);
-    if (state->afn->MultizoneCompExhaustFanData(1).InletNode == 0) {
-        state->afn->MultizoneCompExhaustFanData(1).InletNode = 3;
+    if (state->afn->exhaust_fans(1).InletNode == 0) {
+        state->afn->exhaust_fans(1).InletNode = 3;
     }
-    state->dataLoopNodes->Node(state->afn->MultizoneCompExhaustFanData(1).InletNode).MassFlowRate = 0.1005046;
+    state->dataLoopNodes->Node(state->afn->exhaust_fans(1).InletNode).MassFlowRate = 0.1005046;
 
     if (state->afn->DisSysCompCVFData(1).InletNode == 0) {
         state->afn->DisSysCompCVFData(1).InletNode = 1;
@@ -5962,7 +5962,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     // Set up node values
     state->dataLoopNodes->Node.allocate(17);
-    state->dataLoopNodes->Node(state->afn->MultizoneCompExhaustFanData(1).InletNode).MassFlowRate = 0.1005046;
+    state->dataLoopNodes->Node(state->afn->exhaust_fans(1).InletNode).MassFlowRate = 0.1005046;
 
     state->dataLoopNodes->Node(state->afn->DisSysCompCVFData(1).InletNode).MassFlowRate = 1.40;
     state->afn->DisSysCompCVFData(1).FlowRate = state->dataLoopNodes->Node(state->afn->DisSysCompCVFData(1).InletNode).MassFlowRate;

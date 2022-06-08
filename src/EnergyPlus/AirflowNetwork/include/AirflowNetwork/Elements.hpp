@@ -833,10 +833,14 @@ namespace AirflowNetwork {
         int LinkNum;                          // Linkage number
         AirflowElement *element;              // Pointer to airflow element
         Real64 control;                       // Control value
+        std::optional<Real64> mass_flow;      // Specified mass flow, optional
+        int inlet_node;                       // Inlet node
+        int outlet_node;                      // Inlet node
 
         // Default Constructor
         AirflowNetworkLinkage()
-            : NodeHeights{{0.0, 0.0}}, CompNum(0), indices{{0, 0}}, nodes{{nullptr, nullptr}}, LinkNum(0), element(nullptr), control(1.0)
+            : NodeHeights{{0.0, 0.0}}, CompNum(0), indices{{0, 0}}, nodes{{nullptr, nullptr}}, LinkNum(0), element(nullptr), control(1.0),
+              inlet_node(0), outlet_node(0)
         {
         }
 
@@ -1058,7 +1062,7 @@ namespace AirflowNetwork {
         }
     };
 
-    struct ConstantVolumeFan : public AirflowElement // Constant volume fan component
+    struct SimpleFan : public AirflowElement // Constant volume fan component
     {
         // Members
         Real64 FlowRate;           // Air volume flow rate
@@ -1072,7 +1076,7 @@ namespace AirflowNetwork {
         bool FanModelFlag;         // True, this fan is FAN:SYSTEMMODEL
 
         // Default Constructor
-        ConstantVolumeFan()
+        SimpleFan()
             : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0),
               FanModelFlag(false)
         {
