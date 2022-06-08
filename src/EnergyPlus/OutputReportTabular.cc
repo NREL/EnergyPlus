@@ -14528,6 +14528,23 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     }
                 }
 
+                for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum == iAirLoop &&
+                        state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
+                        AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad = FinalSysSizing(iAirLoop).SysCoolCoinSpaceSens;
+                        AirLoopCoolCompLoadTables(iAirLoop).designPeakLoad = FinalSysSizing(iAirLoop).SysDesCoolLoad;
+                        AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad = -FinalSysSizing(iAirLoop).SysHeatCoinSpaceSens;
+                        AirLoopHeatCompLoadTables(iAirLoop).designPeakLoad = -FinalSysSizing(iAirLoop).SysDesHeatLoad;
+                        AirLoopCoolCompLoadTables(iAirLoop).diffPeakEst =
+                            AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad - AirLoopCoolCompLoadTables(iAirLoop).estInstDelSensLoad;
+                        AirLoopCoolCompLoadTables(iAirLoop).diffDesignPeak =
+                            AirLoopCoolCompLoadTables(iAirLoop).designPeakLoad - AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad;
+                        AirLoopHeatCompLoadTables(iAirLoop).diffPeakEst =
+                            AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad - AirLoopHeatCompLoadTables(iAirLoop).estInstDelSensLoad;
+                        AirLoopCoolCompLoadTables(iAirLoop).diffDesignPeak =
+                            AirLoopHeatCompLoadTables(iAirLoop).designPeakLoad - AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad;
+                    }
+                }
                 ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
                 ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
 
