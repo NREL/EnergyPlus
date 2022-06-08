@@ -854,7 +854,7 @@ namespace DataSizing {
               sysSizeHeatingDominant(false), sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0),
               DesCoolCoilVolFlow(0.0), DesHeatCoilVolFlow(0.0), DesMainCoilVolFlow(0.0), SysHeatCoilTimeStepPk(0), SysHeatAirTimeStepPk(0),
               HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0), SysHeatCoinSpaceSens(0.0), SysDesCoolLoad(0.0), SysCoolLoadTimeStepPk(0),
-              SysDesHeatLoad(0.0), SysHeatLoadTimeStepPk(0)  
+              SysDesHeatLoad(0.0), SysHeatLoadTimeStepPk(0)
         {
         }
     };
