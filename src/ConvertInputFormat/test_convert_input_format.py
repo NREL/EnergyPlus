@@ -123,10 +123,10 @@ def run_convertinputformat(
     if not input_file.exists() or not input_file.is_file():
         raise ValueError(f"input_file '{input_file}' is not a valid file")
 
-    cmd = f"{convertinputformat_exe} --output {out_dir} {input_file}"
-    print(f"Running: {cmd}")
-    subprocess.check_call([convertinputformat_exe, '--output', out_dir,
-                           input_file])
+    full_command_args = [convertinputformat_exe, '--output', out_dir, input_file]
+    command_as_strings = [str(x) for x in full_command_args]
+    print(f"Running: {' '.join(command_as_strings)}")
+    subprocess.check_call(command_as_strings)
 
 
 if __name__ == "__main__":
