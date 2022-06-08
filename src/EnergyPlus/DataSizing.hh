@@ -827,9 +827,9 @@ namespace DataSizing {
 
         Real64 SysCoolCoinSpaceSens; // sum of zone space sensible cooling loads at coincident peak
         Real64 SysHeatCoinSpaceSens; //  sum of zone space sensible heating loads at coincident peak
-        Real64 SysDesCoolLoad;          // system peak load with coincident
-        int SysCoolLoadTimeStepPk; // timestep in day of cooling load peak
-        Real64 SysDesHeatLoad;          // system peak load with coincident
+        Real64 SysDesCoolLoad;       // system peak load with coincident
+        int SysCoolLoadTimeStepPk;   // timestep in day of cooling load peak
+        Real64 SysDesHeatLoad;       // system peak load with coincident
         int SysHeatLoadTimeStepPk;   // timestep in day of cooling load peak
         // Default Constructor
         SystemSizingData()
