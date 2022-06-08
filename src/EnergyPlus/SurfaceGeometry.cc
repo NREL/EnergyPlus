@@ -8315,21 +8315,31 @@ namespace SurfaceGeometry {
         // set report variables
         if (state.dataSurface->TotSurfPropGndSurfs > 0) {
             for (int Loop = 1; Loop <= state.dataSurface->TotSurfPropGndSurfs; Loop++) {
-                SetupOutputVariable(state,
-                                    "Surfaces Property Ground Surfaces Average Temperature",
-                                    OutputProcessor::Unit::C,
-                                    state.dataSurface->GroundSurfsProperty(Loop).SurfsTempAvg,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
-                                    state.dataSurface->GroundSurfsProperty(Loop).Name);
-
-                SetupOutputVariable(state,
-                                    "Surfaces Property Ground Surfaces Average Reflectance",
-                                    OutputProcessor::Unit::None,
-                                    state.dataSurface->GroundSurfsProperty(Loop).SurfsReflAvg,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
-                                    state.dataSurface->GroundSurfsProperty(Loop).Name);
+                bool SetTempSchReportVar = true;
+                bool SetReflSchReportVar = true;
+                auto &thisGndSurfsObj = state.dataSurface->GroundSurfsProperty(Loop);
+                for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
+                    if (!thisGndSurfsObj.GndSurfs(gSurfNum).TempSchPtr == 0 && SetTempSchReportVar) {
+                        SetupOutputVariable(state,
+                                            "Surfaces Property Ground Surfaces Average Temperature",
+                                            OutputProcessor::Unit::C,
+                                            thisGndSurfsObj.SurfsTempAvg,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::State,
+                                            thisGndSurfsObj.Name);
+                        SetTempSchReportVar = false;
+                    }
+                    if (!thisGndSurfsObj.GndSurfs(gSurfNum).ReflSchPtr == 0 && SetReflSchReportVar) {
+                        SetupOutputVariable(state,
+                                            "Surfaces Property Ground Surfaces Average Reflectance",
+                                            OutputProcessor::Unit::None,
+                                            thisGndSurfsObj.SurfsReflAvg,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::State,
+                                            thisGndSurfsObj.Name);
+                        SetReflSchReportVar = false;
+                    }
+                }
             }
         }
     }
