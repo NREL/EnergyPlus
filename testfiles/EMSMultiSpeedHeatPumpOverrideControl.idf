@@ -98,7 +98,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,22.1;
+  Version,22.2;
 
   Building,
     Single family House,     !- Name
