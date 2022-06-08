@@ -96,7 +96,8 @@ namespace AirflowNetwork {
 
     enum class DuctLineType
     {
-        None = 0,
+        Invalid = -1,
+        None,
         SupplyTrunk,  // Supply trunk
         SupplyBranch, // SupplyBrnach
         ReturnTrunk,  // Return trunk
@@ -1512,7 +1513,7 @@ namespace AirflowNetwork {
         // Default Constructor
         AirflowNetworkLinkageProp()
             : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Invalid), VAVTermDamper(false),
-              LinkageViewFactorObjectNum(0), AirLoopNum(0)
+              LinkageViewFactorObjectNum(0), AirLoopNum(0), ductLineType(DuctLineType::Invalid)
         {
         }
     };
