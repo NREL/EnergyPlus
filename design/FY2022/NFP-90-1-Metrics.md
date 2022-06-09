@@ -39,7 +39,18 @@ capacities less than 65,000 Btu/h.
 
 |Formulas|Code|
 |--|--|
-|![grafik](https://user-images.githubusercontent.com/49325382/172903437-c1b7f7e2-7453-4e86-9ea8-b19aa25a4b4e.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/172903437-c1b7f7e2-7453-4e86-9ea8-b19aa25a4b4e.png)|// AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
+    Real64 constexpr CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
+    Real64 constexpr OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
+    Real64 constexpr OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
+    Real64 constexpr AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate
+    // and hence AirMassFlowRatio is 1.0
+    Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
+    // specifies a nominal/default fan electric power consumption per rated air
+    // volume flow rate to account for indoor fan electric power consumption
+    // when the standard tests are conducted on units that do not have an
+    // indoor air circulating fan. Used if user doesn't enter a specific value.
+    Real64 constexpr PLRforSEER(0.5); // Part-load ratio for SEER calculation (single speed DX cooling coils)|
 |![grafik](https://user-images.githubusercontent.com/49325382/172903497-31efbd95-4cb9-4727-8b81-2f6e80c18dcd.png)<br> ![grafik](https://user-images.githubusercontent.com/49325382/172903561-05bf3a7f-8214-4690-af07-e5f5d2cdc723.png)
 ||
 
