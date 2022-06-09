@@ -101,8 +101,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
 // This module was created from IBLAST subroutines
 
 // USE STATEMENTS:
-// Use statements for data only modules
-// Using/Aliasing
 using namespace DataEnvironment;
 using namespace DataHeatBalFanSys;
 using namespace DataHeatBalance;
@@ -124,7 +122,7 @@ enum class AirflowSpec
     AirChanges,
     Num
 };
-std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
+constexpr std::array<std::string_view, static_cast<int>(AirflowSpec::Num)> airflowNamesUC = {
     "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/PERSON", "AIRCHANGES/HOUR"};
 
 enum class AirflowSpecAlt
@@ -138,10 +136,22 @@ enum class AirflowSpecAlt
     AirChanges,
     Num
 };
-std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> airflowAltNamesUC = {
+constexpr std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> airflowAltNamesUC = {
     "FLOW", "FLOW/ZONE", "FLOW/AREA", "FLOW/EXTERIORAREA", "FLOW/EXTERIORWALLAREA", "AIRCHANGES/HOUR"};
 
-std::array<std::string_view, static_cast<int>(VentilationType::Num)> ventilationTypeNamesUC = {"NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
+constexpr std::array<std::string_view, static_cast<int>(VentilationType::Num)> ventilationTypeNamesUC = {"NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
+
+constexpr std::array<std::string_view, static_cast<int>(DataRoomAirModel::RoomAirModel::Num)> roomAirModelNamesUC = {
+    "USERDEFINED",
+    "MIXING",
+    "ONENODEDISPLACEMENTVENTILATION",
+    "THREENODEDISPLACEMENTVENTILATION",
+    "CROSSVENTILATION",
+    "UNDERFLOORAIRDISTRIBUTIONINTERIOR",
+    "UNDERFLOORAIRDISTRIBUTIONEXTERIOR",
+    "AIRFLOWNETWORK"};
+
+constexpr std::array<std::string_view, static_cast<int>(DataRoomAirModel::CouplingScheme::Num)> couplingSchemeNamesUC = {"DIRECT", "INDIRECT"};
 
 void ManageAirHeatBalance(EnergyPlusData &state)
 {
@@ -1668,8 +1678,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisVentilation.FanType = static_cast<VentilationType>(getEnumerationValue(ventilationTypeNamesUC, cAlphaArgs(5)));
                     if (thisVentilation.FanType == VentilationType::Invalid) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\". invalid " +
-                                            cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
+                                        format(R"({}{}="{}". invalid {}="{}".)",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               thisVentilation.Name,
+                                               cAlphaFieldNames(5),
+                                               cAlphaArgs(5)));
                         ErrorsFound = true;
                     }
                 }
@@ -2721,7 +2735,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     ErrorsFound = true;
                 }
             }
-            if (lAlphaFieldBlanks(2)) {
+            if (lNumericFieldBlanks(2)) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                      " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Mixing will result.");
@@ -2748,7 +2762,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     ErrorsFound = true;
                 }
             }
-            if (lAlphaFieldBlanks(3)) {
+            if (lNumericFieldBlanks(3)) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                      " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Mixing will result.");
@@ -4457,8 +4471,8 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
             state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
 
-            state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = static_cast<DataRoomAirModel::RoomAirModel>(
-                getEnumerationValue(DataRoomAirModel::roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            state.dataRoomAirMod->AirModel(ZoneNum).AirModelType =
+                static_cast<DataRoomAirModel::RoomAirModel>(getEnumerationValue(roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType) {
             case DataRoomAirModel::RoomAirModel::Mixing:
                 // nothing to do here actually
@@ -4568,8 +4582,8 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
             }
 
-            state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = static_cast<DataRoomAirModel::CouplingScheme>(
-                getEnumerationValue(DataRoomAirModel::couplingSchemeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+            state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme =
+                static_cast<DataRoomAirModel::CouplingScheme>(getEnumerationValue(couplingSchemeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
             if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == DataRoomAirModel::CouplingScheme::Invalid) {
                 ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));

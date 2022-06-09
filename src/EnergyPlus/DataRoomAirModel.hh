@@ -83,14 +83,6 @@ namespace DataRoomAirModel {
     };
     constexpr const char *ChAirModel[] = {
         "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
-    constexpr std::array<std::string_view, static_cast<int>(RoomAirModel::Num)> roomAirModelNamesUC = {"USERDEFINED",
-                                                                                                       "MIXING",
-                                                                                                       "ONENODEDISPLACEMENTVENTILATION",
-                                                                                                       "THREENODEDISPLACEMENTVENTILATION",
-                                                                                                       "CROSSVENTILATION",
-                                                                                                       "UNDERFLOORAIRDISTRIBUTIONINTERIOR",
-                                                                                                       "UNDERFLOORAIRDISTRIBUTIONEXTERIOR",
-                                                                                                       "AIRFLOWNETWORK"};
 
     // Parameters to indicate air temperature coupling scheme
     enum class CouplingScheme
@@ -100,7 +92,6 @@ namespace DataRoomAirModel {
         Indirect,
         Num
     };
-    constexpr std::array<std::string_view, static_cast<int>(CouplingScheme::Num)> couplingSchemeNamesUC = {"DIRECT", "INDIRECT"};
 
     // Parameters to indicate type of air node, which is dependent on air models
     enum class AirNodeType
