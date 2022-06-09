@@ -35,13 +35,20 @@ In the current workorder, we would focus on two metrics only and propose to focu
 SEER2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
 capacities less than 65,000 Btu/h. 
 
-*For single stage system*
+*For single stage systems*
+
+|Formulas|Code|
+|--|--|
+|![grafik](https://user-images.githubusercontent.com/49325382/172903437-c1b7f7e2-7453-4e86-9ea8-b19aa25a4b4e.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/172903497-31efbd95-4cb9-4727-8b81-2f6e80c18dcd.png)<br> ![grafik](https://user-images.githubusercontent.com/49325382/172903561-05bf3a7f-8214-4690-af07-e5f5d2cdc723.png)
+||
+
 
 ![grafik](https://user-images.githubusercontent.com/49325382/172479575-decc82f9-f849-49a5-8c78-cfb8c5543883.png)
 
 ![grafik](https://user-images.githubusercontent.com/49325382/172479689-e6e9fc45-cad9-48e0-8967-fc868ec50113.png)
 
-*For two stage system*
+*For two stage systems*
 
 ![grafik](https://user-images.githubusercontent.com/49325382/172479815-28222eae-82fa-4173-851d-ca2e954ffea8.png)
 
