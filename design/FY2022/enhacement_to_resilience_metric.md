@@ -140,9 +140,7 @@ When *ThermalResilienceSummary* is declared in *Output:Table:SummaryReports*, th
 
 ### 2. Additional Warnings ###
 
-During the power outage period, a warning will be thrown when the electricity usage is non-zero.
-
-In the calculation of zone level Heating/Cooling SET Degree-Hours, if multiple *People* objects are defined for one zone, EnergyPlus will use the SET of one *People* object to compute the zone level SET Degree-Hours. In this feature update, a warning message will be produced to caution user that such zone-level values will only be meaningful if each zone have at most one *People* object defined.
+In the calculation of zone-level Heating/Cooling SET Degree-Hours, if multiple *People* objects are defined for one zone, and they have different SET, PMV, or Heat/Cold Stress Temperature Threshold, EnergyPlus will use the SET/PMV/Threshold Temperature of one *People* object to compute the zone level SET Degree-Hours. In this feature update, a warning message will be produced to caution users that such zone-level values will only be meaningful if all *People* object defined for the same zone agree on these measures.
 
 ### 3. Bug fixes ###
 In the develop branch, for Heating and Cooling SET degree-hours tabular report, the hours are only accumulated for occupied hours for both the "SET > 30°C Hours (°C)" column and the column "SET > 30°C OccupantHours (°C)", due to the `NumOcc > 0` check and the `state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0` check when passing values from `state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET` to `state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum)`.
