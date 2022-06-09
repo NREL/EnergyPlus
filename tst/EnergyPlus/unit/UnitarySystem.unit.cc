@@ -2176,17 +2176,17 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
                       ZoneEquipment,
                       sensOut,
                       latOut);
-    // main heating coil is meeting demand
-    EXPECT_NEAR(sensOut, 5500, 0.001 * 7500);
+    // main heating coil is not capable to meet demand, supp coil is operating
+    EXPECT_NEAR(sensOut, 5500, 0.001 * 5500);
     EXPECT_EQ(sensOut, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(thisSys->m_SensHeatEnergyRate, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(5500.0, thisSys->m_HeatingCoilSensDemand);
-    // Main heating coil is operating between speed1 and speed2
+    // Main heating coil is operating maximum capacity
     EXPECT_EQ(2, thisSys->m_HeatingSpeedNum);
     EXPECT_EQ(1.0, thisSys->m_HeatingCycRatio);
     EXPECT_EQ(thisSys->m_HeatingPartLoadFrac, 1.0);
     EXPECT_EQ(thisSys->m_HeatingSpeedRatio, 1.0);
-    // supp coil at 1st speed
+    // supp coil cycling at 1st speed
     EXPECT_EQ(1, thisSys->m_SuppHeatingSpeedNum);
     EXPECT_GT(thisSys->m_SuppHeatPartLoadFrac, 0.0);
     EXPECT_GT(thisSys->m_SuppHeatingCycRatio, 0.0);
@@ -2207,17 +2207,17 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
                       ZoneEquipment,
                       sensOut,
                       latOut);
-    // main heating coil is meeting demand
-    EXPECT_NEAR(sensOut, 8000, 0.001 * 10000);
+    // main heating coil is not capable to meet demand, supp coil is operating
+    EXPECT_NEAR(sensOut, 8000, 0.001 * 8000);
     EXPECT_EQ(sensOut, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(thisSys->m_SensHeatEnergyRate, thisSys->m_SensibleLoadMet);
     EXPECT_EQ(8000.0, thisSys->m_HeatingCoilSensDemand);
-    // Main heating coil is operating between speed1 and speed2
+    // Main heating coil is operating at max capacity
     EXPECT_EQ(2, thisSys->m_HeatingSpeedNum);
     EXPECT_EQ(1.0, thisSys->m_HeatingCycRatio);
     EXPECT_EQ(thisSys->m_HeatingPartLoadFrac, 1.0);
     EXPECT_EQ(thisSys->m_HeatingSpeedRatio, 1.0);
-    // supp coil at 1st speed
+    // supp coil operates between speed1 and speed2
     EXPECT_EQ(2, thisSys->m_SuppHeatingSpeedNum);
     EXPECT_GT(thisSys->m_SuppHeatPartLoadFrac, 0.0);
     EXPECT_EQ(1.0, thisSys->m_SuppHeatingCycRatio);
