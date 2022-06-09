@@ -463,37 +463,37 @@ namespace AirflowNetwork {
         std::string TypeName; // Name of Large vertical opening type
         int LVOType;          // Large vertical opening type number
         Real64 LVOValue;      // Extra crack length for LVO type 1 with multiple operable parts,
-        // or Height of pivoting axis for LVO type 2
-        int NumFac;         // Number of Opening Factor Values
-        Real64 OpenFac1;    // Opening factor #1
-        Real64 DischCoeff1; // Discharge coefficient for opening factor #1
-        Real64 WidthFac1;   // Width factor for for Opening factor #1
-        Real64 HeightFac1;  // Height factor for opening factor #1
-        Real64 StartHFac1;  // Start height factor for opening factor #1
-        Real64 OpenFac2;    // Opening factor #2
-        Real64 DischCoeff2; // Discharge coefficient for opening factor #2
-        Real64 WidthFac2;   // Width factor for for Opening factor #2
-        Real64 HeightFac2;  // Height factor for opening factor #2
-        Real64 StartHFac2;  // Start height factor for opening factor #2
-        Real64 OpenFac3;    // Opening factor #3
-        Real64 DischCoeff3; // Discharge coefficient for opening factor #3
-        Real64 WidthFac3;   // Width factor for for Opening factor #3
-        Real64 HeightFac3;  // Height factor for opening factor #3
-        Real64 StartHFac3;  // Start height factor for opening factor #3
-        Real64 OpenFac4;    // Opening factor #4
-        Real64 DischCoeff4; // Discharge coefficient for opening factor #4
-        Real64 WidthFac4;   // Width factor for for Opening factor #4
-        Real64 HeightFac4;  // Height factor for opening factor #4
-        Real64 StartHFac4;  // Start height factor for opening factor #4
-        Real64 OpenFactor;  // Opening factor
-        int WidthErrCount;  // Width error count
-        int WidthErrIndex;  // Width error index
-        int HeightErrCount; // Height error count
-        int HeightErrIndex; // Height error index
+                              // or Height of pivoting axis for LVO type 2
+        int NumFac;           // Number of Opening Factor Values
+        Real64 OpenFac1;      // Opening factor #1
+        Real64 DischCoeff1;   // Discharge coefficient for opening factor #1
+        Real64 WidthFac1;     // Width factor for for Opening factor #1
+        Real64 HeightFac1;    // Height factor for opening factor #1
+        Real64 StartHFac1;    // Start height factor for opening factor #1
+        Real64 OpenFac2;      // Opening factor #2
+        Real64 DischCoeff2;   // Discharge coefficient for opening factor #2
+        Real64 WidthFac2;     // Width factor for for Opening factor #2
+        Real64 HeightFac2;    // Height factor for opening factor #2
+        Real64 StartHFac2;    // Start height factor for opening factor #2
+        Real64 OpenFac3;      // Opening factor #3
+        Real64 DischCoeff3;   // Discharge coefficient for opening factor #3
+        Real64 WidthFac3;     // Width factor for for Opening factor #3
+        Real64 HeightFac3;    // Height factor for opening factor #3
+        Real64 StartHFac3;    // Start height factor for opening factor #3
+        Real64 OpenFac4;      // Opening factor #4
+        Real64 DischCoeff4;   // Discharge coefficient for opening factor #4
+        Real64 WidthFac4;     // Width factor for for Opening factor #4
+        Real64 HeightFac4;    // Height factor for opening factor #4
+        Real64 StartHFac4;    // Start height factor for opening factor #4
+        Real64 OpenFactor;    // Opening factor
+        int WidthErrCount;    // Width error count
+        int WidthErrIndex;    // Width error index
+        int HeightErrCount;   // Height error count
+        int HeightErrIndex;   // Height error index
 
         // Default Constructor
-        DetailedOpening()
-            : FlowCoef(0.0), FlowExpo(0.0), TypeName("NONPIVOTED"), LVOType(0), LVOValue(0.0), NumFac(0), OpenFac1(0.0), DischCoeff1(0.0),
+        DetailedOpening(EnergyPlusData &state)
+            : m_state(state), FlowCoef(0.0), FlowExpo(0.0), TypeName("NONPIVOTED"), LVOType(0), LVOValue(0.0), NumFac(0), OpenFac1(0.0), DischCoeff1(0.0),
               WidthFac1(0.0), HeightFac1(0.0), StartHFac1(0.0), OpenFac2(0.0), DischCoeff2(0.0), WidthFac2(0.0), HeightFac2(0.0), StartHFac2(0.0),
               OpenFac3(0.0), DischCoeff3(0.0), WidthFac3(0.0), HeightFac3(0.0), StartHFac3(0.0), OpenFac4(0.0), DischCoeff4(0.0), WidthFac4(0.0),
               HeightFac4(0.0), StartHFac4(0.0), OpenFactor(0.0), WidthErrCount(0), WidthErrIndex(0), HeightErrCount(0), HeightErrIndex(0)
@@ -514,6 +514,9 @@ namespace AirflowNetwork {
         {
             return ComponentType::DOP;
         }
+
+     private:
+        EnergyPlusData &m_state; // Having this here is not desirable, but a refactor of this object cannot be undertaken yet
     };
 
     struct SimpleOpening : public AirflowElement // Large simple opening component
@@ -1103,7 +1106,7 @@ namespace AirflowNetwork {
         // Each range has a min flow rate and 4 coefficients
 
         // Default Constructor
-        DetailedFan() : FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0)
+        DetailedFan(EnergyPlusData &state) : m_state(state), FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0)
         {
         }
 
@@ -1130,6 +1133,9 @@ namespace AirflowNetwork {
         {
             return ComponentType::FAN;
         }
+
+    private:
+        EnergyPlusData &m_state; // Having this here is not desirable, but this object is not used. After DetailedFan is dealt with, this will be next
     };
 
     struct DisSysCompCoilProp : public AirflowElement // Coil component

@@ -124,10 +124,6 @@ namespace AirflowNetwork {
         Real64 g;
         Real64 AA1;
 
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        // CompNum = state.afn->AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
@@ -271,10 +267,6 @@ namespace AirflowNetwork {
         Real64 g;
         Real64 AA1;
 
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        // CompNum = state.afn->AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
@@ -719,7 +711,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedFan::calculate(EnergyPlusData &state,
+    int DetailedFan::calculate(EnergyPlusData &,
                                bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -790,7 +782,7 @@ namespace AirflowNetwork {
             k = 5 * (j - 1) + 1;
             BX = Coeff(k);
             BY = Coeff(k + 1) + BX * (Coeff(k + 2) + BX * (Coeff(k + 3) + BX * Coeff(k + 4))) - PRISE;
-            if (BY < 0.0) ShowFatalError(state, "Out of range, too low in an AirflowNetwork detailed Fan");
+            if (BY < 0.0) ShowFatalError(m_state, "Out of range, too low in an AirflowNetwork detailed Fan");
 
             while (true) {
                 DX = Coeff(k + 5);
@@ -798,7 +790,7 @@ namespace AirflowNetwork {
                 // if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
                 if (BY * DY <= 0.0) break;
                 ++j;
-                if (j > NumCur) ShowFatalError(state, "Out of range, too high (FAN) in ADS simulation");
+                if (j > NumCur) ShowFatalError(m_state, "Out of range, too high (FAN) in ADS simulation");
                 k += 5;
                 BX = DX;
                 BY = DY;
@@ -808,7 +800,7 @@ namespace AirflowNetwork {
             CY = 0.0;
         Label40:;
             ++L;
-            if (L > 100) ShowFatalError(state, "Too many iterations (FAN) in AirflowNtework simulation");
+            if (L > 100) ShowFatalError(m_state, "Too many iterations (FAN) in AirflowNtework simulation");
             CCY = CY;
             CX = BX - BY * ((DX - BX) / (DY - BY));
             CY = Coeff(k + 1) + CX * (Coeff(k + 2) + CX * (Coeff(k + 3) + CX * Coeff(k + 4))) - PRISE;
@@ -844,7 +836,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedFan::calculate(EnergyPlusData &state,
+    int DetailedFan::calculate(EnergyPlusData &,
                                Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                [[maybe_unused]] const Real64 multiplier, // Element multiplier
                                const Real64 control,                     // Element control signal
@@ -915,7 +907,7 @@ namespace AirflowNetwork {
         k = 5 * (j - 1) + 1;
         BX = Coeff(k);
         BY = Coeff(k + 1) + BX * (Coeff(k + 2) + BX * (Coeff(k + 3) + BX * Coeff(k + 4))) - PRISE;
-        if (BY < 0.0) ShowFatalError(state, "Out of range, too low in an AirflowNetwork detailed Fan");
+        if (BY < 0.0) ShowFatalError(m_state, "Out of range, too low in an AirflowNetwork detailed Fan");
 
         while (true) {
             DX = Coeff(k + 5);
@@ -923,7 +915,7 @@ namespace AirflowNetwork {
             // if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
             if (BY * DY <= 0.0) break;
             ++j;
-            if (j > NumCur) ShowFatalError(state, "Out of range, too high (FAN) in ADS simulation");
+            if (j > NumCur) ShowFatalError(m_state, "Out of range, too high (FAN) in ADS simulation");
             k += 5;
             BX = DX;
             BY = DY;
@@ -933,7 +925,7 @@ namespace AirflowNetwork {
         CY = 0.0;
     Label40:;
         ++L;
-        if (L > 100) ShowFatalError(state, "Too many iterations (FAN) in AirflowNtework simulation");
+        if (L > 100) ShowFatalError(m_state, "Too many iterations (FAN) in AirflowNtework simulation");
         CCY = CY;
         CX = BX - BY * ((DX - BX) / (DY - BY));
         CY = Coeff(k + 1) + CX * (Coeff(k + 2) + CX * (Coeff(k + 3) + CX * Coeff(k + 4))) - PRISE;
@@ -1239,7 +1231,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedOpening::calculate(EnergyPlusData &state,
+    int DetailedOpening::calculate(EnergyPlusData &,
                                    [[maybe_unused]] bool const LFLAG,                   // Initialization flag.If = 1, use laminar relationship
                                    Real64 const PDROP,                                  // Total pressure drop across a component (P1 - P2) [Pa]
                                    [[maybe_unused]] const Real64 multiplier,            // Element multiplier
@@ -1361,7 +1353,7 @@ namespace AirflowNetwork {
                 Cfact = DischCoeff1 + (Fact - OpenFac1) / (OpenFac2 - OpenFac1) * (DischCoeff2 - DischCoeff1);
             } else {
                 ShowFatalError(
-                    state,
+                    m_state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                         name);
             }
@@ -1378,7 +1370,7 @@ namespace AirflowNetwork {
                 Cfact = DischCoeff2 + (Fact - OpenFac2) / (OpenFac3 - OpenFac2) * (DischCoeff3 - DischCoeff2);
             } else {
                 ShowFatalError(
-                    state,
+                    m_state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                         name);
             }
@@ -1399,7 +1391,7 @@ namespace AirflowNetwork {
                 Cfact = DischCoeff3 + (Fact - OpenFac3) / (OpenFac4 - OpenFac3) * (DischCoeff4 - DischCoeff3);
             } else {
                 ShowFatalError(
-                    state,
+                    m_state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                         name);
             }
@@ -1407,7 +1399,7 @@ namespace AirflowNetwork {
 
         // calculate DpProfNew
         for (i = 1; i <= NrInt + 2; ++i) {
-            DpProfNew(i) = PDROP + state.afn->dos.DpProf(Loc + i) - state.afn->dos.DpL(linkage.LinkNum, 1);
+            DpProfNew(i) = PDROP + m_state.afn->dos.DpProf(Loc + i) - m_state.afn->dos.DpL(linkage.LinkNum, 1);
         }
 
         // Get opening data based on the opening factor
@@ -1446,11 +1438,11 @@ namespace AirflowNetwork {
             if (ActLw == 0.0) {
                 ++WidthErrCount;
                 if (WidthErrCount < 2) {
-                    ShowWarningError(state, "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
-                    ShowContinueError(state, "The actual width is set to 1.0E-6 m.");
-                    ShowContinueErrorTimeStamp(state, "Occurrence info:");
+                    ShowWarningError(m_state, "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
+                    ShowContinueError(m_state, "The actual width is set to 1.0E-6 m.");
+                    ShowContinueErrorTimeStamp(m_state, "Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
+                    ShowRecurringWarningErrorAtEnd(m_state,
                                                    "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
                                                        " is 0 error continues.",
                                                    WidthErrIndex,
@@ -1462,11 +1454,11 @@ namespace AirflowNetwork {
             if (ActLh == 0.0) {
                 ++HeightErrCount;
                 if (HeightErrCount < 2) {
-                    ShowWarningError(state, "The actual height of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
-                    ShowContinueError(state, "The actual height is set to 1.0E-6 m.");
-                    ShowContinueErrorTimeStamp(state, "Occurrence info:");
+                    ShowWarningError(m_state, "The actual height of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
+                    ShowContinueError(m_state, "The actual height is set to 1.0E-6 m.");
+                    ShowContinueErrorTimeStamp(m_state, "Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state,
+                    ShowRecurringWarningErrorAtEnd(m_state,
                                                    "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
                                                        " is 0 error continues.",
                                                    HeightErrIndex,
@@ -1565,20 +1557,20 @@ namespace AirflowNetwork {
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = std::sqrt(state.afn->dos.RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = std::sqrt(m_state.afn->dos.RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(state.afn->dos.RhoProfF(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(m_state.afn->dos.RhoProfF(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma12 += fmasum;
                     dp1fma12 += dfmasum;
                 } else {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = -std::sqrt(state.afn->dos.RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = -std::sqrt(m_state.afn->dos.RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(-state.afn->dos.RhoProfT(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(-m_state.afn->dos.RhoProfT(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma21 += fmasum;
@@ -1618,9 +1610,9 @@ namespace AirflowNetwork {
             // Calculation of massflow and its derivative
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
-                    rholink = state.afn->dos.RhoProfF(Loc + i);
+                    rholink = m_state.afn->dos.RhoProfF(Loc + i);
                 } else {
-                    rholink = state.afn->dos.RhoProfT(Loc + i);
+                    rholink = m_state.afn->dos.RhoProfT(Loc + i);
                 }
 
                 if ((EvalHghts(i) <= h2) || (EvalHghts(i) >= h4)) {
@@ -1675,9 +1667,9 @@ namespace AirflowNetwork {
                 for (i = 2; i <= NrInt + 1; ++i) {
                     rholink = 0.0;
                     if (DpProfNew(i) > 0) {
-                        rholink = state.afn->dos.RhoProfF(Loc + i);
+                        rholink = m_state.afn->dos.RhoProfF(Loc + i);
                     } else {
-                        rholink = state.afn->dos.RhoProfT(Loc + i);
+                        rholink = m_state.afn->dos.RhoProfT(Loc + i);
                     }
                     rholink /= NrInt;
                     rholink = 1.2;
@@ -2056,7 +2048,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompCoilProp::calculate([[maybe_unused]] EnergyPlusData &state,
+    int DisSysCompCoilProp::calculate(EnergyPlusData &,
                                       bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -2212,7 +2204,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompCoilProp::calculate([[maybe_unused]] EnergyPlusData &state,
+    int DisSysCompCoilProp::calculate(EnergyPlusData &,
                                       Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                       [[maybe_unused]] const Real64 multiplier, // Element multiplier
                                       [[maybe_unused]] const Real64 control,    // Element control signal
@@ -2355,7 +2347,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompTermUnitProp::calculate([[maybe_unused]] EnergyPlusData &state,
+    int DisSysCompTermUnitProp::calculate(EnergyPlusData &state,
                                           bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                           Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                           [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -2517,7 +2509,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompHXProp::calculate([[maybe_unused]] EnergyPlusData &state,
+    int DisSysCompHXProp::calculate(EnergyPlusData &,
                                     bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                     Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                     [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -2661,7 +2653,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompHXProp::calculate([[maybe_unused]] EnergyPlusData &state,
+    int DisSysCompHXProp::calculate(EnergyPlusData &,
                                     Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                     [[maybe_unused]] const Real64 multiplier, // Element multiplier
                                     [[maybe_unused]] const Real64 control,    // Element control signal
