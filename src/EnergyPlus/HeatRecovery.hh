@@ -64,9 +64,6 @@ struct EnergyPlusData;
 
 namespace HeatRecovery {
 
-    // Heat exchanger performance data type
-    int constexpr BALANCEDHX_PERFDATATYPE1 = 1;
-
     enum class HXConfiguration
     {
         Invalid = -1,
@@ -88,8 +85,7 @@ namespace HeatRecovery {
     struct HeatExchCond
     {
         std::string Name;                                    // name of component
-        int ExchTypeNum = 0;                                 // Integer equivalent to ExchType
-        int HeatExchPerfTypeNum = 0;                         // Desiccant balanced heat exchanger performance data type num
+        int ExchType = 0;                                 // Integer equivalent to ExchType
         std::string HeatExchPerfName;                        // Desiccant balanced heat exchanger performance data name
         int SchedPtr = 0;                                    // index of schedule
         HXConfiguration FlowArr = HXConfiguration::Invalid;  // flow Arrangement:
@@ -340,11 +336,10 @@ namespace HeatRecovery {
 
     Real64 SafeDiv(Real64 a, Real64 b);
 
-    void CalculateEpsFromNTUandZ(EnergyPlusData &state,
+    Real64 CalculateEpsFromNTUandZ(EnergyPlusData &state,
                                  Real64 NTU,              // number of transfer units
                                  Real64 Z,                // capacity rate ratio
-                                 HXConfiguration FlowArr, // flow arrangement
-                                 Real64 &Eps              // heat exchanger effectiveness
+                                 HXConfiguration FlowArr // flow arrangement
     );
 
     void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
