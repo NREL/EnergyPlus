@@ -54,7 +54,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -92,21 +91,36 @@ namespace HeatRecovery {
         Num
     };
 
+    // invalid and num are not used for this internal enum class, but if I leave them out, the custom_check script complains
+    // I'm not sure whether to leave them in unused, or add them to the exception list in the script
+    // leaving them for now.
+    enum class CalculateNTUBoundsErrors
+    {
+        Invalid = -1,
+        NoError,
+        MassFlowRatio,
+        NominalEffectiveness1,
+        NominalEffectiveness2,
+        Quantity,
+        NominalEffectiveness3,
+        Num
+    };
+
     struct HeatExchCond
     {
-        std::string Name;                                    // name of component
-        int ExchType = 0;                                    // Integer equivalent to ExchType
-        std::string HeatExchPerfName;                        // Desiccant balanced heat exchanger performance data name
-        int SchedPtr = 0;                                    // index of schedule
-        HXConfiguration FlowArr = HXConfiguration::Invalid;  // flow Arrangement:
-        BooleanSwitch EconoLockOut = BooleanSwitch::Invalid; // 1: Yes;  0: No
-        Real64 hARatio = 0.0;                                // ratio of supply side h*A to secondary side h*A
-        Real64 NomSupAirVolFlow = 0.0;                       // nominal supply air volume flow rate (m3/s)
-        Real64 NomSupAirInTemp = 0.0;                        // nominal supply air inlet temperature (C)
-        Real64 NomSupAirOutTemp = 0.0;                       // nominal supply air outlet temperature (C)
-        Real64 NomSecAirVolFlow = 0.0;                       // nominal secondary air volume flow rate (m3/s)
-        Real64 NomSecAirInTemp = 0.0;                        // nominal secondary air inlet temperature (C)
-        Real64 NomElecPower = 0.0;                           // nominal electric power consumption [W]
+        std::string Name;                                   // name of component
+        int ExchType = 0;                                   // Integer equivalent to ExchType
+        std::string HeatExchPerfName;                       // Desiccant balanced heat exchanger performance data name
+        int SchedPtr = 0;                                   // index of schedule
+        HXConfiguration FlowArr = HXConfiguration::Invalid; // flow Arrangement:
+        bool EconoLockOut = false;
+        Real64 hARatio = 0.0;          // ratio of supply side h*A to secondary side h*A
+        Real64 NomSupAirVolFlow = 0.0; // nominal supply air volume flow rate (m3/s)
+        Real64 NomSupAirInTemp = 0.0;  // nominal supply air inlet temperature (C)
+        Real64 NomSupAirOutTemp = 0.0; // nominal supply air outlet temperature (C)
+        Real64 NomSecAirVolFlow = 0.0; // nominal secondary air volume flow rate (m3/s)
+        Real64 NomSecAirInTemp = 0.0;  // nominal secondary air inlet temperature (C)
+        Real64 NomElecPower = 0.0;     // nominal electric power consumption [W]
         // values describing nominal condition (derived from input parameters)
         Real64 UA0 = 0.0;               // (Uavg*A) at nominal condition
         Real64 mTSup0 = 0.0;            // product mDot*Tabs, supply  air, nominal cond.
@@ -399,11 +413,11 @@ namespace HeatRecovery {
     );
 
     void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
-                                 Real64 &NTU,             // number of transfer units
-                                 int &Err,                // error indicator
-                                 Real64 Z,                // capacity rate ratio
-                                 HXConfiguration FlowArr, // flow arrangement
-                                 Real64 Eps               // heat exchanger effectiveness
+                                 Real64 &NTU,                   // number of transfer units
+                                 CalculateNTUBoundsErrors &Err, // error indicator
+                                 Real64 Z,                      // capacity rate ratio
+                                 HXConfiguration FlowArr,       // flow arrangement
+                                 Real64 Eps                     // heat exchanger effectiveness
     );
 
     Real64 GetNTUforCrossFlowBothUnmixed(EnergyPlusData &state,

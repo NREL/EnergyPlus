@@ -300,16 +300,22 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            {
-                thisExchanger.EconoLockOut = getYesNoValue(state.dataIPShortCut->cAlphaArgs(4));
-                if (thisExchanger.EconoLockOut == BooleanSwitch::Invalid) {
-                    if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                        thisExchanger.EconoLockOut = BooleanSwitch::Yes;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(4));
-                        ErrorsFound = true;
-                    }
+            BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(4));
+            switch (toggle) {
+            case BooleanSwitch::Yes:
+                thisExchanger.EconoLockOut = true;
+                break;
+            case BooleanSwitch::No:
+                thisExchanger.EconoLockOut = false;
+                break;
+            default:
+                if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                    thisExchanger.EconoLockOut = true;
+                } else {
+                    ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(4));
+                    ErrorsFound = true;
                 }
+                break;
             }
             thisExchanger.hARatio = state.dataIPShortCut->rNumericArgs(1);
             thisExchanger.NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
@@ -512,14 +518,22 @@ namespace HeatRecovery {
                 thisExchanger.RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(13);
             }
 
-            thisExchanger.EconoLockOut = getYesNoValue(state.dataIPShortCut->cAlphaArgs(10));
-            if (thisExchanger.EconoLockOut == BooleanSwitch::Invalid) {
+            BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(10));
+            switch (toggle) {
+            case BooleanSwitch::Yes:
+                thisExchanger.EconoLockOut = true;
+                break;
+            case BooleanSwitch::No:
+                thisExchanger.EconoLockOut = false;
+                break;
+            default:
                 if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    thisExchanger.EconoLockOut = BooleanSwitch::Yes;
+                    thisExchanger.EconoLockOut = true;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(10));
                     ErrorsFound = true;
                 }
+                break;
             }
 
             BranchNodeConnections::TestCompSet(state,
@@ -627,14 +641,23 @@ namespace HeatRecovery {
             // HeatExchPerfType = state.dataIPShortCut->cAlphaArgs(7);
 
             thisExchanger.HeatExchPerfName = state.dataIPShortCut->cAlphaArgs(8);
-            thisExchanger.EconoLockOut = getYesNoValue(state.dataIPShortCut->cAlphaArgs(9));
-            if (thisExchanger.EconoLockOut == BooleanSwitch::Invalid) {
+
+            BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(9));
+            switch (toggle) {
+            case BooleanSwitch::Yes:
+                thisExchanger.EconoLockOut = true;
+                break;
+            case BooleanSwitch::No:
+                thisExchanger.EconoLockOut = false;
+                break;
+            default:
                 if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    thisExchanger.EconoLockOut = BooleanSwitch::No;
+                    thisExchanger.EconoLockOut = true;
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(9));
                     ErrorsFound = true;
                 }
+                break;
             }
 
         } // end of input loop over desiccant balanced heat exchangers
@@ -1234,8 +1257,7 @@ namespace HeatRecovery {
         Real64 RhoAir; // air density at outside pressure & standard temperature and humidity
         Real64 CpAir;  // heat capacity of air
         // of humidity ratio and temperature
-        int ErrStat; // error status returned by CalculateNTUfromEpsAndZ
-        Real64 Z;    // Min/max flow ratio
+        Real64 Z; // Min/max flow ratio
 
         if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag) {
             this->size(state);
@@ -1252,6 +1274,7 @@ namespace HeatRecovery {
             //    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
             CpAir = Psychrometrics::PsyCpAirFnW(0.0);
 
+            CalculateNTUBoundsErrors ErrStat = CalculateNTUBoundsErrors::NoError;
             switch (this->ExchType) {
             case DataHVACGlobals::HX_AIRTOAIR_FLATPLATE:
                 this->NomSupAirMassFlow = RhoAir * this->NomSupAirVolFlow;
@@ -1271,11 +1294,12 @@ namespace HeatRecovery {
                        SafeDiv(this->NomSupAirOutTemp - this->NomSupAirInTemp, CMin0 * (this->NomSecAirInTemp - this->NomSupAirInTemp));
                 Z = CMin0 / CMax0;
 
-                ErrStat = 0;
                 CalculateNTUfromEpsAndZ(state, NTU0, ErrStat, Z, this->FlowArr, Eps0);
 
-                if (ErrStat == 1) {
-
+                switch (ErrStat) {
+                case CalculateNTUBoundsErrors::NoError:
+                    break; // great!
+                case CalculateNTUBoundsErrors::MassFlowRatio:
                     FatalError = true;
                     ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
                     ShowContinueError(state, "  the mass flow ratio is out of bounds");
@@ -1289,7 +1313,8 @@ namespace HeatRecovery {
                                       format("Max_Mass_Flow_Rate = {:.2R} [air density] * {:.1R} [Max_Vol_Flow_Rate]",
                                              RhoAir,
                                              max(this->NomSupAirVolFlow, this->NomSecAirVolFlow)));
-                } else if (ErrStat == 2) {
+                    break;
+                case CalculateNTUBoundsErrors::NominalEffectiveness1:
                     FatalError = true;
                     ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
                     ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
@@ -1300,7 +1325,8 @@ namespace HeatRecovery {
                     ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
                     ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
                     ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
-                } else if (ErrStat == 3) {
+                    break;
+                case CalculateNTUBoundsErrors::NominalEffectiveness2:
                     FatalError = true;
                     ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
                     ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
@@ -1311,7 +1337,8 @@ namespace HeatRecovery {
                     ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
                     ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
                     ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
-                } else if (ErrStat == 4) {
+                    break;
+                case CalculateNTUBoundsErrors::Quantity:
                     FatalError = true;
                     ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
                     ShowContinueError(state, "  the quantity Eff_nom*(Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) is out of bounds");
@@ -1325,7 +1352,8 @@ namespace HeatRecovery {
                     ShowContinueError(state,
                                       "Change these inputs to obtain a physically realizable product of effectiveness times min/max mass ratio "
                                       "for this heat exchanger");
-                } else if (ErrStat == 5) {
+                    break;
+                case CalculateNTUBoundsErrors::NominalEffectiveness3:
                     FatalError = true;
                     ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
                     ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
@@ -1336,6 +1364,10 @@ namespace HeatRecovery {
                     ShowContinueError(state, "The temperatures are user inputs. The mass flow rates are user input volume flow rates");
                     ShowContinueError(state, format("  times the density of air [{:.2R} kg/m3]", RhoAir));
                     ShowContinueError(state, "Change these inputs to obtain a physically realizable heat exchanger effectiveness");
+                    break;
+                case CalculateNTUBoundsErrors::Invalid:
+                case CalculateNTUBoundsErrors::Num:
+                    break; // function won't actually return ::Invalid or ::Num, this is just so the compiler doesn't complain about the missing cases
                 }
 
                 if (FatalError) {
@@ -1704,7 +1736,7 @@ namespace HeatRecovery {
 
         Real64 UnitSupMassFlow; // supply air mass flow rate passing through the unit [kg/s]
         Real64 UnitSecMassFlow; // secondary air mass flow rate passing through the unit [kg/s]
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut == BooleanSwitch::Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut) {
             UnitSupMassFlow = 0.0; // set HX supply flow to 0, all supply air will go through supply bypass
             UnitSecMassFlow = 0.0; // set HX secondary flow to 0, all secondary air will got through secondary bypass
             UnitOn = false;        // turn off HX calculations when in economizer mode
@@ -1930,8 +1962,7 @@ namespace HeatRecovery {
         bool HighHumCtrlActiveFlag = present(HighHumCtrlFlag) && bool(HighHumCtrlFlag); // local representing high humidity control when PRESENT
 
         // Determine mass flow through heat exchanger and mass flow being bypassed (only flat plate bypasses flow)
-        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut == BooleanSwitch::Yes) &&
-            this->ExchConfig == HXConfigurationType::Plate) {
+        if (((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut) && this->ExchConfig == HXConfigurationType::Plate) {
             this->SupBypassMassFlow = this->SupInMassFlow;
             this->SupOutMassFlow = this->SupInMassFlow;
             this->SecBypassMassFlow = this->SecInMassFlow;
@@ -1945,7 +1976,7 @@ namespace HeatRecovery {
         // Unit is scheduled OFF, so bypass heat exchange calcs
         if (ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr) <= 0.0) UnitOn = false;
         //! Economizer is active, so bypass heat exchange calcs. This applies to both flat plate and rotary HX's
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut == BooleanSwitch::Yes) {
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut) {
             UnitOn = false;
         }
         // Determine if unit is ON or OFF based on air mass flow through the supply and secondary airstreams and operation flag
@@ -2396,14 +2427,6 @@ namespace HeatRecovery {
         Real64 ProcessTotHeatRecRate;  // process total heat recovery rate (heating +, cooling -)
         Real64 ProcessLatHeatRecRate;  // process latent heat recovery rate (heating [humidify] +, cooling [dehumidify] -)
 
-        Real64 Coeff1;                  // coefficient1 to empirical model (used for both temperature and humidity ratio equations)
-        Real64 Coeff2;                  // coefficient2 to empirical model (used for both temperature and humidity ratio equations)
-        Real64 Coeff3;                  // coefficient3 to empirical model (used for both temperature and humidity ratio equations)
-        Real64 Coeff4;                  // coefficient4 to empirical model (used for both temperature and humidity ratio equations)
-        Real64 Coeff5;                  // coefficient5 to empirical model (used for both temperature and humidity ratio equations)
-        Real64 Coeff6;                  // coefficient6 to empirical model (used for both temperature and humidity ratio equations)
-        Real64 Coeff7;                  // coefficient7 to empirical model (used for both temperature and humidity ratio equations)
-        Real64 Coeff8;                  // coefficient8 to empirical model (used for both temperature and humidity ratio equations)
         Real64 BalFaceVelActual;        // operating face velocity [m/s]
         Real64 FullLoadSupOutTemp(0);   // empirical model supply outlet temperature [C]
         Real64 FullLoadSupOutHumRat(0); // empirical model supply outlet humidity ratio [kg/kg]
@@ -2470,7 +2493,7 @@ namespace HeatRecovery {
         if (this->SecInMassFlow <= DataHVACGlobals::SmallMassFlow) UnitOn = false;
         if (HXPartLoadRatio == 0.0) UnitOn = false;
         if (!HXUnitOn) UnitOn = false;
-        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut == BooleanSwitch::Yes) UnitOn = false;
+        if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut) UnitOn = false;
 
         if (UnitOn) {
             Real64 local_SupInMassFlow; // Supply side HX mass flow rate
@@ -2489,20 +2512,13 @@ namespace HeatRecovery {
             // for cycling fan case, boost both local variables up to full flow
             if (FanOpMode == DataHVACGlobals::CycFanCycCoil) {
                 local_SupInMassFlow /= HXPartLoadRatio; // supply = regen
-                local_SecInMassFlow /= HXPartLoadRatio;       // secondary = process
+                local_SecInMassFlow /= HXPartLoadRatio; // secondary = process
             }
 
             // Check for balanced flow condition
             this->CheckForBalancedFlow(state, local_SecInMassFlow, local_SupInMassFlow, FirstHVACIteration);
 
-            Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[0];
-            Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[1];
-            Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[2];
-            Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[3];
-            Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[4];
-            Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[5];
-            Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[6];
-            Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).B[7];
+            auto &perf = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex);
 
             T_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
             T_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
@@ -2523,8 +2539,9 @@ namespace HeatRecovery {
             this->CheckModelBoundsTempEq(state, T_RegenInTemp, T_RegenInHumRat, T_ProcInTemp, T_ProcInHumRat, T_FaceVel, FirstHVACIteration);
 
             if (T_ProcInTemp != 0.0 && T_RegenInTemp != 0.0) {
-                FullLoadSupOutTemp = Coeff1 + Coeff2 * T_RegenInHumRat + Coeff3 * T_RegenInTemp + Coeff4 * (T_RegenInHumRat / T_RegenInTemp) +
-                                     Coeff5 * T_ProcInHumRat + Coeff6 * T_ProcInTemp + Coeff7 * (T_ProcInHumRat / T_ProcInTemp) + Coeff8 * T_FaceVel;
+                FullLoadSupOutTemp = perf.B[0] + perf.B[1] * T_RegenInHumRat + perf.B[2] * T_RegenInTemp +
+                                     perf.B[3] * (T_RegenInHumRat / T_RegenInTemp) + perf.B[4] * T_ProcInHumRat + perf.B[5] * T_ProcInTemp +
+                                     perf.B[6] * (T_ProcInHumRat / T_ProcInTemp) + perf.B[7] * T_FaceVel;
 
                 // Check model boundary for supply (regen) temp and do not cap value if out of bounds, check that supply in temp > out temp
                 this->CheckModelBoundOutput_Temp(state, this->SupInTemp, FullLoadSupOutTemp, FirstHVACIteration);
@@ -2532,15 +2549,6 @@ namespace HeatRecovery {
             } else {
                 FullLoadDeltaT = 0.0;
             }
-
-            Coeff1 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[0];
-            Coeff2 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[1];
-            Coeff3 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[2];
-            Coeff4 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[3];
-            Coeff5 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[4];
-            Coeff6 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[5];
-            Coeff7 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[6];
-            Coeff8 = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).C[7];
 
             H_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
             H_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
@@ -2557,9 +2565,9 @@ namespace HeatRecovery {
 
             //     Calc curve
             if (H_ProcInTemp != 0.0 && H_RegenInTemp != 0.0) {
-                FullLoadSupOutHumRat = Coeff1 + Coeff2 * H_RegenInHumRat + Coeff3 * H_RegenInTemp + Coeff4 * (H_RegenInHumRat / H_RegenInTemp) +
-                                       Coeff5 * H_ProcInHumRat + Coeff6 * H_ProcInTemp + Coeff7 * (H_ProcInHumRat / H_ProcInTemp) +
-                                       Coeff8 * H_FaceVel;
+                FullLoadSupOutHumRat = perf.C[0] + perf.C[1] * H_RegenInHumRat + perf.C[2] * H_RegenInTemp +
+                                       perf.C[3] * (H_RegenInHumRat / H_RegenInTemp) + perf.C[4] * H_ProcInHumRat + perf.C[5] * H_ProcInTemp +
+                                       perf.C[6] * (H_ProcInHumRat / H_ProcInTemp) + perf.C[7] * H_FaceVel;
 
                 // Check model boundary for supply (regen) hum rat and do not cap value if out of bounds, check that supply in HR < out HR
                 this->CheckModelBoundOutput_HumRat(state, this->SupInHumRat, FullLoadSupOutHumRat, FirstHVACIteration);
@@ -2615,15 +2623,16 @@ namespace HeatRecovery {
                 HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
             }
 
+            Real64 constexpr lowerLimit = 1.e-5;
             if (FanOpMode == DataHVACGlobals::CycFanCycCoil || RegenInletIsOANode) {
                 //       Supply (regen) air stream mass flow rate is cycling and proportional to PLR, outlet conditions are full load
                 //       conditions
                 this->SupOutTemp = this->SupInTemp + FullLoadDeltaT;
-                this->SupOutHumRat = min(1.0, max(1.e-5, this->SupInHumRat + FullLoadDeltaW));
+                this->SupOutHumRat = min(1.0, max(lowerLimit, this->SupInHumRat + FullLoadDeltaW));
             } else {
                 //       Supply (regen) air stream mass flow rate is constant and outlet conditions are averaged
                 this->SupOutTemp = this->SupInTemp + (FullLoadDeltaT * HXPartLoadRatio);
-                this->SupOutHumRat = min(1.0, max(1.e-5, this->SupInHumRat + (FullLoadDeltaW * HXPartLoadRatio)));
+                this->SupOutHumRat = min(1.0, max(lowerLimit, this->SupInHumRat + (FullLoadDeltaW * HXPartLoadRatio)));
             }
 
             //     for a balanced flow HX, use average mass flow rate and actual node conditions to calculate CSup and CSec
@@ -2656,7 +2665,7 @@ namespace HeatRecovery {
                 this->SecOutHumRat = Psychrometrics::PsyWFnTdbH(state, this->SecOutTemp, this->SecOutEnth, ThisSubTSatSecOutHumRat);
             }
 
-            this->ElecUseRate = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).NomElecPower * HXPartLoadRatio;
+            this->ElecUseRate = perf.NomElecPower * HXPartLoadRatio;
 
         } // ENDIF for "IF (UnitOn) THEN"
 
@@ -3110,7 +3119,7 @@ namespace HeatRecovery {
 
     void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
                                  Real64 &NTU,                   // number of transfer units
-                                 int &Err,                      // error indicator
+                                 CalculateNTUBoundsErrors &Err, // error indicator
                                  Real64 const Z,                // capacity rate ratio
                                  HXConfiguration const FlowArr, // flow arrangement
                                  Real64 const Eps               // heat exchanger effectiveness
@@ -3141,29 +3150,29 @@ namespace HeatRecovery {
         NTU = 0.0;
         // check input validity
         if (Z < 0.0 || Z > 1.0) {
-            Err = 1;
+            Err = CalculateNTUBoundsErrors::MassFlowRatio;
             return;
         }
 
         if (FlowArr == HXConfiguration::ParallelFlow) {
             if (Eps < 0.0 || Eps > 1.0 / (1.0 + Z)) {
-                Err = 2;
+                Err = CalculateNTUBoundsErrors::NominalEffectiveness1;
                 return;
             }
         } else if (FlowArr == HXConfiguration::CrossFlowOther) {
             if (Eps < 0.0 || Eps > (1.0 - std::exp(-Z)) / Z) {
-                Err = 3;
+                Err = CalculateNTUBoundsErrors::NominalEffectiveness2;
                 return;
             }
             // check product (Eps*Z)
             if (Eps * Z < 0.0 || Eps * Z > 1.0 - std::exp(Z * (SMALL - 1.0))) {
-                Err = 4;
+                Err = CalculateNTUBoundsErrors::Quantity;
                 return;
             }
             // check product (Eps*Z)
         } else {
             if (Eps < 0.0 || Eps > 1.0) {
-                Err = 5;
+                Err = CalculateNTUBoundsErrors::NominalEffectiveness3;
                 return;
             }
         }
