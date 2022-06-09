@@ -215,7 +215,7 @@ namespace AirflowNetwork {
 
     void generic_crack(Real64 &coef,             // Flow coefficient
                        Real64 const expn,        // Flow exponent
-                       bool const init,         // Initialization flag. If true, compute linear relationship
+                       bool const init,          // Initialization flag. If true, compute linear relationship
                        Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
                        const AirState &propN,    // Node 1 properties
                        const AirState &propM,    // Node 2 properties
@@ -225,7 +225,7 @@ namespace AirflowNetwork {
 
     int GenericDuct(Real64 const Length,      // Duct length
                     Real64 const Diameter,    // Duct diameter
-                    bool const init,         // Initialization flag. If true, compute linear relationship
+                    bool const init,          // Initialization flag. If true, compute linear relationship
                     Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
                     const AirState &propN,    // Node 1 properties
                     const AirState &propM,    // Node 2 properties
@@ -237,20 +237,20 @@ namespace AirflowNetwork {
     struct MultizoneZoneProp // Zone information
     {
         // Members
-        std::string ZoneName;    // Name of Associated EnergyPlus Thermal Zone
-        std::string VentControl; // Ventilation Control Mode: "TEMPERATURE", "ENTHALPIC", "CONSTANT", or "NOVENT"
-        std::string VentSchName; // Name of ventilation temperature control schedule
-        Real64 Height;           // Nodal height
-        Real64 OpenFactor;       // Limit Value on Multiplier for Modulating Venting Open Factor,
-        // Not applicable if Vent Control Mode = CONSTANT or NOVENT
-        Real64 LowValueTemp; // Lower Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with temp control
-        Real64 UpValueTemp; // Upper Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with temp control
-        Real64 LowValueEnth; // Lower Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with Enthalpic control
-        Real64 UpValueEnth; // Upper Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with Enthalpic control
+        std::string ZoneName;                       // Name of Associated EnergyPlus Thermal Zone
+        std::string VentControl;                    // Ventilation Control Mode: "TEMPERATURE", "ENTHALPIC", "CONSTANT", or "NOVENT"
+        std::string VentSchName;                    // Name of ventilation temperature control schedule
+        Real64 Height;                              // Nodal height
+        Real64 OpenFactor;                          // Limit Value on Multiplier for Modulating Venting Open Factor,
+                                                    // Not applicable if Vent Control Mode = CONSTANT or NOVENT
+        Real64 LowValueTemp;                        // Lower Value on Inside/Outside Temperature Difference for
+                                                    // Modulating the Venting Open Factor with temp control
+        Real64 UpValueTemp;                         // Upper Value on Inside/Outside Temperature Difference for
+                                                    // Modulating the Venting Open Factor with temp control
+        Real64 LowValueEnth;                        // Lower Value on Inside/Outside Temperature Difference for
+                                                    // Modulating the Venting Open Factor with Enthalpic control
+        Real64 UpValueEnth;                         // Upper Value on Inside/Outside Temperature Difference for
+                                                    // Modulating the Venting Open Factor with Enthalpic control
         int ZoneNum;                                // Zone number associated with ZoneName
         int VentSchNum;                             // Zone ventilation schedule number associated with ventilation schedule name
         int VentCtrNum;                             // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
@@ -294,38 +294,38 @@ namespace AirflowNetwork {
         std::string VentSchName;                        // ! Name of ventilation temperature control schedule
         Real64 ModulateFactor;                          // Limit Value on Multiplier for Modulating Venting Open Factor
         Real64 LowValueTemp;                            // Lower Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with temp control
-        Real64 UpValueTemp; // Upper Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with temp control
-        Real64 LowValueEnth; // Lower Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with Enthalpic control
-        Real64 UpValueEnth; // Upper Value on Inside/Outside Temperature Difference for
-        // Modulating the Venting Open Factor with Enthalpic control
-        std::string VentingSchName;                 // Name of ventilation temperature control schedule
-        int VentSchNum;                             // Zone ventilation schedule number associated with ventilation schedule name
-        VentControlType VentSurfCtrNum;             // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
-        int VentingSchNum;                          // Ventilation schedule number
-        int ZonePtr;                                // Pointer to inside face zone
-        bool IndVentControl;                        // Individual surface venting control
-        int ExtLargeOpeningErrCount;                // Exterior large opening error count during HVAC system operation
-        int ExtLargeOpeningErrIndex;                // Exterior large opening error index during HVAC system operation
-        int OpenFactorErrCount;                     // Large opening error count at Open factor > 1.0
-        int OpenFactorErrIndex;                     // Large opening error error index at Open factor > 1.0
-        Real64 Multiplier;                          // Window multiplier
-        bool HybridVentClose;                       // Hybrid ventilation window close control logical
-        bool HybridCtrlGlobal;                      // Hybrid ventilation global control logical
-        bool HybridCtrlMaster;                      // Hybrid ventilation global control master
-        Real64 WindModifier;                        // Wind modifier from hybrid ventilation control
-        std::string OccupantVentilationControlName; // Occupant ventilation control name
-        int OccupantVentilationControlNum;          // Occupant ventilation control number
-        int OpeningStatus;                          // Open status at current time step
-        int PrevOpeningstatus;                      // Open status at previous time step
-        Real64 CloseElapsedTime;                    // Elapsed time during closing (min)
-        Real64 OpenElapsedTime;                     // Elapsed time during closing (min)
-        int ClosingProbStatus;                      // Closing probability status
-        int OpeningProbStatus;                      // Opening probability status
-        bool RAFNflag;                              // True if this surface is used in AirflowNetwork:IntraZone:Linkage
-        bool NonRectangular;                        // True if this surface is not rectangular
+                                                        // Modulating the Venting Open Factor with temp control
+        Real64 UpValueTemp;                             // Upper Value on Inside/Outside Temperature Difference for
+                                                        // Modulating the Venting Open Factor with temp control
+        Real64 LowValueEnth;                            // Lower Value on Inside/Outside Temperature Difference for
+                                                        // Modulating the Venting Open Factor with Enthalpic control
+        Real64 UpValueEnth;                             // Upper Value on Inside/Outside Temperature Difference for
+                                                        // Modulating the Venting Open Factor with Enthalpic control
+        std::string VentingSchName;                     // Name of ventilation temperature control schedule
+        int VentSchNum;                                 // Zone ventilation schedule number associated with ventilation schedule name
+        VentControlType VentSurfCtrNum;                 // Ventilation control mode number: 1 "Temperature", 2 "ENTHALPIC", 3 "CONSTANT", 4 "NOVENT"
+        int VentingSchNum;                              // Ventilation schedule number
+        int ZonePtr;                                    // Pointer to inside face zone
+        bool IndVentControl;                            // Individual surface venting control
+        int ExtLargeOpeningErrCount;                    // Exterior large opening error count during HVAC system operation
+        int ExtLargeOpeningErrIndex;                    // Exterior large opening error index during HVAC system operation
+        int OpenFactorErrCount;                         // Large opening error count at Open factor > 1.0
+        int OpenFactorErrIndex;                         // Large opening error error index at Open factor > 1.0
+        Real64 Multiplier;                              // Window multiplier
+        bool HybridVentClose;                           // Hybrid ventilation window close control logical
+        bool HybridCtrlGlobal;                          // Hybrid ventilation global control logical
+        bool HybridCtrlMaster;                          // Hybrid ventilation global control master
+        Real64 WindModifier;                            // Wind modifier from hybrid ventilation control
+        std::string OccupantVentilationControlName;     // Occupant ventilation control name
+        int OccupantVentilationControlNum;              // Occupant ventilation control number
+        int OpeningStatus;                              // Open status at current time step
+        int PrevOpeningstatus;                          // Open status at previous time step
+        Real64 CloseElapsedTime;                        // Elapsed time during closing (min)
+        Real64 OpenElapsedTime;                         // Elapsed time during closing (min)
+        int ClosingProbStatus;                          // Closing probability status
+        int OpeningProbStatus;                          // Opening probability status
+        bool RAFNflag;                                  // True if this surface is used in AirflowNetwork:IntraZone:Linkage
+        bool NonRectangular;                            // True if this surface is not rectangular
         EquivRec EquivRecMethod;        // Equivalent Rectangle Method input: 1 Height; 2 Base surface aspect ratio; 3 User input aspect ratio
         Real64 EquivRecUserAspectRatio; // user input value when EquivRecMethod = 3
 
@@ -363,7 +363,7 @@ namespace AirflowNetwork {
 
         std::string name; // Name of airflow element
 
-        virtual int calculate(bool const init,                   // Initialization flag. If true, compute linear relationship
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
                               AirflowNetworkLinkageProp &linkage, // Linkage
                               std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
@@ -476,25 +476,26 @@ namespace AirflowNetwork {
 
         // Default Constructor
         DetailedOpening(EnergyPlusData &state)
-            : m_state(state), FlowCoef(0.0), FlowExpo(0.0), TypeName("NONPIVOTED"), LVOType(0), LVOValue(0.0), NumFac(0), OpenFac1(0.0), DischCoeff1(0.0),
-              WidthFac1(0.0), HeightFac1(0.0), StartHFac1(0.0), OpenFac2(0.0), DischCoeff2(0.0), WidthFac2(0.0), HeightFac2(0.0), StartHFac2(0.0),
-              OpenFac3(0.0), DischCoeff3(0.0), WidthFac3(0.0), HeightFac3(0.0), StartHFac3(0.0), OpenFac4(0.0), DischCoeff4(0.0), WidthFac4(0.0),
-              HeightFac4(0.0), StartHFac4(0.0), OpenFactor(0.0), WidthErrCount(0), WidthErrIndex(0), HeightErrCount(0), HeightErrIndex(0)
+            : m_state(state), FlowCoef(0.0), FlowExpo(0.0), TypeName("NONPIVOTED"), LVOType(0), LVOValue(0.0), NumFac(0), OpenFac1(0.0),
+              DischCoeff1(0.0), WidthFac1(0.0), HeightFac1(0.0), StartHFac1(0.0), OpenFac2(0.0), DischCoeff2(0.0), WidthFac2(0.0), HeightFac2(0.0),
+              StartHFac2(0.0), OpenFac3(0.0), DischCoeff3(0.0), WidthFac3(0.0), HeightFac3(0.0), StartHFac3(0.0), OpenFac4(0.0), DischCoeff4(0.0),
+              WidthFac4(0.0), HeightFac4(0.0), StartHFac4(0.0), OpenFactor(0.0), WidthErrCount(0), WidthErrIndex(0), HeightErrCount(0),
+              HeightErrIndex(0)
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
             return ComponentType::DOP;
         }
 
-     private:
+    private:
         EnergyPlusData &m_state; // Having this here is not desirable, but a refactor of this object cannot be undertaken yet
     };
 
@@ -512,11 +513,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -537,11 +538,11 @@ namespace AirflowNetwork {
         {
         }
 
-        int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                      AirflowNetworkLinkageProp &linkage, // Linkage
+                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                      ) override;
 
         virtual ComponentType type() const override
         {
@@ -559,11 +560,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate([[maybe_unused]] bool const init,                   // Initialization flag. If true, compute linear relationship
-                      [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
-                      std::array<Real64, 2> &F,                            // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                            // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate([[maybe_unused]] bool const init,                    // Initialization flag. If true, compute linear relationship
+                              [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,                            // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF                            // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -582,10 +583,10 @@ namespace AirflowNetwork {
         }
 
         virtual int calculate([[maybe_unused]] bool const init,   // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,  // Linkage
-                      std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF            // Partial derivative:  DF/DP
-        ) override;
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -605,11 +606,6 @@ namespace AirflowNetwork {
             : name(name), temperature(temperature), pressure(pressure), humidity_ratio(humidity_ratio)
         {
         }
-
-        // ReferenceConditions(Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
-        //    : temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
-        //{
-        //}
     };
 
     struct SurfaceCrack : public AirflowElement // Surface crack component
@@ -628,10 +624,10 @@ namespace AirflowNetwork {
         }
 
         virtual int calculate(bool const linear,                  // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage, // Linkage
-                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
-        ) override;
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -654,11 +650,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -688,11 +684,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -829,11 +825,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -854,11 +850,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -896,11 +892,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -927,11 +923,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -943,7 +939,6 @@ namespace AirflowNetwork {
     {
         // Members
         Real64 FlowRate;           // Air volume flow rate
-        //Real64 Ctrl;               // Control ratio
         int FanTypeNum;            // Fan type: Constant volume or ONOFF
         int FanIndex;              // Fan index
         int InletNode;             // Inlet node number
@@ -951,19 +946,20 @@ namespace AirflowNetwork {
         Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
         int AirLoopNum;            // Air loop number
         bool FanModelFlag;         // True, this fan is FAN:SYSTEMMODEL
+        // Real64 Ctrl;               // Control ratio
 
         // Default Constructor
         SimpleFan()
-            : FlowRate(0.0), /* Ctrl(0.0),*/ FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0),
+            : FlowRate(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0),
               FanModelFlag(false)
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -985,15 +981,15 @@ namespace AirflowNetwork {
         // Each range has a min flow rate and 4 coefficients
 
         // Default Constructor
-        DetailedFan(EnergyPlusData &state) : m_state(state), FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0)
+        DetailedFan(EnergyPlusData &state) : m_state(state), FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0), n(0)
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -1017,11 +1013,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -1042,11 +1038,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -1069,11 +1065,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -1092,11 +1088,11 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-        ) override;
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+                              ) override;
 
         virtual ComponentType type() const override
         {
@@ -1231,10 +1227,10 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                              AirflowNetworkLinkageProp &linkage,       // Linkage
-                              std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type() const override
@@ -1251,10 +1247,10 @@ namespace AirflowNetwork {
         {
         }
 
-        virtual int calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                              AirflowNetworkLinkageProp &linkage,       // Linkage
-                              std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+        virtual int calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type() const override
