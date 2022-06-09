@@ -978,7 +978,7 @@ namespace AirflowNetwork {
         Real64 TranRat;        // Flow coefficient at laminar/turbulent transition
         int n;                 // Number of ranges for fan performance curve
         Array1D<Real64> Coeff; // Coefficients of fan performance curve.
-        // Each range has a min flow rate and 4 coefficients
+                               // Each range has a min flow rate and 4 coefficients
 
         // Default Constructor
         DetailedFan(EnergyPlusData &state) : m_state(state), FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0), n(0)
@@ -1115,13 +1115,13 @@ namespace AirflowNetwork {
     struct Node : public AirState // AirflowNetwork nodal data
     {
         // Members
-        std::string Name;      // Provide a unique node name
-        std::string NodeType;  // Provide node type "External", "Thermal Zone" or "Other"
-        std::string EPlusNode; // EnergyPlus node name
-        Real64 NodeHeight;     // Node height [m]
-        int NodeNum;           // Node number
-        int NodeTypeNum;       // Node type with integer number
-        // 0: Calculated, 1: Given pressure;
+        std::string Name;          // Provide a unique node name
+        std::string NodeType;      // Provide node type "External", "Thermal Zone" or "Other"
+        std::string EPlusNode;     // EnergyPlus node name
+        Real64 NodeHeight;         // Node height [m]
+        int NodeNum;               // Node number
+        int NodeTypeNum;           // Node type with integer number
+                                   // 0: Calculated, 1: Given pressure;
         std::string EPlusZoneName; // EnergyPlus node name
         int EPlusZoneNum;          // E+ zone number
         int EPlusNodeNum;

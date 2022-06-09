@@ -77,10 +77,10 @@ namespace AirflowNetwork {
         return x * x;
     }
 
-    int Duct::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                        AirflowNetworkLinkageProp &linkage,       // Linkage
-                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int Duct::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                        AirflowNetworkLinkageProp &linkage, // Linkage
+                        std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                        std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -291,10 +291,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DuctLeak::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                            AirflowNetworkLinkageProp &linkage,       // Linkage
-                            std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                            std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int DuctLeak::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                            AirflowNetworkLinkageProp &linkage, // Linkage
+                            std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                            std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -378,10 +378,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SimpleFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                             AirflowNetworkLinkageProp &linkage,       // Linkage
-                             std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                             std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int SimpleFan::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                             AirflowNetworkLinkageProp &linkage, // Linkage
+                             std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                             std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -409,10 +409,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                               AirflowNetworkLinkageProp &linkage,       // Linkage
-                               std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                               std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int DetailedFan::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                               AirflowNetworkLinkageProp &linkage, // Linkage
+                               std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                               std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -462,7 +462,8 @@ namespace AirflowNetwork {
         } else {
             PRISE = -linkage.pressure_drop * (RhoAir / propN.density) / (TranRat * linkage.control);
         }
-        // if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << linkage.pressure_drop << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
+        // if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << linkage.pressure_drop << PRISE << AFECTL(i) <<
+        // DisSysCompDetFanData(CompNum).TranRat;
         if (init) {
             // Initialization by linear approximation.
             F[0] = -Qfree * linkage.control * (1.0 - PRISE / Pshut);
@@ -530,10 +531,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int Damper::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                          AirflowNetworkLinkageProp &linkage,       // Linkage
-                          std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                          std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int Damper::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                          AirflowNetworkLinkageProp &linkage, // Linkage
+                          std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                          std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -584,10 +585,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int EffectiveLeakageRatio::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                         AirflowNetworkLinkageProp &linkage,       // Linkage
-                                         std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int EffectiveLeakageRatio::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                         AirflowNetworkLinkageProp &linkage, // Linkage
+                                         std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                         std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -663,7 +664,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedOpening::calculate([[maybe_unused]] bool const init,                   // Initialization flag. If true, compute linear relationship
+    int DetailedOpening::calculate([[maybe_unused]] bool const init,                    // Initialization flag. If true, compute linear relationship
                                    [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
                                    std::array<Real64, 2> &F,                            // Airflow through the component [kg/s]
                                    std::array<Real64, 2> &DF                            // Partial derivative:  DF/DP
@@ -1119,10 +1120,10 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int SimpleOpening::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                 AirflowNetworkLinkageProp &linkage,       // Linkage
-                                 std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                 std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int SimpleOpening::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                 AirflowNetworkLinkageProp &linkage, // Linkage
+                                 std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                 std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -1257,10 +1258,10 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int ConstantPressureDrop::calculate([[maybe_unused]] bool const init,        // Initialization flag. If true, compute linear relationship
-                                        AirflowNetworkLinkageProp &linkage,       // Linkage
-                                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int ConstantPressureDrop::calculate([[maybe_unused]] bool const init,   // Initialization flag. If true, compute linear relationship
+                                        AirflowNetworkLinkageProp &linkage, // Linkage
+                                        std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                        std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -1277,10 +1278,10 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a Constant pressure drop component
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //Real64 Co;
+        // Real64 Co;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        //const Node &propM = *linkage.nodes[1]; // Node 2 properties
+        // const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         int n = linkage.indices[0];
         int m = linkage.indices[1];
@@ -1295,18 +1296,18 @@ namespace AirflowNetwork {
         } else {
             linkage.pressure_drop = DP;
             F[0] = linkage.mass_flow.value();
-            //state.afn->PZ(m) = state.afn->PZ(n) - DP;
-            //Co = F[0] / DP;
+            // state.afn->PZ(m) = state.afn->PZ(n) - DP;
+            // Co = F[0] / DP;
             DF[0] = 10.e10;
         }
-        
+
         return 1;
     }
 
-    int EffectiveLeakageArea::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                        AirflowNetworkLinkageProp &linkage,       // Linkage
-                                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int EffectiveLeakageArea::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                        AirflowNetworkLinkageProp &linkage, // Linkage
+                                        std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                        std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -1385,10 +1386,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompCoilProp::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int DisSysCompCoilProp::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                      AirflowNetworkLinkageProp &linkage, // Linkage
+                                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -1537,10 +1538,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompTermUnitProp::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                          AirflowNetworkLinkageProp &linkage,       // Linkage
-                                          std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                          std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int DisSysCompTermUnitProp::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                          AirflowNetworkLinkageProp &linkage, // Linkage
+                                          std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                          std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -1692,10 +1693,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompHXProp::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                    AirflowNetworkLinkageProp &linkage,       // Linkage
-                                    std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                    std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int DisSysCompHXProp::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                    AirflowNetworkLinkageProp &linkage, // Linkage
+                                    std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                    std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -1832,10 +1833,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ZoneExhaustFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                  AirflowNetworkLinkageProp &linkage,       // Linkage
-                                  std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                  std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int ZoneExhaustFan::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                  AirflowNetworkLinkageProp &linkage, // Linkage
+                                  std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                  std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -1948,10 +1949,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int HorizontalOpening::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                     AirflowNetworkLinkageProp &linkage,       // Linkage
-                                     std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                     std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int HorizontalOpening::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                     AirflowNetworkLinkageProp &linkage, // Linkage
+                                     std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                     std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2078,7 +2079,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SpecifiedMassFlow::calculate([[maybe_unused]] bool const init,                   // Initialization flag. If true, compute linear relationship
+    int SpecifiedMassFlow::calculate([[maybe_unused]] bool const init,                    // Initialization flag. If true, compute linear relationship
                                      [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
                                      std::array<Real64, 2> &F,                            // Airflow through the component [kg/s]
                                      std::array<Real64, 2> &DF                            // Partial derivative:  DF/DP
@@ -2103,9 +2104,9 @@ namespace AirflowNetwork {
     }
 
     int SpecifiedVolumeFlow::calculate([[maybe_unused]] bool const init,   // Initialization flag. If true, compute linear relationship
-                                       AirflowNetworkLinkageProp &linkage,  // Linkage
-                                       std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
-                                       std::array<Real64, 2> &DF            // Partial derivative:  DF/DP
+                                       AirflowNetworkLinkageProp &linkage, // Linkage
+                                       std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                       std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2137,10 +2138,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int OutdoorAirFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                                 AirflowNetworkLinkageProp &linkage,       // Linkage
-                                 std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                 std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int OutdoorAirFan::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                                 AirflowNetworkLinkageProp &linkage, // Linkage
+                                 std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                                 std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -2246,10 +2247,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ReliefFlow::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
-                              AirflowNetworkLinkageProp &linkage,       // Linkage
-                              std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+    int ReliefFlow::calculate(bool const init,                    // Initialization flag. If true, compute linear relationship
+                              AirflowNetworkLinkageProp &linkage, // Linkage
+                              std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
     )
     {
 
@@ -2435,7 +2436,7 @@ namespace AirflowNetwork {
 
     int GenericDuct(Real64 const Length,      // Duct length
                     Real64 const Diameter,    // Duct diameter
-                    bool const init,         // Initialization flag. If true, compute linear relationship
+                    bool const init,          // Initialization flag. If true, compute linear relationship
                     Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
                     const AirState &propN,    // Node 1 properties
                     const AirState &propM,    // Node 2 properties
