@@ -110,18 +110,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_HorizontalOpening)
     state->afn->AirflowNetworkLinkageData[0].NodeHeights[1] = 2.0;
     state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[1]}};
     state->afn->AirflowNetworkLinkageData[0].set_surface(&state->afn->MultizoneSurfaceData[0]);
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = 0.05;
 
-    Real64 multiplier = 1.0;
-    Real64 control = 1.0;
-
-    NF = state->afn->MultizoneCompHorOpeningData[0].calculate(
-        *state, 1, 0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    NF = state->afn->MultizoneCompHorOpeningData[0].calculate(false, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(3.47863, F[0], 0.00001);
     EXPECT_NEAR(34.7863, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = state->afn->MultizoneCompHorOpeningData[0].calculate(*state, 1, -0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = -0.05;
+    NF = state->afn->MultizoneCompHorOpeningData[0].calculate(false, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(-3.42065, F[0], 0.00001);
     EXPECT_NEAR(34.20649, DF[0], 0.0001);
     EXPECT_NEAR(2.96657, F[1], 0.00001);
@@ -141,35 +139,34 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     std::array<Real64, 2> F;
     std::array<Real64, 2> DF;
 
-    clear_and_resize(state->afn->AirflowNetworkCompData, 1);
+    state->afn->AirflowNetworkCompData.resize(1);
     state->afn->AirflowNetworkCompData[0].TypeNum = 1;
 
-    clear_and_resize(state->afn->DisSysCompCoilData, 1);
-    state->afn->DisSysCompCoilData[0].hydraulicDiameter = 1.0;
+    state->afn->DisSysCompCoilData.resize(1);
     state->afn->DisSysCompCoilData[0].L = 1.0;
+    state->afn->DisSysCompCoilData[0].hydraulicDiameter = 1.0;
 
-    clear_and_resize(state->afn->nodes, 2);
+    state->afn->nodes.resize(2);
     state->afn->nodes[0].density = 1.2;
     state->afn->nodes[1].density = 1.2;
 
     state->afn->nodes[0].viscosity = 1.0e-5;
     state->afn->nodes[1].viscosity = 1.0e-5;
 
-    clear_and_resize(state->afn->AirflowNetworkLinkageData, 1);
+    state->afn->AirflowNetworkLinkageData.resize(1);
     state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[1]}};
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = 0.05;
 
     F[1] = DF[1] = 0.0;
 
-    Real64 multiplier = 1.0;
-    Real64 control = 1.0;
-
-    NF = state->afn->DisSysCompCoilData[0].calculate(*state, 1, 0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    NF = state->afn->DisSysCompCoilData[0].calculate(true, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(-294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[1]);
 
-    NF = state->afn->DisSysCompCoilData[0].calculate(*state, 1, -0.05, multiplier, control, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = -0.05;
+    NF = state->afn->DisSysCompCoilData[0].calculate(true, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_NEAR(294.5243112740431, F[0], 0.00001);
     EXPECT_NEAR(5890.4862254808613, DF[0], 0.0001);
     EXPECT_EQ(0.0, F[1]);
@@ -190,21 +187,23 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
 
     Real64 dp{10.0};
 
-    clear_and_resize(state->afn->nodes, 2);
+    state->afn->nodes.resize(2);
     Real64 sqrt_density = state->afn->nodes[0].sqrt_density; // = state1.sqrt_density
     Real64 viscosity = state->afn->nodes[0].viscosity;       // = state1.viscosity
     state->afn->AirflowNetworkLinkageData.allocate(1);
     state->afn->AirflowNetworkLinkageData[0].nodes = {{&state->afn->nodes[0], &state->afn->nodes[1]}};
 
     // Linear
-    NF = crack.calculate(*state, true, dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = dp;
+    NF = crack.calculate(true, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(0.01 * sqrt_density / viscosity, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = crack.calculate(*state, true, -dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = -dp;
+    NF = crack.calculate(true, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(-0.01 * sqrt_density / viscosity, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
@@ -212,14 +211,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
     EXPECT_EQ(1, NF);
 
     // Nonlinear
-    NF = crack.calculate(*state, false, dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = dp;
+    NF = crack.calculate(false, state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(0.001 * std::pow(10.0, 0.65), F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = crack.calculate(*state, false, -dp, 1.0, 1.0, state->afn->AirflowNetworkLinkageData[0], F, DF);
+    state->afn->AirflowNetworkLinkageData[0].pressure_drop = -dp;
+    NF = crack.calculate(false,state->afn->AirflowNetworkLinkageData[0], F, DF);
     EXPECT_EQ(-0.001 * std::pow(10.0, 0.65), F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
@@ -286,14 +287,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedMassFlow)
     Real64 f = element.mass_flow;
 
     // Linear
-    NF = element.calculate(*state, true, dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = dp;
+    NF = element.calculate(true, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, true, -dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = -dp;
+    NF = element.calculate(true, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
@@ -301,14 +304,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedMassFlow)
     EXPECT_EQ(1, NF);
 
     // Nonlinear tests
-    NF = element.calculate(*state, false, dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = dp;
+    NF = element.calculate(false, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, false, -dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = -dp;
+    NF = element.calculate(false, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
@@ -335,14 +340,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedVolumeFlow)
     Real64 f = element.volume_flow * density;
 
     // Linear
-    NF = element.calculate(*state, true, dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = dp;
+    NF = element.calculate(true, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, true, -dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = -dp;
+    NF = element.calculate(true, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
@@ -350,14 +357,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedVolumeFlow)
     EXPECT_EQ(1, NF);
 
     // Nonlinear tests
-    NF = element.calculate(*state, false, dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = dp;
+    NF = element.calculate(false, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);
     EXPECT_EQ(0.0, DF[1]);
     EXPECT_EQ(1, NF);
 
-    NF = element.calculate(*state, false, -dp, 1.0, 1.0, link, F, DF);
+    link.pressure_drop = -dp;
+    NF = element.calculate(false, link, F, DF);
     EXPECT_EQ(f, F[0]);
     EXPECT_EQ(0.0, F[1]);
     EXPECT_EQ(0.0, DF[0]);

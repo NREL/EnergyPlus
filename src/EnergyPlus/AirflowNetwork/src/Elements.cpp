@@ -77,11 +77,7 @@ namespace AirflowNetwork {
         return x * x;
     }
 
-    int Duct::calculate(EnergyPlusData &,
-                        bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                        [[maybe_unused]] const Real64 control,    // Element control signal
+    int Duct::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                         AirflowNetworkLinkageProp &linkage,       // Linkage
                         std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -129,36 +125,36 @@ namespace AirflowNetwork {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 DF[0] = (2.0 * propN.density * A * hydraulicDiameter) / (propN.viscosity * InitLamCoef * ld);
             } else {
                 DF[0] = (2.0 * propM.density * A * hydraulicDiameter) / (propM.viscosity * InitLamCoef * ld);
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = -DF[0] * linkage.pressure_drop;
             // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwi:" << i << InitLamCoef << F[0] << DF[0];
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow coefficient !=0
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propN.density * A * A);
                     A1 = (propN.viscosity * LamDynCoef * ld) / (2.0 * propN.density * A * hydraulicDiameter);
-                    A0 = -PDROP;
+                    A0 = -linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = (CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propN.density * A * hydraulicDiameter) / (propN.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = FL * hydraulicDiameter / (propN.viscosity * A);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << linkage.pressure_drop << FL << CDM << RE;
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(2.0 * propN.density * PDROP) * A;
+                    S2 = std::sqrt(2.0 * propN.density * linkage.pressure_drop) * A;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
                     while (true) {
@@ -180,19 +176,19 @@ namespace AirflowNetwork {
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propM.density * A * A);
                     A1 = (propM.viscosity * LamDynCoef * ld) / (2.0 * propM.density * A * hydraulicDiameter);
-                    A0 = PDROP;
+                    A0 = linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = -(CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propM.density * A * hydraulicDiameter) / (propM.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = -FL * hydraulicDiameter / (propM.viscosity * A);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << linkage.pressure_drop << FL << CDM << RE;
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(-2.0 * propM.density * PDROP) * A;
+                    S2 = std::sqrt(-2.0 * propM.density * linkage.pressure_drop) * A;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
                     while (true) {
@@ -215,149 +211,13 @@ namespace AirflowNetwork {
                 DF[0] = CDM;
             } else {
                 F[0] = FT;
-                DF[0] = 0.5 * FT / PDROP;
+                DF[0] = 0.5 * FT / linkage.pressure_drop;
             }
         }
         return 1;
     }
 
-    int Duct::calculate(EnergyPlusData &,
-                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                        [[maybe_unused]] const Real64 control,    // Element control signal
-                        AirflowNetworkLinkageProp &linkage,       // Linkage
-                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a duct/pipe component using Colebrook equation for the
-        // turbulent friction factor
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr C(0.868589);
-        Real64 constexpr EPS(0.001);
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 A0;
-        Real64 A1;
-        Real64 A2;
-        Real64 B;
-        Real64 D;
-        Real64 S2;
-        Real64 CDM;
-        Real64 FL; // friction factor for laminar flow.
-        Real64 FT; // friction factor for turbulent flow.
-        Real64 FTT;
-        Real64 RE; // Reynolds number.
-        Real64 ed;
-        Real64 ld;
-        Real64 g;
-        Real64 AA1;
-
-        ed = roughness / hydraulicDiameter;
-        ld = L / hydraulicDiameter;
-        g = 1.14 - 0.868589 * std::log(ed);
-        AA1 = g;
-
-        // Standard calculation.
-        if (PDROP >= 0.0) {
-            // Flow in positive direction.
-            // Laminar flow coefficient !=0
-            if (LamFriCoef >= 0.001) {
-                A2 = LamFriCoef / (2.0 * propN.density * A * A);
-                A1 = (propN.viscosity * LamDynCoef * ld) / (2.0 * propN.density * A * hydraulicDiameter);
-                A0 = -PDROP;
-                CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                FL = (CDM - A1) / (2.0 * A2);
-                CDM = 1.0 / CDM;
-            } else {
-                CDM = (2.0 * propN.density * A * hydraulicDiameter) / (propN.viscosity * LamDynCoef * ld);
-                FL = CDM * PDROP;
-            }
-            RE = FL * hydraulicDiameter / (propN.viscosity * A);
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-            // Turbulent flow; test when Re>10.
-            if (RE >= 10.0) {
-                S2 = std::sqrt(2.0 * propN.density * PDROP) * A;
-                FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                while (true) {
-                    FT = FTT;
-                    B = (9.3 * propN.viscosity * A) / (FT * roughness);
-                    D = 1.0 + g * B;
-                    g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                    // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                    if (std::abs(FTT - FT) / FTT < EPS) break;
-                }
-                FT = FTT;
-            } else {
-                FT = FL;
-            }
-        } else {
-            // Flow in negative direction.
-            // Laminar flow coefficient !=0
-            if (LamFriCoef >= 0.001) {
-                A2 = LamFriCoef / (2.0 * propM.density * A * A);
-                A1 = (propM.viscosity * LamDynCoef * ld) / (2.0 * propM.density * A * hydraulicDiameter);
-                A0 = PDROP;
-                CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                FL = -(CDM - A1) / (2.0 * A2);
-                CDM = 1.0 / CDM;
-            } else {
-                CDM = (2.0 * propM.density * A * hydraulicDiameter) / (propM.viscosity * LamDynCoef * ld);
-                FL = CDM * PDROP;
-            }
-            RE = -FL * hydraulicDiameter / (propM.viscosity * A);
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-            // Turbulent flow; test when Re>10.
-            if (RE >= 10.0) {
-                S2 = std::sqrt(-2.0 * propM.density * PDROP) * A;
-                FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                while (true) {
-                    FT = FTT;
-                    B = (9.3 * propM.viscosity * A) / (FT * roughness);
-                    D = 1.0 + g * B;
-                    g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                    // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                    if (std::abs(FTT - FT) / FTT < EPS) break;
-                }
-                FT = -FTT;
-            } else {
-                FT = FL;
-            }
-        }
-        // Select laminar or turbulent flow.
-        if (std::abs(FL) <= std::abs(FT)) {
-            F[0] = FL;
-            DF[0] = CDM;
-        } else {
-            F[0] = FT;
-            DF[0] = 0.5 * FT / PDROP;
-        }
-        return 1;
-    }
-
-    int SurfaceCrack::calculate(EnergyPlusData &,
-                                bool const linear,                  // Initialization flag. If true, use linear relationship
-                                Real64 const pdrop,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                                const Real64 multiplier,            // Element multiplier
-                                const Real64 control,               // Element control signal
+    int SurfaceCrack::calculate(bool const linear,                  // Initialization flag. If true, use linear relationship
                                 AirflowNetworkLinkageProp &linkage, // Linkage
                                 std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
                                 std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
@@ -388,25 +248,25 @@ namespace AirflowNetwork {
         Real64 upwind_density{propN.density};
         Real64 upwind_viscosity{propN.viscosity};
         Real64 upwind_sqrt_density{propN.sqrt_density};
-        Real64 abs_pdrop = pdrop;
+        Real64 abs_pdrop = linkage.pressure_drop;
 
-        if (pdrop < 0.0) {
+        if (linkage.pressure_drop < 0.0) {
             sign = -1.0;
             upwind_temperature = propM.temperature;
             upwind_density = propM.density;
             upwind_viscosity = propM.viscosity;
             upwind_sqrt_density = propM.sqrt_density;
-            abs_pdrop = -pdrop;
+            abs_pdrop = -linkage.pressure_drop;
         }
 
-        Real64 coef = coefficient * control * multiplier / upwind_sqrt_density;
+        Real64 coef = coefficient * linkage.control * linkage.multiplier / upwind_sqrt_density;
 
         // Laminar calculation
         Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
         Real64 Ctl{std::pow(reference_density / upwind_density / RhoCor, exponent - 1.0) *
                    std::pow(reference_viscosity / VisAve, 2.0 * exponent - 1.0)};
         Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
-        Real64 FL{CDM * pdrop};
+        Real64 FL{CDM * linkage.pressure_drop};
         Real64 abs_FT;
 
         if (linear) {
@@ -425,90 +285,13 @@ namespace AirflowNetwork {
                 DF[0] = CDM;
             } else {
                 F[0] = sign * abs_FT;
-                DF[0] = F[0] * exponent / pdrop;
+                DF[0] = F[0] * exponent / linkage.pressure_drop;
             }
         }
         return 1;
     }
 
-    int SurfaceCrack::calculate(EnergyPlusData &,
-                                Real64 const pdrop,       // Total pressure drop across a component (P1 - P2) [Pa]
-                                const Real64 multiplier,  // Element multiplier
-                                const Real64 control,     // Element control signal
-                                AirflowNetworkLinkageProp &linkage, // Linkage
-                                std::array<Real64, 2> &F, // Airflow through the component [kg/s]
-                                std::array<Real64, 2> &DF // Partial derivative:  DF/DP
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  Jason DeGraw
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a surface crack component
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // Real64 rhoz_norm = AIRDENSITY(StandardP, StandardT, StandardW);
-        // Real64 viscz_norm = 1.71432e-5 + 4.828e-8 * StandardT;
-
-        Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
-        Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
-
-        Real64 sign{1.0};
-        Real64 upwind_temperature{propN.temperature};
-        Real64 upwind_density{propN.density};
-        Real64 upwind_viscosity{propN.viscosity};
-        Real64 upwind_sqrt_density{propN.sqrt_density};
-        Real64 abs_pdrop = pdrop;
-
-        if (pdrop < 0.0) {
-            sign = -1.0;
-            upwind_temperature = propM.temperature;
-            upwind_density = propM.density;
-            upwind_viscosity = propM.viscosity;
-            upwind_sqrt_density = propM.sqrt_density;
-            abs_pdrop = -pdrop;
-        }
-
-        Real64 coef = coefficient * control * multiplier / upwind_sqrt_density;
-
-        // Laminar calculation
-        Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
-        Real64 Ctl{std::pow(reference_density / upwind_density / RhoCor, exponent - 1.0) *
-                   std::pow(reference_viscosity / VisAve, 2.0 * exponent - 1.0)};
-        Real64 CDM{coef * upwind_density / upwind_viscosity * Ctl};
-        Real64 FL{CDM * pdrop};
-        Real64 abs_FT;
-
-        // Turbulent flow.
-        if (exponent == 0.5) {
-            abs_FT = coef * upwind_sqrt_density * std::sqrt(abs_pdrop) * Ctl;
-        } else {
-            abs_FT = coef * upwind_sqrt_density * std::pow(abs_pdrop, exponent) * Ctl;
-        }
-        // Select linear or turbulent flow.
-        if (std::abs(FL) <= abs_FT) {
-            F[0] = FL;
-            DF[0] = CDM;
-        } else {
-            F[0] = sign * abs_FT;
-            DF[0] = F[0] * exponent / pdrop;
-        }
-
-        return 1;
-    }
-
-    int DuctLeak::calculate(EnergyPlusData &,
-                            bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                            Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                            [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                            [[maybe_unused]] const Real64 control,    // Element control signal
+    int DuctLeak::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                             AirflowNetworkLinkageProp &linkage,       // Linkage
                             std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                             std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -542,145 +325,60 @@ namespace AirflowNetwork {
         constexpr Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         Real64 coef = FlowCoef;
 
-        if (PDROP >= 0.0) {
+        if (linkage.pressure_drop >= 0.0) {
             coef /= propN.sqrt_density;
         } else {
             coef /= propM.sqrt_density;
         }
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 Ctl = std::pow(RhozNorm / propN.density, FlowExpo - 1.0) * std::pow(VisczNorm / propN.viscosity, 2.0 * FlowExpo - 1.0);
                 DF[0] = coef * propN.density / propN.viscosity * Ctl;
             } else {
                 Ctl = std::pow(RhozNorm / propM.density, FlowExpo - 1.0) * std::pow(VisczNorm / propM.viscosity, 2.0 * FlowExpo - 1.0);
                 DF[0] = coef * propM.density / propM.viscosity * Ctl;
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = -DF[0] * linkage.pressure_drop;
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 // Flow in positive direction for laminar flow.
                 Ctl = std::pow(RhozNorm / propN.density, FlowExpo - 1.0) * std::pow(VisczNorm / propN.viscosity, 2.0 * FlowExpo - 1.0);
                 CDM = coef * propN.density / propN.viscosity * Ctl;
-                FL = CDM * PDROP;
+                FL = CDM * linkage.pressure_drop;
                 // Flow in positive direction for turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = coef * propN.sqrt_density * std::sqrt(PDROP);
+                    FT = coef * propN.sqrt_density * std::sqrt(linkage.pressure_drop);
                 } else {
-                    FT = coef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
+                    FT = coef * propN.sqrt_density * std::pow(linkage.pressure_drop, FlowExpo);
                 }
             } else {
                 // Flow in negative direction for laminar flow
                 CDM = coef * propM.density / propM.viscosity;
-                FL = CDM * PDROP;
+                FL = CDM * linkage.pressure_drop;
                 // Flow in negative direction for turbulent flow
                 if (FlowExpo == 0.5) {
-                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP);
+                    FT = -coef * propM.sqrt_density * std::sqrt(-linkage.pressure_drop);
                 } else {
-                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
+                    FT = -coef * propM.sqrt_density * std::pow(-linkage.pressure_drop, FlowExpo);
                 }
             }
             // Select laminar or turbulent flow.
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << PDROP << FL << FT;
+            // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << linkage.pressure_drop << FL << FT;
             if (std::abs(FL) <= std::abs(FT)) {
                 F[0] = FL;
                 DF[0] = CDM;
             } else {
                 F[0] = FT;
-                DF[0] = FT * FlowExpo / PDROP;
+                DF[0] = FT * FlowExpo / linkage.pressure_drop;
             }
         }
         return 1;
     }
 
-    int DuctLeak::calculate(EnergyPlusData &,
-                            Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                            [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                            [[maybe_unused]] const Real64 control,    // Element control signal
-                            AirflowNetworkLinkageProp &linkage,       // Linkage
-                            std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                            std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a power law resistance airflow component
-
-        // THIS NEEDS TO BE REFACTORED INTO THE CRACK OBJECT HEIRARCHY
-        // That will cause diffs, do it in next PR
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 Ctl;
-
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        constexpr Real64 RhozNorm = AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0);
-        constexpr Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
-        Real64 coef = FlowCoef;
-
-        if (PDROP >= 0.0) {
-            coef /= propN.sqrt_density;
-        } else {
-            coef /= propM.sqrt_density;
-        }
-
-        // Standard calculation.
-        if (PDROP >= 0.0) {
-            // Flow in positive direction for laminar flow.
-            Ctl = std::pow(RhozNorm / propN.density, FlowExpo - 1.0) * std::pow(VisczNorm / propN.viscosity, 2.0 * FlowExpo - 1.0);
-            CDM = coef * propN.density / propN.viscosity * Ctl;
-            FL = CDM * PDROP;
-            // Flow in positive direction for turbulent flow.
-            if (FlowExpo == 0.5) {
-                FT = coef * propN.sqrt_density * std::sqrt(PDROP);
-            } else {
-                FT = coef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
-            }
-        } else {
-            // Flow in negative direction for laminar flow
-            CDM = coef * propM.density / propM.viscosity;
-            FL = CDM * PDROP;
-            // Flow in negative direction for turbulent flow
-            if (FlowExpo == 0.5) {
-                FT = -coef * propM.sqrt_density * std::sqrt(-PDROP);
-            } else {
-                FT = -coef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
-            }
-        }
-        // Select laminar or turbulent flow.
-        // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << PDROP << FL << FT;
-        if (std::abs(FL) <= std::abs(FT)) {
-            F[0] = FL;
-            DF[0] = CDM;
-        } else {
-            F[0] = FT;
-            DF[0] = FT * FlowExpo / PDROP;
-        }
-        return 1;
-    }
-
-    int SimpleFan::calculate(EnergyPlusData &,
-                             bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                             Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                             [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                             [[maybe_unused]] const Real64 control,    // Element control signal
+    int SimpleFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                              AirflowNetworkLinkageProp &linkage,       // Linkage
                              std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                              std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -705,17 +403,13 @@ namespace AirflowNetwork {
         } else {
             const Node &propN = *linkage.nodes[0]; // Node 1 properties
             const Node &propM = *linkage.nodes[1]; // Node 2 properties
-            GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
+            GenericDuct(0.1, 0.001, init, linkage.pressure_drop, propN, propM, F, DF);
         }
         DF[0] = 0.0; // This should probably not be here, probably will cause diffs if it goes
         return 1;
     }
 
-    int DetailedFan::calculate(EnergyPlusData &,
-                               bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                               Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                               const Real64 control,                     // Element control signal
+    int DetailedFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                AirflowNetworkLinkageProp &linkage,       // Linkage
                                std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -757,21 +451,21 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_901("(A5,I3,5E14.6)");
 
         int NumCur = n;
-        if (control <= 0.0) {
+        if (linkage.control <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            generic_crack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(FlowCoef, FlowExpo, init, linkage.pressure_drop, propN, propM, F, DF);
             return 1;
         }
         // Pressure rise at reference fan speed.
-        if (control >= TranRat) {
-            PRISE = -PDROP * (RhoAir / propN.density) / (control * control);
+        if (linkage.control >= TranRat) {
+            PRISE = -linkage.pressure_drop * (RhoAir / propN.density) / (linkage.control * linkage.control);
         } else {
-            PRISE = -PDROP * (RhoAir / propN.density) / (TranRat * control);
+            PRISE = -linkage.pressure_drop * (RhoAir / propN.density) / (TranRat * linkage.control);
         }
-        // if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << PDROP << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
-        if (LFLAG) {
+        // if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << linkage.pressure_drop << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
+        if (init) {
             // Initialization by linear approximation.
-            F[0] = -Qfree * control * (1.0 - PRISE / Pshut);
+            F[0] = -Qfree * linkage.control * (1.0 - PRISE / Pshut);
             DPDF = -Pshut / Qfree;
             // if (LIST >= 4)
             //    gio::write(Unit21, Format_901) << " fni:" << JA << DisSysCompDetFanData(CompNum).Qfree << DisSysCompDetFanData(CompNum).Pshut;
@@ -826,146 +520,17 @@ namespace AirflowNetwork {
             DPDF = Coeff(k + 2) + CX * (2.0 * Coeff(k + 3) + CX * 3.0 * Coeff(k + 4));
         }
         // Convert to flow at given speed.
-        F[0] *= (propN.density / RhoAir) * control;
+        F[0] *= (propN.density / RhoAir) * linkage.control;
         // Set derivative w/r pressure drop (-).
-        if (control >= TranRat) {
-            DF[0] = -control / DPDF;
+        if (linkage.control >= TranRat) {
+            DF[0] = -linkage.control / DPDF;
         } else {
             DF[0] = -1.0 / DPDF;
         }
         return 1;
     }
 
-    int DetailedFan::calculate(EnergyPlusData &,
-                               Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                               const Real64 control,                     // Element control signal
-                               AirflowNetworkLinkageProp &linkage,       // Linkage
-                               std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                               std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a detailed fan component -- using standard interface.
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr TOL(0.00001);
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int j;
-        int k;
-        int L;
-        Real64 DPDF;
-        Real64 PRISE; // pressure rise (negative of pressure drop) (Pa).
-        Real64 BX;
-        Real64 BY;
-        Real64 CX;
-        Real64 CY;
-        Real64 CCY;
-        Real64 DX;
-        Real64 DY;
-
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,5E14.6)");
-
-        int NumCur = n;
-
-        if (control <= 0.0) {
-            // Speed = 0; treat fan as resistance.
-            generic_crack(FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
-            return 1;
-        }
-        // Pressure rise at reference fan speed.
-        if (control >= TranRat) {
-            PRISE = -PDROP * (RhoAir / propN.density) / pow_2(control);
-        } else {
-            PRISE = -PDROP * (RhoAir / propN.density) / (TranRat * control);
-        }
-        // if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << PDROP << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
-        // if (LFLAG) {
-        //    // Initialization by linear approximation.
-        //    F[0] = -Qfree * control * (1.0 - PRISE / Pshut);
-        //    DPDF = -Pshut / Qfree;
-        //    // if (LIST >= 4)
-        //    //    gio::write(Unit21, Format_901) << " fni:" << JA << DisSysCompDetFanData(CompNum).Qfree << DisSysCompDetFanData(CompNum).Pshut;
-        //} else {
-        // Solution of the fan performance curve.
-        // Determine curve fit range.
-        j = 1;
-        k = 5 * (j - 1) + 1;
-        BX = Coeff(k);
-        BY = Coeff(k + 1) + BX * (Coeff(k + 2) + BX * (Coeff(k + 3) + BX * Coeff(k + 4))) - PRISE;
-        if (BY < 0.0) ShowFatalError(m_state, "Out of range, too low in an AirflowNetwork detailed Fan");
-
-        while (true) {
-            DX = Coeff(k + 5);
-            DY = Coeff(k + 1) + DX * (Coeff(k + 2) + DX * (Coeff(k + 3) + DX * Coeff(k + 5))) - PRISE;
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
-            if (BY * DY <= 0.0) break;
-            ++j;
-            if (j > NumCur) ShowFatalError(m_state, "Out of range, too high (FAN) in ADS simulation");
-            k += 5;
-            BX = DX;
-            BY = DY;
-        }
-        // Determine reference mass flow rate by false position method.
-        L = 0;
-        CY = 0.0;
-    Label40:;
-        ++L;
-        if (L > 100) ShowFatalError(m_state, "Too many iterations (FAN) in AirflowNtework simulation");
-        CCY = CY;
-        CX = BX - BY * ((DX - BX) / (DY - BY));
-        CY = Coeff(k + 1) + CX * (Coeff(k + 2) + CX * (Coeff(k + 3) + CX * Coeff(k + 4))) - PRISE;
-        if (BY * CY == 0.0) goto Label90;
-        if (BY * CY > 0.0) goto Label60;
-        DX = CX;
-        DY = CY;
-        if (CY * CCY > 0.0) BY *= 0.5;
-        goto Label70;
-    Label60:;
-        BX = CX;
-        BY = CY;
-        if (CY * CCY > 0.0) DY *= 0.5;
-    Label70:;
-        // if (LIST >= 4) gio::write(Unit21, Format_901) << " fpi:" << j << BX << CX << DX << BY << DY;
-        if (DX - BX < TOL * CX) goto Label80;
-        if (DX - BX < TOL) goto Label80;
-        goto Label40;
-    Label80:;
-        CX = 0.5 * (BX + DX);
-    Label90:;
-        F[0] = CX;
-        DPDF = Coeff(k + 2) + CX * (2.0 * Coeff(k + 3) + CX * 3.0 * Coeff(k + 4));
-
-        // Convert to flow at given speed.
-        F[0] *= (propN.density / RhoAir) * control;
-        // Set derivative w/r pressure drop (-).
-        if (control >= TranRat) {
-            DF[0] = -control / DPDF;
-        } else {
-            DF[0] = -1.0 / DPDF;
-        }
-        return 1;
-    }
-
-    int Damper::calculate(EnergyPlusData &,
-                          bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                          Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                          [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                          [[maybe_unused]] const Real64 control,    // Element control signal
+    int Damper::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                           AirflowNetworkLinkageProp &linkage,       // Linkage
                           std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                           std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -992,95 +557,34 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        C = control;
+        C = linkage.control;
         if (C < FlowMin) C = FlowMin;
         if (C > FlowMax) C = FlowMax;
         C = A0 + C * (A1 + C * (A2 + C * A3));
         // if (LIST >= 4)
         //    gio::write(Unit21, Format_901) << " Dmp:" << i << AFECTL(i) << DisSysCompDamperData(CompNum).FlowMin
         //                                   << DisSysCompDamperData(CompNum).FlowMax << C;
-        if (LFLAG || std::abs(PDROP) <= LTP) {
+        if (init || std::abs(linkage.pressure_drop) <= LTP) {
             //                              Laminar flow.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 DF[0] = C * LamFlow * propN.density / propN.viscosity;
             } else {
                 DF[0] = C * LamFlow * propM.density / propM.viscosity;
             }
-            F[0] = DF[0] * PDROP;
+            F[0] = DF[0] * linkage.pressure_drop;
         } else {
             //                              Turbulent flow.
-            if (PDROP >= 0.0) {
-                F[0] = C * TurFlow * propN.sqrt_density * std::pow(PDROP, FlowExpo);
+            if (linkage.pressure_drop >= 0.0) {
+                F[0] = C * TurFlow * propN.sqrt_density * std::pow(linkage.pressure_drop, FlowExpo);
             } else {
-                F[0] = -C * TurFlow * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
+                F[0] = -C * TurFlow * propM.sqrt_density * std::pow(-linkage.pressure_drop, FlowExpo);
             }
-            DF[0] = F[0] * FlowExpo / PDROP;
+            DF[0] = F[0] * FlowExpo / linkage.pressure_drop;
         }
         return 1;
     }
 
-    int Damper::calculate(EnergyPlusData &,
-                          const Real64 PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                          [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                          const Real64 control,                     // Element control signal
-                          AirflowNetworkLinkageProp &linkage,       // Linkage
-                          std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                          std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a Controlled power law resistance airflow component (damper)
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 C;
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        C = control;
-        if (C < FlowMin) C = FlowMin;
-        if (C > FlowMax) C = FlowMax;
-        C = A0 + C * (A1 + C * (A2 + C * A3));
-        // if (LIST >= 4)
-        //    gio::write(Unit21, Format_901) << " Dmp:" << i << AFECTL(i) << DisSysCompDamperData(CompNum).FlowMin
-        //                                   << DisSysCompDamperData(CompNum).FlowMax << C;
-        if (std::abs(PDROP) <= LTP) {
-            //                              Laminar flow.
-            if (PDROP >= 0.0) {
-                DF[0] = C * LamFlow * propN.density / propN.viscosity;
-            } else {
-                DF[0] = C * LamFlow * propM.density / propM.viscosity;
-            }
-            F[0] = DF[0] * PDROP;
-        } else {
-            //                              Turbulent flow.
-            if (PDROP >= 0.0) {
-                F[0] = C * TurFlow * propN.sqrt_density * std::pow(PDROP, FlowExpo);
-            } else {
-                F[0] = -C * TurFlow * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
-            }
-            DF[0] = F[0] * FlowExpo / PDROP;
-        }
-        return 1;
-    }
-
-    int EffectiveLeakageRatio::calculate(EnergyPlusData &,
-                                         bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                         Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                         [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                         [[maybe_unused]] const Real64 control,    // Element control signal
+    int EffectiveLeakageRatio::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                          AirflowNetworkLinkageProp &linkage,       // Linkage
                                          std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                          std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -1113,129 +617,53 @@ namespace AirflowNetwork {
         // Get component properties
         FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 DF[0] = FlowCoef * propN.density / propN.viscosity;
             } else {
                 DF[0] = FlowCoef * propM.density / propM.viscosity;
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = -DF[0] * linkage.pressure_drop;
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow.
                 CDM = FlowCoef * propN.density / propN.viscosity;
-                FL = CDM * PDROP;
+                FL = CDM * linkage.pressure_drop;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
+                    FT = FlowCoef * propN.sqrt_density * std::sqrt(linkage.pressure_drop);
                 } else {
-                    FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
+                    FT = FlowCoef * propN.sqrt_density * std::pow(linkage.pressure_drop, FlowExpo);
                 }
             } else {
                 // Flow in negative direction.
                 // Laminar flow.
                 CDM = FlowCoef * propM.density / propM.viscosity;
-                FL = CDM * PDROP;
+                FL = CDM * linkage.pressure_drop;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
+                    FT = -FlowCoef * propM.sqrt_density * std::sqrt(-linkage.pressure_drop);
                 } else {
-                    FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
+                    FT = -FlowCoef * propM.sqrt_density * std::pow(-linkage.pressure_drop, FlowExpo);
                 }
             }
             // Select laminar or turbulent flow.
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << PDROP << FL << FT;
+            // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << linkage.pressure_drop << FL << FT;
             if (std::abs(FL) <= std::abs(FT)) {
                 F[0] = FL;
                 DF[0] = CDM;
             } else {
                 F[0] = FT;
-                DF[0] = FT * FlowExpo / PDROP;
+                DF[0] = FT * FlowExpo / linkage.pressure_drop;
             }
         }
         return 1;
     }
 
-    int EffectiveLeakageRatio::calculate(EnergyPlusData &,
-                                         Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                         [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                         [[maybe_unused]] const Real64 control,    // Element control signal
-                                         AirflowNetworkLinkageProp &linkage,       // Linkage
-                                         std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a Effective leakage ratio component
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 FlowCoef;
-
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // Get component properties
-        FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
-
-        // Standard calculation.
-        if (PDROP >= 0.0) {
-            // Flow in positive direction.
-            // Laminar flow.
-            CDM = FlowCoef * propN.density / propN.viscosity;
-            FL = CDM * PDROP;
-            // Turbulent flow.
-            if (FlowExpo == 0.5) {
-                FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
-            } else {
-                FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
-            }
-        } else {
-            // Flow in negative direction.
-            // Laminar flow.
-            CDM = FlowCoef * propM.density / propM.viscosity;
-            FL = CDM * PDROP;
-            // Turbulent flow.
-            if (FlowExpo == 0.5) {
-                FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
-            } else {
-                FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
-            }
-        }
-        // Select laminar or turbulent flow.
-        // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << PDROP << FL << FT;
-        if (std::abs(FL) <= std::abs(FT)) {
-            F[0] = FL;
-            DF[0] = CDM;
-        } else {
-            F[0] = FT;
-            DF[0] = FT * FlowExpo / PDROP;
-        }
-        return 1;
-    }
-
-    int DetailedOpening::calculate(EnergyPlusData &,
-                                   [[maybe_unused]] bool const LFLAG,                   // Initialization flag.If = 1, use laminar relationship
-                                   Real64 const PDROP,                                  // Total pressure drop across a component (P1 - P2) [Pa]
-                                   [[maybe_unused]] const Real64 multiplier,            // Element multiplier
-                                   [[maybe_unused]] const Real64 control,               // Element control signal
+    int DetailedOpening::calculate([[maybe_unused]] bool const init,                   // Initialization flag. If true, compute linear relationship
                                    [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
                                    std::array<Real64, 2> &F,                            // Airflow through the component [kg/s]
                                    std::array<Real64, 2> &DF                            // Partial derivative:  DF/DP
@@ -1399,7 +827,7 @@ namespace AirflowNetwork {
 
         // calculate DpProfNew
         for (i = 1; i <= NrInt + 2; ++i) {
-            DpProfNew(i) = PDROP + m_state.afn->dos.DpProf(Loc + i) - m_state.afn->dos.DpL(linkage.LinkNum, 1);
+            DpProfNew(i) = linkage.pressure_drop + m_state.afn->dos.DpProf(Loc + i) - m_state.afn->dos.DpL(linkage.LinkNum, 1);
         }
 
         // Get opening data based on the opening factor
@@ -1691,11 +1119,7 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int SimpleOpening::calculate(EnergyPlusData &,
-                                 bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                 Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                 [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                 [[maybe_unused]] const Real64 control,    // Element control signal
+    int SimpleOpening::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                  AirflowNetworkLinkageProp &linkage,       // Linkage
                                  std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                  std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -1753,7 +1177,7 @@ namespace AirflowNetwork {
             }
         }
 
-        if (PDROP >= 0.0) {
+        if (linkage.pressure_drop >= 0.0) {
             coeff /= propN.sqrt_density;
         } else {
             coeff /= propM.sqrt_density;
@@ -1768,24 +1192,24 @@ namespace AirflowNetwork {
 
         DRHO = propN.density - propM.density;
         GDRHO = 9.8 * DRHO;
-        // if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << PDROP << std::abs(DRHO) << MinRhoDiff;
+        // if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << linkage.pressure_drop << std::abs(DRHO) << MinRhoDiff;
         if (OpenFactor == 0.0) {
-            generic_crack(coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(coeff, FlowExpo, init, linkage.pressure_drop, propN, propM, F, DF);
             return 1;
         }
-        if (std::abs(DRHO) < MinRhoDiff || LFLAG) {
-            DPMID = PDROP - 0.5 * Height * GDRHO;
+        if (std::abs(DRHO) < MinRhoDiff || init) {
+            DPMID = linkage.pressure_drop - 0.5 * Height * GDRHO;
             // Initialization or identical temps: treat as one-way flow.
             NF = 1;
-            generic_crack(coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
+            generic_crack(coeff, FlowExpo, init, DPMID, propN, propM, F, DF);
             // if (LIST >= 4) gio::write(Unit21, Format_900) << " Drs:" << DPMID << F[0] << DF[0];
         } else {
             // Possible two-way flow:
-            Y = PDROP / GDRHO;
-            // if (LIST >= 4) gio::write(Unit21, Format_900) << " DrY:" << PDROP << GDRHO << Y;
+            Y = linkage.pressure_drop / GDRHO;
+            // if (LIST >= 4) gio::write(Unit21, Format_900) << " DrY:" << linkage.pressure_drop << GDRHO << Y;
             // F0 = lower flow, FH = upper flow.
             C = SQRT2 * Width * DischCoeff;
-            DF0 = C * std::sqrt(std::abs(PDROP)) / std::abs(GDRHO);
+            DF0 = C * std::sqrt(std::abs(linkage.pressure_drop)) / std::abs(GDRHO);
             //        F0 = 0.666667d0*C*SQRT(ABS(GDRHO*Y))*ABS(Y)
             F0 = (2.0 / 3.0) * C * std::sqrt(std::abs(GDRHO * Y)) * std::abs(Y);
             DFH = C * std::sqrt(std::abs((Height - Y) / GDRHO));
@@ -1833,11 +1257,7 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int ConstantPressureDrop::calculate(EnergyPlusData &,
-                                        [[maybe_unused]] bool const LFLAG,        // Initialization flag.If = 1, use laminar relationship
-                                        const Real64 PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                        [[maybe_unused]] const Real64 control,    // Element control signal
+    int ConstantPressureDrop::calculate([[maybe_unused]] bool const init,        // Initialization flag. If true, compute linear relationship
                                         AirflowNetworkLinkageProp &linkage,       // Linkage
                                         std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -1860,7 +1280,7 @@ namespace AirflowNetwork {
         //Real64 Co;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
+        //const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
         int n = linkage.indices[0];
         int m = linkage.indices[1];
@@ -1869,23 +1289,21 @@ namespace AirflowNetwork {
         // A  = Cross section area [m2]
         // DP = Pressure difference across the element [Pa]
 
-        if (PDROP == 0.0) {
+        if (linkage.pressure_drop == 0.0) {
             F[0] = std::sqrt(2.0 * propN.density) * A * std::sqrt(DP);
             DF[0] = 0.5 * F[0] / DP;
         } else {
+            linkage.pressure_drop = DP;
             F[0] = linkage.mass_flow.value();
             //state.afn->PZ(m) = state.afn->PZ(n) - DP;
             //Co = F[0] / DP;
             DF[0] = 10.e10;
         }
+        
         return 1;
     }
 
-    int EffectiveLeakageArea::calculate(EnergyPlusData &,
-                                        bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                        [[maybe_unused]] const Real64 control,    // Element control signal
+    int EffectiveLeakageArea::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                         AirflowNetworkLinkageProp &linkage,       // Linkage
                                         std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -1921,133 +1339,53 @@ namespace AirflowNetwork {
         // Get component properties
         FlowCoef = ELA * DischCoeff * sqrt_2 * std::pow(RefDeltaP, 0.5 - FlowExpo);
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 DF[0] = FlowCoef * propN.density / propN.viscosity;
             } else {
                 DF[0] = FlowCoef * propM.density / propM.viscosity;
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = -DF[0] * linkage.pressure_drop;
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow.
                 CDM = FlowCoef * propN.density / propN.viscosity;
-                FL = CDM * PDROP;
+                FL = CDM * linkage.pressure_drop;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
+                    FT = FlowCoef * propN.sqrt_density * std::sqrt(linkage.pressure_drop);
                 } else {
-                    FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
+                    FT = FlowCoef * propN.sqrt_density * std::pow(linkage.pressure_drop, FlowExpo);
                 }
             } else {
                 // Flow in negative direction.
                 // Laminar flow.
                 CDM = FlowCoef * propM.density / propM.viscosity;
-                FL = CDM * PDROP;
+                FL = CDM * linkage.pressure_drop;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
+                    FT = -FlowCoef * propM.sqrt_density * std::sqrt(-linkage.pressure_drop);
                 } else {
-                    FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
+                    FT = -FlowCoef * propM.sqrt_density * std::pow(-linkage.pressure_drop, FlowExpo);
                 }
             }
             // Select laminar or turbulent flow.
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << PDROP << FL << FT;
+            // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << linkage.pressure_drop << FL << FT;
             if (std::abs(FL) <= std::abs(FT)) {
                 F[0] = FL;
                 DF[0] = CDM;
             } else {
                 F[0] = FT;
-                DF[0] = FT * FlowExpo / PDROP;
+                DF[0] = FT * FlowExpo / linkage.pressure_drop;
             }
         }
         return 1;
     }
 
-    int EffectiveLeakageArea::calculate(EnergyPlusData &,
-                                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                        [[maybe_unused]] const Real64 control,    // Element control signal
-                                        AirflowNetworkLinkageProp &linkage,       // Linkage
-                                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a Surface effective leakage area component
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 const sqrt_2(std::sqrt(2.0));
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 FlowCoef;
-
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        // Get component properties
-        FlowCoef = ELA * DischCoeff * sqrt_2 * std::pow(RefDeltaP, 0.5 - FlowExpo);
-
-        // Standard calculation.
-        if (PDROP >= 0.0) {
-            // Flow in positive direction.
-            // Laminar flow.
-            CDM = FlowCoef * propN.density / propN.viscosity;
-            FL = CDM * PDROP;
-            // Turbulent flow.
-            if (FlowExpo == 0.5) {
-                FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
-            } else {
-                FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
-            }
-        } else {
-            // Flow in negative direction.
-            // Laminar flow.
-            CDM = FlowCoef * propM.density / propM.viscosity;
-            FL = CDM * PDROP;
-            // Turbulent flow.
-            if (FlowExpo == 0.5) {
-                FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
-            } else {
-                FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
-            }
-        }
-        // Select laminar or turbulent flow.
-        // if (LIST >= 4) gio::write(Unit21, Format_901) << " plr: " << i << PDROP << FL << FT;
-        if (std::abs(FL) <= std::abs(FT)) {
-            F[0] = FL;
-            DF[0] = CDM;
-        } else {
-            F[0] = FT;
-            DF[0] = FT * FlowExpo / PDROP;
-        }
-
-        return 1;
-    }
-
-    int DisSysCompCoilProp::calculate(EnergyPlusData &,
-                                      bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                      [[maybe_unused]] const Real64 control,    // Element control signal
+    int DisSysCompCoilProp::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                       AirflowNetworkLinkageProp &linkage,       // Linkage
                                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -2107,36 +1445,36 @@ namespace AirflowNetwork {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 DF[0] = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * InitLamCoef * ld);
             } else {
                 DF[0] = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * InitLamCoef * ld);
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = -DF[0] * linkage.pressure_drop;
             // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwi:" << i << InitLamCoef << F[0] << DF[0];
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow coefficient !=0
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propN.density * area * area);
                     A1 = (propN.viscosity * LamDynCoef * ld) / (2.0 * propN.density * area * hydraulicDiameter);
-                    A0 = -PDROP;
+                    A0 = -linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = (CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = FL * hydraulicDiameter / (propN.viscosity * area);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << linkage.pressure_drop << FL << CDM << RE;
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(2.0 * propN.density * PDROP) * area;
+                    S2 = std::sqrt(2.0 * propN.density * linkage.pressure_drop) * area;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
                     while (true) {
@@ -2158,19 +1496,19 @@ namespace AirflowNetwork {
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propM.density * area * area);
                     A1 = (propM.viscosity * LamDynCoef * ld) / (2.0 * propM.density * area * hydraulicDiameter);
-                    A0 = PDROP;
+                    A0 = linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = -(CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = -FL * hydraulicDiameter / (propM.viscosity * area);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << linkage.pressure_drop << FL << CDM << RE;
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(-2.0 * propM.density * PDROP) * area;
+                    S2 = std::sqrt(-2.0 * propM.density * linkage.pressure_drop) * area;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
                     while (true) {
@@ -2193,160 +1531,13 @@ namespace AirflowNetwork {
                 DF[0] = CDM;
             } else {
                 F[0] = FT;
-                DF[0] = 0.5 * FT / PDROP;
+                DF[0] = 0.5 * FT / linkage.pressure_drop;
             }
         }
         return 1;
     }
 
-    int DisSysCompCoilProp::calculate(EnergyPlusData &,
-                                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                      [[maybe_unused]] const Real64 control,    // Element control signal
-                                      AirflowNetworkLinkageProp &linkage,       // Linkage
-                                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a coil component
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr C(0.868589);
-        Real64 constexpr EPS(0.001);
-        Real64 constexpr Rough(0.0001);
-        Real64 constexpr LamDynCoef(64.0);
-        Real64 constexpr LamFriCoef(0.0001);
-        Real64 constexpr TurDynCoef(0.0001);
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 A0;
-        Real64 A1;
-        Real64 A2;
-        Real64 B;
-        Real64 D;
-        Real64 S2;
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 FTT;
-        Real64 RE;
-        Real64 ed;
-        Real64 ld;
-        Real64 g;
-        Real64 AA1;
-        Real64 area;
-
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        // Get component properties
-        // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
-        ed = Rough / hydraulicDiameter;
-
-        area = square(hydraulicDiameter) * DataGlobalConstants::Pi;
-        ld = L / hydraulicDiameter;
-        g = 1.14 - 0.868589 * std::log(ed);
-        AA1 = g;
-
-        // Standard calculation.
-        if (PDROP >= 0.0) {
-            // Flow in positive direction.
-            // Laminar flow coefficient !=0
-            if (LamFriCoef >= 0.001) {
-                A2 = LamFriCoef / (2.0 * propN.density * area * area);
-                A1 = (propN.viscosity * LamDynCoef * ld) / (2.0 * propN.density * area * hydraulicDiameter);
-                A0 = -PDROP;
-                CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                FL = (CDM - A1) / (2.0 * A2);
-                CDM = 1.0 / CDM;
-            } else {
-                CDM = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * LamDynCoef * ld);
-                FL = CDM * PDROP;
-            }
-            RE = FL * hydraulicDiameter / (propN.viscosity * area);
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-            // Turbulent flow; test when Re>10.
-            if (RE >= 10.0) {
-                S2 = std::sqrt(2.0 * propN.density * PDROP) * area;
-                FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                while (true) {
-                    FT = FTT;
-                    B = (9.3 * propN.viscosity * area) / (FT * Rough);
-                    D = 1.0 + g * B;
-                    g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                    // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                    if (std::abs(FTT - FT) / FTT < EPS) break;
-                }
-                FT = FTT;
-            } else {
-                FT = FL;
-            }
-        } else {
-            // Flow in negative direction.
-            // Laminar flow coefficient !=0
-            if (LamFriCoef >= 0.001) {
-                A2 = LamFriCoef / (2.0 * propM.density * area * area);
-                A1 = (propM.viscosity * LamDynCoef * ld) / (2.0 * propM.density * area * hydraulicDiameter);
-                A0 = PDROP;
-                CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                FL = -(CDM - A1) / (2.0 * A2);
-                CDM = 1.0 / CDM;
-            } else {
-                CDM = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * LamDynCoef * ld);
-                FL = CDM * PDROP;
-            }
-            RE = -FL * hydraulicDiameter / (propM.viscosity * area);
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
-            // Turbulent flow; test when Re>10.
-            if (RE >= 10.0) {
-                S2 = std::sqrt(-2.0 * propM.density * PDROP) * area;
-                FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
-                while (true) {
-                    FT = FTT;
-                    B = (9.3 * propM.viscosity * area) / (FT * Rough);
-                    D = 1.0 + g * B;
-                    g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                    // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << B << FTT << g;
-                    if (std::abs(FTT - FT) / FTT < EPS) break;
-                }
-                FT = -FTT;
-            } else {
-                FT = FL;
-            }
-        }
-        // Select laminar or turbulent flow.
-        if (std::abs(FL) <= std::abs(FT)) {
-            F[0] = FL;
-            DF[0] = CDM;
-        } else {
-            F[0] = FT;
-            DF[0] = 0.5 * FT / PDROP;
-        }
-        return 1;
-    }
-
-    int DisSysCompTermUnitProp::calculate(EnergyPlusData &,
-                                          bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                          Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                          [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                          [[maybe_unused]] const Real64 control,    // Element control signal
+    int DisSysCompTermUnitProp::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                           AirflowNetworkLinkageProp &linkage,       // Linkage
                                           std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                           std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -2404,36 +1595,36 @@ namespace AirflowNetwork {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 DF[0] = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * InitLamCoef * ld);
             } else {
                 DF[0] = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * InitLamCoef * ld);
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = -DF[0] * linkage.pressure_drop;
             // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwi:" << i << InitLamCoef << F[0] << DF[0];
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow coefficient !=0
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propN.density * area * area);
                     A1 = (propN.viscosity * LamDynCoef * ld) / (2.0 * propN.density * area * hydraulicDiameter);
-                    A0 = -PDROP;
+                    A0 = -linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = (CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = FL * hydraulicDiameter / (propN.viscosity * area);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << linkage.pressure_drop << FL << CDM << RE;
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(2.0 * propN.density * PDROP) * area;
+                    S2 = std::sqrt(2.0 * propN.density * linkage.pressure_drop) * area;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
                     while (true) {
@@ -2455,19 +1646,19 @@ namespace AirflowNetwork {
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propM.density * area * area);
                     A1 = (propM.viscosity * LamDynCoef * ld) / (2.0 * propM.density * area * hydraulicDiameter);
-                    A0 = PDROP;
+                    A0 = linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = -(CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = -FL * hydraulicDiameter / (propM.viscosity * area);
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << PDROP << FL << CDM << RE;
+                // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwl:" << i << linkage.pressure_drop << FL << CDM << RE;
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(-2.0 * propM.density * PDROP) * area;
+                    S2 = std::sqrt(-2.0 * propM.density * linkage.pressure_drop) * area;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     // if (LIST >= 4) gio::write(Unit21, Format_901) << " dwt:" << i << S2 << FTT << g;
                     while (true) {
@@ -2490,7 +1681,7 @@ namespace AirflowNetwork {
                 DF[0] = CDM;
             } else {
                 F[0] = FT;
-                DF[0] = 0.5 * FT / PDROP;
+                DF[0] = 0.5 * FT / linkage.pressure_drop;
             }
         }
         // If damper, setup the airflows from nodal values calculated from terminal
@@ -2501,11 +1692,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompHXProp::calculate(EnergyPlusData &,
-                                    bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                    Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                    [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                    [[maybe_unused]] const Real64 control,    // Element control signal
+    int DisSysCompHXProp::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                     AirflowNetworkLinkageProp &linkage,       // Linkage
                                     std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                     std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -2560,34 +1747,34 @@ namespace AirflowNetwork {
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 DF[0] = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * InitLamCoef * ld);
             } else {
                 DF[0] = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * InitLamCoef * ld);
             }
-            F[0] = -DF[0] * PDROP;
+            F[0] = -DF[0] * linkage.pressure_drop;
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow coefficient !=0
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propN.density * area * area);
                     A1 = (propN.viscosity * LamDynCoef * ld) / (2.0 * propN.density * area * hydraulicDiameter);
-                    A0 = -PDROP;
+                    A0 = -linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = (CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = FL * hydraulicDiameter / (propN.viscosity * area);
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(2.0 * propN.density * PDROP) * area;
+                    S2 = std::sqrt(2.0 * propN.density * linkage.pressure_drop) * area;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     while (true) {
                         FT = FTT;
@@ -2607,18 +1794,18 @@ namespace AirflowNetwork {
                 if (LamFriCoef >= 0.001) {
                     A2 = LamFriCoef / (2.0 * propM.density * area * area);
                     A1 = (propM.viscosity * LamDynCoef * ld) / (2.0 * propM.density * area * hydraulicDiameter);
-                    A0 = PDROP;
+                    A0 = linkage.pressure_drop;
                     CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
                     FL = -(CDM - A1) / (2.0 * A2);
                     CDM = 1.0 / CDM;
                 } else {
                     CDM = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * LamDynCoef * ld);
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                 }
                 RE = -FL * hydraulicDiameter / (propM.viscosity * area);
                 // Turbulent flow; test when Re>10.
                 if (RE >= 10.0) {
-                    S2 = std::sqrt(-2.0 * propM.density * PDROP) * area;
+                    S2 = std::sqrt(-2.0 * propM.density * linkage.pressure_drop) * area;
                     FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
                     while (true) {
                         FT = FTT;
@@ -2639,149 +1826,13 @@ namespace AirflowNetwork {
                 DF[0] = CDM;
             } else {
                 F[0] = FT;
-                DF[0] = 0.5 * FT / PDROP;
+                DF[0] = 0.5 * FT / linkage.pressure_drop;
             }
         }
         return 1;
     }
 
-    int DisSysCompHXProp::calculate(EnergyPlusData &,
-                                    Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                    [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                    [[maybe_unused]] const Real64 control,    // Element control signal
-                                    AirflowNetworkLinkageProp &linkage,       // Linkage
-                                    std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                    std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 2/1/04
-        //                      Revised the subroutine to meet E+ needs
-        //       MODIFIED       Lixing Gu, 1/18/09
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a heat exchanger component
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr C(0.868589);
-        Real64 constexpr EPS(0.001);
-        Real64 constexpr Rough(0.0001);
-        Real64 constexpr LamDynCoef(64.0);
-        Real64 constexpr LamFriCoef(0.0001);
-        Real64 constexpr TurDynCoef(0.0001);
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 A0;
-        Real64 A1;
-        Real64 A2;
-        Real64 B;
-        Real64 D;
-        Real64 S2;
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 FTT;
-        Real64 RE;
-        Real64 ed;
-        Real64 ld;
-        Real64 g;
-        Real64 AA1;
-        Real64 area;
-
-        // Get component properties
-        ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
-        ld = L / hydraulicDiameter;
-        g = 1.14 - 0.868589 * std::log(ed);
-        AA1 = g;
-
-        // Standard calculation.
-        if (PDROP >= 0.0) {
-            // Flow in positive direction.
-            // Laminar flow coefficient !=0
-            if (LamFriCoef >= 0.001) {
-                A2 = LamFriCoef / (2.0 * propN.density * area * area);
-                A1 = (propN.viscosity * LamDynCoef * ld) / (2.0 * propN.density * area * hydraulicDiameter);
-                A0 = -PDROP;
-                CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                FL = (CDM - A1) / (2.0 * A2);
-                CDM = 1.0 / CDM;
-            } else {
-                CDM = (2.0 * propN.density * area * hydraulicDiameter) / (propN.viscosity * LamDynCoef * ld);
-                FL = CDM * PDROP;
-            }
-            RE = FL * hydraulicDiameter / (propN.viscosity * area);
-            // Turbulent flow; test when Re>10.
-            if (RE >= 10.0) {
-                S2 = std::sqrt(2.0 * propN.density * PDROP) * area;
-                FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                while (true) {
-                    FT = FTT;
-                    B = (9.3 * propN.viscosity * area) / (FT * Rough);
-                    D = 1.0 + g * B;
-                    g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                    if (std::abs(FTT - FT) / FTT < EPS) break;
-                }
-                FT = FTT;
-            } else {
-                FT = FL;
-            }
-        } else {
-            // Flow in negative direction.
-            // Laminar flow coefficient !=0
-            if (LamFriCoef >= 0.001) {
-                A2 = LamFriCoef / (2.0 * propM.density * area * area);
-                A1 = (propM.viscosity * LamDynCoef * ld) / (2.0 * propM.density * area * hydraulicDiameter);
-                A0 = PDROP;
-                CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
-                FL = -(CDM - A1) / (2.0 * A2);
-                CDM = 1.0 / CDM;
-            } else {
-                CDM = (2.0 * propM.density * area * hydraulicDiameter) / (propM.viscosity * LamDynCoef * ld);
-                FL = CDM * PDROP;
-            }
-            RE = -FL * hydraulicDiameter / (propM.viscosity * area);
-            // Turbulent flow; test when Re>10.
-            if (RE >= 10.0) {
-                S2 = std::sqrt(-2.0 * propM.density * PDROP) * area;
-                FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                while (true) {
-                    FT = FTT;
-                    B = (9.3 * propM.viscosity * area) / (FT * Rough);
-                    D = 1.0 + g * B;
-                    g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
-                    FTT = S2 / std::sqrt(ld / pow_2(g) + TurDynCoef);
-                    if (std::abs(FTT - FT) / FTT < EPS) break;
-                }
-                FT = -FTT;
-            } else {
-                FT = FL;
-            }
-        }
-        // Select laminar or turbulent flow.
-        if (std::abs(FL) <= std::abs(FT)) {
-            F[0] = FL;
-            DF[0] = CDM;
-        } else {
-            F[0] = FT;
-            DF[0] = 0.5 * FT / PDROP;
-        }
-        return 1;
-    }
-
-    int ZoneExhaustFan::calculate(EnergyPlusData &,
-                                  bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                  Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                  [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                  [[maybe_unused]] const Real64 control,    // Element control signal
+    int ZoneExhaustFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                   AirflowNetworkLinkageProp &linkage,       // Linkage
                                   std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                   std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -2836,15 +1887,15 @@ namespace AirflowNetwork {
             expn = FlowExpo;
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 coef = FlowCoef / propN.sqrt_density * Corr;
             } else {
                 coef = FlowCoef / propM.sqrt_density * Corr;
             }
 
-            if (LFLAG) {
+            if (init) {
                 // Initialization by linear relation.
-                if (PDROP >= 0.0) {
+                if (linkage.pressure_drop >= 0.0) {
                     RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propN.density / propN.viscosity * Ctl;
@@ -2853,21 +1904,21 @@ namespace AirflowNetwork {
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propM.density / propM.viscosity * Ctl;
                 }
-                F[0] = -DF[0] * PDROP;
+                F[0] = -DF[0] * linkage.pressure_drop;
             } else {
                 // Standard calculation.
-                if (PDROP >= 0.0) {
+                if (linkage.pressure_drop >= 0.0) {
                     // Flow in positive direction.
                     // Laminar flow.
                     RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propN.density / propN.viscosity * Ctl;
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
+                        FT = coef * propN.sqrt_density * std::sqrt(linkage.pressure_drop) * Ctl;
                     } else {
-                        FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
+                        FT = coef * propN.sqrt_density * std::pow(linkage.pressure_drop, expn) * Ctl;
                     }
                 } else {
                     // Flow in negative direction.
@@ -2875,34 +1926,29 @@ namespace AirflowNetwork {
                     RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propM.density / propM.viscosity * Ctl;
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::sqrt(-linkage.pressure_drop) * Ctl;
                     } else {
-                        FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::pow(-linkage.pressure_drop, expn) * Ctl;
                     }
                 }
                 // Select laminar or turbulent flow.
-                // if (LIST >= 4) gio::write(Unit21, Format_901) << " scr: " << i << PDROP << FL << FT;
+                // if (LIST >= 4) gio::write(Unit21, Format_901) << " scr: " << i << linkage.pressure_drop << FL << FT;
                 if (std::abs(FL) <= std::abs(FT)) {
                     F[0] = FL;
                     DF[0] = CDM;
                 } else {
                     F[0] = FT;
-                    DF[0] = FT * expn / PDROP;
+                    DF[0] = FT * expn / linkage.pressure_drop;
                 }
             }
         }
         return 1;
     }
 
-    int HorizontalOpening::calculate(EnergyPlusData &,
-                                     bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                     Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                     //int const i,                              // Linkage number
-                                     [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                     [[maybe_unused]] const Real64 control,    // Element control signal
+    int HorizontalOpening::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                      AirflowNetworkLinkageProp &linkage,       // Linkage
                                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -2967,7 +2013,7 @@ namespace AirflowNetwork {
 
         // Check which zone is higher
         if (Fact == 0.0) {
-            generic_crack(coef, expn, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(coef, expn, init, linkage.pressure_drop, propN, propM, F, DF);
             return 1;
         }
 
@@ -2983,8 +2029,8 @@ namespace AirflowNetwork {
             if (propN.density > propM.density) {
                 BuoFlowMax = RhozAver * 0.055 * std::sqrt(9.81 * std::abs(propN.density - propM.density) * pow_5(DH) / RhozAver);
                 PurgedP = Cshape * Cshape * 9.81 * std::abs(propN.density - propM.density) * pow_5(DH) / (2.0 * pow_2(OpenArea));
-                if (std::abs(PDROP) <= PurgedP) {
-                    BuoFlow = BuoFlowMax * (1.0 - std::abs(PDROP) / PurgedP);
+                if (std::abs(linkage.pressure_drop) <= PurgedP) {
+                    BuoFlow = BuoFlowMax * (1.0 - std::abs(linkage.pressure_drop) / PurgedP);
                     dPBuoFlow = BuoFlowMax / PurgedP;
                 }
             }
@@ -2993,28 +2039,28 @@ namespace AirflowNetwork {
             if (propN.density < propM.density) {
                 BuoFlowMax = RhozAver * 0.055 * std::sqrt(9.81 * std::abs(propN.density - propM.density) * pow_5(DH) / RhozAver);
                 PurgedP = Cshape * Cshape * 9.81 * std::abs(propN.density - propM.density) * pow_5(DH) / (2.0 * pow_2(OpenArea));
-                if (std::abs(PDROP) <= PurgedP) {
-                    BuoFlow = BuoFlowMax * (1.0 - std::abs(PDROP) / PurgedP);
+                if (std::abs(linkage.pressure_drop) <= PurgedP) {
+                    BuoFlow = BuoFlowMax * (1.0 - std::abs(linkage.pressure_drop) / PurgedP);
                     dPBuoFlow = BuoFlowMax / PurgedP;
                 }
             }
         }
 
-        if (PDROP == 0.0) {
+        if (linkage.pressure_drop == 0.0) {
             fma12 = BuoFlow;
             fma21 = BuoFlow;
             dp1fma12 = 0.0;
             dp1fma21 = 0.0;
-        } else if (PDROP > 0.0) {
-            fma12 = propN.density * OpenArea * Fact * DischCoeff * std::sqrt(2.0 * PDROP / RhozAver) + BuoFlow;
-            dp1fma12 = propN.density * OpenArea * DischCoeff / std::sqrt(2.0 * PDROP * RhozAver) + dPBuoFlow;
+        } else if (linkage.pressure_drop > 0.0) {
+            fma12 = propN.density * OpenArea * Fact * DischCoeff * std::sqrt(2.0 * linkage.pressure_drop / RhozAver) + BuoFlow;
+            dp1fma12 = propN.density * OpenArea * DischCoeff / std::sqrt(2.0 * linkage.pressure_drop * RhozAver) + dPBuoFlow;
             if (BuoFlow > 0.0) {
                 fma21 = BuoFlow;
                 dp1fma21 = dPBuoFlow;
             }
-        } else { // PDROP.LT.0.0
-            fma21 = propM.density * OpenArea * Fact * DischCoeff * std::sqrt(2.0 * std::abs(PDROP) / RhozAver) + BuoFlow;
-            dp1fma21 = -propM.density * OpenArea * DischCoeff / std::sqrt(2.0 * std::abs(PDROP) * RhozAver) + dPBuoFlow;
+        } else { // linkage.pressure_drop.LT.0.0
+            fma21 = propM.density * OpenArea * Fact * DischCoeff * std::sqrt(2.0 * std::abs(linkage.pressure_drop) / RhozAver) + BuoFlow;
+            dp1fma21 = -propM.density * OpenArea * DischCoeff / std::sqrt(2.0 * std::abs(linkage.pressure_drop) * RhozAver) + dPBuoFlow;
             if (BuoFlow > 0.0) {
                 fma12 = BuoFlow;
                 dp1fma12 = dPBuoFlow;
@@ -3032,11 +2078,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SpecifiedMassFlow::calculate(EnergyPlusData &,
-                                     [[maybe_unused]] bool const LFLAG,                   // Initialization flag.If = 1, use laminar relationship
-                                     [[maybe_unused]] Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                                     const Real64 multiplier,                             // Element multiplier
-                                     const Real64 control,                                // Element control signal
+    int SpecifiedMassFlow::calculate([[maybe_unused]] bool const init,                   // Initialization flag. If true, compute linear relationship
                                      [[maybe_unused]] AirflowNetworkLinkageProp &linkage, // Linkage
                                      std::array<Real64, 2> &F,                            // Airflow through the component [kg/s]
                                      std::array<Real64, 2> &DF                            // Partial derivative:  DF/DP
@@ -3052,7 +2094,7 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine computes airflow for a specified mass flow element.
 
-        F[0] = mass_flow * control * multiplier;
+        F[0] = mass_flow * linkage.control * linkage.multiplier;
         DF[0] = 0.0;
         F[1] = 0.0;
         DF[1] = 0.0;
@@ -3060,12 +2102,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SpecifiedVolumeFlow::calculate(EnergyPlusData &,
-                                       [[maybe_unused]] bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
-                                       [[maybe_unused]] Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
-                                       //[[maybe_unused]] int const i,        // Linkage number
-                                       const Real64 multiplier,             // Element multiplier
-                                       const Real64 control,                // Element control signal
+    int SpecifiedVolumeFlow::calculate([[maybe_unused]] bool const init,   // Initialization flag. If true, compute linear relationship
                                        AirflowNetworkLinkageProp &linkage,  // Linkage
                                        std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
                                        std::array<Real64, 2> &DF            // Partial derivative:  DF/DP
@@ -3084,7 +2121,7 @@ namespace AirflowNetwork {
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
         const Node &propM = *linkage.nodes[1]; // Node 2 properties
 
-        Real64 flow = volume_flow * control * multiplier;
+        Real64 flow = volume_flow * linkage.control * linkage.multiplier;
 
         Real64 upwind_density{propN.density};
 
@@ -3100,12 +2137,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int OutdoorAirFan::calculate(EnergyPlusData &,
-                                 bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                                 Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                 //int const i,                              // Linkage number
-                                 [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                 [[maybe_unused]] const Real64 control,    // Element control signal
+    int OutdoorAirFan::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                                  AirflowNetworkLinkageProp &linkage,       // Linkage
                                  std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                                  std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -3154,15 +2186,15 @@ namespace AirflowNetwork {
             expn = FlowExpo;
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 coef = FlowCoef / propN.sqrt_density * Corr;
             } else {
                 coef = FlowCoef / propM.sqrt_density * Corr;
             }
 
-            if (LFLAG) {
+            if (init) {
                 // Initialization by linear relation.
-                if (PDROP >= 0.0) {
+                if (linkage.pressure_drop >= 0.0) {
                     RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propN.density / propN.viscosity * Ctl;
@@ -3171,21 +2203,21 @@ namespace AirflowNetwork {
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propM.density / propM.viscosity * Ctl;
                 }
-                F[0] = -DF[0] * PDROP;
+                F[0] = -DF[0] * linkage.pressure_drop;
             } else {
                 // Standard calculation.
-                if (PDROP >= 0.0) {
+                if (linkage.pressure_drop >= 0.0) {
                     // Flow in positive direction.
                     // Laminar flow.
                     RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propN.density / propN.viscosity * Ctl;
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
+                        FT = coef * propN.sqrt_density * std::sqrt(linkage.pressure_drop) * Ctl;
                     } else {
-                        FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
+                        FT = coef * propN.sqrt_density * std::pow(linkage.pressure_drop, expn) * Ctl;
                     }
                 } else {
                     // Flow in negative direction.
@@ -3193,12 +2225,12 @@ namespace AirflowNetwork {
                     RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propM.density / propM.viscosity * Ctl;
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::sqrt(-linkage.pressure_drop) * Ctl;
                     } else {
-                        FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::pow(-linkage.pressure_drop, expn) * Ctl;
                     }
                 }
                 // Select laminar or turbulent flow.
@@ -3207,19 +2239,14 @@ namespace AirflowNetwork {
                     DF[0] = CDM;
                 } else {
                     F[0] = FT;
-                    DF[0] = FT * expn / PDROP;
+                    DF[0] = FT * expn / linkage.pressure_drop;
                 }
             }
         }
         return 1;
     }
 
-    int ReliefFlow::calculate(EnergyPlusData &,
-                              bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                              Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                              //int const i,                              // Linkage number
-                              [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                              [[maybe_unused]] const Real64 control,    // Element control signal
+    int ReliefFlow::calculate(bool const init,                         // Initialization flag. If true, compute linear relationship
                               AirflowNetworkLinkageProp &linkage,       // Linkage
                               std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
@@ -3252,8 +2279,6 @@ namespace AirflowNetwork {
         Real64 FL;
         Real64 FT;
 
-        int AirLoopNum = linkage.AirLoopNum;
-
         if (linkage.mass_flow) {
             F[0] = linkage.mass_flow.value();
             DF[0] = 0.0;
@@ -3268,15 +2293,15 @@ namespace AirflowNetwork {
             expn = FlowExpo;
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
-            if (PDROP >= 0.0) {
+            if (linkage.pressure_drop >= 0.0) {
                 coef = FlowCoef / propN.sqrt_density * Corr;
             } else {
                 coef = FlowCoef / propM.sqrt_density * Corr;
             }
 
-            if (LFLAG) {
+            if (init) {
                 // Initialization by linear relation.
-                if (PDROP >= 0.0) {
+                if (linkage.pressure_drop >= 0.0) {
                     RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propN.density / propN.viscosity * Ctl;
@@ -3285,21 +2310,21 @@ namespace AirflowNetwork {
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     DF[0] = coef * propM.density / propM.viscosity * Ctl;
                 }
-                F[0] = -DF[0] * PDROP;
+                F[0] = -DF[0] * linkage.pressure_drop;
             } else {
                 // Standard calculation.
-                if (PDROP >= 0.0) {
+                if (linkage.pressure_drop >= 0.0) {
                     // Flow in positive direction.
                     // Laminar flow.
                     RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propN.density / propN.viscosity * Ctl;
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
+                        FT = coef * propN.sqrt_density * std::sqrt(linkage.pressure_drop) * Ctl;
                     } else {
-                        FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
+                        FT = coef * propN.sqrt_density * std::pow(linkage.pressure_drop, expn) * Ctl;
                     }
                 } else {
                     // Flow in negative direction.
@@ -3307,12 +2332,12 @@ namespace AirflowNetwork {
                     RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
                     Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                     CDM = coef * propM.density / propM.viscosity * Ctl;
-                    FL = CDM * PDROP;
+                    FL = CDM * linkage.pressure_drop;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::sqrt(-linkage.pressure_drop) * Ctl;
                     } else {
-                        FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::pow(-linkage.pressure_drop, expn) * Ctl;
                     }
                 }
                 // Select laminar or turbulent flow.
@@ -3321,7 +2346,7 @@ namespace AirflowNetwork {
                     DF[0] = CDM;
                 } else {
                     F[0] = FT;
-                    DF[0] = FT * expn / PDROP;
+                    DF[0] = FT * expn / linkage.pressure_drop;
                 }
             }
         }
@@ -3410,7 +2435,7 @@ namespace AirflowNetwork {
 
     int GenericDuct(Real64 const Length,      // Duct length
                     Real64 const Diameter,    // Duct diameter
-                    bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
+                    bool const init,         // Initialization flag. If true, compute linear relationship
                     Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]
                     const AirState &propN,    // Node 1 properties
                     const AirState &propM,    // Node 2 properties
@@ -3450,7 +2475,7 @@ namespace AirflowNetwork {
         Real64 g = 1.14 - 0.868589 * std::log(ed);
         Real64 AA1 = g;
 
-        if (LFLAG) {
+        if (init) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
                 DF[0] = (2.0 * propN.density * area * Diameter) / (propN.viscosity * InitLamCoef * ld);

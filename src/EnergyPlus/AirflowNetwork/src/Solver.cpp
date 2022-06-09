@@ -1442,7 +1442,7 @@ namespace AirflowNetwork {
                 }
 
                 DisSysCompCVFData(i).name = fan_name; // Name of duct effective leakage ratio component
-                DisSysCompCVFData(i).Ctrl = 1.0;      // Control ratio
+                //DisSysCompCVFData(i).Ctrl = 1.0;      // Control ratio
                 DisSysCompCVFData(i).FanIndex = fanIndex;
                 DisSysCompCVFData(i).FlowRate = flowRate;
                 DisSysCompCVFData(i).FanTypeNum = fanType_Num;
@@ -4671,7 +4671,6 @@ namespace AirflowNetwork {
                     }
                 } break;
                 case ComponentType::EXF: {
-                    exhaust_links.push_back(&link);
                     int index;
                     bool errors = false;
                     GetFanIndex(m_state, link.element->name, index, errors);
@@ -4679,28 +4678,6 @@ namespace AirflowNetwork {
                         // Fatal?
                     }
                     link.inlet_node = m_state.dataFans->Fan(index).InletNodeNum;
-                    break;
-                }
-                case ComponentType::OAF: {
-                    oa_links.push_back(&link);
-                    int index;
-                    bool errors = false;
-                    GetFanIndex(m_state, link.element->name, index, errors);
-                    if (errors) {
-                        // Fatal?
-                    }
-                    link.inlet_node = m_state.dataFans->Fan(index).InletNodeNum;
-                    break;
-                }
-                case ComponentType::REL: {
-                    relief_links.push_back(&link);
-                    int index;
-                    bool errors = false;
-                    GetFanIndex(m_state, link.element->name, index, errors);
-                    if (errors) {
-                        // Fatal?
-                    }
-                    link.outlet_node = m_state.dataFans->Fan(index).OutletNodeNum;
                     break;
                 }
                 default:
@@ -4863,14 +4840,12 @@ namespace AirflowNetwork {
                     AirflowNetworkLinkageData(count).CompNum = compnum;
                     switch (AirflowNetworkLinkageData(count).element->type()) {
                     case ComponentType::CVF: {
-                        simple_fan_links.push_back(&AirflowNetworkLinkageData(count));
                         // Because the Fan:SystemModel gets treated as one of the other fans, have to be careful with this
                         auto fan = static_cast<SimpleFan*>(AirflowNetworkLinkageData(count).element);
                         AirflowNetworkLinkageData(count).inlet_node = fan->InletNode;
                         break;
                     }
                     case ComponentType::OAF: {
-                        oa_links.push_back(&AirflowNetworkLinkageData(count));
                         AirflowNetworkLinkageData(count).inlet_node =
                             MixedAir::GetOAMixerInletNodeNumber(m_state, static_cast<OutdoorAirFan*>(AirflowNetworkLinkageData(count).element)->OAMixerNum);
                         if (AirflowNetworkLinkageData(count).inlet_node == 0) {
@@ -4879,7 +4854,6 @@ namespace AirflowNetwork {
                         break;
                     }
                     case ComponentType::REL: {
-                        relief_links.push_back(&AirflowNetworkLinkageData(count));
                         AirflowNetworkLinkageData(count).outlet_node = MixedAir::GetOAMixerInletNodeNumber(
                             m_state, static_cast<ReliefFlow*>(AirflowNetworkLinkageData(count).element)->OAMixerNum);
                         if (AirflowNetworkLinkageData(count).outlet_node == 0) {
@@ -13070,7 +13044,7 @@ namespace AirflowNetwork {
         bool allZero; // noel
 #endif
         Array1D<Real64> X(4);
-        Real64 DP;
+        //Real64 DP;
         std::array<Real64, 2> F{{0.0, 0.0}};
         std::array<Real64, 2> DF{{0.0, 0.0}};
 
@@ -13090,7 +13064,7 @@ namespace AirflowNetwork {
             AU(n) = 0.0;
         }
         // Loop(s) to calculate control, etc.
-        for (auto link : AirflowNetworkLinkageData) {
+        for (auto &link : AirflowNetworkLinkageData) {
 
             int n = link.indices[0];
             int m = link.indices[1];
@@ -13256,22 +13230,23 @@ namespace AirflowNetwork {
             int m = AirflowNetworkLinkageData(i).indices[1];
             //!!! Check array of DP. DpL is used for multizone air flow calculation only
             //!!! and is not for forced air calculation
-            if (i > NumOfLinksMultiZone) {
-                DP = PZ(n) - PZ(m) + PS(i) + PW(i);
-            } else {
-                DP = PZ(n) - PZ(m) + dos.DpL(i, 1) + PW(i);
-            }
+            //if (i > NumOfLinksMultiZone) {
+            //    DP = PZ(n) - PZ(m) + PS(i) + PW(i);
+            //} else {
+            //    DP = PZ(n) - PZ(m) + dos.DpL(i, 1) + PW(i);
+            //}
             Real64 multiplier = 1.0;
             Real64 control = AirflowNetworkLinkageData(i).control;
             // if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = AirflowNetworkLinkageData(i).CompNum;
 
-            NF = AirflowNetworkLinkageData(i).element->calculate(m_state, LFLAG, DP, multiplier, control, AirflowNetworkLinkageData(i), F, DF);
-            if (AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
-                DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
-            }
+            NF = AirflowNetworkLinkageData(i).element->calculate(LFLAG, AirflowNetworkLinkageData(i), F, DF);
+            //auto DP = AirflowNetworkLinkageData(i).pressure_drop;
+            //if (AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
+            //    DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
+            //}
 
-            AirflowNetworkLinkSimu(i).DP = DP;
+            AirflowNetworkLinkSimu(i).DP = AirflowNetworkLinkageData(i).pressure_drop;
             AFLOW(i) = F[0];
             AFLOW2(i) = 0.0;
             if (AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::DOP) {
