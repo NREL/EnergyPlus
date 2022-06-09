@@ -684,7 +684,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SimpleFan::calculate(EnergyPlusData &state,
+    int SimpleFan::calculate(EnergyPlusData &,
                              bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                              Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                              [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -701,88 +701,22 @@ namespace AirflowNetwork {
         //       MODIFIED       Lixing Gu, 2/1/04
         //                      Revised the subroutine to meet E+ needs
         //       MODIFIED       Lixing Gu, 6/8/05
+        //       MODIFIED       Jason DeGraw, 6/8/2022
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
-        // Using/Aliasing
-        auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int k;
-        int k1;
-        Real64 SumTermFlow;     // Sum of all Terminal flows [kg/s]
-        Real64 SumFracSuppLeak; // Sum of all supply leaks as a fraction of supply fan flow rate
-
-        int NF(1);
-
-        int AirLoopNum = linkage.AirLoopNum;
-
-        if (FanTypeNum == DataHVACGlobals::FanType_SimpleOnOff) {
-            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
-                state.dataLoopNodes->Node(InletNode).MassFlowRate == 0.0) {
-                NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
-            } else if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
-                       state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
-                F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
-            } else {
-                F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate * Ctrl;
-                if (state.afn->MultiSpeedHPIndicator == 2) {
-                    F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate *
-                               state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
-                           state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate *
-                               (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
-                }
-            }
-        } else if (FanTypeNum == DataHVACGlobals::FanType_SimpleConstVolume) {
-            if (state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) {
-                F[0] = FlowRate * Ctrl;
-            } else if (NumPrimaryAirSys > 1 && state.dataLoopNodes->Node(InletNode).MassFlowRate <= 0.0) {
-                NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
-            }
-
-            if (state.afn->MultiSpeedHPIndicator == 2) {
-                F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
-            }
-        } else if (FanTypeNum == DataHVACGlobals::FanType_SimpleVAV) {
-            // Check VAV termals with a damper
-            SumTermFlow = 0.0;
-            SumFracSuppLeak = 0.0;
-            for (k = 1; k <= state.afn->ActualNumOfLinks; ++k) {
-                if (state.afn->AirflowNetworkLinkageData(k).VAVTermDamper && state.afn->AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
-                    k1 = state.afn->AirflowNetworkLinkageData(k).nodes[0]->EPlusNodeNum;
-                    if (state.dataLoopNodes->Node(k1).MassFlowRate > 0.0) {
-                        SumTermFlow += state.dataLoopNodes->Node(k1).MassFlowRate;
-                    }
-                }
-                if (state.afn->AirflowNetworkCompData(state.afn->AirflowNetworkLinkageData(k).CompNum).CompTypeNum == iComponentTypeNum::ELR) {
-                    // Calculate supply leak sensible losses
-                    auto Node1 = state.afn->AirflowNetworkLinkageData(k).nodes[0];
-                    auto Node2 = state.afn->AirflowNetworkLinkageData(k).nodes[1];
-                    if ((Node2->EPlusZoneNum > 0) && (Node1->EPlusNodeNum == 0) &&
-                        (Node1->AirLoopNum == AirLoopNum)) {
-                        SumFracSuppLeak +=
-                            state.afn->DisSysCompELRData(state.afn->AirflowNetworkCompData(state.afn->AirflowNetworkLinkageData(k).CompNum).TypeNum)
-                                .ELR;
-                    }
-                }
-            }
-            F[0] = SumTermFlow / (1.0 - SumFracSuppLeak);
-            state.afn->VAVTerminalRatio = 0.0;
-            if (F[0] > MaxAirMassFlowRate) {
-                state.afn->VAVTerminalRatio = MaxAirMassFlowRate / F[0];
-                F[0] = MaxAirMassFlowRate;
-            }
+        if (linkage.mass_flow) {
+            F[0] = linkage.mass_flow.value();
+            DF[0] = 0.0;
+        } else {
+            const Node &propN = *linkage.nodes[0]; // Node 1 properties
+            const Node &propM = *linkage.nodes[1]; // Node 2 properties
+            GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
         }
-        DF[0] = 0.0;
-        return NF;
+        DF[0] = 0.0; // This should probably not be here, probably will cause diffs if it goes
+        return 1;
     }
 
     int DetailedFan::calculate(EnergyPlusData &state,
@@ -2859,7 +2793,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ZoneExhaustFan::calculate(EnergyPlusData &state,
+    int ZoneExhaustFan::calculate(EnergyPlusData &,
                                   bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                   Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                   [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -2874,6 +2808,7 @@ namespace AirflowNetwork {
         //       DATE WRITTEN   Extracted from AIRNET
         //       MODIFIED       Lixing Gu, 12/17/06
         //                      Revised for zone exhaust fan
+        //       MODIFIED       Jason DeGraw, 6/8/2022
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -2910,9 +2845,8 @@ namespace AirflowNetwork {
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
-            auto surf = linkage.surface();
-            Corr = surf->Factor;
-            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
+            Corr = linkage.control;
+            RhozNorm = AIRDENSITY_CONSTEXPR(StandardP, StandardT, StandardW); // This is not great, will remove after moving to generic_crack
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -2974,108 +2908,6 @@ namespace AirflowNetwork {
                     F[0] = FT;
                     DF[0] = FT * expn / PDROP;
                 }
-            }
-        }
-        return 1;
-    }
-
-    int ZoneExhaustFan::calculate(EnergyPlusData &state,
-                                  Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                                  [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                                  const Real64 control,                     // Element control signal
-                                  AirflowNetworkLinkageProp &linkage,       // Linkage
-                                  std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                                  std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
-        //       MODIFIED       Lixing Gu, 12/17/06
-        //                      Revised for zone exhaust fan
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine solves airflow for a surface crack component
-
-        // Using/Aliasing
-        using DataHVACGlobals::VerySmallMassFlow;
-
-        const Node &propN = *linkage.nodes[0]; // Node 1 properties
-        const Node &propM = *linkage.nodes[1]; // Node 2 properties
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 RhozNorm;
-        Real64 VisczNorm;
-        Real64 expn;
-        Real64 Ctl;
-        Real64 coef;
-        Real64 VisAve;
-        Real64 Tave;
-        Real64 RhoCor;
-        // int InletNode;
-
-        // Formats
-        // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
-
-        if (linkage.mass_flow) {
-            F[0] = linkage.mass_flow.value();
-            DF[0] = 0.0;
-            return 1;
-        } else {
-            // Treat the component as a surface crack
-            // Crack standard condition from given inputs
-            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
-            VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
-
-            expn = FlowExpo;
-            VisAve = (propN.viscosity + propM.viscosity) / 2.0;
-            Tave = (propN.temperature + propM.temperature) / 2.0;
-            if (PDROP >= 0.0) {
-                coef = control * FlowCoef / propN.sqrt_density;
-            } else {
-                coef = control * FlowCoef / propM.sqrt_density;
-            }
-
-            // Standard calculation.
-            if (PDROP >= 0.0) {
-                // Flow in positive direction.
-                // Laminar flow.
-                RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
-                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propN.density / propN.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
-                } else {
-                    FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
-                }
-            } else {
-                // Flow in negative direction.
-                // Laminar flow.
-                RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
-                Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propM.density / propM.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
-                } else {
-                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
-                }
-            }
-            // Select laminar or turbulent flow.
-            // if (LIST >= 4) gio::write(Unit21, Format_901) << " scr: " << i << PDROP << FL << FT;
-            if (std::abs(FL) <= std::abs(FT)) {
-                F[0] = FL;
-                DF[0] = CDM;
-            } else {
-                F[0] = FT;
-                DF[0] = FT * expn / PDROP;
             }
         }
         return 1;
@@ -3284,7 +3116,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int OutdoorAirFan::calculate(EnergyPlusData &state,
+    int OutdoorAirFan::calculate(EnergyPlusData &,
                                  bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                  Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                  //int const i,                              // Linkage number
@@ -3331,8 +3163,8 @@ namespace AirflowNetwork {
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
-            Corr = 1.0;
-            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
+            Corr = linkage.control;
+            RhozNorm = AIRDENSITY_CONSTEXPR(StandardP, StandardT, StandardW); // This is not great, will remove after moving to generic_crack
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3398,7 +3230,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ReliefFlow::calculate(EnergyPlusData &state,
+    int ReliefFlow::calculate(EnergyPlusData &,
                               bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                               Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                               //int const i,                              // Linkage number
@@ -3445,8 +3277,8 @@ namespace AirflowNetwork {
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
-            Corr = 1.0;
-            RhozNorm = state.afn->properties.density(StandardP, StandardT, StandardW);
+            Corr = linkage.control;
+            RhozNorm = AIRDENSITY_CONSTEXPR(StandardP, StandardT, StandardW); // This is not great, will remove after moving to generic_crack
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;

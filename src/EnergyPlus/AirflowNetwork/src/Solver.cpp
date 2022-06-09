@@ -4670,9 +4670,6 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     }
                 } break;
-                case ComponentType::CVF:
-                    simple_fan_links.push_back(&link);
-                    break;
                 case ComponentType::EXF: {
                     exhaust_links.push_back(&link);
                     int index;
@@ -4864,6 +4861,36 @@ namespace AirflowNetwork {
                     assert(compnum_iter != compnum.end());
                     int compnum = compnum_iter->second;
                     AirflowNetworkLinkageData(count).CompNum = compnum;
+                    switch (AirflowNetworkLinkageData(count).element->type()) {
+                    case ComponentType::CVF: {
+                        simple_fan_links.push_back(&AirflowNetworkLinkageData(count));
+                        // Because the Fan:SystemModel gets treated as one of the other fans, have to be careful with this
+                        auto fan = static_cast<SimpleFan*>(AirflowNetworkLinkageData(count).element);
+                        AirflowNetworkLinkageData(count).inlet_node = fan->InletNode;
+                        break;
+                    }
+                    case ComponentType::OAF: {
+                        oa_links.push_back(&AirflowNetworkLinkageData(count));
+                        AirflowNetworkLinkageData(count).inlet_node =
+                            MixedAir::GetOAMixerInletNodeNumber(m_state, static_cast<OutdoorAirFan*>(AirflowNetworkLinkageData(count).element)->OAMixerNum);
+                        if (AirflowNetworkLinkageData(count).inlet_node == 0) {
+                            // Fatal?
+                        }
+                        break;
+                    }
+                    case ComponentType::REL: {
+                        relief_links.push_back(&AirflowNetworkLinkageData(count));
+                        AirflowNetworkLinkageData(count).outlet_node = MixedAir::GetOAMixerInletNodeNumber(
+                            m_state, static_cast<ReliefFlow*>(AirflowNetworkLinkageData(count).element)->OAMixerNum);
+                        if (AirflowNetworkLinkageData(count).outlet_node == 0) {
+                            // Fatal?
+                        }
+                        break;
+                    }
+                    default:
+                        // Nothing to do here
+                        break;
+                    }
                 } else {
                     ShowSevereError(m_state,
                                     format(RoutineName) + CurrentModuleObject + ": The " + cAlphaFields(4) + " is not defined in " +
@@ -13058,6 +13085,66 @@ namespace AirflowNetwork {
             AU(n) = 0.0;
         }
         // Loop(s) to calculate control, etc.
+        for (auto link : simple_fan_links) {
+            int AirLoopNum = link->AirLoopNum;
+            auto fan = static_cast<SimpleFan *>(link->element);
+            constexpr int CycFanCycComp{1};
+            if (fan->FanTypeNum == DataHVACGlobals::FanType_SimpleOnOff) {
+                if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                    m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate == 0.0) {
+                    link->mass_flow = {};
+                } else if (m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                           m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
+                    link->mass_flow = m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
+                } else {
+                    link->mass_flow = m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate * link->control;
+                    if (m_state.afn->MultiSpeedHPIndicator == 2) {
+                        link->mass_flow = m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate *
+                                              m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
+                                          m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate *
+                                              (1.0 - m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
+                    }
+                }
+            } else if (fan->FanTypeNum == DataHVACGlobals::FanType_SimpleConstVolume) {
+                if (m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate > 0.0) {
+                    link->mass_flow = fan->FlowRate * link->control;
+                } else if (m_state.dataHVACGlobal->NumPrimaryAirSys > 1 && m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate <= 0.0) {
+                    link->mass_flow = {};
+                }
+
+                if (m_state.afn->MultiSpeedHPIndicator == 2) {
+                    link->mass_flow = m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
+                }
+            } else if (fan->FanTypeNum == DataHVACGlobals::FanType_SimpleVAV) {
+                // Check VAV termals with a damper
+                Real64 SumTermFlow = 0.0;
+                Real64 SumFracSuppLeak = 0.0;
+                for (int k = 1; k <= ActualNumOfLinks; ++k) {
+                    if (AirflowNetworkLinkageData(k).VAVTermDamper && AirflowNetworkLinkageData(k).AirLoopNum == AirLoopNum) {
+                        auto k1 = m_state.afn->AirflowNetworkLinkageData(k).nodes[0]->EPlusNodeNum;
+                        if (m_state.dataLoopNodes->Node(k1).MassFlowRate > 0.0) {
+                            SumTermFlow += m_state.dataLoopNodes->Node(k1).MassFlowRate;
+                        }
+                    }
+                    if (AirflowNetworkLinkageData(k).element->type() == ComponentType::ELR) {
+                        // Calculate supply leak sensible losses
+                        auto Node1 = AirflowNetworkLinkageData(k).nodes[0];
+                        auto Node2 = AirflowNetworkLinkageData(k).nodes[1];
+                        if ((Node2->EPlusZoneNum > 0) && (Node1->EPlusNodeNum == 0) && (Node1->AirLoopNum == AirLoopNum)) {
+                            SumFracSuppLeak +=
+                                static_cast<EffectiveLeakageRatio*>(AirflowNetworkLinkageData(k).element)->ELR;
+                        }
+                    }
+                }
+                auto flow = SumTermFlow / (1.0 - SumFracSuppLeak);
+                VAVTerminalRatio = 0.0;
+                if (flow > fan->MaxAirMassFlowRate) {
+                    VAVTerminalRatio = fan->MaxAirMassFlowRate / flow;
+                    flow = fan->MaxAirMassFlowRate;
+                }
+                link->mass_flow = flow;
+            }
+        }
         for (auto link : exhaust_links) {
             if (m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate > DataHVACGlobals::VerySmallMassFlow) {
                 // Treat the component as an exhaust fan
@@ -13069,40 +13156,44 @@ namespace AirflowNetwork {
             } else {
                 // Treat the component as a crack
                 link->mass_flow = {};
+                auto surf = link->surface();
+                link->control = surf->Factor;
             }
         }
         for (auto link : oa_links) {
             if (m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate > DataHVACGlobals::VerySmallMassFlow) {
                 // Treat the component as an oa fan
-                F[0] = m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate;
-                DF[0] = 0.0;
                 constexpr int CycFanCycComp{1};
+                auto flow = m_state.dataLoopNodes->Node(link->inlet_node).MassFlowRate;
                 if (m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
                     m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                    F[0] = F[0] / m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio;
+                    flow /= m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio;
                 }
+                link->mass_flow = flow;
             } else {
                 // Treat the component as a crack
                 link->mass_flow = {};
+                link->control = 1.0;
             }
         }
         for (auto link : relief_links) {
             if (m_state.dataLoopNodes->Node(link->outlet_node).MassFlowRate > DataHVACGlobals::VerySmallMassFlow) {
                 // Treat the component as a relief fan
-                DF[0] = 0.0;
                 if (PressureSetFlag == PressureCtrlRelief) {
-                    F[0] = ReliefMassFlowRate;
+                    link->mass_flow = ReliefMassFlowRate;
                 } else {
                     constexpr int CycFanCycComp{1};
-                    F[0] = m_state.dataLoopNodes->Node(link->outlet_node).MassFlowRate;
+                    auto flow = m_state.dataLoopNodes->Node(link->outlet_node).MassFlowRate;
                     if (m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
                         m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                        F[0] = F[0] / m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio;
+                        flow /= m_state.dataAirLoop->AirLoopAFNInfo(link->AirLoopNum).LoopOnOffFanPartLoadRatio;
                     }
+                    link->mass_flow = flow;
                 }
             } else {
                 // Treat the component as a crack
                 link->mass_flow = {};
+                link->control = 1.0;
             }
         }
         // Set up the Jacobian matrix.
