@@ -830,11 +830,12 @@ namespace AirflowNetwork {
         std::optional<Real64> mass_flow;      // Specified mass flow, optional
         int inlet_node;                       // Inlet node
         int outlet_node;                      // Inlet node
+        Real64 pressure_drop;                 // Pressure drop across this linkage
 
         // Default Constructor
         AirflowNetworkLinkage()
             : NodeHeights{{0.0, 0.0}}, CompNum(0), indices{{0, 0}}, nodes{{nullptr, nullptr}}, LinkNum(0), element(nullptr), control(1.0),
-              inlet_node(0), outlet_node(0)
+              inlet_node(0), outlet_node(0), pressure_drop(0.0)
         {
         }
 

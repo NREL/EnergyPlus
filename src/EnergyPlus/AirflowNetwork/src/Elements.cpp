@@ -1833,7 +1833,7 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int ConstantPressureDrop::calculate(EnergyPlusData &state,
+    int ConstantPressureDrop::calculate(EnergyPlusData &,
                                         [[maybe_unused]] bool const LFLAG,        // Initialization flag.If = 1, use laminar relationship
                                         const Real64 PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                         [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -1850,14 +1850,14 @@ namespace AirflowNetwork {
         //       MODIFIED       Lixing Gu, 2/1/04
         //                      Revised the subroutine to meet E+ needs
         //       MODIFIED       Lixing Gu, 6/8/05
+        //       MODIFIED       Jason DeGraw, 6/8/2022
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Constant pressure drop component
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Co;
-        int k;
+        //Real64 Co;
 
         const Node &propN = *linkage.nodes[0]; // Node 1 properties
         const Node &propM = *linkage.nodes[1]; // Node 2 properties
@@ -1873,14 +1873,9 @@ namespace AirflowNetwork {
             F[0] = std::sqrt(2.0 * propN.density) * A * std::sqrt(DP);
             DF[0] = 0.5 * F[0] / DP;
         } else {
-            for (k = 1; k <= state.afn->ActualNumOfLinks; ++k) {
-                if (state.afn->AirflowNetworkLinkageData(k).indices[1] == n) {
-                    F[0] = state.afn->AFLOW(k);
-                    break;
-                }
-            }
-            state.afn->PZ(m) = state.afn->PZ(n) - DP;
-            Co = F[0] / DP;
+            F[0] = linkage.mass_flow.value();
+            //state.afn->PZ(m) = state.afn->PZ(n) - DP;
+            //Co = F[0] / DP;
             DF[0] = 10.e10;
         }
         return 1;
@@ -2347,7 +2342,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompTermUnitProp::calculate(EnergyPlusData &state,
+    int DisSysCompTermUnitProp::calculate(EnergyPlusData &,
                                           bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                           Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
                                           [[maybe_unused]] const Real64 multiplier, // Element multiplier
@@ -2499,11 +2494,8 @@ namespace AirflowNetwork {
             }
         }
         // If damper, setup the airflows from nodal values calculated from terminal
-        if (linkage.VAVTermDamper) {
-            F[0] = state.dataLoopNodes->Node(DamperInletNode).MassFlowRate;
-            if (state.afn->VAVTerminalRatio > 0.0) {
-                F[0] *= state.afn->VAVTerminalRatio;
-            }
+        if (linkage.mass_flow) {
+            F[0] = linkage.mass_flow.value();
             DF[0] = 0.0;
         }
         return 1;
