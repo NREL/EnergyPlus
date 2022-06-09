@@ -82,10 +82,20 @@ namespace HeatRecovery {
         Num
     };
 
+    enum class FrostControlOption
+    {
+        Invalid = -1,
+        None,
+        ExhaustOnly,
+        ExhaustAirRecirculation,
+        MinimumExhaustTemperature,
+        Num
+    };
+
     struct HeatExchCond
     {
         std::string Name;                                    // name of component
-        int ExchType = 0;                                 // Integer equivalent to ExchType
+        int ExchType = 0;                                    // Integer equivalent to ExchType
         std::string HeatExchPerfName;                        // Desiccant balanced heat exchanger performance data name
         int SchedPtr = 0;                                    // index of schedule
         HXConfiguration FlowArr = HXConfiguration::Invalid;  // flow Arrangement:
@@ -132,12 +142,12 @@ namespace HeatRecovery {
         // 1 = None, 2 = Bypass, 3 = Stop Rotary HX Rotation
         HXConfigurationType ExchConfig = HXConfigurationType::Invalid; // parameter equivalent of HX configuration, plate or rotary
         // frost control parameters
-        std::string FrostControlType;              // type of frost control used if any
-        Real64 ThresholdTemperature = 0.0;         // threshold temperature for frost control
-        Real64 InitialDefrostTime = 0.0;           // initial defrost time
-        Real64 RateofDefrostTimeIncrease = 0.0;    // rate of change of defrost time
-        Real64 DefrostFraction = 0.0;              // fraction of time HX is in frost control mode
-        bool ControlToTemperatureSetPoint = false; // temperature control flag for generic HX
+        FrostControlOption FrostControlType = FrostControlOption::Invalid; // type of frost control used if any
+        Real64 ThresholdTemperature = 0.0;                                 // threshold temperature for frost control
+        Real64 InitialDefrostTime = 0.0;                                   // initial defrost time
+        Real64 RateofDefrostTimeIncrease = 0.0;                            // rate of change of defrost time
+        Real64 DefrostFraction = 0.0;                                      // fraction of time HX is in frost control mode
+        bool ControlToTemperatureSetPoint = false;                         // temperature control flag for generic HX
         // outlet conditions
         Real64 SupOutTemp = 0.0;     // supply air outlet temperature (C)
         Real64 SupOutHumRat = 0.0;   // supply air outlet humidity ratio (kg water/kg dry air)
@@ -337,9 +347,9 @@ namespace HeatRecovery {
     Real64 SafeDiv(Real64 a, Real64 b);
 
     Real64 CalculateEpsFromNTUandZ(EnergyPlusData &state,
-                                 Real64 NTU,              // number of transfer units
-                                 Real64 Z,                // capacity rate ratio
-                                 HXConfiguration FlowArr // flow arrangement
+                                   Real64 NTU,             // number of transfer units
+                                   Real64 Z,               // capacity rate ratio
+                                   HXConfiguration FlowArr // flow arrangement
     );
 
     void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
