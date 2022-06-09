@@ -29,10 +29,11 @@ We have identified the following commonly used metrics:
 |FEI (AMCA 208)|ASHRAE 90.1-2019|Fan Energy Index|Fan Energy|[10]|
 
 In the current workorder, we would focus on two metrics only and propose to focus on SEER2 and HSPF2 based on ANRI 210/240 2023. 
-1. SEER2
+
+**1. SEER2**
 
 SEER2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
-capacities less than 65,000 Btu/h
+capacities less than 65,000 Btu/h. 
 
 *For single stage system*
 
@@ -75,7 +76,7 @@ based on the following temperature bin values
 
 
 
-2. HSPF2
+**2. HSPF2**
 
 HSPF2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
 capacities less than 65,000 Btu/h
@@ -93,13 +94,13 @@ based on the following temperature bin values
 ![grafik](https://user-images.githubusercontent.com/49325382/172480836-a70565ce-130e-43f0-ba11-10254a894054.png)
 
 
-These temperature bin values changes in the newer version, thus we need to define two arrays one for the older and one for the newer version. 
+These temperature bin values changed in the newer version, thus we need to define two arrays one for the older and one for the newer version. 
 
 
 ## Approach ##
 
-For each of the two metrics, will identify a set of EnergyPlus components for which the metric applies. Replicate the code pattern of existing metrics for the new metric and write unit tests to ensure the calculation is correct. Once the metrics are calculated we can integrate them into the corresponding report code of the equipment summary table. For now we want to add those two new metrics (SEER2 and HSPF2) in addition to the existing ones (SEER and HSPF) and explain the difference in a footnote. 
-- Extent the implementation in StandardRatings.hh & StandardRatings.cc
+For each of the two metrics, we will identify a set of EnergyPlus components for which the metric applies. Replicate the code pattern of existing metrics for the new metric and write unit tests to ensure the calculation is correct. Once the metrics are calculated we can integrate them into the corresponding report code of the equipment summary table. For now we want to add those two new metrics (SEER2 and HSPF2) in addition to the existing ones (SEER and HSPF) and explain the difference in a footnote. 
+- Extend the implementation in StandardRatings.hh & StandardRatings.cc
    - for SEER2 by adding code to the following functions
      - CalcDXCoilStandardRating
      - SingleSpeedDXCoolingCoilStandardRatings
@@ -141,6 +142,7 @@ The EngineeringReference will be updated to include the formulas used to calcula
 
 ## Example Files and Transition Changes ##
 
+No new example files are needed.
 No transition change is required.
 
 ## E-mail and Conference Call Conclusions ##
