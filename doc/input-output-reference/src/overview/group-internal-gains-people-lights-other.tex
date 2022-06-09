@@ -80,16 +80,18 @@ The name of the People object. Must be unique across all People objects.
 
 This field applies this People object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the people/area and area/person options of the Number of People Calculation Method to place a varying number of people at the same density in each zone or space. The names of the actual people objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}People Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
-When multiple people objects are defined for the same zone, a warning message
-will be produced to caution users that zone-level resilience metrics results will
-only be meaningful if each zone has at most one People object defined. This is
-especially true for SET Degree-Hours and Discomfort-Weighted Exceedance Hours
+When multiple people objects are defined for the same zone, and they have
+different SET, PMV, Heat/Cold Stress Temperature Threshold, a warning message
+will be produced to caution users that zone-level resilience metrics results
+will only be meaningful if each zone has at most one People object defined. This
+is especially true for SET Degree-Hours and Discomfort-Weighted Exceedance Hours
 tables. In the SET Degree-Hour case, this is because in the calculation of zone
 level Heating/Cooling SET Degree-Hours, if multiple People objects are defined
 for one zone, EnergyPlus will only use the SET of one People object to compute
 the zone level SET Degree-Hours, and neglecting the SET of other people object
-defined in the same zone. As a result, when multiple people objects are linked to
-one zone, the zone-level resilience metrics results might be invalid.
+defined in the same zone. As a result, when multiple people objects with
+different SET, PMV, or Heat/Cold Stress Temperature are linked to one zone, the
+corresponding zone-level resilience metrics results might be invalid.
 
 \paragraph{Field: Number of People Schedule Name}\label{field-number-of-people-schedule-name}
 
@@ -161,7 +163,7 @@ This field is used in the calculation of hours of safety for cold events, which
 is defined as the longest duration (number of hours), starting from the
 beginning time of the risk period (e.g., the start time of a power outage), to
 not below a certain temperature threshold (specified in this field). If not
-specified, 60F (or 15.56C) will be used as the default temperature threshold. Other
+specified, 60F (or 15.56C) will be used as the default temperature threshold.
 
 \paragraph{Field: Heat Stress Temperature Threshold}\label{heat-stress-temperature-threshold}
 

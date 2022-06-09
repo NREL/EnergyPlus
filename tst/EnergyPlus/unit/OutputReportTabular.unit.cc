@@ -10132,7 +10132,8 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
 {
-    // when multiple people objects are defined for one zone, a warning is thrown, as people-dependent resilience metrics are not meaningful in these
+    // when multiple people objects with different threshold settings are defined for one zone,
+    // a warning is thrown, as people-dependent resilience metrics are not meaningful in these
     // settings
     std::string const idf_objects = delimited_string({
 
