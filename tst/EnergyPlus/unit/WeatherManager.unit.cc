@@ -1861,8 +1861,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_GroupReportPeriodByType)
                                                       ",                             !- End Year",
                                                       "8,                            !- End Month",
                                                       "5,                            !- End Day of Month",
-                                                      "10;                           !- End Hour of Day"
-    });
+                                                      "10;                           !- End Hour of Day"});
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
