@@ -6028,7 +6028,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
-    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::iComponentTypeNum::DOP;
+    // The remainder of this test should not be replicated - there's no changing of elements on the fly.
+    // This is a translation of an old test that fixed an issue, so leaving it in, but that doesn't
+    // mean that this should EVER be done elsewhere.
+    AirflowNetwork::SimpleOpening sop;
+    auto original_value = state->afn->AirflowNetworkLinkageData(2).element;
+    state->afn->AirflowNetworkLinkageData(3).element = &sop;
     state->afn->report();
 
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
@@ -6045,7 +6050,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilAirChangeRate, 0.2438, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilMass, 0.85114, 0.001);
     // Infiltration
-    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::iComponentTypeNum::SCR;
+    state->afn->AirflowNetworkLinkageData(3).element = original_value;
     state->afn->update();
     state->afn->report();
     EXPECT_NEAR(state->afn->exchangeData(1).SumMCp, 2.38012, 0.001);

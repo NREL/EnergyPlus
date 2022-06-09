@@ -8701,8 +8701,8 @@ namespace AirflowNetwork {
                     }
                     hg = Psychrometrics::PsyHgAirFnWTdb(m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1), m_state.dataHeatBalFanSys->MAT(ZN1));
 
-                    if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
-                        AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
+                    if (AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR ||
+                        AirflowNetworkLinkageData(i).element->type() == ComponentType::SEL) {
                         if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW +=
                                 (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1)));
@@ -8771,8 +8771,8 @@ namespace AirflowNetwork {
                     }
                     hg = Psychrometrics::PsyHgAirFnWTdb(m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2), m_state.dataHeatBalFanSys->MAT(ZN2));
 
-                    if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
-                        AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
+                    if (AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR ||
+                        AirflowNetworkLinkageData(i).element->type() == ComponentType::SEL) {
                         if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN2)) {
                             AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW +=
                                 (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2)));
@@ -9036,8 +9036,8 @@ namespace AirflowNetwork {
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
                         Tamb = Zone(ZN1).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
-                        if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
-                            AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
+                        if (AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR ||
+                            AirflowNetworkLinkageData(i).element->type() == ComponentType::SEL) {
                             if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN1)) {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW +=
                                     (linkReport1(i).FLOW2OFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN1))) *
@@ -9116,8 +9116,8 @@ namespace AirflowNetwork {
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
                         Tamb = Zone(ZN2).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
-                        if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
-                            AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
+                        if (AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR ||
+                            AirflowNetworkLinkageData(i).element->type() == ComponentType::SEL) {
                             if (Tamb > m_state.dataHeatBalFanSys->MAT(ZN2)) {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW +=
                                     (linkReport1(i).FLOWOFF * CpAir * (Tamb - m_state.dataHeatBalFanSys->MAT(ZN2))) * ReportingFraction;
@@ -9451,8 +9451,8 @@ namespace AirflowNetwork {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN1).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
-                    if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
-                        AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
+                    if (AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR ||
+                        AirflowNetworkLinkageData(i).element->type() == ComponentType::SEL) {
                         exchangeData(ZN1).SumMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
                         exchangeData(ZN1).SumMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
                     } else {
@@ -9472,8 +9472,8 @@ namespace AirflowNetwork {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN2).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(m_state.dataEnvrn->OutHumRat);
-                    if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SCR ||
-                        AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::SEL) {
+                    if (AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR ||
+                        AirflowNetworkLinkageData(i).element->type() == ComponentType::SEL) {
                         exchangeData(ZN2).SumMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
                         exchangeData(ZN2).SumMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
                     } else {
@@ -9758,7 +9758,7 @@ namespace AirflowNetwork {
 
         // Assign airflows to EPLus nodes
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::DWC ||
+            if (AirflowNetworkLinkageData(i).element->type() == ComponentType::DWC ||
                 AirflowNetworkLinkageData(i).VAVTermDamper) {
                 // Exclude envelope leakage Crack element
                 Node1 = AirflowNetworkLinkageData(i).indices[0];
@@ -9823,8 +9823,8 @@ namespace AirflowNetwork {
                 exchangeData(AirflowNetworkLinkageData(i).ZoneNum).CondSen -= Qsen;
             }
             // Calculate sensible leakage losses
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::PLR ||
-                AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::ELR) {
+            if (AirflowNetworkLinkageData(i).element->type() == ComponentType::PLR ||
+                AirflowNetworkLinkageData(i).element->type() == ComponentType::ELR) {
                 // Calculate supply leak sensible losses
                 if ((nodes(Node2).EPlusZoneNum > 0) && (nodes(Node1).EPlusNodeNum == 0) &&
                     (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
@@ -9849,14 +9849,14 @@ namespace AirflowNetwork {
             Node2 = AirflowNetworkLinkageData(i).indices[1];
             // Calculate latent loads from duct conduction losses
             if (AirflowNetworkLinkageData(i).ZoneNum > 0 &&
-                AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::DWC) {
+                AirflowNetworkLinkageData(i).element->type() == ComponentType::DWC) {
                 Qlat = AirflowNetworkLinkSimu(i).FLOW * (AirflowNetworkNodeSimu(Node2).WZ - AirflowNetworkNodeSimu(Node1).WZ);
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qlat = 0.0;
                 exchangeData(AirflowNetworkLinkageData(i).ZoneNum).DiffLat -= Qlat;
             }
             // Calculate latent leakage losses
-            if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::PLR ||
-                AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == iComponentTypeNum::ELR) {
+            if (AirflowNetworkLinkageData(i).element->type() == ComponentType::PLR ||
+                AirflowNetworkLinkageData(i).element->type() == ComponentType::ELR) {
                 // Calculate supply leak latent losses
                 if ((nodes(Node2).EPlusZoneNum > 0) && (nodes(Node1).EPlusNodeNum == 0) &&
                     (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
