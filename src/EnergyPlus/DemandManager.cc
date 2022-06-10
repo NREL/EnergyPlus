@@ -329,8 +329,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     int NumAlphas;            // Number of elements in the alpha array
     int NumNums;              // Number of elements in the numeric array
     int IOStat;               // IO Status when calling get input subroutine
-    Array1D_string AlphArray; // Character string data
-    Array1D<Real64> NumArray; // Numeric data
     std::string Units;        // String for meter units
     bool ErrorsFound(false);
     std::string CurrentModuleObject; // for ease in renaming.
@@ -344,8 +342,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
     if (state.dataDemandManager->NumDemandManagerList > 0) {
-        AlphArray.dimension(NumAlphas, std::string());
-        NumArray.dimension(NumNums, 0.0);
+        state.dataIPShortCut->cAlphaArgs({1, NumAlphas}) = "";
+        state.dataIPShortCut->rNumericArgs({1, NumNums}) = 0.0;
 
         DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
 
@@ -354,24 +352,24 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      ListNum,
-                                                                     AlphArray,
+                                                                     state.dataIPShortCut->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     NumArray,
+                                                                     state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
                                                                      _,
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
-            DemandManagerList(ListNum).Name = AlphArray(1);
+            DemandManagerList(ListNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            DemandManagerList(ListNum).Meter = GetMeterIndex(state, AlphArray(2));
+            DemandManagerList(ListNum).Meter = GetMeterIndex(state, state.dataIPShortCut->cAlphaArgs(2));
 
             if (DemandManagerList(ListNum).Meter == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
-                ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+                ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
 
             } else {
@@ -383,7 +381,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                     } else {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\".");
+                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                         ShowContinueError(state, "Only Electricity and ElectricityNet meters are currently allowed.");
                         ErrorsFound = true;
                     }
@@ -393,41 +391,41 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             // Further checking for conflicting DEMAND MANAGER LISTs
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(state, AlphArray(3));
+                DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
 
                 if (DemandManagerList(ListNum).LimitSchedule == 0) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" not found.");
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
                     ErrorsFound = true;
                 }
             }
 
-            DemandManagerList(ListNum).SafetyFraction = NumArray(1);
+            DemandManagerList(ListNum).SafetyFraction = state.dataIPShortCut->rNumericArgs(1);
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(state, AlphArray(4));
+                DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
 
                 if (DemandManagerList(ListNum).BillingSchedule == 0) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\" not found.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                     ErrorsFound = true;
                 }
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(state, AlphArray(5));
+                DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
 
                 if (DemandManagerList(ListNum).PeakSchedule == 0) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + AlphArray(5) + "\" not found.");
+                                        state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\" not found.");
                     ErrorsFound = true;
                 }
             }
 
-            DemandManagerList(ListNum).AveragingWindow = max(int(NumArray(2) / state.dataGlobal->MinutesPerTimeStep), 1);
+            DemandManagerList(ListNum).AveragingWindow = max(int(state.dataIPShortCut->rNumericArgs(2) / state.dataGlobal->MinutesPerTimeStep), 1);
             // Round to nearest timestep
             // Can make this fancier to include windows that do not fit the timesteps
             DemandManagerList(ListNum).History.allocate(DemandManagerList(ListNum).AveragingWindow);
@@ -435,7 +433,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
             // Validate Demand Manager Priority
             {
-                auto const SELECT_CASE_var(AlphArray(6));
+                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(6));
                 if (SELECT_CASE_var == "SEQUENTIAL") {
                     DemandManagerList(ListNum).ManagerPriority = ManagePriorityType::Sequential;
 
@@ -448,7 +446,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                        state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphArray(6) + "\" not found.");
+                                        state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) + "\" not found.");
                     ErrorsFound = true;
                 }
             }
@@ -463,25 +461,27 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                     // Validate DEMAND MANAGER Type
                     {
-                        auto const SELECT_CASE_var(AlphArray(MgrNum * 2 + 5));
+                        auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5));
                         if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") ||
                             (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") ||
                             (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
-                            DemandManagerList(ListNum).Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
+                            DemandManagerList(ListNum).Manager(MgrNum) =
+                                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), DemandMgr);
 
                             if (DemandManagerList(ListNum).Manager(MgrNum) == 0) {
                                 ShowSevereError(state,
                                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" + AlphArray(MgrNum * 2 + 6) +
-                                                    "\" not found.");
+                                                    state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" +
+                                                    state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6) + "\" not found.");
                                 ErrorsFound = true;
                             }
 
                         } else {
                             ShowSevereError(state,
                                             CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                                state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5) + "=\"" + AlphArray(MgrNum * 2 + 5) + "\".");
+                                                state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5) + "\".");
                             ErrorsFound = true;
                         }
                     }
@@ -553,9 +553,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             }
 
         } // ListNum
-
-        AlphArray.deallocate();
-        NumArray.deallocate();
 
         // Iteration diagnostic reporting for all DEMAND MANAGER LISTs
         SetupOutputVariable(state,
