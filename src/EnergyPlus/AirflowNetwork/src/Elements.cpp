@@ -828,7 +828,7 @@ namespace AirflowNetwork {
 
         // calculate DpProfNew
         for (i = 1; i <= NrInt + 2; ++i) {
-            DpProfNew(i) = linkage.pressure_drop + m_state.afn->dos.DpProf(Loc + i) - m_state.afn->dos.DpL(linkage.LinkNum, 1);
+            DpProfNew(i) = linkage.pressure_drop + m_state.get().afn->dos.DpProf(Loc + i) - m_state.get().afn->dos.DpL(linkage.LinkNum, 1);
         }
 
         // Get opening data based on the opening factor
@@ -986,20 +986,20 @@ namespace AirflowNetwork {
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = std::sqrt(m_state.afn->dos.RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = std::sqrt(m_state.get().afn->dos.RhoProfF(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(m_state.afn->dos.RhoProfF(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(m_state.get().afn->dos.RhoProfF(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma12 += fmasum;
                     dp1fma12 += dfmasum;
                 } else {
                     if (std::abs(DpProfNew(i)) <= DpZeroOffset) {
-                        dfmasum = -std::sqrt(m_state.afn->dos.RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
+                        dfmasum = -std::sqrt(m_state.get().afn->dos.RhoProfT(Loc + i) * DpZeroOffset) / DpZeroOffset;
                         fmasum = DpProfNew(i) * dfmasum;
                     } else {
-                        fmasum = std::sqrt(-m_state.afn->dos.RhoProfT(Loc + i) * DpProfNew(i));
+                        fmasum = std::sqrt(-m_state.get().afn->dos.RhoProfT(Loc + i) * DpProfNew(i));
                         dfmasum = 0.5 * fmasum / DpProfNew(i);
                     }
                     fma21 += fmasum;
@@ -1039,9 +1039,9 @@ namespace AirflowNetwork {
             // Calculation of massflow and its derivative
             for (i = 2; i <= NrInt + 1; ++i) {
                 if (DpProfNew(i) > 0) {
-                    rholink = m_state.afn->dos.RhoProfF(Loc + i);
+                    rholink = m_state.get().afn->dos.RhoProfF(Loc + i);
                 } else {
-                    rholink = m_state.afn->dos.RhoProfT(Loc + i);
+                    rholink = m_state.get().afn->dos.RhoProfT(Loc + i);
                 }
 
                 if ((EvalHghts(i) <= h2) || (EvalHghts(i) >= h4)) {
@@ -1096,9 +1096,9 @@ namespace AirflowNetwork {
                 for (i = 2; i <= NrInt + 1; ++i) {
                     rholink = 0.0;
                     if (DpProfNew(i) > 0) {
-                        rholink = m_state.afn->dos.RhoProfF(Loc + i);
+                        rholink = m_state.get().afn->dos.RhoProfF(Loc + i);
                     } else {
-                        rholink = m_state.afn->dos.RhoProfT(Loc + i);
+                        rholink = m_state.get().afn->dos.RhoProfT(Loc + i);
                     }
                     rholink /= NrInt;
                     rholink = 1.2;

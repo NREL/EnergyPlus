@@ -1144,6 +1144,7 @@ namespace RoomAirModelManager {
                      state.afn->nodes(NodeNum1).EPlusZoneNum == ThisZone)) {
                     int CompNum = state.afn->AirflowNetworkLinkageData(Loop2).CompNum;
                     int TypeNum = state.afn->AirflowNetworkCompData(CompNum).TypeNum;
+                    auto pointer = dynamic_cast<AirflowNetwork::SurfaceCrack *>(state.afn->AirflowNetworkLinkageData(Loop2).element);
                     if (state.afn->AirflowNetworkCompData(CompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
                         if (state.afn->MultizoneSurfaceCrackData(TypeNum).exponent != 0.50) {
                             state.dataRoomAirMod->AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;

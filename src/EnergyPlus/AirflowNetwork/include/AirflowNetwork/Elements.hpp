@@ -52,6 +52,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <optional>
+#include <functional>
 
 namespace EnergyPlus {
 
@@ -476,11 +477,11 @@ namespace AirflowNetwork {
 
         // Default Constructor
         DetailedOpening(EnergyPlusData &state)
-            : m_state(state), FlowCoef(0.0), FlowExpo(0.0), TypeName("NONPIVOTED"), LVOType(0), LVOValue(0.0), NumFac(0), OpenFac1(0.0),
+            : FlowCoef(0.0), FlowExpo(0.0), TypeName("NONPIVOTED"), LVOType(0), LVOValue(0.0), NumFac(0), OpenFac1(0.0),
               DischCoeff1(0.0), WidthFac1(0.0), HeightFac1(0.0), StartHFac1(0.0), OpenFac2(0.0), DischCoeff2(0.0), WidthFac2(0.0), HeightFac2(0.0),
               StartHFac2(0.0), OpenFac3(0.0), DischCoeff3(0.0), WidthFac3(0.0), HeightFac3(0.0), StartHFac3(0.0), OpenFac4(0.0), DischCoeff4(0.0),
-              WidthFac4(0.0), HeightFac4(0.0), StartHFac4(0.0), OpenFactor(0.0), WidthErrCount(0), WidthErrIndex(0), HeightErrCount(0),
-              HeightErrIndex(0)
+              WidthFac4(0.0), HeightFac4(0.0), StartHFac4(0.0), OpenFactor(0.0), WidthErrCount(0), WidthErrIndex(0), HeightErrCount(0), HeightErrIndex(0),
+              m_state(state)
         {
         }
 
@@ -496,7 +497,7 @@ namespace AirflowNetwork {
         }
 
     private:
-        EnergyPlusData &m_state; // Having this here is not desirable, but a refactor of this object cannot be undertaken yet
+        std::reference_wrapper<EnergyPlusData> m_state; // Having this here is not desirable, but a refactor of this object cannot be undertaken yet
     };
 
     struct SimpleOpening : public AirflowElement // Large simple opening component
@@ -981,7 +982,7 @@ namespace AirflowNetwork {
                                // Each range has a min flow rate and 4 coefficients
 
         // Default Constructor
-        DetailedFan(EnergyPlusData &state) : m_state(state), FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0), n(0)
+        DetailedFan(EnergyPlusData &state) : FlowCoef(0.0), FlowExpo(0.0), RhoAir(0.0), Qfree(0.0), Pshut(0.0), TranRat(0.0), n(0), m_state(state)
         {
         }
 
@@ -1231,7 +1232,7 @@ namespace AirflowNetwork {
                               AirflowNetworkLinkageProp &linkage, // Linkage
                               std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
-        );
+        ) override;
 
         virtual ComponentType type() const override
         {
@@ -1251,7 +1252,7 @@ namespace AirflowNetwork {
                               AirflowNetworkLinkageProp &linkage, // Linkage
                               std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
                               std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
-        );
+        ) override;
 
         virtual ComponentType type() const override
         {

@@ -715,7 +715,7 @@ namespace AirflowNetwork {
             m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, CurrentModuleObject); // Temporary workaround
         instances = m_state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != m_state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            int i = 1;                                                            // Temporary workaround
+            int i = 1;                                                                   // Temporary workaround
             MultizoneCompDetOpeningData.resize(AirflowNetworkNumOfDetOpenings, m_state); // Horribly abusive temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
