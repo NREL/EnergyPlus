@@ -109,19 +109,78 @@ capacities less than 65,000 Btu/h
 
 Calculation is done as follows (more details in ANSI/AHRI 210/240):
 
-![grafik](https://user-images.githubusercontent.com/49325382/172480799-8f0fadc9-30ff-4339-9fa3-6df32cd14611.png)
+**HSPF2**
 
-![grafik](https://user-images.githubusercontent.com/49325382/172480916-a795389b-2a03-45be-b07f-8abfbc55d2c1.png)
+*For Single Stage Systems*
 
-![grafik](https://user-images.githubusercontent.com/49325382/172482051-43528104-e044-419d-b3c1-e1f93856c6df.png)
+|Single Stage Systems|
+|--|
+|Graphical representation of HSPFs:<br>![grafik](https://user-images.githubusercontent.com/49325382/173143481-5eed06c5-27fd-4738-9949-521e1c78f4ba.png)|
 
-based on the following temperature bin values
+|Variable|Formulas|Code|
+|--|--|--|
+|HSPF2|![grafik](https://user-images.githubusercontent.com/49325382/173143637-e0040636-ead7-4f8c-aa98-a5201e186dca.png)|TBD|
+||![grafik](https://user-images.githubusercontent.com/49325382/173143734-78cfcda6-dbcd-4033-9580-d4e5147d9fe2.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173143858-d7f16ea6-9d41-4ff5-aefe-e32f367a99d5.png)||
+|F<sub>def</sub>|for systems with Demand-defrost Control System<br>![grafik](https://user-images.githubusercontent.com/49325382/173144123-bfa55c31-413d-4377-86a2-e4da531d5081.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173144315-ea4fb04c-2352-4648-bc46-703458a7657a.png)||
+|F<sub>def</sub>|for other systems<br>![grafik](https://user-images.githubusercontent.com/49325382/173144257-3a009b3a-7905-49cb-98fe-d6851f24fbeb.png)||
+|| Single Stage System with Either a Fixed-Speed Indoor Blower or a Constant-Air-Volume-Rate Indoor Blower, or a Single-Speed Coil-Only System Heat Pump||
+|![grafik](https://user-images.githubusercontent.com/49325382/173144574-ec155a4e-1917-4456-b348-90e9ba87c3ce.png)|![grafik](https://user-images.githubusercontent.com/49325382/173144598-c7c56aed-afaa-4911-a500-4f45f54af809.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173144622-90dffae7-a817-4f9c-b688-cd4843583643.png)|![grafik](https://user-images.githubusercontent.com/49325382/173144644-54b20a35-6ddd-4ccb-9e54-50f05490a8f1.png)||
+||If neither the H4<sub>boost</sub> test nor the H4<sub>full</sub> test is conducted|![grafik](https://user-images.githubusercontent.com/49325382/173145543-d562c0b7-ae25-47b9-9b13-6f43ace9867d.png)|
+|![grafik](https://user-images.githubusercontent.com/49325382/173145438-88aaa2c9-cb24-43bd-95ed-e57bae36da6a.png)|![grafik](https://user-images.githubusercontent.com/49325382/173145463-da6d5482-b86c-4511-a1d4-48e47206c18b.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173146291-5635848c-fc68-49d3-86e8-124f5be6b4d0.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173145491-99190c89-1674-4980-aa2f-923006269832.png)|![grafik](https://user-images.githubusercontent.com/49325382/173145503-1b470006-bda0-4a6f-beae-3c8e19219c9b.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173146324-d1728aaa-0476-430f-bdbb-f2b6e99c5dfd.png)||
+||If either the H4<sub>boost</sub> or H4<sub>full</sub> test is conducted||
+|![grafik](https://user-images.githubusercontent.com/49325382/173145778-de104f9f-f368-46df-9046-74f50aa7bdb6.png)|![grafik](https://user-images.githubusercontent.com/49325382/173145797-4b5258b7-b11f-4218-b2d8-d2e674409c88.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173146706-3d91abf4-8e99-4348-a749-508333692d8b.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173145821-e1177647-fa2e-448d-97b2-abe134088385.png)|![grafik](https://user-images.githubusercontent.com/49325382/173145845-dea513e2-d8bc-4f41-8eb6-972d2f9c27a4.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173146726-a1043835-e19c-45ce-b07f-e44ec1a3a3f4.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173145868-75bd05d0-2964-4491-bd3e-68c80b027a96.png)|![grafik](https://user-images.githubusercontent.com/49325382/173145884-ff9b9f1b-54a2-4b18-aefd-b8293f853713.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173146745-c6a3b2de-d4a1-4442-982f-875858822653.png)||
+|E(j<sub>j</sub>|![grafik](https://user-images.githubusercontent.com/49325382/173147003-00395c1c-0399-482b-bda7-09edcaaa99cf.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173147126-494aa8eb-4f35-4fef-8165-77c8cae2d3a0.png)|||
+|![grafik](https://user-images.githubusercontent.com/49325382/173147162-0fc3b8ce-0438-4eed-879d-c11be8a75161.png)|![grafik](https://user-images.githubusercontent.com/49325382/173147243-d80ee99c-9829-43a0-b0c2-ba49effe268c.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173147267-6b8fb525-7cce-486c-802d-1a47d0fa70fb.png)|![grafik](https://user-images.githubusercontent.com/49325382/173147308-7d795754-15e0-4d57-8713-077a7e10d7de.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173147296-f0d0ed83-1942-41ae-be17-282a605e6cad.png)|![grafik](https://user-images.githubusercontent.com/49325382/173147331-3ca83043-0388-4b8c-983c-07335cf03603.png)||
+||Additional Steps for Calculating the HSPF2 of a Heat Pump Having a Single-Speed Compressor and a Variable-Speed, Variable-Air-Volume-Rate Indoor Blower ||
+||Additional Steps for Calculating the HSPF2 for MIB ||
 
-![grafik](https://user-images.githubusercontent.com/49325382/172480836-a70565ce-130e-43f0-ba11-10254a894054.png)
+*For Two-Stage Systems*
 
+|Two-Stage Systems|
+|--|
+|Graphical representation of HSPFs:<br>![grafik](https://user-images.githubusercontent.com/49325382/173147668-100574da-546e-4aee-acfc-3b352de64e53.png)|
+
+|Variable|Formulas|Code|
+|--|--|--|
+|HSPF2|![grafik](https://user-images.githubusercontent.com/49325382/173148257-b9a2bf26-24c6-41db-8d49-a402f3623fdb.png)|TBD|
+||![grafik](https://user-images.githubusercontent.com/49325382/173150846-51c7ca5a-8b80-407c-8c52-9b3b9b284151.png)|![grafik](https://user-images.githubusercontent.com/49325382/173150866-0857b901-bc10-4d21-b311-2be30f75536d.png)|
+||![grafik](https://user-images.githubusercontent.com/49325382/173150930-1bdbf0fe-eb55-4385-9579-4cd402279503.png)||
+|Case I<br>![grafik](https://user-images.githubusercontent.com/49325382/173151062-826c01ea-e608-4c59-88de-82e482cba0bc.png)|Building load is less than Low Stage capacity|||
+||![grafik](https://user-images.githubusercontent.com/49325382/173151119-adc0c360-5e5f-4b68-bc17-0206e34092d7.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173151205-09079ab5-adad-4749-a0e9-38fd2aa3e27c.png)||
+|Case II<br>![grafik](https://user-images.githubusercontent.com/49325382/173151354-94db543b-52a7-4400-a39e-52dbd8543006.png)|Building load is greater than the Low Stage capacity, but less than the Full Stage capacity, and the unit cycles between Low Stage operation and Full Stage operation.||
+||![grafik](https://user-images.githubusercontent.com/49325382/173151403-1d906be4-2682-4f0d-bffd-f4ff3a4a1b2d.png)||
+|Case III<br>![grafik](https://user-images.githubusercontent.com/49325382/173151523-af30bd15-fd24-4217-a3af-68eb0aac7318.png)|Building load is greater than the Low Stage capacity, but less than the Full Stage capacity, and the unit cycles between off and Full Stage operation.||
+||![grafik](https://user-images.githubusercontent.com/49325382/173151557-ca671412-25ab-4e94-8223-9b9a476d4116.png)||
+|![grafik](https://user-images.githubusercontent.com/49325382/173151660-63520e45-2322-4d90-8000-86778a5142ff.png)|When the building load is greater than the unit capacity||
+||![grafik](https://user-images.githubusercontent.com/49325382/173151685-fa5c0bc4-9b62-4d5f-bf47-5f60131a859b.png)||
+
+
+*For Variable Speed System*
+
+|Variable Speed System|
+|--|
+|Graphical representation of HSPFs:<br>![grafik](https://user-images.githubusercontent.com/49325382/173147965-8f0fc7e8-5808-490c-8e7d-f36bc7e8abad.png)|
+
+|Variable|Formulas|Code|
+|--|--|--|
+|HSPF2|![grafik](https://user-images.githubusercontent.com/49325382/173148257-b9a2bf26-24c6-41db-8d49-a402f3623fdb.png)|TBD|
+||![grafik](https://user-images.githubusercontent.com/49325382/173148304-e6399e4d-2be1-4d94-9221-70a5d6e28c4a.png)||
+|Case I<br>![grafik](https://user-images.githubusercontent.com/49325382/173150588-e80b6ad4-59c0-4736-9c69-63480e9dbdd3.png)|Building Load is less than the capacity of the unit at the Low Compressor Speed||
+|Case II<br>![grafik](https://user-images.githubusercontent.com/49325382/173150412-f1325086-f758-40c8-82c4-116db328732b.png)|Building load can be matched by modulating the compressor speed between low speed and full speed||
+||![grafik](https://user-images.githubusercontent.com/49325382/173150460-8e50e95d-ba7a-45c6-98ab-4257ac2382f7.png)||
+|Case III<br>![grafik](https://user-images.githubusercontent.com/49325382/173149950-452a7920-0ccd-4ea8-b316-90e563a49037.png)|Building Load is greater than the capacity of the unit at the Full Compressor Speed||
+||![grafik](https://user-images.githubusercontent.com/49325382/173150028-3732a2c7-bff3-4616-abb9-e1e3d735cea5.png)|
+
+There are also other variations, but I think they are not needed. E.g., Heat pumps having a Heat Comfort Controller, Heat Pump Having a Two-capacity Compressor or Heat Pump Having a Triple-Capacity Compressor 
 
 These temperature bin values changed in the newer version, thus we need to define two arrays one for the older and one for the newer version. 
-
 
 ## Approach ##
 
