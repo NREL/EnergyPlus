@@ -388,7 +388,7 @@ void ManageSizing(EnergyPlusData &state)
 
                     } // ... End hour loop.
 
-                    if (state.dataGlobal->EndDayFlag) {
+                    if (state.dataGlobal->EndDayFlag && !state.dataGlobal->WarmupFlag) {
                         UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                     }
@@ -3503,7 +3503,7 @@ void ReportTemperatureInputError(
                                      state.dataIPShortCut->rNumericArgs(paramNum),
                                      state.dataIPShortCut->cNumericFieldNames(paramNum - 2),
                                      state.dataIPShortCut->rNumericArgs(paramNum - 2)));
-            ShowContinueError(state, format("This is not allowed.  Please check and revise your input."));
+            ShowContinueError(state, "This is not allowed.  Please check and revise your input.");
             ErrorsFound = true;
         } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
             ShowWarningError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
@@ -3512,7 +3512,7 @@ void ReportTemperatureInputError(
                                      state.dataIPShortCut->cNumericFieldNames(paramNum),
                                      state.dataIPShortCut->rNumericArgs(paramNum),
                                      comparisonTemperature));
-            ShowContinueError(state, format("Please check your input to make sure this is correct."));
+            ShowContinueError(state, "Please check your input to make sure this is correct.");
         }
     }
 }
