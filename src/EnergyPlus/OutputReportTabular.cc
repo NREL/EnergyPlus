@@ -14537,14 +14537,10 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                         airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
                         airLoopHeatTable.peakDesSensLoad = -finalSysSizing.SysHeatCoinSpaceSens;
                         airLoopHeatTable.designPeakLoad = -finalSysSizing.SysDesHeatLoad;
-                        airLoopCoolTable.diffPeakEst =
-                            airLoopCoolTable.peakDesSensLoad - airLoopCoolTable.estInstDelSensLoad;
-                        airLoopCoolTable.diffDesignPeak =
-                            airLoopCoolTable.designPeakLoad - airLoopCoolTable.peakDesSensLoad;
-                        airLoopHeatTable.diffPeakEst =
-                            airLoopHeatTable.peakDesSensLoad - airLoopHeatTable.estInstDelSensLoad;
-                        airLoopCoolTable.diffDesignPeak =
-                            airLoopHeatTable.designPeakLoad - airLoopHeatTable.peakDesSensLoad;
+                        airLoopCoolTable.diffPeakEst = airLoopCoolTable.peakDesSensLoad - airLoopCoolTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopCoolTable.designPeakLoad - airLoopCoolTable.peakDesSensLoad;
+                        airLoopHeatTable.diffPeakEst = airLoopHeatTable.peakDesSensLoad - airLoopHeatTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopHeatTable.designPeakLoad - airLoopHeatTable.peakDesSensLoad;
                     }
                 }
                 ComputeEngineeringChecks(airLoopCoolTable);
@@ -14562,14 +14558,8 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 LoadSummaryUnitConversion(state, airLoopCoolTable, unitsStyle_cur);
                 LoadSummaryUnitConversion(state, airLoopHeatTable, unitsStyle_cur);
 
-                OutputCompLoadSummary(state,
-                                      OutputType::AirLoop,
-                                      airLoopCoolTable,
-                                      airLoopHeatTable,
-                                      iAirLoop,
-                                      unitsStyle_cur,
-                                      produceTabular,
-                                      produceSQLite);
+                OutputCompLoadSummary(
+                    state, OutputType::AirLoop, airLoopCoolTable, airLoopHeatTable, iAirLoop, unitsStyle_cur, produceTabular, produceSQLite);
             }
         }
 
