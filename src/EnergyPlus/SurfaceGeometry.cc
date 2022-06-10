@@ -2317,11 +2317,9 @@ namespace SurfaceGeometry {
         //  Surface First pointers are set, set last
         if (state.dataGlobal->NumOfZones > 0) {
             state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).AllSurfaceLast = state.dataSurface->TotSurfaces;
-            if (state.dataGlobal->NumOfZones > 1) {
-                for (size_t ZoneNum = 1; ZoneNum <= static_cast<size_t>(state.dataGlobal->NumOfZones) - 1; ++ZoneNum) {
-                    state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
-                }
-            }
+        }
+        for (size_t ZoneNum = 1; ZoneNum <= static_cast<size_t>(state.dataGlobal->NumOfZones) - 1; ++ZoneNum) {
+            state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
         }
         for (size_t ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataSurface->Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
