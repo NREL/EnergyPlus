@@ -81,7 +81,6 @@ capacities less than 65,000 Btu/h.
 |Variable|Formulas|Code|
 |--|--|--|
 |SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173120318-d5df3faf-7196-4bb8-badc-ca3e56166dce.png)|TBD|
-
 |q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png)||
 |P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png)||
 |q<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png)||
@@ -90,12 +89,17 @@ capacities less than 65,000 Btu/h.
 |q<sub>Int</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png)||
 |P<sub>Int</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png)||
 |P<sub>LOW</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png)||
-
-based on the following temperature bin values
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480683-d9c856c8-552f-48ac-b28a-8c96f68f2d7d.png)
-
-
+|Case 1<br>![grafik](https://user-images.githubusercontent.com/49325382/173123094-073047bf-c555-4b7c-b826-fdd95ea3a13e.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173123126-76a4e1c1-6dce-4fcc-8f24-1405024f3392.png)|Building load is no greater than unit capacity at low speed||
+||![grafik](https://user-images.githubusercontent.com/49325382/173125098-d13579fb-6db4-4db1-bf89-54f217a378dd.png)||
+|C<sub>D</sub><sup>C,low</sup>|![grafik](https://user-images.githubusercontent.com/49325382/173123971-9e334ba4-4922-4a0a-bb93-fd85bccc4952.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173124040-b8ea5f77-d0ad-4cd8-b141-36d59162e9fc.png)<br>Substitute Test G and I for test C and D||
+|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.25<br>If Tests G and I are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value||
+|Case 2<br>![grafik](https://user-images.githubusercontent.com/49325382/173124209-db6b6044-efe8-4e7f-88f7-aae795049240.png)|Building load can be matched by modulating the compressor speed between low speed and full speed||
+|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png)||
+|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png)||
+||![grafik](https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png)||
+|EER<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173124302-997c297d-555b-4ed2-afd5-6351d53642ba.png)||
+|Case 3<br>![grafik](https://user-images.githubusercontent.com/49325382/173124546-69a9d1f7-570a-422a-9b02-05aff8282289.png)|Building load is equal to or greater than unit capacity at full stage||
+||![grafik](https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png)||
 
 **2. HSPF2**
 
