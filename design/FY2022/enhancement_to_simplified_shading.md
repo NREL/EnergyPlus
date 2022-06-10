@@ -43,16 +43,16 @@ A new object *SurfaceProperty:IncidentSolarMultiplier* will be created.
           \type object-list
           \object-list SurfaceNames
           \note Enter the name of an exterior window outside surface object
-      N1, \field Shading Multiplier
+      N1, \field Incident Solar Multiplier
           \note a constant multiplier for window solar transmittance 
-          \note and visible transmittance. If the Shading Multiplier Schedule Name is 
-          \note defined, the product of these two will be the final shading multiplier.
+          \note and visible transmittance. If the Incident Solar Multiplier Schedule Name is 
+          \note defined, the product of these two will be the final Incident Solar Multiplier.
           \type real
           \units dimensionless
           \minimum 0
           \maximum 1
           \default 1.0
-      A2; \field Shading Multiplier Schedule Name
+      A2; \field Incident Solar Multiplier Schedule Name
           \note The schedule values should be greater than or equal 
           \note to 0 and less than or equal to 1.
           \type object-list
