@@ -35,43 +35,43 @@ In the current workorder, we would focus on two metrics only and propose to focu
 SEER2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
 capacities less than 65,000 Btu/h. 
 
-*For single stage systems*
+*For Single Stage Systems*
 
-|Formulas|Code|
-|--|--|
-|![grafik](https://user-images.githubusercontent.com/49325382/172903437-c1b7f7e2-7453-4e86-9ea8-b19aa25a4b4e.png)|// AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    Real64 constexpr CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
-    Real64 constexpr OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
-    Real64 constexpr OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
-    Real64 constexpr AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate
-    // and hence AirMassFlowRatio is 1.0
-    Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
-    // specifies a nominal/default fan electric power consumption per rated air
-    // volume flow rate to account for indoor fan electric power consumption
-    // when the standard tests are conducted on units that do not have an
-    // indoor air circulating fan. Used if user doesn't enter a specific value.
-    Real64 constexpr PLRforSEER(0.5); // Part-load ratio for SEER calculation (single speed DX cooling coils)|
-|![grafik](https://user-images.githubusercontent.com/49325382/172903497-31efbd95-4cb9-4727-8b81-2f6e80c18dcd.png)<br> ![grafik](https://user-images.githubusercontent.com/49325382/172903561-05bf3a7f-8214-4690-af07-e5f5d2cdc723.png)
-||
+|Single Stage Systems|
+|--|
+|Graphical representation of SEER2:<br>![grafik](https://user-images.githubusercontent.com/49325382/173094322-3b9a650f-cccc-4e0f-a9ae-559c60d860e6.png)|
 
+|Variable|Formulas|Code|
+|--|--|--|
+|SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173093830-56c75bd8-8e3b-49b5-b58f-0788f717e479.png)|TBD|
+|PLF(0.5)|![grafik](https://user-images.githubusercontent.com/49325382/173094047-5a2d4c02-a8b6-4690-9bfc-b337637dd780.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173094092-27b80da1-3fd4-415a-963f-f0e4d11ccf64.png)|TBD|
+|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value|TBD|
 
-![grafik](https://user-images.githubusercontent.com/49325382/172479575-decc82f9-f849-49a5-8c78-cfb8c5543883.png)
+*For Two Stage Systems*
 
-![grafik](https://user-images.githubusercontent.com/49325382/172479689-e6e9fc45-cad9-48e0-8967-fc868ec50113.png)
+|Two Stage Systems|
+|--|
+|Graphical representation of SEER2:<br>![grafik](https://user-images.githubusercontent.com/49325382/173099074-caeb59f7-d3b8-45ab-b8a7-5367506ff7f6.png)|
 
-*For two stage systems*
-
-![grafik](https://user-images.githubusercontent.com/49325382/172479815-28222eae-82fa-4173-851d-ca2e954ffea8.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172479963-1cc6958b-d26d-430a-be8c-4ab72b65496c.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480013-4891ec3e-674c-457e-a508-5ef224b426f0.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480066-e1b8d5ea-7717-41c3-9314-32ea6481d11f.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480104-85ffdfb5-cb27-42bc-84d8-4d1cc1dbdab8.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480159-9ebaa6e0-a48a-4bf9-a6cb-8c6a163161ba.png)
+|Variable|Formulas|Code|
+|--|--|--|
+|SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173098299-1b89804d-d8a3-4a75-8db3-8ad3bbdc8e36.png)|TBD|
+|q(t<sub>j</sub>) and E(t<sub>j</sub>) are calculated for the following temperature bins|![grafik](https://user-images.githubusercontent.com/49325382/173098780-28c8a2ef-b13f-46e3-956e-6540477912dc.png)|
+|building load < Low Stage capacity|11.2.1.2.1||
+|building load > Low Stage capacity && building load < Full Stage capacity|11.2.1.2.2 or ??||
+|building load > Unit capacity|11.2.1.2.4||
+|BL(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173107798-68ba98a9-e5d8-4a07-9a18-da6b1145bf5b.png)||
+|q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108139-86c76624-cf0a-4452-a0e9-3e7379898df4.png)||
+|P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108210-583a6e5a-5b81-40cf-8d85-dcd31b0358a0.png)||
+|q<sub>Full</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108349-8f3ffe8c-3960-4b1d-8d42-a649556b0e5c.png)||
+|P<sub>Full</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108376-c5732907-dd1b-46fc-89a3-1dcaf3ca59a2.png)||
+|Case 1<br>![grafik](https://user-images.githubusercontent.com/49325382/173108719-2512fa72-daf7-4ce3-a2d3-c54a9fee1b31.png)|Building load is less than Low Stage capacity||
+||![grafik](https://user-images.githubusercontent.com/49325382/173108824-f8bee0dc-5ba6-48e0-a8f6-0e8719e28305.png)||
+|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value|TBD|
+|Case 2<br>![grafik](https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png)|Buildign load is greater than Low Stage capacity, but less than Full Stage capacity and the unit cycles between Low Stage operation and Full Stage operation||
+||![grafik](https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png)||
+|Case 3<br>![grafik](https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png)|Buildign load is greater than Low Stage capacity, but less than Full Stage capacity and the unit cycles between off and Full Stage operation||
+||![grafik](https://user-images.githubusercontent.com/49325382/173109574-80e66076-9575-413b-a465-416d82ea1db3.png)||
 
 *For variable speed system*
 
