@@ -2222,6 +2222,30 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
     EXPECT_GT(thisSys->m_SuppHeatPartLoadFrac, 0.0);
     EXPECT_EQ(1.0, thisSys->m_SuppHeatingCycRatio);
     EXPECT_GT(thisSys->m_SuppHeatingSpeedRatio, 0.0);
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 8000;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToHeatSP = 8000;
+    thisSys->DesignMaxOutletTemp = 25.0;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+    // check that heating coil air outlet node is at maximum supply air temperature
+    //
+    // This is not passing because main heating coil is not limited by Maximum Supply Temperature correctly.
+    // DesignMaxOutletTemp is used in calcUnitarySystemToLoad function for load based control
+    // It calls calcUnitaryHeatingSystem, where PLR is not recalculated for dx coils.
+    // So DesignMaxOutletTemp didn't really limit main heating coil
+    //
+    // EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, 25, 0.001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_SetpointBased)
@@ -2478,6 +2502,33 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Setp
 
     // check that heating coil air outlet node is at set point
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
+    // heating coil air inlet node temp is less than heating coil air outlet node temp
+    EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(3).Temp);
+    // backup heating coil air inlet node temp is less than heating coil air outlet node temp
+    EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(4).Temp);
+    // make sure control works at speed = 2
+    EXPECT_EQ(thisSys->m_HeatingSpeedNum, 2);
+
+    // Backup Heating coil air outlet node = 2
+    state->dataLoopNodes->Node(2).TempSetPoint = 33.0;
+    // test maximum supply air temperature lower than supp coil outlet temperature
+    thisSys->DesignMaxOutletTemp = 32;
+
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+
+    // check that heating coil air outlet node is at maximum supply air temperature
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, 32, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(4).Temp, state->dataLoopNodes->Node(3).Temp);
     // backup heating coil air inlet node temp is less than heating coil air outlet node temp

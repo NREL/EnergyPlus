@@ -10937,6 +10937,9 @@ namespace UnitarySystems {
                                                                   state.dataLoopNodes->Node(this->m_SuppCoilAirOutletNode).HumRat));
                 Real64 HCDeltaT = max(0.0, this->DesignMaxOutletTemp - state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).Temp);
                 Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
+                if (this->m_NumOfSpeedSuppHeating > 0) {
+                    this->calcMultiStageSuppCoilStageByLoad(state, MaxHeatCoilLoad, FirstHVACIteration);
+                }
                 this->calcUnitarySuppHeatingSystem(state, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppCoilLoad = MaxHeatCoilLoad;
             }
@@ -14389,7 +14392,7 @@ namespace UnitarySystems {
                             Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
                             Par[8] = ReqOutput;
                             Par[9] = true; // is supplemental coil
-                            if (this->m_SuppHeatingSpeedNum > 1.0) {
+                            if (this->m_SuppHeatingSpeedNum > 1) {
                                 Par[4] = CycRatio;
                                 General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, this->heatingCoilVarSpeedResidual, 0.0, 1.0, Par);
                                 this->m_SuppHeatingCycRatio = CycRatio;

@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! SingleFamilyHouse_TwoSpeed_CutoutTemperature.idf
+! SingleFamilyHouse_TwoSpeed_MultiStageElectricSuppCoil.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
 ! Highlights:             This file does the basic test of an air distribution system in a residetial home.
@@ -84,7 +84,7 @@
 ! Purchased Hot Water:            No
 ! Coils:                          Coil:Heating:DX:MultiSpeed
 !                                 Coil:Cooling:DX:MultiSpeed
-!                                 Coil:Heating:Fuel
+!                                 Coil:Heating:Electric:MultiStage
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -118,17 +118,84 @@
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
+  Sizing:System,
+    Typical Residential System,    !- AirLoop Name
+    Sensible,                !- Type of Load to Size On
+    autosize,                !- Design Outdoor Air Flow Rate {m3/s}
+    1,                       !- Central Heating Maximum System Air Flow Ratio
+    7,                       !- Preheat Design Temperature {C}
+    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
+    11,                      !- Precool Design Temperature {C}
+    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
+    12,                      !- Central Cooling Design Supply Air Temperature {C}
+    50,                      !- Central Heating Design Supply Air Temperature {C}
+    NonCoincident,           !- Type of Zone Sum to Use
+    No,                      !- 100% Outdoor Air in Cooling
+    No,                      !- 100% Outdoor Air in Heating
+    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    ,                        !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    ,                        !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    OnOff;                   !- Central Cooling Capacity Control Method
+
+  Sizing:Zone,
+    LIVING ZONE,                !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
+    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    50,                      !- Zone Heating Design Supply Air Temperature {C}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    ,        !- Design Specification Outdoor Air Object Name
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    DesignDay,               !- Cooling Design Air Flow Method
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Cooling Minimum Air Flow {m3/s}
+    0,                       !- Cooling Minimum Air Flow Fraction
+    DesignDay,               !- Heating Design Air Flow Method
+    0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Heating Maximum Air Flow {m3/s}
+    0,                       !- Heating Maximum Air Flow Fraction
+    ,       !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   Output:DebuggingData,
     No,                      !- Report Debugging Data
     No;                      !- Report During Warmup
 
   SimulationControl,
-    No,                      !- Do Zone Sizing Calculation
-    No,                      !- Do System Sizing Calculation
+    Yes,                      !- Do Zone Sizing Calculation
+    Yes,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                     !- Run Simulation for Sizing Periods
-    No,                      !- Run Simulation for Weather File Run Periods
+    No,                     !- Run Simulation for Sizing Periods
+    Yes,                      !- Run Simulation for Weather File Run Periods
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
@@ -1420,12 +1487,12 @@
     Coil:Heating:Electric:MultiStage,  !- Supplemental Heating Coil Object Type
     Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
-    0.6456241022976,                        !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                        !- Cooling Supply Air Flow Rate {m3/s}
     ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
     ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
     SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
-    0.4228649091072,                        !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                        !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
@@ -1530,13 +1597,11 @@ UnitarySystemPerformance:Multispeed,
     ,                        !- Temperature Setpoint Node Name
     3,                       !- Number of Stages
     1,                       !- Stage 1 Efficiency {W/W}
-    10000,                    !- Stage 1 Nominal Capacity {W}
+    autosize,                    !- Stage 1 Nominal Capacity {W}
     1,                       !- Stage 2 Efficiency {W/W}
-    20000,                    !- Stage 2 Nominal Capacity {W}
+    autosize,                    !- Stage 2 Nominal Capacity {W}
     1,                       !- Stage 3 Efficiency {W/W}
-    30000,                    !- Stage 3 Nominal Capacity {W}
-    1,                       !- Stage 4 Efficiency {W/W}
-    40000;        !- Stage 4 Nominal Capacity {W}
+    autosize;                    !- Stage 3 Nominal Capacity {W}
 
   Coil:Cooling:DX:MultiSpeed,
     ACDXCoil 1,              !- Name
@@ -1759,7 +1824,7 @@ UnitarySystemPerformance:Multispeed,
     Electricity,             !- Fuel Type
     4,                       !- Region number for Calculating HSPF
     2,                       !- Number of Speeds
-    10000,                   !- Speed 1 Gross Rated Heating Capacity {W}
+    autosize,                   !- Speed 1 Gross Rated Heating Capacity {W}
     4.235,                   !- Speed 1 Gross Rated Heating COP {W/W}
     0.6135,                  !- Speed 1 Rated Air Flow Rate {m3/s}
     573.3,                   !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
@@ -1770,7 +1835,7 @@ UnitarySystemPerformance:Multispeed,
     HPACHeatPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name
     0.2,                     !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}
     HAPCHeatWHFT Speed 1,    !- Speed 1 Waste Heat Function of Temperature Curve Name
-    13000,                   !- Speed 2 Gross Rated Heating Capacity {W}
+    autosize,                   !- Speed 2 Gross Rated Heating Capacity {W}
     3.9,                     !- Speed 2 Gross Rated Heating COP {W/W}
     0.7551,                  !- Speed 2 Rated Air Flow Rate {m3/s}
     673.3,                   !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
