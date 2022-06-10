@@ -241,6 +241,7 @@ set(SRC
     DualDuct.hh
     EMSManager.cc
     EMSManager.hh
+    EPVector.hh
     EarthTube.cc
     EarthTube.hh
     EcoRoofManager.cc
