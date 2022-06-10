@@ -279,8 +279,8 @@ namespace AirflowNetwork {
 
             // Members
 
-            std::string Name; // Provide a unique object name
-            DuctSizeMethod ductSizeMethod;      // Duct autosize method as enum
+            std::string Name;              // Provide a unique object name
+            DuctSizeMethod ductSizeMethod; // Duct autosize method as enum
             Real64 DuctSizeFactor;         // Duct size factor
             Real64 DuctSizeMaxV;           // Maximum airflow velocity
             Real64 DuctSizePLossSTrunk;    // Pressure loss across supply trunk
@@ -343,7 +343,7 @@ namespace AirflowNetwork {
         bool TExtHeightDep;          // Choice of height dependence of external node temperature
         bool AllowSupportZoneEqp;    // Allow unsupported zone equipment
         // "ZeroNodePressures", or "LinearInitializationMethod"
-        bool AFNDuctAutoSize;          // True: perform duct autosize, otherwise no duct autosize
+        bool AFNDuctAutoSize; // True: perform duct autosize, otherwise no duct autosize
         AirflowNetworkDuctSizingProp ductSizing;
 
         // Default Constructor
@@ -378,7 +378,7 @@ namespace AirflowNetwork {
                                Solver solver,                     // Solver type
                                bool const TExtHeightDep,          // Choice of height dependence of external node temperature
                                bool const AllowSupportZoneEqp,    // Allow unsupported zone equipment
-                               bool const AFNDuctAutoSize        // True: perform duct autosize, otherwise no duct autosize
+                               bool const AFNDuctAutoSize         // True: perform duct autosize, otherwise no duct autosize
                                )
 
             : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), BldgType(BldgType), HeightOption(HeightOption),
