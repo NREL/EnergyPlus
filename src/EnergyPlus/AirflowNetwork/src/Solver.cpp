@@ -2243,7 +2243,6 @@ namespace AirflowNetwork {
             AirflowNetworkSimu.Azimuth = Numbers(5);
             AirflowNetworkSimu.AspectRatio = Numbers(6);
             AirflowNetworkSimu.MaxPressure = 500.0; // Maximum pressure difference by default
-
         }
 
         CurrentModuleObject = "AirflowNetwork:Distribution:DuctSizing";
