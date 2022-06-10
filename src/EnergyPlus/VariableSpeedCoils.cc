@@ -8105,34 +8105,32 @@ namespace VariableSpeedCoils {
     }
 
     Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state,
-                                    int const &CoilIndex, // index to cooling coil
-                                    bool &ErrorsFound     // set to true if problem
+                                    int const CoilIndex, // index to cooling coil
+                                    bool &ErrorsFound    // set to true if problem
     )
     {
+        Real64 RatedSourceTemp = 0.0;
         switch (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VSCoilType) {
         case DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit: {
-            return RatedInletWaterTemp;
+            RatedSourceTemp = RatedInletWaterTemp;
         }
         case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit: {
-            return RatedInletWaterTempHeat;
+            RatedSourceTemp = RatedInletWaterTempHeat;
         }
         case DataHVACGlobals::CoilDX_HeatPumpWaterHeaterVariableSpeed: {
-            return state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).WHRatedInletWaterTemp;
+            RatedSourceTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).WHRatedInletWaterTemp;
         }
         case DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed: {
-            return RatedAmbAirTemp;
+            RatedSourceTemp = RatedAmbAirTemp;
         }
         case DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed: {
-            return RatedAmbAirTempHeat;
+            RatedSourceTemp = RatedAmbAirTempHeat;
         }
         default: {
-            ShowSevereError(state,
-                            "GetVSCoilRatedSourceTemp: Could not find rated source temperature, Type= VS DX Coil Name=\"" +
-                                state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).Name + "\"");
-            ErrorsFound = true;
-            return 0.0;
+            assert(false);
         }
         }
+        return RatedSourceTemp;
     }
 
     void SetVarSpeedCoilData(EnergyPlusData &state,
