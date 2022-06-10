@@ -304,7 +304,6 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            constexpr std::array<bool, static_cast<int>(BooleanSwitch::Num)> boolSwitchToBool = {false, true};
             if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 thisExchanger.EconoLockOut = true;
             } else {
@@ -312,7 +311,7 @@ namespace HeatRecovery {
                 if (toggle == BooleanSwitch::Invalid) {
                     ShowSevereError(state, format("{}: incorrect econo lockout: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(4)));
                 }
-                thisExchanger.EconoLockOut = boolSwitchToBool[static_cast<int>(toggle)];
+                thisExchanger.EconoLockOut = static_cast<bool>(toggle);
             }
 
             thisExchanger.hARatio = state.dataIPShortCut->rNumericArgs(1);
@@ -524,22 +523,14 @@ namespace HeatRecovery {
                 thisExchanger.RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(13);
             }
 
-            BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(10));
-            switch (toggle) {
-            case BooleanSwitch::Yes:
+            if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 thisExchanger.EconoLockOut = true;
-                break;
-            case BooleanSwitch::No:
-                thisExchanger.EconoLockOut = false;
-                break;
-            default:
-                if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    thisExchanger.EconoLockOut = true;
-                } else {
+            } else {
+                BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(10));
+                if (toggle == BooleanSwitch::Invalid) {
                     ShowSevereError(state, format("{}: incorrect econo lockout: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(10)));
-                    ErrorsFound = true;
                 }
-                break;
+                thisExchanger.EconoLockOut = static_cast<bool>(toggle);
             }
 
             BranchNodeConnections::TestCompSet(state,
@@ -652,22 +643,14 @@ namespace HeatRecovery {
 
             thisExchanger.HeatExchPerfName = state.dataIPShortCut->cAlphaArgs(8);
 
-            BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(9));
-            switch (toggle) {
-            case BooleanSwitch::Yes:
+            if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                 thisExchanger.EconoLockOut = true;
-                break;
-            case BooleanSwitch::No:
-                thisExchanger.EconoLockOut = false;
-                break;
-            default:
-                if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    thisExchanger.EconoLockOut = true;
-                } else {
+            } else {
+                BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(9));
+                if (toggle == BooleanSwitch::Invalid) {
                     ShowSevereError(state, format("{}: incorrect econo lockout: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(9)));
-                    ErrorsFound = true;
                 }
-                break;
+                thisExchanger.EconoLockOut = static_cast<bool>(toggle);
             }
 
         } // end of input loop over desiccant balanced heat exchangers
