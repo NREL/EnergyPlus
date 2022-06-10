@@ -1756,6 +1756,10 @@ namespace AirflowNetwork {
             m_state, "AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
+        m_state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            m_state, "AirflowNetwork:Distribution:DuctSizing", TotalArgs, NumAlphas, NumNumbers);
+        MaxNums = max(MaxNums, NumNumbers);
+        MaxAlphas = max(MaxAlphas, NumAlphas);
 
         Alphas.allocate(MaxAlphas);
         cAlphaFields.allocate(MaxAlphas);
@@ -2210,36 +2214,8 @@ namespace AirflowNetwork {
             // Get inputs for duct sizing
             AirflowNetworkSimu.AFNDuctAutoSize = false;
             if (NumAlphas == 10) {
-                if (!UtilityRoutines::SameString(Alphas(10), "None")) {
-                    if (UtilityRoutines::SameString(Alphas(10), "MaximumVelocity")) {
-                        AirflowNetworkSimu.ductSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity;
-                    } else if (UtilityRoutines::SameString(Alphas(10), "PressureLoss")) {
-                        AirflowNetworkSimu.ductSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::PressureLoss;
-                    } else if (UtilityRoutines::SameString(Alphas(10), "PressureLossWithMaximumVelocity")) {
-                        AirflowNetworkSimu.ductSizeMethod = AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss;
-                    } else {
-                        ShowSevereError(m_state,
-                                        format("{} {} object, {} = {}  is invalid.", RoutineName, CurrentModuleObject, cAlphaFields(10), Alphas(10)));
-                        ShowContinueError(
-                            m_state,
-                            format("Valid choices are None, MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. {}: {} = {}",
-                                   CurrentModuleObject,
-                                   cAlphaFields(1),
-                                   AirflowNetworkSimu.AirflowNetworkSimuName));
-                        ErrorsFound = true;
-                        SimObjectError = true;
-                    }
+                if (UtilityRoutines::SameString(Alphas(10), "YES")) {
                     AirflowNetworkSimu.AFNDuctAutoSize = true;
-                    if (SimulateAirflowNetwork != AirflowNetworkControlMultiADS) {
-                        ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
-                        ShowContinueError(m_state,
-                                          format("Although {} = \"{}\" is entered, but {} is not MultizoneWithoutDistribution.",
-                                                 cAlphaFields(10),
-                                                 Alphas(10),
-                                                 cAlphaFields(2)));
-                        ShowContinueError(m_state, format("..Duct sizing is not performed"));
-                        AirflowNetworkSimu.AFNDuctAutoSize = false;
-                    }
                     if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
                         if (NumAPL > 1) {
                             ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
@@ -2268,14 +2244,73 @@ namespace AirflowNetwork {
             AirflowNetworkSimu.AspectRatio = Numbers(6);
             AirflowNetworkSimu.MaxPressure = 500.0; // Maximum pressure difference by default
 
-            if (AirflowNetworkSimu.AFNDuctAutoSize) {
-                AirflowNetworkSimu.DuctSizeFactor = Numbers(7);
-                AirflowNetworkSimu.DuctSizeMaxV = Numbers(8);
-                AirflowNetworkSimu.DuctSizePLossSTrunk = Numbers(9);
-                AirflowNetworkSimu.DuctSizePLossSBranch = Numbers(10);
-                AirflowNetworkSimu.DuctSizePLossRTrunk = Numbers(11);
-                AirflowNetworkSimu.DuctSizePLossRBranch = Numbers(12);
+        }
+
+        CurrentModuleObject = "AirflowNetwork:Distribution:DuctSizing";
+        int NumDuctSizing = m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, CurrentModuleObject);
+        if (NumDuctSizing > 1) {
+            ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+            ShowContinueError(
+                m_state,
+                format("The number of AirflowNetwork:Distribution:DuctSizing is greater than 1. The current requirement for Duct Sizing requires a "
+                       "single object."));
+            ShowContinueError(m_state, format("..Duct sizing is not performed"));
+            AirflowNetworkSimu.AFNDuctAutoSize = false;
+        } else if (NumDuctSizing == 1) {
+            ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+            ShowContinueError(
+                m_state,
+                format("The number of AirflowNetwork:Distribution:DuctSizing is not avalable. The current requirement for Duct Sizing requires a "
+                       "single object."));
+            ShowContinueError(m_state, format("..Duct sizing is not performed"));
+            AirflowNetworkSimu.AFNDuctAutoSize = false;
+        }
+        if (AirflowNetworkSimu.AFNDuctAutoSize && NumDuctSizing == 1) {
+            m_state.dataInputProcessing->inputProcessor->getObjectItem(m_state,
+                                                                       CurrentModuleObject,
+                                                                       NumDuctSizing,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
+
+            AirflowNetworkSimu.ductSizing.Name = Alphas(1);
+            if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("MaximumVelocity"))) {
+                AirflowNetworkSimu.ductSizing.ductSizeMethod = AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity;
+            } else if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("PressureLoss"))) {
+                AirflowNetworkSimu.ductSizing.ductSizeMethod = AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::PressureLoss;
+            } else if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("PressureLossWithMaximumVelocity"))) {
+                AirflowNetworkSimu.ductSizing.ductSizeMethod = AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss;
+            } else {
+                ShowSevereError(m_state, format("{} {} object, {} = {}  is invalid.", RoutineName, CurrentModuleObject, cAlphaFields(2), Alphas(2)));
+                ShowContinueError(m_state,
+                                  format("Valid choices are MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. {}: {} = {}",
+                                         CurrentModuleObject,
+                                         cAlphaFields(1),
+                                         Alphas(1)));
+                ErrorsFound = true;
             }
+            if (SimulateAirflowNetwork != AirflowNetworkControlMultiADS) {
+                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowContinueError(m_state,
+                                  format("Although {} = \"{}\" is entered, but {} is not MultizoneWithoutDistribution.",
+                                         cAlphaFields(10),
+                                         Alphas(10),
+                                         cAlphaFields(2)));
+                ShowContinueError(m_state, format("..Duct sizing is not performed"));
+                AirflowNetworkSimu.AFNDuctAutoSize = false;
+            }
+            AirflowNetworkSimu.ductSizing.DuctSizeFactor = Numbers(1);
+            AirflowNetworkSimu.ductSizing.DuctSizeMaxV = Numbers(2);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossSTrunk = Numbers(3);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossSBranch = Numbers(4);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossRTrunk = Numbers(5);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossRBranch = Numbers(6);
         }
 
         // *** Read AirflowNetwork simulation zone data
@@ -12253,7 +12288,7 @@ namespace AirflowNetwork {
             AirflowNetworkSimu.iWPCCnt = iWPCCntr::Input;
             AirflowNetworkSimu.AllowSupportZoneEqp = false;
         }
-        Real64 factor = AirflowNetworkSimu.DuctSizeFactor;
+        Real64 factor = AirflowNetworkSimu.ductSizing.DuctSizeFactor;
 
         NodeLoopSupply = m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1);
         NodeLoopReturn = m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipReturnNodeNum(1);
@@ -12340,13 +12375,14 @@ namespace AirflowNetwork {
                 if (DuctSizingSTFlag) {
                     Real64 Velocity = 0.0;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
-                        SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                         SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = AirflowNetworkSimu.DuctSizePLossSTrunk;
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossSTrunk;
                         Par(2) = DisSysCompCVFData(1).FlowRate;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12355,18 +12391,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Trunk size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++AirflowNetworkSimu.ErrCountDuct;
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Trunk "
                                         "size. Supply Trunk is calculated using velocity at 5m/s. Simulation continues...",
-                                        AirflowNetworkSimu.ErrIndexDuct,
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12385,16 +12421,17 @@ namespace AirflowNetwork {
                         SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / SupplyTrunkArea;
                     }
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
-                        if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
-                            SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                             SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Trunk size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       AirflowNetworkSimu.DuctSizeMaxV,
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Supply Trunk Diameter");
                         }
@@ -12459,13 +12496,14 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
-                        SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                         SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = AirflowNetworkSimu.DuctSizePLossSBranch;
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossSBranch;
                         Par(2) = MdotBranch;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12474,18 +12512,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Branch size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++AirflowNetworkSimu.ErrCountDuct;
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Branch "
                                         "size. Supply Branch is calculated using velocity at 5m/s. Simulation continues...",
-                                        AirflowNetworkSimu.ErrIndexDuct,
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12504,16 +12542,17 @@ namespace AirflowNetwork {
                         SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / SupplyBranchArea;
                     }
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
-                        if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
-                            SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                             SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Branch size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       AirflowNetworkSimu.DuctSizeMaxV,
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Supply Branch Diameter");
                         }
@@ -12582,13 +12621,14 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
-                        ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                         ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = AirflowNetworkSimu.DuctSizePLossRTrunk;
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossRTrunk;
                         Par(2) = DisSysCompCVFData(1).FlowRate;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12597,18 +12637,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Trunk size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++AirflowNetworkSimu.ErrCountDuct;
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Return Duct Trunk "
                                         "size. Supply Branch is calculated using velocity at 5m/s. Simulation continues...",
-                                        AirflowNetworkSimu.ErrIndexDuct,
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12627,16 +12667,17 @@ namespace AirflowNetwork {
                         ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / SupplyBranchArea;
                     }
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
-                        if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
-                            ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                             ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Trunk size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       AirflowNetworkSimu.DuctSizeMaxV,
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Return Trunk Diameter");
                         }
@@ -12702,13 +12743,14 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity) {
-                        ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                         ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = AirflowNetworkSimu.DuctSizePLossRBranch;
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossRBranch;
                         Par(2) = MdotBranch;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12717,18 +12759,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (AirflowNetworkSimu.ErrCountDuct == 0) {
-                                    ++AirflowNetworkSimu.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Branch size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++AirflowNetworkSimu.ErrCountDuct;
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Branch "
                                         "size. Return Branch is calculated using velocity at 5m/s. Simulation continues...",
-                                        AirflowNetworkSimu.ErrIndexDuct,
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12747,16 +12789,17 @@ namespace AirflowNetwork {
                         ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / ReturnBranchArea;
                     }
-                    if (AirflowNetworkSimu.ductSizeMethod == AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss) {
-                        if (Velocity > AirflowNetworkSimu.DuctSizeMaxV) {
-                            ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
                             ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Branch size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       AirflowNetworkSimu.DuctSizeMaxV,
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Return Branch Diameter");
                         }

@@ -26118,14 +26118,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
 
     // Duct sizing test
     state->afn->AirflowNetworkSimu.AFNDuctAutoSize = true;
-    state->afn->AirflowNetworkSimu.ductSizeMethod = AirflowNetwork::AirflowNetworkSimuProp::DuctSizeMethod::PressureLoss;
+                    state->afn->AirflowNetworkSimu.ductSizing.ductSizeMethod =
+                        AirflowNetwork::AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::PressureLoss;
 
-    state->afn->AirflowNetworkSimu.DuctSizeFactor = 1.0;
-    state->afn->AirflowNetworkSimu.DuctSizeMaxV = 10.0;
-    state->afn->AirflowNetworkSimu.DuctSizePLossSTrunk = 5.0;
-    state->afn->AirflowNetworkSimu.DuctSizePLossSBranch = 70.0;
-    state->afn->AirflowNetworkSimu.DuctSizePLossRTrunk = 3.0;
-    state->afn->AirflowNetworkSimu.DuctSizePLossRBranch = 4.0;
+    state->afn->AirflowNetworkSimu.ductSizing.DuctSizeFactor = 1.0;
+                    state->afn->AirflowNetworkSimu.ductSizing.DuctSizeMaxV = 10.0;
+    state->afn->AirflowNetworkSimu.ductSizing.DuctSizePLossSTrunk = 5.0;
+                    state->afn->AirflowNetworkSimu.ductSizing.DuctSizePLossSBranch = 70.0;
+    state->afn->AirflowNetworkSimu.ductSizing.DuctSizePLossRTrunk = 3.0;
+                    state->afn->AirflowNetworkSimu.ductSizing.DuctSizePLossRBranch = 4.0;
 
     state->dataHeatBalFanSys->MAT.allocate(3);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(3);
@@ -26168,7 +26169,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     EXPECT_NEAR(state->afn->DisSysCompDuctData(3).A, 0.335458, 0.0001);
 
     // Maximum velocity method
-    state->afn->AirflowNetworkSimu.ductSizeMethod = AirflowNetwork::AirflowNetworkSimuProp::DuctSizeMethod::MaxVelocity;
+    state->afn->AirflowNetworkSimu.ductSizing.ductSizeMethod =
+        AirflowNetwork::AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity;
     state->afn->DuctSizing();
     // Supply trunk
     EXPECT_NEAR(state->afn->DisSysCompDuctData(4).hydraulicDiameter, 0.361257, 0.0001);
@@ -26184,8 +26186,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     EXPECT_NEAR(state->afn->DisSysCompDuctData(3).A, 0.102500, 0.0001);
 
     // PressureLossWithMaximumVelocity method
-    state->afn->AirflowNetworkSimu.ductSizeMethod = AirflowNetwork::AirflowNetworkSimuProp::DuctSizeMethod::VelocityAndLoss;
-    state->afn->AirflowNetworkSimu.DuctSizeMaxV = 6.0;
+    state->afn->AirflowNetworkSimu.ductSizing.ductSizeMethod =
+        AirflowNetwork::AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss;
+    state->afn->AirflowNetworkSimu.ductSizing.DuctSizeMaxV = 6.0;
     state->afn->DuctSizing();
     // Supply trunk
     EXPECT_NEAR(state->afn->DisSysCompDuctData(4).hydraulicDiameter, 0.531093, 0.0001);
