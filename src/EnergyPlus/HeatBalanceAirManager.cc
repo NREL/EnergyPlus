@@ -1102,26 +1102,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                if (!lNumericFieldBlanks(5)) {
-                    thisInfiltration.ConstantTermCoef = rNumericArgs(5);
-                } else {
-                    thisInfiltration.ConstantTermCoef = 1.0;
-                }
-                if (!lNumericFieldBlanks(6)) {
-                    thisInfiltration.TemperatureTermCoef = rNumericArgs(6);
-                } else {
-                    thisInfiltration.TemperatureTermCoef = 0.0;
-                }
-                if (!lNumericFieldBlanks(7)) {
-                    thisInfiltration.VelocityTermCoef = rNumericArgs(7);
-                } else {
-                    thisInfiltration.VelocityTermCoef = 0.0;
-                }
-                if (!lNumericFieldBlanks(8)) {
-                    thisInfiltration.VelocitySQTermCoef = rNumericArgs(8);
-                } else {
-                    thisInfiltration.VelocitySQTermCoef = 0.0;
-                }
+                thisInfiltration.ConstantTermCoef = !lNumericFieldBlanks(5) ? rNumericArgs(5) : 1.0;
+                thisInfiltration.TemperatureTermCoef = !lNumericFieldBlanks(6) ? rNumericArgs(6) : 0.0;
+                thisInfiltration.VelocityTermCoef = !lNumericFieldBlanks(7) ? rNumericArgs(7) : 0.0;
+                thisInfiltration.VelocitySQTermCoef = !lNumericFieldBlanks(8) ? rNumericArgs(8) : 0.0;
 
                 if (thisInfiltration.ConstantTermCoef == 0.0 && thisInfiltration.TemperatureTermCoef == 0.0 &&
                     thisInfiltration.VelocityTermCoef == 0.0 && thisInfiltration.VelocitySQTermCoef == 0.0) {
@@ -1777,26 +1761,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisVentilation.FanEfficiency = 1.0;
                 }
 
-                if (!lNumericFieldBlanks(7)) {
-                    thisVentilation.ConstantTermCoef = rNumericArgs(7);
-                } else {
-                    thisVentilation.ConstantTermCoef = 1.0;
-                }
-                if (!lNumericFieldBlanks(8)) {
-                    thisVentilation.TemperatureTermCoef = rNumericArgs(8);
-                } else {
-                    thisVentilation.TemperatureTermCoef = 0.0;
-                }
-                if (!lNumericFieldBlanks(9)) {
-                    thisVentilation.VelocityTermCoef = rNumericArgs(9);
-                } else {
-                    thisVentilation.VelocityTermCoef = 0.0;
-                }
-                if (!lNumericFieldBlanks(10)) {
-                    thisVentilation.VelocitySQTermCoef = rNumericArgs(10);
-                } else {
-                    thisVentilation.VelocitySQTermCoef = 0.0;
-                }
+                thisVentilation.ConstantTermCoef = !lNumericFieldBlanks(7) ? rNumericArgs(7) : 1.0;
+                thisVentilation.TemperatureTermCoef = !lNumericFieldBlanks(8) ? rNumericArgs(8) : 0.0;
+                thisVentilation.VelocityTermCoef = !lNumericFieldBlanks(9) ? rNumericArgs(9) : 0.0;
+                thisVentilation.VelocitySQTermCoef = !lNumericFieldBlanks(10) ? rNumericArgs(10) : 0.0;
 
                 if (thisVentilation.ConstantTermCoef == 0.0 && thisVentilation.TemperatureTermCoef == 0.0 &&
                     thisVentilation.VelocityTermCoef == 0.0 && thisVentilation.VelocitySQTermCoef == 0.0) {
@@ -1869,11 +1837,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                if (!lNumericFieldBlanks(12)) {
-                    thisVentilation.MaxIndoorTemperature = rNumericArgs(12);
-                } else {
-                    thisVentilation.MaxIndoorTemperature = VentilTempLimit;
-                }
+                thisVentilation.MaxIndoorTemperature = !lNumericFieldBlanks(12) ? rNumericArgs(12) : VentilTempLimit;
                 if ((thisVentilation.MaxIndoorTemperature < -VentilTempLimit) || (thisVentilation.MaxIndoorTemperature > VentilTempLimit)) {
                     if (Item1 == 1) {
                         ShowSevereError(state,
@@ -1928,11 +1892,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                if (!lNumericFieldBlanks(13)) {
-                    thisVentilation.DelTemperature = rNumericArgs(13);
-                } else {
-                    thisVentilation.DelTemperature = -VentilTempLimit;
-                }
+                thisVentilation.DelTemperature = !lNumericFieldBlanks(13) ? rNumericArgs(13) : -VentilTempLimit;
                 //    Ventilation(Loop)%DelTemperature = rNumericArgs(13)  !  3/12/03  Negative del temp now allowed COP
 
                 thisVentilation.DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
@@ -1987,11 +1947,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                if (!lNumericFieldBlanks(14)) {
-                    thisVentilation.MinOutdoorTemperature = rNumericArgs(14);
-                } else {
-                    thisVentilation.MinOutdoorTemperature = -VentilTempLimit;
-                }
+                thisVentilation.MinOutdoorTemperature = !lNumericFieldBlanks(14) ? rNumericArgs(14) : -VentilTempLimit;
                 if ((thisVentilation.MinOutdoorTemperature < -VentilTempLimit) || (thisVentilation.MinOutdoorTemperature > VentilTempLimit)) {
                     if (Item1 == 1) {
                         ShowSevereError(state,
@@ -2041,11 +1997,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                if (!lNumericFieldBlanks(15)) {
-                    thisVentilation.MaxOutdoorTemperature = rNumericArgs(15);
-                } else {
-                    thisVentilation.MaxOutdoorTemperature = VentilTempLimit;
-                }
+                thisVentilation.MaxOutdoorTemperature = !lNumericFieldBlanks(15) ? rNumericArgs(15) : VentilTempLimit;
                 if (Item1 == 1) {
                     if ((thisVentilation.MaxOutdoorTemperature < -VentilTempLimit) || (thisVentilation.MaxOutdoorTemperature > VentilTempLimit)) {
                         ShowSevereError(state,
@@ -2095,11 +2047,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                if (!lNumericFieldBlanks(16)) {
-                    thisVentilation.MaxWindSpeed = rNumericArgs(16);
-                } else {
-                    thisVentilation.MaxWindSpeed = VentilWSLimit;
-                }
+                thisVentilation.MaxWindSpeed = !lNumericFieldBlanks(16) ? rNumericArgs(16) : VentilWSLimit;
                 if (Item1 == 1) {
                     if ((thisVentilation.MaxWindSpeed < -VentilWSLimit) || (thisVentilation.MaxWindSpeed > VentilWSLimit)) {
                         ShowSevereError(state,
@@ -2478,11 +2426,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
         }
 
-        if (!lNumericFieldBlanks(9)) {
-            state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature = rNumericArgs(9);
-        } else {
-            state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature = -VentilTempLimit;
-        }
+        state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature = !lNumericFieldBlanks(9) ? rNumericArgs(9) : -VentilTempLimit;
         if ((state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature < -VentilTempLimit) ||
             (state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature > VentilTempLimit)) {
             ShowSevereError(state,
@@ -2527,11 +2471,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
         }
 
-        if (!lNumericFieldBlanks(10)) {
-            state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature = rNumericArgs(10);
-        } else {
-            state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature = VentilTempLimit;
-        }
+        state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature = !lNumericFieldBlanks(10) ? rNumericArgs(10) : VentilTempLimit;
         if ((state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature < -VentilTempLimit) ||
             (state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature > VentilTempLimit)) {
             ShowSevereError(state,
@@ -2575,11 +2515,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
         }
 
-        if (!lNumericFieldBlanks(11)) {
-            state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed = rNumericArgs(11);
-        } else {
-            state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed = VentilWSLimit;
-        }
+        state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed = !lNumericFieldBlanks(11) ? rNumericArgs(11) : VentilWSLimit;
         if ((state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed < -VentilWSLimit) ||
             (state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed > VentilWSLimit)) {
             ShowSevereError(state,

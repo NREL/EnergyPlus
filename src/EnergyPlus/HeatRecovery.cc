@@ -140,7 +140,7 @@ namespace HeatRecovery {
         if (CompIndex == 0) {
             HeatExchNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
             if (HeatExchNum == 0) {
-                ShowFatalError(state, "SimHeatRecovery: Unit not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimHeatRecovery: Unit not found={}", CompName));
             }
             CompIndex = HeatExchNum;
         } else {
@@ -285,9 +285,13 @@ namespace HeatRecovery {
                 thisExchanger.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (thisExchanger.SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered ={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -296,27 +300,21 @@ namespace HeatRecovery {
                 "COUNTERFLOW", "PARALLELFLOW", "CROSSFLOWBOTHUNMIXED", "CROSS_FLOW_OTHER_NOT_USED"};
             thisExchanger.FlowArr = static_cast<HXConfiguration>(getEnumerationValue(hxConfigurationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             if (thisExchanger.FlowArr == HXConfiguration::Invalid) {
-                ShowSevereError(state, cCurrentModuleObject + ": incorrect flow arrangement: " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowSevereError(state, format("{}: incorrect flow arrangement: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
 
-            BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(4));
-            switch (toggle) {
-            case BooleanSwitch::Yes:
+            constexpr std::array<bool, static_cast<int>(BooleanSwitch::Num)> boolSwitchToBool = {false, true};
+            if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 thisExchanger.EconoLockOut = true;
-                break;
-            case BooleanSwitch::No:
-                thisExchanger.EconoLockOut = false;
-                break;
-            default:
-                if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    thisExchanger.EconoLockOut = true;
-                } else {
-                    ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(4));
-                    ErrorsFound = true;
+            } else {
+                BooleanSwitch toggle = getYesNoValue(state.dataIPShortCut->cAlphaArgs(4));
+                if (toggle == BooleanSwitch::Invalid) {
+                    ShowSevereError(state, format("{}: incorrect econo lockout: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(4)));
                 }
-                break;
+                thisExchanger.EconoLockOut = boolSwitchToBool[static_cast<int>(toggle)];
             }
+
             thisExchanger.hARatio = state.dataIPShortCut->rNumericArgs(1);
             thisExchanger.NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
             thisExchanger.NomSupAirInTemp = state.dataIPShortCut->rNumericArgs(3);
@@ -328,7 +326,7 @@ namespace HeatRecovery {
                                                            state.dataIPShortCut->cAlphaArgs(5),
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           thisExchanger.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
@@ -337,7 +335,7 @@ namespace HeatRecovery {
                                                             state.dataIPShortCut->cAlphaArgs(6),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            thisExchanger.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
@@ -346,7 +344,7 @@ namespace HeatRecovery {
                                                            state.dataIPShortCut->cAlphaArgs(7),
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           thisExchanger.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Secondary,
@@ -355,7 +353,7 @@ namespace HeatRecovery {
                                                             state.dataIPShortCut->cAlphaArgs(8),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirFlatPlate,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            thisExchanger.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Secondary,
@@ -406,9 +404,13 @@ namespace HeatRecovery {
                 thisExchanger.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (thisExchanger.SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered ={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           thisExchanger.Name));
                     ErrorsFound = true;
                 }
             }
@@ -419,14 +421,16 @@ namespace HeatRecovery {
             thisExchanger.HeatEffectLatent75 = state.dataIPShortCut->rNumericArgs(5);
             if (thisExchanger.HeatEffectSensible75 < thisExchanger.HeatEffectSensible100) {
                 ShowWarningError(state,
-                                 cCurrentModuleObject + " \"" + thisExchanger.Name +
-                                     "\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow.");
+                                 format("{} \"{}\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow.",
+                                        cCurrentModuleObject,
+                                        thisExchanger.Name));
                 ShowContinueError(state, "Sensible heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
             if (thisExchanger.HeatEffectLatent75 < thisExchanger.HeatEffectLatent100) {
                 ShowWarningError(state,
-                                 cCurrentModuleObject + " \"" + thisExchanger.Name +
-                                     "\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.");
+                                 format("{} \"{}\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.",
+                                        cCurrentModuleObject,
+                                        thisExchanger.Name));
                 ShowContinueError(state, "Latent heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
             thisExchanger.CoolEffectSensible100 = state.dataIPShortCut->rNumericArgs(6);
@@ -435,21 +439,23 @@ namespace HeatRecovery {
             thisExchanger.CoolEffectLatent75 = state.dataIPShortCut->rNumericArgs(9);
             if (thisExchanger.CoolEffectSensible75 < thisExchanger.CoolEffectSensible100) {
                 ShowWarningError(state,
-                                 cCurrentModuleObject + " \"" + thisExchanger.Name +
-                                     "\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
+                                 format("{} \"{}\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow.",
+                                        cCurrentModuleObject,
+                                        thisExchanger.Name));
                 ShowContinueError(state, "Sensible cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
             if (thisExchanger.CoolEffectLatent75 < thisExchanger.CoolEffectLatent100) {
                 ShowWarningError(state,
-                                 cCurrentModuleObject + " \"" + thisExchanger.Name +
-                                     "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
+                                 format("{} \"{}\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.",
+                                        cCurrentModuleObject,
+                                        thisExchanger.Name));
                 ShowContinueError(state, "Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
             thisExchanger.SupInletNode = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(3),
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           thisExchanger.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
@@ -458,7 +464,7 @@ namespace HeatRecovery {
                                                             state.dataIPShortCut->cAlphaArgs(4),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            thisExchanger.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
@@ -467,7 +473,7 @@ namespace HeatRecovery {
                                                            state.dataIPShortCut->cAlphaArgs(5),
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           thisExchanger.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Secondary,
@@ -476,7 +482,7 @@ namespace HeatRecovery {
                                                             state.dataIPShortCut->cAlphaArgs(6),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::HeatExchangerAirToAirSensibleAndLatent,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            thisExchanger.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Secondary,
@@ -499,7 +505,7 @@ namespace HeatRecovery {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
                 thisExchanger.ExchConfig = HXConfigurationType::Rotary;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " configuration not found= " + state.dataIPShortCut->cAlphaArgs(8));
+                ShowSevereError(state, format("{} configuration not found= {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(8)));
                 ShowContinueError(state, "HX configuration must be either Plate or Rotary");
                 ErrorsFound = true;
             }
@@ -508,7 +514,7 @@ namespace HeatRecovery {
             thisExchanger.FrostControlType =
                 static_cast<FrostControlOption>(getEnumerationValue(frostControlNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
             if (thisExchanger.FrostControlType == FrostControlOption::Invalid) {
-                ShowSevereError(state, "Invalid Frost Control method for " + thisExchanger.Name + " =  " + state.dataIPShortCut->cAlphaArgs(9));
+                ShowSevereError(state, format("Invalid Frost Control method for {} =  {}", thisExchanger.Name, state.dataIPShortCut->cAlphaArgs(9)));
                 ErrorsFound = true;
             }
 
@@ -530,7 +536,7 @@ namespace HeatRecovery {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                     thisExchanger.EconoLockOut = true;
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(10));
+                    ShowSevereError(state, format("{}: incorrect econo lockout: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(10)));
                     ErrorsFound = true;
                 }
                 break;
@@ -580,9 +586,13 @@ namespace HeatRecovery {
                 thisExchanger.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (thisExchanger.SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                        " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
-                                        '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                    format("{}{}: invalid {} entered ={} for {}={}",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaFieldNames(1),
+                                           thisExchanger.Name));
                     ErrorsFound = true;
                 }
             }
@@ -593,7 +603,7 @@ namespace HeatRecovery {
                                                            state.dataIPShortCut->cAlphaArgs(3),
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           thisExchanger.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
@@ -602,7 +612,7 @@ namespace HeatRecovery {
                                                             state.dataIPShortCut->cAlphaArgs(4),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            thisExchanger.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
@@ -612,7 +622,7 @@ namespace HeatRecovery {
                                                            state.dataIPShortCut->cAlphaArgs(5),
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           thisExchanger.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Secondary,
@@ -621,7 +631,7 @@ namespace HeatRecovery {
                                                             state.dataIPShortCut->cAlphaArgs(6),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::HeatExchangerDesiccantBalancedFlow,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            thisExchanger.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Secondary,
@@ -654,7 +664,7 @@ namespace HeatRecovery {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                     thisExchanger.EconoLockOut = true;
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + ": incorrect econo lockout: " + state.dataIPShortCut->cAlphaArgs(9));
+                    ShowSevereError(state, format("{}: incorrect econo lockout: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(9)));
                     ErrorsFound = true;
                 }
                 break;
@@ -691,7 +701,7 @@ namespace HeatRecovery {
             thisPerfData.NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
             // check validity
             if (thisPerfData.NomSupAirVolFlow <= 0.0 && thisPerfData.NomSupAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Nominal air flow rate must be greater than zero.");
                 ShowContinueError(state, format("... value entered = {:.6R}", thisPerfData.NomSupAirVolFlow));
                 ErrorsFound = true;
@@ -701,7 +711,7 @@ namespace HeatRecovery {
             // check validity
             if ((thisPerfData.NomProcAirFaceVel <= 0.0 && thisPerfData.NomProcAirFaceVel != DataSizing::AutoSize) ||
                 thisPerfData.NomProcAirFaceVel > 6.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Nominal air face velocity cannot be less than or equal to zero or greater than 6 m/s.");
                 ShowContinueError(state, format("... value entered = {:.6R}", thisPerfData.NomProcAirFaceVel));
                 ErrorsFound = true;
@@ -709,27 +719,21 @@ namespace HeatRecovery {
             thisPerfData.NomElecPower = state.dataIPShortCut->rNumericArgs(3);
             // check validity
             if (thisPerfData.NomElecPower < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Nominal electric power cannot be less than zero.");
                 ShowContinueError(state, format("... value entered = {:.6R}", thisPerfData.NomElecPower));
                 ErrorsFound = true;
             }
 
             // regen outlet temp variables
-            thisPerfData.B[0] = state.dataIPShortCut->rNumericArgs(4);
-            thisPerfData.B[1] = state.dataIPShortCut->rNumericArgs(5);
-            thisPerfData.B[2] = state.dataIPShortCut->rNumericArgs(6);
-            thisPerfData.B[3] = state.dataIPShortCut->rNumericArgs(7);
-            thisPerfData.B[4] = state.dataIPShortCut->rNumericArgs(8);
-            thisPerfData.B[5] = state.dataIPShortCut->rNumericArgs(9);
-            thisPerfData.B[6] = state.dataIPShortCut->rNumericArgs(10);
-            thisPerfData.B[7] = state.dataIPShortCut->rNumericArgs(11);
+            for (int i = 0; i < 8; ++i)
+                thisPerfData.B[i] = state.dataIPShortCut->rNumericArgs(i + 4);
 
             //     Check that the minimum is not greater than or equal to the maximum for each of the following model boundaries
             thisPerfData.T_MinRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(12);
             thisPerfData.T_MaxRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(13);
             if (thisPerfData.T_MinRegenAirInHumRat >= thisPerfData.T_MaxRegenAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.T_MinRegenAirInHumRat));
@@ -737,14 +741,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MinRegenAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.T_MinRegenAirInHumRat));
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MaxRegenAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1.");
                 ShowContinueError(state, format("... maximum value entered by user = {:.6R}", thisPerfData.T_MaxRegenAirInHumRat));
@@ -754,7 +758,7 @@ namespace HeatRecovery {
             thisPerfData.T_MinRegenAirInTemp = state.dataIPShortCut->rNumericArgs(14);
             thisPerfData.T_MaxRegenAirInTemp = state.dataIPShortCut->rNumericArgs(15);
             if (thisPerfData.T_MinRegenAirInTemp >= thisPerfData.T_MaxRegenAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air temperature must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.T_MinRegenAirInTemp));
@@ -765,7 +769,7 @@ namespace HeatRecovery {
             thisPerfData.T_MinProcAirInHumRat = state.dataIPShortCut->rNumericArgs(16);
             thisPerfData.T_MaxProcAirInHumRat = state.dataIPShortCut->rNumericArgs(17);
             if (thisPerfData.T_MinProcAirInHumRat >= thisPerfData.T_MaxProcAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.T_MinProcAirInHumRat));
@@ -773,14 +777,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MinProcAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.T_MinProcAirInHumRat));
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MaxProcAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air humidity ratio must be less than or equal to 1.");
                 ShowContinueError(state, format("... maximum value entered by user = {:.6R}", thisPerfData.T_MaxProcAirInHumRat));
@@ -790,7 +794,7 @@ namespace HeatRecovery {
             thisPerfData.T_MinProcAirInTemp = state.dataIPShortCut->rNumericArgs(18);
             thisPerfData.T_MaxProcAirInTemp = state.dataIPShortCut->rNumericArgs(19);
             if (thisPerfData.T_MinProcAirInTemp >= thisPerfData.T_MaxProcAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air temperature must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.T_MinProcAirInTemp));
@@ -801,7 +805,7 @@ namespace HeatRecovery {
             thisPerfData.T_MinFaceVel = state.dataIPShortCut->rNumericArgs(20);
             thisPerfData.T_MaxFaceVel = state.dataIPShortCut->rNumericArgs(21);
             if (thisPerfData.T_MinFaceVel >= thisPerfData.T_MaxFaceVel) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen air velocity must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.T_MinFaceVel));
@@ -812,7 +816,7 @@ namespace HeatRecovery {
             thisPerfData.MinRegenAirOutTemp = state.dataIPShortCut->rNumericArgs(22);
             thisPerfData.MaxRegenAirOutTemp = state.dataIPShortCut->rNumericArgs(23);
             if (thisPerfData.MinRegenAirOutTemp >= thisPerfData.MaxRegenAirOutTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen outlet air temperature must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.MinRegenAirOutTemp));
@@ -823,7 +827,7 @@ namespace HeatRecovery {
             thisPerfData.T_MinRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(24) / 100.0;
             thisPerfData.T_MaxRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(25) / 100.0;
             if (thisPerfData.T_MinRegenAirInRelHum >= thisPerfData.T_MaxRegenAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.T_MinRegenAirInRelHum * 100.0));
@@ -831,14 +835,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MinRegenAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.T_MinRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MaxRegenAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of regen inlet air relative humidity must be less than or equal to 100.");
                 ShowContinueError(state, format("... maximum value entered = {:.6R}", thisPerfData.T_MaxRegenAirInRelHum * 100.0));
@@ -848,7 +852,7 @@ namespace HeatRecovery {
             thisPerfData.T_MinProcAirInRelHum = state.dataIPShortCut->rNumericArgs(26) / 100.0;
             thisPerfData.T_MaxProcAirInRelHum = state.dataIPShortCut->rNumericArgs(27) / 100.0;
             if (thisPerfData.T_MinProcAirInRelHum >= thisPerfData.T_MaxProcAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.T_MinProcAirInRelHum * 100.0));
@@ -856,14 +860,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MinProcAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.T_MinProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (thisPerfData.T_MaxProcAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air temperature equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air relative humidity must be less than or equal to 100.");
                 ShowContinueError(state, format("... maximum value entered = {:.6R}", thisPerfData.T_MaxProcAirInRelHum * 100.0));
@@ -871,20 +875,14 @@ namespace HeatRecovery {
             }
 
             // regen outlet humidity ratio variables
-            thisPerfData.C[0] = state.dataIPShortCut->rNumericArgs(28);
-            thisPerfData.C[1] = state.dataIPShortCut->rNumericArgs(29);
-            thisPerfData.C[2] = state.dataIPShortCut->rNumericArgs(30);
-            thisPerfData.C[3] = state.dataIPShortCut->rNumericArgs(31);
-            thisPerfData.C[4] = state.dataIPShortCut->rNumericArgs(32);
-            thisPerfData.C[5] = state.dataIPShortCut->rNumericArgs(33);
-            thisPerfData.C[6] = state.dataIPShortCut->rNumericArgs(34);
-            thisPerfData.C[7] = state.dataIPShortCut->rNumericArgs(35);
+            for (int i = 0; i < 8; ++i)
+                thisPerfData.C[i] = state.dataIPShortCut->rNumericArgs(i + 28);
 
             //     Check that the minimum is not greater than or equal to the maximum for each of the following model boundaries
             thisPerfData.H_MinRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(36);
             thisPerfData.H_MaxRegenAirInHumRat = state.dataIPShortCut->rNumericArgs(37);
             if (thisPerfData.H_MinRegenAirInHumRat >= thisPerfData.H_MaxRegenAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.H_MinRegenAirInHumRat));
@@ -892,14 +890,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MinRegenAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air humidity ratio must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.H_MinRegenAirInHumRat));
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MaxRegenAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regeneration inlet air humidity ratio must be less than or equal to 1.");
                 ShowContinueError(state, format("... maximum value entered by user = {:.6R}", thisPerfData.H_MaxRegenAirInHumRat));
@@ -909,7 +907,7 @@ namespace HeatRecovery {
             thisPerfData.H_MinRegenAirInTemp = state.dataIPShortCut->rNumericArgs(38);
             thisPerfData.H_MaxRegenAirInTemp = state.dataIPShortCut->rNumericArgs(39);
             if (thisPerfData.H_MinRegenAirInTemp >= thisPerfData.H_MaxRegenAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regeneration inlet air temperature must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.H_MinRegenAirInTemp));
@@ -920,7 +918,7 @@ namespace HeatRecovery {
             thisPerfData.H_MinProcAirInHumRat = state.dataIPShortCut->rNumericArgs(40);
             thisPerfData.H_MaxProcAirInHumRat = state.dataIPShortCut->rNumericArgs(41);
             if (thisPerfData.H_MinProcAirInHumRat >= thisPerfData.H_MaxProcAirInHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.H_MinProcAirInHumRat));
@@ -928,14 +926,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MinProcAirInHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air humidity ratio must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered by user = {:.6R}", thisPerfData.H_MinProcAirInHumRat));
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MaxProcAirInHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air humidity ratio must be less than or equal to 1.");
                 ShowContinueError(state, format("... maximum value entered by user = {:.6R}", thisPerfData.H_MaxProcAirInHumRat));
@@ -945,7 +943,7 @@ namespace HeatRecovery {
             thisPerfData.H_MinProcAirInTemp = state.dataIPShortCut->rNumericArgs(42);
             thisPerfData.H_MaxProcAirInTemp = state.dataIPShortCut->rNumericArgs(43);
             if (thisPerfData.H_MinProcAirInTemp >= thisPerfData.H_MaxProcAirInTemp) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air temperature must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.H_MinProcAirInTemp));
@@ -956,7 +954,7 @@ namespace HeatRecovery {
             thisPerfData.H_MinFaceVel = state.dataIPShortCut->rNumericArgs(44);
             thisPerfData.H_MaxFaceVel = state.dataIPShortCut->rNumericArgs(45);
             if (thisPerfData.H_MinFaceVel >= thisPerfData.H_MaxFaceVel) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen air velocity must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.H_MinFaceVel));
@@ -967,7 +965,7 @@ namespace HeatRecovery {
             thisPerfData.MinRegenAirOutHumRat = state.dataIPShortCut->rNumericArgs(46);
             thisPerfData.MaxRegenAirOutHumRat = state.dataIPShortCut->rNumericArgs(47);
             if (thisPerfData.MinRegenAirOutHumRat >= thisPerfData.MaxRegenAirOutHumRat) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen outlet air humidity ratio must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.MinRegenAirOutHumRat));
@@ -975,14 +973,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.MinRegenAirOutHumRat < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen outlet air humidity ratio must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.MinRegenAirOutHumRat));
                 ErrorsFound = true;
             }
             if (thisPerfData.MaxRegenAirOutHumRat > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regen outlet air humidity ratio must be less or equal to 1.");
                 ShowContinueError(state, format("... maximum value entered = {:.6R}", thisPerfData.MaxRegenAirOutHumRat));
@@ -992,7 +990,7 @@ namespace HeatRecovery {
             thisPerfData.H_MinRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(48) / 100.0;
             thisPerfData.H_MaxRegenAirInRelHum = state.dataIPShortCut->rNumericArgs(49) / 100.0;
             if (thisPerfData.H_MinRegenAirInRelHum >= thisPerfData.H_MaxRegenAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.H_MinRegenAirInRelHum * 100.0));
@@ -1000,14 +998,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MinRegenAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of regen inlet air relative humidity must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.H_MinRegenAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MaxRegenAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of regen inlet air relative humidity must be less or equal to 100.");
                 ShowContinueError(state, format("... maximum value entered = {:.6R}", thisPerfData.H_MaxRegenAirInRelHum * 100.0));
@@ -1017,7 +1015,7 @@ namespace HeatRecovery {
             thisPerfData.H_MinProcAirInRelHum = state.dataIPShortCut->rNumericArgs(50) / 100.0;
             thisPerfData.H_MaxProcAirInRelHum = state.dataIPShortCut->rNumericArgs(51) / 100.0;
             if (thisPerfData.H_MinProcAirInRelHum >= thisPerfData.H_MaxProcAirInRelHum) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min/max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be less than the maximum.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.H_MinProcAirInRelHum * 100.0));
@@ -1025,14 +1023,14 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MinProcAirInRelHum < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in min boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the minimum value of process inlet air relative humidity must be greater than or equal to 0.");
                 ShowContinueError(state, format("... minimum value entered = {:.6R}", thisPerfData.H_MinProcAirInRelHum * 100.0));
                 ErrorsFound = true;
             }
             if (thisPerfData.H_MaxProcAirInRelHum > 1.0) {
-                ShowSevereError(state, cCurrentModuleObject + " \"" + thisPerfData.Name + "\"");
+                ShowSevereError(state, format("{} \"{}\"", cCurrentModuleObject, thisPerfData.Name));
                 ShowContinueError(state, "Error found in max boundary for the regen outlet air humidity ratio equation.");
                 ShowContinueError(state, "... the maximum value of process inlet air relative humidity must be less than or equal to 100.");
                 ShowContinueError(state, format("... maximum value entered = {:.6R}", thisPerfData.H_MaxProcAirInRelHum * 100.0));
@@ -1052,8 +1050,8 @@ namespace HeatRecovery {
                 }
             }
             if (thisExchanger.PerfDataIndex == 0) {
-                ShowSevereError(state, DataHVACGlobals::cHXTypes(thisExchanger.ExchType) + " \"" + thisExchanger.Name + "\"");
-                ShowContinueError(state, "... Performance data set not found = " + thisExchanger.HeatExchPerfName);
+                ShowSevereError(state, format("{} \"{}\"", DataHVACGlobals::cHXTypes(thisExchanger.ExchType), thisExchanger.Name));
+                ShowContinueError(state, format("... Performance data set not found = {}", thisExchanger.HeatExchPerfName));
                 ErrorsFound = true;
             } else {
                 if (!ErrorsFound) {
@@ -1301,7 +1299,7 @@ namespace HeatRecovery {
                     break; // great!
                 case CalculateNTUBoundsErrors::MassFlowRatio:
                     FatalError = true;
-                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
+                    ShowSevereError(state, format("In the HeatExchanger:AirToAir:FlatPlate component {}", this->Name));
                     ShowContinueError(state, "  the mass flow ratio is out of bounds");
                     ShowContinueError(state, format("The mass flow ratio is (Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) = {:.2R}", Z));
                     ShowContinueError(state, "The mass flow ratio should be >= 0.0 and <= 1.0");
@@ -1316,7 +1314,7 @@ namespace HeatRecovery {
                     break;
                 case CalculateNTUBoundsErrors::NominalEffectiveness1:
                     FatalError = true;
-                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
+                    ShowSevereError(state, format("In the HeatExchanger:AirToAir:FlatPlate component {}", this->Name));
                     ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
                     ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
                     ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", 1.0 / (1.0 + Z)));
@@ -1328,7 +1326,7 @@ namespace HeatRecovery {
                     break;
                 case CalculateNTUBoundsErrors::NominalEffectiveness2:
                     FatalError = true;
-                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
+                    ShowSevereError(state, format("In the HeatExchanger:AirToAir:FlatPlate component {}", this->Name));
                     ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
                     ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
                     ShowContinueError(state, format("The effectiveness should be >= 0.0 and <= {:.3R}", (1.0 - std::exp(-Z)) / Z));
@@ -1340,7 +1338,7 @@ namespace HeatRecovery {
                     break;
                 case CalculateNTUBoundsErrors::Quantity:
                     FatalError = true;
-                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
+                    ShowSevereError(state, format("In the HeatExchanger:AirToAir:FlatPlate component {}", this->Name));
                     ShowContinueError(state, "  the quantity Eff_nom*(Min_Mass_Flow_Rate / Max_Mass_Flow_Rate) is out of bounds");
                     ShowContinueError(state, format("The value is {:.3R}", Eps0 * Z));
                     ShowContinueError(state, format("The value should be >= 0.0 and <= {:.3R}", 1.0 - std::exp(Z * (SMALL - 1.0))));
@@ -1355,7 +1353,7 @@ namespace HeatRecovery {
                     break;
                 case CalculateNTUBoundsErrors::NominalEffectiveness3:
                     FatalError = true;
-                    ShowSevereError(state, "In the HeatExchanger:AirToAir:FlatPlate component " + this->Name);
+                    ShowSevereError(state, format("In the HeatExchanger:AirToAir:FlatPlate component {}", this->Name));
                     ShowContinueError(state, "  the calculated nominal effectiveness is out of bounds");
                     ShowContinueError(state, format("The effectiveness is {:.3R}", Eps0));
                     ShowContinueError(state, "The effectiveness should be >= 0.0 and <= 1.0");
@@ -1401,7 +1399,7 @@ namespace HeatRecovery {
                     if (state.dataLoopNodes->Node(this->SupOutletNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(
-                                state, "Missing temperature setpoint for " + DataHVACGlobals::cHXTypes(this->ExchType) + " \"" + this->Name + "\" :");
+                                state, format("Missing temperature setpoint for {} \"{}\" :", DataHVACGlobals::cHXTypes(this->ExchType), this->Name));
                             ShowContinueError(
                                 state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                             ShowFatalError(state, " Previous condition causes program termination.");
@@ -1409,9 +1407,9 @@ namespace HeatRecovery {
                             // need call to EMS to check node
                             CheckIfNodeSetPointManagedByEMS(state, this->SupOutletNode, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                             if (FatalError) {
-                                ShowSevereError(state,
-                                                "Missing temperature setpoint for " + DataHVACGlobals::cHXTypes(this->ExchType) + " \"" + this->Name +
-                                                    "\" :");
+                                ShowSevereError(
+                                    state,
+                                    format("Missing temperature setpoint for {} \"{}\" :", DataHVACGlobals::cHXTypes(this->ExchType), this->Name));
                                 ShowContinueError(
                                     state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                                 ShowContinueError(
@@ -1484,8 +1482,9 @@ namespace HeatRecovery {
                         if (state.dataLoopNodes->Node(this->SecOutletNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowWarningError(state,
-                                                 "Missing optional HumRatMax setpoint for " + DataHVACGlobals::cHXTypes(this->ExchType) + " \"" +
-                                                     this->Name + "\"");
+                                                 format("Missing optional HumRatMax setpoint for {} \"{}\"",
+                                                        DataHVACGlobals::cHXTypes(this->ExchType),
+                                                        this->Name));
                                 ShowContinueError(state,
                                                   "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
                                                   "humidity ratio setpoint.");
@@ -1499,8 +1498,9 @@ namespace HeatRecovery {
                                 state.dataLoopNodes->NodeSetpointCheck(this->SecOutletNode).needsSetpointChecking = false;
                                 if (LocalWarningError) {
                                     ShowWarningError(state,
-                                                     "Missing optional HumRatMax setpoint for " + DataHVACGlobals::cHXTypes(this->ExchType) + " \"" +
-                                                         this->Name + "\"");
+                                                     format("Missing optional HumRatMax setpoint for {} \"{}\"",
+                                                            DataHVACGlobals::cHXTypes(this->ExchType),
+                                                            this->Name));
                                     ShowContinueError(state,
                                                       "...the simulation will continue without control of the desiccant heat exchanger to a "
                                                       "maximum humidity ratio setpoint.");
@@ -2017,15 +2017,17 @@ namespace HeatRecovery {
                         ++this->UnBalancedErrCount;
                         if (this->UnBalancedErrCount <= 2) {
                             ShowSevereError(state,
-                                            DataHVACGlobals::cHXTypes(this->ExchType) + ": \"" + this->Name +
-                                                "\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1.");
+                                            format("{}: \"{}\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1.",
+                                                   DataHVACGlobals::cHXTypes(this->ExchType),
+                                                   this->Name));
                             ShowContinueErrorTimeStamp(
                                 state, format("...HX Supply air to Exhaust air flow ratio = {:.5R}.", HXSupAirVolFlowRate / HXSecAirVolFlowRate));
                         } else {
                             ShowRecurringWarningErrorAtEnd(
                                 state,
-                                DataHVACGlobals::cHXTypes(this->ExchType) + " \"" + this->Name +
-                                    "\":  Unbalanced air volume flow ratio exceeds 2:1 warning continues. HX flow ratio statistics follow.",
+                                format("{} \"{}\":  Unbalanced air volume flow ratio exceeds 2:1 warning continues. HX flow ratio statistics follow.",
+                                       DataHVACGlobals::cHXTypes(this->ExchType),
+                                       this->Name),
                                 this->UnBalancedErrIndex,
                                 HXSupAirVolFlowRate / HXSecAirVolFlowRate,
                                 HXSupAirVolFlowRate / HXSecAirVolFlowRate);
@@ -2041,14 +2043,16 @@ namespace HeatRecovery {
                 if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     ++this->LowFlowErrCount;
                     if (this->LowFlowErrCount == 1) {
-                        ShowWarningError(state, DataHVACGlobals::cHXTypes(this->ExchType) + " \"" + this->Name + "\"");
+                        ShowWarningError(state, format("{} \"{}\"", DataHVACGlobals::cHXTypes(this->ExchType), this->Name));
                         ShowContinueError(state, "Average air volume flow rate is <50% or >130% of the nominal HX supply air volume flow rate.");
                         ShowContinueErrorTimeStamp(state, format("Air volume flow rate ratio = {:.3R}.", HXAirVolFlowRatio));
                     } else {
                         ShowRecurringWarningErrorAtEnd(
                             state,
-                            DataHVACGlobals::cHXTypes(this->ExchType) + " \"" + this->Name +
-                                "\":  Average air volume flow rate is <50% or >130% warning continues. Air flow rate ratio statistics follow.",
+                            format(
+                                "{} \"{}\":  Average air volume flow rate is <50% or >130% warning continues. Air flow rate ratio statistics follow.",
+                                DataHVACGlobals::cHXTypes(this->ExchType),
+                                this->Name),
                             this->LowFlowErrIndex,
                             HXAirVolFlowRatio,
                             HXAirVolFlowRatio);
@@ -2086,9 +2090,11 @@ namespace HeatRecovery {
                 //   The model should at least guard against negative numbers
                 this->SensEffectiveness = 0.0;
                 if (!this->SensEffectivenessFlag) {
-                    ShowWarningError(state,
-                                     "HeatExchanger:AirToAir:SensibleAndLatent =\"" + this->Name + "\"" +
-                                         " sensible effectiveness is less than zero. Check the following inputs.");
+                    ShowWarningError(
+                        state,
+                        format(
+                            "HeatExchanger:AirToAir:SensibleAndLatent =\"{}\" sensible effectiveness is less than zero. Check the following inputs.",
+                            this->Name));
                     if (this->SupInTemp < this->SecInTemp) {
                         ShowContinueError(state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectSensible100));
                         ShowContinueError(state, format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", this->HeatEffectSensible75));
@@ -2106,9 +2112,10 @@ namespace HeatRecovery {
                 // The model should at least guard against negative numbers
                 this->LatEffectiveness = 0.0;
                 if (!this->LatEffectivenessFlag) {
-                    ShowWarningError(state,
-                                     "HeatExchanger:AirToAir:SensibleAndLatent =\"" + this->Name + "\"" +
-                                         " latent effectiveness is less than zero. Check the following inputs.");
+                    ShowWarningError(
+                        state,
+                        format("HeatExchanger:AirToAir:SensibleAndLatent =\"{}\" latent effectiveness is less than zero. Check the following inputs.",
+                               this->Name));
                     if (this->SupInTemp < this->SecInTemp) {
                         ShowContinueError(state, format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectLatent100));
                         ShowContinueError(state, format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", this->HeatEffectLatent75));
@@ -2203,8 +2210,9 @@ namespace HeatRecovery {
                             this->SensEffectiveness = 0.0;
                             if (!this->SensEffectivenessFlag) {
                                 ShowWarningError(state,
-                                                 "HeatExchanger:AirToAir:SensibleAndLatent =\"" + this->Name + "\"" +
-                                                     " sensible effectiveness is less than zero. Check the following inputs.");
+                                                 format("HeatExchanger:AirToAir:SensibleAndLatent =\"{}\" sensible effectiveness is less than zero. "
+                                                        "Check the following inputs.",
+                                                        this->Name));
                                 if (this->SupInTemp < this->SecInTemp) {
                                     ShowContinueError(
                                         state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectSensible100));
@@ -2227,8 +2235,9 @@ namespace HeatRecovery {
                             this->LatEffectiveness = 0.0;
                             if (!this->LatEffectivenessFlag) {
                                 ShowWarningError(state,
-                                                 "HeatExchanger:AirToAir:SensibleAndLatent =\"" + this->Name + "\"" +
-                                                     " latent effectiveness is less than zero. Check the following inputs.");
+                                                 format("HeatExchanger:AirToAir:SensibleAndLatent =\"{}\" latent effectiveness is less than zero. "
+                                                        "Check the following inputs.",
+                                                        this->Name));
                                 if (this->SupInTemp < this->SecInTemp) {
                                     ShowContinueError(state,
                                                       format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectLatent100));
@@ -3350,14 +3359,14 @@ namespace HeatRecovery {
                                       "...Using regeneration inlet air temperatures that are outside the regeneration outlet air temperature "
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Regeneration inlet air temp used in regen outlet air temperature equation is out of range error continues...",
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.index,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.last,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.last);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   format("{} \"{}\" - Regeneration inlet air temp used in regen outlet air temperature equation is "
+                                                          "out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.index,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.last,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.last);
                 }
             }
             // Regen inlet humidity ratio for temp eqn
@@ -3371,14 +3380,14 @@ namespace HeatRecovery {
                                       "...Using regeneration inlet air humidity ratios that are outside the regeneration outlet air temperature "
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Regeneration inlet air humidity ratio used in regen outlet temperature equation is out of range error continues...",
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.index,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.last,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.last);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   format("{} \"{}\" - Regeneration inlet air humidity ratio used in regen outlet temperature "
+                                                          "equation is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.index,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.last,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.last);
                 }
             }
             // Process inlet temp for temp eqn
@@ -3394,9 +3403,10 @@ namespace HeatRecovery {
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Process inlet air temperature used in regen outlet temperature equation is out of range error continues...",
+                        format(
+                            "{} \"{}\" - Process inlet air temperature used in regen outlet temperature equation is out of range error continues...",
+                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.index,
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.last,
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.last);
@@ -3413,14 +3423,14 @@ namespace HeatRecovery {
                                       "...Using process inlet air humidity ratios that are outside the regeneratoin outlet air temperature equation "
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Process inlet air humidity ratio used in regen outlet temperature equation is out of range error continues...",
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.index,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.last,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.last);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   format("{} \"{}\" - Process inlet air humidity ratio used in regen outlet temperature equation is "
+                                                          "out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.index,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.last,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.last);
                 }
             }
             // Process and regeneration face velocity for temp eqn
@@ -3435,10 +3445,10 @@ namespace HeatRecovery {
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Process and regen inlet air face velocity used in regen outlet temperature equation is "
-                                                       "out of range error continues...",
+                                                   format("{} \"{}\" - Process and regen inlet air face velocity used in regen outlet temperature "
+                                                          "equation is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.last);
@@ -3477,17 +3487,21 @@ namespace HeatRecovery {
             }
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.print = true;
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration inlet air temperature used in regen outlet air temperature equation is outside model boundaries at " +
-                    OutputChar + '.';
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.buffer1 = format(
+                    "{} \"{}\" - Regeneration inlet air temperature used in regen outlet air temperature equation is outside model boundaries at {}.",
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                    OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {} {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", T_RegenInTemp);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.buffer3 =
-                    "...Regeneration outlet air temperature equation: regeneration inlet air temperature passed to the model = " + CharValue;
+                    format("...Regeneration outlet air temperature equation: regeneration inlet air temperature passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInTempError.print = false;
             }
@@ -3510,16 +3524,21 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration inlet air humidity ratio used in regen outlet air temperature equation is outside model boundaries at " +
-                    OutputChar + '.';
+                    format("{} \"{}\" - Regeneration inlet air humidity ratio used in regen outlet air temperature equation is outside model "
+                           "boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {} {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", T_RegenInHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.buffer3 =
-                    "...Regeneration outlet air temperature equation: regeneration inlet air humidity ratio passed to the model = " + CharValue;
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.buffer3 = format(
+                    "...Regeneration outlet air temperature equation: regeneration inlet air humidity ratio passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_RegenInHumRatError.print = false;
             }
@@ -3544,17 +3563,21 @@ namespace HeatRecovery {
                 //       Suppress warning message when process inlet temperature = 0 (DX coil is off)
                 if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.last == 0.0)
                     state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.print = false;
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Process inlet air temperature used in regen outlet air temperature equation is outside model boundaries at " + OutputChar +
-                    '.';
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.buffer1 = format(
+                    "{} \"{}\" - Process inlet air temperature used in regen outlet air temperature equation is outside model boundaries at {}.",
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                    OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ',' +
-                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {},{} {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", T_ProcInTemp);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.buffer3 =
-                    "...Regeneration outlet air temperature equation: process inlet air temperature passed to the model = " + CharValue;
+                    format("...Regeneration outlet air temperature equation: process inlet air temperature passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInTempError.print = false;
             }
@@ -3579,17 +3602,21 @@ namespace HeatRecovery {
                 //       Suppress warning message when process inlet humrat = 0 (DX coil is off)
                 if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.last == 0.0)
                     state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.print = false;
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Process inlet air humidity ratio used in regen outlet air temperature equation is outside model boundaries at " +
-                    OutputChar + '.';
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.buffer1 = format(
+                    "{} \"{}\" - Process inlet air humidity ratio used in regen outlet air temperature equation is outside model boundaries at {}.",
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                    OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {} {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", T_ProcInHumRat);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.buffer3 =
-                    "...Regeneration outlet air temperature equation: process inlet air humidity ratio passed to the model = " + CharValue;
+                    format("...Regeneration outlet air temperature equation: process inlet air humidity ratio passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.print = false;
             }
@@ -3612,16 +3639,21 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Process and regen inlet air face velocity used in regen outlet air temperature equation is outside model boundaries at " +
-                    OutputChar + '.';
+                    format("{} \"{}\" - Process and regen inlet air face velocity used in regen outlet air temperature equation is outside model "
+                           "boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {} {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", T_FaceVel);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.buffer3 =
-                    "...Regeneration outlet air temperature equation: process and regen face velocity passed to the model = " + CharValue;
+                    format("...Regeneration outlet air temperature equation: process and regen face velocity passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_FaceVelError.print = false;
             }
@@ -3695,10 +3727,10 @@ namespace HeatRecovery {
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air temperature used in regen outlet air humidity ratio equation is "
-                                                       "out of range error continues...",
+                                                   format("{} \"{}\" - Regeneration inlet air temperature used in regen outlet air humidity ratio "
+                                                          "equation is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.last);
@@ -3716,10 +3748,10 @@ namespace HeatRecovery {
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation "
-                                                       "is out of range error continues...",
+                                                   format("{} \"{}\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio "
+                                                          "equation is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.last);
@@ -3736,14 +3768,14 @@ namespace HeatRecovery {
                                       "...Using process inlet air temperatures that are outside the regeneration outlet air humidity ratio equation "
                                       "model may adversely affect desiccant model performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Process inlet air temperature used in regen outlet air humidity ratio equation is out of range error continues...",
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.index,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.last,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.last);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   format("{} \"{}\" - Process inlet air temperature used in regen outlet air humidity ratio "
+                                                          "equation is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.index,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.last,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.last);
                 }
             }
             // Process inlet humidity ratio for humidity ratio eqn
@@ -3758,10 +3790,10 @@ namespace HeatRecovery {
                                       "model boundaries may adversely affect desiccant model performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Process inlet air humidity ratio used in regen outlet air humidity ratio equation is "
-                                                       "out of range error continues...",
+                                                   format("{} \"{}\" - Process inlet air humidity ratio used in regen outlet air humidity ratio "
+                                                          "equation is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_ProcInHumRatError.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.last);
@@ -3779,10 +3811,10 @@ namespace HeatRecovery {
                                       "equation model boundaries may adversely affect desiccant model performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Process and regen face velocity used in regen outlet air humidity ratio equation is out "
-                                                       "of range error continues...",
+                                                   format("{} \"{}\" - Process and regen face velocity used in regen outlet air humidity ratio "
+                                                          "equation is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.last);
@@ -3822,16 +3854,21 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration inlet air temperature used in regen outlet air humidity ratio equation is outside model boundaries at " +
-                    OutputChar + '.';
+                    format("{} \"{}\" - Regeneration inlet air temperature used in regen outlet air humidity ratio equation is outside model "
+                           "boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + " , " + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {} , {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.2R}", H_RegenInTemp);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.buffer3 =
-                    "...Regeneration outlet air humidity ratio equation: regeneration inlet air temperature passed to the model = " + CharValue;
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.buffer3 = format(
+                    "...Regeneration outlet air humidity ratio equation: regeneration inlet air temperature passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInTempError.print = false;
             }
@@ -3854,16 +3891,21 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation is outside model boundaries at " +
-                    OutputChar + '.';
+                    format("{} \"{}\" - Regeneration inlet air humidity ratio used in regen outlet air humidity ratio equation is outside model "
+                           "boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {} {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", H_RegenInHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.buffer3 =
-                    "...Regeneration outlet air humidity ratio equation: regeneration inlet air humidity ratio passed to the model = " + CharValue;
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.buffer3 = format(
+                    "...Regeneration outlet air humidity ratio equation: regeneration inlet air humidity ratio passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_RegenInHumRatError.print = false;
             }
@@ -3888,17 +3930,21 @@ namespace HeatRecovery {
                 //       Suppress warning message when process inlet temperature = 0 (DX coil is off)
                 if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.last == 0.0)
                     state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.print = false;
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Process inlet air temperature used in regen outlet air humidity ratio equation is outside model boundaries at " +
-                    OutputChar + '.';
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.buffer1 = format(
+                    "{} \"{}\" - Process inlet air temperature used in regen outlet air humidity ratio equation is outside model boundaries at {}.",
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                    OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {} {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", H_ProcInTemp);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.buffer3 =
-                    "...Regeneration outlet air humidity ratio equation: process inlet air temperature passed to the model = " + CharValue;
+                    format("...Regeneration outlet air humidity ratio equation: process inlet air temperature passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInTempError.print = false;
             }
@@ -3924,16 +3970,21 @@ namespace HeatRecovery {
                 if (state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.last == 0.0)
                     state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.print = false;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Process inlet air humidity ratio used in regen outlet air humidity ratio equation is outside model boundaries at " +
-                    OutputChar + '.';
+                    format("{} \"{}\" - Process inlet air humidity ratio used in regen outlet air humidity ratio equation is outside model "
+                           "boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {}, {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", H_ProcInHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.buffer3 =
-                    "...Regeneration outlet air humidity ratio equation: process inlet air humidity ratio passed to the model = " + CharValue;
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.buffer3 = format(
+                    "...Regeneration outlet air humidity ratio equation: process inlet air humidity ratio passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_ProcInHumRatError.print = false;
             }
@@ -3956,17 +4007,21 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Process and regen inlet air face velocity used in regen outlet air humidity ratio equation is outside model boundaries "
-                    "at " +
-                    OutputChar + '.';
+                    format("{} \"{}\" - Process and regen inlet air face velocity used in regen outlet air humidity ratio equation is outside model "
+                           "boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {}, {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", H_FaceVel);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.buffer3 =
-                    "...Regeneration outlet air humidity ratio equation: process and regeneration face velocity passed to the model = " + CharValue;
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.buffer3 = format(
+                    "...Regeneration outlet air humidity ratio equation: process and regeneration face velocity passed to the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).H_FaceVelError.print = false;
             }
@@ -4035,9 +4090,9 @@ namespace HeatRecovery {
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Regeneration outlet air temperature above regen inlet air temperature error continues...",
+                        format("{} \"{}\" - Regeneration outlet air temperature above regen inlet air temperature error continues...",
+                               state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                               state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.index,
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.last,
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.last);
@@ -4057,9 +4112,9 @@ namespace HeatRecovery {
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Regeneration outlet air temperature should be less than regen inlet air temperature error continues...",
+                        format("{} \"{}\" - Regeneration outlet air temperature should be less than regen inlet air temperature error continues...",
+                               state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                               state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.index,
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.last,
                         state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.last);
@@ -4082,15 +4137,19 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration outlet air temperature is greater than inlet temperature at " + OutputChar + '.';
+                    format("{} \"{}\" - Regeneration outlet air temperature is greater than inlet temperature at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.buffer2 =
-                    "...Regen inlet air temperature = " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                    format("...Regen inlet air temperature = {}. Occurrence info = {}, {}, {}",
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", RegenOutTemp);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempFailedError.buffer3 =
-                    "...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = " + CharValue;
+                    format("...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.print = false;
             }
@@ -4115,15 +4174,20 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration outlet air temperature equation is outside model boundaries at " + OutputChar + '.';
+                    format("{} \"{}\" - Regeneration outlet air temperature equation is outside model boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {}, {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", RegenOutTemp);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.buffer3 =
-                    "...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = " + CharValue;
+                    format("...Regen outlet air temperature equation: regeneration outlet air temperature allowed from the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutTempError.print = false;
             }
@@ -4192,14 +4256,14 @@ namespace HeatRecovery {
                                       "...Regeneration outlet air humidity ratio should always be greater than or equal to regen inlet air humidity "
                                       "ratio. Verify correct model coefficients.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                            "\" - Regeneration outlet air humidity ratio should be greater than regen inlet air humidity ratio error continues...",
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.index,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.last,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.last);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   format("{} \"{}\" - Regeneration outlet air humidity ratio should be greater than regen inlet air "
+                                                          "humidity ratio error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.index,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.last,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.last);
                 }
             }
 
@@ -4215,9 +4279,9 @@ namespace HeatRecovery {
                         "...Regeneration outlet air humidity ratio outside model boundaries may adversely affect desiccant model performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Regeneration outlet air humidity ratio is out of range error continues...",
+                                                   format("{} \"{}\" - Regeneration outlet air humidity ratio is out of range error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.last);
@@ -4240,15 +4304,19 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration outlet air humidity ratio is less than the inlet air humidity ratio at " + OutputChar + '.';
+                    format("{} \"{}\" - Regeneration outlet air humidity ratio is less than the inlet air humidity ratio at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.buffer2 =
-                    "...Regen inlet air humidity ratio = " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                    format("...Regen inlet air humidity ratio = {}. Occurrence info = {}, {}, {}",
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", RegenOutHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.buffer3 =
-                    "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = " + CharValue;
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.buffer3 = format(
+                    "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatFailedErr.print = false;
             }
@@ -4273,15 +4341,20 @@ namespace HeatRecovery {
             if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.print = true;
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.buffer1 =
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                    "\" - Regeneration outlet air humidity ratio is outside model boundaries at " + OutputChar + '.';
+                    format("{} \"{}\" - Regeneration outlet air humidity ratio is outside model boundaries at {}.",
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                           state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                           OutputChar);
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.buffer2 =
-                    "...Valid range = " + OutputCharLo + " to " + OutputCharHi + ". Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " +
-                    state.dataEnvrn->CurMnDy + ", " + CreateSysTimeIntervalString(state);
+                    format("...Valid range = {} to {}. Occurrence info = {}, {}, {}",
+                           OutputCharLo,
+                           OutputCharHi,
+                           state.dataEnvrn->EnvironmentName,
+                           state.dataEnvrn->CurMnDy,
+                           CreateSysTimeIntervalString(state));
                 CharValue = format("{:.6R}", RegenOutHumRat);
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.buffer3 =
-                    "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = " + CharValue;
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.buffer3 = format(
+                    "...Regen outlet air humidity ratio equation: regeneration outlet air humidity ratio allowed from the model = {}", CharValue);
             } else {
                 state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenOutHumRatError.print = false;
             }
@@ -4359,10 +4432,10 @@ namespace HeatRecovery {
                                       "coefficients.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air relative humidity related to regen outlet air temperature "
-                                                       "equation is outside model boundaries error continues...",
+                                                   format("{} \"{}\" - Regeneration inlet air relative humidity related to regen outlet air "
+                                                          "temperature equation is outside model boundaries error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.last);
@@ -4381,10 +4454,10 @@ namespace HeatRecovery {
                                       "model boundaries may adversely affect desiccant model performance. Verify correct model coefficients.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Process inlet air relative humidity related to regen outlet air temperature equation is "
-                                                       "outside model boundaries error continues...",
+                                                   format("{} \"{}\" - Process inlet air relative humidity related to regen outlet air temperature "
+                                                          "equation is outside model boundaries error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.last);
@@ -4435,15 +4508,15 @@ namespace HeatRecovery {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.print = true;
 
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.buffer1 =
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                "\" - Regeneration inlet air relative humidity related to regen outlet air temperature equation is outside model boundaries at " +
-                OutputChar + '.';
+                format("{} \"{}\" - Regeneration inlet air relative humidity related to regen outlet air temperature equation is outside model "
+                       "boundaries at {}.",
+                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                       OutputChar);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.buffer2 =
-                "...Model limit on regeneration inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.buffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
-                CreateSysTimeIntervalString(state);
+                format("...Model limit on regeneration inlet air relative humidity is {} to {}.", OutputCharLo, OutputCharHi);
+            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.buffer3 = format(
+                "...Occurrence info = {}, {}, {}", state.dataEnvrn->EnvironmentName, state.dataEnvrn->CurMnDy, CreateSysTimeIntervalString(state));
         } else {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumTempErr.print = false;
         }
@@ -4457,16 +4530,15 @@ namespace HeatRecovery {
             OutputCharHi = format("{:.1R}", state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).T_MaxProcAirInRelHum * 100.0);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.print = true;
 
-            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.buffer1 =
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                "\" - Process inlet air relative humidity related to regen outlet air temperature equation is outside model boundaries at " +
-                OutputChar + '.';
+            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.buffer1 = format(
+                "{} \"{}\" - Process inlet air relative humidity related to regen outlet air temperature equation is outside model boundaries at {}.",
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                OutputChar);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.buffer2 =
-                "...Model limit on process inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.buffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
-                CreateSysTimeIntervalString(state);
+                format("...Model limit on process inlet air relative humidity is {} to {}.", OutputCharLo, OutputCharHi);
+            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.buffer3 = format(
+                "...Occurrence info = {}, {}, {}", state.dataEnvrn->EnvironmentName, state.dataEnvrn->CurMnDy, CreateSysTimeIntervalString(state));
         } else {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumTempErr.print = false;
         }
@@ -4540,10 +4612,10 @@ namespace HeatRecovery {
                                       "coefficients.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio "
-                                                       "equation is outside model boundaries error continues...",
+                                                   format("{} \"{}\" - Regeneration inlet air relative humidity related to regen outlet air humidity "
+                                                          "ratio equation is outside model boundaries error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.last);
@@ -4563,10 +4635,10 @@ namespace HeatRecovery {
                                       "coefficients.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
-                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                                                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                                                       "\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation "
-                                                       "is outside model boundaries error continues...",
+                                                   format("{} \"{}\" - Process inlet air relative humidity related to regen outlet air humidity "
+                                                          "ratio equation is outside model boundaries error continues...",
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                                                          state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.last,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.last);
@@ -4617,15 +4689,15 @@ namespace HeatRecovery {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.print = true;
 
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.buffer1 =
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                "\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio equation is outside model boundaries at " +
-                OutputChar + '.';
+                format("{} \"{}\" - Regeneration inlet air relative humidity related to regen outlet air humidity ratio equation is outside model "
+                       "boundaries at {}.",
+                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                       OutputChar);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.buffer2 =
-                "...Model limit on regeneration inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.buffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
-                CreateSysTimeIntervalString(state);
+                format("...Model limit on regeneration inlet air relative humidity is {} to {}.", OutputCharLo, OutputCharHi);
+            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.buffer3 = format(
+                "...Occurrence info = {}, {}, {}", state.dataEnvrn->EnvironmentName, state.dataEnvrn->CurMnDy, CreateSysTimeIntervalString(state));
         } else {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).regenInRelHumHumRatErr.print = false;
         }
@@ -4640,15 +4712,15 @@ namespace HeatRecovery {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.print = true;
 
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.buffer1 =
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType + " \"" +
-                state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name +
-                "\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation is outside model boundaries at " +
-                OutputChar + '.';
+                format("{} \"{}\" - Process inlet air relative humidity related to regen outlet air humidity ratio equation is outside model "
+                       "boundaries at {}.",
+                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).PerfType,
+                       state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).Name,
+                       OutputChar);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.buffer2 =
-                "...Model limit on process inlet air relative humidity is " + OutputCharLo + " to " + OutputCharHi + '.';
-            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.buffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
-                CreateSysTimeIntervalString(state);
+                format("...Model limit on process inlet air relative humidity is {} to {}.", OutputCharLo, OutputCharHi);
+            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.buffer3 = format(
+                "...Occurrence info = {}, {}, {}", state.dataEnvrn->EnvironmentName, state.dataEnvrn->CurMnDy, CreateSysTimeIntervalString(state));
         } else {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).procInRelHumHumRatErr.print = false;
         }
@@ -4712,13 +4784,14 @@ namespace HeatRecovery {
                     //                 //'outlet humidity ratio equation model boundaries may adversely affect desiccant model performance. '&
                     //                 //'Verify correct model coefficients.')
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        DataHVACGlobals::cHXTypes(this->ExchType) + " \"" + this->Name +
-                            "\" - unbalanced air flow rate is limited to 2% error continues with the imbalanced fraction statistics reported...",
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.index,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.last,
-                        state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.last);
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   format("{} \"{}\" - unbalanced air flow rate is limited to 2% error continues with the imbalanced "
+                                                          "fraction statistics reported...",
+                                                          DataHVACGlobals::cHXTypes(this->ExchType),
+                                                          this->Name),
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.index,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.last,
+                                                   state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.last);
                 }
             }
 
@@ -4737,12 +4810,11 @@ namespace HeatRecovery {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.print = true;
 
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer1 =
-                DataHVACGlobals::cHXTypes(this->ExchType) + " \"" + this->Name + "\" - unbalanced air flow rate is limited to 2%.";
+                format("{} \"{}\" - unbalanced air flow rate is limited to 2%.", DataHVACGlobals::cHXTypes(this->ExchType), this->Name);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer2 =
-                "...Regeneration air mass flow rate is " + OutputCharRegen + " and process air mass flow rate is " + OutputCharProc + '.';
-            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer3 =
-                "...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ", " +
-                CreateSysTimeIntervalString(state);
+                format("...Regeneration air mass flow rate is {} and process air mass flow rate is {}.", OutputCharRegen, OutputCharProc);
+            state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer3 = format(
+                "...Occurrence info = {}, {}, {}", state.dataEnvrn->EnvironmentName, state.dataEnvrn->CurMnDy, CreateSysTimeIntervalString(state));
         } else {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.print = false;
         }
@@ -4774,7 +4846,7 @@ namespace HeatRecovery {
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupInletNode;
         } else {
-            ShowSevereError(state, "GetSupplyInletNode: Could not find heat exchanger = \"" + HXName + "\"");
+            ShowSevereError(state, format("GetSupplyInletNode: Could not find heat exchanger = \"{}\"", HXName));
             ErrorsFound = true;
             return 0;
         }
@@ -4806,7 +4878,7 @@ namespace HeatRecovery {
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupOutletNode;
         } else {
-            ShowSevereError(state, "GetSupplyOutletNode: Could not find heat exchanger = \"" + HXName + "\"");
+            ShowSevereError(state, format("GetSupplyOutletNode: Could not find heat exchanger = \"{}\"", HXName));
             ErrorsFound = true;
             return 0;
         }
@@ -4838,7 +4910,7 @@ namespace HeatRecovery {
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecInletNode;
         } else {
-            ShowSevereError(state, "GetSecondaryInletNode: Could not find heat exchanger = \"" + HXName + "\"");
+            ShowSevereError(state, format("GetSecondaryInletNode: Could not find heat exchanger = \"{}\"", HXName));
             ErrorsFound = true;
             return 0;
         }
@@ -4870,7 +4942,7 @@ namespace HeatRecovery {
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecOutletNode;
         } else {
-            ShowSevereError(state, "GetSecondaryOutletNode: Could not find heat exchanger = \"" + HXName + "\"");
+            ShowSevereError(state, format("GetSecondaryOutletNode: Could not find heat exchanger = \"{}\"", HXName));
             ErrorsFound = true;
             return 0;
         }
@@ -4902,7 +4974,7 @@ namespace HeatRecovery {
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).NomSupAirVolFlow;
         } else {
-            ShowSevereError(state, "GetSupplyAirFlowRate: Could not find heat exchanger = \"" + HXName + "\"");
+            ShowSevereError(state, format("GetSupplyAirFlowRate: Could not find heat exchanger = \"{}\"", HXName));
             ShowContinueError(state, "... Supply Air Flow Rate returned as 0.");
             ErrorsFound = true;
             return 0.0;
@@ -4935,7 +5007,7 @@ namespace HeatRecovery {
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).ExchType;
         } else {
-            ShowSevereError(state, "GetHeatExchangerObjectTypeNum: Could not find heat exchanger = \"" + HXName + "\"");
+            ShowSevereError(state, format("GetHeatExchangerObjectTypeNum: Could not find heat exchanger = \"{}\"", HXName));
             ErrorsFound = true;
             return 0;
         }
@@ -4975,7 +5047,7 @@ namespace HeatRecovery {
         }
 
         if (WhichHX <= 0 || WhichHX > state.dataHeatRecovery->NumHeatExchangers) {
-            ShowSevereError(state, "SetHeatExchangerData: Could not find heat exchanger = \"" + HXName + "\"");
+            ShowSevereError(state, format("SetHeatExchangerData: Could not find heat exchanger = \"{}\"", HXName));
             ErrorsFound = true;
             return;
         }
