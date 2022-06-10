@@ -101,14 +101,6 @@ struct RoomAirModelManagerData : BaseGlobalStruct
     bool GetUCSDDVDataFlag = true; // UCSD
     bool GetAirModelData = true;   // Used to "get" all air model data
     bool MyOneTimeFlag = true;
-    int CompNum = 0;
-    int TypeNum = 0;
-    int NodeNum1 = 0;
-    int NodeNum2 = 0;
-    int CompNumber = 0;                    // AirflowNetwork Component number
-    int TypeNumber = 0;                    // Airflownetwork Type Number within a component
-    int NodeNumber1 = 0;                   // The first node number in an AirflowNetwork linkage data
-    int NodeNumber2 = 0;                   // The Second node number in an AirflowNetwork linkage data
     int contFloorBegin = 0;                // counter
     int contFloorLast = 0;                 // counter
     int contFloor = 0;                     // counter
@@ -127,11 +119,6 @@ struct RoomAirModelManagerData : BaseGlobalStruct
     int contDoorBegin = 0;                 // counter
     int contDoorLast = 0;                  // counter
     int contDoor = 0;                      // counter
-    int Loop = 0;                          // counter
-    int Loop2 = 0;                         // counter
-    int Loop3 = 0;                         // counter
-    int i = 0;                             // counter
-    int N = 0;                             // counter
     Real64 Z1ZoneAux = 0.0;                // Auxiliary variables
     Real64 Z2ZoneAux = 0.0;                // Auxiliary variables
     Real64 Z1Zone = 0.0;                   // Auxiliary variables

@@ -13064,7 +13064,8 @@ namespace AirflowNetwork {
             AU(n) = 0.0;
         }
         // Loop(s) to calculate control, etc.
-        for (auto &link : AirflowNetworkLinkageData) {
+        for (int i = 0; i < NetworkNumOfLinks; ++i) {
+            auto &link = AirflowNetworkLinkageData[i];
 
             int n = link.indices[0];
             int m = link.indices[1];

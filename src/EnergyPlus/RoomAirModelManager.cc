@@ -1135,24 +1135,24 @@ namespace RoomAirModelManager {
 
             // If a crack is used it must have an air flow coefficient = 0.5
             for (Loop2 = 1; Loop2 <= state.afn->NumOfLinksMultiZone; ++Loop2) {
-                state.dataRoomAirModelMgr->NodeNum1 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[0];
-                state.dataRoomAirModelMgr->NodeNum2 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[1];
+                int NodeNum1 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[0];
+                int NodeNum2 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[1];
                 if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Zone == ThisZone ||
-                    (state.afn->nodes(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum == ThisZone &&
-                     state.afn->nodes(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum > 0) ||
-                    (state.afn->nodes(state.dataRoomAirModelMgr->NodeNum2).EPlusZoneNum > 0 &&
-                     state.afn->nodes(state.dataRoomAirModelMgr->NodeNum1).EPlusZoneNum == ThisZone)) {
-                    state.dataRoomAirModelMgr->CompNum = state.afn->AirflowNetworkLinkageData(Loop2).CompNum;
-                    state.dataRoomAirModelMgr->TypeNum = state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).TypeNum;
-                    if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
-                        if (state.afn->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent != 0.50) {
+                    (state.afn->nodes(NodeNum2).EPlusZoneNum == ThisZone &&
+                     state.afn->nodes(NodeNum1).EPlusZoneNum > 0) ||
+                    (state.afn->nodes(NodeNum2).EPlusZoneNum > 0 &&
+                     state.afn->nodes(NodeNum1).EPlusZoneNum == ThisZone)) {
+                    int CompNum = state.afn->AirflowNetworkLinkageData(Loop2).CompNum;
+                    int TypeNum = state.afn->AirflowNetworkCompData(CompNum).TypeNum;
+                    if (state.afn->AirflowNetworkCompData(CompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
+                        if (state.afn->MultizoneSurfaceCrackData(TypeNum).exponent != 0.50) {
                             state.dataRoomAirMod->AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                             ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
                             ShowWarningError(state, "Roomair model will not be applied for Zone=" + state.dataIPShortCut->cAlphaArgs(1) + '.');
                             ShowContinueError(
                                 state,
                                 format("AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was={:.2R}",
-                                       state.afn->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNum).exponent));
+                                       state.afn->MultizoneSurfaceCrackData(TypeNum).exponent));
                         }
                     }
                 }
@@ -2125,27 +2125,25 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->CVNumAirflowNetworkSurfaces = 0;
 
             // calculate maximum number of airflow network surfaces in each zone
-            for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.afn->NumOfLinksMultiZone;
-                 ++state.dataRoomAirModelMgr->Loop) {
-                ++AuxSurf(state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop).SurfNum).Zone);
+            for (int Loop = 1; Loop <= state.afn->NumOfLinksMultiZone; ++Loop) {
+                ++AuxSurf(state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop).SurfNum).Zone);
                 ++state.dataRoomAirMod->CVNumAirflowNetworkSurfaces;
                 // Check if this is an interzone airflow network surface
-                if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop).SurfNum).ExtBoundCond > 0 &&
-                    (state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop).SurfNum !=
-                     state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop).SurfNum).ExtBoundCond)) {
+                if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop).SurfNum).ExtBoundCond > 0 &&
+                    (state.afn->MultizoneSurfaceData(Loop).SurfNum !=
+                     state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop).SurfNum).ExtBoundCond)) {
                     ++AuxSurf(
                         state.dataSurface
                             ->Surface(
-                                state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop).SurfNum).ExtBoundCond)
+                                state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop).SurfNum).ExtBoundCond)
                             .Zone);
                     ++state.dataRoomAirMod->CVNumAirflowNetworkSurfaces;
                 }
             }
             // calculate maximum number of airflow network surfaces in a single zone
             MaxSurf = AuxSurf(1);
-            for (state.dataRoomAirModelMgr->Loop = 2; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
-                 ++state.dataRoomAirModelMgr->Loop) {
-                if (AuxSurf(state.dataRoomAirModelMgr->Loop) > MaxSurf) MaxSurf = AuxSurf(state.dataRoomAirModelMgr->Loop);
+            for (int Loop = 2; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+                if (AuxSurf(Loop) > MaxSurf) MaxSurf = AuxSurf(Loop);
             }
 
             if (!allocated(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV)) {
@@ -2162,46 +2160,41 @@ namespace RoomAirModelManager {
 
             state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV = 0;
             // Organize surfaces in vector AirflowNetworkSurfaceUCSDCV(Zone, surface indexes)
-            for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
-                 ++state.dataRoomAirModelMgr->Loop) {
+            for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 // the 0 component of the array has the number of relevant AirflowNetwork surfaces for the zone
-                state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, state.dataRoomAirModelMgr->Loop) = AuxSurf(state.dataRoomAirModelMgr->Loop);
-                if (AuxSurf(state.dataRoomAirModelMgr->Loop) != 0) {
-                    Real64 const ceilingHeight(state.dataRoomAirMod->ZoneCeilingHeight((state.dataRoomAirModelMgr->Loop - 1) * 2 + 1));
+                state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, Loop) = AuxSurf(Loop);
+                if (AuxSurf(Loop) != 0) {
+                    Real64 const ceilingHeight(state.dataRoomAirMod->ZoneCeilingHeight((Loop - 1) * 2 + 1));
                     SurfNum = 1;
-                    for (state.dataRoomAirModelMgr->Loop2 = 1; state.dataRoomAirModelMgr->Loop2 <= state.afn->NumOfLinksMultiZone;
-                         ++state.dataRoomAirModelMgr->Loop2) {
-                        if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Zone ==
-                            state.dataRoomAirModelMgr->Loop) {
+                    for (int Loop2 = 1; Loop2 <= state.afn->NumOfLinksMultiZone; ++Loop2) {
+                        if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Zone == Loop) {
                             // SurfNum has the reference surface number relative to AirflowNetworkSurfaceData
-                            state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(SurfNum, state.dataRoomAirModelMgr->Loop) =
-                                state.dataRoomAirModelMgr->Loop2;
+                            state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(SurfNum, Loop) = Loop2;
                             // calculate the surface width and height
-                            state.dataRoomAirModelMgr->CompNumber = state.afn->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->Loop2).CompNum;
-                            state.dataRoomAirModelMgr->TypeNumber = state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).TypeNum;
-                            if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum ==
-                                AirflowNetwork::iComponentTypeNum::DOP) {
+                            int CompNumber = state.afn->AirflowNetworkLinkageData(Loop2).CompNum;
+                            int TypeNumber = state.afn->AirflowNetworkCompData(CompNumber).TypeNum;
+                            if (state.afn->AirflowNetworkLinkageData(Loop2).element->type() ==
+                                AirflowNetwork::ComponentType::DOP) {
+                                auto detailed_opening = static_cast<AirflowNetwork::DetailedOpening *>(
+                                    state.afn->AirflowNetworkLinkageData(Loop2).element);
                                 WidthFactMax = 0.0;
                                 HeightFactMax = 0.0;
-                                for (state.dataRoomAirModelMgr->Loop3 = 1;
-                                     state.dataRoomAirModelMgr->Loop3 <=
-                                     state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).NumFac;
-                                     ++state.dataRoomAirModelMgr->Loop3) {
-                                    if (state.dataRoomAirModelMgr->Loop3 == 1) {
-                                        WidthFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).WidthFac1;
-                                        HeightFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).HeightFac1;
+                                for (int Loop3 = 1; Loop3 <= detailed_opening->NumFac; ++Loop3) {
+                                    if (Loop3 == 1) {
+                                        WidthFact = detailed_opening->WidthFac1;
+                                        HeightFact = detailed_opening->HeightFac1;
                                     }
-                                    if (state.dataRoomAirModelMgr->Loop3 == 2) {
-                                        WidthFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).WidthFac2;
-                                        HeightFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).HeightFac2;
+                                    if (Loop3 == 2) {
+                                        WidthFact = detailed_opening->WidthFac2;
+                                        HeightFact = detailed_opening->HeightFac2;
                                     }
-                                    if (state.dataRoomAirModelMgr->Loop3 == 3) {
-                                        WidthFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).WidthFac3;
-                                        HeightFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).HeightFac3;
+                                    if (Loop3 == 3) {
+                                        WidthFact = detailed_opening->WidthFac3;
+                                        HeightFact = detailed_opening->HeightFac3;
                                     }
-                                    if (state.dataRoomAirModelMgr->Loop3 == 4) {
-                                        WidthFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).WidthFac4;
-                                        HeightFact = state.afn->MultizoneCompDetOpeningData(state.dataRoomAirModelMgr->TypeNumber).HeightFac4;
+                                    if (Loop3 == 4) {
+                                        WidthFact = detailed_opening->WidthFac4;
+                                        HeightFact = detailed_opening->HeightFac4;
                                     }
                                     if (WidthFact > WidthFactMax) {
                                         WidthFactMax = WidthFact;
@@ -2210,65 +2203,59 @@ namespace RoomAirModelManager {
                                         HeightFactMax = HeightFact;
                                     }
                                 }
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width =
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Width =
                                     WidthFactMax *
-                                    state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Width;
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Height =
+                                    state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Width;
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Height =
                                     HeightFactMax *
-                                    state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Height;
-                            } else if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum ==
+                                    state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Height;
+                            } else if (state.afn->AirflowNetworkCompData(CompNumber).CompTypeNum ==
                                        AirflowNetwork::iComponentTypeNum::SCR) { // surface type = CRACK
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width =
-                                    state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Width / 2;
-                                AinCV = state.afn->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNumber).coefficient /
-                                        (BaseDischargeCoef *
-                                         std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state,
-                                                                           state.dataEnvrn->OutBaroPress,
-                                                                           state.dataHeatBalFanSys->MAT(state.dataRoomAirModelMgr->Loop),
-                                                                           state.dataHeatBalFanSys->ZoneAirHumRat(state.dataRoomAirModelMgr->Loop))));
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Height =
-                                    AinCV / state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width;
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Width =
+                                    state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Width / 2;
+                                AinCV = state.afn->MultizoneSurfaceCrackData(TypeNumber).coefficient /
+                                        (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state,
+                                                                                               state.dataEnvrn->OutBaroPress,
+                                                                                               state.dataHeatBalFanSys->MAT(Loop),
+                                                                                               state.dataHeatBalFanSys->ZoneAirHumRat(Loop))));
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Height =
+                                    AinCV / state.dataRoomAirMod->SurfParametersCVDV(Loop2).Width;
                             }
                             // calculate the surface Zmin and Zmax
-                            if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum ==
+                            if (state.afn->AirflowNetworkCompData(CompNumber).CompTypeNum ==
                                 AirflowNetwork::iComponentTypeNum::DOP) {
-                                AirflowNetworkSurfPtr = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum;
-                                NSides = state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Sides;
+                                AirflowNetworkSurfPtr = state.afn->MultizoneSurfaceData(Loop2).SurfNum;
+                                NSides = state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Sides;
                                 Real64 z_min(std::numeric_limits<Real64>::max()), z_max(std::numeric_limits<Real64>::lowest());
                                 for (int i = 1; i <= NSides; ++i) {
                                     Real64 const z_i(state.dataSurface->Surface(AirflowNetworkSurfPtr).Vertex(i).z);
                                     z_min = std::min(z_min, z_i);
                                     z_max = std::max(z_max, z_i);
                                 }
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Zmin = z_min - ceilingHeight;
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Zmax = z_max - ceilingHeight;
-                            } else if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->CompNumber).CompTypeNum ==
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Zmin = z_min - ceilingHeight;
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Zmax = z_max - ceilingHeight;
+                            } else if (state.afn->AirflowNetworkCompData(CompNumber).CompTypeNum ==
                                        AirflowNetwork::iComponentTypeNum::SCR) { // surface type = CRACK
-                                AirflowNetworkSurfPtr = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum;
-                                NSides = state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Sides;
+                                AirflowNetworkSurfPtr = state.afn->MultizoneSurfaceData(Loop2).SurfNum;
+                                NSides = state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Loop2).SurfNum).Sides;
                                 Real64 z_min(std::numeric_limits<Real64>::max()), z_max(std::numeric_limits<Real64>::lowest());
                                 for (int i = 1; i <= NSides; ++i) {
                                     Real64 const z_i(state.dataSurface->Surface(AirflowNetworkSurfPtr).Vertex(i).z);
                                     z_min = std::min(z_min, z_i);
                                     z_max = std::max(z_max, z_i);
                                 }
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Zmin = z_min - ceilingHeight;
-                                state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Zmax = z_max - ceilingHeight;
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Zmin = z_min - ceilingHeight;
+                                state.dataRoomAirMod->SurfParametersCVDV(Loop2).Zmax = z_max - ceilingHeight;
                             }
 
                             ++SurfNum;
                             // Check if airflow network Surface is an interzone surface:
                         } else {
-                            state.dataRoomAirModelMgr->NodeNumber1 = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).NodeNums[0];
-                            state.dataRoomAirModelMgr->NodeNumber2 = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).NodeNums[1];
-                            if ((state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber2).EPlusZoneNum ==
-                                     state.dataRoomAirModelMgr->Loop &&
-                                 state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber1).EPlusZoneNum > 0) ||
-                                (state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber2).EPlusZoneNum > 0 &&
-                                 state.afn->nodes(state.dataRoomAirModelMgr->NodeNumber1).EPlusZoneNum ==
-                                     state.dataRoomAirModelMgr->Loop)) {
-                                state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(SurfNum, state.dataRoomAirModelMgr->Loop) =
-                                    state.dataRoomAirModelMgr->Loop2;
+                            int NodeNumber1 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[0];
+                            int NodeNumber2 = state.afn->MultizoneSurfaceData(Loop2).NodeNums[1];
+                            if ((state.afn->nodes(NodeNumber2).EPlusZoneNum == Loop && state.afn->nodes(NodeNumber1).EPlusZoneNum > 0) ||
+                                (state.afn->nodes(NodeNumber2).EPlusZoneNum > 0 && state.afn->nodes(NodeNumber1).EPlusZoneNum == Loop)) {
+                                state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(SurfNum, Loop) = Loop2;
                                 ++SurfNum;
                             }
                         }
@@ -2416,81 +2403,80 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->ZoneDVMixedFlagRep = 0.0;
                 state.dataRoomAirMod->ZoneDVMixedFlag = 0;
                 // Output variables and DV zone flag
-                for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
-                     ++state.dataRoomAirModelMgr->Loop) {
-                    if (state.dataRoomAirMod->AirModel(state.dataRoomAirModelMgr->Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDDV)
+                for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+                    if (state.dataRoomAirMod->AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDDV)
                         continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:ThreeNodeDisplacementVentilation'
                     SetupOutputVariable(state,
                                         "Room Air Zone Mixed Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTMX(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTMX(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTOC(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTOC(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Floor Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTFloor(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTFloor(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->HeightTransition(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->HeightTransition(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recommended Minimum Flow Fraction",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->FracMinFlow(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->FracMinFlow(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneDVMixedFlagRep(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneDVMixedFlagRep(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->AvgTempGrad(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->AvgTempGrad(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Maximum Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->MaxTempGrad(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->MaxTempGrad(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermal Comfort Effective Air Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->TCMF(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->TCMF(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermostat Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataHeatBalFanSys->TempTstatAir(state.dataRoomAirModelMgr->Loop),
+                                        state.dataHeatBalFanSys->TempTstatAir(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                 }
             }
 
@@ -2508,177 +2494,175 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->ZoneUFPowInPlumes = 0.0;
                 state.dataRoomAirMod->ZoneUFPowInPlumesfromWindows = 0.0;
                 // Output variables and UF zone flag
-                for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
-                     ++state.dataRoomAirModelMgr->Loop) {
-                    if (state.dataRoomAirMod->AirModel(state.dataRoomAirModelMgr->Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFI)
+                for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+                    if (state.dataRoomAirMod->AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFI)
                         continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionInterior'
                     SetupOutputVariable(state,
                                         "Room Air Zone Mixed Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTMX(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTMX(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTOC(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTOC(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->HeightTransition(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->HeightTransition(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFMixedFlagRep(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneUFMixedFlagRep(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->AvgTempGrad(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->AvgTempGrad(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Effective Comfort Air Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->TCMF(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->TCMF(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermostat Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataHeatBalFanSys->TempTstatAir(state.dataRoomAirModelMgr->Loop),
+                                        state.dataHeatBalFanSys->TempTstatAir(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height Gamma Value",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFGamma(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneUFGamma(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Plume Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        state.dataRoomAirMod->ZoneUFPowInPlumes(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneUFPowInPlumes(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Temperature Stratification Fraction",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->Phi(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->Phi(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
 
                     // set zone equip pointer in the UCSDUI data structure
                     for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == state.dataRoomAirModelMgr->Loop) {
-                            state.dataRoomAirMod->ZoneUCSDUI(state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirModelMgr->Loop)).ZoneEquipPtr =
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
+                            state.dataRoomAirMod->ZoneUCSDUI(state.dataRoomAirMod->ZoneUFPtr(Loop)).ZoneEquipPtr =
                                 ZoneEquipConfigNum;
                             break;
                         }
                     } // ZoneEquipConfigNum
                 }
-                for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
-                     ++state.dataRoomAirModelMgr->Loop) {
-                    if (state.dataRoomAirMod->AirModel(state.dataRoomAirModelMgr->Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFE)
+                for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+                    if (state.dataRoomAirMod->AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFE)
                         continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionExterior'
                     SetupOutputVariable(state,
                                         "Room Air Zone Mixed Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTMX(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTMX(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTOC(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTOC(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->HeightTransition(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->HeightTransition(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFMixedFlagRep(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneUFMixedFlagRep(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->AvgTempGrad(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->AvgTempGrad(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Effective Comfort Air Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->TCMF(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->TCMF(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermostat Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataHeatBalFanSys->TempTstatAir(state.dataRoomAirModelMgr->Loop),
+                                        state.dataHeatBalFanSys->TempTstatAir(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height Gamma Value",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFGamma(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneUFGamma(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Plume Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        state.dataRoomAirMod->ZoneUFPowInPlumes(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneUFPowInPlumes(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Window Plume Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        state.dataRoomAirMod->ZoneUFPowInPlumesfromWindows(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneUFPowInPlumesfromWindows(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Temperature Stratification Fraction",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->Phi(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->Phi(Loop),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     // set zone equip pointer in the UCSDUE data structure
                     for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == state.dataRoomAirModelMgr->Loop) {
-                            state.dataRoomAirMod->ZoneUCSDUE(state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirModelMgr->Loop)).ZoneEquipPtr =
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
+                            state.dataRoomAirMod->ZoneUCSDUE(state.dataRoomAirMod->ZoneUFPtr(Loop)).ZoneEquipPtr =
                                 ZoneEquipConfigNum;
                             break;
                         }
@@ -2730,101 +2714,97 @@ namespace RoomAirModelManager {
                 state.dataUCSDShared->HWindow = 0.0;
                 state.dataUCSDShared->HDoor = 0.0;
 
-                for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
-                     ++state.dataRoomAirModelMgr->Loop) {
-                    if (state.dataRoomAirMod->AirModel(state.dataRoomAirModelMgr->Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDCV)
+                for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+                    if (state.dataRoomAirMod->AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDCV)
                         continue; // don't set these up if they don't make sense
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
                     if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
-                        state.dataRoomAirMod->IsZoneCV(state.dataRoomAirModelMgr->Loop) = false;
-                        state.dataRoomAirMod->AirModel(state.dataRoomAirModelMgr->Loop).SimAirModel = false;
+                        state.dataRoomAirMod->IsZoneCV(Loop) = false;
+                        state.dataRoomAirMod->AirModel(Loop).SimAirModel = false;
                         ShowSevereError(state,
                                         "Unmixed Flow: Cross Ventilation cannot be applied for Zone=" +
-                                            state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                            state.dataHeatBal->Zone(Loop).Name);
                         ShowContinueError(state,
                                           "An HVAC system is present in the zone. Fully mixed airflow model will be used for Zone=" +
-                                              state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                              state.dataHeatBal->Zone(Loop).Name);
                         continue;
                     }
                     // CurrentModuleObject='RoomAirSettings:CrossVentilation'
                     SetupOutputVariable(state,
                                         "Room Air Zone Jet Region Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTJET(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTJET(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation Region Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTREC(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZTREC(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Jet Region Average Air Velocity",
                                         OutputProcessor::Unit::m_s,
-                                        state.dataRoomAirMod->Ujet(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->Ujet(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation Region Average Air Velocity",
                                         OutputProcessor::Unit::m_s,
-                                        state.dataRoomAirMod->Urec(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->Urec(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation and Inflow Rate Ratio",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->RecInflowRatio(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->RecInflowRatio(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Inflow Opening Area",
                                         OutputProcessor::Unit::m2,
-                                        state.dataRoomAirMod->Ain(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->Ain(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Room Length",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->Dstar(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->Dstar(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixing Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneCVisMixing(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneCVisMixing(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
+                                        state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Recirculating Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneCVhasREC(state.dataRoomAirModelMgr->Loop),
+                                        state.dataRoomAirMod->ZoneCVhasREC(Loop),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
-                                        state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
-                    for (state.dataRoomAirModelMgr->i = 1;
-                         state.dataRoomAirModelMgr->i <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum);
-                         ++state.dataRoomAirModelMgr->i) {
-                        state.dataRoomAirModelMgr->N = state.afn->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->i).CompNum;
-                        if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->N).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
-                            SurfNum = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->i).SurfNum;
-                            SetupOutputVariable(
-                                state,
-                                "Room Air Window Jet Region Average Air Velocity",
-                                OutputProcessor::Unit::m_s,
-                                state.dataRoomAirMod->CVJetRecFlows(state.dataRoomAirModelMgr->i, state.dataRoomAirModelMgr->Loop).Ujet,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->i).SurfName);
+                                        state.dataHeatBal->Zone(Loop).Name);
+                    for (int i = 1; i <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++i) {
+                        int N = state.afn->AirflowNetworkLinkageData(i).CompNum;
+                        if (state.afn->AirflowNetworkCompData(N).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
+                            SurfNum = state.afn->MultizoneSurfaceData(i).SurfNum;
+                            SetupOutputVariable(state,
+                                                "Room Air Window Jet Region Average Air Velocity",
+                                                OutputProcessor::Unit::m_s,
+                                                state.dataRoomAirMod->CVJetRecFlows(i, Loop).Ujet,
+                                                OutputProcessor::SOVTimeStepType::Zone,
+                                                OutputProcessor::SOVStoreType::Average,
+                                                state.afn->MultizoneSurfaceData(i).SurfName);
                         }
                     }
                 }
