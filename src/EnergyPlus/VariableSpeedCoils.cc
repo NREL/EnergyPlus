@@ -8113,22 +8113,22 @@ namespace VariableSpeedCoils {
         switch (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VSCoilType) {
         case DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit: {
             RatedSourceTemp = RatedInletWaterTemp;
-        }
+        } break;
         case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit: {
             RatedSourceTemp = RatedInletWaterTempHeat;
-        }
+        } break;
         case DataHVACGlobals::CoilDX_HeatPumpWaterHeaterVariableSpeed: {
             RatedSourceTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).WHRatedInletWaterTemp;
-        }
+        } break;
         case DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed: {
             RatedSourceTemp = RatedAmbAirTemp;
-        }
+        } break;
         case DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed: {
             RatedSourceTemp = RatedAmbAirTempHeat;
-        }
+        } break;
         default: {
             assert(false);
-        }
+        } break;
         }
         return RatedSourceTemp;
     }
