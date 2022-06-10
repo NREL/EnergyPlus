@@ -325,7 +325,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     Array1D<Real64> rNumericArgs;
     std::string cCurrentModuleObject;
 
-    int i;
     int Loop;
     int Loop1;
     Array1D_bool RepVarSet;
@@ -337,7 +336,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     int InfiltCount;
     int VentiCount;
     bool ControlFlag;
-    int Item;
     int Item1;
     bool errFlag;
     int ZLItem;
@@ -598,16 +596,24 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                            format(R"({}{}="{}", invalid (not found) {}="{}".)",
+                                   RoutineName,
+                                   cCurrentModuleObject,
+                                   cAlphaArgs(1),
+                                   cAlphaFieldNames(2),
+                                   cAlphaArgs(2)));
             ErrorsFound = true;
         }
         GlobalNames::IntraObjUniquenessCheck(
             state, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataHeatBalAirMgr->UniqueZoneNames, IsNotOK);
         if (IsNotOK) {
             ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", a duplicated object " +
-                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" is found.");
+                            format(R"({}{}="{}", a duplicated object {}="{}" is found.)",
+                                   RoutineName,
+                                   cCurrentModuleObject,
+                                   cAlphaArgs(1),
+                                   cAlphaFieldNames(2),
+                                   cAlphaArgs(2)));
             ShowContinueError(state, "A zone can only have one " + cCurrentModuleObject + " object.");
             ErrorsFound = true;
         }
@@ -619,8 +625,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Invalid) {
                 state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
-                                 std::string{RoutineName} + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + " not valid choice for " +
-                                     cCurrentModuleObject + '=' + cAlphaArgs(1));
+                                 format("{}{} = {} not valid choice for {}={}",
+                                        RoutineName,
+                                        cAlphaFieldNames(3),
+                                        cAlphaArgs(3),
+                                        cCurrentModuleObject,
+                                        cAlphaArgs(1)));
                 ShowContinueError(state, "The default choice \"NONE\" is assigned");
             }
         }
@@ -639,20 +649,27 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         state.dataHeatBal->ZoneAirBalance(Loop).InducedAirSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
         if (state.dataHeatBal->ZoneAirBalance(Loop).InducedAirSchedPtr == 0) {
             if (lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(4) +
-                                    " is required but field is blank.");
+                ShowSevereError(
+                    state,
+                    format("{}{}=\"{}\",{} is required but field is blank.", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(4)));
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                    cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                                format(R"({}{}="{}", invalid (not found) {}="{}".)",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cAlphaFieldNames(4),
+                                       cAlphaArgs(4)));
             }
             ErrorsFound = true;
         }
         if (!CheckScheduleValueMinMax(state, state.dataHeatBal->ZoneAirBalance(Loop).InducedAirSchedPtr, ">=", 0.0, "<=", 1.0)) {
             ShowSevereError(state,
-                            cCurrentModuleObject + " = " + state.dataHeatBal->ZoneAirBalance(Loop).Name + ":  Error found in " + cAlphaFieldNames(4) +
-                                " = " + cAlphaArgs(4));
+                            format("{} = {}:  Error found in {} = {}",
+                                   cCurrentModuleObject,
+                                   state.dataHeatBal->ZoneAirBalance(Loop).Name,
+                                   cAlphaFieldNames(4),
+                                   cAlphaArgs(4)));
             ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
             ErrorsFound = true;
         }
@@ -661,9 +678,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         ControlFlag = GetHybridVentilationControlStatus(state, state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr);
         if (ControlFlag && state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
             state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
-            ShowWarningError(state,
-                             cCurrentModuleObject + " = " + state.dataHeatBal->ZoneAirBalance(Loop).Name + ": This Zone (" + cAlphaArgs(2) +
-                                 ") is controlled by AvailabilityManager:HybridVentilation with Simple Airflow Control Type option.");
+            ShowWarningError(
+                state,
+                format("{} = {}: This Zone ({}) is controlled by AvailabilityManager:HybridVentilation with Simple Airflow Control Type option.",
+                       cCurrentModuleObject,
+                       state.dataHeatBal->ZoneAirBalance(Loop).Name,
+                       cAlphaArgs(2)));
             ShowContinueError(state,
                               "Air balance method type QUADRATURE and Simple Airflow Control Type cannot co-exist. The NONE method is assigned");
         }
@@ -789,7 +809,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     state.dataHeatBal->TotDesignFlowInfiltration = 0;
     errFlag = false;
-    for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
+    for (int Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Item,
@@ -829,7 +849,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     if (errFlag) {
-        ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
+        ShowSevereError(state, format("{}Errors with invalid names in {} objects.", RoutineName, cCurrentModuleObject));
         ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
         state.dataHeatBal->TotDesignFlowInfiltration = 0;
     }
@@ -843,7 +863,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     if (state.dataHeatBal->TotDesignFlowInfiltration > 0) {
         Loop = 0;
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-        for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
+        for (int Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -889,8 +909,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     if (Item1 == 1) {
                         if (lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                                " is required but field is blank.");
+                                            format("{}{}=\"{}\",{} is required but field is blank.",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   cAlphaArgs(1),
+                                                   cAlphaFieldNames(3)));
                         } else {
                             ShowSevereError(state,
                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
@@ -902,7 +925,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 // setup a flag if the outdoor air balance method is applied
                 if (thisInfiltration.ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-                    for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
+                    for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                         if (thisInfiltration.ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
                             if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                                 thisInfiltration.QuadratureSum = true;
@@ -922,9 +945,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisInfiltration.DesignLevel = rNumericArgs(1);
                     if (lAlphaFieldBlanks(1)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                             cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(1) +
-                                             ", but that field is blank.  0 Infiltration will result.");
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisInfiltration.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(1)));
                     }
                     break;
 
@@ -935,9 +961,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             if (thisInfiltration.ZonePtr > 0) {
                                 if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea <= 0.0) {
                                     ShowWarningError(state,
-                                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                                         cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
-                                                         ", but Zone Floor Area = 0.  0 Infiltration will result.");
+                                                     format("{}{}=\"{}\", {} specifies {}, but Zone Floor Area = 0.  0 Infiltration will result.",
+                                                            RoutineName,
+                                                            cCurrentModuleObject,
+                                                            thisInfiltration.Name,
+                                                            cAlphaFieldNames(4),
+                                                            cNumericFieldNames(2)));
                                 }
                             }
                         } else {
@@ -952,9 +981,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     if (lAlphaFieldBlanks(2)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                             cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
-                                             ", but that field is blank.  0 Infiltration will result.");
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisInfiltration.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(2)));
                     }
                     break;
 
@@ -964,9 +996,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea;
                             if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea <= 0.0) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                                     cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
-                                                     ", but Exterior Surface Area = 0.  0 Infiltration will result.");
+                                                 format("{}{}=\"{}\", {} specifies {}, but Exterior Surface Area = 0.  0 Infiltration will result.",
+                                                        RoutineName,
+                                                        cCurrentModuleObject,
+                                                        thisInfiltration.Name,
+                                                        cAlphaFieldNames(4),
+                                                        cNumericFieldNames(3)));
                             }
                         } else {
                             ShowSevereError(state,
@@ -980,9 +1015,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     if (lAlphaFieldBlanks(3)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                             cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
-                                             ", but that field is blank.  0 Infiltration will result.");
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisInfiltration.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(3)));
                     }
                     break;
 
@@ -992,9 +1030,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea;
                             if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea <= 0.0) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                                     cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
-                                                     ", but Exterior Wall Area = 0.  0 Infiltration will result.");
+                                                 format("{}{}=\"{}\", {} specifies {}, but Exterior Wall Area = 0.  0 Infiltration will result.",
+                                                        RoutineName,
+                                                        cCurrentModuleObject,
+                                                        thisInfiltration.Name,
+                                                        cAlphaFieldNames(4),
+                                                        cNumericFieldNames(3)));
                             }
                         } else {
                             ShowSevereError(state,
@@ -1008,9 +1049,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     if (lAlphaFieldBlanks(3)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                             cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
-                                             ", but that field is blank.  0 Infiltration will result.");
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisInfiltration.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(3)));
                     }
                     break;
 
@@ -1021,9 +1065,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                 rNumericArgs(4) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume / DataGlobalConstants::SecInHour;
                             if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume <= 0.0) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                                     cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
-                                                     ", but Zone Volume = 0.  0 Infiltration will result.");
+                                                 format("{}{}=\"{}\", {} specifies {}, but Zone Volume = 0.  0 Infiltration will result.",
+                                                        RoutineName,
+                                                        cCurrentModuleObject,
+                                                        thisInfiltration.Name,
+                                                        cAlphaFieldNames(4),
+                                                        cNumericFieldNames(4)));
                             }
                         } else {
                             ShowSevereError(state,
@@ -1037,17 +1084,20 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     if (lAlphaFieldBlanks(4)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisInfiltration.Name + "\", " +
-                                             cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
-                                             ", but that field is blank.  0 Infiltration will result.");
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisInfiltration.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(4)));
                     }
                     break;
 
                 default:
                     if (Item1 == 1) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                            "\", invalid calculation method=" + cAlphaArgs(4));
+                        ShowSevereError(
+                            state,
+                            format("{}{}=\"{}\", invalid calculation method={}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4)));
                         ErrorsFound = true;
                     }
                 }
@@ -1076,9 +1126,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (thisInfiltration.ConstantTermCoef == 0.0 && thisInfiltration.TemperatureTermCoef == 0.0 &&
                     thisInfiltration.VelocityTermCoef == 0.0 && thisInfiltration.VelocitySQTermCoef == 0.0) {
                     if (Item1 == 1) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", in " + cAlphaFieldNames(2) +
-                                             "=\"" + cAlphaArgs(2) + "\".");
+                        ShowWarningError(
+                            state,
+                            format(
+                                R"({}{}="{}", in {}="{}".)", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                         ShowContinueError(state, "Infiltration Coefficients are all zero.  No Infiltration will be reported.");
                     }
                 }
@@ -1109,14 +1160,18 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                            format(R"({}{}="{}", invalid (not found) {}="{}".)",
+                                   RoutineName,
+                                   cCurrentModuleObject,
+                                   cAlphaArgs(1),
+                                   cAlphaFieldNames(2),
+                                   cAlphaArgs(2)));
             ErrorsFound = true;
         }
 
         // setup a flag if the outdoor air balance method is applied
         if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-            for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
+            for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
                     if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
@@ -1130,13 +1185,17 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         state.dataHeatBal->Infiltration(InfiltCount).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
         if (state.dataHeatBal->Infiltration(InfiltCount).SchedPtr == 0) {
             if (lAlphaFieldBlanks(3)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                    " is required but field is blank.");
+                ShowSevereError(
+                    state,
+                    format("{}{}=\"{}\",{} is required but field is blank.", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(3)));
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                    cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                                format(R"({}{}="{}", invalid (not found) {}="{}".)",
+                                       RoutineName,
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cAlphaFieldNames(3),
+                                       cAlphaArgs(3)));
             }
             ErrorsFound = true;
         }
@@ -1148,8 +1207,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr > 0) {
             if (state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(InfiltCount).ZonePtr).ExteriorTotalSurfArea <= 0.0) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
-                                     cAlphaArgs(2) + "\" does not have surfaces exposed to outdoors.");
+                                 format(R"({}{}="{}", {}="{}" does not have surfaces exposed to outdoors.)",
+                                        RoutineName,
+                                        cCurrentModuleObject,
+                                        cAlphaArgs(1),
+                                        cAlphaFieldNames(2),
+                                        cAlphaArgs(2)));
                 ShowContinueError(state, "Infiltration model is appropriate for exterior zones not interior zones, simulation continues.");
             }
         }
@@ -1184,7 +1247,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         // setup a flag if the outdoor air balance method is applied
         if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-            for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
+            for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
                     if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
@@ -1442,7 +1505,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     state.dataHeatBal->TotDesignFlowVentilation = 0;
     errFlag = false;
     cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-    for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
+    for (int Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Item,
@@ -1495,7 +1558,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     if (state.dataHeatBal->TotDesignFlowVentilation > 0) {
         Loop = 0;
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
+        for (int Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -1536,7 +1599,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 // setup a flag if the outdoor air balance method is applied
                 if (thisVentilation.ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-                    for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
+                    for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                         if (thisVentilation.ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
                             if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                                 thisVentilation.QuadratureSum = true;
@@ -2211,7 +2274,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         // setup a flag if the outdoor air balance method is applied
         if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-            for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
+            for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
                     if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Ventilation(VentiCount).QuadratureSum = true;
