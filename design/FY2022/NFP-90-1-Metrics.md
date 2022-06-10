@@ -57,9 +57,6 @@ capacities less than 65,000 Btu/h.
 |--|--|--|
 |SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173098299-1b89804d-d8a3-4a75-8db3-8ad3bbdc8e36.png)|TBD|
 |q(t<sub>j</sub>) and E(t<sub>j</sub>) are calculated for the following temperature bins|![grafik](https://user-images.githubusercontent.com/49325382/173098780-28c8a2ef-b13f-46e3-956e-6540477912dc.png)|
-|building load < Low Stage capacity|11.2.1.2.1||
-|building load > Low Stage capacity && building load < Full Stage capacity|11.2.1.2.2 or ??||
-|building load > Unit capacity|11.2.1.2.4||
 |BL(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173107798-68ba98a9-e5d8-4a07-9a18-da6b1145bf5b.png)||
 |q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108139-86c76624-cf0a-4452-a0e9-3e7379898df4.png)||
 |P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108210-583a6e5a-5b81-40cf-8d85-dcd31b0358a0.png)||
@@ -72,24 +69,27 @@ capacities less than 65,000 Btu/h.
 ||![grafik](https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png)||
 |Case 3<br>![grafik](https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png)|Building load is greater than Low Stage capacity, but less than Full Stage capacity and the unit cycles between off and Full Stage operation||
 ||![grafik](https://user-images.githubusercontent.com/49325382/173109574-80e66076-9575-413b-a465-416d82ea1db3.png)||
-|C<sub>D</sub><sup>c,Full</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not conducted set C<sub>D</sub><sup>c,Full to the default value or use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117743-27b547d9-8b76-4056-9f91-7c655b387df5.png)<br>If the test is conducted use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117884-9f2f26f4-8ed4-496d-b6d2-4c30beca8b1d.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173117960-61d85889-c575-4b0c-b8a3-e32d591ca7d2.png)||
+|C<sub>D</sub><sup>c,Full</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not conducted set C<sub>D</sub><sup>c,Full</sup> to the default value or use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117743-27b547d9-8b76-4056-9f91-7c655b387df5.png)<br>If the test is conducted use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117884-9f2f26f4-8ed4-496d-b6d2-4c30beca8b1d.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173117960-61d85889-c575-4b0c-b8a3-e32d591ca7d2.png)||
 |Case 4<br>![grafik](https://user-images.githubusercontent.com/49325382/173118064-7b60a4a5-97f4-4527-9e30-f9f1362c2c76.png)![grafik](https://user-images.githubusercontent.com/49325382/173118087-143d1ad3-8563-44b9-a5c0-1ebb16791c6c.png)|Building load is greater than or equal to the unit capacity||
 ||![grafik](https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png)||
  
-*For variable speed system*
+*For Variable Speed System*
+ |Variable Speed Systems|
+|--|
+|Graphical representation of SEER2:<br>![grafik](https://user-images.githubusercontent.com/49325382/173118907-586d86c5-5b44-45a2-99fd-667391a0c7ac.png)|
 
-![grafik](https://user-images.githubusercontent.com/49325382/172480279-14b2e39b-f23a-4be7-88d1-1429ff94812d.png)
+|Variable|Formulas|Code|
+|--|--|--|
+|SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173120318-d5df3faf-7196-4bb8-badc-ca3e56166dce.png)|TBD|
 
-![grafik](https://user-images.githubusercontent.com/49325382/172480347-a5b2974c-4fa7-4986-89dc-f74cc1a97c05.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480383-a0029b39-fb23-498b-90c7-ce5ed6aa557c.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480433-31e57201-4845-40ed-a543-e15703b277e6.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480471-7fc56c8a-04c6-4b16-9532-2c562f79f894.png)
-
-![grafik](https://user-images.githubusercontent.com/49325382/172480515-87f68ed2-93e0-4319-9d1b-06691b4392af.png)
-
+|q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png)||
+|P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png)||
+|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png)||
+|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png)||
+|q<sub>Int</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122508-574ace81-85a7-4c2f-b00b-d3e1b6d812d9.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173122561-5ae042d0-28a6-4fd9-812d-f9486abe1066.png)||
+|q<sub>Int</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png)||
+|P<sub>Int</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png)||
+|P<sub>LOW</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png)||
 
 based on the following temperature bin values
 
