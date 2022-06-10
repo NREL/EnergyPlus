@@ -1426,7 +1426,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTWindowSurfaceList;           // List of all window surfaces
     std::vector<int> AllExtSolWindowSurfaceList;       // List of all exterior solar window surfaces
     std::vector<int> AllExtSolWinWithFrameSurfaceList; // List of all exterior solar window surfaces with a frame and divider
-    std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva surfaces
+    std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva foundation surfaces
     std::vector<int> AllSurfaceListReportOrder;        // List of all surfaces - output reporting order
 
     // Surface HB arrays

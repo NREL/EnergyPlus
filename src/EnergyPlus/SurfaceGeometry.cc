@@ -2318,10 +2318,10 @@ namespace SurfaceGeometry {
         if (state.dataGlobal->NumOfZones > 0) {
             state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).AllSurfaceLast = state.dataSurface->TotSurfaces;
         }
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones - 1; ++ZoneNum) {
+        for (size_t ZoneNum = 1; ZoneNum <= static_cast<size_t>(state.dataGlobal->NumOfZones) - 1; ++ZoneNum) {
             state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
         }
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (size_t ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataSurface->Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
                 state.dataHeatBal->Zone(ZoneNum).TDDDomeLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
             } else if ((state.dataSurface->Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
@@ -2343,7 +2343,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
         }
 
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (size_t ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) {
                 ShowSevereError(state, std::string{RoutineName} + "Zone has no surfaces, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
                 SurfError = true;
@@ -2588,7 +2588,7 @@ namespace SurfaceGeometry {
             OpaqueHTSurfsWithWin = 0;
             InternalMassSurfs = 0;
             if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) continue; // Zone with no surfaces
-            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
+            for (size_t SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                  ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor ||
                     state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Wall ||
@@ -2619,7 +2619,7 @@ namespace SurfaceGeometry {
         if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
 
         LayNumOutside = 0;
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (size_t SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             // Check for EcoRoof and only 1 allowed to be used.
             if (state.dataSurface->Surface(SurfNum).Construction > 0)
                 state.dataSurface->SurfExtEcoRoof(SurfNum) =
@@ -2648,7 +2648,8 @@ namespace SurfaceGeometry {
         state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
         state.dataSurface->AllShadowPossObstrSurfaceList.reserve(state.dataSurface->TotSurfaces);
         state.dataSurface->AllIZSurfaceList.reserve(state.dataSurface->TotSurfaces);
-        state.dataSurface->AllHTNonWindowSurfaceList.reserve(state.dataSurface->TotSurfaces - state.dataSurface->TotWindows);
+        state.dataSurface->AllHTNonWindowSurfaceList.reserve(static_cast<size_t>(state.dataSurface->TotSurfaces) -
+                                                             static_cast<size_t>(state.dataSurface->TotWindows));
         state.dataSurface->AllHTWindowSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
@@ -12255,7 +12256,7 @@ namespace SurfaceGeometry {
             }
         };
         std::vector<EdgeByPts> uniqueEdges;
-        uniqueEdges.reserve(zonePoly.NumSurfaceFaces * 6);
+        uniqueEdges.reserve(static_cast<size_t>(zonePoly.NumSurfaceFaces) * 6);
 
         // construct list of unique edges
         Vector curVertex;
@@ -12314,7 +12315,7 @@ namespace SurfaceGeometry {
 
         using DataVectorTypes::Vector;
         std::vector<Vector> uniqVertices;
-        uniqVertices.reserve(zonePoly.NumSurfaceFaces * 6);
+        uniqVertices.reserve(static_cast<size_t>(zonePoly.NumSurfaceFaces) * 6);
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
@@ -12400,7 +12401,7 @@ namespace SurfaceGeometry {
         using DataVectorTypes::Vector_2d;
 
         std::vector<Vector2dCount> floorCeilingXY;
-        floorCeilingXY.reserve(zonePoly.NumSurfaceFaces * 6);
+        floorCeilingXY.reserve(static_cast<size_t>(zonePoly.NumSurfaceFaces) * 6);
 
         // make list of x and y coordinates for all faces that are on the floor or ceiling
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
@@ -12979,8 +12980,8 @@ namespace SurfaceGeometry {
                     if (DivWidth > 0.0 && !ErrorInSurface) {
                         DivArea = DivWidth * (state.dataSurface->FrameDivider(FrDivNum).HorDividers * state.dataSurface->Surface(ThisSurf).Width +
                                               state.dataSurface->FrameDivider(FrDivNum).VertDividers * state.dataSurface->Surface(ThisSurf).Height -
-                                              state.dataSurface->FrameDivider(FrDivNum).HorDividers *
-                                                  state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth);
+                                              static_cast<Real64>(state.dataSurface->FrameDivider(FrDivNum).HorDividers) *
+                                                  static_cast<Real64>(state.dataSurface->FrameDivider(FrDivNum).VertDividers) * DivWidth);
                         state.dataSurface->SurfWinDividerArea(ThisSurf) = DivArea * state.dataSurface->Surface(ThisSurf).Multiplier;
                         if ((state.dataSurface->Surface(ThisSurf).Area - state.dataSurface->SurfWinDividerArea(ThisSurf)) <= 0.0) {
                             ShowSevereError(state,
@@ -13008,28 +13009,23 @@ namespace SurfaceGeometry {
                                 state.dataSurface->Surface(ThisSurf).Area /
                                 (state.dataSurface->Surface(ThisSurf).Area + state.dataSurface->SurfWinDividerArea(ThisSurf));
                             // Correction factor for portion of divider subject to divider projection correction
-                            DivFrac = (1.0 - state.dataSurface->FrameDivider(FrDivNum).HorDividers *
-                                                 state.dataSurface->FrameDivider(FrDivNum).VertDividers * pow_2(DivWidth) / DivArea);
+                            DivFrac =
+                                (1.0 - static_cast<Real64>(state.dataSurface->FrameDivider(FrDivNum).HorDividers) *
+                                           static_cast<Real64>(state.dataSurface->FrameDivider(FrDivNum).VertDividers) * pow_2(DivWidth) / DivArea);
                             state.dataSurface->SurfWinProjCorrDivOut(ThisSurf) =
                                 DivFrac * state.dataSurface->FrameDivider(FrDivNum).DividerProjectionOut / DivWidth;
                             state.dataSurface->SurfWinProjCorrDivIn(ThisSurf) =
                                 DivFrac * state.dataSurface->FrameDivider(FrDivNum).DividerProjectionIn / DivWidth;
                             // Correction factor for portion of frame subject to frame projection correction
                             if (FrWidth > 0.0) {
+                                Real64 horizPlusVertDividers = static_cast<Real64>(state.dataSurface->FrameDivider(FrDivNum).HorDividers) +
+                                                               static_cast<Real64>(state.dataSurface->FrameDivider(FrDivNum).VertDividers);
                                 state.dataSurface->SurfWinProjCorrFrOut(ThisSurf) =
                                     (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut / FrWidth) *
-                                    (ThisHeight + ThisWidth -
-                                     (state.dataSurface->FrameDivider(FrDivNum).HorDividers +
-                                      state.dataSurface->FrameDivider(FrDivNum).VertDividers) *
-                                         DivWidth) /
-                                    (ThisHeight + ThisWidth + 2 * FrWidth);
+                                    (ThisHeight + ThisWidth - horizPlusVertDividers * DivWidth) / (ThisHeight + ThisWidth + 2 * FrWidth);
                                 state.dataSurface->SurfWinProjCorrFrIn(ThisSurf) =
                                     (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn / FrWidth) *
-                                    (ThisHeight + ThisWidth -
-                                     (state.dataSurface->FrameDivider(FrDivNum).HorDividers +
-                                      state.dataSurface->FrameDivider(FrDivNum).VertDividers) *
-                                         DivWidth) /
-                                    (ThisHeight + ThisWidth + 2 * FrWidth);
+                                    (ThisHeight + ThisWidth - horizPlusVertDividers * DivWidth) / (ThisHeight + ThisWidth + 2 * FrWidth);
                             }
                         }
                     }
