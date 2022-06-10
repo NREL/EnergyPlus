@@ -5582,9 +5582,10 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                  (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
             } // end of loop over zones cooled by central system
             // Get peak system cooling load with coincident
-            if (SysSizing(CurOverallSimDay, AirLoopNum).SysDesCoolLoad < SysSizing(CurOverallSimDay, AirLoopNum).SumZoneCoolLoadSeq(TimeStepInDay)) {
-                SysSizing(CurOverallSimDay, AirLoopNum).SysDesCoolLoad = SysSizing(CurOverallSimDay, AirLoopNum).SumZoneCoolLoadSeq(TimeStepInDay);
-                SysSizing(CurOverallSimDay, AirLoopNum).SysCoolLoadTimeStepPk = TimeStepInDay;
+            auto &sysSizing = SysSizing(CurOverallSimDay, AirLoopNum);
+            if (sysSizing.SysDesCoolLoad < sysSizing.SumZoneCoolLoadSeq(TimeStepInDay)) {
+                sysSizing.SysDesCoolLoad = sysSizing.SumZoneCoolLoadSeq(TimeStepInDay);
+                sysSizing.SysCoolLoadTimeStepPk = TimeStepInDay;
             }
             // check that there is system mass flow
             if (SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) > 0.0) {
@@ -5706,11 +5707,9 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                           (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                 } // end heated zones loop
                 // Get peak system heating load with coincident
-                if (abs(SysSizing(CurOverallSimDay, AirLoopNum).SysDesHeatLoad) >
-                    abs(SysSizing(CurOverallSimDay, AirLoopNum).SumZoneHeatLoadSeq(TimeStepInDay))) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysDesHeatLoad =
-                        SysSizing(CurOverallSimDay, AirLoopNum).SumZoneHeatLoadSeq(TimeStepInDay);
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatLoadTimeStepPk = TimeStepInDay;
+                if (abs(sysSizing.SysDesHeatLoad) > abs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
+                    sysSizing.SysDesHeatLoad = sysSizing.SumZoneHeatLoadSeq(TimeStepInDay);
+                    sysSizing.SysHeatLoadTimeStepPk = TimeStepInDay;
                 }
                 // check that the system flow rate is nonzero
                 if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > 0.0) {
@@ -5801,11 +5800,9 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                           (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                 } // end of cooled zones loop
                 // Get peak system heating load with coincident
-                if (abs(SysSizing(CurOverallSimDay, AirLoopNum).SysDesHeatLoad) <
-                    abs(SysSizing(CurOverallSimDay, AirLoopNum).SumZoneHeatLoadSeq(TimeStepInDay))) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysDesHeatLoad =
-                        SysSizing(CurOverallSimDay, AirLoopNum).SumZoneHeatLoadSeq(TimeStepInDay);
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatLoadTimeStepPk = TimeStepInDay;
+                if (abs(sysSizing.SysDesHeatLoad) < abs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
+                    sysSizing.SysDesHeatLoad = sysSizing.SumZoneHeatLoadSeq(TimeStepInDay);
+                    sysSizing.SysHeatLoadTimeStepPk = TimeStepInDay;
                 }
 
                 if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > 0.0) {
