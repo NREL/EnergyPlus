@@ -65,6 +65,30 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
     std::string DDNameFanPeak = "";
     std::string dateTimeFanPeak = "";
 
+    auto makeCoolingDDDateTimeFanPeak = [this, &state, &DDNameFanPeak, &dateTimeFanPeak]() {
+        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
+            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
+            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
+            dateTimeFanPeak = format("{}/{} {}",
+                                     state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
+                                     state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
+                                     state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
+                                         state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
+        }
+    };
+
+    auto makeHeatingDDDateTimeFanPeak = [this, &state, &DDNameFanPeak, &dateTimeFanPeak]() {
+        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
+            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
+            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
+            dateTimeFanPeak = format("{}/{} {}",
+                                     state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
+                                     state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
+                                     state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
+                                         state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
+        }
+    };
+
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
     } else if (this->dataConstantUsedForSizing > 0 && this->dataFractionUsedForSizing > 0) {
@@ -88,116 +112,35 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         this->autoSizedValue = max(this->zoneEqSizing(this->curZoneEqNum).AirVolFlow,
                                                    this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow,
                                                    this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow);
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else {
                         if (state.dataSize->ZoneCoolingOnlyFan) {
                             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (state.dataSize->ZoneHeatingOnlyFan) {
                             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                             this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                             this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                             this->autoSizedValue = max(this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow,
                                                        this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow);
                             if (this->autoSizedValue == this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow) {
-                                if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                    this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                    DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                    dateTimeFanPeak =
-                                        format("{}/{} {}",
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                               state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                                   state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                                }
+                                makeCoolingDDDateTimeFanPeak();
                             } else if (this->autoSizedValue == this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow) {
-                                if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                    this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                    DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                    dateTimeFanPeak =
-                                        format("{}/{} {}",
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                               state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                                   state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                                }
+                                makeHeatingDDDateTimeFanPeak();
                             }
                         } else {
                             this->autoSizedValue = max(this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow,
                                                        this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
                             if (this->autoSizedValue == this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow) {
-                                if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                    this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                    DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                    dateTimeFanPeak =
-                                        format("{}/{} {}",
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                               state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                                   state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                                }
+                                makeCoolingDDDateTimeFanPeak();
                             } else if (this->autoSizedValue == this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
-                                if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                    this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                    DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                    dateTimeFanPeak =
-                                        format("{}/{} {}",
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                               state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                               state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                                   state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                                }
+                                makeHeatingDDDateTimeFanPeak();
                             }
                         }
                     }
@@ -205,80 +148,26 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                 case DataSizing::FractionOfAutosizedCoolingAirflow: {
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue =
                             max(this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow,
                                 this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow);
                         if (this->autoSizedValue ==
                             this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     } else {
                         this->autoSizedValue =
@@ -286,108 +175,36 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                 this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
                         if (this->autoSizedValue ==
                             this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     }
                 } break;
                 case DataSizing::FractionOfAutosizedHeatingAirflow: {
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue =
                             max(this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow,
                                 this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow);
                         if (this->autoSizedValue ==
                             this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     } else {
                         this->autoSizedValue =
@@ -395,234 +212,72 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                 this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);
                         if (this->autoSizedValue ==
                             this->dataFracOfAutosizedCoolingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     }
                 } break;
                 case DataSizing::FlowPerCoolingCapacity: {
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = max(this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity,
                                                    this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity);
                         if (this->autoSizedValue == this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     } else {
                         this->autoSizedValue = max(this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity,
                                                    this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity);
                         if (this->autoSizedValue == this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     }
                 } break;
                 case DataSizing::FlowPerHeatingCapacity: {
                     if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (state.dataSize->ZoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                        }
+                        makeCoolingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
-                        if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                            this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                            DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                            dateTimeFanPeak =
-                                format("{}/{} {}",
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                       state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                       state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                           state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                        }
+                        makeHeatingDDDateTimeFanPeak();
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = max(this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity,
                                                    this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity);
                         if (this->autoSizedValue == this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     } else {
                         this->autoSizedValue = max(this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity,
                                                    this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity);
                         if (this->autoSizedValue == this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
-                            }
+                            makeCoolingDDDateTimeFanPeak();
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
-                            if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
-                                this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                                DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
-                                dateTimeFanPeak =
-                                    format("{}/{} {}",
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                           state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
-                                           state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
-                                               state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
-                            }
+                            makeHeatingDDDateTimeFanPeak();
                         }
                     }
                 } break;
