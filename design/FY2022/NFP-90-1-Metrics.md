@@ -29,6 +29,7 @@ We have identified the following commonly used metrics:
 |FEI (AMCA 208)|ASHRAE 90.1-2019|Fan Energy Index|Fan Energy|[10]|
 
 In the current workorder, we would focus on two metrics only and propose to focus on SEER2 and HSPF2 based on ANRI 210/240 2023. 
+In order to support the old metrics side by side with the new metrics, we proposed to refactor the calculation of SEER and HSPF2 into separate functions so they can be easily depricated when the time comes. 
 
 **1. SEER2**
 
