@@ -466,9 +466,7 @@ namespace VariableSpeedCoils {
                              bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state,
-                                    int const CoilIndex
-    );
+    Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state, int const CoilIndex);
 
     void SetVarSpeedCoilData(EnergyPlusData &state,
                              int const WSHPNum,                        // Number of OA Controller
