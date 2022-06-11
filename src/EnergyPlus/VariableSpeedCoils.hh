@@ -467,8 +467,7 @@ namespace VariableSpeedCoils {
     );
 
     Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state,
-                                    int const CoilIndex, // index to cooling coil
-                                    bool &ErrorsFound    // set to true if problem
+                                    int const CoilIndex
     );
 
     void SetVarSpeedCoilData(EnergyPlusData &state,

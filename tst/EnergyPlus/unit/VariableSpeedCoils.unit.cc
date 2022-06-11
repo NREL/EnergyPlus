@@ -3100,7 +3100,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Cooling)
     bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
-    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0, ErrorsFound), 35.0);
+    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 35.0);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Heating)
@@ -3210,7 +3210,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Heating)
     bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
-    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0, ErrorsFound), 8.3333);
+    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 8.3333);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_AWHP)
@@ -3412,7 +3412,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_AWHP)
     bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
-    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0, ErrorsFound), 55.72);
+    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 55.72);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
@@ -3639,7 +3639,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
     bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
-    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0, ErrorsFound), 29.4444);
+    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 29.4444);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Heating)
@@ -3853,7 +3853,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Heating)
     bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
-    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0, ErrorsFound), 21.1111);
+    EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 21.1111);
 }
 
 } // namespace EnergyPlus
