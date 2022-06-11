@@ -8104,9 +8104,7 @@ namespace VariableSpeedCoils {
         return Speeds;
     }
 
-    Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state,
-                                    int const CoilIndex
-    )
+    Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state, int const CoilIndex)
     {
         Real64 RatedSourceTemp = 0.0;
         switch (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VSCoilType) {
