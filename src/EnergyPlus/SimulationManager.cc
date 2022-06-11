@@ -252,7 +252,6 @@ namespace SimulationManager {
         PostIPProcessing(state);
 
         state.dataGlobal->BeginSimFlag = true;
-        state.dataGlobal->BeginFullSimFlag = false;
         state.dataGlobal->DoOutputReporting = false;
         state.dataReportFlag->DisplayPerfSimulationFlag = false;
         state.dataReportFlag->DoWeatherInitReporting = false;
@@ -289,7 +288,6 @@ namespace SimulationManager {
         state.dataGlobal->DoingSizing = true;
         ManageSizing(state);
 
-        state.dataGlobal->BeginFullSimFlag = true;
         SimsDone = false;
         if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoHVACSizingSimulation) {
             state.dataGlobal->DoOutputReporting = true;
@@ -439,16 +437,6 @@ namespace SimulationManager {
             DisplayString(state, "Initializing New Environment Parameters");
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
-                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                     .suppressBegEnvReset)) {
-                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
-                // easily converge fewer warmup days are allowed
-                DisplayString(state, "Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
-                state.dataGlobal->beginEnvrnWarmStartFlag = true;
-            } else {
-                state.dataGlobal->beginEnvrnWarmStartFlag = false;
-            }
             state.dataGlobal->EndEnvrnFlag = false;
             state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
@@ -572,7 +560,6 @@ namespace SimulationManager {
                         state.dataGlobal->BeginDayFlag = false;
                         state.dataGlobal->BeginEnvrnFlag = false;
                         state.dataGlobal->BeginSimFlag = false;
-                        state.dataGlobal->BeginFullSimFlag = false;
                     } // TimeStep loop
 
                     state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
@@ -1957,7 +1944,6 @@ namespace SimulationManager {
             state.dataGlobal->BeginDayFlag = false;
             state.dataGlobal->BeginEnvrnFlag = false;
             state.dataGlobal->BeginSimFlag = false;
-            state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
             if (state.dataSysVars->DeveloperFlag)
