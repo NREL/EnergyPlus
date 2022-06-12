@@ -15935,7 +15935,10 @@ namespace UnitarySystems {
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         bool SuppHeat = bool(Par[9]);
 
-        switch (thisSys.m_HeatingCoilType_Num) {
+        int heatCoilType = thisSys.m_HeatingCoilType_Num;
+        if (SuppHeat) heatCoilType = thisSys.m_SuppHeatCoilType_Num;
+
+        switch (heatCoilType) {
         case DataHVACGlobals::CoilDX_MultiSpeedHeating: {
             CycRatio = Par[4];
             SpeedNum = int(Par[5]);
@@ -16345,7 +16348,10 @@ namespace UnitarySystems {
         auto &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         bool SuppHeat = bool(Par[9]);
 
-        switch (thisSys.m_HeatingCoilType_Num) {
+        int heatCoilType = thisSys.m_HeatingCoilType_Num;
+        if (SuppHeat) heatCoilType = thisSys.m_SuppHeatCoilType_Num;
+
+        switch (heatCoilType) {
         case DataHVACGlobals::CoilDX_MultiSpeedHeating: {
             SpeedRatio = int(Par[4]);
             SpeedNum = int(Par[5]);
