@@ -3097,7 +3097,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Cooling)
         "    PLF Curve, 0.85, 0.8333, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless;",
     });
 
-    bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 35.0);
@@ -3207,7 +3206,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Heating)
         "    PLF Curve, 0.85, 0.8333, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless;",
     });
 
-    bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 8.3333);
@@ -3409,7 +3407,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_AWHP)
         "    100;                     !- Maximum Value of x",
     });
 
-    bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 55.72);
@@ -3636,7 +3633,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    48.9;                    !- Maximum Value of y",
     });
 
-    bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 29.4444);
@@ -3850,7 +3846,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Heating)
         "    1.0;                     !- Maximum Value of x",
     });
 
-    bool ErrorsFound;
     ASSERT_TRUE(process_idf(idf_objects));
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(VariableSpeedCoils::GetVSCoilRatedSourceTemp(*state, 1.0), 21.1111);
