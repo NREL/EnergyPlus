@@ -199,6 +199,8 @@ namespace HeatBalanceSurfaceManager {
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
+    void InitSurfacePropertyViewFactors(EnergyPlusData &state);
+
 } // namespace HeatBalanceSurfaceManager
 
 struct HeatBalSurfMgr : BaseGlobalStruct
