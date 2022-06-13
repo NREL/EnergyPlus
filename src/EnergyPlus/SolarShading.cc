@@ -9554,7 +9554,11 @@ void WindowShadingManager(EnergyPlusData &state)
             }
 
             if (state.dataSurface->Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
-            if (!state.dataSurface->Surface(ISurf).HasShadeControl) continue;
+            if (!state.dataSurface->Surface(ISurf).HasShadeControl) {
+                continue;
+            } else {
+                state.dataSurface->SurfWinActiveShadedConstruction(ISurf) = state.dataSurface->SurfActiveConstruction(ISurf);
+            }
 
             // Initialize switching factor (applicable only to switchable glazing) to unswitched
             state.dataSurface->SurfWinSwitchingFactor(ISurf) = 0.0;
