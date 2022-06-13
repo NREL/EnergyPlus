@@ -4698,7 +4698,7 @@ namespace VariableSpeedCoils {
                     if (varSpeedCoil.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                         RatedSourceTempCool = OutTemp;
                     } else {
-                        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum, ErrorsFound);
+                        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
                     }
                     TotCapTempModFac =
                         CurveManager::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
@@ -4776,7 +4776,7 @@ namespace VariableSpeedCoils {
                     if (varSpeedCoil.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                         RatedSourceTempCool = OutTemp;
                     } else {
-                        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum, ErrorsFound);
+                        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
                     }
                     TotCapTempModFac =
                         CurveManager::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
@@ -5306,7 +5306,7 @@ namespace VariableSpeedCoils {
             PlantUtilities::RegisterPlantCompDesignFlow(state, varSpeedCoil.WaterInletNodeNum, 0.5 * varSpeedCoil.RatedWaterVolFlowRate);
         }
 
-        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum, ErrorsFound);
+        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
         if (varSpeedCoil.VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit || varSpeedCoil.VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit) {
 
             if (PltSizNum > 0) {
@@ -8104,10 +8104,7 @@ namespace VariableSpeedCoils {
         return Speeds;
     }
 
-    Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state,
-                                    int const CoilIndex, // index to cooling coil
-                                    bool &ErrorsFound    // set to true if problem
-    )
+    Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state, int const CoilIndex)
     {
         Real64 RatedSourceTemp = 0.0;
         switch (state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).VSCoilType) {
