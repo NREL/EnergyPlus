@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -1515,14 +1516,15 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         // store the results in AirToZoneNodeInfo()%CoolCtrlZoneNums and AirToZoneNodeInfo()%HeatCtrlZoneNums
 
         // Allocate scratch arrays for storing controlled zone numbers for each air loop.
-        state.dataSimAirServingZones->CtrlZoneNumsCool.allocate(state.dataGlobal->NumOfZones);
-        state.dataSimAirServingZones->CtrlZoneNumsHeat.allocate(state.dataGlobal->NumOfZones);
-        state.dataSimAirServingZones->ZoneInletNodesCool.allocate(state.dataGlobal->NumOfZones);
-        state.dataSimAirServingZones->ZoneInletNodesHeat.allocate(state.dataGlobal->NumOfZones);
-        state.dataSimAirServingZones->TermInletNodesCool.allocate(state.dataGlobal->NumOfZones);
-        state.dataSimAirServingZones->TermInletNodesHeat.allocate(state.dataGlobal->NumOfZones);
-        state.dataSimAirServingZones->TermUnitSizingNumsCool.allocate(state.dataGlobal->NumOfZones);
-        state.dataSimAirServingZones->TermUnitSizingNumsHeat.allocate(state.dataGlobal->NumOfZones);
+        int atuArraySize = max(state.dataGlobal->NumOfZones, state.dataDefineEquipment->AirDistUnit.size());
+        state.dataSimAirServingZones->CtrlZoneNumsCool.allocate(atuArraySize);
+        state.dataSimAirServingZones->CtrlZoneNumsHeat.allocate(atuArraySize);
+        state.dataSimAirServingZones->ZoneInletNodesCool.allocate(atuArraySize);
+        state.dataSimAirServingZones->ZoneInletNodesHeat.allocate(atuArraySize);
+        state.dataSimAirServingZones->TermInletNodesCool.allocate(atuArraySize);
+        state.dataSimAirServingZones->TermInletNodesHeat.allocate(atuArraySize);
+        state.dataSimAirServingZones->TermUnitSizingNumsCool.allocate(atuArraySize);
+        state.dataSimAirServingZones->TermUnitSizingNumsHeat.allocate(atuArraySize);
 
         state.dataSimAirServingZones->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
