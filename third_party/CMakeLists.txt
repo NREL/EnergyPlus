@@ -172,3 +172,9 @@ if(OPENGL_FOUND)
   set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(tess2 PROPERTIES FOLDER ThirdParty/Penumbra)
 endif()
+
+# libtk205
+set(LIBTK205_BUILD_TESTING
+        ${BUILD_TESTING}
+        CACHE BOOL "" FORCE)
+add_subdirectory(libtk205)

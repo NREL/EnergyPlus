@@ -488,6 +488,68 @@ namespace PlantChillers {
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
+    struct ASHRAE205ChillerSpecs : BaseChillerSpecs
+    {
+        // Members
+        Real64 TempLowLimitEvapOut;                // C - low temperature shut off
+        Real64 DesignHeatRecVolFlowRate;           // m3/s, Design Water mass flow rate through heat recovery loop
+        bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous was input autosize.
+        Real64 DesignHeatRecMassFlowRate;          // kg/s, Design Water mass flow rate through heat recovery loop
+        bool HeatRecActive;                        // True entered Heat Rec Vol Flow Rate >0
+        int HeatRecInletNodeNum;                   // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
+        Real64 HeatRecCapacityFraction;            // user input for heat recovery capacity fraction []
+        Real64 HeatRecMaxCapacityLimit;            // Capacity limit for Heat recovery, one time calc [W]
+        int HeatRecSetPointNodeNum;                // index for system node with the heat recover leaving setpoint
+        int HeatRecInletLimitSchedNum;             // index for schedule for the inlet high limit for heat recovery operation
+        PlantLocation HRPlantLoc;                  // heat recovery water plant loop component index
+        std::string EndUseSubcategory;             // identifier use for the end use subcategory
+        Real64 CondOutletHumRat;                   // kg/kg - condenser outlet humditiy ratio, air side
+        Real64 ActualCOP;
+        Real64 HeatRecInletTemp;
+        Real64 HeatRecOutletTemp;
+        Real64 HeatRecMdot;
+        Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
+
+        // Default Constructor
+        ASHRAE205ChillerSpecs()
+                : TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
+                  DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
+                  HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
+                  HeatRecInletLimitSchedNum(0), HRPlantLoc{}, CondOutletHumRat(0.0), ActualCOP(0.0),
+                  HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), ChillerCondAvgTemp(0.0)
+        {
+        }
+
+        static void getInput(EnergyPlusData &state);
+
+        void setupOutputVariables(EnergyPlusData &state);
+
+        static ElectricChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
+
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
+
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
+
+        void size(EnergyPlusData &state) override;
+
+        void calculate(EnergyPlusData &state,
+                       Real64 &MyLoad,                                   // operating load
+                       bool RunFlag,                                     // TRUE when chiller operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
+        );
+
+        void update(EnergyPlusData &state,
+                    Real64 MyLoad, // current load
+                    bool RunFlag   // TRUE if chiller operating
+        );
+
+        void oneTimeInit(EnergyPlusData &state) override;
+    };
 } // namespace PlantChillers
 
 struct PlantChillersData : BaseGlobalStruct

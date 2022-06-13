@@ -82,6 +82,8 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <RS0001_factory.h>
+#include <RS0001.h>
 
 namespace EnergyPlus {
 

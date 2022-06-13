@@ -779,7 +779,8 @@ target_link_libraries(
          Windows-CalcEngine
          airflownetworklib
          ssc
-         cpgfunctionEP)
+         cpgfunctionEP
+         libtk205)
 
 target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings cpp_pch_files)
 
