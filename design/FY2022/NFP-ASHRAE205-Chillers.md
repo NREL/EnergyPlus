@@ -82,7 +82,7 @@ Chiller:Electric:ASHRAE205,
        \retaincase
        \required-field
   A3,  \field Zone Name
-       \note Chiller losses are added as heat gains to this Zone. If blank, losses are not added to any Zone.
+       \note Chiller efficiency losses are added as heat gains to this Zone. If blank, losses are not added to any Zone.
        \type object-list
        \object-list ZoneNames
   N1,  \field Reference Capacity
@@ -110,22 +110,22 @@ Chiller:Electric:ASHRAE205,
        \note Not required if air-cooled or evaporatively-cooled
   A8,  \field Oil Cooler Inlet Node Name
        \type node
-       \note Not required if air-cooled or evaporatively-cooled, or if heat rejection is met by condenser
+       \note Not required if oil cooler heat is rejected to condenser stream
   A9,  \field Oil Cooler Outlet Node Name
        \type node
-       \note Not required if air-cooled or evaporatively-cooled, or if heat rejection is met by condenser
+       \note Not required if oil cooler heat is rejected to condenser stream
   A10, \field Auxiliary Inlet Node Name
        \type node
-       \note Not required if heat rejection is met by condenser
+       \note Not required if auxilliary heat is rejected to condenser stream
   A11, \field Auxiliary Outlet Node Name
        \type node
-       \note Not required if heat rejection is met by condenser
+       \note Not required if auxilliary heat is rejected to condenser stream
   A12, \field Heat Recovery Inlet Node Name
        \type node
-       \note For 205 expansion; heat recovery not currently supported
+       \note For RS0001 expansion; heat recovery not currently supported
   A13, \field Heat Recovery Outlet Node Name
        \type node
-       \note For 205 expansion; heat recovery not currently supported
+       \note For RS0001 expansion; heat recovery not currently supported
   A14, \field End-Use Subcategory
        \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
