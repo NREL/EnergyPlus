@@ -439,6 +439,12 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             // Validate Demand Manager Priority
             DemandManagerList(ListNum).ManagerPriority =
                 static_cast<ManagePriorityType>(getEnumerationValue(ManagePriorityNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+            if (DemandManagerList(ListNum).ManagerPriority == ManagePriorityType::Invalid) {
+                ShowSevereError(state,
+                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
+                                    state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphArray(6) + "\" not found.");
+                ErrorsFound = true;
+            }
 
             // Get DEMAND MANAGER Type and Name pairs
             DemandManagerList(ListNum).NumOfManager = int((NumAlphas - 6) / 2.0);
@@ -706,7 +712,6 @@ void GetDemandManagerInput(EnergyPlusData &state)
             {
                 DemandMgr(MgrNum).LimitControl =
                     static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
-
                 if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
@@ -726,6 +731,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
             // Validate Selection Control
             DemandMgr(MgrNum).SelectionControl =
                 static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+            if (DemandMgr(MgrNum).SelectionControl == ManagerSelection::Invalid) {
+                ShowSevereError(state,
+                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                    state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
+                ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                ErrorsFound = true;
+            }
 
             if (NumArray(4) == 0.0)
                 DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -824,6 +836,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
             // Validate Selection Control
             DemandMgr(MgrNum).SelectionControl =
                 static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+            if (DemandMgr(MgrNum).SelectionControl == ManagerSelection::Invalid) {
+                ShowSevereError(state,
+                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                    state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
+                ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                ErrorsFound = true;
+            }
 
             if (NumArray(4) == 0.0)
                 DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -944,6 +963,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 // Validate Selection Control
                 DemandMgr(MgrNum).SelectionControl =
                     static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                if (DemandMgr(MgrNum).SelectionControl == ManagerSelection::Invalid) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
+                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                    ErrorsFound = true;
+                }
 
                 if (NumArray(4) == 0.0)
                     DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -1047,6 +1073,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 // Validate Limiting Control
                 DemandMgr(MgrNum).LimitControl =
                     static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
+                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
+                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                    ErrorsFound = true;
+                }
 
                 if (NumArray(1) == 0.0)
                     DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -1073,6 +1106,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 // Validate Selection Control
                 DemandMgr(MgrNum).SelectionControl =
                     static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                if (DemandMgr(MgrNum).SelectionControl == ManagerSelection::Invalid) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
+                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                    ErrorsFound = true;
+                }
 
                 if (NumArray(5) == 0.0)
                     DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -1174,6 +1214,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 // Validate Limiting Control
                 DemandMgr(MgrNum).LimitControl =
                     static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitVentNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
+                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
+                    ShowContinueError(state, "...value must be one of Off, FixedRate, or ReductionRatio.");
+                    ErrorsFound = true;
+                }
 
                 if (NumArray(1) == 0.0)
                     DemandMgr(MgrNum).LimitDuration = state.dataGlobal->MinutesPerTimeStep;
@@ -1188,6 +1235,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 // Validate Selection Control
                 DemandMgr(MgrNum).SelectionControl =
                     static_cast<ManagerSelection>(getEnumerationValue(ManagerSelectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                if (DemandMgr(MgrNum).SelectionControl == ManagerSelection::Invalid) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
+                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                    ErrorsFound = true;
+                }
 
                 if (NumArray(5) == 0.0)
                     DemandMgr(MgrNum).RotationDuration = state.dataGlobal->MinutesPerTimeStep;
