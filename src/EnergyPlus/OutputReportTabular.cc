@@ -3439,8 +3439,8 @@ void AddTOCReportPeriod(const int nReportPeriods,
 {
     static std::string const Entire_Facility("Entire Facility");
     for (int i = 1; i <= nReportPeriods; i++) {
-        std::string ReportPeriod_Resilience_Summary =
-            fmt::format("{} Resilience Summary for Reporting Period {}: {}", kw, i, ReportPeriodInputData(i).title);
+        std::string ReportPeriod_Resilience_Summary = fmt::format(
+            "{} Resilience Summary for Reporting Period {}: {}", kw, i, ReportPeriodInputData(i).title, ReportPeriodInputData(i).totalElectricityUse);
         tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriod_Resilience_Summary, Entire_Facility) << "\">" << kw
                    << " Resilience Summary for Reporting Period " << i << ": " << ReportPeriodInputData(i).title << "</a>\n";
     }
@@ -12548,7 +12548,7 @@ void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
 
     if (ReportPeriodInputData(periodIdx).startYear != 0) {
         WriteSubtitle(state,
-                      format("Reporting period: {}/{}/{} {}:00 -- {}/{}/{} {}:00",
+                      format("Reporting period: {}/{}/{} {}:00 -- {}/{}/{} {}:00, Total Electricity Usage: {:.2R} kWh",
                              ReportPeriodInputData(periodIdx).startYear,
                              ReportPeriodInputData(periodIdx).startMonth,
                              ReportPeriodInputData(periodIdx).startDay,
@@ -12556,16 +12556,18 @@ void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                              ReportPeriodInputData(periodIdx).endYear,
                              ReportPeriodInputData(periodIdx).endMonth,
                              ReportPeriodInputData(periodIdx).endDay,
-                             ReportPeriodInputData(periodIdx).endHour));
+                             ReportPeriodInputData(periodIdx).endHour,
+                             ReportPeriodInputData(periodIdx).totalElectricityUse / 3600000.0));
     } else {
         WriteSubtitle(state,
-                      format("Reporting period: {}/{} {}:00 -- {}/{} {}:00",
+                      format("Reporting period: {}/{} {}:00 -- {}/{} {}:00, Total Electricity Usage: {:.2R} kWh",
                              ReportPeriodInputData(periodIdx).startMonth,
                              ReportPeriodInputData(periodIdx).startDay,
                              ReportPeriodInputData(periodIdx).startHour,
                              ReportPeriodInputData(periodIdx).endMonth,
                              ReportPeriodInputData(periodIdx).endDay,
-                             ReportPeriodInputData(periodIdx).endHour));
+                             ReportPeriodInputData(periodIdx).endHour,
+                             ReportPeriodInputData(periodIdx).totalElectricityUse / 3600000.0));
     }
 }
 

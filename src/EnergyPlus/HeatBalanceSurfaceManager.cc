@@ -5495,6 +5495,14 @@ void ReportThermalResilience(EnergyPlusData &state)
     reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
     findReportPeriodIdx(state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
 
+    auto &ort(state.dataOutRptTab);
+    for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+        if (reportPeriodFlags(i)) {
+            int curResMeterNumber = ort->meterNumTotalsBEPS(1);
+            state.dataWeatherManager->ThermalReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+        }
+    }
+
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
@@ -6104,6 +6112,15 @@ void ReportCO2Resilience(EnergyPlusData &state)
         Array1D_bool reportPeriodFlags;
         reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
         findReportPeriodIdx(state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+
+        auto &ort(state.dataOutRptTab);
+        for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+            if (reportPeriodFlags(i)) {
+                int curResMeterNumber = ort->meterNumTotalsBEPS(1);
+                state.dataWeatherManager->CO2ReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+            }
+        }
+        
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 ZoneAirCO2 = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum);
 
@@ -6205,6 +6222,15 @@ void ReportVisualResilience(EnergyPlusData &state)
         reportPeriodFlags.dimension(state.dataWeatherManager->TotVisualReportPers, false);
         findReportPeriodIdx(
             state, state.dataWeatherManager->VisualReportPeriodInput, state.dataWeatherManager->TotVisualReportPers, reportPeriodFlags);
+
+        auto &ort(state.dataOutRptTab);
+        for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+            if (reportPeriodFlags(i)) {
+                int curResMeterNumber = ort->meterNumTotalsBEPS(1);
+                state.dataWeatherManager->VisualReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+            }
+        }
+
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
             // Now divide by total reference points to get average
@@ -6281,6 +6307,7 @@ void findReportPeriodIdx(EnergyPlusData &state,
                          const int nReportPeriods,
                          Array1D_bool &inReportPeriodFlags)
 {
+    // return an array of flags, indicating whether the current time is in reporting period i
     int currentDate;
     for (int i = 1; i <= nReportPeriods; i++) {
         int reportStartDate = ReportPeriodInputData(i).startJulianDate;

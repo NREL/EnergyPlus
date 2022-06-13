@@ -271,11 +271,12 @@ namespace WeatherManager {
         int endDay;
         int endHour;
         int endJulianDate;
+        Real64 totalElectricityUse;
 
         // Default Constructor
         ReportPeriodData()
             : startYear(2017), startMonth(1), startDay(1), startHour(1), startJulianDate(2457755), endYear(2017), endMonth(12), endDay(31),
-              endHour(24), endJulianDate(2458119)
+              endHour(24), endJulianDate(2458119), totalElectricityUse(0.0)
         {
         }
     };
