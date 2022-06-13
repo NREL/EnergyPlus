@@ -14395,7 +14395,6 @@ namespace UnitarySystems {
                 state.dataUnitarySystems->HeatingLoad = false;
             }
             LatLoad = 0.0;
-            this->m_FanOpMode = 1; // why is this here?
         }
 
         Real64 OnOffAirFlowRatio = 1.0;
