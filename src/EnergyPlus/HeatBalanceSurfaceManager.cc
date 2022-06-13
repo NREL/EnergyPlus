@@ -6081,7 +6081,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
                 state.dataWeatherManager->CO2ReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
             }
         }
-        
+
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 ZoneAirCO2 = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum);
 
