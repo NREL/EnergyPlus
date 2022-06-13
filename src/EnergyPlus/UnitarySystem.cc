@@ -15936,7 +15936,11 @@ namespace UnitarySystems {
         bool SuppHeat = bool(Par[9]);
 
         int heatCoilType = thisSys.m_HeatingCoilType_Num;
-        if (SuppHeat) heatCoilType = thisSys.m_SuppHeatCoilType_Num;
+        int heatingCoilOutletNode = thisSys.HeatCoilOutletNodeNum;
+        if (SuppHeat) {
+            heatCoilType = thisSys.m_SuppHeatCoilType_Num;
+            heatingCoilOutletNode = thisSys.m_SuppCoilAirOutletNode;
+        }
 
         switch (heatCoilType) {
         case DataHVACGlobals::CoilDX_MultiSpeedHeating: {
@@ -15978,7 +15982,7 @@ namespace UnitarySystems {
                                                       LatLoad,
                                                       OnOffAirFlowRatio);
 
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(heatingCoilOutletNode).Temp;
         } break;
         case DataHVACGlobals::Coil_HeatingElectric_MultiStage: {
             CycRatio = Par[4];
@@ -15987,7 +15991,7 @@ namespace UnitarySystems {
 
             HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, SuppHeat);
 
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(heatingCoilOutletNode).Temp;
         } break;
         case DataHVACGlobals::Coil_HeatingGas_MultiStage: {
             CycRatio = Par[4];
@@ -15996,7 +16000,7 @@ namespace UnitarySystems {
 
             HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, SuppHeat);
 
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(heatingCoilOutletNode).Temp;
         } break;
         default: {
             assert(false);
@@ -16349,7 +16353,11 @@ namespace UnitarySystems {
         bool SuppHeat = bool(Par[9]);
 
         int heatCoilType = thisSys.m_HeatingCoilType_Num;
-        if (SuppHeat) heatCoilType = thisSys.m_SuppHeatCoilType_Num;
+        int heatingCoilOutletNode = thisSys.HeatCoilOutletNodeNum;
+        if (SuppHeat) {
+            heatCoilType = thisSys.m_SuppHeatCoilType_Num;
+            heatingCoilOutletNode = thisSys.m_SuppCoilAirOutletNode;
+        }
 
         switch (heatCoilType) {
         case DataHVACGlobals::CoilDX_MultiSpeedHeating: {
@@ -16390,7 +16398,7 @@ namespace UnitarySystems {
                                                       LatLoad,
                                                       OnOffAirFlowRatio);
 
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(heatingCoilOutletNode).Temp;
         } break;
         case DataHVACGlobals::Coil_HeatingElectric_MultiStage: {
             SpeedRatio = int(Par[4]);
@@ -16399,7 +16407,7 @@ namespace UnitarySystems {
 
             HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, SuppHeat);
 
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(heatingCoilOutletNode).Temp;
         } break;
         case DataHVACGlobals::Coil_HeatingGas_MultiStage: {
             SpeedRatio = int(Par[4]);
@@ -16408,7 +16416,7 @@ namespace UnitarySystems {
 
             HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(heatingCoilOutletNode).Temp;
         } break;
         default: {
             assert(false);

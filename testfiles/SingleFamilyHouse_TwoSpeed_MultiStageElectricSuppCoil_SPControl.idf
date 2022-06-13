@@ -2,12 +2,12 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! SingleFamilyHouse_TwoSpeed_MultiStageElectricSuppCoil.idf
+! SingleFamilyHouse_TwoSpeed_MultiStageElectricSuppCoil_SPControl.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
 ! Highlights:             This file does the basic test of an air distribution system in a residential home.
 !                         A two speed heat pump with a supplmental multistage electric heater provides space heating and cooling.
-!                         It provides thermostat temperature difference between cutout and setpoint.
+!                         Coils are set point controlled and provides thermostat temperature difference between cutout and setpoint.
 !
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -72,6 +72,7 @@
 ! HVAC:                           A unitary system of AirLoopHVAC:UnitarySystem provides space cooling and
 !                                 heating. The system has a supplemental heating coil as Coil:Heating:Electric:MultiStage.
 !                                 Thermostat setting at 22C for space heating and 26.6C for space cooling.
+!                                 Coils are controlled using SetpointManager:SingleZone:Heating and SetpointManager:SingleZone:Cooling
 !                                 Heating and cooling performance curves are based on performance data of Carrier 25HNA948A30
 !                                 outdoor section with FE5ANB006 Indoor section (low and high speeds).
 !
