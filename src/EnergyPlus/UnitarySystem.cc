@@ -15646,36 +15646,17 @@ namespace UnitarySystems {
                                                           std::vector<Real64> const &Par // Function parameters
     )
     {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Yueyue Zhou
-        //       DATE WRITTEN   May 2022
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates part load ratio for multistage supplemental coil.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls calc routines of  multistage electric Coil to get delivered heating at the given stage
-        // and calculates the residual as defined above
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 CycRatio;
         Real64 QActual;
-        int SpeedNum;
-        int FanOpMode;
 
         int CoilIndex = int(Par[1]);
-        CycRatio = Par[4];
-        SpeedNum = int(Par[5]);
-        FanOpMode = int(Par[6]);
+        Real64 CycRatio = Par[4];
+        int SpeedNum = int(Par[5]);
+        int FanOpMode = int(Par[6]);
 
         HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
 
-        Residuum = Par[2] - QActual;
-
-        return Residuum;
+        return Par[2] - QActual;
     }
 
     Real64 UnitarySys::calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
@@ -15683,36 +15664,17 @@ namespace UnitarySystems {
                                                              std::vector<Real64> const &Par // Function parameters
     )
     {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Yueyue Zhou
-        //       DATE WRITTEN   May 2022
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates part load ratio for multistage supplemental coil.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls calc routines of  multistage electric Coil to get delivered heating at the given stage
-        // and calculates the residual as defined above
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 SpeedRatio;
         Real64 QActual;
-        int SpeedNum;
-        int FanOpMode;
 
         int CoilIndex = int(Par[1]);
-        SpeedRatio = Par[4];
-        SpeedNum = int(Par[5]);
-        FanOpMode = int(Par[6]);
+        Real64 SpeedRatio = Par[4];
+        int SpeedNum = int(Par[5]);
+        int FanOpMode = int(Par[6]);
 
         HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
 
-        Residuum = Par[2] - QActual;
-
-        return Residuum;
+        return Par[2] - QActual;
     }
 
     Real64 UnitarySys::HXAssistedCoolCoilTempResidual(EnergyPlusData &state,

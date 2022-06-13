@@ -163,7 +163,7 @@ namespace HeatingCoils {
             if (CompIndex == 0) {
                 CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatingCoils->HeatingCoil);
                 if (CoilNum == 0) {
-                    ShowFatalError(state, format("SimulateHeatingCoilComponents: Coil not found={}", std::string{CompName}));
+                    ShowFatalError(state, format("SimulateHeatingCoilComponents: Coil not found={}", CompName));
                 }
                 //    CompIndex=CoilNum
             } else {
@@ -189,7 +189,7 @@ namespace HeatingCoils {
             }
         } else {
             ShowSevereError(state, "SimulateHeatingCoilComponents: CompIndex argument not used.");
-            ShowContinueError(state, format("..CompName = {}", std::string{CompName}));
+            ShowContinueError(state, format("..CompName = {}", CompName));
             ShowFatalError(state, "Preceding conditions cause termination.");
         }
 
@@ -401,7 +401,7 @@ namespace HeatingCoils {
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
-                                           std::string{RoutineName},
+                                           RoutineName,
                                            CurrentModuleObject,
                                            cAlphaFields(2),
                                            Alphas(2),
@@ -535,7 +535,7 @@ namespace HeatingCoils {
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
-                                           std::string{RoutineName},
+                                           RoutineName,
                                            CurrentModuleObject,
                                            cAlphaFields(2),
                                            Alphas(2),
@@ -677,7 +677,7 @@ namespace HeatingCoils {
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
-                                           std::string{RoutineName},
+                                           RoutineName,
                                            CurrentModuleObject,
                                            cAlphaFields(2),
                                            Alphas(2),
@@ -704,7 +704,7 @@ namespace HeatingCoils {
                 heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::None) {
                 ShowSevereError(state,
                                 format("{}{}: Invalid {} entered ={} for {}={}",
-                                       std::string{RoutineName},
+                                       RoutineName,
                                        CurrentModuleObject,
                                        cAlphaFields(3),
                                        Alphas(3),
@@ -888,7 +888,7 @@ namespace HeatingCoils {
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
-                                           std::string{RoutineName},
+                                           RoutineName,
                                            CurrentModuleObject,
                                            cAlphaFields(2),
                                            Alphas(2),
@@ -1087,7 +1087,7 @@ namespace HeatingCoils {
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
-                                           std::string{RoutineName},
+                                           RoutineName,
                                            CurrentModuleObject,
                                            cAlphaFields(2),
                                            Alphas(2),
@@ -1408,7 +1408,7 @@ namespace HeatingCoils {
         }
 
         if (state.dataHeatingCoils->InputErrorsFound) {
-            ShowFatalError(state, format("{}Errors found in input.  Program terminates.", std::string{RoutineName}));
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
         }
 
         Alphas.deallocate();
@@ -1823,9 +1823,8 @@ namespace HeatingCoils {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(
-                                        state,
-                                        format("SizeHeatingCoil: Potential issue with equipment sizing for {}, {}", CompType, std::string{CompName}));
+                                    ShowMessage(state,
+                                                format("SizeHeatingCoil: Potential issue with equipment sizing for {}, {}", CompType, CompName));
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -3204,10 +3203,10 @@ namespace HeatingCoils {
         if (CompIndex == 0) {
             CoilNum = UtilityRoutines::FindItem(CompName, state.dataHeatingCoils->HeatingCoil);
             if (CoilNum == 0) {
-                ShowFatalError(state, format("CheckHeatingCoilSchedule: Coil not found=\"{}\".", std::string{CompName}));
+                ShowFatalError(state, format("CheckHeatingCoilSchedule: Coil not found=\"{}\".", CompName));
             }
             if (!UtilityRoutines::SameString(CompType, cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num))) {
-                ShowSevereError(state, format("CheckHeatingCoilSchedule: Coil=\"{}\"", std::string{CompName}));
+                ShowSevereError(state, format("CheckHeatingCoilSchedule: Coil=\"{}\"", CompName));
                 ShowContinueError(state,
                                   format("...expected type=\"{}\", actual type=\"{}\".",
                                          CompType,
