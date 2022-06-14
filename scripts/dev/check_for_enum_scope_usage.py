@@ -66,6 +66,9 @@ from typing import List, Set
 import unittest
 
 
+verbose = False
+
+
 class PotentialUsage:
     def __init__(self, file_path: Path, line_number: int, line: str):
         self.file_path: Path = file_path
@@ -142,6 +145,8 @@ class EnumScopeEvaluator:
         self.all_source_file_contents = dict()
 
     def run(self):
+        if verbose:
+            print("Creating list of files for searching")
         source_files_to_search = []
         header_files_to_search = []
         for p in [self.source_dir, self.test_dir]:
@@ -156,12 +161,16 @@ class EnumScopeEvaluator:
         source_files_to_search.sort()
         header_files_to_search.sort()
 
+        if verbose:
+            print("Processing header file data")
         for file in header_files_to_search:
             s = SingleHeaderFile(file)
             s.run()
             self.all_enum_declarations.extend(s.enum_declarations)
 
-        for file in source_files_to_search:
+        if verbose:
+            print("Processing source file into lists of lines")
+        for file in source_files_to_search + header_files_to_search:
             with open(file, "r") as f:
                 original_lines = f.readlines()
             new_lines = list()
@@ -169,15 +178,19 @@ class EnumScopeEvaluator:
                 if "//" in line:
                     tokens = line.split("//")
                     line = tokens[0].strip()
-                if "::" not in line:
+                if "::" not in line and ' ' not in line:
                     line = ""  # ignore lines without namespace qualifier to save space for later searching
                 new_lines.append(line.strip())
             self.all_source_file_contents[file] = new_lines
 
+        if verbose:
+            print("Checking source file lines for usages")
         for file_path, file_lines in self.all_source_file_contents.items():
             for line_num, line in enumerate(file_lines):
                 self.check_single_line_for_usage(file_path, line_num, line)
 
+        if verbose:
+            print("Reconciling usages")
         apparent_enums_in_only_one_source_file: List[str] = list()
         apparent_enums_in_zero_source_files: List[str] = list()
         for e in self.all_enum_declarations:
@@ -189,6 +202,8 @@ class EnumScopeEvaluator:
             if len(unique_files_in_usages) == 1:
                 apparent_enums_in_only_one_source_file.append(f"{e.describe()} in {next(iter(unique_files_in_usages))}")
 
+        if verbose:
+            print("Reporting results")
         if len(apparent_enums_in_zero_source_files) > 0:
             print(f"Detected {len(apparent_enums_in_zero_source_files)} enums in ZERO source files:")
             for e in apparent_enums_in_zero_source_files:
@@ -201,6 +216,7 @@ class EnumScopeEvaluator:
         self.error_count = len(apparent_enums_in_zero_source_files) + len(apparent_enums_in_only_one_source_file)
 
     def check_single_line_for_usage(self, file_path: Path, line_num: int, line: str):
+        # search for usages of Enum:: first
         for match in finditer(r'(\w*::)', line):
             g = match.group(1)
             if g != 'std::':
@@ -208,6 +224,16 @@ class EnumScopeEvaluator:
                 for e in self.all_enum_declarations:
                     if e.enum_name == scope:
                         e.usages.append(PotentialUsage(file_path, line_num, line))
+        # also search for declarations of the enum type as in EnumType e;
+        if ' ' in line:
+            for e in self.all_enum_declarations:
+                if f"{e.enum_name} " in line:
+                    e.usages.append(PotentialUsage(file_path, line_num, line))
+        # finally it might also be used as a template type:
+        if '>' in line:
+            for e in self.all_enum_declarations:
+                if f"{e.enum_name}>" in line:
+                    e.usages.append(PotentialUsage(file_path, line_num, line))
 
 
 class TestEnumStuff(unittest.TestCase):

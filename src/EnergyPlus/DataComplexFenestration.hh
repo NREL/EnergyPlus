@@ -60,18 +60,6 @@ namespace EnergyPlus {
 
 namespace DataComplexFenestration {
 
-    // Parameters for gas definitions
-    enum class GasCoeffs
-    {
-        Invalid = -1,
-        Custom,
-        Air,
-        Argon,
-        Krypton,
-        Xenon,
-        Num
-    };
-
     struct GapSupportPillar
     {
         // Members

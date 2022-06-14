@@ -90,6 +90,14 @@ namespace TarcogShading {
     using namespace TARCOGGasses90;
     using namespace TARCOGParams;
 
+    enum class CalcForcedVentilation
+    {
+        Invalid = -1,
+        Skip,
+        Allow,
+        Num
+    };
+
     // Functions
 
     void shading(EnergyPlusData &state,
