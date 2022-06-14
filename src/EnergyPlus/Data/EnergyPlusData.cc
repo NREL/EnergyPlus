@@ -80,6 +80,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataChillerGasAbsorption = std::make_unique<ChillerGasAbsorptionData>();
     this->dataChillerIndirectAbsorption = std::make_unique<ChillerIndirectAbsoprtionData>();
     this->dataChillerReformulatedEIR = std::make_unique<ChillerReformulatedEIRData>();
+    this->dataChillerElectricASHRAE205 = std::make_unique<ChillerElectricASHRAE205Data>();
     this->dataCoilCooingDX = std::make_unique<CoilCoolingDXData>();
     this->dataCondenserLoopTowers = std::make_unique<CondenserLoopTowersData>();
     this->dataConstruction = std::make_unique<ConstructionData>();
