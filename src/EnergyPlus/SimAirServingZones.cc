@@ -1441,18 +1441,6 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
     // (3) Other air system node data such as temperatures and humidity ratios are only
     //     initialized at the start of an environment (run period or design day).
 
-    Real64 MassFlowSaved; // mass flow rate for a node saved from previous call
-    Real64 MassFlowSet;   // desired mass flow rate for a node
-
-    EPVector<int> ctrlZoneNumsCool;
-    EPVector<int> ctrlZoneNumsHeat;
-    EPVector<int> zoneInletNodesCool;
-    EPVector<int> zoneInletNodesHeat;
-    EPVector<int> termInletNodesCool;
-    EPVector<int> termInletNodesHeat;
-    EPVector<int> termUnitSizingNumsCool;
-    EPVector<int> termUnitSizingNumsHeat;
-
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     bool ErrorsFound;
@@ -1473,16 +1461,20 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         // Figure out what zones are served by each primary air system (air loop) and
         // store the results in AirToZoneNodeInfo()%CoolCtrlZoneNums and AirToZoneNodeInfo()%HeatCtrlZoneNums
 
-        // Allocate scratch arrays for storing controlled zone numbers for each air loop.
+        // Temporary air loop zone data
+        struct AirloopZone
+        {
+            int ctrlZoneNum = 0;         // Controlled zone num
+            int zoneInletNode = 0;       // Zone supply inlet node
+            int termUnitInletNode = 0;   // Terminal unit inlet node
+            int termUnitSizingIndex = 0; // Terminal unit sizing index
+        };
+
+        EPVector<AirloopZone> cooledZone;
+        EPVector<AirloopZone> heatedZone;
         size_t atuArraySize = max(static_cast<size_t>(state.dataGlobal->NumOfZones), state.dataDefineEquipment->AirDistUnit.size());
-        ctrlZoneNumsCool.allocate(atuArraySize);
-        ctrlZoneNumsHeat.allocate(atuArraySize);
-        zoneInletNodesCool.allocate(atuArraySize);
-        zoneInletNodesHeat.allocate(atuArraySize);
-        termInletNodesCool.allocate(atuArraySize);
-        termInletNodesHeat.allocate(atuArraySize);
-        termUnitSizingNumsCool.allocate(atuArraySize);
-        termUnitSizingNumsHeat.allocate(atuArraySize);
+        cooledZone.allocate(atuArraySize);
+        heatedZone.allocate(atuArraySize);
 
         state.dataSimAirServingZones->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
@@ -1613,17 +1605,21 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) = supNode(SupNodeIndex);
                 }
             }
-            supNode.deallocate();
-            supNodeType.deallocate();
         }
 
         // Now loop over the air loops
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
-            ctrlZoneNumsCool = 0;
-            ctrlZoneNumsHeat = 0;
-            zoneInletNodesCool = 0;
-            zoneInletNodesHeat = 0;
+            for (size_t num = 1; num <= atuArraySize; ++num) {
+                cooledZone(num).ctrlZoneNum = 0;
+                heatedZone(num).ctrlZoneNum = 0;
+                cooledZone(num).zoneInletNode = 0;
+                heatedZone(num).zoneInletNode = 0;
+                cooledZone(num).termUnitInletNode = 0;
+                heatedZone(num).termUnitInletNode = 0;
+                cooledZone(num).termUnitSizingIndex = 0;
+                heatedZone(num).termUnitSizingIndex = 0;
+            }
             int NumZonesCool = 0;
             int NumZonesHeat = 0;
             int NumComponentsInSys = 0;
@@ -1682,11 +1678,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesCool == 1) {
                                     AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Cooling;
                                 }
-                                ctrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
-                                zoneInletNodesCool(NumZonesCool) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                termInletNodesCool(NumZonesCool) =
+                                cooledZone(NumZonesCool).ctrlZoneNum = CtrlZoneNum;
+                                cooledZone(NumZonesCool).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                cooledZone(NumZonesCool).termUnitInletNode =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode;
-                                termUnitSizingNumsCool(NumZonesCool) =
+                                cooledZone(NumZonesCool).termUnitSizingIndex =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).TermUnitSizingIndex;
                                 if (AirLoopNum > 0) {
                                     if (PrimaryAirSystems(AirLoopNum).OASysExists) {
@@ -1719,11 +1715,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesHeat == 1) {
                                     AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Heating;
                                 }
-                                ctrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
-                                zoneInletNodesHeat(NumZonesHeat) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                termInletNodesHeat(NumZonesHeat) =
+                                heatedZone(NumZonesHeat).ctrlZoneNum = CtrlZoneNum;
+                                heatedZone(NumZonesHeat).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                heatedZone(NumZonesHeat).termUnitInletNode =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode;
-                                termUnitSizingNumsHeat(NumZonesHeat) =
+                                heatedZone(NumZonesHeat).termUnitSizingIndex =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).TermUnitSizingIndex;
                                 if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
@@ -1777,11 +1773,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesCool == 1 && OutBranchNum > 1) {
                                     PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).DuctType = Cooling;
                                 }
-                                ctrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
-                                zoneInletNodesCool(NumZonesCool) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                termInletNodesCool(NumZonesCool) =
+                                cooledZone(NumZonesCool).ctrlZoneNum = CtrlZoneNum;
+                                cooledZone(NumZonesCool).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                cooledZone(NumZonesCool).termUnitInletNode =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode;
-                                termUnitSizingNumsCool(NumZonesCool) =
+                                cooledZone(NumZonesCool).termUnitSizingIndex =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).TermUnitSizingIndex;
                                 if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
@@ -1794,11 +1790,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesHeat == 1 && OutBranchNum > 1) {
                                     PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).DuctType = Heating;
                                 }
-                                ctrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
-                                zoneInletNodesHeat(NumZonesHeat) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                termInletNodesHeat(NumZonesHeat) =
+                                heatedZone(NumZonesHeat).ctrlZoneNum = CtrlZoneNum;
+                                heatedZone(NumZonesHeat).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                heatedZone(NumZonesHeat).termUnitInletNode =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode;
-                                termUnitSizingNumsHeat(NumZonesHeat) =
+                                heatedZone(NumZonesHeat).termUnitSizingIndex =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).TermUnitSizingIndex;
                                 if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
@@ -1830,17 +1826,17 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex.allocate(NumZonesHeat);
             // Move the controlled zone numbers from the scratch arrays into AirToZoneNodeInfo
             for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesCool; ++ZoneInSysIndex) {
-                AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) = ctrlZoneNumsCool(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZoneInSysIndex) = zoneInletNodesCool(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) = termInletNodesCool(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZoneInSysIndex) = termUnitSizingNumsCool(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) = cooledZone(ZoneInSysIndex).ctrlZoneNum;
+                AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZoneInSysIndex) = cooledZone(ZoneInSysIndex).zoneInletNode;
+                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) = cooledZone(ZoneInSysIndex).termUnitInletNode;
+                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZoneInSysIndex) = cooledZone(ZoneInSysIndex).termUnitSizingIndex;
             }
 
             for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesHeat; ++ZoneInSysIndex) {
-                AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZoneInSysIndex) = ctrlZoneNumsHeat(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZoneInSysIndex) = zoneInletNodesHeat(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) = termInletNodesHeat(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZoneInSysIndex) = termUnitSizingNumsHeat(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZoneInSysIndex) = heatedZone(ZoneInSysIndex).ctrlZoneNum;
+                AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZoneInSysIndex) = heatedZone(ZoneInSysIndex).zoneInletNode;
+                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) = heatedZone(ZoneInSysIndex).termUnitInletNode;
+                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZoneInSysIndex) = heatedZone(ZoneInSysIndex).termUnitSizingIndex;
             }
 
             AirToZoneNodeInfo(AirLoopNum).NumZonesCooled = NumZonesCool;
@@ -1937,15 +1933,6 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         ConnectReturnNodes(state);
 
         state.dataSimAirServingZones->InitAirLoopsOneTimeFlag = false;
-
-        ctrlZoneNumsCool.deallocate();
-        ctrlZoneNumsHeat.deallocate();
-        zoneInletNodesCool.deallocate();
-        zoneInletNodesHeat.deallocate();
-        termInletNodesCool.deallocate();
-        termInletNodesHeat.deallocate();
-        termUnitSizingNumsCool.deallocate();
-        termUnitSizingNumsHeat.deallocate();
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding errors cause termination");
@@ -2220,6 +2207,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             int OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
             int NodeNumOut = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).NodeNumOut;
             int ZoneSideNodeNum = AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum);
+            Real64 MassFlowSet = 0.0;
 
             if (!FirstHVACIteration) {
                 MassFlowSet = state.dataLoopNodes->Node(ZoneSideNodeNum).MassFlowRate;
@@ -2276,7 +2264,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 int NodeNumIn = PrimaryAirSystems(AirLoopNum).Branch(InBranchNum).NodeNumIn;
 
                 // [DC/LBNL] Save previous mass flow rate
-                MassFlowSaved = state.dataLoopNodes->Node(NodeNumIn).MassFlowRate;
+                Real64 MassFlowSaved = state.dataLoopNodes->Node(NodeNumIn).MassFlowRate;
 
                 state.dataLoopNodes->Node(NodeNumIn).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
 
