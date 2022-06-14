@@ -8404,19 +8404,15 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         int PipeNum = state.dataSurface->SurfWinTDDPipeNum(SurfNum);
                         int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                         Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
-                        Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
-                        if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum2)) {
-                            GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum2);
-                        }
                         // Exterior diffuse solar incident on window (W/m2)
                         Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) +
-                                             GndReflSolarRad * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
+                                             state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
                         // Exterior diffuse sky solar transmitted by TDD (W/m2)
                         Real64 SkySolarTrans = state.dataEnvrn->DifSolarRad *
                                                TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso) *
                                                state.dataSolarShading->SurfAnisoSkyMult(SurfNum2);
                         // Exterior diffuse ground solar transmitted by TDD (W/m2)
-                        Real64 GndSolarTrans = GndReflSolarRad * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
+                        Real64 GndSolarTrans = state.dataEnvrn->GndSolarRad * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
                                                state.dataSurface->Surface(SurfNum2).ViewFactorGround;
 
                         state.dataSurface->SurfWinBmSolar(SurfNum) =
@@ -8449,12 +8445,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                              state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                             state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-                        Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
-                        if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
-                            GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum);
-                        }
                         Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum) +
-                                             GndReflSolarRad * state.dataSurface->Surface(SurfNum).ViewFactorGround +
+                                             state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(SurfNum).ViewFactorGround +
                                              ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
                         state.dataSurface->SurfWinBmSolar(SurfNum) =
@@ -9623,11 +9615,8 @@ void WindowShadingManager(EnergyPlusData &state)
                 BeamSolarOnWindow = state.dataEnvrn->BeamSolarRad *
                                     state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, ISurf) *
                                     state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, ISurf);
-                Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
-                if (state.dataSurface->UseSurfPropertyGndSurfRefl(ISurf)) {
-                    GndReflSolarRad = state.dataSurface->GndReflSolarRad(ISurf);
-                }
-                SolarOnWindow = BeamSolarOnWindow + SkySolarOnWindow + GndReflSolarRad * state.dataSurface->Surface(ISurf).ViewFactorGround;
+                SolarOnWindow =
+                    BeamSolarOnWindow + SkySolarOnWindow + state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(ISurf).ViewFactorGround;
                 HorizSolar = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad;
             }
 
@@ -10283,7 +10272,6 @@ void SkyDifSolarShading(EnergyPlusData &state)
 
     // Using/Aliasing
 
-    int SrdSurfsNum;        // Srd surface counter
     Real64 Fac1WoShdg;      // Intermediate calculation factor, without shading
     Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
     Real64 Fac1WithShdg;    // Intermediate calculation factor, with shading
@@ -10451,16 +10439,14 @@ void SkyDifSolarShading(EnergyPlusData &state)
         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
 
         if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+            int SrdSurfsNum;
+            Real64 SrdSurfsViewFactor = 0.0;
             SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
+            auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+            for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
             }
-        }
-        if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
-            int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
-            if (state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet) {
-                state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
-            }
+            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR - SrdSurfsViewFactor;
         }
     }
 

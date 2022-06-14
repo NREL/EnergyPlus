@@ -300,79 +300,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->SurfHasLinkedOutAirNode(SurfNum)) {
-                int const linkedNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
-                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirDryBulb;
-                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWetBulb;
-                state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindSpeed;
-                state.dataSurface->SurfOutWindDir(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindDir;
-            }
-
-            if (!state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) continue;
-
-            if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) || state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
-                int GndSurfsNum = 0;
-                int SrdSurfsNum = 0;
-                Real64 SrdSurfsViewFactor = 0.0;
-                Real64 SurfsSkyViewFactor = 0.0;
-                Real64 GroundSurfsViewFactor = 0.0;
-                bool IsGroundViewFactorSet = false;
-                bool SetGroundViewFactorObject = false;
-                if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                    SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                    SurfsSkyViewFactor = SrdSurfsProperty.SkyViewFactor;
-                    if (SurfsSkyViewFactor > 0.0) {
-                        SrdSurfsViewFactor += SurfsSkyViewFactor;
-                    }
-                    for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                        SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                    }
-                }
-                if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
-                    GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
-                    IsGroundViewFactorSet = state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet;
-                    GroundSurfsViewFactor = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
-                    SrdSurfsViewFactor += GroundSurfsViewFactor;
-                }
-                // Check if the sum of all defined view factors > 1.0
-                if (SrdSurfsViewFactor > 1.0) {
-                    ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
-                    ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
-                }
-                if (SurfsSkyViewFactor >= 0 && IsGroundViewFactorSet) {
-                    // If both surface sky and ground view factor defined, overwrite with the defined value
-                    Surface(SurfNum).ViewFactorSkyIR = SurfsSkyViewFactor;
-                    Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                } else if (SurfsSkyViewFactor >= 0 && !IsGroundViewFactorSet) {
-                    // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
-                    Surface(SurfNum).ViewFactorSkyIR = SurfsSkyViewFactor;
-                    Surface(SurfNum).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
-                    if (GndSurfsNum > 0) {
-                        SetGroundViewFactorObject = true;
-                        state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
-                    }
-                } else if (SurfsSkyViewFactor < 0 && IsGroundViewFactorSet) {
-                    // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
-                    Surface(SurfNum).ViewFactorGroundIR = GroundSurfsViewFactor;
-                    Surface(SurfNum).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
-                    if (SrdSurfsNum > 0) {
-                        state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface(SurfNum).ViewFactorSkyIR;
-                    }
-                } else {
-                    // If neither ground or sky view factor define, continue to use the original proportion.
-                    Surface(SurfNum).ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
-                    Surface(SurfNum).ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
-                    if (SrdSurfsNum > 0) {
-                        state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface(SurfNum).ViewFactorSkyIR;
-                    }
-                    if (GndSurfsNum > 0) {
-                        SetGroundViewFactorObject = true;
-                        state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
-                    }
-                }
-                if (SetGroundViewFactorObject) {
-                    ReSetGroundSurfacesViewFactor(state, SurfNum);
-                }
+                auto &linkedNode = state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum));
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = linkedNode.OutAirDryBulb;
+                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = linkedNode.OutAirWetBulb;
+                state.dataSurface->SurfOutWindSpeed(SurfNum) = linkedNode.OutAirWindSpeed;
+                state.dataSurface->SurfOutWindDir(SurfNum) = linkedNode.OutAirWindDir;
             }
         }
     }
@@ -8938,6 +8870,98 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
         }
     }
 }
+
+void InitSurfacePropertyViewFactors(EnergyPlusData &state)
+{
+
+    // purpuse:
+    //   Initializes sky and ground surfaces view factors of exterior surfaces
+    //   used by SurfaceProperty:LocalEnvironment
+    //   view factors are constant hence should be set only once
+
+    if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
+        return;
+    }
+    if (!state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) {
+        return;
+    }
+
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) || state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
+
+            auto &Surface = state.dataSurface->Surface(SurfNum);
+
+            int GndSurfsNum = 0;
+            int SrdSurfsNum = 0;
+            Real64 SrdSurfsViewFactor = 0.0;
+            Real64 SurfsSkyViewFactor = 0.0;
+            Real64 GroundSurfsViewFactor = 0.0;
+            bool IsSkyViewFactorSet = false;
+            bool IsGroundViewFactorSet = false;
+            bool SetGroundViewFactorObject = false;
+            if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+                auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                SurfsSkyViewFactor = SrdSurfsProperty.SkyViewFactor;
+                IsSkyViewFactorSet = SrdSurfsProperty.IsSkyViewFactorSet;
+                if (SurfsSkyViewFactor > 0.0) {
+                    SrdSurfsViewFactor += SurfsSkyViewFactor;
+                }
+                for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                    SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                }
+            }
+            if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
+                GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
+                IsGroundViewFactorSet = state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet;
+                GroundSurfsViewFactor = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
+                SrdSurfsViewFactor += GroundSurfsViewFactor;
+            }
+
+            // Check if the sum of all defined view factors > 1.0
+            if (SrdSurfsViewFactor > 1.0) {
+                ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface.Name + ".");
+                ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than or equal to 1.0.");
+            }
+            if (IsSkyViewFactorSet && IsGroundViewFactorSet) {
+                // If both surface sky and ground view factor defined, overwrite with the defined value
+                Surface.ViewFactorSkyIR = SurfsSkyViewFactor;
+                Surface.ViewFactorGroundIR = GroundSurfsViewFactor;
+            } else if (IsSkyViewFactorSet && !IsGroundViewFactorSet) {
+                // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
+                Surface.ViewFactorSkyIR = SurfsSkyViewFactor;
+                Surface.ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
+                if (GndSurfsNum > 0) {
+                    SetGroundViewFactorObject = true;
+                    state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
+                }
+            } else if (!IsSkyViewFactorSet && IsGroundViewFactorSet) {
+                // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
+                Surface.ViewFactorGroundIR = GroundSurfsViewFactor;
+                Surface.ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
+                if (SrdSurfsNum > 0) {
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).IsSkyViewFactorSet = true;
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface.ViewFactorSkyIR;
+                }
+            } else {
+                // If neither ground nor sky view factor specified, continue to use the original proportion.
+                Surface.ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
+                Surface.ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
+                if (SrdSurfsNum > 0) {
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).IsSkyViewFactorSet = true;
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface.ViewFactorSkyIR;
+                }
+                if (GndSurfsNum > 0) {
+                    SetGroundViewFactorObject = true;
+                    state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
+                }
+            }
+            if (SetGroundViewFactorObject) {
+                ReSetGroundSurfacesViewFactor(state, SurfNum);
+            }
+        }
+    }
+}	
 
 void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
 {

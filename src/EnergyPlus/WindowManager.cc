@@ -2631,23 +2631,13 @@ namespace WindowManager {
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
                         SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            surface.ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                        }
-                        for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                             SrdSurfNum++) {
-                            SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(
-                                    state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                DataGlobalConstants::KelvinConv;
+                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                        for (SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                             DataGlobalConstants::KelvinConv;
                             OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
-                    }
-                    if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
-                        int GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
-                        surface.ViewFactorGroundIR = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
                     }
                 }
                 if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)
