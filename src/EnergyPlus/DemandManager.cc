@@ -331,12 +331,9 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     bool ErrorsFound(false);
 
     std::string cCurrentModuleObject = "DemandManagerAssignmentList";
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNums);
     state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataDemandManager->NumDemandManagerList > 0) {
-        state.dataIPShortCut->cAlphaArgs({1, NumAlphas}) = "";
-        state.dataIPShortCut->rNumericArgs({1, NumNums}) = 0.0;
 
         state.dataDemandManager->DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
 
