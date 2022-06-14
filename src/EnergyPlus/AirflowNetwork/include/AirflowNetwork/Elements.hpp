@@ -94,6 +94,15 @@ namespace AirflowNetwork {
         UserAspectRatio  // Effective rectangle user input aspect ratio selection
     };
 
+    enum class DuctLineType
+    {
+        Invalid = -1,
+        SupplyTrunk,  // Supply trunk
+        SupplyBranch, // SupplyBrnach
+        ReturnTrunk,  // Return trunk
+        ReturnBranch, // ReturnBrnach
+    };
+
     // Using/Aliasing
 
     // Data
@@ -258,6 +267,54 @@ namespace AirflowNetwork {
             Num
         };
 
+        struct AirflowNetworkDuctSizingProp // Duct sizing
+        {
+            enum class DuctSizeMethod
+            {
+                Invalid = -1,
+                MaxVelocity,
+                PressureLoss,
+                VelocityAndLoss
+            };
+
+            // Members
+
+            std::string Name;              // Provide a unique object name
+            DuctSizeMethod ductSizeMethod; // Duct autosize method as enum
+            Real64 DuctSizeFactor;         // Duct size factor
+            Real64 DuctSizeMaxV;           // Maximum airflow velocity
+            Real64 DuctSizePLossSTrunk;    // Pressure loss across supply trunk
+            Real64 DuctSizePLossSBranch;   // Pressure loss across supply branch
+            Real64 DuctSizePLossRTrunk;    // Pressure loss across return trunk
+            Real64 DuctSizePLossRBranch;   // Pressure loss across return branch
+            int ErrCountDuct;
+            int ErrIndexDuct;
+
+            // Default Constructor
+            AirflowNetworkDuctSizingProp()
+                : ductSizeMethod(DuctSizeMethod::MaxVelocity), DuctSizeFactor(1.0), DuctSizeMaxV(5.0), DuctSizePLossSTrunk(1.0),
+                  DuctSizePLossSBranch(1.0), DuctSizePLossRTrunk(1.0), DuctSizePLossRBranch(1.0), ErrCountDuct(0), ErrIndexDuct(0)
+            {
+            }
+
+            // Member Constructor
+            AirflowNetworkDuctSizingProp(DuctSizeMethod ductSizeMethod,     // Duct autosize method as enum
+                                         Real64 const DuctSizeFactor,       // Duct size factor
+                                         Real64 const DuctSizeMaxV,         // Maximum airflow velocity
+                                         Real64 const DuctSizePLossSTrunk,  // Pressure loss across supply trunk
+                                         Real64 const DuctSizePLossSBranch, // Pressure loss across supply branch
+                                         Real64 const DuctSizePLossRTrunk,  // Pressure loss across return trunk
+                                         Real64 const DuctSizePLossRBranch, // Pressure loss across return branch
+                                         int const ErrCountDuct,
+                                         int const ErrIndexDuct)
+
+                : ductSizeMethod(ductSizeMethod), DuctSizeFactor(DuctSizeFactor), DuctSizeMaxV(DuctSizeMaxV),
+                  DuctSizePLossSTrunk(DuctSizePLossSTrunk), DuctSizePLossSBranch(DuctSizePLossSBranch), DuctSizePLossRTrunk(DuctSizePLossRTrunk),
+                  DuctSizePLossRBranch(DuctSizePLossRBranch), ErrCountDuct(ErrCountDuct), ErrIndexDuct(ErrIndexDuct)
+            {
+            }
+        };
+
         // Members
         std::string AirflowNetworkSimuName; // Provide a unique object name
         std::string Control;                // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
@@ -286,12 +343,15 @@ namespace AirflowNetwork {
         bool TExtHeightDep;          // Choice of height dependence of external node temperature
         bool AllowSupportZoneEqp;    // Allow unsupported zone equipment
         // "ZeroNodePressures", or "LinearInitializationMethod"
+        bool AFNDuctAutoSize; // True: perform duct autosize, otherwise no duct autosize
+        AirflowNetworkDuctSizingProp ductSizing;
 
         // Default Constructor
         AirflowNetworkSimuProp()
             : Control("NoMultizoneOrDistribution"), WPCCntr("Input"), MaxIteration(500), InitFlag(0), solver(Solver::SkylineLU), RelTol(1.0e-5),
               AbsTol(1.0e-5), ConvLimit(-0.5), MaxPressure(500.0), Azimuth(0.0), AspectRatio(1.0), DiffP(1.0e-4), ExtLargeOpeningErrCount(0),
-              ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), InitType("ZeroNodePressures"), TExtHeightDep(false)
+              ExtLargeOpeningErrIndex(0), OpenFactorErrCount(0), OpenFactorErrIndex(0), InitType("ZeroNodePressures"), TExtHeightDep(false),
+              AllowSupportZoneEqp(false), AFNDuctAutoSize(false)
         {
         }
 
@@ -316,13 +376,16 @@ namespace AirflowNetwork {
                                int const OpenFactorErrIndex,      // Large opening error error index at Open factor > 1.0
                                std::string const &InitType,       // Initialization flag type:
                                Solver solver,                     // Solver type
-                               bool const TExtHeightDep           // Choice of height dependence of external node temperature
+                               bool const TExtHeightDep,          // Choice of height dependence of external node temperature
+                               bool const AllowSupportZoneEqp,    // Allow unsupported zone equipment
+                               bool const AFNDuctAutoSize         // True: perform duct autosize, otherwise no duct autosize
                                )
+
             : AirflowNetworkSimuName(AirflowNetworkSimuName), Control(Control), WPCCntr(WPCCntr), BldgType(BldgType), HeightOption(HeightOption),
               MaxIteration(MaxIteration), InitFlag(InitFlag), solver(solver), RelTol(RelTol), AbsTol(AbsTol), ConvLimit(ConvLimit),
               MaxPressure(MaxPressure), Azimuth(Azimuth), AspectRatio(AspectRatio), DiffP(DiffP), ExtLargeOpeningErrCount(ExtLargeOpeningErrCount),
               ExtLargeOpeningErrIndex(ExtLargeOpeningErrIndex), OpenFactorErrCount(OpenFactorErrCount), OpenFactorErrIndex(OpenFactorErrIndex),
-              InitType(InitType), TExtHeightDep(TExtHeightDep)
+              InitType(InitType), TExtHeightDep(TExtHeightDep), AllowSupportZoneEqp(AllowSupportZoneEqp), AFNDuctAutoSize(AFNDuctAutoSize)
         {
         }
     };
@@ -1462,11 +1525,12 @@ namespace AirflowNetwork {
         bool VAVTermDamper;                 // True if this component is a damper for a VAV terminal
         int LinkageViewFactorObjectNum;
         int AirLoopNum; // Airloop number
+        DuctLineType ductLineType;
 
         // Default Constructor
         AirflowNetworkLinkageProp()
             : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Invalid), VAVTermDamper(false),
-              LinkageViewFactorObjectNum(0), AirLoopNum(0)
+              LinkageViewFactorObjectNum(0), AirLoopNum(0), ductLineType(DuctLineType::Invalid)
         {
         }
     };
