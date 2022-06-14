@@ -1452,33 +1452,22 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
     using ZonePlenum::ZoneSupplyPlenumConditions;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumAllSupAirPathNodes; // total number of nodes in a supply air path including duplicates
-    int NumSupAirPathNodes;    // total number of nodes in a supply air path
-    int NumSupAirPathOutNodes; // total number of outlet nodes in a supply air path
-    int NumSupAirPathIntNodes; // total number of intermediate nodes in a supply air path
-    int NodeIndex;             // DO loop index for nodes on branch
-    int SupNodeIndex;          // do loop index of a supply air path node
-    int SupNodeIndex2;         // 2nd do loop index of a supply air path node
-    int SupAirPathNodeNum;     // index of a supply air path node
-    int SupAirPathOutNodeNum;  // index of a supply air path outlet node
-    int AirLoopNum;            // DO loop counter for air systems
-    int BranchNum;             // DO loop counter for branches
-    int OutBranchNum;          // reference number of an outlet branch
-    int InBranchNum;           // reference number of an inlet branch
+    // int NumAllSupAirPathNodes; // total number of nodes in a supply air path including duplicates
+    // int NumSupAirPathNodes;    // total number of nodes in a supply air path
+    // int NumSupAirPathOutNodes; // total number of outlet nodes in a supply air path
+    // int NumSupAirPathIntNodes; // total number of intermediate nodes in a supply air path
+    // int NodeIndex;             // DO loop index for nodes on branch
+    // int SupAirPathNodeNum;     // index of a supply air path node
+    // int SupAirPathOutNodeNum;  // index of a supply air path outlet node
+    // int OutBranchNum;          // reference number of an outlet branch
+    // int InBranchNum;           // reference number of an inlet branch
     // unused  INTEGER :: InletBranchNum   ! Branch reference number of splitter inlet branch
     int NodeNum;                  // a node number
-    int OutNum;                   // DO loop index for outlet branches
-    int InNum;                    // DO loop index for inlet branches
-    int CompNum;                  // DO loop index for  branch components
     int ZoneSideNodeNum;          // a Zone Equipment inlet node number
-    int BranchNodeIndex;          // DO loop index for nodes on a branch
     int NodeNumOut;               // node number of a branch outlet node
     int NodeNumIn;                // node number of a splitter inlet node or a branch inlet node
-    int SplitterOutNum;           // DO loop index of splitter outlets
-    int PlenumOutNum;             // DO loop index of supply plenum outlets
     Real64 MassFlowSaved;         // mass flow rate for a node saved from previous call
     Real64 MassFlowSet;           // desired mass flow rate for a node
-    int SupAirPath;               // supply air path do loop index
     int SupAirPathNum;            // specific supply air path index
     int SplitterNum;              // Zone equip splitter index
     int PlenumNum;                // supply plenum index
@@ -1492,6 +1481,15 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
     int SupFanIndex;
     int RetFanIndex;
     bool FoundOASys;
+
+    EPVector<int> ctrlZoneNumsCool;
+    EPVector<int> ctrlZoneNumsHeat;
+    EPVector<int> zoneInletNodesCool;
+    EPVector<int> zoneInletNodesHeat;
+    EPVector<int> termInletNodesCool;
+    EPVector<int> termInletNodesHeat;
+    EPVector<int> termUnitSizingNumsCool;
+    EPVector<int> termUnitSizingNumsHeat;
 
     // Dimension the local subcomponent arrays
 
@@ -1516,30 +1514,30 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         // store the results in AirToZoneNodeInfo()%CoolCtrlZoneNums and AirToZoneNodeInfo()%HeatCtrlZoneNums
 
         // Allocate scratch arrays for storing controlled zone numbers for each air loop.
-        int atuArraySize = max(state.dataGlobal->NumOfZones, state.dataDefineEquipment->AirDistUnit.size());
-        state.dataSimAirServingZones->CtrlZoneNumsCool.allocate(atuArraySize);
-        state.dataSimAirServingZones->CtrlZoneNumsHeat.allocate(atuArraySize);
-        state.dataSimAirServingZones->ZoneInletNodesCool.allocate(atuArraySize);
-        state.dataSimAirServingZones->ZoneInletNodesHeat.allocate(atuArraySize);
-        state.dataSimAirServingZones->TermInletNodesCool.allocate(atuArraySize);
-        state.dataSimAirServingZones->TermInletNodesHeat.allocate(atuArraySize);
-        state.dataSimAirServingZones->TermUnitSizingNumsCool.allocate(atuArraySize);
-        state.dataSimAirServingZones->TermUnitSizingNumsHeat.allocate(atuArraySize);
+        size_t atuArraySize = max(static_cast<size_t>(state.dataGlobal->NumOfZones), state.dataDefineEquipment->AirDistUnit.size());
+        ctrlZoneNumsCool.allocate(atuArraySize);
+        ctrlZoneNumsHeat.allocate(atuArraySize);
+        zoneInletNodesCool.allocate(atuArraySize);
+        zoneInletNodesHeat.allocate(atuArraySize);
+        termInletNodesCool.allocate(atuArraySize);
+        termInletNodesHeat.allocate(atuArraySize);
+        termUnitSizingNumsCool.allocate(atuArraySize);
+        termUnitSizingNumsHeat.allocate(atuArraySize);
 
         state.dataSimAirServingZones->MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
-        for (SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
+        for (int SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
 
-            NumAllSupAirPathNodes = 0;
-            SupAirPathNodeNum = 0;
-            SupAirPathOutNodeNum = 0;
-            NumSupAirPathOutNodes = 0;
-            NumSupAirPathNodes = 0;
-            NumSupAirPathIntNodes = 0;
+            int NumAllSupAirPathNodes = 0;
+            int SupAirPathNodeNum = 0;
+            int SupAirPathOutNodeNum = 0;
+            int NumSupAirPathOutNodes = 0;
+            int NumSupAirPathNodes = 0;
+            int NumSupAirPathIntNodes = 0;
 
             // each supply air path may have up to one splitter and one plenum.  Check for all combinations count
             // all nodes (including duplicates)
-            for (CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
+            for (int CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
                 if (UtilityRoutines::SameString(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:ZoneSplitter")) {
                     SplitterNum = UtilityRoutines::FindItemInList(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentName(CompNum),
                                                                   state.dataSplitterComponent->SplitterCond,
@@ -1567,53 +1565,53 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     NumAllSupAirPathNodes += state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
                 }
             }
-            state.dataSimAirServingZones->SupNode.allocate(NumAllSupAirPathNodes);
-            state.dataSimAirServingZones->SupNodeType.allocate(NumAllSupAirPathNodes);
+            EPVector<int> supNode;
+            EPVector<DataZoneEquipment::AirNodeType> supNodeType;
+            supNode.allocate(NumAllSupAirPathNodes);
+            supNodeType.allocate(NumAllSupAirPathNodes);
 
             // figure out the order of the splitter and plenum in the path, by flagging the first node of the component
             // as either a 'pathinlet' or a 'compinlet'
-            for (CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
+            for (int CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
                 SplitterNum = state.dataZoneEquip->SupplyAirPath(SupAirPath).SplitterIndex(CompNum);
                 PlenumNum = state.dataZoneEquip->SupplyAirPath(SupAirPath).PlenumIndex(CompNum);
                 if (SplitterNum > 0) {
                     ++SupAirPathNodeNum;
-                    state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
+                    supNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
                     if (CompNum == 1) {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
+                        supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
+                        supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
                     }
-                    for (SplitterOutNum = 1; SplitterOutNum <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes;
+                    for (int SplitterOutNum = 1; SplitterOutNum <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes;
                          ++SplitterOutNum) {
                         ++SupAirPathNodeNum;
-                        state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
-                            state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
+                        supNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
+                        supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 } else if (PlenumNum > 0) {
                     ++SupAirPathNodeNum;
-                    state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).InletNode;
+                    supNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).InletNode;
                     if (CompNum == 1) {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
+                        supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
+                        supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
                     }
-                    for (PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
+                    for (int PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                         ++SupAirPathNodeNum;
-                        state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
-                            state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
+                        supNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
+                        supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 }
             }
 
             // find the nodes that connect a splitter and a plenum
-            for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
-                    for (SupNodeIndex2 = SupNodeIndex + 1; SupNodeIndex2 <= NumAllSupAirPathNodes; ++SupNodeIndex2) {
-                        if ((state.dataSimAirServingZones->SupNode(SupNodeIndex) == state.dataSimAirServingZones->SupNode(SupNodeIndex2)) &&
-                            (state.dataSimAirServingZones->SupNodeType(SupNodeIndex2) == DataZoneEquipment::AirNodeType::CompInlet)) {
-                            state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Intermediate;
+            for (int SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
+                if (supNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
+                    for (int SupNodeIndex2 = SupNodeIndex + 1; SupNodeIndex2 <= NumAllSupAirPathNodes; ++SupNodeIndex2) {
+                        if ((supNode(SupNodeIndex) == supNode(SupNodeIndex2)) &&
+                            (supNodeType(SupNodeIndex2) == DataZoneEquipment::AirNodeType::CompInlet)) {
+                            supNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Intermediate;
                             break;
                         }
                     }
@@ -1621,11 +1619,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             }
 
             //  the rest of the nodes are outlet nodes and count the duplicated intermediate nodes
-            for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
+            for (int SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
+                if (supNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
                     ++NumSupAirPathOutNodes;
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Outlet;
-                } else if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate) {
+                    supNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Outlet;
+                } else if (supNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate) {
                     ++NumSupAirPathIntNodes;
                 }
             }
@@ -1640,40 +1638,38 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOutletNodes = NumSupAirPathOutNodes;
 
             // transfer data from the local SupNode array to the SupplyAirPath data structure
-            for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::PathInlet ||
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate ||
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
+            for (int SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
+                if (supNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::PathInlet ||
+                    supNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate ||
+                    supNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
                     ++SupAirPathNodeNum;
                     // map the local node numbers to the HVAC (global) node numbers
-                    state.dataZoneEquip->SupplyAirPath(SupAirPath).Node(SupAirPathNodeNum) = state.dataSimAirServingZones->SupNode(SupNodeIndex);
-                    state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType(SupAirPathNodeNum) =
-                        state.dataSimAirServingZones->SupNodeType(SupNodeIndex);
+                    state.dataZoneEquip->SupplyAirPath(SupAirPath).Node(SupAirPathNodeNum) = supNode(SupNodeIndex);
+                    state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType(SupAirPathNodeNum) = supNodeType(SupNodeIndex);
                 }
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
+                if (supNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
                     ++SupAirPathOutNodeNum;
                     // map the outlet node number to the HVAC (global) node number
-                    state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) =
-                        state.dataSimAirServingZones->SupNode(SupNodeIndex);
+                    state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) = supNode(SupNodeIndex);
                 }
             }
-            state.dataSimAirServingZones->SupNode.deallocate();
-            state.dataSimAirServingZones->SupNodeType.deallocate();
+            supNode.deallocate();
+            supNodeType.deallocate();
         }
 
         // Now loop over the air loops
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
-            state.dataSimAirServingZones->CtrlZoneNumsCool = 0;
-            state.dataSimAirServingZones->CtrlZoneNumsHeat = 0;
-            state.dataSimAirServingZones->ZoneInletNodesCool = 0;
-            state.dataSimAirServingZones->ZoneInletNodesHeat = 0;
+            ctrlZoneNumsCool = 0;
+            ctrlZoneNumsHeat = 0;
+            zoneInletNodesCool = 0;
+            zoneInletNodesHeat = 0;
             int NumZonesCool = 0;
             int NumZonesHeat = 0;
             NumComponentsInSys = 0;
 
             // count the number of components in this primary air system
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+            for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                 NumComponentsInSys += PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
             }
             // set the Simple flag
@@ -1682,29 +1678,28 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             }
 
             // loop over the air loop's output nodes
-            for (OutNum = 1; OutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
+            for (int OutNum = 1; OutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
                 ZoneSideNodeNum = AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum);
                 // find the corresponding branch number
-                OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
+                int OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
                 // find the supply air path corresponding to each air loop outlet node
                 SupAirPathNum = 0;
                 // loop over the air loop's output nodes
-                for (SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
+                for (int SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
                     if (ZoneSideNodeNum == state.dataZoneEquip->SupplyAirPath(SupAirPath).InletNodeNum) {
                         SupAirPathNum = SupAirPath;
                         break;
                     }
                 }
+                int NumSupAirPathOutNodes = 0;
                 if (SupAirPathNum > 0) {
                     NumSupAirPathOutNodes = state.dataZoneEquip->SupplyAirPath(SupAirPathNum).NumOutletNodes;
-                } else {
-                    NumSupAirPathOutNodes = 0;
                 }
 
                 // Now Loop over the Supply Air Path outlet nodes and find out which zone and which air terminal
                 // unit on that zone is connected to that supply air path.
 
-                for (SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum) {
+                for (int SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum) {
                     FoundSupPathZoneConnect = false;
                     // loop over all controlled zones.
                     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
@@ -1727,12 +1722,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesCool == 1) {
                                     AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Cooling;
                                 }
-                                state.dataSimAirServingZones->CtrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
-                                state.dataSimAirServingZones->ZoneInletNodesCool(NumZonesCool) =
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                state.dataSimAirServingZones->TermInletNodesCool(NumZonesCool) =
+                                ctrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
+                                zoneInletNodesCool(NumZonesCool) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                termInletNodesCool(NumZonesCool) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode;
-                                state.dataSimAirServingZones->TermUnitSizingNumsCool(NumZonesCool) =
+                                termUnitSizingNumsCool(NumZonesCool) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).TermUnitSizingIndex;
                                 if (AirLoopNum > 0) {
                                     if (PrimaryAirSystems(AirLoopNum).OASysExists) {
@@ -1765,12 +1759,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesHeat == 1) {
                                     AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Heating;
                                 }
-                                state.dataSimAirServingZones->CtrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
-                                state.dataSimAirServingZones->ZoneInletNodesHeat(NumZonesHeat) =
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                state.dataSimAirServingZones->TermInletNodesHeat(NumZonesHeat) =
+                                ctrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
+                                zoneInletNodesHeat(NumZonesHeat) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                termInletNodesHeat(NumZonesHeat) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode;
-                                state.dataSimAirServingZones->TermUnitSizingNumsHeat(NumZonesHeat) =
+                                termUnitSizingNumsHeat(NumZonesHeat) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).TermUnitSizingIndex;
                                 if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
@@ -1824,12 +1817,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesCool == 1 && OutBranchNum > 1) {
                                     PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).DuctType = Cooling;
                                 }
-                                state.dataSimAirServingZones->CtrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
-                                state.dataSimAirServingZones->ZoneInletNodesCool(NumZonesCool) =
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                state.dataSimAirServingZones->TermInletNodesCool(NumZonesCool) =
+                                ctrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
+                                zoneInletNodesCool(NumZonesCool) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                termInletNodesCool(NumZonesCool) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode;
-                                state.dataSimAirServingZones->TermUnitSizingNumsCool(NumZonesCool) =
+                                termUnitSizingNumsCool(NumZonesCool) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).TermUnitSizingIndex;
                                 if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
@@ -1842,12 +1834,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (NumZonesHeat == 1 && OutBranchNum > 1) {
                                     PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).DuctType = Heating;
                                 }
-                                state.dataSimAirServingZones->CtrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
-                                state.dataSimAirServingZones->ZoneInletNodesHeat(NumZonesHeat) =
-                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                state.dataSimAirServingZones->TermInletNodesHeat(NumZonesHeat) =
+                                ctrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
+                                zoneInletNodesHeat(NumZonesHeat) = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                termInletNodesHeat(NumZonesHeat) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode;
-                                state.dataSimAirServingZones->TermUnitSizingNumsHeat(NumZonesHeat) =
+                                termUnitSizingNumsHeat(NumZonesHeat) =
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).TermUnitSizingIndex;
                                 if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
@@ -1871,21 +1862,17 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex.allocate(NumZonesHeat);
             // Move the controlled zone numbers from the scratch arrays into AirToZoneNodeInfo
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesCool; ++ZoneInSysIndex) {
-                AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) = state.dataSimAirServingZones->CtrlZoneNumsCool(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZoneInSysIndex) = state.dataSimAirServingZones->ZoneInletNodesCool(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) =
-                    state.dataSimAirServingZones->TermInletNodesCool(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZoneInSysIndex) =
-                    state.dataSimAirServingZones->TermUnitSizingNumsCool(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) = ctrlZoneNumsCool(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZoneInSysIndex) = zoneInletNodesCool(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) = termInletNodesCool(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZoneInSysIndex) = termUnitSizingNumsCool(ZoneInSysIndex);
             }
 
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesHeat; ++ZoneInSysIndex) {
-                AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZoneInSysIndex) = state.dataSimAirServingZones->CtrlZoneNumsHeat(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZoneInSysIndex) = state.dataSimAirServingZones->ZoneInletNodesHeat(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) =
-                    state.dataSimAirServingZones->TermInletNodesHeat(ZoneInSysIndex);
-                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZoneInSysIndex) =
-                    state.dataSimAirServingZones->TermUnitSizingNumsHeat(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZoneInSysIndex) = ctrlZoneNumsHeat(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZoneInSysIndex) = zoneInletNodesHeat(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) = termInletNodesHeat(ZoneInSysIndex);
+                AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZoneInSysIndex) = termUnitSizingNumsHeat(ZoneInSysIndex);
             }
 
             AirToZoneNodeInfo(AirLoopNum).NumZonesCooled = NumZonesCool;
@@ -1902,7 +1889,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             // now fill the return air bypass information needed by the RAB setpoint manager
             if (PrimaryAirSystems(AirLoopNum).Splitter.Exists && PrimaryAirSystems(AirLoopNum).Mixer.Exists) {
                 PrimaryAirSystems(AirLoopNum).RABExists = true;
-                for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                     // find the RAB branch; its inlet is a splitter outlet and it outlet is a mixer inlet
                     if ((PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumIn == PrimaryAirSystems(AirLoopNum).Splitter.NodeNumOut(1) ||
                          PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumIn == PrimaryAirSystems(AirLoopNum).Splitter.NodeNumOut(2)) &&
@@ -1991,20 +1978,20 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
         state.dataSimAirServingZones->InitAirLoopsOneTimeFlag = false;
 
-        state.dataSimAirServingZones->CtrlZoneNumsCool.deallocate();
-        state.dataSimAirServingZones->CtrlZoneNumsHeat.deallocate();
-        state.dataSimAirServingZones->ZoneInletNodesCool.deallocate();
-        state.dataSimAirServingZones->ZoneInletNodesHeat.deallocate();
-        state.dataSimAirServingZones->TermInletNodesCool.deallocate();
-        state.dataSimAirServingZones->TermInletNodesHeat.deallocate();
-        state.dataSimAirServingZones->TermUnitSizingNumsCool.deallocate();
-        state.dataSimAirServingZones->TermUnitSizingNumsHeat.deallocate();
+        ctrlZoneNumsCool.deallocate();
+        ctrlZoneNumsHeat.deallocate();
+        zoneInletNodesCool.deallocate();
+        zoneInletNodesHeat.deallocate();
+        termInletNodesCool.deallocate();
+        termInletNodesHeat.deallocate();
+        termUnitSizingNumsCool.deallocate();
+        termUnitSizingNumsHeat.deallocate();
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding errors cause termination");
         }
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
             SupFanIndex = 0;
             RetFanIndex = 0;
@@ -2014,9 +2001,9 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             FanModelType retFanModelType = FanModelType::Invalid;
 
             bool FoundCentralCoolCoil = false;
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+            for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
 
-                for (CompNum = 1; CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                for (int CompNum = 1; CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     CompTypeNum = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == CompType::OAMixer_Num) {
                         FoundOASys = true;
@@ -2093,10 +2080,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             }
         }
         // Check whether there are Central Heating Coils in the Primary Air System
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             bool FoundCentralHeatCoil = false;
-            for (BranchNum = 1; !FoundCentralHeatCoil && BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
-                for (CompNum = 1; !FoundCentralHeatCoil && CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+            for (int BranchNum = 1; !FoundCentralHeatCoil && BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                for (int CompNum = 1; !FoundCentralHeatCoil && CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
+                     ++CompNum) {
                     CompTypeNum = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (CompTypeNum == CompType::WaterCoil_SimpleHeat || CompTypeNum == CompType::Coil_ElectricHeat ||
                         CompTypeNum == CompType::Coil_GasHeat || CompTypeNum == CompType::SteamCoil_AirHeat ||
@@ -2119,10 +2107,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         } // end of AirLoop loop
 
         // Check whether there are Central Cooling Coils in the Primary Air System
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             bool FoundCentralCoolCoil = false;
-            for (BranchNum = 1; !FoundCentralCoolCoil && BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
-                for (CompNum = 1; !FoundCentralCoolCoil && CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+            for (int BranchNum = 1; !FoundCentralCoolCoil && BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                for (int CompNum = 1; !FoundCentralCoolCoil && CompNum <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
+                     ++CompNum) {
                     CompTypeNum = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (CompTypeNum == CompType::WaterCoil_SimpleCool || CompTypeNum == CompType::WaterCoil_Cooling ||
                         CompTypeNum == CompType::WaterCoil_DetailedCool || CompTypeNum == CompType::WaterCoil_CoolingHXAsst ||
@@ -2148,9 +2137,9 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
     // Size the air loop branch air flows
     if (!state.dataGlobal->SysSizingCalc && state.dataSimAirServingZones->InitAirLoopsBranchSizingFlag) {
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+            for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                 SizeAirLoopBranches(state, AirLoopNum, BranchNum);
             }
         }
@@ -2158,7 +2147,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         state.dataSimAirServingZones->InitAirLoopsBranchSizingFlag = false;
 
         // calculate the ratio of air loop design flow to the sum of the zone design flows
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             state.dataSimAirServingZones->SumZoneDesFlow = 0.0;
             state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply = PrimaryAirSystems(AirLoopNum).DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
             state.dataAirLoop->AirLoopFlow(AirLoopNum).DesReturnFrac = PrimaryAirSystems(AirLoopNum).DesignReturnFlowFraction;
@@ -2197,10 +2186,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             }
         }
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // Start looping through all of the air loops...
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // Start looping through all of the air loops...
 
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) { // loop over all branches in system
-                for (NodeIndex = 1; NodeIndex <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalNodes;
+            for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) { // loop over all branches in system
+                for (int NodeIndex = 1; NodeIndex <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalNodes;
                      ++NodeIndex) { // loop over alll nodes on branch
 
                     NodeNum = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNum(NodeIndex);
@@ -2248,11 +2237,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
     // Do the following initializations (every time step).
 
-    for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+    for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         // zero all MassFlowRateSetPoints
-        for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) { // loop over all branches in system
+        for (int BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) { // loop over all branches in system
             if (PrimaryAirSystems(AirLoopNum).Branch(BranchNum).DuctType == RAB) continue;
-            for (NodeIndex = 1; NodeIndex <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalNodes;
+            for (int NodeIndex = 1; NodeIndex <= PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalNodes;
                  ++NodeIndex) { // loop over alll nodes on branch
                 NodeNum = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNum(NodeIndex);
                 state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = 0.0;
@@ -2265,8 +2254,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         }
 
         // set the required flow (from zone equipment) at system outlet nodes
-        for (OutNum = 1; OutNum <= PrimaryAirSystems(AirLoopNum).NumOutletBranches; ++OutNum) {
-            OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
+        for (int OutNum = 1; OutNum <= PrimaryAirSystems(AirLoopNum).NumOutletBranches; ++OutNum) {
+            int OutBranchNum = PrimaryAirSystems(AirLoopNum).OutletBranchNum[OutNum - 1];
             NodeNumOut = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).NodeNumOut;
             ZoneSideNodeNum = AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum);
 
@@ -2287,7 +2276,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             }
 
             // Pass the required mass flow upstream to the start of each outlet branch
-            for (BranchNodeIndex = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).TotalNodes - 1; BranchNodeIndex >= 1; --BranchNodeIndex) {
+            for (int BranchNodeIndex = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).TotalNodes - 1; BranchNodeIndex >= 1; --BranchNodeIndex) {
                 NodeNum = PrimaryAirSystems(AirLoopNum).Branch(OutBranchNum).NodeNum(BranchNodeIndex);
                 if (PrimaryAirSystems(AirLoopNum).OASysExists && (NodeNum == PrimaryAirSystems(AirLoopNum).OASysInletNodeNum)) {
                     // need to modify if OA relief and supply not balanced because of exhaust fans
@@ -2317,8 +2306,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             for (auto &e : AirLoopControlInfo)
                 e.ConvergedFlag = false;
 
-            for (InNum = 1; InNum <= PrimaryAirSystems(AirLoopNum).NumInletBranches; ++InNum) {
-                InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum[InNum - 1];
+            for (int InNum = 1; InNum <= PrimaryAirSystems(AirLoopNum).NumInletBranches; ++InNum) {
+                int InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum[InNum - 1];
                 if (InBranchNum == 0) {
                     ShowFatalError(state, "Missing Inlet Branch on Primary Air System=" + PrimaryAirSystems(AirLoopNum).Name);
                 }
@@ -2339,8 +2328,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         }
         // if a flow rate is specified for the loop use it here
         if (AirLoopControlInfo(AirLoopNum).LoopFlowRateSet && !FirstHVACIteration) {
-            for (InNum = 1; InNum <= PrimaryAirSystems(AirLoopNum).NumInletBranches; ++InNum) {
-                InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum[InNum - 1];
+            for (int InNum = 1; InNum <= PrimaryAirSystems(AirLoopNum).NumInletBranches; ++InNum) {
+                int InBranchNum = PrimaryAirSystems(AirLoopNum).InletBranchNum[InNum - 1];
                 NodeNumIn = PrimaryAirSystems(AirLoopNum).Branch(InBranchNum).NodeNumIn;
                 state.dataLoopNodes->Node(NodeNumIn).MassFlowRate =
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply * state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac -
