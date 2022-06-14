@@ -324,10 +324,10 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumFields;     // Total number of fields in object
-    int NumAlphas;     // Number of elements in the alpha array
-    int NumNums;       // Number of elements in the numeric array
-    int IOStat;        // IO Status when calling get input subroutine
+    int NumFields; // Total number of fields in object
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
     bool ErrorsFound(false);
 
     std::string cCurrentModuleObject = "DemandManagerAssignmentList";
@@ -367,8 +367,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             thisDemandMgrList.Meter = GetMeterIndex(state, state.dataIPShortCut->cAlphaArgs(2));
 
             if (DemandManagerList(ListNum).Meter == 0) {
-                ShowSevereError(state, format("Invalid ", state.dataIPShortCut->cAlphaFieldNames(2), '=', state.dataIPShortCut->cAlphaArgs(2)));
-                ShowContinueError(state, format("Entered in ", cCurrentModuleObject, '=', thisDemandMgrList.Name));
+                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, thisDemandMgrList.Name));
                 ErrorsFound = true;
 
             } else {
@@ -377,14 +377,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                     if ((SELECT_CASE_var == "Electricity") || (SELECT_CASE_var == "ElectricityNet")) {
                     } else {
                         ShowSevereError(state,
-                                        format(cCurrentModuleObject,
-                                               "=\"",
+                                        format("{} = \"{}\" invalid value {} = \"{}\".",
+                                               cCurrentModuleObject,
                                                thisDemandMgrList.Name,
-                                               "\" invalid value ",
                                                state.dataIPShortCut->cAlphaFieldNames(2),
-                                               "=\"",
-                                               state.dataIPShortCut->cAlphaArgs(2),
-                                               "\"."));
+                                               state.dataIPShortCut->cAlphaArgs(2)));
                         ShowContinueError(state, "Only Electricity and ElectricityNet meters are currently allowed.");
                         ErrorsFound = true;
                     }
@@ -398,14 +395,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 if (thisDemandMgrList.LimitSchedule == 0) {
                     ShowSevereError(state,
-                                    format(cCurrentModuleObject,
-                                           "=\"",
+                                    format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                           cCurrentModuleObject,
                                            thisDemandMgrList.Name,
-                                           "\" invalid ",
                                            state.dataIPShortCut->cAlphaFieldNames(3),
-                                           "=\"",
-                                           state.dataIPShortCut->cAlphaArgs(3),
-                                           "\" not found."));
+                                           state.dataIPShortCut->cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -417,12 +411,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 if (thisDemandMgrList.BillingSchedule == 0) {
                     ShowSevereError(state,
-                                    format(cCurrentModuleObject,
-                                           "=\"" + thisDemandMgrList.Name,
-                                           "\" invalid ",
+                                    format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                           cCurrentModuleObject,
+                                           thisDemandMgrList.Name,
                                            state.dataIPShortCut->cAlphaFieldNames(4),
-                                           "=\"" + state.dataIPShortCut->cAlphaArgs(4),
-                                           "\" not found."));
+                                           state.dataIPShortCut->cAlphaArgs(4)));
                     ErrorsFound = true;
                 }
             }
@@ -432,13 +425,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 if (thisDemandMgrList.PeakSchedule == 0) {
                     ShowSevereError(state,
-                                    format(cCurrentModuleObject,
-                                           "=\"" + thisDemandMgrList.Name,
-                                           "\" invalid ",
+                                    format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                           cCurrentModuleObject,
+                                           thisDemandMgrList.Name,
                                            state.dataIPShortCut->cAlphaFieldNames(5),
-                                           "=\"",
-                                           state.dataIPShortCut->cAlphaArgs(5),
-                                           "\" not found."));
+                                           state.dataIPShortCut->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
             }
@@ -463,13 +454,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 } else {
                     ShowSevereError(state,
-                                    format(cCurrentModuleObject,
-                                           "=\"",
+                                    format("{} = \"{}\" invalid value {} = \"{}\" not found.",
+                                           cCurrentModuleObject,
                                            thisDemandMgrList.Name,
-                                           "\" invalid value ",
                                            state.dataIPShortCut->cAlphaFieldNames(6),
-                                           "=\"" + state.dataIPShortCut->cAlphaArgs(6),
-                                           "\" not found."));
+                                           state.dataIPShortCut->cAlphaArgs(6)));
                     ErrorsFound = true;
                 }
             }
@@ -494,27 +483,21 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                             if (thisManager == 0) {
                                 ShowSevereError(state,
-                                                format(cCurrentModuleObject,
-                                                       "=\"",
+                                                format("{} = \"{}\" invalid {} = \"{}\" not found.",
+                                                       cCurrentModuleObject,
                                                        thisDemandMgrList.Name,
-                                                       "\" invalid ",
                                                        state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6),
-                                                       "=\"",
-                                                       state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6),
-                                                       "\" not found."));
+                                                       state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6)));
                                 ErrorsFound = true;
                             }
 
                         } else {
                             ShowSevereError(state,
-                                            format(cCurrentModuleObject,
-                                                   "=\"",
+                                            format("{} = \"{}\" invalid value {} = \"{}\".",
+                                                   cCurrentModuleObject,
                                                    thisDemandMgrList.Name,
-                                                   "\" invalid value ",
                                                    state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5),
-                                                   "=\"",
-                                                   state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5),
-                                                   "\"."));
+                                                   state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5)));
                             ErrorsFound = true;
                         }
                     }
@@ -582,7 +565,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                                 thisDemandMgrList.Name);
 
             if (ErrorsFound) {
-                ShowFatalError(state, format("Errors found in processing input for ", cCurrentModuleObject));
+                ShowFatalError(state, format("Errors found in processing input for {}.", cCurrentModuleObject));
             }
 
         } // ListNum
