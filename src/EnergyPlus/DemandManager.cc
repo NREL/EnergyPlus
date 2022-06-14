@@ -324,7 +324,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumFields; // Total number of fields in object
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
@@ -460,7 +459,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             thisDemandMgrList.NumOfManager = int((NumAlphas - 6) / 2.0);
 
             if (thisDemandMgrList.NumOfManager > 0) {
-                auto &DemandMgr = state.dataDemandManager->DemandMgr;
                 thisDemandMgrList.Manager.allocate(thisDemandMgrList.NumOfManager);
                 for (int MgrNum = 1; MgrNum <= thisDemandMgrList.NumOfManager; ++MgrNum) {
 
@@ -472,7 +470,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                             (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") ||
                             (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
-                            thisManager = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), DemandMgr);
+                            thisManager =
+                                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
 
                             if (thisManager == 0) {
                                 ShowSevereError(state,
