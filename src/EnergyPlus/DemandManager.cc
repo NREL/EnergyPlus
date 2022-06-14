@@ -324,16 +324,14 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ListNum;
-    int MgrNum;
+    int NumFields;     // Total number of fields in object
     int NumAlphas;     // Number of elements in the alpha array
     int NumNums;       // Number of elements in the numeric array
     int IOStat;        // IO Status when calling get input subroutine
-    std::string Units; // String for meter units
     bool ErrorsFound(false);
 
     std::string cCurrentModuleObject = "DemandManagerAssignmentList";
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, ListNum, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNums);
 
     auto &DemandManagerList(state.dataDemandManager->DemandManagerList);
     auto &DemandMgr(state.dataDemandManager->DemandMgr);
@@ -346,7 +344,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
         DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
 
-        for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
+        for (int ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
 
             auto &thisDemandMgrList = DemandManagerList(ListNum);
 
@@ -377,8 +375,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                 {
                     auto const SELECT_CASE_var(state.dataOutputProcessor->EnergyMeters(thisDemandMgrList.Meter).ResourceType);
                     if ((SELECT_CASE_var == "Electricity") || (SELECT_CASE_var == "ElectricityNet")) {
-                        Units = "[W]"; // For setup of report variables
-
                     } else {
                         ShowSevereError(state,
                                         format(cCurrentModuleObject,
@@ -484,7 +480,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             if (thisDemandMgrList.NumOfManager > 0) {
                 thisDemandMgrList.Manager.allocate(thisDemandMgrList.NumOfManager);
 
-                for (MgrNum = 1; MgrNum <= thisDemandMgrList.NumOfManager; ++MgrNum) {
+                for (int MgrNum = 1; MgrNum <= thisDemandMgrList.NumOfManager; ++MgrNum) {
 
                     auto &thisManager = thisDemandMgrList.Manager(MgrNum);
                     // Validate DEMAND MANAGER Type
