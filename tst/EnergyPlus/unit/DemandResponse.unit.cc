@@ -172,11 +172,12 @@ TEST_F(EnergyPlusFixture, DemandManagerAssignmentListGetInputTest)
     // test expected fatal error due to wrong demand manager objet name
     // object name in the list and in the object are different
     std::string expected_error = delimited_string({
-        "   ** Severe  ** DemandManagerAssignmentList=\"DEMAND MANAGER\" invalid DemandManager Name=\"EXT LIGHTS MANAGER 1\" not found.",
-        "   **  Fatal  ** Errors found in processing input for DemandManagerAssignmentList",
+        "   ** Severe  ** DemandManagerAssignmentList = \"DEMAND MANAGER\" invalid DemandManager Name = \"EXT LIGHTS MANAGER 1\" not found.",
+        "   **  Fatal  ** Errors found in processing input for DemandManagerAssignmentList.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=DemandManagerAssignmentList=\"DEMAND MANAGER\" invalid DemandManager Name=\"EXT LIGHTS MANAGER 1\" not found.",
+        "   ..... Last severe error=DemandManagerAssignmentList = \"DEMAND MANAGER\" invalid DemandManager Name = \"EXT LIGHTS MANAGER 1\" not "
+        "found.",
     });
 
     EXPECT_ANY_THROW(GetDemandManagerListInput(*state));
