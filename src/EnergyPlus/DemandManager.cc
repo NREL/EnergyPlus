@@ -343,7 +343,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
     CurrentModuleObject = "DemandManagerAssignmentList";
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, ListNum, NumAlphas, NumNums);
 
-    auto &DemandManagerList(state.dataDemandManager->DemandManagerList);
     auto &DemandMgr(state.dataDemandManager->DemandMgr);
 
     state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -352,9 +351,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
         AlphArray.dimension(NumAlphas, std::string());
         NumArray.dimension(NumNums, 0.0);
 
-        DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
+        state.dataDemandManager->DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
 
         for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
+
+            auto &thisDemandManagerList = state.dataDemandManager->DemandManagerList(ListNum);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -370,18 +371,18 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
-            DemandManagerList(ListNum).Name = AlphArray(1);
+            thisDemandManagerList.Name = AlphArray(1);
 
-            DemandManagerList(ListNum).Meter = GetMeterIndex(state, AlphArray(2));
+            thisDemandManagerList.Meter = GetMeterIndex(state, AlphArray(2));
 
-            if (DemandManagerList(ListNum).Meter == 0) {
+            if (thisDemandManagerList.Meter == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
                 ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
 
             } else {
-                if ((state.dataOutputProcessor->EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType == "Electricity") ||
-                    (state.dataOutputProcessor->EnergyMeters(DemandManagerList(ListNum).Meter).ResourceType == "ElectricityNet")) {
+                if ((state.dataOutputProcessor->EnergyMeters(thisDemandManagerList.Meter).ResourceType == "Electricity") ||
+                    (state.dataOutputProcessor->EnergyMeters(thisDemandManagerList.Meter).ResourceType == "ElectricityNet")) {
                     Units = "[W]"; // For setup of report variables
 
                 } else {
@@ -396,9 +397,9 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             // Further checking for conflicting DEMAND MANAGER LISTs
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(state, AlphArray(3));
+                thisDemandManagerList.LimitSchedule = GetScheduleIndex(state, AlphArray(3));
 
-                if (DemandManagerList(ListNum).LimitSchedule == 0) {
+                if (thisDemandManagerList.LimitSchedule == 0) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
                                         state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" not found.");
@@ -406,12 +407,12 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                 }
             }
 
-            DemandManagerList(ListNum).SafetyFraction = NumArray(1);
+            thisDemandManagerList.SafetyFraction = NumArray(1);
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(state, AlphArray(4));
+                thisDemandManagerList.BillingSchedule = GetScheduleIndex(state, AlphArray(4));
 
-                if (DemandManagerList(ListNum).BillingSchedule == 0) {
+                if (thisDemandManagerList.BillingSchedule == 0) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
                                         state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\" not found.");
@@ -420,9 +421,9 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(state, AlphArray(5));
+                thisDemandManagerList.PeakSchedule = GetScheduleIndex(state, AlphArray(5));
 
-                if (DemandManagerList(ListNum).PeakSchedule == 0) {
+                if (thisDemandManagerList.PeakSchedule == 0) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
                                         state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + AlphArray(5) + "\" not found.");
@@ -430,16 +431,16 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                 }
             }
 
-            DemandManagerList(ListNum).AveragingWindow = max(int(NumArray(2) / state.dataGlobal->MinutesPerTimeStep), 1);
+            thisDemandManagerList.AveragingWindow = max(int(NumArray(2) / state.dataGlobal->MinutesPerTimeStep), 1);
             // Round to nearest timestep
             // Can make this fancier to include windows that do not fit the timesteps
-            DemandManagerList(ListNum).History.allocate(DemandManagerList(ListNum).AveragingWindow);
-            DemandManagerList(ListNum).History = 0.0;
+            thisDemandManagerList.History.allocate(thisDemandManagerList.AveragingWindow);
+            thisDemandManagerList.History = 0.0;
 
             // Validate Demand Manager Priority
-            DemandManagerList(ListNum).ManagerPriority =
+            thisDemandManagerList.ManagerPriority =
                 static_cast<ManagePriorityType>(getEnumerationValue(ManagePriorityNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
-            if (DemandManagerList(ListNum).ManagerPriority == ManagePriorityType::Invalid) {
+            if (thisDemandManagerList.ManagerPriority == ManagePriorityType::Invalid) {
                 ShowSevereError(state,
                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
                                     state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphArray(6) + "\" not found.");
@@ -447,12 +448,12 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             }
 
             // Get DEMAND MANAGER Type and Name pairs
-            DemandManagerList(ListNum).NumOfManager = int((NumAlphas - 6) / 2.0);
+            thisDemandManagerList.NumOfManager = int((NumAlphas - 6) / 2.0);
 
-            if (DemandManagerList(ListNum).NumOfManager > 0) {
-                DemandManagerList(ListNum).Manager.allocate(DemandManagerList(ListNum).NumOfManager);
+            if (thisDemandManagerList.NumOfManager > 0) {
+                thisDemandManagerList.Manager.allocate(thisDemandManagerList.NumOfManager);
 
-                for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
+                for (MgrNum = 1; MgrNum <= thisDemandManagerList.NumOfManager; ++MgrNum) {
 
                     // Validate DEMAND MANAGER Type
 
@@ -460,9 +461,9 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                         (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:ELECTRICEQUIPMENT") ||
                         (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:THERMOSTATS") || (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:VENTILATION")) {
 
-                        DemandManagerList(ListNum).Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
+                        thisDemandManagerList.Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
 
-                        if (DemandManagerList(ListNum).Manager(MgrNum) == 0) {
+                        if (thisDemandManagerList.Manager(MgrNum) == 0) {
                             ShowSevereError(state,
                                             CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
                                                 state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" + AlphArray(MgrNum * 2 + 6) +
@@ -486,58 +487,58 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Demand Manager Meter Demand Power",
                                 OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).MeterDemand,
+                                thisDemandManagerList.MeterDemand,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandManagerList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Average Demand Power",
                                 OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).AverageDemand,
+                                thisDemandManagerList.AverageDemand,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandManagerList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Peak Demand Power",
                                 OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).PeakDemand,
+                                thisDemandManagerList.PeakDemand,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandManagerList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Scheduled Limit Power",
                                 OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).ScheduledLimit,
+                                thisDemandManagerList.ScheduledLimit,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandManagerList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Demand Limit Power",
                                 OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).DemandLimit,
+                                thisDemandManagerList.DemandLimit,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandManagerList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Over Limit Power",
                                 OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).OverLimit,
+                                thisDemandManagerList.OverLimit,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandManagerList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Over Limit Time",
                                 OutputProcessor::Unit::hr,
-                                DemandManagerList(ListNum).OverLimitDuration,
+                                thisDemandManagerList.OverLimitDuration,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandManagerList.Name);
 
             if (ErrorsFound) {
                 ShowFatalError(state, "Errors found in processing input for " + CurrentModuleObject);
@@ -709,16 +710,14 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            {
-                DemandMgr(MgrNum).LimitControl =
-                    static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
-                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
-                    ErrorsFound = true;
-                }
+            DemandMgr(MgrNum).LimitControl =
+                static_cast<ManagerLimit>(getEnumerationValue(ManagerLimitNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(3))));
+            if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Invalid) {
+                ShowSevereError(state,
+                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
+                ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                ErrorsFound = true;
             }
 
             if (NumArray(1) == 0.0)
