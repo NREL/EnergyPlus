@@ -118,6 +118,8 @@ set(SRC
     ChillerAbsorption.hh
     ChillerElectricEIR.cc
     ChillerElectricEIR.hh
+    ChillerElectricASHRAE205.cc
+    ChillerElectricASHRAE205.hh
     ChillerExhaustAbsorption.cc
     ChillerExhaustAbsorption.hh
     ChillerGasAbsorption.cc
