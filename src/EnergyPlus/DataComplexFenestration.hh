@@ -72,17 +72,6 @@ namespace DataComplexFenestration {
         Num
     };
 
-    // Parameters for thermal model
-    enum class ThermalModel
-    {
-        Invalid = -1,
-        ISO15099,
-        ScaledCavityWidth,
-        ConvectiveScalarModel_NoSDThickness,
-        ConvectiveScalarModel_WithSDThickness,
-        Num
-    };
-
     struct GapSupportPillar
     {
         // Members

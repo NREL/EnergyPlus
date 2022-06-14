@@ -130,15 +130,6 @@ namespace DataHeatBalance {
     constexpr int DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
     constexpr int DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
-    // Parameters for Sky Radiance Distribution
-    enum class SkyRadDistribution
-    {
-        Invalid = -1,
-        Isotropic,
-        Anisotropic,
-        Num
-    };
-
     // Parameters for ZoneAirSolutionAlgo
     enum class SolutionAlgo
     {
