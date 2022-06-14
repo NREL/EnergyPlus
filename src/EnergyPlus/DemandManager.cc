@@ -332,21 +332,17 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
     std::string cCurrentModuleObject = "DemandManagerAssignmentList";
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNums);
-
-    auto &DemandManagerList(state.dataDemandManager->DemandManagerList);
-    auto &DemandMgr(state.dataDemandManager->DemandMgr);
-
     state.dataDemandManager->NumDemandManagerList = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataDemandManager->NumDemandManagerList > 0) {
         state.dataIPShortCut->cAlphaArgs({1, NumAlphas}) = "";
         state.dataIPShortCut->rNumericArgs({1, NumNums}) = 0.0;
 
-        DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
+        state.dataDemandManager->DemandManagerList.allocate(state.dataDemandManager->NumDemandManagerList);
 
         for (int ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
 
-            auto &thisDemandMgrList = DemandManagerList(ListNum);
+            auto &thisDemandMgrList = state.dataDemandManager->DemandManagerList(ListNum);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -366,7 +362,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
             thisDemandMgrList.Meter = GetMeterIndex(state, state.dataIPShortCut->cAlphaArgs(2));
 
-            if (DemandManagerList(ListNum).Meter == 0) {
+            if (thisDemandMgrList.Meter == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, thisDemandMgrList.Name));
                 ErrorsFound = true;
@@ -467,8 +463,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             thisDemandMgrList.NumOfManager = int((NumAlphas - 6) / 2.0);
 
             if (thisDemandMgrList.NumOfManager > 0) {
+                auto &DemandMgr = state.dataDemandManager->DemandMgr;
                 thisDemandMgrList.Manager.allocate(thisDemandMgrList.NumOfManager);
-
                 for (int MgrNum = 1; MgrNum <= thisDemandMgrList.NumOfManager; ++MgrNum) {
 
                     auto &thisManager = thisDemandMgrList.Manager(MgrNum);
@@ -527,10 +523,10 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Demand Manager Peak Demand Power",
                                 OutputProcessor::Unit::W,
-                                DemandManagerList(ListNum).PeakDemand,
+                                thisDemandMgrList.PeakDemand,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                DemandManagerList(ListNum).Name);
+                                thisDemandMgrList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Scheduled Limit Power",
