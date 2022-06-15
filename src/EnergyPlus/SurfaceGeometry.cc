@@ -8332,7 +8332,7 @@ namespace SurfaceGeometry {
                 bool SetReflSchReportVar = true;
                 auto &thisGndSurfsObj = state.dataSurface->GroundSurfsProperty(Loop);
                 for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
-                    if ((!thisGndSurfsObj.GndSurfs(gSurfNum).TempSchPtr == 0) && SetTempSchReportVar) {
+                    if (thisGndSurfsObj.GndSurfs(gSurfNum).TempSchPtr != 0 && SetTempSchReportVar) {
                         SetupOutputVariable(state,
                                             "Surfaces Property Ground Surfaces Average Temperature",
                                             OutputProcessor::Unit::C,
@@ -8342,7 +8342,7 @@ namespace SurfaceGeometry {
                                             thisGndSurfsObj.Name);
                         SetTempSchReportVar = false;
                     }
-                    if ((!thisGndSurfsObj.GndSurfs(gSurfNum).ReflSchPtr == 0) && SetReflSchReportVar) {
+                    if (thisGndSurfsObj.GndSurfs(gSurfNum).ReflSchPtr != 0 && SetReflSchReportVar) {
                         SetupOutputVariable(state,
                                             "Surfaces Property Ground Surfaces Average Reflectance",
                                             OutputProcessor::Unit::None,

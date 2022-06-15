@@ -1309,44 +1309,30 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;
-        int SurfPtr;             // surface pointer
-        int ExtShadingSchedPtr;  // schedule pointer
-        int SurroundingSurfsPtr; // schedule pointer
-        int OutdoorAirNodePtr;   // schedule pointer
-        int GroundSurfsPtr;      // pointer to multiple ground surfaces object
-
-        // Default Constructor
-        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0), GroundSurfsPtr(0)
-        {
-        }
+        int SurfPtr = 0;             // surface pointer
+        int ExtShadingSchedPtr = 0;  // schedule pointer
+        int SurroundingSurfsPtr = 0; // schedule pointer
+        int OutdoorAirNodePtr = 0;   // outdoor air node pointer
+        int GroundSurfsPtr = 0;      // pointer to multiple ground surfaces object
     };
 
     struct SurroundingSurfProperty
     {
         // Members
         std::string Name;
-        Real64 ViewFactor;
-        int TempSchNum; // schedule pointer
-                        // Default Constructor
-        SurroundingSurfProperty() : ViewFactor(0.0), TempSchNum(0)
-        {
-        }
+        Real64 ViewFactor = 0.0; // view factor to surrounding surface
+        int TempSchNum = 0;      // schedule pointer
     };
 
     struct SurroundingSurfacesProperty
     {
         // Members
         std::string Name;
-        Real64 SkyViewFactor;
-        int SkyTempSchNum;         // schedule pointer
-        int TotSurroundingSurface; // Total number of surrounding surfaces defined for an exterior surface
-        bool IsSkyViewFactorSet;   // false if the sky view factor field is blank
+        Real64 SkyViewFactor = 0.0;      // sky view factor
+        int SkyTempSchNum = 0;           // schedule pointer
+        int TotSurroundingSurface = 0;   // Total number of surrounding surfaces defined for an exterior surface
+        bool IsSkyViewFactorSet = false; // false if the sky view factor field is blank
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
-
-        // Default Constructor
-        SurroundingSurfacesProperty() : SkyViewFactor(0.0), SkyTempSchNum(0), TotSurroundingSurface(0), IsSkyViewFactorSet(false)
-        {
-        }
     };
 
     struct IntMassObject
