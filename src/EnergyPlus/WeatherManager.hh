@@ -199,9 +199,9 @@ namespace WeatherManager {
         int RawSimDays;                  // number of basic sim days.
         bool firstHrInterpUseHr1;        // true when using Hour 1 for first hour interpolations; false to use Hour 24
         Real64 maxCoolingOATSizing;      // max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
-        Real64 maxCoolingOADPSizing;     // max outdoor dew point for DesignDay or RunPeriodDesign type weather
+        Real64 maxCoolingOADPSizing;     // outdoor dew point at max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
         Real64 minHeatingOATSizing;      // min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
-        Real64 minHeatingOADPSizing;     // min outdoor dew point for DesignDay or RunPeriodDesign type weather
+        Real64 minHeatingOADPSizing;     // outdoor dew point at min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
 
         // Default Constructor
         EnvironmentData()
