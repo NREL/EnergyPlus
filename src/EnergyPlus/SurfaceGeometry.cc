@@ -8036,7 +8036,7 @@ namespace SurfaceGeometry {
                                     format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                            RoutineName,
                                            cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           SurfLocalEnv.Name,
                                            state.dataIPShortCut->cAlphaFieldNames(2)));
                     ShowContinueError(
                         state,
@@ -8056,7 +8056,7 @@ namespace SurfaceGeometry {
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                                RoutineName,
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               SurfLocalEnv.Name,
                                                state.dataIPShortCut->cAlphaFieldNames(3)));
                         ShowContinueError(state,
                                           format("{} entered value = \"{}\", no corresponding shading schedule has been found in the input file.",
@@ -8077,7 +8077,7 @@ namespace SurfaceGeometry {
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                                RoutineName,
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               SurfLocalEnv.Name,
                                                state.dataIPShortCut->cAlphaFieldNames(4)));
                         ShowContinueError(
                             state,
@@ -8096,7 +8096,7 @@ namespace SurfaceGeometry {
                                                     state.dataIPShortCut->cAlphaArgs(5),
                                                     ErrorsFound,
                                                     DataLoopNode::ConnectionObjectType::SurfacePropertyLocalEnvironment,
-                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    SurfLocalEnv.Name,
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
@@ -8106,7 +8106,7 @@ namespace SurfaceGeometry {
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                                RoutineName,
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               SurfLocalEnv.Name,
                                                state.dataIPShortCut->cAlphaFieldNames(5)));
                         ShowContinueError(state,
                                           format("{} entered value = \"{}\", no corresponding outdoor air node has been found in the input file.",
@@ -8126,7 +8126,7 @@ namespace SurfaceGeometry {
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                                RoutineName,
                                                cCurrentModuleObject,
-                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               SurfLocalEnv.Name,
                                                state.dataIPShortCut->cAlphaFieldNames(6)));
                         ShowContinueError(
                             state,
