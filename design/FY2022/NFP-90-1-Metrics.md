@@ -236,6 +236,14 @@ from Neal Kruis (Slack): Add disclaimer that it is not "not reasonable to expect
 
 from Jason Glazer (PR): "As you are adding these new metrics to the EquipmentSummary report, please leave the existing SEER and HSPF as well and clarify the source of both in footnotes to the tables."
 
+Comments from call on 6/15/2022:
+
+- focus on generic DX cooling coil first and then look into the older specialied coils
+- required quic and timely feedback through hardcoding some parameters first to the caluclation going (with some known assumptions at this point)
+- look into unit tests with manufacturer data if possible
+- test the implementation by comparing the old version of the metrics with the new implementation (are value within anitipated range)
+
+
 ## Acknowledgments ##
 
 TBD 
@@ -262,3 +270,5 @@ Equipment. 2020. URL: https://www.ahrinet.org/Portals/_Appleseed/documents/Stand
 [9] 10 CFR Appendix E to Subpart B of Part 430 - Uniform Test Method for Measuring the Energy Consumption of Water Heaters. 2016. https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE
 
 [10] ANSI/AMCA Standard 208, Calculation of the Fan Energy Index. 2019. https://www.amca.org/news/press-releases/ansi/amca-standard-208,-calculation-of-the-fan-energy-index,-available-for-free-download.html&usg=AOvVaw2eZxHxgdq183Y9WsZlgjTB
+
+[11] Differences between SEER and HSOPF and SEER2 and HSPF2 https://www.ahrinet.org/Portals/AHRI%20CAC%20HP%20Appendix%20M1%20Presentation%20-%20AHR%20Expo.pdf
