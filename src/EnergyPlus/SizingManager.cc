@@ -282,16 +282,6 @@ void ManageSizing(EnergyPlusData &state)
                 ++NumSizingPeriodsPerformed;
 
                 state.dataGlobal->BeginEnvrnFlag = true;
-                if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
-                    (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                         .suppressBegEnvReset)) {
-                    // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
-                    // more easily converge fewer warmup days are allowed
-                    DisplayString(state, "Suppressing Initialization of New Environment Parameters");
-                    state.dataGlobal->beginEnvrnWarmStartFlag = true;
-                } else {
-                    state.dataGlobal->beginEnvrnWarmStartFlag = false;
-                }
                 state.dataGlobal->EndEnvrnFlag = false;
                 state.dataEnvrn->EndMonthFlag = false;
                 state.dataGlobal->WarmupFlag = true;
@@ -388,7 +378,7 @@ void ManageSizing(EnergyPlusData &state)
 
                     } // ... End hour loop.
 
-                    if (state.dataGlobal->EndDayFlag) {
+                    if (state.dataGlobal->EndDayFlag && !state.dataGlobal->WarmupFlag) {
                         UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                     }
@@ -483,16 +473,6 @@ void ManageSizing(EnergyPlusData &state)
             ++NumSizingPeriodsPerformed;
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
-                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                     .suppressBegEnvReset)) {
-                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
-                // easily converge fewer warmup days are allowed
-                DisplayString(state, "Suppressing Initialization of New Environment Parameters");
-                state.dataGlobal->beginEnvrnWarmStartFlag = true;
-            } else {
-                state.dataGlobal->beginEnvrnWarmStartFlag = false;
-            }
             state.dataGlobal->EndEnvrnFlag = false;
             state.dataGlobal->WarmupFlag = false;
             state.dataGlobal->DayOfSim = 0;
@@ -1197,8 +1177,8 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             }
 
             // sum up heating and max flows for any four pipe cooled beam terminal units (the only one using the airTerminalPtr at this point)
-            if (allocated(AirDistUnit) && state.dataDefineEquipment->NumAirDistUnits > 0) {
-                for (int aDUNum = 1; aDUNum <= state.dataDefineEquipment->NumAirDistUnits; ++aDUNum) {
+            if (allocated(AirDistUnit) && (int)state.dataDefineEquipment->AirDistUnit.size() > 0) {
+                for (int aDUNum = 1; aDUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++aDUNum) {
                     if (AirDistUnit(aDUNum).airTerminalPtr.get() != nullptr) {
                         if (AirLoopNum == AirDistUnit(aDUNum).airTerminalPtr->getAirLoopNum()) {
                             airLoopHeatingMaximumFlowRateSum += AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
@@ -1402,7 +1382,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
             // conincident sizing result if available for block air flow
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
 
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
             state.dataSize->VpsHtgBySys(AirLoopNum) = 0.0;
@@ -1529,7 +1509,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             state.dataSize->VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
             state.dataSize->EvzByZoneCool(termUnitSizingIndex) = TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
             state.dataSize->EvzMinBySysCool(AirLoopNum) = state.dataSize->EvzByZoneCool(termUnitSizingIndex);
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
             state.dataSize->VpzClgSumBySys(AirLoopNum) = state.dataSize->VdzClgByZone(termUnitSizingIndex);
             // single zone heating
             state.dataSize->VotHtgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
@@ -1549,7 +1529,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             state.dataSize->VpzClgSumBySys(AirLoopNum) = 0.0;
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
             // conincident sizing result if available for block air flow
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
             state.dataSize->VpsHtgBySys(AirLoopNum) = 0.0;
             state.dataSize->VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
@@ -1879,7 +1859,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                              state.dataOutRptPredefined->pdchS62zcdAlN,
                                                              TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                              AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                    for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                    for (int iAirDistUnit = 1; iAirDistUnit <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++iAirDistUnit) {
                         if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      state.dataOutRptPredefined->pdchS62zcdBox,
@@ -1961,7 +1941,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                              state.dataOutRptPredefined->pdchS62zhdAlN,
                                                              TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                              AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                    for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                    for (int iAirDistUnit = 1; iAirDistUnit <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++iAirDistUnit) {
                         if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      state.dataOutRptPredefined->pdchS62zhdBox,
@@ -3503,7 +3483,7 @@ void ReportTemperatureInputError(
                                      state.dataIPShortCut->rNumericArgs(paramNum),
                                      state.dataIPShortCut->cNumericFieldNames(paramNum - 2),
                                      state.dataIPShortCut->rNumericArgs(paramNum - 2)));
-            ShowContinueError(state, format("This is not allowed.  Please check and revise your input."));
+            ShowContinueError(state, "This is not allowed.  Please check and revise your input.");
             ErrorsFound = true;
         } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
             ShowWarningError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
@@ -3512,7 +3492,7 @@ void ReportTemperatureInputError(
                                      state.dataIPShortCut->cNumericFieldNames(paramNum),
                                      state.dataIPShortCut->rNumericArgs(paramNum),
                                      comparisonTemperature));
-            ShowContinueError(state, format("Please check your input to make sure this is correct."));
+            ShowContinueError(state, "Please check your input to make sure this is correct.");
         }
     }
 }
@@ -4421,7 +4401,6 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
         state.dataGlobal->BeginDayFlag = false;
         state.dataGlobal->BeginEnvrnFlag = false;
         state.dataGlobal->BeginSimFlag = false;
-        state.dataGlobal->BeginFullSimFlag = false;
 
         //          ! do another timestep=1
         ManageWeather(state);

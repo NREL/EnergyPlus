@@ -69,62 +69,41 @@ namespace BaseboardRadiator {
         // Members
         std::string EquipID;
         std::string Schedule;
-        int SchedPtr;
-        DataPlant::PlantEquipmentType EquipType;
-        int ZonePtr;
-        int WaterInletNode;
-        int WaterOutletNode;
-        int ControlCompTypeNum;
-        int CompErrIndex;
-        Real64 UA;
-        Real64 WaterMassFlowRate;
-        Real64 WaterVolFlowRateMax;  // m3/s
-        Real64 WaterMassFlowRateMax; // kg/s
-        Real64 Offset;
-        Real64 AirMassFlowRate;    // kg/s
-        Real64 DesAirMassFlowRate; // kg/s
-        Real64 WaterInletTemp;
-        Real64 WaterOutletTemp;
-        Real64 WaterInletEnthalpy;
-        Real64 WaterOutletEnthalpy;
-        Real64 AirInletTemp;
-        Real64 AirInletHumRat;
-        Real64 AirOutletTemp;
-        Real64 Power;
-        Real64 Energy;
+        int SchedPtr = 0;
+        DataPlant::PlantEquipmentType EquipType = DataPlant::PlantEquipmentType::Invalid;
+        int ZonePtr = 0;
+        int WaterInletNode = 0;
+        int WaterOutletNode = 0;
+        int ControlCompTypeNum = 0;
+        int CompErrIndex = 0;
+        Real64 UA = 0.0;
+        Real64 WaterMassFlowRate = 0.0;
+        Real64 WaterVolFlowRateMax = 0.0;  // m3/s
+        Real64 WaterMassFlowRateMax = 0.0; // kg/s
+        Real64 Offset = 0.0;
+        Real64 AirMassFlowRate = 0.0;    // kg/s
+        Real64 DesAirMassFlowRate = 0.0; // kg/s
+        Real64 WaterInletTemp = 0.0;
+        Real64 WaterOutletTemp = 0.0;
+        Real64 WaterInletEnthalpy = 0.0;
+        Real64 WaterOutletEnthalpy = 0.0;
+        Real64 AirInletTemp = 0.0;
+        Real64 AirInletHumRat = 0.0;
+        Real64 AirOutletTemp = 0.0;
+        Real64 Power = 0.0;
+        Real64 Energy = 0.0;
         PlantLocation plantLoc;
-        int BBLoadReSimIndex;
-        int BBMassFlowReSimIndex;
-        int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod; // - Method for water baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity,
-                              // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC
-                                      // equipment, {-}, or {W/m2}
-
-        bool MySizeFlag;
-        bool CheckEquipName;
-        bool SetLoopIndexFlag;
-        bool MyEnvrnFlag;
-
-        // Default Constructor
-        BaseboardParams()
-            : SchedPtr(0), EquipType(DataPlant::PlantEquipmentType::Invalid), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0),
-              ControlCompTypeNum(0), CompErrIndex(0), UA(0.0), WaterMassFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterMassFlowRateMax(0.0),
-              Offset(0.0), AirMassFlowRate(0.0), DesAirMassFlowRate(0.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterInletEnthalpy(0.0),
-              WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0), Energy(0.0), plantLoc{},
-              BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0),
-              MySizeFlag(true), CheckEquipName(true), SetLoopIndexFlag(true), MyEnvrnFlag(true)
-        {
-        }
-    };
-
-    struct BaseboardParamsNumericFieldData
-    {
-        // Members
         Array1D_string FieldNames;
+        int HeatingCapMethod = 0; // - Method for water baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity,
+                                  // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity = 0.0; // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone
+                                            // HVAC equipment, {-}, or {W/m2}
 
-        // Default Constructor
-        BaseboardParamsNumericFieldData() = default;
+        bool MySizeFlag = true;
+        bool CheckEquipName = true;
+        bool SetLoopIndexFlag = true;
+        bool MyEnvrnFlag = true;
+        bool ZoneEquipmentListChecked = false;
     };
 
     void SimBaseboard(EnergyPlusData &state,
@@ -155,19 +134,12 @@ namespace BaseboardRadiator {
 struct BaseboardRadiatorData : BaseGlobalStruct
 {
 
-    int NumBaseboards = 0;
     bool getInputFlag = true;
-    bool ZoneEquipmentListChecked = false;
-    Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
-    Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+    EPVector<BaseboardRadiator::BaseboardParams> baseboards;
 
     void clear_state() override
     {
-        this->NumBaseboards = 0;
-        this->getInputFlag = true;
-        this->ZoneEquipmentListChecked = false;
-        this->Baseboard.deallocate();
-        this->BaseboardParamsNumericFields.deallocate();
+        *this = BaseboardRadiatorData();
     }
 };
 

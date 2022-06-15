@@ -75,8 +75,13 @@ namespace PipeHeatTransfer {
     // Using/Aliasing
     using namespace GroundTemperatureManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
+    enum class PipeIndoorBoundaryType
+    {
+        Invalid = -1,
+        Zone,
+        Schedule,
+        Num
+    };
 
     enum class EnvrnPtr
     {

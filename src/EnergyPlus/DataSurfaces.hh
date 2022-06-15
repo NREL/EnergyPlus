@@ -178,6 +178,17 @@ namespace DataSurfaces {
         Num
     };
 
+    enum RefAirTemp // Parameters to indicate reference air temperatures for inside surface temperature calculations
+    {
+        Invalid = -1,
+        ZoneMeanAirTemp,   // mean air temperature of the zone => MAT
+        AdjacentAirTemp,   // air temperature adjacent to surface => TempEffBulkAir
+        ZoneSupplyAirTemp, // supply air temperature of the zone
+        Num
+    };
+
+    constexpr std::array<int, static_cast<int>(DataSurfaces::RefAirTemp::Num)> SurfTAirRefReportVals = {1, 2, 3};
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -198,11 +209,6 @@ namespace DataSurfaces {
     constexpr int LowerLeftCorner(2);
     constexpr int LowerRightCorner(3);
     constexpr int UpperRightCorner(4);
-
-    // Parameters to indicate reference air temperatures for inside surface temperature calculations
-    constexpr int ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
-    constexpr int AdjacentAirTemp(2);   // air temperature adjacent ot surface => TempEffBulkAir
-    constexpr int ZoneSupplyAirTemp(3); // supply air temperature of the zone
 
     constexpr int AltAngStepsForSolReflCalc(10); // Number of steps in altitude angle for solar reflection calc
     constexpr int AzimAngStepsForSolReflCalc(9); // Number of steps in azimuth angle of solar reflection calc
@@ -1312,12 +1318,16 @@ namespace DataSurfaces {
         Real64 SkyViewFactor;
         int SkyTempSchNum; // schedule pointer
         Real64 GroundViewFactor;
-        int GroundTempSchNum;      // schedule pointer
-        int TotSurroundingSurface; // Total number of surrounding surfaces defined for an exterior surface
+        int GroundTempSchNum;       // schedule pointer
+        int TotSurroundingSurface;  // Total number of surrounding surfaces defined for an exterior surface
+        bool IsSkyViewFactorSet;    // false if the sky view factor field is blank
+        bool IsGroundViewFactorSet; // false if the ground view factor field is blank
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
 
         // Default Constructor
-        SurroundingSurfacesProperty() : SkyViewFactor(-1.0), SkyTempSchNum(0), GroundViewFactor(-1.0), GroundTempSchNum(0), TotSurroundingSurface(0)
+        SurroundingSurfacesProperty()
+            : SkyViewFactor(0.0), SkyTempSchNum(0), GroundViewFactor(0.0), GroundTempSchNum(0), TotSurroundingSurface(0), IsSkyViewFactorSet(false),
+              IsGroundViewFactorSet(false)
         {
         }
     };
@@ -1415,6 +1425,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     // Surface HB arrays
@@ -1505,6 +1516,7 @@ struct SurfacesData : BaseGlobalStruct
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
+    Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
     Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<ConvectionConstants::InConvClass>
@@ -1812,6 +1824,7 @@ struct SurfacesData : BaseGlobalStruct
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
+        this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
 
         this->SurfOutDryBulbTemp.deallocate();
@@ -1882,6 +1895,7 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfICSPtr.deallocate();
         this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
         this->SurfTAirRef.deallocate();
+        this->SurfTAirRefRpt.deallocate();
         this->SurfIntConvCoeffIndex.deallocate();
         this->SurfExtConvCoeffIndex.deallocate();
         this->SurfIntConvClassification.deallocate();

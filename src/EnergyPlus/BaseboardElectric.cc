@@ -108,29 +108,30 @@ namespace BaseboardElectric {
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, baseboard->Baseboard, &BaseboardParams::EquipName);
+            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, baseboard->baseboards, &BaseboardParams::EquipName);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, "SimElectricBaseboard: Unit not found=" + EquipName);
             }
             CompIndex = BaseboardNum;
         } else {
             BaseboardNum = CompIndex;
-            if (BaseboardNum > baseboard->NumBaseboards || BaseboardNum < 1) {
+            int numBaseboards = (int)baseboard->baseboards.size();
+            if (BaseboardNum > numBaseboards || BaseboardNum < 1) {
                 ShowFatalError(state,
                                format("SimElectricBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       BaseboardNum,
-                                      baseboard->NumBaseboards,
+                                      numBaseboards,
                                       EquipName));
             }
-            if (baseboard->Baseboard(BaseboardNum).CheckEquipName) {
-                if (EquipName != baseboard->Baseboard(BaseboardNum).EquipName) {
+            if (baseboard->baseboards(BaseboardNum).CheckEquipName) {
+                if (EquipName != baseboard->baseboards(BaseboardNum).EquipName) {
                     ShowFatalError(state,
                                    format("SimElectricBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
                                           BaseboardNum,
                                           EquipName,
-                                          baseboard->Baseboard(BaseboardNum).EquipName));
+                                          baseboard->baseboards(BaseboardNum).EquipName));
                 }
-                baseboard->Baseboard(BaseboardNum).CheckEquipName = false;
+                baseboard->baseboards(BaseboardNum).CheckEquipName = false;
             }
         }
 
@@ -141,12 +142,12 @@ namespace BaseboardElectric {
         // Simulate baseboard
         SimElectricConvective(state, BaseboardNum, QZnReq);
 
-        PowerMet = baseboard->Baseboard(BaseboardNum).Power;
+        PowerMet = baseboard->baseboards(BaseboardNum).Power;
 
-        baseboard->Baseboard(BaseboardNum).Energy =
-            baseboard->Baseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        baseboard->Baseboard(BaseboardNum).ElecUseLoad =
-            baseboard->Baseboard(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        baseboard->baseboards(BaseboardNum).Energy =
+            baseboard->baseboards(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        baseboard->baseboards(BaseboardNum).ElecUseLoad =
+            baseboard->baseboards(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)
@@ -197,11 +198,7 @@ namespace BaseboardElectric {
 
         NumConvElecBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        // Calculate total number of baseboard units
-        baseboard->NumBaseboards = NumConvElecBaseboards;
-
-        baseboard->Baseboard.allocate(baseboard->NumBaseboards);
-        baseboard->BaseboardNumericFields.allocate(baseboard->NumBaseboards);
+        baseboard->baseboards.allocate(NumConvElecBaseboards);
 
         if (NumConvElecBaseboards > 0) { // Get the data for cooling schemes
             BaseboardNum = 0;
@@ -220,9 +217,9 @@ namespace BaseboardElectric {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames.allocate(NumNums);
-                baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames = "";
-                baseboard->BaseboardNumericFields(ConvElecBBNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+                baseboard->baseboards(ConvElecBBNum).FieldNames.allocate(NumNums);
+                baseboard->baseboards(ConvElecBBNum).FieldNames = "";
+                baseboard->baseboards(ConvElecBBNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
@@ -233,7 +230,7 @@ namespace BaseboardElectric {
                     state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
                 ++BaseboardNum;
-                auto &thisBaseboard = baseboard->Baseboard(BaseboardNum);
+                auto &thisBaseboard = baseboard->baseboards(BaseboardNum);
                 thisBaseboard.EquipName = state.dataIPShortCut->cAlphaArgs(1);                  // name of this baseboard
                 thisBaseboard.EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
@@ -351,12 +348,12 @@ namespace BaseboardElectric {
             }
         }
 
-        for (BaseboardNum = 1; BaseboardNum <= baseboard->NumBaseboards; ++BaseboardNum) {
+        for (BaseboardNum = 1; BaseboardNum <= NumConvElecBaseboards; ++BaseboardNum) {
 
             // Setup Report variables for the Electric Baseboards
             // CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Electric'
 
-            auto &thisBaseboard = baseboard->Baseboard(BaseboardNum);
+            auto &thisBaseboard = baseboard->baseboards(BaseboardNum);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -413,50 +410,36 @@ namespace BaseboardElectric {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        using DataZoneEquipment::CheckZoneEquipmentList;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNode;
-        int Loop;
-
         auto &baseboard = state.dataBaseboardElectric;
 
-        // Do the one time initializations
-        if (baseboard->MyOneTimeFlag) {
-            // initialize the environment and sizing flags
-            state.dataBaseboardElectric->MyEnvrnFlag.allocate(baseboard->NumBaseboards);
-            state.dataBaseboardElectric->MyEnvrnFlag = true;
-
-            baseboard->MyOneTimeFlag = false;
-        }
-
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!baseboard->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            baseboard->ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= baseboard->NumBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(state, baseboard->Baseboard(Loop).EquipType, baseboard->Baseboard(Loop).EquipName)) continue;
+        if (!baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked = true;
+            if (!DataZoneEquipment::CheckZoneEquipmentList(
+                    state, baseboard->baseboards(BaseboardNum).EquipType, baseboard->baseboards(BaseboardNum).EquipName)) {
                 ShowSevereError(state,
-                                "InitBaseboard: Unit=[" + baseboard->Baseboard(Loop).EquipType + ',' + baseboard->Baseboard(Loop).EquipName +
+                                "InitBaseboard: Unit=[" + baseboard->baseboards(BaseboardNum).EquipType + ',' +
+                                    baseboard->baseboards(BaseboardNum).EquipName +
                                     "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && baseboard->Baseboard(BaseboardNum).MySizeFlag) {
+        if (!state.dataGlobal->SysSizingCalc && baseboard->baseboards(BaseboardNum).MySizeFlag) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
-            baseboard->Baseboard(BaseboardNum).MySizeFlag = false;
+            baseboard->baseboards(BaseboardNum).MySizeFlag = false;
         }
 
         // Set the reporting variables to zero at each timestep.
-        baseboard->Baseboard(BaseboardNum).Energy = 0.0;
-        baseboard->Baseboard(BaseboardNum).Power = 0.0;
-        baseboard->Baseboard(BaseboardNum).ElecUseLoad = 0.0;
-        baseboard->Baseboard(BaseboardNum).ElecUseRate = 0.0;
+        baseboard->baseboards(BaseboardNum).Energy = 0.0;
+        baseboard->baseboards(BaseboardNum).Power = 0.0;
+        baseboard->baseboards(BaseboardNum).ElecUseLoad = 0.0;
+        baseboard->baseboards(BaseboardNum).ElecUseRate = 0.0;
 
         // Do the every time step initializations
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-        baseboard->Baseboard(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
-        baseboard->Baseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        baseboard->baseboards(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
+        baseboard->baseboards(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
     }
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
@@ -505,48 +488,48 @@ namespace BaseboardElectric {
 
         if (state.dataSize->CurZoneEqNum > 0) {
 
-            CompType = baseboard->Baseboard(BaseboardNum).EquipType;
-            CompName = baseboard->Baseboard(BaseboardNum).EquipName;
+            CompType = baseboard->baseboards(BaseboardNum).EquipType;
+            CompName = baseboard->baseboards(BaseboardNum).EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
-            state.dataSize->DataZoneNumber = baseboard->Baseboard(BaseboardNum).ZonePtr;
+            state.dataSize->DataZoneNumber = baseboard->baseboards(BaseboardNum).ZonePtr;
             SizingMethod = HeatingCapacitySizing;
             FieldNum = 1;
             PrintFlag = true;
-            SizingString = baseboard->BaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
-            CapSizingMethod = baseboard->Baseboard(BaseboardNum).HeatingCapMethod;
+            SizingString = baseboard->baseboards(BaseboardNum).FieldNames(FieldNum) + " [W]";
+            CapSizingMethod = baseboard->baseboards(BaseboardNum).HeatingCapMethod;
             ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
-                    if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
+                    if (baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
                             state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
-                    TempSize = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
+                    TempSize = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
-                        baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
-                    state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
                         state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     TempSize = AutoSize;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else {
-                    TempSize = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
+                    TempSize = baseboard->baseboards(BaseboardNum).ScaledHeatingCapacity;
                 }
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                baseboard->Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
+                baseboard->baseboards(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 state.dataSize->DataScalableCapSizingON = false;
             }
         }
@@ -583,19 +566,19 @@ namespace BaseboardElectric {
 
         auto &baseboard = state.dataBaseboardElectric;
 
-        AirInletTemp = baseboard->Baseboard(BaseboardNum).AirInletTemp;
-        CpAir = PsyCpAirFnW(baseboard->Baseboard(BaseboardNum).AirInletHumRat);
+        AirInletTemp = baseboard->baseboards(BaseboardNum).AirInletTemp;
+        CpAir = PsyCpAirFnW(baseboard->baseboards(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
         // currently only the efficiency is used to calculate the electric consumption.  There could be some
         //  thermal loss that could be accounted for with this efficiency input.
-        Effic = baseboard->Baseboard(BaseboardNum).BaseboardEfficiency;
+        Effic = baseboard->baseboards(BaseboardNum).BaseboardEfficiency;
 
-        if (GetCurrentScheduleValue(state, baseboard->Baseboard(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
+        if (GetCurrentScheduleValue(state, baseboard->baseboards(BaseboardNum).SchedPtr) > 0.0 && LoadMet >= SmallLoad) {
 
             // if the load exceeds the capacity than the capacity is set to the BB limit.
-            if (LoadMet > baseboard->Baseboard(BaseboardNum).NominalCapacity) {
-                QBBCap = baseboard->Baseboard(BaseboardNum).NominalCapacity;
+            if (LoadMet > baseboard->baseboards(BaseboardNum).NominalCapacity) {
+                QBBCap = baseboard->baseboards(BaseboardNum).NominalCapacity;
             } else {
                 QBBCap = LoadMet;
             }
@@ -604,17 +587,17 @@ namespace BaseboardElectric {
             AirOutletTemp = AirInletTemp + QBBCap / CapacitanceAir;
 
             // The Baseboard electric Load is calculated using the efficiency
-            baseboard->Baseboard(BaseboardNum).ElecUseRate = QBBCap / Effic;
+            baseboard->baseboards(BaseboardNum).ElecUseRate = QBBCap / Effic;
 
         } else {
             // if there is an off condition the BB does nothing.
             AirOutletTemp = AirInletTemp;
             QBBCap = 0.0;
-            baseboard->Baseboard(BaseboardNum).ElecUseRate = 0.0;
+            baseboard->baseboards(BaseboardNum).ElecUseRate = 0.0;
         }
 
-        baseboard->Baseboard(BaseboardNum).AirOutletTemp = AirOutletTemp;
-        baseboard->Baseboard(BaseboardNum).Power = QBBCap;
+        baseboard->baseboards(BaseboardNum).AirOutletTemp = AirOutletTemp;
+        baseboard->baseboards(BaseboardNum).Power = QBBCap;
     }
 
 } // namespace BaseboardElectric

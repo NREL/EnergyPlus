@@ -1858,7 +1858,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -2083,7 +2083,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -4466,9 +4466,7 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
     state->dataContaminantBalance->ZoneAirGC(2) = 20.0;
 
     state->dataEarthTube->GetInputFlag = false;
-    state->dataEarthTube->TotEarthTube = 0;
     state->dataCoolTower->GetInputFlag = false;
-    state->dataCoolTower->NumCoolTowers = 0;
     state->dataThermalChimneys->ThermalChimneyGetInputFlag = false;
     state->dataThermalChimneys->TotThermalChimney = 0;
 
@@ -4584,7 +4582,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataHeatBalFanSys->ZoneMassBalanceFlag.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 24.;

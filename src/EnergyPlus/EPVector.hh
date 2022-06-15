@@ -58,13 +58,14 @@ namespace EnergyPlus {
 template <typename T> struct EPVector : private std::vector<T>
 {
     using std::vector<T>::size;
+#ifdef NDEBUG
     using std::vector<T>::operator[];
+#endif
     using std::vector<T>::empty;
     using std::vector<T>::begin;
     using std::vector<T>::end;
     using std::vector<T>::cbegin;
     using std::vector<T>::cend;
-    using std::vector<T>::clear;
     using std::vector<T>::emplace_back;
     using std::vector<T>::push_back;
     using const_iterator = typename std::vector<T>::const_iterator;
@@ -72,27 +73,57 @@ template <typename T> struct EPVector : private std::vector<T>
     using value_type = T;
     using size_type = typename std::vector<T>::size_type;
 
-    [[nodiscard]] T &operator()(std::size_t n)
+#ifndef NDEBUG
+    [[nodiscard]] T &operator[](size_type n)
+    {
+        return std::vector<T>::at(n);
+    }
+
+    [[nodiscard]] const T &operator[](size_type n) const
+    {
+        return std::vector<T>::at(n);
+    }
+#endif
+
+    [[nodiscard]] T &operator()(size_type n)
     {
         return (*this)[n - 1];
     }
 
-    [[nodiscard]] const T &operator()(std::size_t n) const
+    [[nodiscard]] const T &operator()(size_type n) const
     {
         return (*this)[n - 1];
     }
 
-    void allocate(std::size_t size)
+    void allocate(size_type size)
     {
         m_allocated = true;
-        this->resize(size);
+        std::vector<T>::resize(size);
         std::fill(begin(), end(), T{});
     }
 
     void deallocate() noexcept
     {
         m_allocated = false;
-        this->clear();
+        std::vector<T>::clear();
+    }
+
+    void clear() noexcept
+    {
+        m_allocated = false;
+        std::vector<T>::clear();
+    }
+
+    void resize(size_type count)
+    {
+        m_allocated = true;
+        std::vector<T>::resize(count);
+    }
+
+    void resize(size_type count, const T &value)
+    {
+        m_allocated = true;
+        std::vector<T>::resize(count, value);
     }
 
     [[nodiscard]] bool allocated() const noexcept
@@ -109,8 +140,8 @@ template <typename T> struct EPVector : private std::vector<T>
     // dimension is often used to initalize the vector instead of allocate + operator=
     void dimension(std::size_t size, const T &v)
     {
-        this->clear();
-        this->resize(size, v);
+        std::vector<T>::clear();
+        std::vector<T>::resize(size, v);
     }
 
     // isize needed for current FindItemInList
@@ -126,13 +157,14 @@ private:
 template <> struct EPVector<bool> : private std::vector<std::uint8_t>
 {
     using std::vector<std::uint8_t>::size;
+#ifdef NDEBUG
     using std::vector<std::uint8_t>::operator[];
+#endif
     using std::vector<std::uint8_t>::empty;
     using std::vector<std::uint8_t>::begin;
     using std::vector<std::uint8_t>::end;
     using std::vector<std::uint8_t>::cbegin;
     using std::vector<std::uint8_t>::cend;
-    using std::vector<std::uint8_t>::clear;
     using std::vector<std::uint8_t>::emplace_back;
     using std::vector<std::uint8_t>::push_back;
     using const_iterator = typename std::vector<std::uint8_t>::const_iterator;
@@ -140,32 +172,72 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     using value_type = std::uint8_t;
     using size_type = typename std::vector<std::uint8_t>::size_type;
 
-    [[nodiscard]] std::uint8_t &operator()(std::size_t n) noexcept
+#ifndef NDEBUG
+    [[nodiscard]] std::uint8_t &operator[](std::size_t n)
+    {
+        return std::vector<std::uint8_t>::at(n);
+    }
+
+    [[nodiscard]] const std::uint8_t &operator[](size_type n) const
+    {
+        return std::vector<std::uint8_t>::at(n);
+    }
+
+    [[nodiscard]] std::uint8_t &operator()(size_type n)
     {
         return (*this)[n - 1];
     }
 
-    [[nodiscard]] const std::uint8_t &operator()(std::size_t n) const noexcept
+    [[nodiscard]] const std::uint8_t &operator()(size_type n) const
     {
         return (*this)[n - 1];
     }
+#else
+    [[nodiscard]] std::uint8_t &operator()(size_type n) noexcept
+    {
+        return (*this)[n - 1];
+    }
+
+    [[nodiscard]] const std::uint8_t &operator()(size_type n) const noexcept
+    {
+        return (*this)[n - 1];
+    }
+#endif
 
     [[nodiscard]] bool allocated() const noexcept
     {
         return m_allocated || !this->empty();
     }
 
-    void allocate(std::size_t size)
+    void allocate(size_type size)
     {
         m_allocated = true;
-        this->resize(size);
+        std::vector<std::uint8_t>::resize(size);
         std::fill(begin(), end(), false);
     }
 
     void deallocate() noexcept
     {
         m_allocated = false;
-        this->clear();
+        std::vector<std::uint8_t>::clear();
+    }
+
+    void clear() noexcept
+    {
+        m_allocated = false;
+        std::vector<std::uint8_t>::clear();
+    }
+
+    void resize(size_type count)
+    {
+        m_allocated = true;
+        std::vector<std::uint8_t>::resize(count);
+    }
+
+    void resize(size_type count, const bool &value)
+    {
+        m_allocated = true;
+        std::vector<std::uint8_t>::resize(count, value);
     }
 
     // operator= used for initialization of the vector
@@ -177,8 +249,8 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
     // dimension is often used to initalize the vector instead of allocate + operator=
     void dimension(std::size_t size, const bool v)
     {
-        this->clear();
-        this->resize(size, v);
+        std::vector<std::uint8_t>::clear();
+        std::vector<std::uint8_t>::resize(size, v);
     }
 
     // isize needed for current FindItemInList

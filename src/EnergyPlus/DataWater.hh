@@ -282,7 +282,7 @@ namespace DataWater {
         Real64 NomAnnualRain;
         // calculated and from elsewhere.
         Real64 CurrentRate;
-        Real64 CurrentAmount;
+        Real64 CurrentAmount;                                      //  units of m
         std::array<Real64, 12> MonthlyTotalPrecInWeather = {0.0};  // Monthly total rain in weather file [mm]
         std::array<Real64, 12> MonthlyTotalPrecInSitePrec = {0.0}; // Monthly total rain in site:precipitation [mm]
         std::array<int, 12> numRainyHoursInWeather = {0};          // Monthly number of rainy hours

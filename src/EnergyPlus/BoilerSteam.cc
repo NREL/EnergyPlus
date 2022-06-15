@@ -161,10 +161,9 @@ namespace BoilerSteam {
 
         SteamFluidIndex = 0;
         state.dataIPShortCut->cCurrentModuleObject = "Boiler:Steam";
-        state.dataBoilerSteam->numBoilers =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+        int numBoilers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-        if (state.dataBoilerSteam->numBoilers <= 0) {
+        if (numBoilers <= 0) {
             ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
@@ -173,10 +172,10 @@ namespace BoilerSteam {
         if (allocated(state.dataBoilerSteam->Boiler)) return;
 
         // Boiler will have fuel input to it , that is it !
-        state.dataBoilerSteam->Boiler.allocate(state.dataBoilerSteam->numBoilers);
+        state.dataBoilerSteam->Boiler.allocate(numBoilers);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
-        for (BoilerNum = 1; BoilerNum <= state.dataBoilerSteam->numBoilers; ++BoilerNum) {
+        for (BoilerNum = 1; BoilerNum <= numBoilers; ++BoilerNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      BoilerNum,
@@ -229,9 +228,9 @@ namespace BoilerSteam {
             thisBoiler.MinPartLoadRat = state.dataIPShortCut->rNumericArgs(5);
             thisBoiler.MaxPartLoadRat = state.dataIPShortCut->rNumericArgs(6);
             thisBoiler.OptPartLoadRat = state.dataIPShortCut->rNumericArgs(7);
-            thisBoiler.FullLoadCoef(1) = state.dataIPShortCut->rNumericArgs(8);
-            thisBoiler.FullLoadCoef(2) = state.dataIPShortCut->rNumericArgs(9);
-            thisBoiler.FullLoadCoef(3) = state.dataIPShortCut->rNumericArgs(10);
+            thisBoiler.FullLoadCoef[0] = state.dataIPShortCut->rNumericArgs(8);
+            thisBoiler.FullLoadCoef[1] = state.dataIPShortCut->rNumericArgs(9);
+            thisBoiler.FullLoadCoef[2] = state.dataIPShortCut->rNumericArgs(10);
             thisBoiler.SizFac = state.dataIPShortCut->rNumericArgs(11);
             if (thisBoiler.SizFac <= 0.0) thisBoiler.SizFac = 1.0;
 
@@ -814,7 +813,7 @@ namespace BoilerSteam {
         Real64 TheorFuelUse = this->BoilerLoad / this->NomEffic;
 
         // Calculate fuel used
-        this->FuelUsed = TheorFuelUse / (this->FullLoadCoef(1) + this->FullLoadCoef(2) * OperPLR + this->FullLoadCoef(3) * pow_2(OperPLR));
+        this->FuelUsed = TheorFuelUse / (this->FullLoadCoef[0] + this->FullLoadCoef[1] * OperPLR + this->FullLoadCoef[2] * pow_2(OperPLR));
         // Calculate boiler efficiency
         this->BoilerEff = this->BoilerLoad / this->FuelUsed;
     }
