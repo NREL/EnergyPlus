@@ -2021,8 +2021,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         for (int AirLoopNum = 1; AirLoopNum <= numPrimaryAirSys; ++AirLoopNum) {
             auto &thisPrimaryAirSys = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
             bool FoundCentralHeatCoil = false;
+            bool unitaryCoolingCoilExists = false;
+            bool unitaryHeatingCoilExists = false;
             for (int BranchNum = 1; !FoundCentralHeatCoil && BranchNum <= thisPrimaryAirSys.NumBranches; ++BranchNum) {
                 for (int CompNum = 1; !FoundCentralHeatCoil && CompNum <= thisPrimaryAirSys.Branch(BranchNum).TotalComponents; ++CompNum) {
+                    std::string &CompName = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name;
                     CompType CompTypeNum = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num;
                     switch (CompTypeNum) {
                     case CompType::WaterCoil_SimpleHeat:
@@ -2040,11 +2043,12 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         break;
                     case CompType::UnitarySystemModel:
                         // mine HeatCoilExists from UnitarySystem
-                        std::string CompName = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name;
-                        bool CoolingCoilExists = false;
-                        bool HeatingCoilExists = false;
-                        UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, CoolingCoilExists, HeatingCoilExists, 0);
-                        if (HeatingCoilExists) FoundCentralHeatCoil = true;
+                        unitaryCoolingCoilExists = false;
+                        unitaryHeatingCoilExists = false;
+                        UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, unitaryCoolingCoilExists, unitaryHeatingCoilExists, 0);
+                        if (unitaryHeatingCoilExists) FoundCentralHeatCoil = true;
+                        break;
+                    default:
                         break;
                     }
                 } // end of component loop
@@ -2056,9 +2060,12 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         for (int AirLoopNum = 1; AirLoopNum <= numPrimaryAirSys; ++AirLoopNum) {
             auto &thisPrimaryAirSys = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
             bool FoundCentralCoolCoil = false;
+            bool unitaryCoolingCoilExists = false;
+            bool unitaryHeatingCoilExists = false;
             for (int BranchNum = 1; !FoundCentralCoolCoil && BranchNum <= thisPrimaryAirSys.NumBranches; ++BranchNum) {
                 for (int CompNum = 1; !FoundCentralCoolCoil && CompNum <= thisPrimaryAirSys.Branch(BranchNum).TotalComponents; ++CompNum) {
                     CompType CompTypeNum = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num;
+                    std::string &CompName = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name;
                     switch (CompTypeNum) {
                     case CompType::WaterCoil_SimpleCool:
                     case CompType::WaterCoil_Cooling:
@@ -2074,11 +2081,12 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         break;
                     case CompType::UnitarySystemModel:
                         // mine CoolHeat coil exists from UnitarySys
-                        std::string CompName = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name;
-                        bool CoolingCoilExists = false;
-                        bool HeatingCoilExists = false;
-                        UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, CoolingCoilExists, HeatingCoilExists, 0);
-                        if (CoolingCoilExists) FoundCentralCoolCoil = true;
+                        unitaryCoolingCoilExists = false;
+                        unitaryHeatingCoilExists = false;
+                        UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, unitaryCoolingCoilExists, unitaryHeatingCoilExists, 0);
+                        if (unitaryCoolingCoilExists) FoundCentralCoolCoil = true;
+                        break;
+                    default:
                         break;
                     }
                 } // end of component loop
