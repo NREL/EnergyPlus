@@ -8108,11 +8108,16 @@ namespace SurfaceGeometry {
                     int GndSurfsNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataSurface->GroundSurfsProperty);
                     if (GndSurfsNum == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(6) + " has been found.");
-                        ShowContinueError(state,
-                                          state.dataIPShortCut->cAlphaFieldNames(6) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(6) +
-                                              "\" no corresponding ground surfaces properties has been found in the input file.");
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(6)));
+                        ShowContinueError(
+                            state,
+                            format("{} entered value = \"{}\", no corresponding ground surfaces object has been found in the input file.",
+                                   state.dataIPShortCut->cAlphaFieldNames(6),
+                                   state.dataIPShortCut->cAlphaArgs(6)));
                         ErrorsFound = true;
                     } else {
                         state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsPtr = GndSurfsNum;

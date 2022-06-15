@@ -10439,9 +10439,8 @@ void SkyDifSolarShading(EnergyPlusData &state)
         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
 
         if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-            int SrdSurfsNum;
             Real64 SrdSurfsViewFactor = 0.0;
-            SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+            int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
             auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
             for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                 SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
