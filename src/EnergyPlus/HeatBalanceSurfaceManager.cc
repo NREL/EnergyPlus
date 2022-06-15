@@ -8961,7 +8961,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
             }
         }
     }
-}	
+}
 
 void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
 {
