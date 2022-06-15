@@ -7992,13 +7992,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
         int NumNumeric;
-        int Loop;
-        int SurfLoop;
         int IOStat;
-        int SurfNum;
-        int NodeNum;
-        int ExtShadingSchedNum;
-        int SurroundingSurfsNum;
 
         //-----------------------------------------------------------------------
         //                SurfaceProperty:LocalEnvironment
@@ -8015,7 +8009,7 @@ namespace SurfaceGeometry {
                 state.dataSurface->SurfLocalEnvironment.allocate(state.dataSurface->TotSurfLocalEnv);
             }
 
-            for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
@@ -8033,7 +8027,7 @@ namespace SurfaceGeometry {
                 state.dataSurface->SurfLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -8048,7 +8042,7 @@ namespace SurfaceGeometry {
 
                 // Assign External Shading Schedule number
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                    int ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (ExtShadingSchedNum == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -8064,7 +8058,7 @@ namespace SurfaceGeometry {
 
                 // Assign surrounding surfaces object number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    SurroundingSurfsNum =
+                    int SurroundingSurfsNum =
                         UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->SurroundingSurfsProperty);
                     if (SurroundingSurfsNum == 0) {
                         ShowSevereError(state,
@@ -8081,15 +8075,15 @@ namespace SurfaceGeometry {
 
                 // Assign outdoor air node number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    NodeNum = GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(5),
-                                                ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::SurfacePropertyLocalEnvironment,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Air,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                ObjectIsParent);
+                    int NodeNum = GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(5),
+                                                    ErrorsFound,
+                                                    DataLoopNode::ConnectionObjectType::SurfacePropertyLocalEnvironment,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Air,
+                                                    DataLoopNode::ConnectionType::Inlet,
+                                                    NodeInputManager::CompFluidStream::Primary,
+                                                    ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -8126,8 +8120,8 @@ namespace SurfaceGeometry {
             }
         }
         // Link surface properties to surface object
-        for (SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-            for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
+        for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 if (state.dataSurface->SurfLocalEnvironment(Loop).SurfPtr == SurfLoop) {
                     if (state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
                         state.dataSurface->SurfHasLinkedOutAirNode(SurfLoop) = true;
