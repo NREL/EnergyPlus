@@ -128,6 +128,32 @@ using namespace FaultsManager;
 using namespace HybridModel;
 using ScheduleManager::GetCurrentScheduleValue;
 
+enum class ZoneControlTypes
+{
+    Invalid = -1,
+    TStat = 1,
+    TCTStat = 2,
+    OTTStat = 3,
+    HStat = 4,
+    TandHStat = 5,
+    StagedDual = 6,
+    Num
+};
+
+enum class AdaptiveComfortModel
+{
+    Invalid = -1,
+    ADAP_NONE = 1,
+    ASH55_CENTRAL = 2,
+    ASH55_UPPER_90 = 3,
+    ASH55_UPPER_80 = 4,
+    CEN15251_CENTRAL = 5,
+    CEN15251_UPPER_I = 6,
+    CEN15251_UPPER_II = 7,
+    CEN15251_UPPER_III = 8,
+    Num
+};
+
 static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::ThermostatType::Num)> ValidControlTypes = {
     "Uncontrolled",
     "ThermostatSetpoint:SingleHeating",
