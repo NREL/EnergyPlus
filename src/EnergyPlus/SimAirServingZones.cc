@@ -2024,20 +2024,28 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             for (int BranchNum = 1; !FoundCentralHeatCoil && BranchNum <= thisPrimaryAirSys.NumBranches; ++BranchNum) {
                 for (int CompNum = 1; !FoundCentralHeatCoil && CompNum <= thisPrimaryAirSys.Branch(BranchNum).TotalComponents; ++CompNum) {
                     CompType CompTypeNum = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num;
-                    if (CompTypeNum == CompType::WaterCoil_SimpleHeat || CompTypeNum == CompType::Coil_ElectricHeat ||
-                        CompTypeNum == CompType::Coil_GasHeat || CompTypeNum == CompType::SteamCoil_AirHeat ||
-                        CompTypeNum == CompType::Coil_DeSuperHeat || CompTypeNum == CompType::DXHeatPumpSystem ||
-                        CompTypeNum == CompType::Furnace_UnitarySys_HeatOnly || CompTypeNum == CompType::Furnace_UnitarySys_HeatCool ||
-                        CompTypeNum == CompType::UnitarySystem_BypassVAVSys || CompTypeNum == CompType::UnitarySystem_MSHeatPump ||
-                        CompTypeNum == CompType::CoilUserDefined) {
+                    switch (CompTypeNum) {
+                    case CompType::WaterCoil_SimpleHeat:
+                    case CompType::Coil_ElectricHeat:
+                    case CompType::Coil_GasHeat:
+                    case CompType::SteamCoil_AirHeat:
+                    case CompType::Coil_DeSuperHeat:
+                    case CompType::DXHeatPumpSystem:
+                    case CompType::Furnace_UnitarySys_HeatOnly:
+                    case CompType::Furnace_UnitarySys_HeatCool:
+                    case CompType::UnitarySystem_BypassVAVSys:
+                    case CompType::UnitarySystem_MSHeatPump:
+                    case CompType::CoilUserDefined:
                         FoundCentralHeatCoil = true;
-                    } else if (CompTypeNum == CompType::UnitarySystemModel) {
+                        break;
+                    case CompType::UnitarySystemModel:
                         // mine HeatCoilExists from UnitarySystem
                         std::string CompName = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name;
                         bool CoolingCoilExists = false;
                         bool HeatingCoilExists = false;
                         UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, CoolingCoilExists, HeatingCoilExists, 0);
                         if (HeatingCoilExists) FoundCentralHeatCoil = true;
+                        break;
                     }
                 } // end of component loop
             }     // end of Branch loop
@@ -2051,19 +2059,27 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             for (int BranchNum = 1; !FoundCentralCoolCoil && BranchNum <= thisPrimaryAirSys.NumBranches; ++BranchNum) {
                 for (int CompNum = 1; !FoundCentralCoolCoil && CompNum <= thisPrimaryAirSys.Branch(BranchNum).TotalComponents; ++CompNum) {
                     CompType CompTypeNum = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num;
-                    if (CompTypeNum == CompType::WaterCoil_SimpleCool || CompTypeNum == CompType::WaterCoil_Cooling ||
-                        CompTypeNum == CompType::WaterCoil_DetailedCool || CompTypeNum == CompType::WaterCoil_CoolingHXAsst ||
-                        CompTypeNum == CompType::DXCoil_CoolingHXAsst || CompTypeNum == CompType::DXSystem ||
-                        CompTypeNum == CompType::Furnace_UnitarySys_HeatCool || CompTypeNum == CompType::UnitarySystem_BypassVAVSys ||
-                        CompTypeNum == CompType::UnitarySystem_MSHeatPump || CompTypeNum == CompType::CoilUserDefined) {
+                    switch (CompTypeNum) {
+                    case CompType::WaterCoil_SimpleCool:
+                    case CompType::WaterCoil_Cooling:
+                    case CompType::WaterCoil_DetailedCool:
+                    case CompType::WaterCoil_CoolingHXAsst:
+                    case CompType::DXCoil_CoolingHXAsst:
+                    case CompType::DXSystem:
+                    case CompType::Furnace_UnitarySys_HeatCool:
+                    case CompType::UnitarySystem_BypassVAVSys:
+                    case CompType::UnitarySystem_MSHeatPump:
+                    case CompType::CoilUserDefined:
                         FoundCentralCoolCoil = true;
-                    } else if (CompTypeNum == CompType::UnitarySystemModel) {
+                        break;
+                    case CompType::UnitarySystemModel:
                         // mine CoolHeat coil exists from UnitarySys
                         std::string CompName = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name;
                         bool CoolingCoilExists = false;
                         bool HeatingCoilExists = false;
                         UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, CoolingCoilExists, HeatingCoilExists, 0);
                         if (CoolingCoilExists) FoundCentralCoolCoil = true;
+                        break;
                     }
                 } // end of component loop
             }     // end of Branch loop
@@ -2285,8 +2301,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 void ConnectReturnNodes(EnergyPlusData &state)
 {
     // This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
-    // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,
-    // same airloop)
+    // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node
+    // (same zone, same airloop)
 
     auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
@@ -2876,8 +2892,8 @@ void SolveAirLoopControllers(
     // E.g., actuator inlet water flow
     for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystems(AirLoopNum).NumControllers; ++AirLoopControlNum) {
 
-        // BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA system
-        // ControllerConvergedFlag is returned true here for water coils in OA system
+        // BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA
+        // system ControllerConvergedFlag is returned true here for water coils in OA system
         ManageControllers(state,
                           PrimaryAirSystems(AirLoopNum).ControllerName(AirLoopControlNum),
                           PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum),
@@ -2905,7 +2921,8 @@ void SolveAirLoopControllers(
         ControllerConvergedFlag = false;
         // if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
         if (AirLoopControlInfo(AirLoopNum).EconoActive) {
-            // nesting this next if to try and speed this up. If economizer is not active, it doesn't matter if CanBeLockedOutByEcono = true
+            // nesting this next if to try and speed this up. If economizer is not active, it doesn't matter if CanBeLockedOutByEcono =
+            // true
             if (PrimaryAirSystems(AirLoopNum).CanBeLockedOutByEcono(AirLoopControlNum)) {
                 ControllerConvergedFlag = true;
                 continue;
@@ -2968,14 +2985,14 @@ void SolveAirLoopControllers(
 
                 // Re-evaluate air loop components with new actuated variables
                 ++NumCalls;
-                // this call to SimAirLoopComponents will simulate the OA system and set the PrimaryAirSystem( AirLoopNum ).ControlConverged(
-                // AirLoopControlNum ) flag for controllers of water coils in the OA system for controllers not in the OA system, this flag is set
-                // above in this function
+                // this call to SimAirLoopComponents will simulate the OA system and set the PrimaryAirSystem( AirLoopNum
+                // ).ControlConverged( AirLoopControlNum ) flag for controllers of water coils in the OA system for controllers not in the
+                // OA system, this flag is set above in this function
                 SimAirLoopComponents(state, AirLoopNum, FirstHVACIteration);
                 // pass convergence flag from OA system water coils (i.e., SolveWaterCoilController) back to this loop
                 // for future reference, the PrimaryAirSystem().ControlConverged flag is set while managing OA system water coils.
-                // If convergence is not achieved with OA system water coils, suspect how this flag is passed back here or why OA system coils do
-                // not converge
+                // If convergence is not achieved with OA system water coils, suspect how this flag is passed back here or why OA system
+                // coils do not converge
                 ControllerConvergedFlag = PrimaryAirSystems(AirLoopNum).ControlConverged(AirLoopControlNum);
                 IsUpToDateFlag = true;
             }
@@ -4062,7 +4079,8 @@ void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const 
                                          PrimaryAirSystems(AirLoopNum).Name,
                                          ScalableSM + "Supply Air Flow Rate [m3/s]",
                                          PrimaryAirSystems(AirLoopNum).DesignVolFlowRate);
-            // Initialize MaxOutAir for DOAS loops with no actual OASys, systems with an OA controller will overwrite this is CalcOAController
+            // Initialize MaxOutAir for DOAS loops with no actual OASys, systems with an OA controller will overwrite this is
+            // CalcOAController
             if (PrimaryAirSystems(AirLoopNum).isAllOA)
                 state.dataAirLoop->AirLoopFlow(AirLoopNum).MaxOutAir = PrimaryAirSystems(AirLoopNum).DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
         }
@@ -5013,8 +5031,9 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                                     ShowContinueError(state,
                                                       "But zone \"" + TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName +
                                                           "\" associated with system does not have OA flow/person");
-                                    ShowContinueError(
-                                        state, "or flow/area values specified in DesignSpecification:OutdoorAir object associated with the zone");
+                                    ShowContinueError(state,
+                                                      "or flow/area values specified in DesignSpecification:OutdoorAir object associated "
+                                                      "with the zone");
                                 }
 
                                 // Save Std 62.1 heating ventilation required by zone
@@ -7177,7 +7196,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
         print(state.files.ssz, "Time");
         // static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
         // for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
-        //     { IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
+        //     { IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep
+        //     <<
         // CalcSysSizing( I ).AirPriLoopName << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName <<
         // ":Des Cool Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Cap [W]" <<
         // SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Sens Cool Cap [W]"; }
@@ -7861,10 +7881,16 @@ void LimitZoneVentEff(EnergyPlusData &state,
         }
 
         // Update VRP table entries:
-        PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchS62zcdVpz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VpzClgByZone, 4); // Vpz
-        PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchS62zcdVdz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VdzClgByZone, 4); // Vdz
+        PreDefTableEntry(state,
+                         state.dataOutRptPredefined->pdchS62zcdVpz,
+                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
+                         VpzClgByZone,
+                         4); // Vpz
+        PreDefTableEntry(state,
+                         state.dataOutRptPredefined->pdchS62zcdVdz,
+                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
+                         VdzClgByZone,
+                         4); // Vdz
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchS62zcdVpzmin,
                          TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
