@@ -8010,6 +8010,9 @@ namespace SurfaceGeometry {
             }
 
             for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
+
+                auto &SurfLocalEnv = state.dataSurface->SurfLocalEnvironment(Loop);
+
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
@@ -8024,7 +8027,7 @@ namespace SurfaceGeometry {
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                state.dataSurface->SurfLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
+                SurfLocalEnv.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Assign surface number
                 int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
@@ -8042,7 +8045,7 @@ namespace SurfaceGeometry {
                                state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
-                    state.dataSurface->SurfLocalEnvironment(Loop).SurfPtr = SurfNum;
+                    SurfLocalEnv.SurfPtr = SurfNum;
                 }
 
                 // Assign External Shading Schedule number
@@ -8061,7 +8064,7 @@ namespace SurfaceGeometry {
                                                  state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr = ExtShadingSchedNum;
+                        SurfLocalEnv.ExtShadingSchedPtr = ExtShadingSchedNum;
                     }
                 }
 
@@ -8083,7 +8086,7 @@ namespace SurfaceGeometry {
                                    state.dataIPShortCut->cAlphaArgs(4)));
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr = SurroundingSurfsNum;
+                        SurfLocalEnv.SurroundingSurfsPtr = SurroundingSurfsNum;
                     }
                 }
 
@@ -8111,7 +8114,7 @@ namespace SurfaceGeometry {
                                                  state.dataIPShortCut->cAlphaArgs(5)));
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr = NodeNum;
+                        SurfLocalEnv.OutdoorAirNodePtr = NodeNum;
                     }
                 }
 
@@ -8132,7 +8135,7 @@ namespace SurfaceGeometry {
                                    state.dataIPShortCut->cAlphaArgs(6)));
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsPtr = GndSurfsNum;
+                        SurfLocalEnv.GroundSurfsPtr = GndSurfsNum;
                     }
                 }
             }
@@ -8140,24 +8143,25 @@ namespace SurfaceGeometry {
         // Link surface properties to surface object
         for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
             for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
-                if (state.dataSurface->SurfLocalEnvironment(Loop).SurfPtr == SurfLoop) {
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
+                auto &SurfLocalEnv = state.dataSurface->SurfLocalEnvironment(Loop);
+                if (SurfLocalEnv.SurfPtr == SurfLoop) {
+                    if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
                         state.dataSurface->SurfHasLinkedOutAirNode(SurfLoop) = true;
-                        state.dataSurface->SurfLinkedOutAirNode(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr;
+                        state.dataSurface->SurfLinkedOutAirNode(SurfLoop) = SurfLocalEnv.OutdoorAirNodePtr;
                     }
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr != 0) {
+                    if (SurfLocalEnv.ExtShadingSchedPtr != 0) {
                         state.dataSurface->SurfSchedExternalShadingFrac(SurfLoop) = true;
-                        state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr;
+                        state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = SurfLocalEnv.ExtShadingSchedPtr;
                     }
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr != 0) {
+                    if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
-                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr;
+                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = SurfLocalEnv.SurroundingSurfsPtr;
                     }
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsPtr != 0) {
+                    if (SurfLocalEnv.GroundSurfsPtr != 0) {
                         state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfLoop) = true;
                         state.dataSurface->UseSurfPropertyGndSurfTemp(SurfLoop) = true;
                         state.dataSurface->UseSurfPropertyGndSurfRefl(SurfLoop) = true;
-                        state.dataSurface->GroundSurfsPropertyNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).GroundSurfsPtr;
+                        state.dataSurface->GroundSurfsPropertyNum(SurfLoop) = SurfLocalEnv.GroundSurfsPtr;
                     }
                 }
             }
