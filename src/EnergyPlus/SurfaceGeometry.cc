@@ -8030,11 +8030,16 @@ namespace SurfaceGeometry {
                 int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                          "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                                    format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
+                    ShowContinueError(
+                        state,
+                        format("{} entered value = \"{}\", no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.",
+                               state.dataIPShortCut->cAlphaFieldNames(2),
+                               state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfLocalEnvironment(Loop).SurfPtr = SurfNum;
@@ -8045,11 +8050,15 @@ namespace SurfaceGeometry {
                     int ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (ExtShadingSchedNum == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(3) + " has been found.");
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(3)));
                         ShowContinueError(state,
-                                          state.dataIPShortCut->cAlphaFieldNames(3) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                              "\" no corresponding schedule has been found in the input file.");
+                                          format("{} entered value = \"{}\", no corresponding shading schedule has been found in the input file.",
+                                                 state.dataIPShortCut->cAlphaFieldNames(3),
+                                                 state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     } else {
                         state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr = ExtShadingSchedNum;
@@ -8062,11 +8071,16 @@ namespace SurfaceGeometry {
                         UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->SurroundingSurfsProperty);
                     if (SurroundingSurfsNum == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(4) + " has been found.");
-                        ShowContinueError(state,
-                                          state.dataIPShortCut->cAlphaFieldNames(4) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(4) +
-                                              "\" no corresponding surrounding surfaces properties has been found in the input file.");
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(4)));
+                        ShowContinueError(
+                            state,
+                            format("{} entered value = \"{}\", no corresponding surrounding surfaces properties has been found in the input file.",
+                                   state.dataIPShortCut->cAlphaFieldNames(4),
+                                   state.dataIPShortCut->cAlphaArgs(4)));
                         ErrorsFound = true;
                     } else {
                         state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr = SurroundingSurfsNum;
@@ -8086,11 +8100,15 @@ namespace SurfaceGeometry {
                                                     ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(5) + " has been found.");
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(5)));
                         ShowContinueError(state,
-                                          state.dataIPShortCut->cAlphaFieldNames(5) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(5) +
-                                              "\" no corresponding outdoor air node has been found in the input file.");
+                                          format("{} entered value = \"{}\", no corresponding outdoor air node has been found in the input file.",
+                                                 state.dataIPShortCut->cAlphaFieldNames(5),
+                                                 state.dataIPShortCut->cAlphaArgs(5)));
                         ErrorsFound = true;
                     } else {
                         state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr = NodeNum;
