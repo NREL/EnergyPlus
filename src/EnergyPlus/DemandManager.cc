@@ -376,8 +376,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             thisDemandManagerList.Meter = GetMeterIndex(state, AlphArray(2));
 
             if (thisDemandManagerList.Meter == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
-                ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
+                ShowContinueError(state, format("Entered in {}={}", CurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
 
             } else {
@@ -387,8 +387,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 } else {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\".");
+                                    format("{}=\"{}\" invalid value {}=\"{}\".",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           AlphArray(2)));
                     ShowContinueError(state, "Only Electricity and ElectricityNet meters are currently allowed.");
                     ErrorsFound = true;
                 }
@@ -401,8 +404,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 if (thisDemandManagerList.LimitSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(3),
+                                           AlphArray(3)));
                     ErrorsFound = true;
                 }
             }
@@ -414,8 +420,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 if (thisDemandManagerList.BillingSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(4),
+                                           AlphArray(4)));
                     ErrorsFound = true;
                 }
             }
@@ -425,8 +434,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                 if (thisDemandManagerList.PeakSchedule == 0) {
                     ShowSevereError(state,
-                                    CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + AlphArray(5) + "\" not found.");
+                                    format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                           CurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(5),
+                                           AlphArray(5)));
                     ErrorsFound = true;
                 }
             }
@@ -442,8 +454,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                 static_cast<ManagePriorityType>(getEnumerationValue(ManagePriorityNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
             if (thisDemandManagerList.ManagerPriority == ManagePriorityType::Invalid) {
                 ShowSevereError(state,
-                                CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                    state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphArray(6) + "\" not found.");
+                                format("{}=\"{}\" invalid value {}=\"{}\" not found.",
+                                       CurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(6),
+                                       AlphArray(6)));
                 ErrorsFound = true;
             }
 
@@ -465,16 +480,21 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                         if (thisDemandManagerList.Manager(MgrNum) == 0) {
                             ShowSevereError(state,
-                                            CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                                state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6) + "=\"" + AlphArray(MgrNum * 2 + 6) +
-                                                "\" not found.");
+                                            format("{}=\"{}\" invalid {}=\"{}\" not found.",
+                                                   CurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 6),
+                                                   AlphArray(MgrNum * 2 + 6)));
                             ErrorsFound = true;
                         }
 
                     } else {
                         ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                            state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5) + "=\"" + AlphArray(MgrNum * 2 + 5) + "\".");
+                                        format("{}=\"{}\" invalid value {}=\"{}\".",
+                                               CurrentModuleObject,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(MgrNum * 2 + 5),
+                                               AlphArray(MgrNum * 2 + 5)));
                         ErrorsFound = true;
                     }
 
