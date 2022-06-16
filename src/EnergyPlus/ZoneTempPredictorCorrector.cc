@@ -128,6 +128,32 @@ using namespace FaultsManager;
 using namespace HybridModel;
 using ScheduleManager::GetCurrentScheduleValue;
 
+enum class ZoneControlTypes
+{
+    Invalid = -1,
+    TStat = 1,
+    TCTStat = 2,
+    OTTStat = 3,
+    HStat = 4,
+    TandHStat = 5,
+    StagedDual = 6,
+    Num
+};
+
+enum class AdaptiveComfortModel
+{
+    Invalid = -1,
+    ADAP_NONE = 1,
+    ASH55_CENTRAL = 2,
+    ASH55_UPPER_90 = 3,
+    ASH55_UPPER_80 = 4,
+    CEN15251_CENTRAL = 5,
+    CEN15251_UPPER_I = 6,
+    CEN15251_UPPER_II = 7,
+    CEN15251_UPPER_III = 8,
+    Num
+};
+
 static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::ThermostatType::Num)> ValidControlTypes = {
     "Uncontrolled",
     "ThermostatSetpoint:SingleHeating",
@@ -2371,11 +2397,12 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 StageControlledZone(StageControlledZoneNum).HeatThroRange = rNumericArgs(2);
                 if (rNumericArgs(1) < 0.0) {
                     ShowSevereError(state,
-                                    format("{}=\"" + cAlphaArgs(1) + "\" negative value is found at {}=\"{:.1R}\"",
+                                    format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
+                                           cAlphaArgs(1),
                                            cCurrentModuleObject,
                                            cNumericFieldNames(2),
                                            rNumericArgs(2)));
-                    ShowContinueError(state, ".. The minumum value is 0.");
+                    ShowContinueError(state, ".. The minimum value is 0.");
                     ErrorsFound = true;
                 }
 
@@ -2399,7 +2426,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         if (i > 1) {
                             if (rNumericArgs(2 + i) >= rNumericArgs(1 + i)) {
                                 ShowSevereError(state,
-                                                format("{}=\"{}\" The value at {}=\"{:.1R}\" has to be less than ",
+                                                format(R"({}="{}" The value at {}="{:.1R}" has to be less than )",
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
                                                        cNumericFieldNames(2 + i),

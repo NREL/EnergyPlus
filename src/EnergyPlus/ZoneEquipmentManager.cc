@@ -5312,7 +5312,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     state.dataHeatBalFanSys->MCPTThermChim = 0.0;
     MassFlowRate = 0.0;
 
-    if (state.dataHeatBal->AirFlowFlag != UseSimpleAirFlow) return;
+    if (!state.dataHeatBal->AirFlowFlag) return;
     // AirflowNetwork Multizone field /= SIMPLE
     if (!(state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution ||
           state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation)) {

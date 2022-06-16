@@ -184,7 +184,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(EnergyPl
     }
 
     // as more sizing adjustments are added this will need to change to consider all not just plant coincident
-    state.dataGlobal->FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
+    //    state.dataGlobal->FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
 }
 void HVACSizingSimulationManager::RedoKickOffAndResize(EnergyPlusData &state)
 {
@@ -273,16 +273,6 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             DisplayString(state, "Initializing New Environment Parameters, HVAC Sizing Simulation");
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) &&
-                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                     .suppressBegEnvReset)) {
-                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
-                // easily converge fewer warmup days are allowed
-                DisplayString(state, "Suppressing Initialization of New Environment Parameters");
-                state.dataGlobal->beginEnvrnWarmStartFlag = true;
-            } else {
-                state.dataGlobal->beginEnvrnWarmStartFlag = false;
-            }
             state.dataGlobal->EndEnvrnFlag = false;
             // EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
@@ -365,7 +355,6 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                         state.dataGlobal->BeginDayFlag = false;
                         state.dataGlobal->BeginEnvrnFlag = false;
                         state.dataGlobal->BeginSimFlag = false;
-                        state.dataGlobal->BeginFullSimFlag = false;
 
                     } // TimeStep loop
 
