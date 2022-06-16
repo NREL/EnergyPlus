@@ -9547,7 +9547,9 @@ void WindowShadingManager(EnergyPlusData &state)
 
             if (state.dataSurface->Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
             if (!state.dataSurface->Surface(ISurf).HasShadeControl) {
-                state.dataSurface->SurfWinActiveShadedConstruction(ISurf) = state.dataSurface->SurfActiveConstruction(ISurf);
+                if (state.dataSurface->SurfWinShadingFlag(ISurf) == WinShadingType::ExtShade) {
+                    state.dataSurface->SurfWinActiveShadedConstruction(ISurf) = state.dataSurface->SurfActiveConstruction(ISurf);
+                }
                 continue;
             } else {
                 //
