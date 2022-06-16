@@ -5989,7 +5989,6 @@ void GetATMixers(EnergyPlusData &state)
     using DataZoneEquipment::SubEquipmentData;
     using NodeInputManager::GetOnlySingleNode;
     using namespace DataLoopNode;
-    using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;

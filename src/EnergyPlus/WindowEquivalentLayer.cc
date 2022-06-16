@@ -749,19 +749,11 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                 if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
                     SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                    if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                        state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                    }
-                    if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR =
-                            state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                    }
-                    for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                        SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                        SrdSurfTempAbs =
-                            GetCurrentScheduleValue(
-                                state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                            DataGlobalConstants::KelvinConv;
+                    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                    for (SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                        SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                        SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                         DataGlobalConstants::KelvinConv;
                         OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                     }
                 }

@@ -89,7 +89,6 @@ namespace FourPipeBeam {
     std::shared_ptr<AirTerminalUnit> HVACFourPipeBeam::fourPipeBeamFactory(EnergyPlusData &state, std::string objectName)
     {
 
-        using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using DataLoopNode::ObjectIsNotParent;
         using DataLoopNode::ObjectIsParent;

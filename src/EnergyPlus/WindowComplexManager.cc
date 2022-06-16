@@ -104,7 +104,17 @@ namespace WindowComplexManager {
     using namespace Vectors;
     using namespace DataHeatBalFanSys;
 
-    // Functions
+    // Parameters for gas definitions
+    enum class GasCoeffs
+    {
+        Invalid = -1,
+        Custom,
+        Air,
+        Argon,
+        Krypton,
+        Xenon,
+        Num
+    };
 
     void InitBSDFWindows(EnergyPlusData &state)
     {
@@ -2776,21 +2786,11 @@ namespace WindowComplexManager {
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
                         SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                        }
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                        }
-                        for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                             SrdSurfNum++) {
-                            SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(
-                                    state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                DataGlobalConstants::KelvinConv;
+                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                        for (SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                             DataGlobalConstants::KelvinConv;
                             OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
@@ -2860,7 +2860,7 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = static_cast<int>(DataComplexFenestration::GasCoeffs::Air);
+        GasType = static_cast<int>(GasCoeffs::Air);
         wght(iprop(1, 1)) = GasWght[GasType - 1];
         gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {

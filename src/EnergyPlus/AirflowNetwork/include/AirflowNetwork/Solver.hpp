@@ -106,6 +106,9 @@ namespace AirflowNetwork {
     Real64 AFNPressureResidual(EnergyPlusData &state, Real64 ExFanMassFlowRate,
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
+    Real64 DuctDResidual(EnergyPlusData &state,
+                         Real64 D, // duct diameter
+                         Array1D<Real64> const &Par);
     // derived class or struct
     struct OccupantVentilationControlProp
     {
@@ -242,6 +245,8 @@ namespace AirflowNetwork {
         void single_sided_Cps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
         Real64 zone_OA_change_rate(int ZoneNum); // hybrid ventilation system controlled zone number
         int get_airloop_number(int NodeNumber);  // Get air loop number for each distribution node and linkage
+        void DuctSizing();
+        Real64 CalcDuctDiameter(Real64 hydraulicDiameter, Real64 DeltaP, Real64 MassFlowrate, Real64 TotalL, Real64 TotalLossCoe, Real64 MaxRough);
 
         EPVector<AirflowNetwork::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
