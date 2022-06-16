@@ -233,7 +233,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(4862.02, sizedValue, 0.01);
+    EXPECT_NEAR(4981.71, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 7 - Zone DX Equipment, inlet side AT Mixer
@@ -248,7 +248,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(3843.78, sizedValue, 0.01);
+    EXPECT_NEAR(3899.81, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
     state->dataSize->ZoneEqSizing(1).ATMixerVolFlow = 0.0;
 
@@ -263,7 +263,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(4862.02, sizedValue, 0.01);
+    EXPECT_NEAR(4981.71, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
     state->dataSize->ZoneEqSizing(1).OAVolFlow = 0.0;
 

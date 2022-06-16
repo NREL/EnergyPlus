@@ -3565,8 +3565,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
-    EXPECT_NEAR(15944.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
 
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", state->dataDXCoils->DXCoil(2).Name);
@@ -3577,8 +3577,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(1.75, state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2));
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(1));
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(2).MSRatedTotCap(2), 0.01);
-    EXPECT_NEAR(15944.0, state->dataDXCoils->DXCoil(2).MSRatedTotCap(1), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(2).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(2).MSRatedTotCap(1), 0.01);
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
@@ -3818,12 +3818,12 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
-    EXPECT_NEAR(15944.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
     // Design SHR at speed 2 and speed 1
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
 
     // test SHR design size when partial autosizing (capacity is hardsized)
     state->dataDXCoils->DXCoil(1).MSRatedTotCap(1) = 17500.0; // DataSizing::AutoSize;
@@ -3831,10 +3831,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     SizeDXCoil(*state, 1);
     // Design size SHR at speed 2 and speed 1
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
     // Design Capacity at speed 2 and speed 1
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
     EXPECT_EQ(35000.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2));
     EXPECT_EQ(35000.0 * 0.5, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1));
     // Design flow rate at speed 2 and speed 1
