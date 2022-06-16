@@ -16218,7 +16218,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     state->dataLoopNodes->Node(4).MassFlowRate = 1.23;
 
     // Duct sizing test
-    state->afn->simulation_control.AFNDuctAutoSize = true;
+    state->afn->simulation_control.autosize_ducts = true;
     state->afn->simulation_control.ductSizing.method = AirflowNetwork::DuctSizingMethod::PressureLoss;
 
     state->afn->simulation_control.ductSizing.factor = 1.0;

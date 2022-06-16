@@ -178,7 +178,6 @@ namespace AirflowNetwork {
         Real64 supply_branch_pressure_loss = 1.0;                // Pressure loss across supply branch
         Real64 return_trunk_pressure_loss = 1.0;                 // Pressure loss across return trunk
         Real64 return_branch_pressure_loss = 1.0;                // Pressure loss across return branch
-        
     };
 
     struct SimulationControl // Basic parameters for AirflowNetwork simulation
@@ -212,7 +211,7 @@ namespace AirflowNetwork {
                                                        // "ZeroNodePressures", or "LinearInitializationMethod"
         bool temperature_height_dependence = false;    // Choice of height dependence of external node temperature
         bool allow_unsupported_zone_equipment = false; // Allow unsupported zone equipment
-        bool AFNDuctAutoSize; // True: perform duct autosize, otherwise no duct autosize
+        bool autosize_ducts = false;                   // True: perform duct autosize, otherwise no duct autosize
         DuctSizing ductSizing;
     };
 

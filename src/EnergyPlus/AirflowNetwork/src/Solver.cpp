@@ -294,7 +294,7 @@ namespace AirflowNetwork {
                 validate_distribution();
                 validate_fan_flowrate();
                 ValidateDistributionSystemFlag = false;
-                if (simulation_control.AFNDuctAutoSize) {
+                if (simulation_control.autosize_ducts) {
                     SizeDucts();
                 }
             }
@@ -2213,10 +2213,10 @@ namespace AirflowNetwork {
             }
 
             // Get inputs for duct sizing
-            simulation_control.AFNDuctAutoSize = false;
+            simulation_control.autosize_ducts = false;
             if (NumAlphas == 10) {
                 if (UtilityRoutines::SameString(Alphas(10), "YES")) {
-                    simulation_control.AFNDuctAutoSize = true;
+                    simulation_control.autosize_ducts = true;
                     if (simulation_control.type == ControlType::MultizoneWithDistribution) {
                         if (NumAPL > 1) {
                             ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
@@ -2225,7 +2225,7 @@ namespace AirflowNetwork {
                                 format("The number of AirLoopHAVC is greater than 1. The current requirement for Duct Sizing requires a "
                                        "single AirLoopHVAC."));
                             ShowContinueError(m_state, format("..Duct sizing is not performed"));
-                            simulation_control.AFNDuctAutoSize = false;
+                            simulation_control.autosize_ducts = false;
                         }
                     }
                 }
@@ -2255,7 +2255,7 @@ namespace AirflowNetwork {
                 format("The number of AirflowNetwork:Distribution:DuctSizing is greater than 1. The current requirement for Duct Sizing requires a "
                        "single object."));
             ShowContinueError(m_state, format("..Duct sizing is not performed"));
-            simulation_control.AFNDuctAutoSize = false;
+            simulation_control.autosize_ducts = false;
         } else if (NumDuctSizing == 1) {
             ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
             ShowContinueError(
@@ -2263,9 +2263,9 @@ namespace AirflowNetwork {
                 format("The number of AirflowNetwork:Distribution:DuctSizing is not avalable. The current requirement for Duct Sizing requires a "
                        "single object."));
             ShowContinueError(m_state, format("..Duct sizing is not performed"));
-            simulation_control.AFNDuctAutoSize = false;
+            simulation_control.autosize_ducts = false;
         }
-        if (simulation_control.AFNDuctAutoSize && NumDuctSizing == 1) {
+        if (simulation_control.autosize_ducts && NumDuctSizing == 1) {
             m_state.dataInputProcessing->inputProcessor->getObjectItem(m_state,
                                                                        CurrentModuleObject,
                                                                        NumDuctSizing,
@@ -2303,7 +2303,7 @@ namespace AirflowNetwork {
                                          Alphas(10),
                                          cAlphaFields(2)));
                 ShowContinueError(m_state, format("..Duct sizing is not performed"));
-                simulation_control.AFNDuctAutoSize = false;
+                simulation_control.autosize_ducts = false;
             }
             simulation_control.ductSizing.factor = Numbers(1);
             simulation_control.ductSizing.max_velocity = Numbers(2);
@@ -12285,7 +12285,7 @@ namespace AirflowNetwork {
             ShowWarningError(m_state, "AirflowNetwork Duct Sizing: The current restriction is limited to a single controlled zone only");
             ShowContinueError(m_state, format("The number of controlled zone is {}", NumOfCtrlZones));
             ShowContinueError(m_state, "..Duct sizing is not performed");
-            simulation_control.AFNDuctAutoSize = false;
+            simulation_control.autosize_ducts = false;
             simulation_control.iWPCCnt = iWPCCntr::Input;
             simulation_control.allow_unsupported_zone_equipment = false;
         }
