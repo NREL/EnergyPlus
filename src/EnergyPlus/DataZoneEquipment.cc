@@ -108,7 +108,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // a zone
 
     // Using/Aliasing
-    using BranchNodeConnections::SetUpCompSets;
     using NodeInputManager::CheckUniqueNodeNames;
     using NodeInputManager::CheckUniqueNodeNumbers;
     using NodeInputManager::EndUniqueNodeCheck;

@@ -276,6 +276,7 @@ namespace UnitarySystems {
         Real64 m_DesignHeatingCapacity = 0.0;
         Real64 m_MaxHeatAirVolFlow = 0.0;
         int m_NumOfSpeedHeating = 0;
+        int m_NumOfSpeedSuppHeating = 0;
         bool m_MultiSpeedHeatingCoil = false;
         bool m_VarSpeedHeatingCoil = false;
         int m_SystemHeatControlNodeNum = 0;
@@ -383,6 +384,9 @@ namespace UnitarySystems {
         Real64 m_HeatingSpeedRatio = 0.0;
         int m_HeatingSpeedNum = 0;
         int m_SpeedNum = 0;
+        Real64 m_SuppHeatingCycRatio = 0.0;
+        Real64 m_SuppHeatingSpeedRatio = 0.0;
+        int m_SuppHeatingSpeedNum = 0;
 
         bool m_EMSOverrideCoilSpeedNumOn = false;
         Real64 m_EMSOverrideCoilSpeedNumValue = 0.0;
@@ -615,6 +619,15 @@ namespace UnitarySystems {
                                                     Real64 const PartLoadRatio,    // DX cooling coil part load ratio
                                                     std::vector<Real64> const &Par // Function parameters
         );
+        static Real64 calcMultiStageSuppCoilLoadResidual(EnergyPlusData &state,
+                                                         Real64 const SpeedRatio,
+                                                         std::vector<Real64> const &Par // Function parameters
+        );
+
+        static Real64 calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
+                                                            Real64 const CycRatio,
+                                                            std::vector<Real64> const &Par // Function parameters
+        );
 
         static Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state,
                                                      Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
@@ -800,6 +813,8 @@ namespace UnitarySystems {
                                Real64 const PartLoadRatio, // unit part load ratio
                                Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to AVERAGE airflow over timestep
         );
+
+        void calcMultiStageSuppCoilStageByLoad(EnergyPlusData &state, Real64 const SuppHeatload, bool const FirstHVACIteration);
 
         void calculateCapacity(EnergyPlusData &state,
                                Real64 &SensOutput, // sensible output of AirloopHVAC:UnitarySystem

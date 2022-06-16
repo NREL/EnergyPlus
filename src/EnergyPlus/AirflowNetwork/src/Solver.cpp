@@ -71,6 +71,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -293,6 +294,9 @@ namespace AirflowNetwork {
                 validate_distribution();
                 validate_fan_flowrate();
                 ValidateDistributionSystemFlag = false;
+                if (AirflowNetworkSimu.AFNDuctAutoSize) {
+                    DuctSizing();
+                }
             }
         }
         calculate_balance();
@@ -1752,6 +1756,10 @@ namespace AirflowNetwork {
             m_state, "AirflowNetwork:ZoneControl:PressureController", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
+        m_state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            m_state, "AirflowNetwork:Distribution:DuctSizing", TotalArgs, NumAlphas, NumNumbers);
+        MaxNums = max(MaxNums, NumNumbers);
+        MaxAlphas = max(MaxAlphas, NumAlphas);
 
         Alphas.allocate(MaxAlphas);
         cAlphaFields.allocate(MaxAlphas);
@@ -2203,6 +2211,25 @@ namespace AirflowNetwork {
                 ShowContinueError(m_state, "..Default value \"SkylineLU\" will be used.");
             }
 
+            // Get inputs for duct sizing
+            AirflowNetworkSimu.AFNDuctAutoSize = false;
+            if (NumAlphas == 10) {
+                if (UtilityRoutines::SameString(Alphas(10), "YES")) {
+                    AirflowNetworkSimu.AFNDuctAutoSize = true;
+                    if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
+                        if (NumAPL > 1) {
+                            ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                            ShowContinueError(
+                                m_state,
+                                format("The number of AirLoopHAVC is greater than 1. The current requirement for Duct Sizing requires a "
+                                       "single AirLoopHVAC."));
+                            ShowContinueError(m_state, format("..Duct sizing is not performed"));
+                            AirflowNetworkSimu.AFNDuctAutoSize = false;
+                        }
+                    }
+                }
+            }
+
             if (SimObjectError) {
                 ShowFatalError(
                     m_state,
@@ -2216,6 +2243,73 @@ namespace AirflowNetwork {
             AirflowNetworkSimu.Azimuth = Numbers(5);
             AirflowNetworkSimu.AspectRatio = Numbers(6);
             AirflowNetworkSimu.MaxPressure = 500.0; // Maximum pressure difference by default
+        }
+
+        CurrentModuleObject = "AirflowNetwork:Distribution:DuctSizing";
+        int NumDuctSizing = m_state.dataInputProcessing->inputProcessor->getNumObjectsFound(m_state, CurrentModuleObject);
+        if (NumDuctSizing > 1) {
+            ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+            ShowContinueError(
+                m_state,
+                format("The number of AirflowNetwork:Distribution:DuctSizing is greater than 1. The current requirement for Duct Sizing requires a "
+                       "single object."));
+            ShowContinueError(m_state, format("..Duct sizing is not performed"));
+            AirflowNetworkSimu.AFNDuctAutoSize = false;
+        } else if (NumDuctSizing == 1) {
+            ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+            ShowContinueError(
+                m_state,
+                format("The number of AirflowNetwork:Distribution:DuctSizing is not avalable. The current requirement for Duct Sizing requires a "
+                       "single object."));
+            ShowContinueError(m_state, format("..Duct sizing is not performed"));
+            AirflowNetworkSimu.AFNDuctAutoSize = false;
+        }
+        if (AirflowNetworkSimu.AFNDuctAutoSize && NumDuctSizing == 1) {
+            m_state.dataInputProcessing->inputProcessor->getObjectItem(m_state,
+                                                                       CurrentModuleObject,
+                                                                       NumDuctSizing,
+                                                                       Alphas,
+                                                                       NumAlphas,
+                                                                       Numbers,
+                                                                       NumNumbers,
+                                                                       IOStatus,
+                                                                       lNumericBlanks,
+                                                                       lAlphaBlanks,
+                                                                       cAlphaFields,
+                                                                       cNumericFields);
+
+            AirflowNetworkSimu.ductSizing.Name = Alphas(1);
+            if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("MaximumVelocity"))) {
+                AirflowNetworkSimu.ductSizing.ductSizeMethod = AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity;
+            } else if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("PressureLoss"))) {
+                AirflowNetworkSimu.ductSizing.ductSizeMethod = AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::PressureLoss;
+            } else if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("PressureLossWithMaximumVelocity"))) {
+                AirflowNetworkSimu.ductSizing.ductSizeMethod = AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss;
+            } else {
+                ShowSevereError(m_state, format("{} {} object, {} = {}  is invalid.", RoutineName, CurrentModuleObject, cAlphaFields(2), Alphas(2)));
+                ShowContinueError(m_state,
+                                  format("Valid choices are MaximumVelocity, PressureLoss, and PressureLossWithMaximumVelocity. {}: {} = {}",
+                                         CurrentModuleObject,
+                                         cAlphaFields(1),
+                                         Alphas(1)));
+                ErrorsFound = true;
+            }
+            if (SimulateAirflowNetwork != AirflowNetworkControlMultiADS) {
+                ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
+                ShowContinueError(m_state,
+                                  format("Although {} = \"{}\" is entered, but {} is not MultizoneWithoutDistribution.",
+                                         cAlphaFields(10),
+                                         Alphas(10),
+                                         cAlphaFields(2)));
+                ShowContinueError(m_state, format("..Duct sizing is not performed"));
+                AirflowNetworkSimu.AFNDuctAutoSize = false;
+            }
+            AirflowNetworkSimu.ductSizing.DuctSizeFactor = Numbers(1);
+            AirflowNetworkSimu.ductSizing.DuctSizeMaxV = Numbers(2);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossSTrunk = Numbers(3);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossSBranch = Numbers(4);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossRTrunk = Numbers(5);
+            AirflowNetworkSimu.ductSizing.DuctSizePLossRBranch = Numbers(6);
         }
 
         // *** Read AirflowNetwork simulation zone data
@@ -10303,13 +10397,21 @@ namespace AirflowNetwork {
             }
         }
 
-        // Determine node numbers for zone inlets
-        for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
+        // Determine node numbers for zone inlets and outlets
+        for (int i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
             if (!m_state.dataZoneEquip->ZoneEquipConfig(i).IsControlled) continue;
-            for (j = 1; j <= m_state.dataZoneEquip->ZoneEquipConfig(i).NumInletNodes; ++j) {
-                for (k = 1; k <= AirflowNetworkNumOfNodes; ++k) {
+            for (int j = 1; j <= m_state.dataZoneEquip->ZoneEquipConfig(i).NumInletNodes; ++j) {
+                for (int k = 1; k <= AirflowNetworkNumOfNodes; ++k) {
                     if (m_state.dataZoneEquip->ZoneEquipConfig(i).InletNode(j) == AirflowNetworkNodeData(k).EPlusNodeNum) {
                         AirflowNetworkNodeData(k).EPlusTypeNum = iEPlusNodeType::ZIN;
+                        break;
+                    }
+                }
+            }
+            for (int j = 1; j <= m_state.dataZoneEquip->ZoneEquipConfig(i).NumReturnNodes; ++j) {
+                for (int k = 1; k <= AirflowNetworkNumOfNodes; ++k) {
+                    if (m_state.dataZoneEquip->ZoneEquipConfig(i).ReturnNode(j) == AirflowNetworkNodeData(k).EPlusNodeNum) {
+                        AirflowNetworkNodeData(k).EPlusTypeNum = iEPlusNodeType::ZOU;
                         break;
                     }
                 }
@@ -12126,6 +12228,749 @@ namespace AirflowNetwork {
         }
 
         return AirLoopNumber;
+    }
+
+    void Solver::DuctSizing()
+    {
+        Real64 constexpr EPS(0.001);
+        int constexpr MaxIte(500);
+        Real64 constexpr MinVelocity(0.5);  // minimum airflow velocity (m/s)
+        Real64 constexpr MaxVelocity(20.0); // maximum airflow velocity (m/s)
+
+        int NodeLoopSupply = 0;
+        int NodeLoopReturn = 0;
+        int NodeSplitter = 0;
+        int NodeMixer = 0;
+        int NodeZoneIntlet = 0;
+        int NodeZoneReturn = 0;
+        int NumOfBranches = 0;
+        int AFNNodeNum;
+        int AFNLinkNum;
+        int AFNLinkNum1;
+        Real64 SumLength = 0.0;
+        Real64 DynamicLoss = 0.0;
+        Real64 MaxRough = 0.0;
+        bool DuctSizingSTFlag;
+        bool DuctSizingSBFlag;
+        bool DuctSizingRTFlag;
+        bool DuctSizingRBFlag;
+        Real64 hydraulicDiameter = 0.0;
+        Array1D<Real64> Par(9); // Parameters passed to RegulaFalsi
+        Real64 SupplyTrunkD = 0.0;
+        Real64 SupplyTrunkArea = 0.0;
+        Real64 SupplyBranchD = 0.0;
+        Real64 SupplyBranchArea = 0.0;
+        Real64 ReturnTrunkD = 0.0;
+        Real64 ReturnTrunkArea = 0.0;
+        Real64 ReturnBranchD = 0.0;
+        Real64 ReturnBranchArea = 0.0;
+        Real64 MdotBranch = 0.0;
+        int SolFla = 0;
+
+        int NumOfCtrlZones = 0;
+        for (int ZoneNum = 1; ZoneNum <= m_state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (!m_state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
+            NumOfCtrlZones++;
+            for (int EquipTypeNum = 1; EquipTypeNum <= m_state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++EquipTypeNum) {
+                if (m_state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(EquipTypeNum) == DataZoneEquipment::ZoneEquip::AirDistUnit) {
+                    int AirDistUnitNum = m_state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(EquipTypeNum);
+                    MdotBranch = m_state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).MassFlowRateTU;
+                    break;
+                }
+            }
+        }
+        if (NumOfCtrlZones != 1) {
+            ShowWarningError(m_state, "AirflowNetwork Duct Sizing: The current restriction is limited to a single controlled zone only");
+            ShowContinueError(m_state, format("The number of controlled zone is {}", NumOfCtrlZones));
+            ShowContinueError(m_state, "..Duct sizing is not performed");
+            AirflowNetworkSimu.AFNDuctAutoSize = false;
+            AirflowNetworkSimu.iWPCCnt = iWPCCntr::Input;
+            AirflowNetworkSimu.AllowSupportZoneEqp = false;
+        }
+        Real64 factor = AirflowNetworkSimu.ductSizing.DuctSizeFactor;
+
+        NodeLoopSupply = m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1);
+        NodeLoopReturn = m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipReturnNodeNum(1);
+        for (AFNNodeNum = 1; AFNNodeNum <= AirflowNetworkNumOfNodes; AFNNodeNum++) {
+            if (AirflowNetworkNodeData(AFNNodeNum).EPlusTypeNum == iEPlusNodeType::SPL) {
+                NodeSplitter = AFNNodeNum;
+            } else if (AirflowNetworkNodeData(AFNNodeNum).EPlusTypeNum == iEPlusNodeType::MIX) {
+                NodeMixer = AFNNodeNum;
+            } else if (AirflowNetworkNodeData(AFNNodeNum).EPlusNodeNum == m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1)) {
+                NodeLoopSupply = AFNNodeNum;
+            } else if (AirflowNetworkNodeData(AFNNodeNum).EPlusNodeNum == m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipReturnNodeNum(1)) {
+                NodeLoopReturn = AFNNodeNum;
+            } else if (AirflowNetworkNodeData(AFNNodeNum).EPlusTypeNum == iEPlusNodeType::ZIN) {
+                NodeZoneIntlet = AFNNodeNum;
+            } else if (AirflowNetworkNodeData(AFNNodeNum).EPlusTypeNum == iEPlusNodeType::ZOU) {
+                NodeZoneReturn = AFNNodeNum;
+            }
+        }
+
+        // find trunk ducts
+        DuctSizingSTFlag = false;
+        DuctSizingSBFlag = false;
+        int CompNum = 0;
+        int TypeNum = 0;
+
+        for (AFNLinkNum = 1; AFNLinkNum <= AirflowNetworkNumOfLinks; AFNLinkNum++) {
+            CompNum = AirflowNetworkLinkageData(AFNLinkNum).CompNum;
+            iComponentTypeNum CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
+            SumLength = 0.0;
+            DynamicLoss = 0.0;
+            MaxRough = 0.0;
+            // supply duct trunk
+            if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[0] == NodeLoopSupply) {
+                if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[1] == NodeSplitter) {
+                    // A single trunk duct
+                    if (CompTypeNum == iComponentTypeNum::DWC && AirflowNetworkLinkageData(AFNLinkNum).ZoneNum > 0) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::SupplyTrunk;
+                        TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength = disSysCompDuct.L;
+                        MaxRough = disSysCompDuct.roughness;
+                        DynamicLoss = disSysCompDuct.TurDynCoef;
+                        DuctSizingSTFlag = true;
+                    }
+                } else {
+                    int NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum).NodeNums[1];
+                    int CompNum1;
+                    iComponentTypeNum CompTypeNum1;
+                    CompNum1 = AirflowNetworkLinkageData(AFNLinkNum).CompNum;
+                    CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                    if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::SupplyTrunk;
+                        TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength += disSysCompDuct.L;
+                        MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                        DynamicLoss += disSysCompDuct.TurDynCoef;
+                        // NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum).NodeNums[0];
+                        DuctSizingSBFlag = true;
+                    }
+                    while (NodeNum1 != NodeSplitter) {
+                        for (AFNLinkNum1 = 1; AFNLinkNum1 <= AirflowNetworkNumOfLinks; AFNLinkNum1++) {
+                            if (NodeNum1 != AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[0]) continue;
+                            if (AirflowNetworkCompData(AirflowNetworkLinkageData(AFNLinkNum1).CompNum).CompTypeNum != iComponentTypeNum::DWC)
+                                continue;
+                            if (NodeNum1 == AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[0]) {
+                                CompNum1 = AirflowNetworkLinkageData(AFNLinkNum1).CompNum;
+                                CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                                if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                                    AirflowNetworkLinkageData(AFNLinkNum1).ductLineType = DuctLineType::SupplyTrunk;
+                                    TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                                    auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                                    SumLength += disSysCompDuct.L;
+                                    MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                                    DynamicLoss += disSysCompDuct.TurDynCoef;
+                                    NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[1];
+                                    DuctSizingSTFlag = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (DuctSizingSTFlag) {
+                    Real64 Velocity = 0.0;
+                    Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                        SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
+                    } else {
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossSTrunk;
+                        Par(2) = DisSysCompCVFData(1).FlowRate;
+                        Par(3) = SumLength;
+                        Par(4) = DynamicLoss;
+                        Par(5) = MaxRough;
+
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        if (SolFla == -1) {
+                            if (!m_state.dataGlobal->WarmupFlag) {
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ShowWarningError(m_state,
+                                                     "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Trunk size.");
+                                    ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
+                                } else {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
+                                    ShowRecurringWarningErrorAtEnd(
+                                        m_state,
+                                        "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Trunk "
+                                        "size. Supply Trunk is calculated using velocity at 5m/s. Simulation continues...",
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
+                                        hydraulicDiameter,
+                                        hydraulicDiameter);
+                                }
+                            }
+                        } else if (SolFla == -2) {
+                            ShowFatalError(
+                                m_state,
+                                "Duct Autosizing for Supply Trunk calculation failed: iteration limits exceeded. Supply Trunk is calculated "
+                                "using velocity at 5m/s.");
+                        }
+                        if (SolFla < 0) {
+                            SupplyTrunkD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                        } else {
+                            SupplyTrunkD = hydraulicDiameter * factor;
+                        }
+                        SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
+                        Velocity = flowrate / SupplyTrunkArea;
+                    }
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            SupplyTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                            SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
+                            ShowWarningError(
+                                m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Trunk size");
+                            ShowContinueError(
+                                m_state,
+                                format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
+                                       Velocity));
+                            ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Supply Trunk Diameter");
+                        }
+                    }
+                }
+            }
+            // supply duct branch
+            if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[1] == NodeZoneIntlet) {
+                SumLength = 0.0;
+                DynamicLoss = 0.0;
+                MaxRough = 0.0;
+                if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[0] == NodeSplitter) {
+                    // A single branch duct
+                    if (CompTypeNum == iComponentTypeNum::DWC && AirflowNetworkLinkageData(AFNLinkNum).ZoneNum > 0) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::SupplyTrunk;
+                        TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength = disSysCompDuct.L;
+                        MaxRough = disSysCompDuct.roughness;
+                        DynamicLoss = disSysCompDuct.TurDynCoef;
+                        DuctSizingSTFlag = true;
+                    }
+                } else {
+                    int NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum).NodeNums[0];
+                    int CompNum1;
+                    iComponentTypeNum CompTypeNum1;
+                    CompNum1 = AirflowNetworkLinkageData(AFNLinkNum).CompNum;
+                    CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                    if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::SupplyBranch;
+                        TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength += disSysCompDuct.L;
+                        MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                        DynamicLoss += disSysCompDuct.TurDynCoef;
+                        DuctSizingSBFlag = true;
+                    }
+                    while (NodeNum1 != NodeSplitter) {
+                        for (AFNLinkNum1 = 1; AFNLinkNum1 <= AirflowNetworkNumOfLinks; AFNLinkNum1++) {
+                            if (NodeNum1 != AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[1]) continue;
+                            if (AirflowNetworkCompData(AirflowNetworkLinkageData(AFNLinkNum1).CompNum).CompTypeNum != iComponentTypeNum::DWC)
+                                continue;
+                            if (NodeNum1 == AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[1]) {
+                                CompNum1 = AirflowNetworkLinkageData(AFNLinkNum1).CompNum;
+                                CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                                if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                                    AirflowNetworkLinkageData(AFNLinkNum1).ductLineType = DuctLineType::SupplyBranch;
+                                    TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                                    auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                                    SumLength += disSysCompDuct.L;
+                                    MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                                    DynamicLoss += disSysCompDuct.TurDynCoef;
+                                    NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[0];
+                                    DuctSizingSBFlag = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (DuctSizingSBFlag) {
+                    SolFla = 0;
+                    Real64 Velocity;
+                    Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                        SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
+                    } else {
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossSBranch;
+                        Par(2) = MdotBranch;
+                        Par(3) = SumLength;
+                        Par(4) = DynamicLoss;
+                        Par(5) = MaxRough;
+
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        if (SolFla == -1) {
+                            if (!m_state.dataGlobal->WarmupFlag) {
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ShowWarningError(m_state,
+                                                     "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Branch size.");
+                                    ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
+                                } else {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
+                                    ShowRecurringWarningErrorAtEnd(
+                                        m_state,
+                                        "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Branch "
+                                        "size. Supply Branch is calculated using velocity at 5m/s. Simulation continues...",
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
+                                        hydraulicDiameter,
+                                        hydraulicDiameter);
+                                }
+                            }
+                        } else if (SolFla == -2) {
+                            ShowFatalError(
+                                m_state,
+                                "Duct Autosizing for Supply Branch calculation failed: iteration limits exceeded. Supply Branch is calculated "
+                                "using velocity at 5m/s.");
+                        }
+                        if (SolFla < 0) {
+                            SupplyBranchD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                        } else {
+                            SupplyBranchD = hydraulicDiameter * factor;
+                        }
+                        SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
+                        Velocity = flowrate / SupplyBranchArea;
+                    }
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            SupplyBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                            SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
+                            ShowWarningError(
+                                m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Branch size");
+                            ShowContinueError(
+                                m_state,
+                                format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
+                                       Velocity));
+                            ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Supply Branch Diameter");
+                        }
+                    }
+                }
+            }
+
+            DuctSizingRTFlag = false;
+            DuctSizingRBFlag = false;
+
+            // return duct trunk
+            if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[1] == NodeLoopReturn) {
+                SumLength = 0.0;
+                DynamicLoss = 0.0;
+                MaxRough = 0.0;
+                if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[0] == NodeMixer) {
+                    // A single branch duct
+                    if (CompTypeNum == iComponentTypeNum::DWC && AirflowNetworkLinkageData(AFNLinkNum).ZoneNum > 0) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::ReturnTrunk;
+                        TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength = disSysCompDuct.L;
+                        MaxRough = disSysCompDuct.roughness;
+                        DynamicLoss = disSysCompDuct.TurDynCoef;
+                        DuctSizingRTFlag = true;
+                    }
+                } else {
+                    int NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum).NodeNums[0];
+                    int CompNum1;
+                    iComponentTypeNum CompTypeNum1;
+                    CompNum1 = AirflowNetworkLinkageData(AFNLinkNum).CompNum;
+                    CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                    if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::ReturnTrunk;
+                        TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength += disSysCompDuct.L;
+                        MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                        DynamicLoss += disSysCompDuct.TurDynCoef;
+                        DuctSizingRTFlag = true;
+                    }
+                    while (NodeNum1 != NodeMixer) {
+                        for (AFNLinkNum1 = 1; AFNLinkNum1 <= AirflowNetworkNumOfLinks; AFNLinkNum1++) {
+                            if (NodeNum1 != AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[1]) continue;
+                            if (AirflowNetworkCompData(AirflowNetworkLinkageData(AFNLinkNum1).CompNum).CompTypeNum != iComponentTypeNum::DWC)
+                                continue;
+                            if (NodeNum1 == AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[1]) {
+                                CompNum1 = AirflowNetworkLinkageData(AFNLinkNum1).CompNum;
+                                CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                                if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                                    AirflowNetworkLinkageData(AFNLinkNum1).ductLineType = DuctLineType::ReturnTrunk;
+                                    TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                                    auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                                    SumLength += disSysCompDuct.L;
+                                    MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                                    DynamicLoss += disSysCompDuct.TurDynCoef;
+                                    NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[0];
+                                    DuctSizingRTFlag = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (DuctSizingRTFlag) {
+                    SolFla = 0;
+                    Real64 Velocity;
+                    Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                        ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
+                    } else {
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossRTrunk;
+                        Par(2) = DisSysCompCVFData(1).FlowRate;
+                        Par(3) = SumLength;
+                        Par(4) = DynamicLoss;
+                        Par(5) = MaxRough;
+
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        if (SolFla == -1) {
+                            if (!m_state.dataGlobal->WarmupFlag) {
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ShowWarningError(m_state,
+                                                     "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Trunk size.");
+                                    ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
+                                } else {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
+                                    ShowRecurringWarningErrorAtEnd(
+                                        m_state,
+                                        "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Return Duct Trunk "
+                                        "size. Supply Branch is calculated using velocity at 5m/s. Simulation continues...",
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
+                                        hydraulicDiameter,
+                                        hydraulicDiameter);
+                                }
+                            }
+                        } else if (SolFla == -2) {
+                            ShowFatalError(
+                                m_state,
+                                "Duct Autosizing for Return Trunk calculation failed: iteration limits exceeded. Return Trunk is calculated "
+                                "using velocity at 5m/s.");
+                        }
+                        if (SolFla < 0) {
+                            ReturnTrunkD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                        } else {
+                            ReturnTrunkD = hydraulicDiameter * factor;
+                        }
+                        ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
+                        Velocity = flowrate / SupplyBranchArea;
+                    }
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            ReturnTrunkD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                            ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
+                            ShowWarningError(
+                                m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Trunk size");
+                            ShowContinueError(
+                                m_state,
+                                format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
+                                       Velocity));
+                            ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Return Trunk Diameter");
+                        }
+                    }
+                }
+            }
+
+            // return duct branch
+            if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[0] == NodeZoneReturn) {
+                SumLength = 0.0;
+                DynamicLoss = 0.0;
+                MaxRough = 0.0;
+                if (AirflowNetworkLinkageData(AFNLinkNum).NodeNums[1] == NodeMixer) {
+                    // A single trunk duct
+                    if (CompTypeNum == iComponentTypeNum::DWC && AirflowNetworkLinkageData(AFNLinkNum).ZoneNum > 0) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::ReturnBranch;
+                        TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength = disSysCompDuct.L;
+                        MaxRough = disSysCompDuct.roughness;
+                        DynamicLoss = disSysCompDuct.TurDynCoef;
+                        DuctSizingRBFlag = true;
+                    }
+                } else {
+                    int NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum).NodeNums[1];
+                    int CompNum1;
+                    iComponentTypeNum CompTypeNum1;
+                    CompNum1 = AirflowNetworkLinkageData(AFNLinkNum).CompNum;
+                    CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                    if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                        AirflowNetworkLinkageData(AFNLinkNum).ductLineType = DuctLineType::ReturnBranch;
+                        TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                        auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                        SumLength += disSysCompDuct.L;
+                        MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                        DynamicLoss += disSysCompDuct.TurDynCoef;
+                        DuctSizingRBFlag = true;
+                    }
+                    while (NodeNum1 != NodeMixer) {
+                        for (AFNLinkNum1 = 1; AFNLinkNum1 <= AirflowNetworkNumOfLinks; AFNLinkNum1++) {
+                            if (NodeNum1 != AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[0]) continue;
+                            if (AirflowNetworkCompData(AirflowNetworkLinkageData(AFNLinkNum1).CompNum).CompTypeNum != iComponentTypeNum::DWC)
+                                continue;
+                            if (NodeNum1 == AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[0]) {
+                                CompNum1 = AirflowNetworkLinkageData(AFNLinkNum1).CompNum;
+                                CompTypeNum1 = AirflowNetworkCompData(CompNum1).CompTypeNum;
+                                if (CompTypeNum1 == iComponentTypeNum::DWC) {
+                                    AirflowNetworkLinkageData(AFNLinkNum1).ductLineType = DuctLineType::ReturnBranch;
+                                    TypeNum = AirflowNetworkCompData(CompNum1).TypeNum;
+                                    auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+                                    SumLength += disSysCompDuct.L;
+                                    MaxRough = max(MaxRough, disSysCompDuct.roughness);
+                                    DynamicLoss += disSysCompDuct.TurDynCoef;
+                                    NodeNum1 = AirflowNetworkLinkageData(AFNLinkNum1).NodeNums[1];
+                                    DuctSizingRBFlag = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (DuctSizingRBFlag) {
+                    SolFla = 0;
+                    Real64 Velocity;
+                    Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::MaxVelocity) {
+                        ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                        ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
+                    } else {
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Par(1) = AirflowNetworkSimu.ductSizing.DuctSizePLossRBranch;
+                        Par(2) = MdotBranch;
+                        Par(3) = SumLength;
+                        Par(4) = DynamicLoss;
+                        Par(5) = MaxRough;
+
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        if (SolFla == -1) {
+                            if (!m_state.dataGlobal->WarmupFlag) {
+                                if (AirflowNetworkSimu.ductSizing.ErrCountDuct == 0) {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                    ShowWarningError(m_state,
+                                                     "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Branch size.");
+                                    ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
+                                } else {
+                                    ++AirflowNetworkSimu.ductSizing.ErrCountDuct;
+                                    ShowRecurringWarningErrorAtEnd(
+                                        m_state,
+                                        "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Branch "
+                                        "size. Return Branch is calculated using velocity at 5m/s. Simulation continues...",
+                                        AirflowNetworkSimu.ductSizing.ErrIndexDuct,
+                                        hydraulicDiameter,
+                                        hydraulicDiameter);
+                                }
+                            }
+                        } else if (SolFla == -2) {
+                            ShowFatalError(
+                                m_state,
+                                "Duct Autosizing for Return Branch calculation failed: iteration limits exceeded. Return Branch is calculated "
+                                "using velocity at 5m/s.");
+                        }
+                        if (SolFla < 0) {
+                            ReturnBranchD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                        } else {
+                            ReturnBranchD = hydraulicDiameter * factor;
+                        }
+                        ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
+                        Velocity = flowrate / ReturnBranchArea;
+                    }
+                    if (AirflowNetworkSimu.ductSizing.ductSizeMethod ==
+                        AirflowNetworkSimuProp::AirflowNetworkDuctSizingProp::DuctSizeMethod::VelocityAndLoss) {
+                        if (Velocity > AirflowNetworkSimu.ductSizing.DuctSizeMaxV) {
+                            ReturnBranchD = sqrt(4.0 * flowrate / AirflowNetworkSimu.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                            ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
+                            ShowWarningError(
+                                m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Branch size");
+                            ShowContinueError(
+                                m_state,
+                                format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
+                                       AirflowNetworkSimu.ductSizing.DuctSizeMaxV,
+                                       Velocity));
+                            ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Return Branch Diameter");
+                        }
+                    }
+                }
+            }
+        }
+        // Assign autosize values in Duct element
+        for (AFNLinkNum = 1; AFNLinkNum <= AirflowNetworkNumOfLinks; AFNLinkNum++) {
+            CompNum = AirflowNetworkLinkageData(AFNLinkNum).CompNum;
+            TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
+            auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+            if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::SupplyTrunk) {
+                disSysCompDuct.hydraulicDiameter = SupplyTrunkD;
+                disSysCompDuct.A = SupplyTrunkArea;
+                disSysCompDuct.RelRough = disSysCompDuct.roughness / SupplyTrunkD;       // e/D: relative roughness
+                disSysCompDuct.RelL = disSysCompDuct.L / SupplyTrunkD;                   // L/D: relative length
+                disSysCompDuct.A1 = 1.14 - 0.868589 * std::log(disSysCompDuct.RelRough); // 1.14 - 0.868589*ln(e/D)
+                disSysCompDuct.g = disSysCompDuct.A1;                                    // 1/sqrt(Darcy friction factor)
+            } else if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::SupplyBranch) {
+                disSysCompDuct.hydraulicDiameter = SupplyBranchD;
+                disSysCompDuct.A = SupplyBranchArea;
+                disSysCompDuct.RelRough = disSysCompDuct.roughness / SupplyBranchD;      // e/D: relative roughness
+                disSysCompDuct.RelL = disSysCompDuct.L / SupplyBranchD;                  // L/D: relative length
+                disSysCompDuct.A1 = 1.14 - 0.868589 * std::log(disSysCompDuct.RelRough); // 1.14 - 0.868589*ln(e/D)
+                disSysCompDuct.g = disSysCompDuct.A1;                                    // 1/sqrt(Darcy friction factor)
+            } else if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::ReturnTrunk) {
+                disSysCompDuct.hydraulicDiameter = ReturnTrunkD;
+                disSysCompDuct.A = ReturnTrunkArea;
+                disSysCompDuct.RelRough = disSysCompDuct.roughness / ReturnTrunkD;       // e/D: relative roughness
+                disSysCompDuct.RelL = disSysCompDuct.L / ReturnTrunkD;                   // L/D: relative length
+                disSysCompDuct.A1 = 1.14 - 0.868589 * std::log(disSysCompDuct.RelRough); // 1.14 - 0.868589*ln(e/D)
+                disSysCompDuct.g = disSysCompDuct.A1;                                    // 1/sqrt(Darcy friction factor)
+            } else if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::ReturnBranch) {
+                disSysCompDuct.hydraulicDiameter = ReturnBranchD;
+                disSysCompDuct.A = ReturnBranchArea;
+                disSysCompDuct.RelRough = disSysCompDuct.roughness / ReturnBranchD;      // e/D: relative roughness
+                disSysCompDuct.RelL = disSysCompDuct.L / ReturnBranchD;                  // L/D: relative length
+                disSysCompDuct.A1 = 1.14 - 0.868589 * std::log(disSysCompDuct.RelRough); // 1.14 - 0.868589*ln(e/D)
+                disSysCompDuct.g = disSysCompDuct.A1;                                    // 1/sqrt(Darcy friction factor)
+            }
+        }
+
+        // Print data in eio
+        print(m_state.files.eio,
+              "! <AirflowNetwork Model:Duct Autosizing>, Linkage Name, Duct Type, Duct Name, Duct Hydraunic Diameter, Duct Cross Section Area\n");
+
+        // Assign autosize values in Duct element
+        for (AFNLinkNum = 1; AFNLinkNum <= AirflowNetworkNumOfLinks; AFNLinkNum++) {
+            CompNum = AirflowNetworkLinkageData(AFNLinkNum).CompNum;
+            TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
+            auto &disSysCompDuct = DisSysCompDuctData(TypeNum);
+            if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::SupplyTrunk) {
+                print(m_state.files.eio,
+                      "AirflowNetwork Model:Duct Autosizing, {}, Supply Trunk, {}, ",
+                      AirflowNetworkLinkageData(AFNLinkNum).Name,
+                      disSysCompDuct.name);
+                print(m_state.files.eio, "{:.4R},{:.4R}\n", SupplyTrunkD, SupplyTrunkArea);
+            }
+            if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::SupplyBranch) {
+                print(m_state.files.eio,
+                      "AirflowNetwork Model:Duct Autosizing, {}, Supply Branch, {}, ",
+                      AirflowNetworkLinkageData(AFNLinkNum).Name,
+                      disSysCompDuct.name);
+                print(m_state.files.eio, "{:.4R},{:.4R}\n", SupplyBranchD, SupplyBranchArea);
+            }
+            if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::ReturnTrunk) {
+                print(m_state.files.eio,
+                      "AirflowNetwork Model:Duct Autosizing, {}, Return Trunk, {}, ",
+                      AirflowNetworkLinkageData(AFNLinkNum).Name,
+                      disSysCompDuct.name);
+                print(m_state.files.eio, "{:.4R},{:.4R}\n", ReturnTrunkD, ReturnTrunkArea);
+            }
+            if (AirflowNetworkLinkageData(AFNLinkNum).ductLineType == DuctLineType::ReturnBranch) {
+                print(m_state.files.eio,
+                      "AirflowNetwork Model:Duct Autosizing, {}, Return Branch, {}, ",
+                      AirflowNetworkLinkageData(AFNLinkNum).Name,
+                      disSysCompDuct.name);
+                print(m_state.files.eio, "{:.4R},{:.4R}\n", ReturnBranchD, ReturnBranchArea);
+            }
+        }
+    }
+
+    Real64 Solver::CalcDuctDiameter(Real64 hydraulicDiameter, Real64 DeltaP, Real64 MassFlowrate, Real64 TotalL, Real64 TotalLossCoe, Real64 MaxRough)
+    {
+        Real64 CalcDeltaP = 0.0;
+
+        Real64 A;
+        Real64 A0;
+        Real64 A1;
+        Real64 A2;
+        Real64 B;
+        Real64 D;
+        Real64 S2;
+        Real64 CDM;
+        Real64 FL; // friction factor for laminar flow.
+        Real64 FT; // friction factor for turbulent flow.
+        Real64 FTT;
+        Real64 RE; // Reynolds number.
+        Real64 ed;
+        Real64 ld;
+        Real64 g;
+        Real64 AA1;
+        Real64 velocity;
+        Real64 constexpr LamDynCoef(64.0);
+        Real64 constexpr LamFriCoef(0.001);
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr C(0.868589);
+
+        //// Initial guess with 5 m/s
+        Real64 flowrate = MassFlowrate / m_state.dataEnvrn->StdRhoAir;
+
+        ed = MaxRough / hydraulicDiameter;
+        ld = TotalL / hydraulicDiameter;
+        g = 1.14 - 0.868589 * std::log(ed);
+        AA1 = g;
+        A = hydraulicDiameter * hydraulicDiameter / 4.0 * DataGlobalConstants::Pi;
+        Real64 viscosity{AirflowNetwork::AIRDYNAMICVISCOSITY_CONSTEXPR(20)};
+        velocity = flowrate / A;
+
+        if (LamFriCoef >= 0.001) {
+            A2 = LamFriCoef / (2.0 * m_state.dataEnvrn->StdRhoAir * A * A);
+            A1 = (viscosity * LamDynCoef * ld) / (2.0 * m_state.dataEnvrn->StdRhoAir * A * hydraulicDiameter);
+            A0 = -DeltaP;
+            CDM = std::sqrt(A1 * A1 - 4.0 * A2 * A0);
+            FL = (CDM - A1) / (2.0 * A2);
+            CDM = 1.0 / CDM;
+        } else {
+            CDM = (2.0 * m_state.dataEnvrn->StdRhoAir * A * hydraulicDiameter) / (viscosity * LamDynCoef * ld);
+            FL = CDM * DeltaP;
+        }
+
+        // CDM = (2.0 * m_state.dataEnvrn->StdRhoAir * A * hydraulicDiameter) / (viscosity * LamDynCoef * ld);
+        // FL = CDM * DeltaP;
+
+        RE = FL * hydraulicDiameter / (viscosity * A);
+        S2 = std::sqrt(2.0 * m_state.dataEnvrn->StdRhoAir * DeltaP) * A;
+        FTT = S2 / std::sqrt(ld / pow_2(g) + TotalLossCoe);
+        while (true) {
+            FT = FTT;
+            B = (9.3 * viscosity * A) / (FT * MaxRough);
+            D = 1.0 + g * B;
+            g -= (g - AA1 + C * std::log(D)) / (1.0 + C * B / D);
+            FTT = S2 / std::sqrt(ld / pow_2(g) + TotalLossCoe);
+            if (std::abs(FTT - FT) / FTT < EPS) break;
+        }
+        FT = FTT;
+
+        Real64 f = 1.0 / (g * g);
+
+        // CalcDeltaP = ((FT * TotalL) / hydraulicDiameter + TotalLossCoe) * (m_state.dataEnvrn->StdRhoAir * velocity * velocity / 2.0);
+        CalcDeltaP = ((f * TotalL) / hydraulicDiameter + TotalLossCoe) * (m_state.dataEnvrn->StdRhoAir * velocity * velocity / 2.0);
+
+        return CalcDeltaP;
+    }
+
+    Real64 DuctDResidual(EnergyPlusData &state,
+                         Real64 D, // duct diameter
+                         Array1D<Real64> const &Par)
+    {
+        Real64 DuctDResidual;
+        Real64 CalcDeltaP;
+        Real64 DeltaP = Par(1);
+        Real64 MassFlowrate = Par(2);
+        Real64 TotalL = Par(3);
+        Real64 TotalLossCoe = Par(4);
+        Real64 MaxRough = Par(5);
+
+        CalcDeltaP = state.afn->CalcDuctDiameter(D, DeltaP, MassFlowrate, TotalL, TotalLossCoe, MaxRough);
+
+        DuctDResidual = (CalcDeltaP - DeltaP) / DeltaP;
+        return DuctDResidual;
     }
 
     void OccupantVentilationControlProp::calc(EnergyPlusData &state,
