@@ -135,7 +135,7 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs
     }
 
     void setHVACSizingIndexData(int const index);
-    Real64 GetCoilSourceTempUsedForSizing(EnergyPlusData &state, int const coilType);
+    Real64 GetCoilSourceTempUsedForSizing(EnergyPlusData &state, int const coilType, Real64 &sourceTemp);
 };
 
 struct BaseSizerWithScalableInputsData : BaseGlobalStruct

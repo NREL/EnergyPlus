@@ -160,7 +160,13 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             }
                             CoilOutTemp = min(CoilInTemp, this->finalZoneSizing(this->curZoneEqNum).CoolDesTemp);
                             CoilOutHumRat = min(CoilInHumRat, this->finalZoneSizing(this->curZoneEqNum).CoolDesHumRat);
-                            Real64 OutTemp = GetCoilSourceTempUsedForSizing(state, this->dataCoolCoilType);
+                            int TimeStepNumAtMax = this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax;
+                            int DDNum = this->finalZoneSizing(this->curZoneEqNum).CoolDDNum;
+                            Real64 OutTemp = 0.0;
+                            if (DDNum > 0 && TimeStepNumAtMax > 0) {
+                                OutTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+                            }
+                            if (this->dataCoolCoilType > -1) OutTemp = GetCoilSourceTempUsedForSizing(state, this->dataCoolCoilType, OutTemp);
                             Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                             Real64 CoilOutEnth = Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
                             Real64 PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth)));
@@ -341,7 +347,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (this->dataDesInletAirTemp > 0.0) CoilInTemp = this->dataDesInletAirTemp;
                             if (this->dataDesInletAirHumRat > 0.0) CoilInHumRat = this->dataDesInletAirHumRat;
                         }
-                        Real64 OutTemp = GetCoilSourceTempUsedForSizing(state, this->dataCoolCoilType);
+                        Real64 OutTemp = this->finalSysSizing(this->curSysNum).OutTempAtCoolPeak;
+                        if (this->dataCoolCoilType > -1) OutTemp = GetCoilSourceTempUsedForSizing(state, this->dataCoolCoilType, OutTemp);
                         CoilOutTemp = min(CoilInTemp, CoilOutTemp);
                         CoilOutHumRat = min(CoilInHumRat, CoilOutHumRat);
                         Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);

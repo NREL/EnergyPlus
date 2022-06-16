@@ -1935,8 +1935,8 @@ namespace UnitarySystems {
             }
             // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
             if (((this->m_sysType == SysType::PackagedHP && this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
-                  (this->m_sysType == SysType::PackagedWSHP &&
-                      this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) &&
+                 (this->m_sysType == SysType::PackagedWSHP &&
+                  this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) &&
                 this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
                 int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
                 Real64 heatingAirFlowToCapacityRatio =
