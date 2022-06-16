@@ -167,16 +167,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (DDNum > 0 && TimeStepNumAtMax > 0) {
                                 OutTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                             }
-                            Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(
-                                state, state.dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
                             Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                             Real64 CoilOutEnth = Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
-                            Real64 PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
-                            if (this->zoneEqFanCoil) {
-                                PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth)));
-                            } else if (this->zoneEqUnitVent) {
-                                PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth)));
-                            }
+                            Real64 PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                             // add fan heat to coil load
                             FanCoolLoad += this->calcFanDesHeatGain(DesVolFlow);
                             PeakCoilLoad += FanCoolLoad;
@@ -355,14 +348,6 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (this->dataDesInletAirHumRat > 0.0) CoilInHumRat = this->dataDesInletAirHumRat;
                         }
                         Real64 OutTemp = this->finalSysSizing(this->curSysNum).OutTempAtCoolPeak;
-                        Real64 rhoair = 0.0;
-                        if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
-                            UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
-                            rhoair = state.dataEnvrn->StdRhoAir;
-                        } else {
-                            rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(
-                                state, state.dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);
-                        }
                         CoilOutTemp = min(CoilInTemp, CoilOutTemp);
                         CoilOutHumRat = min(CoilInHumRat, CoilOutHumRat);
                         Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
@@ -402,11 +387,11 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
 
                             this->primaryAirSystem(this->curSysNum).FanDesCoolLoad = FanCoolLoad;
                         }
-                        Real64 PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
+                        Real64 PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(CoilInHumRat);
                         // adjust coil inlet/outlet temp with fan temperature rise
                         if (this->dataDesAccountForFanHeat) {
-                            PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
+                            PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
                             if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::BlowThru) {
                                 CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 // include change in inlet condition in TotCapTempModFac

@@ -265,24 +265,14 @@ class TestFormatCheck(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print("**** Verifying script integrity ****")
-    verbose = False
-    unittest.main(exit=False)
-    verbose = True
-    print("**** DONE ***")
-    print("")
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        del sys.argv[1:]
+        unittest.main(exit=False, verbosity=0)
 
     root_path = Path(__file__).parent.parent.parent
-
-    print("**** Checking EnergyPlus code for malformed fmt strings ****")
     src_path = root_path / "src" / "EnergyPlus"
     errors_found = check_format_strings(src_path)
-    print("**** DONE ****")
-    print("")
-
-    print("**** Checking EnergyPlus unit test code for malformed fmt strings ****")
     tst_path = root_path / "tst" / "EnergyPlus"
     errors_found += check_format_strings(tst_path)
-    print("**** DONE ****")
-
-    sys.exit(errors_found)
+    if errors_found > 0:
+        sys.exit(1)
