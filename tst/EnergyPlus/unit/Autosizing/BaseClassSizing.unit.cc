@@ -76,6 +76,47 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
 
+TEST_F(EnergyPlusFixture, BaseSizer_selectSizerOutput)
+{
+    // ficticious sizing to test the selectSizerOutput function
+    // there are several if blocks to determine which type of reporting to output
+    // report Design Size and User, Design Size only, or User size only
+    // if these if block miss a possible input configuration the simulation may fail
+    // with a Developer Error message
+    // this unit test is a place holder to test for all the possible input configurations
+
+    bool errorsFound = false;
+    bool PrintFlag = true;
+    std::string_view RoutineName = "BaseSizer_selectSizerOutput";
+    std::string_view CompType = "testComp";
+    std::string_view CompName = "testName";
+
+    // pick a sizing method
+    SystemAirFlowSizer thisSizer;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingInput.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+
+    // Test #1
+    // Autosized value may be less than 0
+
+    // negative numbers should never happen for air flow but can certainly happen for temperature
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = -1.0;
+
+    // set up inputs used for sizing
+    Real64 TempSize = DataSizing::AutoSize;
+
+    // call the selectSizerOutput function to make sure this input configuration is caught
+    thisSizer.initializeWithinEP(*state, CompType, CompName, PrintFlag, RoutineName);
+    Real64 autoSizedValue = thisSizer.size(*state, TempSize, errorsFound);
+
+    EXPECT_EQ(-1.0, autoSizedValue);
+    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, thisSizer.errorType));
+}
+
 TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
 {
     // setup global allocation

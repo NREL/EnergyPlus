@@ -49,7 +49,6 @@
 #define HeatingCapacitySizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 

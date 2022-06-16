@@ -117,21 +117,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             CoilInTemp = (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinPriFlowFrac) +
                                          (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - MinPriFlowFrac));
                         }
-                    } else if (this->zoneEqFanCoil) {
-                        // use fan coil flow (i.e., set by parent) or flow used during sizing?
-                        if (DesVolFlow > 0.0) {
-                            DesMassFlow = DesVolFlow * state.dataEnvrn->StdRhoAir;
-                        } else {
-                            DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
-                        }
-                        CoilInTemp = this->setHeatCoilInletTempForZoneEqSizing(
-                            this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                            zoneEqSizing(this->curZoneEqNum),
-                            finalZoneSizing(this->curZoneEqNum));
-                        CoilInHumRat = this->setHeatCoilInletHumRatForZoneEqSizing(
-                            this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                            zoneEqSizing(this->curZoneEqNum),
-                            finalZoneSizing(this->curZoneEqNum));
                     } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
                         CoilInTemp = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneTempAtHeatPeak;
                         CoilInHumRat = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneHumRatAtHeatPeak;
@@ -139,6 +124,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         CoilInTemp = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU;
                         CoilInHumRat = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInHumRatTU;
                     } else {
+                        // all other components calculate coil inlet condition based on actual, not design, OA fraction (e.g., FanCoil)
                         if (DesVolFlow > 0.0) {
                             DesMassFlow = DesVolFlow * state.dataEnvrn->StdRhoAir;
                         } else {
@@ -252,8 +238,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             }
                         } else if (this->curDuctType == DataHVACGlobals::Heating) {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::Other) {
-                            DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } else {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         }
@@ -314,7 +298,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 } else {
                     if (this->unitarySysEqSizing(this->curSysNum).HeatingCapacity) {
                         DesCoilLoad = this->unitarySysEqSizing(this->curSysNum).DesHeatingLoad;
-                        // CoilOutTemp = -999.0; // initialized at top
                         CoilOutTemp = this->finalSysSizing(this->curSysNum).HeatSupTemp;
                         CoilOutHumRat = this->finalSysSizing(this->curSysNum).HeatSupHumRat;
                     } else if (this->dataDesicRegCoil) {
