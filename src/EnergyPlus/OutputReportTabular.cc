@@ -12586,7 +12586,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             degreeHourConversion = 1.0;
         }
 
-        WriteReportHeaderReportingPeriod(state, "Thermal", periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
+        std::string tableType = "Thermal";
+        WriteReportHeaderReportingPeriod(state, tableType, periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
 
         int columnNum = 5;
         Array1D_int columnWidth;
@@ -12606,6 +12607,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
         std::string tableName = "Heat Index Hours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -12617,6 +12619,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
         tableName = "Heat Index OccupantHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -12628,6 +12631,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
         tableName = "Heat Index OccupiedHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -12639,6 +12643,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
         tableName = "Humidex Hours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -12650,6 +12655,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
         tableName = "Humidex OccupantHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -12661,6 +12667,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
         tableName = "Humidex OccupiedHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -12808,6 +12815,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         Array2D_string tableBodyUnmetDegHr;
         tableBodyUnmetDegHr.allocate(columnNumUnmetDegHr, state.dataGlobal->NumOfZones + 4);
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNumUnmetDegHr,
                                                 periodIdx,
                                                 tableName,
@@ -12828,6 +12836,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         columnWidthDiscomfortWt.allocate(columnNumDiscomfortWt);
         columnWidth = 10;
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNumDiscomfortWt,
                                                 periodIdx,
                                                 tableName,
@@ -12838,6 +12847,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableBody);
         tableName = "Discomfort-weighted Exceedance OccupiedHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNumDiscomfortWt,
                                                 periodIdx,
                                                 tableName,
@@ -12880,6 +12890,7 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
 }
 
 void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
+                                             const std::string tableType,
                                              int const columnNum,
                                              int const periodIdx,
                                              const std::string tableName,
@@ -12924,6 +12935,24 @@ void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
     }
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                           rowHead,
+                                                                           columnHead,
+                                                                           "ReportingPeriod-" + std::to_string(periodIdx) + "-" + tableType +
+                                                                               "ResilienceSummary",
+                                                                           "Entire Facility",
+                                                                           tableName);
+    }
+    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                              rowHead,
+                                                                                              columnHead,
+                                                                                              "ReportingPeriod-" + std::to_string(periodIdx) + "-" +
+                                                                                                  tableType + "ResilienceSummary",
+                                                                                              "Entire Facility",
+                                                                                              tableName);
+    }
 }
 
 void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
@@ -12976,6 +13005,24 @@ void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
     tableBody(columnNum, state.dataGlobal->NumOfZones + 3) = "-";
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                           rowHead,
+                                                                           columnHead,
+                                                                           "ReportingPeriod-" + std::to_string(periodIdx) +
+                                                                               "-ThermalResilienceSummary",
+                                                                           "Entire Facility",
+                                                                           tableName);
+    }
+    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                              rowHead,
+                                                                                              columnHead,
+                                                                                              "ReportingPeriod-" + std::to_string(periodIdx) +
+                                                                                                  "-ThermalResilienceSummary",
+                                                                                              "Entire Facility",
+                                                                                              tableName);
+    }
 }
 
 std::string RetrieveEntryFromTableBody(Array2D_string &tableBody, int const rowIndex, int const columnIndex)
@@ -13038,6 +13085,24 @@ void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
     }
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                           rowHead,
+                                                                           columnHead,
+                                                                           "ReportingPeriod-" + std::to_string(periodIdx) +
+                                                                               "-ThermalResilienceSummary",
+                                                                           "Entire Facility",
+                                                                           tableName);
+    }
+    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                              rowHead,
+                                                                                              columnHead,
+                                                                                              "ReportingPeriod-" + std::to_string(periodIdx) +
+                                                                                                  "-ThermalResilienceSummary",
+                                                                                              "Entire Facility",
+                                                                                              tableName);
+    }
 }
 
 void WriteHourOfSafetyTable(EnergyPlusData &state,
@@ -13300,7 +13365,9 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
         tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
 
         std::string tableName = "CO2 Level Hours";
+        std::string tableType = "CO2";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -13312,6 +13379,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
 
         tableName = "CO2 Level OccupantHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -13323,6 +13391,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
 
         tableName = "CO2 Level OccupiedHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -13395,7 +13464,9 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
         tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
 
         std::string tableName = "Illuminance Level Hours";
+        std::string tableType = "Visual";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -13407,6 +13478,7 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
 
         tableName = "Illuminance Level OccupantHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,
@@ -13418,6 +13490,7 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
 
         tableName = "Illuminance Level OccupiedHours";
         WriteResilienceBinsTableReportingPeriod(state,
+                                                tableType,
                                                 columnNum,
                                                 periodIdx,
                                                 tableName,

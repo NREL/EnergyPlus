@@ -10489,6 +10489,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     tableBody.allocate(columnNumUnmetDegHr, state->dataGlobal->NumOfZones + 4);
 
     WriteResilienceBinsTableReportingPeriod(*state,
+                                            "Thermal",
                                             columnNumUnmetDegHr,
                                             1,
                                             tableName,
@@ -10507,6 +10508,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     EXPECT_EQ("-45.0", RetrieveEntryFromTableBody(tableBody, 1, 6));
 
     WriteResilienceBinsTableReportingPeriod(*state,
+                                            "Thermal"
                                             columnNumUnmetDegHr,
                                             2,
                                             tableName,

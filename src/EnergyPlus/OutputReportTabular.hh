@@ -679,6 +679,7 @@ namespace OutputReportTabular {
                                   Real64 const unitConvMultiplier = 1.0);
 
     void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
+                                                 const std::string tableType,
                                                  int const columnNum,
                                                  int const periodIdx,
                                                  const std::string tableName,
