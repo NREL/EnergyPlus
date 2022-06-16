@@ -2279,13 +2279,13 @@ namespace AirflowNetwork {
                                                                        cAlphaFields,
                                                                        cNumericFields);
 
-            simulation_control.ductSizing.Name = Alphas(1);
+            simulation_control.ductSizing.name = Alphas(1);
             if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("MaximumVelocity"))) {
-                simulation_control.ductSizing.ductSizeMethod = DuctSizingMethod::MaxVelocity;
+                simulation_control.ductSizing.method = DuctSizingMethod::MaxVelocity;
             } else if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("PressureLoss"))) {
-                simulation_control.ductSizing.ductSizeMethod = DuctSizingMethod::PressureLoss;
+                simulation_control.ductSizing.method = DuctSizingMethod::PressureLoss;
             } else if (UtilityRoutines::SameString(Alphas(2), UtilityRoutines::MakeUPPERCase("PressureLossWithMaximumVelocity"))) {
-                simulation_control.ductSizing.ductSizeMethod = DuctSizingMethod::VelocityAndLoss;
+                simulation_control.ductSizing.method = DuctSizingMethod::VelocityAndLoss;
             } else {
                 ShowSevereError(m_state, format("{} {} object, {} = {}  is invalid.", RoutineName, CurrentModuleObject, cAlphaFields(2), Alphas(2)));
                 ShowContinueError(m_state,
@@ -2305,12 +2305,12 @@ namespace AirflowNetwork {
                 ShowContinueError(m_state, format("..Duct sizing is not performed"));
                 simulation_control.AFNDuctAutoSize = false;
             }
-            simulation_control.ductSizing.DuctSizeFactor = Numbers(1);
-            simulation_control.ductSizing.DuctSizeMaxV = Numbers(2);
-            simulation_control.ductSizing.DuctSizePLossSTrunk = Numbers(3);
-            simulation_control.ductSizing.DuctSizePLossSBranch = Numbers(4);
-            simulation_control.ductSizing.DuctSizePLossRTrunk = Numbers(5);
-            simulation_control.ductSizing.DuctSizePLossRBranch = Numbers(6);
+            simulation_control.ductSizing.factor = Numbers(1);
+            simulation_control.ductSizing.max_velocity = Numbers(2);
+            simulation_control.ductSizing.supply_trunk_pressure_loss = Numbers(3);
+            simulation_control.ductSizing.supply_branch_pressure_loss = Numbers(4);
+            simulation_control.ductSizing.return_trunk_pressure_loss = Numbers(5);
+            simulation_control.ductSizing.return_branch_pressure_loss = Numbers(6);
         }
 
         // *** Read AirflowNetwork simulation zone data
@@ -12289,7 +12289,7 @@ namespace AirflowNetwork {
             simulation_control.iWPCCnt = iWPCCntr::Input;
             simulation_control.allow_unsupported_zone_equipment = false;
         }
-        Real64 factor = simulation_control.ductSizing.DuctSizeFactor;
+        Real64 factor = simulation_control.ductSizing.factor;
 
         NodeLoopSupply = m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1);
         NodeLoopReturn = m_state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipReturnNodeNum(1);
@@ -12376,13 +12376,13 @@ namespace AirflowNetwork {
                 if (DuctSizingSTFlag) {
                     Real64 Velocity = 0.0;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::MaxVelocity) {
-                        SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
+                        SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                         SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.DuctSizePLossSTrunk;
+                        Par(1) = simulation_control.ductSizing.supply_trunk_pressure_loss;
                         Par(2) = DisSysCompCVFData(1).FlowRate;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12391,18 +12391,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (simulation_control.ductSizing.ErrCountDuct == 0) {
-                                    ++simulation_control.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (ErrCountDuct == 0) {
+                                    ++ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Trunk size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++simulation_control.ductSizing.ErrCountDuct;
+                                    ++ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Trunk "
                                         "size. Supply Trunk is calculated using velocity at 5m/s. Simulation continues...",
-                                        simulation_control.ductSizing.ErrIndexDuct,
+                                        ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12421,16 +12421,16 @@ namespace AirflowNetwork {
                         SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / SupplyTrunkArea;
                     }
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::VelocityAndLoss) {
-                        if (Velocity > simulation_control.ductSizing.DuctSizeMaxV) {
-                            SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
+                        if (Velocity > simulation_control.ductSizing.max_velocity) {
+                            SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                             SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Trunk size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       simulation_control.ductSizing.DuctSizeMaxV,
+                                       simulation_control.ductSizing.max_velocity,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Supply Trunk Diameter");
                         }
@@ -12495,13 +12495,13 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::MaxVelocity) {
-                        SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
+                        SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                         SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.DuctSizePLossSBranch;
+                        Par(1) = simulation_control.ductSizing.supply_branch_pressure_loss;
                         Par(2) = MdotBranch;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12510,18 +12510,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (simulation_control.ductSizing.ErrCountDuct == 0) {
-                                    ++simulation_control.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (ErrCountDuct == 0) {
+                                    ++ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Supply Duct Branch size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Supply Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++simulation_control.ductSizing.ErrCountDuct;
+                                    ++ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Branch "
                                         "size. Supply Branch is calculated using velocity at 5m/s. Simulation continues...",
-                                        simulation_control.ductSizing.ErrIndexDuct,
+                                        ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12540,16 +12540,16 @@ namespace AirflowNetwork {
                         SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / SupplyBranchArea;
                     }
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::VelocityAndLoss) {
-                        if (Velocity > simulation_control.ductSizing.DuctSizeMaxV) {
-                            SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
+                        if (Velocity > simulation_control.ductSizing.max_velocity) {
+                            SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                             SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Branch size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       simulation_control.ductSizing.DuctSizeMaxV,
+                                       simulation_control.ductSizing.max_velocity,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Supply Branch Diameter");
                         }
@@ -12618,13 +12618,13 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::MaxVelocity) {
-                        ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
+                        ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                         ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.DuctSizePLossRTrunk;
+                        Par(1) = simulation_control.ductSizing.return_trunk_pressure_loss;
                         Par(2) = DisSysCompCVFData(1).FlowRate;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12633,18 +12633,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (simulation_control.ductSizing.ErrCountDuct == 0) {
-                                    ++simulation_control.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (ErrCountDuct == 0) {
+                                    ++ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Trunk size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++simulation_control.ductSizing.ErrCountDuct;
+                                    ++ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Return Duct Trunk "
                                         "size. Supply Branch is calculated using velocity at 5m/s. Simulation continues...",
-                                        simulation_control.ductSizing.ErrIndexDuct,
+                                        ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12663,16 +12663,16 @@ namespace AirflowNetwork {
                         ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / SupplyBranchArea;
                     }
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::VelocityAndLoss) {
-                        if (Velocity > simulation_control.ductSizing.DuctSizeMaxV) {
-                            ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
+                        if (Velocity > simulation_control.ductSizing.max_velocity) {
+                            ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                             ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Trunk size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       simulation_control.ductSizing.DuctSizeMaxV,
+                                       simulation_control.ductSizing.max_velocity,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Return Trunk Diameter");
                         }
@@ -12738,13 +12738,13 @@ namespace AirflowNetwork {
                     SolFla = 0;
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::MaxVelocity) {
-                        ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
+                        ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                         ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.DuctSizePLossRBranch;
+                        Par(1) = simulation_control.ductSizing.return_branch_pressure_loss;
                         Par(2) = MdotBranch;
                         Par(3) = SumLength;
                         Par(4) = DynamicLoss;
@@ -12753,18 +12753,18 @@ namespace AirflowNetwork {
                         General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
-                                if (simulation_control.ductSizing.ErrCountDuct == 0) {
-                                    ++simulation_control.ductSizing.ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
+                                if (ErrCountDuct == 0) {
+                                    ++ErrCountDuct; // TODO: Why is the error count shared among all heat pump units?
                                     ShowWarningError(m_state,
                                                      "AirflowNetwork Duct Autosizing: Iteration limit exceeded calculating Return Duct Branch size.");
                                     ShowContinueErrorTimeStamp(m_state, format("Return Duct Hydronic Diameter={:.2R}", hydraulicDiameter));
                                 } else {
-                                    ++simulation_control.ductSizing.ErrCountDuct;
+                                    ++ErrCountDuct;
                                     ShowRecurringWarningErrorAtEnd(
                                         m_state,
                                         "AirflowNetwork Duct Autosizing: Iteration limit warning exceeding Supply Duct Branch "
                                         "size. Return Branch is calculated using velocity at 5m/s. Simulation continues...",
-                                        simulation_control.ductSizing.ErrIndexDuct,
+                                        ErrIndexDuct,
                                         hydraulicDiameter,
                                         hydraulicDiameter);
                                 }
@@ -12783,16 +12783,16 @@ namespace AirflowNetwork {
                         ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
                         Velocity = flowrate / ReturnBranchArea;
                     }
-                    if (simulation_control.ductSizing.ductSizeMethod == DuctSizingMethod::VelocityAndLoss) {
-                        if (Velocity > simulation_control.ductSizing.DuctSizeMaxV) {
-                            ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.DuctSizeMaxV / DataGlobalConstants::Pi);
+                    if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
+                        if (Velocity > simulation_control.ductSizing.max_velocity) {
+                            ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
                             ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Branch size");
                             ShowContinueError(
                                 m_state,
                                 format("The Maximum Airflow Velocity at {:.1R} is less than calculated velosity at {:.1R} using PressureLoss",
-                                       simulation_control.ductSizing.DuctSizeMaxV,
+                                       simulation_control.ductSizing.max_velocity,
                                        Velocity));
                             ShowContinueError(m_state, "..The Maximum Airflow Velocity is used to calculate Return Branch Diameter");
                         }

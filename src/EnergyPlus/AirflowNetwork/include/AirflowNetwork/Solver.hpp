@@ -170,16 +170,15 @@ namespace AirflowNetwork {
 
     struct DuctSizing // Duct sizing
     {
-        std::string Name;                                                // Provide a unique object name
-        DuctSizingMethod ductSizeMethod = DuctSizingMethod::MaxVelocity; // Duct autosize method as enum
-        Real64 DuctSizeFactor = 1.0;                                     // Duct size factor
-        Real64 DuctSizeMaxV = 0.5;                                       // Maximum airflow velocity
-        Real64 DuctSizePLossSTrunk = 1.0;                                // Pressure loss across supply trunk
-        Real64 DuctSizePLossSBranch = 1.0;                               // Pressure loss across supply branch
-        Real64 DuctSizePLossRTrunk = 1.0;                                // Pressure loss across return trunk
-        Real64 DuctSizePLossRBranch = 1.0;                               // Pressure loss across return branch
-        int ErrCountDuct = 0;
-        int ErrIndexDuct = 0;
+        std::string name;                                        // Provide a unique object name
+        DuctSizingMethod method = DuctSizingMethod::MaxVelocity; // Duct autosize method as enum
+        Real64 factor = 1.0;                                     // Duct size factor
+        Real64 max_velocity = 0.5;                               // Maximum airflow velocity
+        Real64 supply_trunk_pressure_loss = 1.0;                 // Pressure loss across supply trunk
+        Real64 supply_branch_pressure_loss = 1.0;                // Pressure loss across supply branch
+        Real64 return_trunk_pressure_loss = 1.0;                 // Pressure loss across return trunk
+        Real64 return_branch_pressure_loss = 1.0;                // Pressure loss across return branch
+        
     };
 
     struct SimulationControl // Basic parameters for AirflowNetwork simulation
@@ -380,9 +379,11 @@ namespace AirflowNetwork {
         int ErrCountVar = 0;
         int ErrCountHighPre = 0;
         int ErrCountLowPre = 0;
+        int ErrCountDuct = 0;
         int ErrIndexHighPre = 0;
         int ErrIndexVar = 0;
         int ErrIndexLowPre = 0;
+        int ErrIndexDuct = 0;
 
         // Object Data
         EPVector<AirflowNetwork::AirflowNetworkReportVars> AirflowNetworkZnRpt;
