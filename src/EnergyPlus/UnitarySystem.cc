@@ -1505,6 +1505,9 @@ namespace UnitarySystems {
         } else {
             state.dataHVACGlobal->DXCT = 1; // uses normal DX coil flow limits
         }
+        // sizing may need to know what type of coil is being sized
+        state.dataSize->DataCoolCoilType = this->m_CoolingCoilType_Num;
+        state.dataSize->DataHeatCoilType = this->m_HeatingCoilType_Num;
 
         bool anyEMSRan;
         EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
@@ -16279,6 +16282,9 @@ namespace UnitarySystems {
             } else {
                 this->m_FirstPass = false;
             }
+            // reset the global system type flags
+            state.dataSize->ZoneEqDXCoil = false;
+            // state.dataSize->ZoneEqFanCoil = false; // not used yet
         }
 
         // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)

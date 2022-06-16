@@ -86,6 +86,10 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs
     Real64 suppHeatCap = 0.0;
     Real64 unitaryHeatCap = 0.0;
     int dataTotCapCurveIndex = 0;
+    int dataCoolCoilType = -1;
+    int dataCoolCoilIndex = -1;
+    int dataHeatCoilType = -1;
+    int dataHeatCoilIndex = -1;
 
     int zoneHVACSizingIndex = 0;
     EPVector<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
@@ -123,10 +127,15 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs
         suppHeatCap = 0.0;
         unitaryHeatCap = 0.0;
         zoneHVACSizingIndex = 0;
+        dataCoolCoilType = -1;
+        dataCoolCoilIndex = -1;
+        dataHeatCoilType = -1;
+        dataHeatCoilIndex = -1;
         zoneHVACSizing.clear();
     }
 
     void setHVACSizingIndexData(int const index);
+    Real64 GetCoilSourceTempUsedForSizing(EnergyPlusData &state, int const coilType);
 };
 
 struct BaseSizerWithScalableInputsData : BaseGlobalStruct

@@ -326,6 +326,15 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         CoilOutHumRat = this->finalSysSizing(this->curSysNum).HeatSupHumRat;
                     }
                 }
+
+                // where is the CapFT curve for system DX coils?
+                Real64 OutTemp = 0.0; 
+                if (this->dataHeatCoilType == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                    this->dataHeatCoilType == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterVariableSpeed ||
+                    this->dataHeatCoilType == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                    OutTemp = GetCoilSourceTempUsedForSizing(state, this->dataHeatCoilType);
+                }
+
                 if (this->curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys && this->airLoopControlInfo(this->curSysNum).UnitarySys) {
                     if (this->dataCoilIsSuppHeater) {
                         NominalCapacityDes = this->suppHeatCap;

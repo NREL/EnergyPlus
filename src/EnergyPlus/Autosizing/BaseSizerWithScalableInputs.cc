@@ -89,6 +89,8 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     this->dataCoilIsSuppHeater = state.dataSize->DataCoilIsSuppHeater;
     this->suppHeatCap = state.dataSize->SuppHeatCap;
     this->unitaryHeatCap = state.dataSize->UnitaryHeatCap;
+    this->dataCoolCoilType = state.dataSize->DataCoolCoilType;
+    this->dataHeatCoilType = state.dataSize->DataHeatCoilType;
 
     this->zoneHVACSizing = state.dataSize->ZoneHVACSizing;
 
@@ -153,6 +155,77 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             }
         }
     }
+}
+
+Real64 BaseSizerWithScalableInputs::GetCoilSourceTempUsedForSizing(EnergyPlusData &state, int const coilType)
+{
+    Real64 constexpr RatedInletWaterTemp = 29.4444;     // 85 F cooling mode
+    Real64 constexpr RatedAmbAirTemp = 35.0;            // 95 F cooling mode
+    Real64 constexpr RatedInletAirTempHeat = 21.1111;   // 21.11C or 70F, heating mode
+    Real64 constexpr RatedInletWaterTempHeat = 21.1111; // 21.11C or 70F, heating mode
+    Real64 constexpr RatedAmbAirTempHeat = 8.3333;      // 8.33 or 47F, heating mode
+    Real64 constexpr RatedAmbAirWBHeat = 6.1111;        // 8.33 or 43F, heating mode, rated wet bulb temperature
+
+    Real64 RatedSourceTemp = 0.0;
+
+    // this is not correct at the moment. Added in #9457 and will be corrected in #9439 or other PR
+    switch (coilType) {
+    case DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit: {
+        RatedSourceTemp = RatedInletWaterTemp;
+        // should be plant supply node temperature
+    } break;
+    case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit: {
+        RatedSourceTemp = RatedInletWaterTempHeat;
+        // should be plant supply node temperature
+    } break;
+    case DataHVACGlobals::CoilDX_HeatPumpWaterHeaterVariableSpeed: {
+        // RatedSourceTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).WHRatedInletWaterTemp;
+        RatedSourceTemp = RatedInletWaterTempHeat;
+        // should be HPWH tank node set point temperature
+    } break;
+    case DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed: {
+        if (this->curZoneEqNum > 0) {
+            // should be outdoor temp at zone peak
+            int TimeStepNumAtMax = this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax;
+            int DDNum = this->finalZoneSizing(this->curZoneEqNum).CoolDDNum;
+            if (DDNum > 0 && TimeStepNumAtMax > 0) {
+                RatedSourceTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+            }
+        } else if (this->curSysNum > 0) {
+            // should be outdoor temp at system peak
+            RatedSourceTemp = state.dataSize->FinalSysSizing(this->curSysNum).OutTempAtCoolPeak;
+        }
+        RatedSourceTemp = RatedAmbAirTemp; // overwrite for time being until this gets fixed
+    } break;
+    case DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed: {
+        if (this->curZoneEqNum > 0) {
+            // should be outdoor temp at zone peak
+            int TimeStepNumAtMax = this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax;
+            int DDNum = this->finalZoneSizing(this->curZoneEqNum).HeatDDNum;
+            if (DDNum > 0 && TimeStepNumAtMax > 0) {
+                RatedSourceTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+            }
+            RatedSourceTemp = state.dataSize->FinalZoneSizing(this->curZoneEqNum).OutTempAtHeatPeak;
+        } else if (this->curSysNum > 0) {
+            // should be outdoor temp at system peak
+            RatedSourceTemp = state.dataSize->FinalSysSizing(this->curSysNum).HeatOutTemp;
+        }
+        RatedSourceTemp = RatedAmbAirTempHeat; // overwrite for time being until this gets fixed
+    } break;
+    default: {
+        if (this->curZoneEqNum > 0) {
+            int TimeStepNumAtMax = this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax;
+            int DDNum = this->finalZoneSizing(this->curZoneEqNum).HeatDDNum;
+            if (DDNum > 0 && TimeStepNumAtMax > 0) {
+                RatedSourceTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+            }
+            RatedSourceTemp = state.dataSize->FinalZoneSizing(this->curZoneEqNum).OutTempAtHeatPeak;
+        } else if (this->curSysNum > 0) {
+            RatedSourceTemp = state.dataSize->FinalSysSizing(this->curSysNum).HeatOutTemp;
+        }
+    } break;
+    }
+    return RatedSourceTemp;
 }
 
 void BaseSizerWithScalableInputs::setHVACSizingIndexData(int const index)
