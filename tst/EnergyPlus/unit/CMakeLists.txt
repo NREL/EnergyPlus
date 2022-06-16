@@ -22,9 +22,9 @@ set(test_src
     AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
     AirTerminalSingleDuctMixer.unit.cc
     AirTerminalSingleDuctPIUReheat.unit.cc
-    AirflowNetworkBalanceManager.unit.cc
-    AirflowNetworkSimulationControl.unit.cc
-    AirflowNetworkSolver.unit.cc
+    AirflowNetworkHVAC.unit.cc
+    AirflowNetworkConditions.unit.cc
+    AirflowNetworkComponents.unit.cc
     Autosizing/All_Simple_Sizing.unit.cc
     Autosizing/AutosizingFixture.hh
     Autosizing/BaseClassSizing.unit.cc
