@@ -681,7 +681,7 @@ namespace DataSurfaces {
         Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
 
         // Boundary conditions and interconnections
-        bool HeatTransSurf;                      // True if surface is a heat transfer surface,
+        bool HeatTransSurf;                      // True if surface is a heat transfer surface (light shelf can also be IsShadowing)
         int OutsideHeatSourceTermSchedule;       // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
         int InsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
                                                  // False if a (detached) shadowing (sub)surface
@@ -713,7 +713,7 @@ namespace DataSurfaces {
         int OSCPtr;             // Pointer to OSC data structure
         int OSCMPtr;            // "Pointer" to OSCM data structure (other side conditions from a model)
         bool MirroredSurf;      // True if it is a mirrored surface
-        bool IsShadowing;       // True if a surface is a shadowing surface
+        bool IsShadowing;       // True if a surface is a shadowing surface (light shelf can also be HeatTransSurf)
         bool IsShadowPossibleObstruction; // True if a surface can be an exterior obstruction
 
         // Optional parameters specific to shadowing surfaces and subsurfaces (detached shading, overhangs, wings, etc.)
@@ -1421,12 +1421,17 @@ struct SurfacesData : BaseGlobalStruct
         RepresentativeSurfaceMap; // A map that categorizes similar surfaces with
                                   // a single representative surface index
 
-    std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
-    std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
-    std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
-    std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
-    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
-    std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
+    std::vector<int> AllHTSurfaceList;                 // List of all heat transfer surfaces
+    std::vector<int> AllExtSolarSurfaceList;           // List of all exterior solar surfaces, all are heat transfer surfaces
+    std::vector<int> AllExtSolAndShadingSurfaceList;   // List of all exterior solar surfaces plus all shading surfaces
+    std::vector<int> AllShadowPossObstrSurfaceList;    // List of all IsShadoPossibleObstuction surfaces
+    std::vector<int> AllIZSurfaceList;                 // List of all interzone heat transfer surfaces
+    std::vector<int> AllHTNonWindowSurfaceList;        // List of all non-window heat transfer surfaces
+    std::vector<int> AllHTWindowSurfaceList;           // List of all window surfaces
+    std::vector<int> AllExtSolWindowSurfaceList;       // List of all exterior solar window surfaces
+    std::vector<int> AllExtSolWinWithFrameSurfaceList; // List of all exterior solar window surfaces with a frame and divider
+    std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva foundation surfaces
+    std::vector<int> AllSurfaceListReportOrder;        // List of all surfaces - output reporting order
 
     // Surface HB arrays
     Array1D<Real64> SurfOutDryBulbTemp; // Surface outside dry bulb air temperature, for surface heat balance (C)
@@ -1821,9 +1826,14 @@ struct SurfacesData : BaseGlobalStruct
         this->Z0.deallocate();
         this->RepresentativeSurfaceMap.clear();
         this->AllHTSurfaceList.clear();
+        this->AllExtSolarSurfaceList.clear();
+        this->AllExtSolAndShadingSurfaceList.clear();
+        this->AllShadowPossObstrSurfaceList.clear();
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
+        this->AllExtSolWindowSurfaceList.clear();
+        this->AllExtSolWinWithFrameSurfaceList.clear();
         this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
 
