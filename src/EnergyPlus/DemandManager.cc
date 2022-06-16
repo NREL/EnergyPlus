@@ -83,6 +83,8 @@ namespace EnergyPlus::DemandManager {
 // times through ManageDemand before the final demand managers are established and the timestep can be
 // completed.
 
+constexpr std::array<std::string_view, static_cast<int>(ManagerType::Num)> ManagerNamesUC{
+    "DEMANDMANAGER:EXTERIORLIGHTS", "DEMANDMANAGER:LIGHTS", "DEMANDMANAGER:ELECTRICEQUIPMENT", "DEMANDMANAGER:THERMOSTATS", "DEMANDMANAGER:VENTILATION"};
 constexpr std::array<std::string_view, static_cast<int>(ManagePriorityType::Num)> ManagePriorityNamesUC{"SEQUENTIAL", "OPTIMAL", "ALL"};
 constexpr std::array<std::string_view, static_cast<int>(ManagerLimit::Num)> ManagerLimitNamesUC{"OFF", "FIXED", "VARIABLE", "REDUCTIONRATIO"};
 constexpr std::array<std::string_view, static_cast<int>(ManagerLimit::Num)> ManagerLimitVentNamesUC{"OFF", "FIXEDRATE", "VARIABLE", "REDUCTIONRATIO"};
@@ -330,7 +332,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ListNum;
-    int MgrNum;
     int NumAlphas;            // Number of elements in the alpha array
     int NumNums;              // Number of elements in the numeric array
     int IOStat;               // IO Status when calling get input subroutine
@@ -468,13 +469,13 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             if (thisDemandManagerList.NumOfManager > 0) {
                 thisDemandManagerList.Manager.allocate(thisDemandManagerList.NumOfManager);
 
-                for (MgrNum = 1; MgrNum <= thisDemandManagerList.NumOfManager; ++MgrNum) {
+                for (int MgrNum = 1; MgrNum <= thisDemandManagerList.NumOfManager; ++MgrNum) {
 
                     // Validate DEMAND MANAGER Type
+                    thisDemandManagerList.MgrType =
+                        static_cast<ManagerType>(getEnumerationValue(ManagerNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(MgrNum * 2 + 5))));
 
-                    if ((AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:LIGHTS") || (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:EXTERIORLIGHTS") ||
-                        (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:ELECTRICEQUIPMENT") ||
-                        (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:THERMOSTATS") || (AlphArray(MgrNum * 2 + 5) == "DEMANDMANAGER:VENTILATION")) {
+                    if (thisDemandManagerList.MgrType != ManagerType::Invalid) {
 
                         thisDemandManagerList.Manager(MgrNum) = UtilityRoutines::FindItemInList(AlphArray(MgrNum * 2 + 6), DemandMgr);
 
