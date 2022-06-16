@@ -51,7 +51,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-
 #include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
@@ -86,9 +85,9 @@
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 namespace EnergyPlus {
 
