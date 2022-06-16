@@ -782,7 +782,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
-    state->dataSize->FinalZoneSizing(1).OutTempAtCoolPeak = 35.0;
+
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
     state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
@@ -1273,7 +1273,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
 
     // overwrite outdoor weather temp to variable speed coil rated water temp until this gets fixed
     state->dataSize->DesDayWeath(1).Temp(1) = 29.4;
-    state->dataSize->FinalZoneSizing(1).OutTempAtCoolPeak = 29.4;
 
     // test #6274 where coil inlet air flow rate was non-zero prior to sizing
     // this simulates another UnitarySystem upstream of this UnitarySystem that ran before this system coil was sized (and placed a non-zero air flow
