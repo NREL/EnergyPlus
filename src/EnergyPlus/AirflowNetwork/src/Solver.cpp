@@ -9333,12 +9333,13 @@ namespace AirflowNetwork {
             if (m_state.dataHeatBal->ZonePreDefRep(i).isOccupied) {
                 m_state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += stdDensAFNNatVentVolume;
                 m_state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += stdDensAFNInfilVolume;
-                m_state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc +=
-                    (AirflowNetworkZnRpt(i).InfilVolume + AirflowNetworkZnRpt(i).VentilVolume) * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                if ((AirflowNetworkZnRpt(i).InfilVolume + AirflowNetworkZnRpt(i).VentilVolume) <
-                    m_state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin) {
-                    m_state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin =
-                        (AirflowNetworkZnRpt(i).InfilVolume + AirflowNetworkZnRpt(i).VentilVolume) * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                m_state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc += AirflowNetworkZnRpt(i).InfilVolume;
+                m_state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOcc += AirflowNetworkZnRpt(i).VentilVolume;
+                if ((AirflowNetworkZnRpt(i).InfilVolume) < m_state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin) {
+                    m_state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin = AirflowNetworkZnRpt(i).InfilVolume;
+                }
+                if ((AirflowNetworkZnRpt(i).VentilVolume) < m_state.dataHeatBal->ZonePreDefRep(i).AFNVentVolMin) {
+                    m_state.dataHeatBal->ZonePreDefRep(i).AFNVentVolMin = AirflowNetworkZnRpt(i).VentilVolume;
                 }
             }
 

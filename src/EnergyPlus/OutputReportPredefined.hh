@@ -697,7 +697,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchOaoAvgInfil = 0;
     int pdchOaoAvgAFNInfil = 0;
     int pdchOaoAvgSimpVent = 0;
-    int pdchOaoAvgTotVent = 0;
+    int pdchOaoAvgAFNVent = 0;
     int pdstOAminOcc = 0;
     int pdchOaoAvgNumOcc2 = 0;
     int pdchOaoNomNumOcc2 = 0;
@@ -706,7 +706,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchOaoMinInfil = 0;
     int pdchOaoMinAFNInfil = 0;
     int pdchOaoMinSimpVent = 0;
-    int pdchOaoMinTotVent = 0;
+    int pdchOaoMinAFNVent = 0;
 
     // Outdoor Air Details Report
     int pdrOutsideAirDetails = 0;
@@ -1666,7 +1666,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchOaoAvgInfil = 0;
         this->pdchOaoAvgAFNInfil = 0;
         this->pdchOaoAvgSimpVent = 0;
-        this->pdchOaoAvgTotVent = 0;
+        this->pdchOaoAvgAFNVent = 0;
         this->pdstOAminOcc = 0;
         this->pdchOaoAvgNumOcc2 = 0;
         this->pdchOaoNomNumOcc2 = 0;
@@ -1675,7 +1675,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchOaoMinInfil = 0;
         this->pdchOaoMinAFNInfil = 0;
         this->pdchOaoMinSimpVent = 0;
-        this->pdchOaoMinTotVent = 0;
+        this->pdchOaoMinAFNVent = 0;
 
         this->pdrOutsideAirDetails = 0;
         this->pdstOAmechVentParByZone = 0;

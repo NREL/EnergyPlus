@@ -710,8 +710,7 @@ namespace OutputReportPredefined {
         s->pdchOaoAvgInfil = newPreDefColumn(state, s->pdstOAavgOcc, "Infiltration [ach]");
         s->pdchOaoAvgAFNInfil = newPreDefColumn(state, s->pdstOAavgOcc, "AFN Infiltration [ach]");
         s->pdchOaoAvgSimpVent = newPreDefColumn(state, s->pdstOAavgOcc, "Simple Ventilation [ach]");
-        // s->pdchOaoAvgTotVent =   newPreDefColumn(state, s->pdstOAavgOcc,'Total Ventilation [ach]')
-
+        s->pdchOaoAvgAFNVent = newPreDefColumn(state, s->pdstOAavgOcc, "AFN Ventilation [ach]");
         addFootNoteSubTable(state, s->pdstOAavgOcc, "Values shown for a single zone without multipliers");
 
         s->pdstOAminOcc = newPreDefSubTable(state, s->pdrOutsideAir, "Minimum Outdoor Air During Occupied Hours");
@@ -723,7 +722,7 @@ namespace OutputReportPredefined {
         s->pdchOaoMinInfil = newPreDefColumn(state, s->pdstOAminOcc, "Infiltration [ach]");
         s->pdchOaoMinAFNInfil = newPreDefColumn(state, s->pdstOAminOcc, "AFN Infiltration [ach]");
         s->pdchOaoMinSimpVent = newPreDefColumn(state, s->pdstOAminOcc, "Simple Ventilation [ach]");
-        // s->pdchOaoMinTotVent =   newPreDefColumn(state, s->pdstOAminOcc,'Total Ventilation [ach]')
+        s->pdchOaoMinAFNVent = newPreDefColumn(state, s->pdstOAminOcc, "AFN Ventilation [ach]");
         addFootNoteSubTable(state, s->pdstOAminOcc, "Values shown for a single zone without multipliers");
 
         // Outdoor Air Details Report
