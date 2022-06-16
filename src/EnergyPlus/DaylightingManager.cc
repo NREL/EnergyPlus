@@ -3003,11 +3003,9 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
             hitObs = false;
             if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-                for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                    if (state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) {
-                        PierceSurface(state, ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
-                        if (hitObs) break;
-                    }
+                for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
+                    PierceSurface(state, ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
+                    if (hitObs) break;
                 }
 
             } else { // Surface octree search
@@ -3374,8 +3372,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         if (state.dataSurface->CalcSolRefl) { // Coordinates of ground point hit by the ray
                             // Sun reaches ground point if vector from this point to the sun is unobstructed
                             hitObs = false;
-                            for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+                            for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                                 PierceSurface(state, ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt, hitObs);
                                 if (hitObs) break;
                             }
@@ -3650,8 +3647,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 }
                             } else {
                                 // Reflecting surface is a building shade
-                                for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                    if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+                                for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                                     if (ObsSurfNum == ReflSurfNum) continue;
                                     PierceSurface(state, ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs);
                                     if (hitObs) break;
@@ -5735,9 +5731,8 @@ void DayltgHitObstruction(EnergyPlusData &state,
     // A shadowing surface is opaque unless its transmittance schedule value is non-zero
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-        for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
+        for (int ISurf : state.dataSurface->AllShadowPossObstrSurfaceList) {
             auto const &surface(state.dataSurface->Surface(ISurf));
-            if (!surface.IsShadowPossibleObstruction) continue;
             IType = surface.Class;
             if ((IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf)) {
                 PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
@@ -5986,15 +5981,9 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
     // For daylit zones, calculate interior daylight illuminance at reference points and
     // simulate lighting control system to get overhead electric lighting reduction
     // factor due to daylighting.
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-            if (state.dataSurface->Surface(SurfNum).ExtSolar) {
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-            }
-        }
+    for (int SurfNum : state.dataSurface->AllExtSolWindowSurfaceList) {
+        state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
+        state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
     }
 
     // Reset space power reduction factors
@@ -7688,7 +7677,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 Alfa;               // Direction angles for ray heading towards the ground (radians)
     Real64 Beta;
     Real64 HorDis;        // Distance between ground hit point and proj'n of window center onto ground (m)
-    int ObsSurfNum;       // Obstruction surface number
     bool hitObs;          // True iff obstruction is hit
     Real64 ObsVisRefl;    // Visible reflectance of obstruction
     Real64 SkyReflVisLum; // Reflected sky luminance at hit point divided by unobstructed sky
@@ -7874,8 +7862,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6) {
                     // Sun reaches ground point if vector from this point to the sun is unobstructed
                     hitObs = false;
-                    for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                        if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+                    for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                         PierceSurface(state, ObsSurfNum, DayltgInterReflectedIllumGroundHitPt, SUNCOS_IHR, DayltgInterReflectedIllumObsHitPt, hitObs);
                         if (hitObs) break;
                     }
@@ -8524,7 +8511,6 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
     Real64 ObstrTrans;         // product of all surface transmittances intersecting incoming beam
 
     Real64 BeamObstrMultiplier; // beam obstruction multiplier in case incoming beam is from the ground
-    int ObsSurfNum;             // Obstruction surface number
     bool hitObs;                // True iff obstruction is hit
     auto &ComplexFenestrationLuminancesObsHitPt =
         state.dataDaylightingManager->ComplexFenestrationLuminancesObsHitPt; // Coordinates of hit point on an obstruction (m)
@@ -8638,8 +8624,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
         if (state.dataSurface->CalcSolRefl) {
             // Sun reaches ground point if vector from this point to the sun is unobstructed
             hitObs = false;
-            for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+            for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                 if (CalledFrom == DataDaylighting::CalledFor::RefPoint) {
                     ComplexFenestrationLuminancesGroundHitPt(1) =
                         state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).x;
@@ -9242,29 +9227,27 @@ void DayltgClosestObstruction(EnergyPlusData &state,
     NearestHitPt = 0.0;
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-        for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-            if (state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) {
-                // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
-                PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt, hit);
-                if (hit) { // Ray pierces surface
-                    // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
-                    // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-                    if ((state.dataSurface->Surface(ObsSurfNum).Class == SurfaceClass::Window) &&
-                        (state.dataSurface->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+        for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
+            // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
+            PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt, hit);
+            if (hit) { // Ray pierces surface
+                // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
+                // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
+                if ((state.dataSurface->Surface(ObsSurfNum).Class == SurfaceClass::Window) &&
+                    (state.dataSurface->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+                    NearestHitSurfNum = ObsSurfNum;
+                } else {
+                    // Distance squared from receiving point to hit point
+                    Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
+                    // Reset NearestHitSurfNum and NearestHitDistance_sq if this hit point is closer than previous closest
+                    if (HitDistance_sq < NearestHitDistance_sq) {
+                        NearestHitDistance_sq = HitDistance_sq;
                         NearestHitSurfNum = ObsSurfNum;
-                    } else {
-                        // Distance squared from receiving point to hit point
-                        Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
-                        // Reset NearestHitSurfNum and NearestHitDistance_sq if this hit point is closer than previous closest
-                        if (HitDistance_sq < NearestHitDistance_sq) {
-                            NearestHitDistance_sq = HitDistance_sq;
-                            NearestHitSurfNum = ObsSurfNum;
-                            NearestHitPt = HitPt;
-                        }
+                        NearestHitPt = HitPt;
                     }
-                } // End of check if obstruction was hit
-            }
-        } // End of loop over possible obstructions for this ray
+                }
+            } // End of check if obstruction was hit
+        }     // End of loop over possible obstructions for this ray
 
     } else { // Surface octree search
 
@@ -9335,7 +9318,6 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &DayltgSurfaceLumFromSunReflNorm = state.dataDaylightingManager->DayltgSurfaceLumFromSunReflNorm; // Unit normal to reflecting surface (m)
     auto &DayltgSurfaceLumFromSunObsHitPt = state.dataDaylightingManager->DayltgSurfaceLumFromSunObsHitPt; // Hit point on obstruction (m)
-    int ObsSurfNum;                                                                                        // Obstruction surface number
     bool hitObs;                                                                                           // True iff obstruction is hit
     Real64 CosIncAngAtHitPt; // Cosine of angle of incidence of sun at HitPt
     Real64 DiffVisRefl;      // Diffuse visible reflectance of ReflSurfNum
@@ -9357,8 +9339,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     if (CosIncAngAtHitPt <= 0.0) return; // Sun is in back of reflecting surface
     // Sun reaches ReflHitPt if vector from ReflHitPt to sun is unobstructed
     hitObs = false;
-    for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-        if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+    for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
         // Exclude as a possible obstructor ReflSurfNum and its base surface (if it has one)
         if (ObsSurfNum == ReflSurfNum || ObsSurfNum == state.dataSurface->Surface(ReflSurfNum).BaseSurf) continue;
         PierceSurface(state, ObsSurfNum, ReflHitPt, SUNCOS_IHR, DayltgSurfaceLumFromSunObsHitPt, hitObs);

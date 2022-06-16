@@ -7909,15 +7909,15 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofWestRoof, 38);
     EXPECT_EQ(nonwindowTubularDaylightingDome1, 40);
     EXPECT_EQ(windowAtticSkylight, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, 27);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, 40);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceFirst, 27);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceLast, 38);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrWinSurfaceLast, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeFirst, 40);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeLast, 40);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceLast, roofWestRoof);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrWinSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeFirst, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeLast, nonwindowTubularDaylightingDome1);
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:
@@ -7967,6 +7967,102 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofEastRoof, state->dataSurface->AllSurfaceListReportOrder[37]);
     EXPECT_EQ(windowAtticSkylight, state->dataSurface->AllSurfaceListReportOrder[38]);
     EXPECT_EQ(roofWestRoof, state->dataSurface->AllSurfaceListReportOrder[39]);
+
+    // Extend test to check other surface lists
+    auto &HTSurfaces = state->dataSurface->AllHTSurfaceList;
+    auto &ExtSolarSurfaces = state->dataSurface->AllExtSolarSurfaceList;
+    auto &ExtSolAndShadingSurfaces = state->dataSurface->AllExtSolAndShadingSurfaceList;
+    auto &ShadowPossObstrSurfaces = state->dataSurface->AllShadowPossObstrSurfaceList;
+    auto &IZSurfaces = state->dataSurface->AllIZSurfaceList;
+    auto &HTNonWindowSurfaces = state->dataSurface->AllHTNonWindowSurfaceList;
+    auto &HTWindowSurfaces = state->dataSurface->AllHTWindowSurfaceList;
+    auto &ExtSolWindowSurfaces = state->dataSurface->AllExtSolWindowSurfaceList;
+    auto &ExtSolWinWithFrameSurfaces = state->dataSurface->AllExtSolWinWithFrameSurfaceList;
+    auto &HTKivaSurfaces = state->dataSurface->AllHTKivaSurfaceList;
+
+    int thisSurface = siteShadeShadeFlatShadeSurface;
+    EXPECT_FALSE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_FALSE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = wallEastGable;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = doorWestDoor;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = wallGarageInterior;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_TRUE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = windowSouthWindow;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_FALSE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_TRUE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = windowTubularDaylightingDiffuser1;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_FALSE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_TRUE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = nonwindowTubularDaylightingDome1;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
 }
 
 TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
