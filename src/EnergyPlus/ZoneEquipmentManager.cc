@@ -55,7 +55,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
@@ -3060,8 +3060,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             switch (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum)) {
             case DataZoneEquipment::AirLoopHVACZone::Splitter: { // 'AirLoopHVAC:ZoneSplitter'
 
-                if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                      state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                if (!(state.afn->AirflowNetworkFanActivated && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                     SimAirLoopSplitter(state,
                                        state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                        FirstHVACIteration,
@@ -3591,8 +3590,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         for (CompNum = state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).NumOfComponents; CompNum >= 1; --CompNum) {
             switch (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum)) {
             case DataZoneEquipment::AirLoopHVACZone::Splitter: { // 'AirLoopHVAC:ZoneSplitter'
-                if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                      state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                if (!(state.afn->AirflowNetworkFanActivated && state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
                     SimAirLoopSplitter(state,
                                        state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                        FirstHVACIteration,
@@ -4108,11 +4106,6 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
     //       DATE WRITTEN   Unknown
     //       MODIFIED       B. Griffith Sept 2011, add storage of requirements by sequence
 
-    using DataHVACGlobals::DualSetPointWithDeadBand;
-    using DataHVACGlobals::SingleCoolingSetPoint;
-    using DataHVACGlobals::SingleHeatCoolSetPoint;
-    using DataHVACGlobals::SingleHeatingSetPoint;
-
     int ctrlZoneNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
     auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
@@ -4135,35 +4128,41 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
         moisture.RemainingOutputReqToDehumidSP = moisture.UnadjRemainingOutputReqToDehumidSP;
 
         // re-evaluate if loads are now such that in dead band or set back
-        {
-            auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
-            if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
+        switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
+        case DataHVACGlobals::ThermostatType::Uncontrolled:
+            // uncontrolled zone; shouldn't ever get here, but who knows
+            state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            break;
+        case DataHVACGlobals::ThermostatType::SingleHeating:
+            if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-            } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
-                if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
             }
+            break;
+        case DataHVACGlobals::ThermostatType::SingleCooling:
+            if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            }
+            break;
+        case DataHVACGlobals::ThermostatType::SingleHeatCool:
+            if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            }
+            break;
+        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
+            if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            }
+            break;
+        default:
+            break;
         }
 
         if (present(EquipPriorityNum)) {
@@ -4238,35 +4237,41 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
         }
 
         // re-evaluate if loads are now such that in dead band or set back
-        {
-            auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
-            if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
+        switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
+        case DataHVACGlobals::ThermostatType::Uncontrolled:
+            // uncontrolled zone; shouldn't ever get here, but who knows
+            state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            break;
+        case DataHVACGlobals::ThermostatType::SingleHeating:
+            if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
                 state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-            } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
-                if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
-            } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
-                } else {
-                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
-                }
             }
+            break;
+        case DataHVACGlobals::ThermostatType::SingleCooling:
+            if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            }
+            break;
+        case DataHVACGlobals::ThermostatType::SingleHeatCool:
+            if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            }
+            break;
+        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
+            if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
+            } else {
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
+            }
+            break;
+        default:
+            break;
         }
 
     } break;
@@ -4436,7 +4441,7 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
 
             for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
 
-                if (state.dataAirflowNetwork->AirflowNetworkNumOfExhFan == 0) {
+                if (state.afn->AirflowNetworkNumOfExhFan == 0) {
                     state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate +=
                         Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
                 }
@@ -5307,10 +5312,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     state.dataHeatBalFanSys->MCPTThermChim = 0.0;
     MassFlowRate = 0.0;
 
-    if (state.dataHeatBal->AirFlowFlag != UseSimpleAirFlow) return;
+    if (!state.dataHeatBal->AirFlowFlag) return;
     // AirflowNetwork Multizone field /= SIMPLE
-    if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
-          state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS)) {
+    if (!(state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
+          state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS)) {
         return;
     }
 
@@ -5513,14 +5518,14 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced)
                     state.dataHeatBal->Ventilation(j).FanPower *= 2.0;
                 // calc electric
-                if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+                if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                     // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
                     if (!state.dataGlobal->KickOffSimulation) {
                         if (!(state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
-                            !state.dataAirflowNetwork->AirflowNetworkZoneFlag(NZ))
+                            !state.afn->AirflowNetworkZoneFlag(NZ))
                             state.dataHeatBal->ZnAirRpt(NZ).VentilFanElec +=
                                 state.dataHeatBal->Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
-                    } else if (!state.dataAirflowNetwork->AirflowNetworkZoneFlag(NZ)) {
+                    } else if (!state.afn->AirflowNetworkZoneFlag(NZ)) {
                         state.dataHeatBal->ZnAirRpt(NZ).VentilFanElec +=
                             state.dataHeatBal->Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                     }
@@ -6362,7 +6367,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
 
     int ZoneSizIndex;
     bool ErrorsFound;
-
+    bool headerAlreadyPrinted = false;
     ErrorsFound = false;
     for (ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         if (state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS) {
@@ -6384,7 +6389,8 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName,
                                            "NeutralSupplyAir",
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
-                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
+                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint,
+                                           headerAlreadyPrinted);
             } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy == DOANeutralDehumSup) {
                 if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint == AutoSize &&
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
@@ -6401,7 +6407,8 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName,
                                            "NeutralDehumidifiedSupplyAir",
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
-                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
+                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint,
+                                           headerAlreadyPrinted);
             } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy == DOACoolSup) {
                 if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint == AutoSize &&
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
@@ -6420,7 +6427,8 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName,
                                            "ColdSupplyAir",
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
-                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
+                                           state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint,
+                                           headerAlreadyPrinted);
             }
             if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint) {
                 ShowSevereError(state, "For Sizing:Zone = " + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName);
@@ -6438,8 +6446,8 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
                                 std::string const &ZoneName,         // the name of the zone
                                 std::string const &DOASCtrlStrategy, // DOAS control strategy
                                 Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
-                                Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
-)
+                                Real64 const DOASHighTemp,           // DOAS design high setpoint temperature [C]
+                                bool &headerAlreadyPrinted)
 {
 
     // SUBROUTINE INFORMATION:
@@ -6458,9 +6466,9 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
         "! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
         "{C}, DOAS Design High Setpoint Temperature {C} ");
 
-    if (state.dataZoneEquipmentManager->reportDOASZoneSizingHeader) {
+    if (!headerAlreadyPrinted) {
         print(state.files.eio, "{}\n", Format_990);
-        state.dataZoneEquipmentManager->reportDOASZoneSizingHeader = false;
+        headerAlreadyPrinted = true;
     }
 
     static constexpr std::string_view Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");

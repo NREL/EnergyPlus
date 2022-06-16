@@ -8179,6 +8179,7 @@ namespace SurfaceGeometry {
                 // N1: sky view factor
                 if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
                     state.dataSurface->SurroundingSurfsProperty(Loop).SkyViewFactor = state.dataIPShortCut->rNumericArgs(1);
+                    state.dataSurface->SurroundingSurfsProperty(Loop).IsSkyViewFactorSet = true;
                 }
 
                 // A2: sky temp sch name
@@ -8189,6 +8190,7 @@ namespace SurfaceGeometry {
                 // N2: ground view factor
                 if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
                     state.dataSurface->SurroundingSurfsProperty(Loop).GroundViewFactor = state.dataIPShortCut->rNumericArgs(2);
+                    state.dataSurface->SurroundingSurfsProperty(Loop).IsGroundViewFactorSet = true;
                 }
 
                 // A3: ground temp sch name
@@ -10287,85 +10289,63 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
 
+            enum Month
             {
-                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOn);
+                January = 1,
+                February,
+                March,
+                April,
+                May,
+                June,
+                July,
+                August,
+                September,
+                October,
+                November,
+                December
+            };
+            constexpr std::array<int, 13> oneBasedDaysInMonth = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 31) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 30) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 29) {
-                        ShowSevereError(state,
-                                        format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else {
+            int const monthOn = state.dataSurface->StormWindow(StormWinNum).MonthOn;
+            if (monthOn >= January && monthOn <= December) {
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn >
+                    oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOn]) {
                     ShowSevereError(state,
-                                    format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                    format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->StormWindow(StormWinNum).MonthOn,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
+                break;
+            } else {
+                ShowSevereError(state,
+                                format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                       cCurrentModuleObject,
+                                       state.dataSurface->StormWindow(StormWinNum).MonthOn,
+                                       StormWinNum));
+                ErrorsFound = true;
             }
-            {
-                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOff);
 
-                if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
-                    (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 31) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 30) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == 2) {
-                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 29) {
-                        ShowSevereError(state,
-                                        format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
-                                               cCurrentModuleObject,
-                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
-                                               StormWinNum));
-                        ErrorsFound = true;
-                    }
-                } else {
+            int const monthOff = state.dataSurface->StormWindow(StormWinNum).MonthOff;
+            if (monthOff >= January && monthOff <= December) {
+                if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff >
+                    oneBasedDaysInMonth[state.dataSurface->StormWindow(StormWinNum).MonthOff]) {
                     ShowSevereError(state,
-                                    format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                    format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           state.dataSurface->StormWindow(StormWinNum).MonthOff,
+                                           state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
+                break;
+            } else {
+                ShowSevereError(state,
+                                format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
+                                       cCurrentModuleObject,
+                                       state.dataSurface->StormWindow(StormWinNum).MonthOff,
+                                       StormWinNum));
+                ErrorsFound = true;
             }
         }
 
@@ -11691,7 +11671,16 @@ namespace SurfaceGeometry {
         int SurfNum;
         int MaterNum;
         int SchNum;
-        int InslType;
+
+        enum class InsulationType
+        {
+            Invalid = -1,
+            Outside,
+            Inside,
+            Num
+        };
+        constexpr std::array<std::string_view, static_cast<int>(InsulationType::Num)> insulationTypeNamesUC = {"OUTSIDE", "INSIDE"};
+
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceControl:MovableInsulation";
         NMatInsul = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -11713,12 +11702,9 @@ namespace SurfaceGeometry {
             MaterNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "Outside")) {
-                InslType = 1;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "Inside")) {
-                InslType = 2;
-            } else {
-                InslType = 0;
+            InsulationType insulationType =
+                static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
+            if (insulationType == InsulationType::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(2) + "\", invalid data.");
@@ -11790,8 +11776,8 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     } else {
                         {
-                            auto const SELECT_CASE_var(InslType);
-                            if (SELECT_CASE_var == 1) {
+                            switch (insulationType) {
+                            case InsulationType::Outside:
                                 if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0) {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -11837,7 +11823,8 @@ namespace SurfaceGeometry {
                                         ErrorsFound = true;
                                     }
                                 }
-                            } else if (SELECT_CASE_var == 2) {
+                                break;
+                            case InsulationType::Inside:
                                 if (state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -11870,7 +11857,9 @@ namespace SurfaceGeometry {
                                             state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
                                     }
                                 }
-                            } else {
+                                break;
+                            default:
+                                assert(false);
                             }
                         }
                         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
@@ -12068,11 +12057,25 @@ namespace SurfaceGeometry {
                     default:
                         assert(false);
                     }
-                    for (auto edge : listOfedgeNotUsedTwice) {
-                        ShowContinueError(
-                            state,
-                            "  The surface    \"" + state.dataSurface->Surface(edge.surfNum).Name +
-                                "\" has an edge that is either not an edge on another surface or is an edge on three or more surfaces: ");
+                    for (auto &edge : listOfedgeNotUsedTwice) {
+                        if (edge.count < 2) {
+                            ShowContinueError(
+                                state,
+                                fmt::format("  The surface \"{}\" has an edge that was used only once: it is not an edge on another surface",
+                                            state.dataSurface->Surface(edge.surfNum).Name));
+
+                        } else {
+                            ShowContinueError(
+                                state,
+                                fmt::format("  The surface \"{}\" has an edge that was used {} times: it is an edge on three or more surfaces: ",
+                                            state.dataSurface->Surface(edge.surfNum).Name,
+                                            edge.count));
+                            std::string surfaceNames = "    It was found on the following Surfaces: ";
+                            for (int surfNum : edge.otherSurfNums) {
+                                surfaceNames += fmt::format("'{}' ", state.dataSurface->Surface(surfNum).Name);
+                            }
+                            ShowContinueError(state, surfaceNames);
+                        }
                         ShowContinueError(state, format("    Vertex start {{ {:.4R}, {:.4R}, {:.4R}}}", edge.start.x, edge.start.y, edge.start.z));
                         ShowContinueError(state, format("    Vertex end   {{ {:.4R}, {:.4R}, {:.4R}}}", edge.end.x, edge.end.y, edge.end.z));
                     }
@@ -12195,13 +12198,11 @@ namespace SurfaceGeometry {
     {
         // J. Glazer - March 2017
 
-        std::vector<Vector> uniqueVertices;
-        makeListOfUniqueVertices(zonePoly, uniqueVertices);
+        std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
         std::vector<EdgeOfSurf> edgeNot2orig = edgesNotTwoForEnclosedVolumeTest(zonePoly, uniqueVertices);
-
         // if all edges had two counts then it is fully enclosed
-        if (edgeNot2orig.size() == size_t(0)) {
+        if (edgeNot2orig.empty()) {
             edgeNot2 = edgeNot2orig;
             return true;
         } else { // if the count is three or greater it is likely that a vertex that is colinear was counted on the faces on one edge and not
@@ -12210,7 +12211,7 @@ namespace SurfaceGeometry {
             DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints(
                 zonePoly, uniqueVertices); // this is done after initial test since it is computationally intensive.
             std::vector<EdgeOfSurf> edgeNot2again = edgesNotTwoForEnclosedVolumeTest(updatedZonePoly, uniqueVertices);
-            if (edgeNot2again.size() == size_t(0)) {
+            if (edgeNot2again.empty()) {
                 return true;
             } else {
                 edgeNot2 = edgesInBoth(edgeNot2orig,
@@ -12229,8 +12230,8 @@ namespace SurfaceGeometry {
         // this is not optimized but the number of edges for a typical polyhedron is 12 and is probably rarely bigger than 20.
 
         std::vector<EdgeOfSurf> inBoth;
-        for (auto e1 : edges1) {
-            for (auto e2 : edges2) {
+        for (const auto &e1 : edges1) {
+            for (const auto &e2 : edges2) {
                 if (edgesEqualOnSameSurface(e1, e2)) {
                     inBoth.push_back(e1);
                     break;
@@ -12243,17 +12244,12 @@ namespace SurfaceGeometry {
     // returns true if the edges match - including the surface number
     bool edgesEqualOnSameSurface(EdgeOfSurf a, EdgeOfSurf b)
     {
-        if (a.surfNum == b.surfNum) {
-            if (a.start == b.start && a.end == b.end) { // vertex comparison
-                return true;
-            } else if (a.start == b.end && a.end == b.start) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+        if (a.surfNum != b.surfNum) {
             return false;
         }
+
+        // vertex comparison (we compare indices, so absolute equal)
+        return ((a.start == b.start && a.end == b.end) || (a.start == b.end && a.end == b.start));
     }
 
     // returns the number of times the edges of the polyhedron of the zone are not used twice by the sides
@@ -12269,6 +12265,7 @@ namespace SurfaceGeometry {
             int end;
             int count;
             int firstSurfNum;
+            std::vector<int> otherSurfNums;
             EdgeByPts() : start(0), end(0), count(0), firstSurfNum(0)
             {
             }
@@ -12291,16 +12288,12 @@ namespace SurfaceGeometry {
                     prevVertexIndex = curVertexIndex;
                 }
                 curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
-                curVertexIndex = findIndexOfVertex(curVertex, uniqueVertices);
-                int found = -1;
-                for (std::size_t i = 0; i < uniqueEdges.size(); i++) {
-                    if ((uniqueEdges[i].start == curVertexIndex && uniqueEdges[i].end == prevVertexIndex) ||
-                        (uniqueEdges[i].start == prevVertexIndex && uniqueEdges[i].end == curVertexIndex)) {
-                        found = i;
-                        break;
-                    }
-                }
-                if (found == -1) {
+                curVertexIndex = findIndexOfVertex(curVertex, uniqueVertices); // uses isAlmostEqual3dPt
+                auto it = std::find_if(uniqueEdges.begin(), uniqueEdges.end(), [&curVertexIndex, &prevVertexIndex](const auto &edge) {
+                    return ((edge.start == curVertexIndex && edge.end == prevVertexIndex) ||
+                            (edge.start == prevVertexIndex && edge.end == curVertexIndex));
+                });
+                if (it == uniqueEdges.end()) {
                     EdgeByPts curEdge;
                     curEdge.start = prevVertexIndex;
                     curEdge.end = curVertexIndex;
@@ -12308,19 +12301,22 @@ namespace SurfaceGeometry {
                     curEdge.firstSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
                     uniqueEdges.emplace_back(curEdge);
                 } else {
-                    ++uniqueEdges[found].count;
+                    ++(it->count);
+                    it->otherSurfNums.push_back(zonePoly.SurfaceFace(iFace).SurfNum);
                 }
             }
         }
         // All edges for an enclosed polyhedron should be shared by two (and only two) sides.
         // So if the count is not two for all edges, the polyhedron is not enclosed
         std::vector<EdgeOfSurf> edgesNotTwoCount;
-        for (auto anEdge : uniqueEdges) {
+        for (const auto &anEdge : uniqueEdges) {
             if (anEdge.count != 2) {
                 EdgeOfSurf curEdgeOne;
                 curEdgeOne.surfNum = anEdge.firstSurfNum;
                 curEdgeOne.start = uniqueVertices[anEdge.start];
                 curEdgeOne.end = uniqueVertices[anEdge.end];
+                curEdgeOne.count = anEdge.count;
+                curEdgeOne.otherSurfNums = anEdge.otherSurfNums;
                 edgesNotTwoCount.push_back(curEdgeOne);
             }
         }
@@ -12328,12 +12324,12 @@ namespace SurfaceGeometry {
     }
 
     // create a list of unique vertices given the polyhedron describing the zone
-    void makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> &uniqVertices)
+    std::vector<Vector> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly)
     {
         // J. Glazer - March 2017
 
         using DataVectorTypes::Vector;
-        uniqVertices.clear();
+        std::vector<Vector> uniqVertices;
         uniqVertices.reserve(zonePoly.NumSurfaceFaces * 6);
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
@@ -12343,7 +12339,7 @@ namespace SurfaceGeometry {
                     uniqVertices.emplace_back(curVertex);
                 } else {
                     bool found = false;
-                    for (auto unqV : uniqVertices) {
+                    for (const auto &unqV : uniqVertices) {
                         if (isAlmostEqual3dPt(curVertex, unqV)) {
                             found = true;
                             break;
@@ -12355,6 +12351,7 @@ namespace SurfaceGeometry {
                 }
             }
         }
+        return uniqVertices;
     }
 
     // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing
@@ -12368,66 +12365,40 @@ namespace SurfaceGeometry {
 
         DataVectorTypes::Polyhedron updZonePoly = zonePoly; // set the return value to the original polyhedron describing the zone
 
-        for (int iFace = 1; iFace <= updZonePoly.NumSurfaceFaces; ++iFace) {
-            bool faceUpdated = false;
-            DataVectorTypes::Face updFace = updZonePoly.SurfaceFace(iFace);
-            for (int iterationLimiter = 0; iterationLimiter < 20;
-                 ++iterationLimiter) { // could probably be while loop but want to make sure it does not get stuck
-                bool insertedVertext = false;
-                for (int curVertexIndex = updFace.NSides; curVertexIndex >= 1; --curVertexIndex) { // go through array from end
-                    Vector curVertex = updFace.FacePoints(curVertexIndex);
-                    Vector nextVertex;
-                    int nextVertexIndex;
-                    if (curVertexIndex == updFace.NSides) {
-                        nextVertexIndex = 1;
-                    } else {
-                        nextVertexIndex = curVertexIndex + 1;
+        for (auto &updFace : updZonePoly.SurfaceFace) {
+            bool insertedVertext = true;
+            while (insertedVertext) {
+                insertedVertext = false;
+                auto &vertices = updFace.FacePoints;
+                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+
+                    auto itnext = std::next(it);
+                    if (itnext == std::end(vertices)) {
+                        itnext = std::begin(vertices);
                     }
-                    nextVertex = updFace.FacePoints(nextVertexIndex);
+
+                    auto curVertex = *it;
+                    auto nextVertex = *itnext;
+
                     // now go through all the vertices and see if they are colinear with start and end vertices
-                    bool found = false;
-                    Vector foundIntermediateVertex;
-                    for (auto testVertex : uniqVertices) {
+                    for (const auto &testVertex : uniqVertices) {
                         if (!isAlmostEqual3dPt(curVertex, testVertex) && !isAlmostEqual3dPt(nextVertex, testVertex)) {
                             if (isPointOnLineBetweenPoints(curVertex, nextVertex, testVertex)) {
-                                foundIntermediateVertex = testVertex;
-                                found = true;
+                                vertices.insert(itnext, testVertex);
+                                ++updFace.NSides;
+                                insertedVertext = true;
+                                break;
                             }
                         }
                     }
-                    if (found) {
-                        insertVertexOnFace(updFace, nextVertexIndex, foundIntermediateVertex);
-                        faceUpdated = true;
-                        insertedVertext = true;
+                    // Break out of the loop on vertices of the surface too, and start again at the while
+                    if (insertedVertext) {
                         break;
                     }
                 }
-                if (!insertedVertext) break;
-            }
-            if (faceUpdated) {
-                updZonePoly.SurfaceFace(iFace) = updFace;
             }
         }
         return updZonePoly;
-    }
-
-    // inserts a vertex in the polygon describing the face (wall) of polyhedron (zone)
-    void insertVertexOnFace(DataVectorTypes::Face &face,
-                            int const indexAt, // index of where to insert new vertex - remaining vertices are moved later
-                            DataVectorTypes::Vector const &vertexToInsert)
-    {
-        // J. Glazer - March 2017
-
-        if (indexAt >= 1 && indexAt <= face.NSides) {
-            int origNumSides = face.NSides;
-            DataVectorTypes::Vector emptyVector(0., 0., 0.);
-            face.FacePoints.append(emptyVector); // just to add new item to the end of array
-            for (int i = origNumSides + 1; i > indexAt; --i) {
-                face.FacePoints(i) = face.FacePoints(i - 1); // move existing items one location further
-            }
-            face.FacePoints(indexAt) = vertexToInsert;
-            ++face.NSides;
-        }
     }
 
     // test if the ceiling and floor are the same except for their height difference by looking at the corners
@@ -12710,13 +12681,30 @@ namespace SurfaceGeometry {
         return sqrt(pow(v1.x - v2.x, 2) + pow(v1.y - v2.y, 2) + pow(v1.z - v2.z, 2));
     }
 
+    Real64 distanceFromPointToLine(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test)
+    {
+        // np.linalg.norm(np.cross(e-s,p-s)/np.linalg.norm(e-s))
+        DataVectorTypes::Vector t = end - start;
+        t.normalize(); // Unit vector of start to end
+
+        DataVectorTypes::Vector other = test - start;
+
+        DataVectorTypes::Vector projection = DataVectorTypes::cross(t, other); // normal unit vector, that's the distance component
+        return projection.length();
+    }
+
     // tests if a point in space lies on the line segment defined by two other points
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test)
     {
         // J. Glazer - March 2017
-
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        // The tolerance has to be low enough. Take for eg a plenum that has an edge that's 30meters long, you risk adding point from the floor to
+        // the roof, cf #7383
+        // compute the shortest distance from the point to the line first to avoid false positive
+        Real64 tol = 0.0127;
+        if (distanceFromPointToLine(start, end, test) < tol) { // distanceFromPointToLine always positive, it's calculated as norml_L2
+            return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        }
+        return false;
     }
 
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound)
@@ -14513,102 +14501,98 @@ namespace SurfaceGeometry {
 
             auto const &vertex(surface.Vertex);
 
-            {
-                auto const SELECT_CASE_var(surface.Sides); // is this a 3- or 4-sided surface
+            if (surface.Sides == 3) { // 3-sided polygon
 
-                if (SELECT_CASE_var == 3) { // 3-sided polygon
+                centroid = cen(vertex(1), vertex(2), vertex(3));
 
-                    centroid = cen(vertex(1), vertex(2), vertex(3));
+            } else if (surface.Sides == 4) { // 4-sided polygon
 
-                } else if (SELECT_CASE_var == 4) { // 4-sided polygon
+                // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                Triangle1(1) = vertex(1);
+                Triangle1(2) = vertex(2);
+                Triangle1(3) = vertex(3);
+                Triangle2(1) = vertex(1);
+                Triangle2(2) = vertex(3);
+                Triangle2(3) = vertex(4);
 
-                    // split into 2 3-sided polygons (Triangle 1 and Triangle 2)
+                // get total Area of quad.
+                Real64 TotalArea(surface.GrossArea);
+                if (TotalArea <= 0.0) {
+                    // catch a problem....
+                    ShowWarningError(state, "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name);
+                    continue;
+                }
+
+                // get area fraction of triangles.
+                Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
+                Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
+
+                // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
+                // quadralateral using the wrong two triangles
+                if ((Tri1Area + Tri2Area) > 1.05) {
+
+                    // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
+                    // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
                     Triangle1(1) = vertex(1);
                     Triangle1(2) = vertex(2);
-                    Triangle1(3) = vertex(3);
-                    Triangle2(1) = vertex(1);
+                    Triangle1(3) = vertex(4);
+                    Triangle2(1) = vertex(2);
                     Triangle2(2) = vertex(3);
                     Triangle2(3) = vertex(4);
 
-                    // get total Area of quad.
-                    Real64 TotalArea(surface.GrossArea);
-                    if (TotalArea <= 0.0) {
-                        // catch a problem....
-                        ShowWarningError(state, "CalcSurfaceCentroid: zero area surface, for surface=" + surface.Name);
-                        continue;
-                    }
-
                     // get area fraction of triangles.
-                    Real64 Tri1Area(AreaPolygon(3, Triangle1) / TotalArea);
-                    Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
-
-                    // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
-                    // quadralateral using the wrong two triangles
-                    if ((Tri1Area + Tri2Area) > 1.05) {
-
-                        // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
-                        // time) split into 2 3-sided polygons (Triangle 1 and Triangle 2)
-                        Triangle1(1) = vertex(1);
-                        Triangle1(2) = vertex(2);
-                        Triangle1(3) = vertex(4);
-                        Triangle2(1) = vertex(2);
-                        Triangle2(2) = vertex(3);
-                        Triangle2(3) = vertex(4);
-
-                        // get area fraction of triangles.
-                        Real64 AreaTriangle1 = AreaPolygon(3, Triangle1);
-                        Real64 AreaTriangle2 = AreaPolygon(3, Triangle2);
-                        TotalArea = AreaTriangle1 + AreaTriangle2;
-                        Tri1Area = AreaTriangle1 / TotalArea;
-                        Tri2Area = AreaTriangle2 / TotalArea;
-                    }
-
-                    // get centroid of Triangle 1
-                    Vector cen1(cen(Triangle1(1), Triangle1(2), Triangle1(3)));
-
-                    // get centroid of Triangle 2
-                    Vector cen2(cen(Triangle2(1), Triangle2(2), Triangle2(3)));
-
-                    // find area weighted combination of the two centroids (coded to avoid temporary Vectors)
-                    cen1 *= Tri1Area;
-                    cen2 *= Tri2Area;
-                    centroid = cen1;
-                    centroid += cen2;
-
-                } else if ((SELECT_CASE_var >= 5)) { // multi-sided polygon
-                    // (Maybe triangulate?  For now, use old "z" average method")
-                    // and X and Y -- straight average
-
-                    //        X1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
-                    //        X2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
-                    //        Y1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
-                    //        Y2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
-                    //        Z1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
-                    //        Z2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
-                    //        Xcm=(X1+X2)/2.0d0
-                    //        Ycm=(Y1+Y2)/2.0d0
-                    //        Zcm=(Z1+Z2)/2.0d0
-
-                    // Calc centroid as average of surfaces
-                    centroid = 0.0;
-                    for (int vert = 1; vert <= surface.Sides; ++vert) {
-                        centroid += vertex(vert);
-                    }
-                    centroid /= double(surface.Sides);
-
-                } else {
-
-                    if (!surface.Name.empty()) {
-                        ShowWarningError(state, "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + surface.Name);
-                        ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
-                    } else {
-                        ShowWarningError(state, format("CalcSurfaceCentroid: caught problem with # of sides, for surface=#{}", ThisSurf));
-                        ShowContinueError(state,
-                                          "...surface name is blank. Examine surfaces -- this may be a problem with ill-formed interzone surfaces.");
-                        ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
-                    }
-                    centroid = 0.0;
+                    Real64 AreaTriangle1 = AreaPolygon(3, Triangle1);
+                    Real64 AreaTriangle2 = AreaPolygon(3, Triangle2);
+                    TotalArea = AreaTriangle1 + AreaTriangle2;
+                    Tri1Area = AreaTriangle1 / TotalArea;
+                    Tri2Area = AreaTriangle2 / TotalArea;
                 }
+
+                // get centroid of Triangle 1
+                Vector cen1(cen(Triangle1(1), Triangle1(2), Triangle1(3)));
+
+                // get centroid of Triangle 2
+                Vector cen2(cen(Triangle2(1), Triangle2(2), Triangle2(3)));
+
+                // find area weighted combination of the two centroids (coded to avoid temporary Vectors)
+                cen1 *= Tri1Area;
+                cen2 *= Tri2Area;
+                centroid = cen1;
+                centroid += cen2;
+
+            } else if (surface.Sides >= 5) { // multi-sided polygon
+                // (Maybe triangulate?  For now, use old "z" average method")
+                // and X and Y -- straight average
+
+                //        X1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
+                //        X2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%x)
+                //        Y1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
+                //        Y2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%y)
+                //        Z1=MINVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
+                //        Z2=MAXVAL(Surface(ThisSurf)%Vertex(1:Surface(ThisSurf)%Sides)%z)
+                //        Xcm=(X1+X2)/2.0d0
+                //        Ycm=(Y1+Y2)/2.0d0
+                //        Zcm=(Z1+Z2)/2.0d0
+
+                // Calc centroid as average of surfaces
+                centroid = 0.0;
+                for (int vert = 1; vert <= surface.Sides; ++vert) {
+                    centroid += vertex(vert);
+                }
+                centroid /= double(surface.Sides);
+
+            } else {
+
+                if (!surface.Name.empty()) {
+                    ShowWarningError(state, "CalcSurfaceCentroid: caught problem with # of sides, for surface=" + surface.Name);
+                    ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
+                } else {
+                    ShowWarningError(state, format("CalcSurfaceCentroid: caught problem with # of sides, for surface=#{}", ThisSurf));
+                    ShowContinueError(state,
+                                      "...surface name is blank. Examine surfaces -- this may be a problem with ill-formed interzone surfaces.");
+                    ShowContinueError(state, format("... number of sides must be >= 3, this surface # sides={}", surface.Sides));
+                }
+                centroid = 0.0;
             }
 
             // store result in the surface structure in DataSurfaces

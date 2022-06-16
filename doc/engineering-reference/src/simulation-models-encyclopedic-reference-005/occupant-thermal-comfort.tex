@@ -227,7 +227,7 @@ DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 \end{equation}
 
 \begin{equation}
-{Q_{r}}=3.96*f\left(_{l}\right)*{[}(0.01*T\left(_{a}\right))\left(^{4}\right)-(0.01*T\left(_{a}\right))\left(^{4}\right){]}
+{Q_{r}}=3.96*f_{cl}*{[}(0.01*T_{cla})^{4}-(0.01*T_{ra})^{4}{]}
 \label{eq:FangerQr}
 \end{equation}
 
@@ -235,7 +235,7 @@ In the EnergyPlus source code, Q\(_{dry}\), Q\(_{c}\) and Q\(_{r}\) are calculat
 
 DryHeatLoss = ConvHeatLoss + RadHeatLoss
 
-ConvHeatLos = CloBodyRat*Hc*(CloSurfTemp - AirTemp)
+ConvHeatLos = Hc*CloBodyRat*(CloSurfTemp - AirTemp)
 
 RadHeatLoss = 3.96*CloBodyRat*{[}(0.01*AbsCloSurfTemp)**4 - (0.01*AbsRadTemp)**4{]}
 
