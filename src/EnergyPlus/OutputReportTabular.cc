@@ -5334,6 +5334,7 @@ void WriteTabularReports(EnergyPlusData &state)
         if (ort->displayThermalResilienceSummary) {
             WriteThermalResilienceTables(state);
         }
+        WriteReportPeriodTimeConsumption(state);
         for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
             WriteThermalResilienceTablesRepPeriod(state, i);
         }
@@ -11157,6 +11158,27 @@ void WriteCompCostTable(EnergyPlusData &state)
     }
 }
 
+// modify the ith row in the reportingperiod input verification table
+void writeRowReportPeriodInputVeri(const std::string reportType,
+                                   Array2D_string &tableBody,
+                                   const int rowid,
+                                   const int periodIdx,
+                                   const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
+{
+    tableBody(1, rowid) = reportType;
+    tableBody(2, rowid) = std::to_string(periodIdx);
+    tableBody(3, rowid) = ReportPeriodInputData(periodIdx).title;
+    tableBody(4, rowid) = formatReportPeriodTimestamp(ReportPeriodInputData(periodIdx).startYear,
+                                                      ReportPeriodInputData(periodIdx).startMonth,
+                                                      ReportPeriodInputData(periodIdx).startDay,
+                                                      ReportPeriodInputData(periodIdx).startHour);
+    tableBody(5, rowid) = formatReportPeriodTimestamp(ReportPeriodInputData(periodIdx).endYear,
+                                                      ReportPeriodInputData(periodIdx).endMonth,
+                                                      ReportPeriodInputData(periodIdx).endDay,
+                                                      ReportPeriodInputData(periodIdx).endHour);
+    tableBody(6, rowid) = RealToStr(ReportPeriodInputData(periodIdx).totalElectricityUse / 3600000.0, 2);
+}
+
 void WriteVeriSumTable(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -12535,6 +12557,15 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
     }
 }
 
+std::string formatReportPeriodTimestamp(const int year, const int month, const int day, const int hour)
+{
+    if (year != 0) {
+        return fmt::format("{}/{}/{} {}:00", year, month, day, hour);
+    } else {
+        return fmt::format("{}/{} {}:00", month, day, hour);
+    }
+}
+
 void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                                       const std::string reportKeyWord,
                                       const int periodIdx,
@@ -12546,28 +12577,78 @@ void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
         "Entire Facility",
         OutputProcessor::StoreType::Averaged);
 
-    if (ReportPeriodInputData(periodIdx).startYear != 0) {
-        WriteSubtitle(state,
-                      format("Reporting period: {}/{}/{} {}:00 -- {}/{}/{} {}:00, Total Electricity Usage: {:.2R} kWh",
-                             ReportPeriodInputData(periodIdx).startYear,
-                             ReportPeriodInputData(periodIdx).startMonth,
-                             ReportPeriodInputData(periodIdx).startDay,
-                             ReportPeriodInputData(periodIdx).startHour,
-                             ReportPeriodInputData(periodIdx).endYear,
-                             ReportPeriodInputData(periodIdx).endMonth,
-                             ReportPeriodInputData(periodIdx).endDay,
-                             ReportPeriodInputData(periodIdx).endHour,
-                             ReportPeriodInputData(periodIdx).totalElectricityUse / 3600000.0));
-    } else {
-        WriteSubtitle(state,
-                      format("Reporting period: {}/{} {}:00 -- {}/{} {}:00, Total Electricity Usage: {:.2R} kWh",
-                             ReportPeriodInputData(periodIdx).startMonth,
-                             ReportPeriodInputData(periodIdx).startDay,
-                             ReportPeriodInputData(periodIdx).startHour,
-                             ReportPeriodInputData(periodIdx).endMonth,
-                             ReportPeriodInputData(periodIdx).endDay,
-                             ReportPeriodInputData(periodIdx).endHour,
-                             ReportPeriodInputData(periodIdx).totalElectricityUse / 3600000.0));
+    WriteSubtitle(state,
+                  format("Reporting period: {} -- {}, Total Electricity Usage: {:.2R} kWh",
+                         formatReportPeriodTimestamp(ReportPeriodInputData(periodIdx).startYear,
+                                                     ReportPeriodInputData(periodIdx).startMonth,
+                                                     ReportPeriodInputData(periodIdx).startDay,
+                                                     ReportPeriodInputData(periodIdx).startHour),
+                         formatReportPeriodTimestamp(ReportPeriodInputData(periodIdx).endYear,
+                                                     ReportPeriodInputData(periodIdx).endMonth,
+                                                     ReportPeriodInputData(periodIdx).endDay,
+                                                     ReportPeriodInputData(periodIdx).endHour),
+                         ReportPeriodInputData(periodIdx).totalElectricityUse / 3600000.0));
+}
+
+void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
+{
+    // Reporting Period Time and Consumption Table
+    // It has the following columns: report type (thermal, co2, visual), period, start, end, total electricity
+    Array1D_string columnHead;
+    Array1D_int columnWidth;
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    int numRowsReportPeriod =
+        state.dataWeatherManager->TotThermalReportPers + state.dataWeatherManager->TotCO2ReportPers + state.dataWeatherManager->TotVisualReportPers;
+    rowHead.allocate(numRowsReportPeriod);
+    columnHead.allocate(6);
+    columnWidth.allocate(6);
+    columnWidth = 14; // array assignment - same for all columns
+    tableBody.allocate(6, numRowsReportPeriod);
+
+    int constexpr reportperiodType(1);
+    int constexpr reportperiodId(2);
+    int constexpr reportperiodTitle(3);
+    int constexpr reportperiodStart(4);
+    int constexpr reportperiodEnd(5);
+    int constexpr reportperiodElectricity(6);
+
+    columnHead(reportperiodType) = "Report Type";
+    columnHead(reportperiodId) = "Report Index";
+    columnHead(reportperiodTitle) = "Title";
+    columnHead(reportperiodStart) = "Start Time";
+    columnHead(reportperiodEnd) = "End Time";
+    columnHead(reportperiodElectricity) = "Total Electricity (kWh)";
+    for (int i = 1; i <= numRowsReportPeriod; i++) {
+        rowHead(i) = std::to_string(i);
+    }
+    // loop through rows
+    int rowid = 1;
+    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotThermalReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("Thermal", tableBody, rowid, periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
+        rowid += 1;
+    }
+    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotCO2ReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("CO2", tableBody, rowid, periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
+        rowid += 1;
+    }
+    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotVisualReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("Visual", tableBody, rowid, periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
+        rowid += 1;
+    }
+
+    std::string tableName = "Reporting Period Time and Consumption";
+    WriteSubtitle(state, tableName);
+    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+    if (state.dataSQLiteProcedures->sqlite) {
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+                tableBody, rowHead, columnHead, "ReportingPeriodSummary", "Entire Facility", tableName);
+        }
+    }
+    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+            tableBody, rowHead, columnHead, "Reporting Period Summary", "Entire Facility", tableName);
     }
 }
 
@@ -12588,6 +12669,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
         std::string tableType = "Thermal";
         WriteReportHeaderReportingPeriod(state, tableType, periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
+        std::string periodTitle = state.dataWeatherManager->ThermalReportPeriodInput(periodIdx).title;
 
         int columnNum = 5;
         Array1D_int columnWidth;
@@ -12610,6 +12692,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -12622,6 +12705,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -12634,6 +12718,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -12646,6 +12731,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -12658,6 +12744,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -12670,6 +12757,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -12724,6 +12812,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             WriteSETHoursTableReportingPeriod(state,
                                               columnNum,
                                               periodIdx,
+                                              periodTitle,
                                               tableName,
                                               columnHead,
                                               columnWidth,
@@ -12751,6 +12840,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             WriteSETHoursTableReportingPeriod(state,
                                               columnNum,
                                               periodIdx,
+                                              periodTitle,
                                               tableName,
                                               columnHead,
                                               columnWidth,
@@ -12769,6 +12859,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         WriteHourOfSafetyTableReportingPeriod(state,
                                               columnNum,
                                               periodIdx,
+                                              periodTitle,
                                               tableName,
                                               columnHead,
                                               columnWidth,
@@ -12781,6 +12872,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         WriteHourOfSafetyTableReportingPeriod(state,
                                               columnNum,
                                               periodIdx,
+                                              periodTitle,
                                               tableName,
                                               columnHead,
                                               columnWidth,
@@ -12818,6 +12910,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNumUnmetDegHr,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHeadUnmetDegHr,
                                                 columnWidthUnmetDegHr,
@@ -12839,6 +12932,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNumDiscomfortWt,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidthDiscomfortWt,
@@ -12850,6 +12944,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableType,
                                                 columnNumDiscomfortWt,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidthDiscomfortWt,
@@ -12893,6 +12988,7 @@ void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
                                              const std::string tableType,
                                              int const columnNum,
                                              int const periodIdx,
+                                             const std::string periodTitle,
                                              const std::string tableName,
                                              Array1D_string const &columnHead,
                                              Array1D_int columnWidth,
@@ -12936,28 +13032,19 @@ void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                                           rowHead,
-                                                                           columnHead,
-                                                                           "ReportingPeriod-" + std::to_string(periodIdx) + "-" + tableType +
-                                                                               "ResilienceSummary",
-                                                                           "Entire Facility",
-                                                                           tableName);
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+            tableBody, rowHead, columnHead, "ReportingPeriod-" + periodTitle + "-" + tableType + "ResilienceSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                              rowHead,
-                                                                                              columnHead,
-                                                                                              "ReportingPeriod-" + std::to_string(periodIdx) + "-" +
-                                                                                                  tableType + "ResilienceSummary",
-                                                                                              "Entire Facility",
-                                                                                              tableName);
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+            tableBody, rowHead, columnHead, "ReportingPeriod-" + periodTitle + "-" + tableType + "ResilienceSummary", "Entire Facility", tableName);
     }
 }
 
 void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                        int const columnNum,
                                        int const periodIdx,
+                                       const std::string periodTitle,
                                        const std::string tableName,
                                        Array1D_string const &columnHead,
                                        Array1D_int columnWidth,
@@ -13006,22 +13093,12 @@ void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                                           rowHead,
-                                                                           columnHead,
-                                                                           "ReportingPeriod-" + std::to_string(periodIdx) +
-                                                                               "-ThermalResilienceSummary",
-                                                                           "Entire Facility",
-                                                                           tableName);
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+            tableBody, rowHead, columnHead, "ReportingPeriod-" + periodTitle + "-ThermalResilienceSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                              rowHead,
-                                                                                              columnHead,
-                                                                                              "ReportingPeriod-" + std::to_string(periodIdx) +
-                                                                                                  "-ThermalResilienceSummary",
-                                                                                              "Entire Facility",
-                                                                                              tableName);
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+            tableBody, rowHead, columnHead, "ReportingPeriod-" + periodTitle + "-ThermalResilienceSummary", "Entire Facility", tableName);
     }
 }
 
@@ -13033,6 +13110,7 @@ std::string RetrieveEntryFromTableBody(Array2D_string &tableBody, int const rowI
 void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
                                            int const columnNum,
                                            int const periodIdx,
+                                           const std::string periodTitle,
                                            const std::string tableName,
                                            Array1D_string const &columnHead,
                                            Array1D_int columnWidth,
@@ -13086,22 +13164,12 @@ void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
 
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                                           rowHead,
-                                                                           columnHead,
-                                                                           "ReportingPeriod-" + std::to_string(periodIdx) +
-                                                                               "-ThermalResilienceSummary",
-                                                                           "Entire Facility",
-                                                                           tableName);
+        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+            tableBody, rowHead, columnHead, "ReportingPeriod-" + periodTitle + "-ThermalResilienceSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                              rowHead,
-                                                                                              columnHead,
-                                                                                              "ReportingPeriod-" + std::to_string(periodIdx) +
-                                                                                                  "-ThermalResilienceSummary",
-                                                                                              "Entire Facility",
-                                                                                              tableName);
+        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+            tableBody, rowHead, columnHead, "ReportingPeriod-" + periodTitle + "-ThermalResilienceSummary", "Entire Facility", tableName);
     }
 }
 
@@ -13349,6 +13417,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
     auto &ort(state.dataOutRptTab);
     if (ort->WriteTabularFiles) {
         WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
+        std::string periodTitle = state.dataWeatherManager->CO2ReportPeriodInput(periodIdx).title;
 
         int columnNum = 3;
         Array1D_int columnWidth;
@@ -13370,6 +13439,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -13382,6 +13452,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -13394,6 +13465,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -13447,6 +13519,7 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
     auto &ort(state.dataOutRptTab);
     if (ort->WriteTabularFiles) {
         WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
+        std::string periodTitle = state.dataWeatherManager->VisualReportPeriodInput(periodIdx).title;
 
         int columnNum = 4;
         Array1D_int columnWidth;
@@ -13469,6 +13542,7 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -13481,6 +13555,7 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,
@@ -13493,6 +13568,7 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
                                                 tableType,
                                                 columnNum,
                                                 periodIdx,
+                                                periodTitle,
                                                 tableName,
                                                 columnHead,
                                                 columnWidth,

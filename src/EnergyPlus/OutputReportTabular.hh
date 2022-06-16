@@ -649,16 +649,26 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable(EnergyPlusData &state);
 
+    void writeRowReportPeriodInputVeri(const std::string reportType,
+                                       Array2D_string &tableBody,
+                                       const int rowid,
+                                       const int periodIdx,
+                                       const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+
     void WriteVeriSumTable(EnergyPlusData &state);
 
     void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool produceSQLite);
 
     void WriteAdaptiveComfortTable(EnergyPlusData &state);
 
+    std::string formatReportPeriodTimestamp(const int year, const int month, const int day, const int hour);
+
     void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                                           const std::string reportKeyWord,
                                           const int periodIdx,
                                           const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+
+    void WriteReportPeriodTimeConsumption(EnergyPlusData &state);
 
     void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const periodIdx);
 
@@ -682,6 +692,7 @@ namespace OutputReportTabular {
                                                  const std::string tableType,
                                                  int const columnNum,
                                                  int const periodIdx,
+                                                 const std::string periodTitle,
                                                  const std::string tableName,
                                                  Array1D_string const &columnHead,
                                                  Array1D_int columnWidth,
@@ -699,6 +710,7 @@ namespace OutputReportTabular {
     void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                            int const columnNum,
                                            int const periodIdx,
+                                           const std::string periodTitle,
                                            const std::string tableName,
                                            Array1D_string const &columnHead,
                                            Array1D_int columnWidth,
@@ -719,6 +731,7 @@ namespace OutputReportTabular {
     void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
                                                int const columnNum,
                                                int const periodIdx,
+                                               const std::string periodTitle,
                                                const std::string tableName,
                                                Array1D_string const &columnHead,
                                                Array1D_int columnWidth,
