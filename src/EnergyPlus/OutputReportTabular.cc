@@ -69,7 +69,7 @@
 #include <fmt/format.h>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
@@ -4344,9 +4344,8 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                                                          state.dataCondenserLoopTowers->towers(iCooler).FanEnergy +
                                                          state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
     }
-    for (int iCooler = 1; iCooler <= state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers; ++iCooler) {
-        state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec +
-                                                         state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).FanEnergy;
+    for (auto &thisCooler : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
+        state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCooler.Qactual * TimeStepSysSec + thisCooler.FanEnergy;
     }
     for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
@@ -4424,7 +4423,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // VAV coils - air to air
     auto &VarSpeedCoil(state.dataVariableSpeedCoils->VarSpeedCoil);
     for (int iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
-        if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+        if (VarSpeedCoil(iCoil).VSCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             if (VarSpeedCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                                                  VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
@@ -4433,7 +4432,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                                                                  VarSpeedCoil(iCoil).BasinHeaterConsumption +
                                                                  VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-        } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+        } else if (VarSpeedCoil(iCoil).VSCoilType == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                                              VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
         }
@@ -5363,7 +5362,8 @@ void parseStatLine(const std::string &lineIn,
                    bool &desConditionlinepassed,
                    bool &heatingDesignlinepassed,
                    bool &coolingDesignlinepassed,
-                   bool &isKoppen)
+                   bool &isKoppen,
+                   bool &insideLiquidPrecipitation)
 {
     // assumes that all the variables are initialized outside of this routine -- it does not re-initialize them
     if (has_prefix(lineIn, "Statistics")) {
@@ -5412,13 +5412,16 @@ void parseStatLine(const std::string &lineIn,
         lineType = StatLineType::WithHDDLine;
     } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
         lineType = StatLineType::WithCDDLine;
-    } else if (has(lineIn, "Max Hourly")) {
+
+    } else if (has(lineIn, "Statistics for Liquid Precipitation")) {
+        insideLiquidPrecipitation = true;
+    } else if (insideLiquidPrecipitation && has(lineIn, "Total")) {
+        lineType = StatLineType::MonthlyPrec;
+    } else if (insideLiquidPrecipitation && has(lineIn, "Max Hourly")) {
         lineType = StatLineType::MaxHourlyPrec;
-    } else if (has(lineIn, "Total")) {
-        if (!has(lineIn, "Statistics for Total Sky Cover")) {
-            lineType = StatLineType::MonthlyPrec;
-        }
+        insideLiquidPrecipitation = false;
     }
+
     // these not part of big if/else because sequential
     if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
     if (lineType == StatLineType::KoppenLine && isKoppen) lineType = StatLineType::KoppenDes1Line;
@@ -5454,9 +5457,6 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
 
     StatLineType lineType = StatLineType::Initialized;
     StatLineType lineTypeinterim = StatLineType::Initialized;
-    bool isASHRAE;
-    bool iscalc;
-    bool isKoppen;
     std::string::size_type ashPtr;
     std::string::size_type lnPtr;
     int col1;
@@ -5473,20 +5473,17 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
     std::string curNameWithSIUnits;
     std::string curNameAndUnits;
     int indexUnitConv;
+
+    bool isASHRAE = false;
+    bool iscalc = false;
+    bool isKoppen = false;
+    bool heatingDesignlinepassed = false;
+    bool coolingDesignlinepassed = false;
+    bool desConditionlinepassed = false;
+    bool insideLiquidPrecipitation = false;
     std::string storeASHRAEHDD;
     std::string storeASHRAECDD;
-    bool heatingDesignlinepassed;
-    bool coolingDesignlinepassed;
-    bool desConditionlinepassed;
 
-    isASHRAE = false;
-    iscalc = false;
-    isKoppen = false;
-    heatingDesignlinepassed = false;
-    coolingDesignlinepassed = false;
-    desConditionlinepassed = false;
-    storeASHRAEHDD = "";
-    storeASHRAECDD = "";
     lineTypeinterim = StatLineType::Initialized;
     if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
         auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
@@ -5496,7 +5493,8 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             // reconcile line with different versions of stat file
             // v7.1 added version as first line.
             strip(lineIn);
-            parseStatLine(lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen);
+            parseStatLine(
+                lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen, insideLiquidPrecipitation);
 
             switch (lineType) {
             case StatLineType::StatisticsLine: { // Statistics for USA_CA_San.Francisco_TMY2
@@ -6317,8 +6315,8 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
             // AFN infiltration -- check that afn sim is being done.
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                  state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
+            if (!(state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+                  state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
                 ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNVentVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen = 0.0;
@@ -13996,59 +13994,59 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
             }
             ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
             }
 
             ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenLossW); // air flow network
             }
             ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatLossW); // air flow network
             }
 
             ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ort->interZoneMixInstantSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenLossW); // air flow network
             }
             ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ort->interZoneMixLatentSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatLossW); // air flow network
             }
         }
     }

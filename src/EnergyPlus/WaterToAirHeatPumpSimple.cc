@@ -2778,12 +2778,12 @@ namespace WaterToAirHeatPumpSimple {
 
                     //       use companion heating coil capacity to calculate volumetric flow rate
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
-                        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
-                                .RatedCapHeatAtRatedCdts > 0) {
-                            SystemCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
-                                                 .RatedCapHeatAtRatedCdts;
+                        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).RatedCapHeat ==
+                            DataSizing::AutoSize) {
+                            SystemCapacity = simpleWatertoAirHP.RatedCapCoolTotal;
                         } else {
-                            SystemCapacity = DataSizing::AutoSize;
+                            SystemCapacity =
+                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).RatedCapHeat;
                         }
                     } else {
                         SystemCapacity = simpleWatertoAirHP.RatedCapCoolAtRatedCdts;

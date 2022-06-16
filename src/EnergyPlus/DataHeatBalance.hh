@@ -130,15 +130,6 @@ namespace DataHeatBalance {
     constexpr int DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
     constexpr int DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
-    // Parameters for Sky Radiance Distribution
-    enum class SkyRadDistribution
-    {
-        Invalid = -1,
-        Isotropic,
-        Anisotropic,
-        Num
-    };
-
     // Parameters for ZoneAirSolutionAlgo
     enum class SolutionAlgo
     {
@@ -640,7 +631,7 @@ namespace DataHeatBalance {
         Real64 WindDirEMSOverrideValue = 0.0;        // value to use for EMS override of the surface's outside wind speed
 
         bool HasLinkedOutAirNode = false; // true if an OutdoorAir::Node is linked to the surface
-        int LinkedOutAirNode = 0.0;       // Index of the an OutdoorAir:Node
+        int LinkedOutAirNode = 0;         // Index of the an OutdoorAir:Node
 
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified

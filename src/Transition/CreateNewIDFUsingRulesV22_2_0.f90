@@ -10,7 +10,7 @@ CONTAINS
 SUBROUTINE SetThisVersionVariables()
       ! TODO: Update this section as appropriate
       VerString='Conversion 22.1 => 22.2'
-      VersionNum=22.1
+      VersionNum=22.2
       ! Starting with version 22.1, the version string requires 4 characters
       ! The original sVersionNum variable is a 3 character length string
       ! If we just change that variable to be 4 characters, it could break everything before 22.1
