@@ -10508,7 +10508,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     EXPECT_EQ("-45.0", RetrieveEntryFromTableBody(tableBody, 1, 6));
 
     WriteResilienceBinsTableReportingPeriod(*state,
-                                            "Thermal"
+                                            "Thermal",
                                             columnNumUnmetDegHr,
                                             2,
                                             tableName,
