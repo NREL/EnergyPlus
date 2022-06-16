@@ -657,6 +657,7 @@ namespace UnitarySystems {
                             Fans::GetFanDesignVolumeFlowRate(state, blankString, blankString, errorsFound, this->m_FanIndex);
                     }
                 }
+                // do not set false this->m_MyFanFlag so that next pass specific initialization and warning are executed
             }
         }
 
