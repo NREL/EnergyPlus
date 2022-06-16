@@ -942,12 +942,12 @@
 
   People,
     SPACE1-1 PEOPLE,         !- Name
-    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
+    SPACE1-1,                !- Zone or ZoneList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5.000000,                !- Number of People
-    ,                        !- People per Floor Area {person/m2}
-    ,                        !- Floor Area per Person {m2/person}
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1036,7 +1036,7 @@
 
   Lights,
     SPACE1-1 Lights,         !- Name
-    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
+    SPACE1-1,                !- Zone or ZoneList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     284,                     !- Lighting Level {W}
@@ -1050,7 +1050,7 @@
 
   ElectricEquipment,
     SPACE1-1_MiscPlug_Equip, !- Name
-    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
+    SPACE1-1,                !- Zone or ZoneList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     207.7352,                !- Design Level {W}

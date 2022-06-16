@@ -495,12 +495,12 @@
 
   People,
     Main Floor= People 1,    !- Name
-    Main Floor,              !- Zone or ZoneList or Space or SpaceList Name
+    Main Floor,              !- Zone or ZoneList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Floor Area {person/m2}
-    ,                        !- Floor Area per Person {m2/person}
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
@@ -672,9 +672,9 @@
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     3.5,                     !- Gross Rated Cooling COP {W/W}
-    29.44,                   !- Reference Entering Water Temperature {C}
-    Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
-    Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
+    29.44,                   !- Rated Entering Water Temperature {C}
+    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    Autosize,                !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -695,9 +695,9 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
     4.2,                     !- Gross Rated Heating COP {W/W}
-    20.0,                    !- Reference Entering Water Temperature {C}
-    Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
-    1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
+    20.0,                    !- Rated Entering Water Temperature {C}
+    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
