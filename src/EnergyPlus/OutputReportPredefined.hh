@@ -288,15 +288,15 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdstWAHP = 0;
     int pdchWAHPType = 0;
     int pdchWAHPRated = 0;
-    int pdchWAHPRefSensCap = 0;
-    int pdchWAHPRefPower = 0;
+    int pdchWAHPRatedSensCap = 0;
+    int pdchWAHPRatedPower = 0;
     int pdchWAHPRatedatRefCdts = 0;
-    int pdchWAHPRefSensCapatRefCdts = 0;
-    int pdchWAHPRefPoweratRefCdts = 0;
-    int pdchWAHPRefCOPatRefCdts = 0;
-    int pdchWAHPRefAirDBT = 0;
-    int pdchWAHPRefAirWBT = 0;
-    int pdchWAHPRefWtrT = 0;
+    int pdchWAHPRatedSensCapatRefCdts = 0;
+    int pdchWAHPRatedPoweratRefCdts = 0;
+    int pdchWAHPRatedCOPatRefCdts = 0;
+    int pdchWAHPRatedAirDBT = 0;
+    int pdchWAHPRatedAirWBT = 0;
+    int pdchWAHPRatedWtrT = 0;
     int pdchWAHPDD = 0;
 
     // VAV DX Cooling Ratings Details

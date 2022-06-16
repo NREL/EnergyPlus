@@ -27,7 +27,7 @@
 //
 // (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
 //     without changes from the version obtained under this License, or (ii) Licensee makes a
-//     rated solely to the software portion of its product, Licensee must refer to the
+//     reference solely to the software portion of its product, Licensee must refer to the
 //     software as "EnergyPlus version X" software, where "X" is the version number Licensee
 //     obtained under this License and may not use a different name for the software. Except as
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
@@ -1245,7 +1245,7 @@ namespace WaterToAirHeatPumpSimple {
         Real64 RatedCoolPowerTempModFac = 0.0; // Rated cooling power curve modifier
         Real64 RatedHeatPowerTempModFac = 0.0; // Rated heating power curve modifier
         Real64 RatedCapCoolTotalDesCDD;        // Rated total cooling coil capacity determined at cooling design conditions
-        constexpr Real64 Tref(283.15);         // Rated Temperature for performance curves,10C [K]
+        constexpr Real64 Tref(283.15);         // Refrence Temperature for performance curves,10C [K]
         int TimeStepNumAtMax;
         int DDNum;
         int PltSizNum;
@@ -2921,7 +2921,7 @@ namespace WaterToAirHeatPumpSimple {
         auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr Real64 Tref(283.15); // Rated Temperature for performance curves,10C [K]
+        constexpr Real64 Tref(283.15); // Reference Temperature for performance curves,10C [K]
         static constexpr std::string_view RoutineName("CalcHPCoolingSimple");
         static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcHPCoolingSimple:SourceSideInletTemp");
 
@@ -3564,7 +3564,7 @@ namespace WaterToAirHeatPumpSimple {
         //    required for condensate to begin falling from the cooling coil.
         //    Runtimes greater than this are integrated to a "part-load" latent
         //    capacity which is used to determine the "part-load" sensible heat ratio.
-        //    See rated below for additional details (linear decay model, Eq. 8b).
+        //    See reference below for additional details (linear decay model, Eq. 8b).
 
         //    For cycling fan operation, a modified version of Henderson and Rengarajan (1996)
         //    model is used by ultilizing the fan delay time as the time-off (or time duration
