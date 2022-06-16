@@ -2,6 +2,9 @@ name: Documentation
 
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-18.04

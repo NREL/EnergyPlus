@@ -9,6 +9,9 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BUILD_TYPE: Release
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: windows-2019
