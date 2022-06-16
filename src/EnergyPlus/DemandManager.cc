@@ -441,9 +441,9 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             thisDemandMgrList.History = 0.0;
 
             // Validate Demand Manager Priority
-            thisDemandManagerList.ManagerPriority = static_cast<ManagePriorityType>(
+            thisDemandMgrList.ManagerPriority = static_cast<ManagePriorityType>(
                 getEnumerationValue(ManagePriorityNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
-            ErrorsFound = ErrorsFound || (thisDemandManagerList.ManagerPriority == ManagePriorityType::Invalid);
+            ErrorsFound = ErrorsFound || (thisDemandMgrList.ManagerPriority == ManagePriorityType::Invalid);
 
             // Get DEMAND MANAGER Type and Name pairs
             thisDemandMgrList.NumOfManager = int((NumAlphas - 6) / 2.0);
@@ -458,7 +458,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                         getEnumerationValue(ManagerNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
 
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5));
-                    if (thisDemandManagerList.MgrType != ManagerType::Invalid) {
+                    if (thisDemandMgrList.MgrType != ManagerType::Invalid) {
 
                         thisManager =
                             UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
