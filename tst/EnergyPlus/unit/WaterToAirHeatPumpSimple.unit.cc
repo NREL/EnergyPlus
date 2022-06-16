@@ -96,10 +96,10 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataSize->DesDayWeath(1).Temp.allocate(24);
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceAirVolFlowRate = AutoSize;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCapCoolTotal = AutoSize;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCapCoolSens = AutoSize;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceWaterVolFlowRate = 0.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens = AutoSize;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = 0.0;
 
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.20;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.20;
@@ -178,7 +178,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex = 3;
 
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCOPCoolAtRefCdts = 5.12;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPCoolAtRefCdts = 5.12;
 
     state->dataSize->DesDayWeath(1).Temp(15) = 32.0;
     state->dataEnvrn->StdBaroPress = 101325.0;
@@ -190,14 +190,14 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     EXPECT_DOUBLE_EQ(0.0075, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat);
 
     // check that the total cooling capacity is >= the sensible cooling capacity
-    EXPECT_GE(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCapCoolTotal,
-              state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCapCoolSens);
+    EXPECT_GE(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
+              state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
 
-    if (state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCapCoolTotal != 0.0) {
+    if (state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal != 0.0) {
         ShowMessage(*state,
-                    format("SizeHVACWaterToAir: Reference Sensible Heat Ratio = {:.2R} [-]",
-                           state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCapCoolSens /
-                               state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).ReferenceCapCoolTotal));
+                    format("SizeHVACWaterToAir: Rated Sensible Heat Ratio = {:.2R} [-]",
+                           state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens /
+                               state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal));
     }
 }
 
@@ -212,14 +212,14 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
         "   Sys 5 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name",
         "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
-        "   2.0,                     !- Reference Air Flow Rate {m3/s}",
-        "   0.0033,                  !- Reference Water Flow Rate {m3/s}",
-        "   20000,                !- Gross Reference Total Cooling Capacity {W}",
-        "   16000,                   !- Gross Reference Sensible Cooling Capacity {W}",
-        "   7.007757577,             !- Gross Reference Cooling COP",
-        "   ,                        !- Reference Entering Water Temperature",
-        "   ,                        !- Reference Entering Air Dry-Bulb Temperature",
-        "   ,                        !- Reference Entering Air Wet-Bulb Temperature",
+        "   2.0,                     !- Rated Air Flow Rate {m3/s}",
+        "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
+        "   20000,                   !- Gross Rated Total Cooling Capacity {W}",
+        "   16000,                   !- Gross Rated Sensible Cooling Capacity {W}",
+        "   7.007757577,             !- Gross Rated Cooling COP",
+        "   ,                        !- Rated Entering Water Temperature",
+        "   ,                        !- Rated Entering Air Dry-Bulb Temperature",
+        "   ,                        !- Rated Entering Air Wet-Bulb Temperature",
         "   TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "   SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name",
         "   CoolPowCurve,            !- Cooling Power Consumption Curve Name",
@@ -232,13 +232,13 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
         "  Sys 5 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name",
         "  Sys 5 Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
         "  Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name",
-        "  1.0,                     !- Reference Air Flow Rate {m3/s}",
-        "  0.0033,                  !- Reference Water Flow Rate {m3/s}",
-        "  20000,                !- Gross Reference Heating Capacity {W}",
-        "  3.167053691,             !- Gross Reference Heating COP",
-        "  ,                        !- Reference Entering Water Temperature",
-        "  ,                        !- Reference Entering Air Dry-Bulb Temperature",
-        "  ,                        !- Ratio of Reference Heating Capacity to Reference Cooling Capacity",
+        "  1.0,                      !- Rated Air Flow Rate {m3/s}",
+        "  0.0033,                   !- Rated Water Flow Rate {m3/s}",
+        "  20000,                    !- Gross Rated Heating Capacity {W}",
+        "  3.167053691,              !- Gross Rated Heating COP",
+        "  ,                         !- Rated Entering Water Temperature",
+        "  ,                         !- Rated Entering Air Dry-Bulb Temperature",
+        "  ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity",
         "  HeatCapCurve,             !- Heating Capacity Curve Name",
         "  HeatPowCurve;             !- Heating Power Curve Name",
 
@@ -654,14 +654,14 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "   Sys 5 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name",
         "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
-        "   1.0,                     !- Reference Air Flow Rate {m3/s}",
-        "   0.0033,                  !- Reference Water Flow Rate {m3/s}",
-        "   23125.59,                !- Gross Reference Total Cooling Capacity {W}",
-        "   16267,                   !- Gross Reference Sensible Cooling Capacity {W}",
-        "   7.007757577,             !- Gross Reference Cooling COP",
-        "   ,                        !- Reference Entering Water Temperature",
-        "   ,                        !- Reference Entering Air Dry-Bulb Temperature",
-        "   ,                        !- Reference Entering Air Wet-Bulb Temperature",
+        "   1.0,                     !- Rated Air Flow Rate {m3/s}",
+        "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
+        "   23125.59,                !- Gross Rated Total Cooling Capacity {W}",
+        "   16267,                   !- Gross Rated Sensible Cooling Capacity {W}",
+        "   7.007757577,             !- Gross Rated Cooling COP",
+        "   ,                        !- Rated Entering Water Temperature",
+        "   ,                        !- Rated Entering Air Dry-Bulb Temperature",
+        "   ,                        !- Rated Entering Air Wet-Bulb Temperature",
         "   TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "   SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name",
         "   CoolPowCurve,            !- Cooling Power Consumption Curve Name",
@@ -674,13 +674,13 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "  Sys 5 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name",
         "  Sys 5 Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
         "  Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name",
-        "  1.0,                     !- Reference Air Flow Rate {m3/s}",
-        "  0.0033,                  !- Reference Water Flow Rate {m3/s}",
-        "  19156.73,                !- Gross Reference Heating Capacity {W}",
-        "  3.167053691,             !- Gross Reference Heating COP",
-        "  ,                        !- Reference Entering Water Temperature",
-        "  ,                        !- Reference Entering Air Dry-Bulb Temperature",
-        "  ,                        !- Ratio of Reference Heating Capacity to Reference Cooling Capacity",
+        "  1.0,                      !- Rated Air Flow Rate {m3/s}",
+        "  0.0033,                   !- Rated Water Flow Rate {m3/s}",
+        "  19156.73,                 !- Gross Rated Heating Capacity {W}",
+        "  3.167053691,              !- Gross Rated Heating COP",
+        "  ,                         !- Rated Entering Water Temperature",
+        "  ,                         !- Rated Entering Air Dry-Bulb Temperature",
+        "  ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity",
         "  HeatCapCurve,             !- Heating Capacity Curve Name",
         "  HeatPowCurve;             !- Heating Power Curve Name",
 

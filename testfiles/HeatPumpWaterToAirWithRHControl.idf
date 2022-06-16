@@ -2265,9 +2265,9 @@
     Sys 1 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.4,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    40125.6,                 !- Gross Reference Total Cooling Capacity {W}
-    28267.06,                !- Gross Reference Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Reference Cooling COP {W/W}
+    40125.6,                 !- Gross Rated Total Cooling Capacity {W}
+    28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -2285,8 +2285,8 @@
     Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.4,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    33156.73,                !- Gross Reference Heating Capacity {W}
-    3.167053691,             !- Gross Reference Heating COP {W/W}
+    33156.73,                !- Gross Rated Heating Capacity {W}
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
@@ -2530,9 +2530,9 @@
     Sys 2 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.3,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    41562.8,                 !- Gross Reference Total Cooling Capacity {W}
-    29533.53,                !- Gross Reference Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Reference Cooling COP {W/W}
+    41562.8,                 !- Gross Rated Total Cooling Capacity {W}
+    29533.53,                !- Gross Rated Sensible Cooling Capacity {W}
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -2550,8 +2550,8 @@
     Sys 2 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.3,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    35078.365,               !- Gross Reference Heating Capacity {W}
-    3.167053691,             !- Gross Reference Heating COP {W/W}
+    35078.365,               !- Gross Rated Heating Capacity {W}
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
@@ -2795,9 +2795,9 @@
     Sys 3 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.3,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    43125.6,                 !- Gross Reference Total Cooling Capacity {W}
-    30267.06,                !- Gross Reference Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Reference Cooling COP {W/W}
+    43125.6,                 !- Gross Rated Total Cooling Capacity {W}
+    30267.06,                !- Gross Rated Sensible Cooling Capacity {W}
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -2815,8 +2815,8 @@
     Sys 3 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.3,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    39156.73,                !- Gross Reference Heating Capacity {W}
-    3.167053691,             !- Gross Reference Heating COP {W/W}
+    39156.73,                !- Gross Rated Heating Capacity {W}
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
@@ -3060,9 +3060,9 @@
     Sys 4 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.4,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    42000.0,                 !- Gross Reference Total Cooling Capacity {W}
-    30000.0,                 !- Gross Reference Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Reference Cooling COP {W/W}
+    42000.0,                 !- Gross Rated Total Cooling Capacity {W}
+    30000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -3080,8 +3080,8 @@
     Sys 4 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.4,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
-    35000.0,                 !- Gross Reference Heating Capacity {W}
-    3.167053691,             !- Gross Reference Heating COP {W/W}
+    35000.0,                 !- Gross Rated Heating Capacity {W}
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
@@ -3325,9 +3325,9 @@
     Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.5,                     !- Rated Air Flow Rate {m3/s}
     0.0033,                  !- Rated Water Flow Rate {m3/s}
-    100000.0,                !- Gross Reference Total Cooling Capacity {W}
-    75000.0,                 !- Gross Reference Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Reference Cooling COP {W/W}
+    100000.0,                !- Gross Rated Total Cooling Capacity {W}
+    75000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -3345,8 +3345,8 @@
     Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.5,                     !- Rated Air Flow Rate {m3/s}
     0.0033,                  !- Rated Water Flow Rate {m3/s}
-    81000.0,                 !- Gross Reference Heating Capacity {W}
-    3.167053691,             !- Gross Reference Heating COP {W/W}
+    81000.0,                 !- Gross Rated Heating Capacity {W}
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity

@@ -287,10 +287,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     // Water-to-Air HP report
     int pdstWAHP = 0;
     int pdchWAHPType = 0;
-    int pdchWAHPRefCap = 0;
+    int pdchWAHPRated = 0;
     int pdchWAHPRefSensCap = 0;
     int pdchWAHPRefPower = 0;
-    int pdchWAHPRefCapatRefCdts = 0;
+    int pdchWAHPRatedatRefCdts = 0;
     int pdchWAHPRefSensCapatRefCdts = 0;
     int pdchWAHPRefPoweratRefCdts = 0;
     int pdchWAHPRefCOPatRefCdts = 0;

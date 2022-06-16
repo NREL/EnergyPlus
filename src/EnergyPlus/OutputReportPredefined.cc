@@ -359,16 +359,16 @@ namespace OutputReportPredefined {
         // Water-to-Air HP report
         s->pdstWAHP = newPreDefSubTable(state, s->pdrEquip, "Water-to-Air Heat Pumps Sizing Report");
         s->pdchWAHPType = newPreDefColumn(state, s->pdstWAHP, "Coil Type");
-        s->pdchWAHPRefCap = newPreDefColumn(state, s->pdstWAHP, "Reference Total Capacity [W]");
-        s->pdchWAHPRefSensCap = newPreDefColumn(state, s->pdstWAHP, "Reference Sensible Capacity [W]");
-        s->pdchWAHPRefPower = newPreDefColumn(state, s->pdstWAHP, "Reference Power [W]");
-        s->pdchWAHPRefCapatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Total Capacity at Reference Conditions [W]");
-        s->pdchWAHPRefSensCapatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Sensible Capacity at Reference Conditions [W]");
-        s->pdchWAHPRefPoweratRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Power at Reference Conditions [W]");
-        s->pdchWAHPRefCOPatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference COP at Reference Conditions [W/W]");
-        s->pdchWAHPRefAirDBT = newPreDefColumn(state, s->pdstWAHP, "Reference Air Dry-bulb Temperature [C]");
-        s->pdchWAHPRefAirWBT = newPreDefColumn(state, s->pdstWAHP, "Reference Air Wet-bulb Temperature [C]");
-        s->pdchWAHPRefWtrT = newPreDefColumn(state, s->pdstWAHP, "Reference Water Temperature [C]");
+        s->pdchWAHPRatedCap = newPreDefColumn(state, s->pdstWAHP, "Reference Total Capacity [W]");
+        s->pdchWAHPRatedSensCap = newPreDefColumn(state, s->pdstWAHP, "Reference Sensible Capacity [W]");
+        s->pdchWAHPRatedPower = newPreDefColumn(state, s->pdstWAHP, "Reference Power [W]");
+        s->pdchWAHPRatedCapatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Total Capacity at Reference Conditions [W]");
+        s->pdchWAHPRatedSensCapatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Sensible Capacity at Reference Conditions [W]");
+        s->pdchWAHPRatedPoweratRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference Power at Reference Conditions [W]");
+        s->pdchWAHPRatedCOPatRefCdts = newPreDefColumn(state, s->pdstWAHP, "Reference COP at Reference Conditions [W/W]");
+        s->pdchWAHPRatedAirDBT = newPreDefColumn(state, s->pdstWAHP, "Reference Air Dry-bulb Temperature [C]");
+        s->pdchWAHPRatedAirWBT = newPreDefColumn(state, s->pdstWAHP, "Reference Air Wet-bulb Temperature [C]");
+        s->pdchWAHPRatedWtrT = newPreDefColumn(state, s->pdstWAHP, "Reference Water Temperature [C]");
         s->pdchWAHPDD = newPreDefColumn(state, s->pdstWAHP, "Design Day used for Sizing");
 
         s->pdstDXHeatCoil = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils");

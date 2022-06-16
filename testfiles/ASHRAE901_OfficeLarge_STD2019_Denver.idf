@@ -11032,9 +11032,9 @@
     Cooling Coil Air Outlet Node AirLoop DataCenter Basement,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Total Cooling Capacity {W}
-    autosize,                !- Gross Reference Sensible Cooling Capacity {W}
-    3.878739046,             !- Gross Reference Cooling COP {W/W}
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Cooling Capacity {W}
+    3.878739046,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -11052,9 +11052,9 @@
     Cooling Coil Air Outlet Node AirLoop DataCenter bot,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Total Cooling Capacity {W}
-    autosize,                !- Gross Reference Sensible Cooling Capacity {W}
-    4.005260634,             !- Gross Reference Cooling COP {W/W}
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Cooling Capacity {W}
+    4.005260634,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -11072,9 +11072,9 @@
     Cooling Coil Air Outlet Node AirLoop DataCenter mid,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Total Cooling Capacity {W}
-    autosize,                !- Gross Reference Sensible Cooling Capacity {W}
-    4.005260634,             !- Gross Reference Cooling COP {W/W}
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Cooling Capacity {W}
+    4.005260634,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -11092,9 +11092,9 @@
     Cooling Coil Air Outlet Node AirLoop DataCenter top,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Total Cooling Capacity {W}
-    autosize,                !- Gross Reference Sensible Cooling Capacity {W}
-    4.005260634,             !- Gross Reference Cooling COP {W/W}
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Cooling Capacity {W}
+    4.005260634,             !- Gross Rated Cooling COP {W/W}
     29.44,                   !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     Autosize,                !- Reference Entering Air Wet-Bulb Temperature {C}
@@ -11114,8 +11114,8 @@
     Heating Coil Air Outlet Node AirLoop DataCenter Basement,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Heating Capacity {W}
-    4.2,                     !- Gross Reference Heating COP {W/W}
+    autosize,                !- Gross Rated Heating Capacity {W}
+    4.2,                     !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
@@ -11130,8 +11130,8 @@
     Heating Coil Air Outlet Node AirLoop DataCenter bot,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Heating Capacity {W}
-    4.2,                     !- Gross Reference Heating COP {W/W}
+    autosize,                !- Gross Rated Heating Capacity {W}
+    4.2,                     !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
@@ -11146,8 +11146,8 @@
     Heating Coil Air Outlet Node AirLoop DataCenter mid,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Heating Capacity {W}
-    4.2,                     !- Gross Reference Heating COP {W/W}
+    autosize,                !- Gross Rated Heating Capacity {W}
+    4.2,                     !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity
@@ -11162,8 +11162,8 @@
     Heating Coil Air Outlet Node AirLoop DataCenter top,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
-    autosize,                !- Gross Reference Heating Capacity {W}
-    4.2,                     !- Gross Reference Heating COP {W/W}
+    autosize,                !- Gross Rated Heating Capacity {W}
+    4.2,                     !- Gross Rated Heating COP {W/W}
     20.0,                    !- Reference Entering Water Temperature {C}
     Autosize,                !- Reference Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Reference Heating Capacity to Reference Cooling Capacity

@@ -4757,9 +4757,7 @@ namespace VariableSpeedCoils {
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
-                    if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0 ||
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum ==
-                            DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                    if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
                         RatedSourceTempCool = RatedInletWaterTemp;
                     } else {
                         RatedSourceTempCool = OutTemp;
@@ -4843,9 +4841,7 @@ namespace VariableSpeedCoils {
 
                     MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                     // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
-                    if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0 ||
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum ==
-                            DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                    if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
                         RatedSourceTempCool = RatedInletWaterTemp;
                     } else {
                         RatedSourceTempCool = OutTemp;
