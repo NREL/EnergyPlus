@@ -6377,8 +6377,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
             // AFN infiltration -- check that afn sim is being done.
-            if (!(state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                  state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
+            if (!state.afn->multizone_always_simulated) {
                 ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNVentVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen = 0.0;
@@ -14911,7 +14910,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
                      state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
@@ -14920,7 +14919,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
                      state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
@@ -14930,7 +14929,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
                      state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenLossW); // air flow network
@@ -14939,7 +14938,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
                      state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatLossW); // air flow network
@@ -14949,7 +14948,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->interZoneMixInstantSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenGainW -
@@ -14959,7 +14958,7 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->interZoneMixLatentSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
                     (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatGainW -

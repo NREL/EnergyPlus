@@ -518,7 +518,6 @@ namespace DataHeatBalance {
         Real64 totOccupants = 0.0;     // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
         Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
         Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
-        int numPeopleObject = 0;       // Number of people objects defined for a space
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
@@ -614,8 +613,6 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
-        std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
-        int numPeopleObject = 0;                     // Number of people objects defined for a zone
         int zoneRadEnclosureFirst = -1;              // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
         int zoneRadEnclosureLast = -1;               // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
 
