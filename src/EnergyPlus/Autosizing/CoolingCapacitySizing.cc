@@ -140,7 +140,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                     CoilInTemp = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInTemp;
                                     CoilInHumRat = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInHumRat;
                                 } else {
-                                    CoilInTemp = this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtCoolPeak;
+                                    CoilInTemp = this->finalZoneSizing(this->curZoneEqNum)
+                                                     .ZoneRetTempAtCoolPeak; // Question whether zone equipment should use return temp for sizing
                                     CoilInHumRat = this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtCoolPeak;
                                 }
                             } else if (this->zoneEqFanCoil) {
