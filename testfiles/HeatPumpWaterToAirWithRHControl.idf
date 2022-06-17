@@ -2268,9 +2268,9 @@
     40125.6,                 !- Gross Rated Total Cooling Capacity {W}
     28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
-    29.44,                   !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
-    Autosize,                !- Rated Entering Air Wet-Bulb Temperature {C}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -2288,7 +2288,7 @@
     33156.73,                !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
@@ -2533,9 +2533,9 @@
     41562.8,                 !- Gross Rated Total Cooling Capacity {W}
     29533.53,                !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
-    29.44,                   !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
-    Autosize,                !- Rated Entering Air Wet-Bulb Temperature {C}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -2553,7 +2553,7 @@
     35078.365,               !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
@@ -2798,9 +2798,9 @@
     43125.6,                 !- Gross Rated Total Cooling Capacity {W}
     30267.06,                !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
-    29.44,                   !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
-    Autosize,                !- Rated Entering Air Wet-Bulb Temperature {C}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -2818,7 +2818,7 @@
     39156.73,                !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
@@ -3063,9 +3063,9 @@
     42000.0,                 !- Gross Rated Total Cooling Capacity {W}
     30000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
-    29.44,                   !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
-    Autosize,                !- Rated Entering Air Wet-Bulb Temperature {C}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -3083,7 +3083,7 @@
     35000.0,                 !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
@@ -3328,9 +3328,9 @@
     100000.0,                !- Gross Rated Total Cooling Capacity {W}
     75000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
-    29.44,                   !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
-    Autosize,                !- Rated Entering Air Wet-Bulb Temperature {C}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -3348,7 +3348,7 @@
     81000.0,                 !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
     20.0,                    !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name

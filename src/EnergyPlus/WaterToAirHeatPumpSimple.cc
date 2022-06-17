@@ -1238,6 +1238,7 @@ namespace WaterToAirHeatPumpSimple {
         Real64 PeakTotCapTempModFac = 0.0;     // Peak total cooling capacity curve modifier
         Real64 RatedTotCapTempModFac = 0.0;    // Rated total cooling capacity curve modifier
         Real64 PeakHeatCapTempModFac = 0.0;    // Peak heating capacity curve modifier
+        Real64 DesignEntWaterTemp;             // Design entering coil water temperature
         Real64 SensCapAtPeak;                  // Sensible load on the cooling coil at cooling design conditions
         Real64 PeakSensCapTempModFac = 0.0;    // Peak sensible cooling capacity curve modifier
         Real64 RatedSensCapTempModFac = 0.0;   // Rated sensible cooling capacity curve modifier
@@ -1475,18 +1476,35 @@ namespace WaterToAirHeatPumpSimple {
                         CoolCapAtPeak = max(0.0, CoolCapAtPeak);
                         // determine entering air wetbulb temperature at rated conditions
                         MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
-                        if (simpleWatertoAirHP.RefEntAirWetbulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirWetbulbTemp == DataSizing::AutoSize) {
                             RatedMixWetBulb = MixWetBulb;
                         } else {
-                            RatedMixWetBulb = simpleWatertoAirHP.RefEntAirWetbulbTemp;
+                            RatedMixWetBulb = simpleWatertoAirHP.RatedEntAirWetbulbTemp;
                             MixHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, MixTemp, RatedMixWetBulb, state.dataEnvrn->StdBaroPress, RoutineName);
                         }
                         // calculate temperatue ratio at design day peak conditions
                         ratioTWB = (MixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        ratioTS = (simpleWatertoAirHP.RefEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        PltSizNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                simpleWatertoAirHP.Name,
+                                                simpleWatertoAirHP.WaterInletNodeNum,
+                                                simpleWatertoAirHP.WaterOutletNodeNum,
+                                                ErrorsFound,
+                                                false);
+                        if (PltSizNum > 0) {
+                            DesignEntWaterTemp = state.dataSize->PlantSizData(PltSizNum).ExitTemp;
+                            ratioTS = (DesignEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        } else {
+                            ShowSevereError(state, "Autosizing of total cooling capacity requires a loop Sizing:Plant object");
+                            ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
+                            ShowContinueError(state,
+                                            "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
+                                                ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                            ErrorsFound = true;
+                        }
                         // calculate temperatue ratio at rated conditions
                         RatedratioTWB = (RatedMixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        RatedratioTS = ratioTS;
+                        RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
                         PeakTotCapTempModFac =
                             CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
@@ -1588,18 +1606,35 @@ namespace WaterToAirHeatPumpSimple {
                         CoolCapAtPeak = max(0.0, CoolCapAtPeak);
                         // determine entering air wetbulb temperature at rated conditions
                         MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
-                        if (simpleWatertoAirHP.RefEntAirWetbulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirWetbulbTemp == DataSizing::AutoSize) {
                             RatedMixWetBulb = MixWetBulb;
                         } else {
-                            RatedMixWetBulb = simpleWatertoAirHP.RefEntAirWetbulbTemp;
+                            RatedMixWetBulb = simpleWatertoAirHP.RatedEntAirWetbulbTemp;
                             MixHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, MixTemp, RatedMixWetBulb, state.dataEnvrn->StdBaroPress, RoutineName);
                         }
                         // calculate temperatue ratio at design day peak conditions
                         ratioTWB = (MixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        ratioTS = (simpleWatertoAirHP.RefEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        PltSizNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                simpleWatertoAirHP.Name,
+                                                simpleWatertoAirHP.WaterInletNodeNum,
+                                                simpleWatertoAirHP.WaterOutletNodeNum,
+                                                ErrorsFound,
+                                                false);
+                        if (PltSizNum > 0) {
+                            DesignEntWaterTemp = state.dataSize->PlantSizData(PltSizNum).ExitTemp;
+                            ratioTS = (DesignEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        } else {
+                            ShowSevereError(state, "Autosizing of total cooling capacity requires a loop Sizing:Plant object");
+                            ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
+                            ShowContinueError(state,
+                                            "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
+                                                ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                            ErrorsFound = true;
+                        }
                         // calculate temperatue ratio at rated conditions
                         RatedratioTWB = (RatedMixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        RatedratioTS = ratioTS;
+                        RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
                         PeakTotCapTempModFac =
                             CurveManager::CurveValue(state, simpleWatertoAirHP.TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
@@ -1719,24 +1754,42 @@ namespace WaterToAirHeatPumpSimple {
                                         FanCoolLoad; // load on the cooling coil which includes ventilation load and fan heat (sensible)
                         SensCapAtPeak = max(0.0, SensCapAtPeak);
                         MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
-                        if (simpleWatertoAirHP.RefEntAirWetbulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirWetbulbTemp == DataSizing::AutoSize) {
                             RatedMixWetBulb = MixWetBulb;
                         } else {
-                            RatedMixWetBulb = simpleWatertoAirHP.RefEntAirWetbulbTemp;
+                            RatedMixWetBulb = simpleWatertoAirHP.RatedEntAirWetbulbTemp;
                         }
-                        if (simpleWatertoAirHP.RefEntAirDrybulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirDrybulbTemp == DataSizing::AutoSize) {
                             RatedMixDryBulb = MixTemp;
                         } else {
-                            RatedMixDryBulb = simpleWatertoAirHP.RefEntAirDrybulbTemp;
+                            RatedMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
                         }
                         // calculate temperature ratios at design day peak conditions
                         ratioTDB = (MixTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         ratioTWB = (MixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        ratioTS = (simpleWatertoAirHP.RefEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        PltSizNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                simpleWatertoAirHP.Name,
+                                                simpleWatertoAirHP.WaterInletNodeNum,
+                                                simpleWatertoAirHP.WaterOutletNodeNum,
+                                                ErrorsFound,
+                                                false);
+                        if (PltSizNum > 0) {
+                            DesignEntWaterTemp = state.dataSize->PlantSizData(PltSizNum).ExitTemp;
+                            ratioTS = (DesignEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        } else {
+                            ShowSevereError(state, "Autosizing of sensible cooling capacity requires a loop Sizing:Plant object");
+                            ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
+                            ShowContinueError(state,
+                                            "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
+                                                ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                            ErrorsFound = true;
+                        }
+                        // calculate temperatue ratio at rated conditions
                         RatedratioTDB = (RatedMixDryBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         RatedratioTWB = (RatedMixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        RatedratioTS = ratioTS;
-
+                        RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        // determine curve modifiers at peak and rated conditions
                         PeakSensCapTempModFac =
                             CurveManager::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
                         RatedSensCapTempModFac = CurveManager::CurveValue(
@@ -1830,24 +1883,41 @@ namespace WaterToAirHeatPumpSimple {
                                         FanCoolLoad; // load on the cooling coil which includes ventilation load and fan heat (sensible)
                         SensCapAtPeak = max(0.0, SensCapAtPeak);
                         MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
-                        if (simpleWatertoAirHP.RefEntAirWetbulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirWetbulbTemp == DataSizing::AutoSize) {
                             RatedMixWetBulb = MixWetBulb;
                         } else {
-                            RatedMixWetBulb = simpleWatertoAirHP.RefEntAirWetbulbTemp;
+                            RatedMixWetBulb = simpleWatertoAirHP.RatedEntAirWetbulbTemp;
                         }
-                        if (simpleWatertoAirHP.RefEntAirDrybulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirDrybulbTemp == DataSizing::AutoSize) {
                             RatedMixDryBulb = MixTemp;
                         } else {
-                            RatedMixDryBulb = simpleWatertoAirHP.RefEntAirDrybulbTemp;
+                            RatedMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
                         }
                         // calculate temperature ratios at design day peak conditions
                         ratioTDB = (MixTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         ratioTWB = (MixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        ratioTS = (simpleWatertoAirHP.RefEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        PltSizNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                simpleWatertoAirHP.Name,
+                                                simpleWatertoAirHP.WaterInletNodeNum,
+                                                simpleWatertoAirHP.WaterOutletNodeNum,
+                                                ErrorsFound,
+                                                false);
+                        if (PltSizNum > 0) {
+                            DesignEntWaterTemp = state.dataSize->PlantSizData(PltSizNum).ExitTemp;
+                            ratioTS = (DesignEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        } else {
+                            ShowSevereError(state, "Autosizing of sensible cooling capacity requires a loop Sizing:Plant object");
+                            ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
+                            ShowContinueError(state,
+                                            "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
+                                                ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                            ErrorsFound = true;
+                        }
+                        // calculate temperatue ratio at rated conditions
                         RatedratioTDB = (RatedMixDryBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         RatedratioTWB = (RatedMixWetBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        RatedratioTS = ratioTS;
-
+                        RatedratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         PeakSensCapTempModFac =
                             CurveManager::CurveValue(state, simpleWatertoAirHP.SensCoolCapCurveIndex, ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
                         RatedSensCapTempModFac = CurveManager::CurveValue(
@@ -1888,7 +1958,7 @@ namespace WaterToAirHeatPumpSimple {
                             RatedCapCoolHeatDD = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
                                                      .RatedCapHeatAtRatedCdts /
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
-                                                     .RatioRatedHeatRatioRatedHeatRatedTotCoolCap /
+                                                     .RatioRatedHeatRatedTotCoolCap /
                                                  RatedTotCapTempModFac;
                             if (RatedCapCoolHeatDD > RatedCapCoolTotalDesCDD) {
                                 // re-base the cooling capacity
@@ -1973,7 +2043,7 @@ namespace WaterToAirHeatPumpSimple {
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchWAHPRatedWtrT,
                                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                             simpleWatertoAirHP.RefEntWaterTemp);
+                                                             simpleWatertoAirHP.RatedEntWaterTemp);
                 } else { // Hardsized with sizing data
                     if (simpleWatertoAirHP.RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0) {
                         RatedCapCoolTotalUser = simpleWatertoAirHP.RatedCapCoolTotal;
@@ -2161,7 +2231,7 @@ namespace WaterToAirHeatPumpSimple {
                     ShowContinueError(state, "Sizing statistics:");
                     ShowContinueError(state, format("Rated entering Air Wet-Bulb Temperature = {:.3T} C", RatedMixWetBulb));
                     ShowContinueError(state, format("Peak entering Air Wet-Bulb Temperature = {:.3T} C", MixWetBulb));
-                    ShowContinueError(state, format("Entering Water Temperature used = {:.3T} C", simpleWatertoAirHP.RefEntWaterTemp));
+                    ShowContinueError(state, format("Entering Water Temperature used = {:.3T} C", simpleWatertoAirHP.RatedEntWaterTemp));
                     ShowContinueError(state, "Design air and water flow rates = 1.0");
                     ShowContinueError(
                         state, format("Rated ratio of load-side air wet-bulb temperature to 283.15 C (Rated ratioTWB) = {:.3T}", RatedratioTWB));
@@ -2200,7 +2270,7 @@ namespace WaterToAirHeatPumpSimple {
                     ShowContinueError(state, "Sizing statistics for Total Cooling Capacity:");
                     ShowContinueError(state, format("Rated entering Air Wet-Bulb Temperature = {:.3T} C", RatedMixWetBulb));
                     ShowContinueError(state, format("Peak entering Air Wet-Bulb Temperature = {:.3T} C", MixWetBulb));
-                    ShowContinueError(state, format("Entering Water Temperature used = {:.3T} C", simpleWatertoAirHP.RefEntWaterTemp));
+                    ShowContinueError(state, format("Entering Water Temperature used = {:.3T} C", simpleWatertoAirHP.RatedEntWaterTemp));
                     ShowContinueError(state, "Design air and water flow rates = 1.0");
                     ShowContinueError(
                         state, format("Rated ratio of load-side air wet-bulb temperature to 283.15 C (Rated ratioTWB) = {:.3T}", RatedratioTWB));
@@ -2298,17 +2368,34 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         HeatCapAtPeak -= FanHeatLoad; // remove fan heat from heating coil load
                         HeatCapAtPeak = max(0.0, HeatCapAtPeak);
-                        if (simpleWatertoAirHP.RefEntAirDrybulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirDrybulbTemp == DataSizing::AutoSize) {
                             RatedHeatMixDryBulb = HeatMixTemp;
                         } else {
-                            RatedHeatMixDryBulb = simpleWatertoAirHP.RefEntAirDrybulbTemp;
+                            RatedHeatMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
                         }
                         // calculate temperatue ratio at design day peak conditions
                         HeatratioTDB = (HeatMixTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        HeatratioTS = (simpleWatertoAirHP.RefEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        PltSizNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                simpleWatertoAirHP.Name,
+                                                simpleWatertoAirHP.WaterInletNodeNum,
+                                                simpleWatertoAirHP.WaterOutletNodeNum,
+                                                ErrorsFound,
+                                                false);
+                        if (PltSizNum > 0) {
+                            DesignEntWaterTemp = state.dataSize->PlantSizData(PltSizNum).ExitTemp;
+                            HeatratioTS = (DesignEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        } else {
+                            ShowSevereError(state, "Autosizing of heating capacity requires a loop Sizing:Plant object");
+                            ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
+                            ShowContinueError(state,
+                                            "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
+                                                ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                            ErrorsFound = true;
+                        }
                         // calculate temperatue ratio at refrence conditions
                         RatedHeatratioTDB = (RatedHeatMixDryBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        RatedHeatratioTS = HeatratioTS;
+                        RatedHeatratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
                         PeakHeatCapTempModFac =
                             CurveManager::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, HeatratioTDB, HeatratioTS, 1.0, 1.0);
@@ -2375,17 +2462,34 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         HeatCapAtPeak -= FanHeatLoad; // remove fan heat from heating coil load
                         HeatCapAtPeak = max(0.0, HeatCapAtPeak);
-                        if (simpleWatertoAirHP.RefEntAirDrybulbTemp == DataSizing::AutoSize) {
+                        if (simpleWatertoAirHP.RatedEntAirDrybulbTemp == DataSizing::AutoSize) {
                             RatedHeatMixDryBulb = HeatMixTemp;
                         } else {
-                            RatedHeatMixDryBulb = simpleWatertoAirHP.RefEntAirDrybulbTemp;
+                            RatedHeatMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
                         }
                         // calculate temperatue ratio at design day peak conditions
                         HeatratioTDB = (HeatMixTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        HeatratioTS = (simpleWatertoAirHP.RefEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        PltSizNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                simpleWatertoAirHP.Name,
+                                                simpleWatertoAirHP.WaterInletNodeNum,
+                                                simpleWatertoAirHP.WaterOutletNodeNum,
+                                                ErrorsFound,
+                                                false);
+                        if (PltSizNum > 0) {
+                            DesignEntWaterTemp = state.dataSize->PlantSizData(PltSizNum).ExitTemp;
+                            HeatratioTS = (DesignEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
+                        } else {
+                            ShowSevereError(state, "Autosizing of heating capacity requires a loop Sizing:Plant object");
+                            ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
+                            ShowContinueError(state,
+                                            "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
+                                                ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                            ErrorsFound = true;
+                        }
                         // calculate temperatue ratio at refrence conditions
                         RatedHeatratioTDB = (RatedHeatMixDryBulb + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
-                        RatedHeatratioTS = HeatratioTS;
+                        RatedHeatratioTS = (simpleWatertoAirHP.RatedEntWaterTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         // determine curve modifiers at peak and rated conditions
                         PeakHeatCapTempModFac =
                             CurveManager::CurveValue(state, simpleWatertoAirHP.HeatCapCurveIndex, HeatratioTDB, HeatratioTS, 1.0, 1.0);
@@ -2416,7 +2520,7 @@ namespace WaterToAirHeatPumpSimple {
                     RatedTotCapTempModFac =
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolAtRatedCdts /
                         RatedCapCoolTotalDes;
-                    RatedCapCoolHeatDD = simpleWatertoAirHP.RatedCapHeatAtRatedCdts / simpleWatertoAirHP.RatioRatedHeatRatioRatedHeatRatedTotCoolCap /
+                    RatedCapCoolHeatDD = simpleWatertoAirHP.RatedCapHeatAtRatedCdts / simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap /
                                          RatedTotCapTempModFac;
                     RatedCoolPowerTempModFac =
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCoolAtRatedCdts /
@@ -2481,7 +2585,7 @@ namespace WaterToAirHeatPumpSimple {
                             "Cooling");
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Cooling");
                     }
-                    RatedCapHeatDes = RatedCapCoolTotalDes * RatedTotCapTempModFac * simpleWatertoAirHP.RatioRatedHeatRatioRatedHeatRatedTotCoolCap /
+                    RatedCapHeatDes = RatedCapCoolTotalDes * RatedTotCapTempModFac * simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap /
                                       RatedHeatCapTempModFac;
                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal =
                         RatedCapCoolTotalDes;
@@ -2531,7 +2635,7 @@ namespace WaterToAirHeatPumpSimple {
                                                                                         // not autosized
                     RatedCapHeatDes =
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolAtRatedCdts *
-                        simpleWatertoAirHP.RatioRatedHeatRatioRatedHeatRatedTotCoolCap / RatedHeatCapTempModFac;
+                        simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap / RatedHeatCapTempModFac;
                 } else { // case 3: companion type is different than EquationFit
                     RatedCapHeatDes = state.dataSize->DXCoolCap;
                 }
@@ -2555,7 +2659,7 @@ namespace WaterToAirHeatPumpSimple {
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchWAHPRatedAirDBT, simpleWatertoAirHP.Name, RatedHeatMixDryBulb);
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchWAHPRatedWtrT, simpleWatertoAirHP.Name, simpleWatertoAirHP.RefEntWaterTemp);
+                    state, state.dataOutRptPredefined->pdchWAHPRatedWtrT, simpleWatertoAirHP.Name, simpleWatertoAirHP.RatedEntWaterTemp);
                 BaseSizer::reportSizerOutput(state,
                                              "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                              simpleWatertoAirHP.Name,

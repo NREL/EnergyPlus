@@ -290,10 +290,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchWAHPRatedCap = 0;
     int pdchWAHPRatedSensCap = 0;
     int pdchWAHPRatedPower = 0;
-    int pdchWAHPRatedatRatedCdts = 0;
-    int pdchWAHPRatedSensCapatRatedCdts = 0;
-    int pdchWAHPRatedPoweratRatedCdts = 0;
-    int pdchWAHPRatedCOPatRatedCdts = 0;
+    int pdchWAHPRatedCapAtRatedCdts = 0;
+    int pdchWAHPRatedSensCapAtRatedCdts = 0;
+    int pdchWAHPRatedPowerAtRatedCdts = 0;
+    int pdchWAHPRatedCOPAtRatedCdts = 0;
     int pdchWAHPRatedAirDBT = 0;
     int pdchWAHPRatedAirWBT = 0;
     int pdchWAHPRatedWtrT = 0;

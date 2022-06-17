@@ -658,8 +658,8 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT ===========
 ! Performance coefficients assume rated Capacities and COP are at:
-! 26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature
-! and 29.4C (85F) entering water temperature
+! 27.0C (80.6F) entering air dry-bulb temperature, 19.0C (66.2F) entering air wet-bulb temperature
+! and 25.0C (77F) entering water temperature
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     Main Floor WAHP Cooling Coil,  !- Name
@@ -672,9 +672,9 @@
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     3.5,                     !- Gross Rated Cooling COP {W/W}
-    29.44,                   !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
-    Autosize,                !- Rated Entering Air Wet-Bulb Temperature {C}
+    25.0,                    !- Rated Entering Water Temperature {C}
+    27.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                    !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -683,7 +683,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT ===========
 ! Performance coefficients assume rated Capacity and COP are at:
-! 21.11C (70F) entering air dry-bulb temperature and 21.11C (70F) entering water temperature
+! 20.0C (68F) entering air dry-bulb temperature and 0.0C (32F) entering water temperature
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Main Floor WAHP Heating Coil,  !- Name
@@ -695,8 +695,8 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
     4.2,                     !- Gross Rated Heating COP {W/W}
-    20.0,                    !- Rated Entering Water Temperature {C}
-    Autosize,                !- Rated Entering Air Dry-Bulb Temperature {C}
+    0.0,                     !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Coefficient Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
@@ -705,10 +705,10 @@
 
   Curve:QuadLinear,
     TotCoolCapCurve,      ! Curve Name
-    -9.149069561,            !- CoefficientC1
-    10.87814026,             !- CoefficientC2
-    -1.718780157,            !- CoefficientC3
-    0.746414818,             !- CoefficientC4
+    -9.04579502522263,            !- CoefficientC1
+    10.7553480046802,             !- CoefficientC2
+    -1.69937859691413,            !- CoefficientC3
+    0.737989300704241,             !- CoefficientC4
     0.0,                     !- CoefficientC5
     -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
@@ -723,10 +723,10 @@
 
   Curve:QuadLinear,
     CoolPowCurve,      ! Curve Name
-    -3.205409884,            !- CoefficientC1
-    -0.976409399,            !- CoefficientC2
-    3.97892546,              !- CoefficientC3
-    0.938181818,             !- CoefficientC4
+    -3.50303494439906,            !- CoefficientC1
+    -1.06706985019601,            !- CoefficientC2
+    4.34837210589294,              !- CoefficientC3
+    0.952179101682919,             !- CoefficientC4
     0.0,                     !- CoefficientC5
     -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
@@ -741,10 +741,10 @@
 
   Curve:QuadLinear,
     HeatCapCurve,      ! Curve Name
-    -1.361311959,            !- CoefficientC1
-    -2.471798046,            !- CoefficientC2
-    4.173164514,             !- CoefficientC3
-    0.640757401,             !- CoefficientC4
+    -1.82449220450272,            !- CoefficientC1
+    -3.31281616694594,            !- CoefficientC2
+    5.59306489123436,             !- CoefficientC3
+    0.858772212623984,             !- CoefficientC4
     0.0,                     !- CoefficientC5
     -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
@@ -759,10 +759,10 @@
 
   Curve:QuadLinear,
     HeatPowCurve,      ! Curve Name
-    -2.176941116,      !- CoefficientC1
-    0.832114286,       !- CoefficientC2
-    1.570743399,       !- CoefficientC3
-    0.690793651,       !- CoefficientC4
+    -2.4442872924394,      !- CoefficientC1
+    0.934304727021879,       !- CoefficientC2
+    1.76364353708994,       !- CoefficientC3
+    0.775628762040029,       !- CoefficientC4
     0.0,               !- CoefficientC5
     -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
@@ -779,11 +779,11 @@
 
   Curve:QuintLinear,
     CoolSensCapCurve,      ! Curve Name
-    -5.462690012,            !- CoefficientC1
-    17.95968138,             !- CoefficientC2
-    -11.87818402,            !- CoefficientC3
-    -0.980163419,            !- CoefficientC4
-    0.767285761,             !- CoefficientC5
+    -5.17921912653132,     !- CoefficientC1
+    17.0277143871191,      !- CoefficientC2
+    -11.2617991739786,     !- CoefficientC3
+    -0.929300603852594,    !- CoefficientC4
+    0.72746963129094,      !- CoefficientC5
     0.0,                     !- CoefficientC6
     -100,                   ! Minimum Value of v
     100,                 ! Maximum Value of v
