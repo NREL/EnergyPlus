@@ -144,7 +144,6 @@ namespace DataZoneEquipment {
 
     constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
-    extern const std::array<std::string_view, static_cast<int>(ZoneEquip::Num)> ZoneEquipTypeNamesUC;
 
     // Per Person Ventilation Rate Mode
     enum class PerPersonVentRateMode
