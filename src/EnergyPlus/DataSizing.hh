@@ -1153,6 +1153,7 @@ struct SizingData : BaseGlobalStruct
     int DataFanIndex = -1;                           // Fan index used during sizing
     DataSizing::ZoneFanPlacement DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
+    int DataCoolCoilType = -1;
     EPVector<DataSizing::OARequirementsData> OARequirements;
     EPVector<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
     EPVector<DataSizing::ZoneSizingInputData> ZoneSizingInput;    // Input data for zone sizing
@@ -1331,6 +1332,7 @@ struct SizingData : BaseGlobalStruct
         this->DataFanIndex = -1;
         this->DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
         this->DataDXSpeedNum = 0;
+        this->DataCoolCoilType = -1;
         this->OARequirements.deallocate();
         this->ZoneAirDistribution.deallocate();
         this->ZoneSizingInput.deallocate();
