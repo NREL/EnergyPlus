@@ -104,7 +104,17 @@ namespace WindowComplexManager {
     using namespace Vectors;
     using namespace DataHeatBalFanSys;
 
-    // Functions
+    // Parameters for gas definitions
+    enum class GasCoeffs
+    {
+        Invalid = -1,
+        Custom,
+        Air,
+        Argon,
+        Krypton,
+        Xenon,
+        Num
+    };
 
     void InitBSDFWindows(EnergyPlusData &state)
     {
@@ -2858,7 +2868,7 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = static_cast<int>(DataComplexFenestration::GasCoeffs::Air);
+        GasType = static_cast<int>(GasCoeffs::Air);
         wght(iprop(1, 1)) = GasWght[GasType - 1];
         gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
