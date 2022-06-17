@@ -3827,7 +3827,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtCoolPeak = 26.66667;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;           // AHRI condition at 95 F db
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;   // AHRI condition at 95 F db
