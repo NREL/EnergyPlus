@@ -1012,8 +1012,7 @@ namespace SolarReflectionManager {
                                         }
                                     }
                                 } else { // Reflecting surface is a building shade
-                                    for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                        if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+                                    for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                                         if (ObsSurfNum == ReflSurfNum) continue;
 
                                         // TH2 CR8959 -- Skip mirrored surfaces
@@ -1228,11 +1227,8 @@ namespace SolarReflectionManager {
                                 state.dataSolarReflectionManager->URay.y = cos_Phi[IPhi] * sin_Theta[ITheta];
                                 // Does this ray hit an obstruction?
                                 hitObs = false;
-                                for (state.dataSolarReflectionManager->iObsSurfNum = 1;
-                                     state.dataSolarReflectionManager->iObsSurfNum <= state.dataSurface->TotSurfaces;
-                                     ++state.dataSolarReflectionManager->iObsSurfNum) {
-                                    if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).IsShadowPossibleObstruction)
-                                        continue;
+                                for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
+                                    state.dataSolarReflectionManager->iObsSurfNum = ObsSurfNum;
                                     // Horizontal roof surfaces cannot be obstructions for rays from ground
                                     if (state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).Tilt < 5.0) continue;
                                     if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).IsShadowing) {
