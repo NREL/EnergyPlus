@@ -352,6 +352,7 @@ namespace RoomAirModelAirflowNetwork {
                     SupplyFrac = 0.0;
                     ReturnFrac = 0.0;
                     NodeFound = false;
+                    int numAirDistUnits = 0;
 
                     // find supply air node number
                     for (LoopAirNode = 1; LoopAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
@@ -361,9 +362,10 @@ namespace RoomAirModelAirflowNetwork {
                             // Check zone equipment name
                             for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
                                 if (state.dataZoneEquip->ZoneEquipList(LoopZone).EquipTypeEnum(I) == DataZoneEquipment::ZoneEquip::AirDistUnit) {
-                                    if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
+                                    if (numAirDistUnits == 0)
                                         numAirDistUnits =
                                             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:AirDistributionUnit");
+                                    if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
                                         ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
                                         state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
                                     }

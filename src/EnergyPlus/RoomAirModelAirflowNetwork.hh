@@ -67,10 +67,9 @@ namespace RoomAirModelAirflowNetwork {
     public:
         int ZoneNum;
         int RoomAirNode;
-        int numAirDistUnits;
 
         // constructor
-        RAFNData() : ZoneNum(0), RoomAirNode(0), numAirDistUnits(0)
+        RAFNData() : ZoneNum(0), RoomAirNode(0)
         {
         }
 

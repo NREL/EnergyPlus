@@ -381,11 +381,27 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0024802305, state->dataLoopNodes->Node(2).HumRat, 0.000001);
 
     // #8419
+    std::string const idf_objects = delimited_string({
+
+        "Zone,NORTH_ZONE;",
+
+        "ZoneHVAC:AirDistributionUnit,",
+        "     NORTH_ZONE PTAC ADU,        !-Name ",
+        "     NORTH_ZONE PTAC Supply Inlet,  !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    NORTH_ZONE PTAC,         !- Air Terminal Name",
+        "    ,                        !- Nominal Upstream Leakage Fraction",
+        "    ,                        !- Constant Downstream Leakage Fraction",
+        "    ;                        !- Design Specification Air Terminal Sizing Object Name",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->afn->get_input();
+
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::AirDistUnit;
     state->dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
     state->dataDefineEquipment->AirDistUnit.allocate(1);
-    thisRAFN.numAirDistUnits = 1;
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName(1) = "ADU";
     state->dataDefineEquipment->AirDistUnit(1).Name = "ADU";
     state->dataDefineEquipment->AirDistUnit(1).EquipName.allocate(1);
@@ -402,7 +418,6 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(1.1824296, state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir, 0.00001);
     EXPECT_NEAR(1010.1746, state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir, 0.001);
 
-    thisRAFN.numAirDistUnits = 0;
     state->dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
 }
 TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
