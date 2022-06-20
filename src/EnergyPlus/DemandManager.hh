@@ -139,7 +139,6 @@ namespace DemandManager {
         Real64 AvoidedDemand;               // Demand avoided by active DEMAND MANAGERs
         Real64 OverLimit;                   // Amount that demand limit is exceeded
         Real64 OverLimitDuration;           // Number of hours that demand limit is exceeded
-        ManagerType MgrType;                // Type of DEMAND MANAGER (:LIGHTS, :ELECTRICEQUIPMENT, etc.)
 
         // Default Constructor
         DemandManagerListData()

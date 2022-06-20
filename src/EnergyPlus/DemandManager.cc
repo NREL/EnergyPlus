@@ -454,11 +454,11 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                     auto &thisManager = thisDemandMgrList.Manager(MgrNum);
                     // Validate DEMAND MANAGER Type
-                    thisDemandMgrList.MgrType = static_cast<ManagerType>(
+                    ManagerType MgrType = static_cast<ManagerType>(
                         getEnumerationValue(ManagerNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
 
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5));
-                    if (thisDemandMgrList.MgrType != ManagerType::Invalid) {
+                    if (MgrType != ManagerType::Invalid) {
 
                         thisManager =
                             UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
