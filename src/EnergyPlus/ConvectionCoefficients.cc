@@ -115,6 +115,17 @@ constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::Ref
     "MEANAIRTEMPERATURE", "ADJACENTAIRTEMPERATURE", "SUPPLYAIRTEMPERATURE"};
 constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::RefWind::Num)> RefWindNamesUC{
     "WEATHERFILE", "HEIGHTADJUST", "PARALLELCOMPONENT", "PARALLELCOMPONENTHEIGHTADJUST"};
+constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::SurfacesType::Num)> SurfacesTypeNamesUC{"ALLEXTERIORSURFACES",
+                                                                                                                     "ALLEXTERIORWINDOWS",
+                                                                                                                     "ALLEXTERIORWALLS",
+                                                                                                                     "ALLEXTERIORROOFS",
+                                                                                                                     "ALLEXTERIORFLOORS",
+                                                                                                                     "ALLINTERIORSURFACES",
+                                                                                                                     "ALLINTERIORWINDOWS",
+                                                                                                                     "ALLINTERIORWALLS",
+                                                                                                                     "ALLINTERIORROOFS",
+                                                                                                                     "ALLINTERIORCEILINGS",
+                                                                                                                     "ALLINTERIORFLOORS"};
 
 enum class ConvSurfDeltaT
 {
@@ -304,14 +315,14 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             }
 
             if (standardAlgo) {
-
-                if (algoNum == ConvectionConstants::HcInt_ASHRAESimple) {
+                switch (algoNum) {
+                case ConvectionConstants::HcInt_ASHRAESimple: {
                     CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
-
-                } else if (algoNum == ConvectionConstants::HcInt_ASHRAETARP) {
+                } break;
+                case ConvectionConstants::HcInt_ASHRAETARP: {
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                         CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                     } else {
@@ -321,21 +332,22 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
-
-                } else if (algoNum == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
-
+                } break;
+                case ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm: {
                     ManageInsideAdaptiveConvectionAlgo(state, SurfNum);
-
-                } else if ((algoNum == ConvectionConstants::HcInt_CeilingDiffuser) || (algoNum == ConvectionConstants::HcInt_TrombeWall)) {
+                } break;
+                case ConvectionConstants::HcInt_CeilingDiffuser:
+                case ConvectionConstants::HcInt_TrombeWall: {
                     // Already done above and can't be at individual surface
-
-                } else if (algoNum == ConvectionConstants::HcInt_ASTMC1340) {
+                } break;
+                case ConvectionConstants::HcInt_ASTMC1340: {
                     CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
-
-                } else {
-
+                } break;
+                default: {
                     ShowFatalError(state, "Unhandled convection coefficient algorithm.");
+                } break;
                 }
+
             } else { // Interior convection has been set by the user with "value" or "schedule"
                 state.dataHeatBalSurf->SurfHConvInt(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
                 // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -2471,7 +2483,11 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
 
     auto &Surface(state.dataSurface->Surface);
 
-    if (SurfaceTypes == "ALLEXTERIORSURFACES") {
+    ConvectionConstants::SurfacesType SurfType =
+        static_cast<ConvectionConstants::SurfacesType>(getEnumerationValue(SurfacesTypeNamesUC, UtilityRoutines::MakeUPPERCase(SurfaceTypes)));
+
+    switch (SurfType) {
+    case ConvectionConstants::SurfacesType::AllExteriorSurfaces: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2517,8 +2533,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLEXTERIORWINDOWS") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllExteriorWindows: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2565,8 +2581,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLEXTERIORWALLS") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllExteriorWalls: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2613,8 +2629,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLEXTERIORROOFS") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllExteriorRoofs: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2661,8 +2677,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLEXTERIORFLOORS") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllExteriorFloors: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2709,8 +2725,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLINTERIORSURFACES") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllInteriorSurfaces: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2756,8 +2772,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLINTERIORWINDOWS") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllInteriorWindows: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2804,8 +2820,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLINTERIORWALLS") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllInteriorWalls: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2852,8 +2868,9 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if ((SurfaceTypes == "ALLINTERIORROOFS") || (SurfaceTypes == "ALLINTERIORCEILINGS")) {
+    } break;
+    case ConvectionConstants::SurfacesType::AllInteriorRoofs:
+    case ConvectionConstants::SurfacesType::AllInteriorCeilings: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2900,8 +2917,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else if (SurfaceTypes == "ALLINTERIORFLOORS") {
+    } break;
+    case ConvectionConstants::SurfacesType::AllInteriorFloors: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2948,9 +2965,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                              "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
-
-    } else {
+    } break;
+    default: {
         SurfacesOfType = false;
+    } break;
     }
 
     if (!SurfacesOfType) {
