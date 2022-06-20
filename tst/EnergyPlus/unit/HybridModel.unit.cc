@@ -239,7 +239,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
-    state->afn->SimulateAirflowNetwork = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
@@ -730,7 +729,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
-    state->afn->SimulateAirflowNetwork = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
