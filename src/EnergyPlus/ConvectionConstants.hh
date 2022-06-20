@@ -274,23 +274,6 @@ enum class RefWind
     Num
 };
 
-enum class SurfacesType
-{
-    Invalid = -1,
-    AllExteriorSurfaces,
-    AllExteriorWindows,
-    AllExteriorWalls,
-    AllExteriorRoofs,
-    AllExteriorFloors,
-    AllInteriorSurfaces,
-    AllInteriorWindows,
-    AllInteriorWalls,
-    AllInteriorRoofs,
-    AllInteriorCeilings,
-    AllInteriorFloors,
-    Num
-};
-
 } // namespace EnergyPlus::ConvectionConstants
 
 #endif
