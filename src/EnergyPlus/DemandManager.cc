@@ -457,7 +457,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                     ManagerType MgrType = static_cast<ManagerType>(
                         getEnumerationValue(ManagerNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
 
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5));
                     if (MgrType != ManagerType::Invalid) {
 
                         thisManager =
