@@ -115,17 +115,6 @@ constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::Ref
     "MEANAIRTEMPERATURE", "ADJACENTAIRTEMPERATURE", "SUPPLYAIRTEMPERATURE"};
 constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::RefWind::Num)> RefWindNamesUC{
     "WEATHERFILE", "HEIGHTADJUST", "PARALLELCOMPONENT", "PARALLELCOMPONENTHEIGHTADJUST"};
-constexpr std::array<std::string_view, static_cast<int>(AllSurfacesType::Num)> AllSurfacesTypeNamesUC{"ALLEXTERIORSURFACES",
-                                                                                                                     "ALLEXTERIORWINDOWS",
-                                                                                                                     "ALLEXTERIORWALLS",
-                                                                                                                     "ALLEXTERIORROOFS",
-                                                                                                                     "ALLEXTERIORFLOORS",
-                                                                                                                     "ALLINTERIORSURFACES",
-                                                                                                                     "ALLINTERIORWINDOWS",
-                                                                                                                     "ALLINTERIORWALLS",
-                                                                                                                     "ALLINTERIORROOFS",
-                                                                                                                     "ALLINTERIORCEILINGS",
-                                                                                                                     "ALLINTERIORFLOORS"};
 
 enum class ConvSurfDeltaT
 {
@@ -167,6 +156,17 @@ enum class AllSurfacesType
     Num
 };
 
+constexpr std::array<std::string_view, static_cast<int>(AllSurfacesType::Num)> AllSurfacesTypeNamesUC{"ALLEXTERIORSURFACES",
+                                                                                                      "ALLEXTERIORWINDOWS",
+                                                                                                      "ALLEXTERIORWALLS",
+                                                                                                      "ALLEXTERIORROOFS",
+                                                                                                      "ALLEXTERIORFLOORS",
+                                                                                                      "ALLINTERIORSURFACES",
+                                                                                                      "ALLINTERIORWINDOWS",
+                                                                                                      "ALLINTERIORWALLS",
+                                                                                                      "ALLINTERIORROOFS",
+                                                                                                      "ALLINTERIORCEILINGS",
+                                                                                                      "ALLINTERIORFLOORS"};
 void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                   const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                   Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
