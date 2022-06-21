@@ -139,34 +139,34 @@ enum class InConvFlowRegime
     Num
 };
 
-enum class AllSurfacesType
+enum class SurfacesType
 {
     Invalid = -1,
-    ExteriorSurfaces,
-    ExteriorWindows,
-    ExteriorWalls,
-    ExteriorRoofs,
-    ExteriorFloors,
-    InteriorSurfaces,
-    InteriorWindows,
-    InteriorWalls,
-    InteriorRoofs,
-    InteriorCeilings,
-    InteriorFloors,
+    AllExteriorSurfaces,
+    AllExteriorWindows,
+    AllExteriorWalls,
+    AllExteriorRoofs,
+    AllExteriorFloors,
+    AllInteriorSurfaces,
+    AllInteriorWindows,
+    AllInteriorWalls,
+    AllInteriorRoofs,
+    AllInteriorCeilings,
+    AllInteriorFloors,
     Num
 };
 
-constexpr std::array<std::string_view, static_cast<int>(AllSurfacesType::Num)> AllSurfacesTypeNamesUC{"ALLEXTERIORSURFACES",
-                                                                                                      "ALLEXTERIORWINDOWS",
-                                                                                                      "ALLEXTERIORWALLS",
-                                                                                                      "ALLEXTERIORROOFS",
-                                                                                                      "ALLEXTERIORFLOORS",
-                                                                                                      "ALLINTERIORSURFACES",
-                                                                                                      "ALLINTERIORWINDOWS",
-                                                                                                      "ALLINTERIORWALLS",
-                                                                                                      "ALLINTERIORROOFS",
-                                                                                                      "ALLINTERIORCEILINGS",
-                                                                                                      "ALLINTERIORFLOORS"};
+constexpr std::array<std::string_view, static_cast<int>(SurfacesType::Num)> SurfacesTypeNamesUC{"ALLEXTERIORSURFACES",
+                                                                                                "ALLEXTERIORWINDOWS",
+                                                                                                "ALLEXTERIORWALLS",
+                                                                                                "ALLEXTERIORROOFS",
+                                                                                                "ALLEXTERIORFLOORS",
+                                                                                                "ALLINTERIORSURFACES",
+                                                                                                "ALLINTERIORWINDOWS",
+                                                                                                "ALLINTERIORWALLS",
+                                                                                                "ALLINTERIORROOFS",
+                                                                                                "ALLINTERIORCEILINGS",
+                                                                                                "ALLINTERIORFLOORS"};
 void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                   const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                   Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
@@ -2500,11 +2500,10 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
 
     auto &Surface(state.dataSurface->Surface);
 
-    AllSurfacesType SurfType =
-        static_cast<AllSurfacesType>(getEnumerationValue(AllSurfacesTypeNamesUC, UtilityRoutines::MakeUPPERCase(SurfaceTypes)));
+    SurfacesType SurfType = static_cast<SurfacesType>(getEnumerationValue(SurfacesTypeNamesUC, UtilityRoutines::MakeUPPERCase(SurfaceTypes)));
 
     switch (SurfType) {
-    case AllSurfacesType::ExteriorSurfaces: {
+    case SurfacesType::AllExteriorSurfaces: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2551,7 +2550,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::ExteriorWindows: {
+    case SurfacesType::AllExteriorWindows: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2599,7 +2598,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::ExteriorWalls: {
+    case SurfacesType::AllExteriorWalls: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2647,7 +2646,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::ExteriorRoofs: {
+    case SurfacesType::AllExteriorRoofs: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2695,7 +2694,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::ExteriorFloors: {
+    case SurfacesType::AllExteriorFloors: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2743,7 +2742,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::InteriorSurfaces: {
+    case SurfacesType::AllInteriorSurfaces: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2790,7 +2789,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::InteriorWindows: {
+    case SurfacesType::AllInteriorWindows: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2838,7 +2837,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::InteriorWalls: {
+    case SurfacesType::AllInteriorWalls: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2886,8 +2885,8 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::InteriorRoofs:
-    case AllSurfacesType::InteriorCeilings: {
+    case SurfacesType::AllInteriorRoofs:
+    case SurfacesType::AllInteriorCeilings: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
@@ -2935,7 +2934,7 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
                                  "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
         }
     } break;
-    case AllSurfacesType::InteriorFloors: {
+    case SurfacesType::AllInteriorFloors: {
         SurfacesOfType = false;
         SurfaceCountOutside = 0;
         SurfaceCountInside = 0;
