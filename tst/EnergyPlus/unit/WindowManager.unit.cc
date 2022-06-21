@@ -3207,6 +3207,11 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
                           "    7.2e10,                  !- Young's modulus {Pa}",
                           "    0.22;                    !- Poisson's ratio",
 
+                          " WindowMaterial:Gas,",
+                          "    Gap_1_W_0_0120,          !- Name",
+                          "    Air,                     !-Gas Type",
+                          "    0.0120;                  !- Thickness {m}",
+
                           "WindowMaterial:Gas,",
                           "    Gas_1_W_0_0100,          !- Name",
                           "    Air,                     !- Gas Type",
@@ -3472,10 +3477,25 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
                           "    1,                       !- Multiplier",
                           "    5.25,                    !- Ceiling Height {m}",
                           "    autocalculate, !-Volume{m3}",
-                          "    autocalculate, !-Floor Area{m2}",
-                          "    , !-Zone Inside Convection Algorithm"
-                          "    ,                        !- Zone Outside Convection Algorithm",
-                          "    Yes;                     !- Part of Total Floor Area",
+                          "    autocalculate; !-Floor Area{m2}",
+                          //"    , !-Zone Inside Convection Algorithm"
+                          //"    ,                        !- Zone Outside Convection Algorithm",
+                          //"    Yes;                     !- Part of Total Floor Area",
+
+                          "Matrix:TwoDimension,",
+                          "    CFS_Glz_2035_Basis,      !- Name",
+                          "    5,                       !- Number of Rows",
+                          "    2,                       !- Number of Columns",
+                          "    0.00000,                 !- Value 1",
+                          "    1.00000,                 !- Value 2",
+                          "    18.00000,                !- Value 3",
+                          "    8.00000,                 !- Value 4",
+                          "    36.00000,                !- <none>",
+                          "    12.00000,                !- <none>",
+                          "    54.00000,                !- <none>",
+                          "    12.00000,                !- <none>",
+                          "    76.50000,                !- <none>",
+                          "    8.00000;                 !- <none>",
 
                           "Matrix:TwoDimension,",
                           "    CFS_Glz_2035_Layer_1_fAbs,  !- Name",
@@ -3752,20 +3772,6 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
                           "    0.21799,                 !- <none>",
                           "    0.21799,                 !- <none>",
                           "    0.21799;                 !- <none>",
-
-                          "Matrix:TwoDimension,",
-                          "    CFS_Glz_2035_Basis,      !- Name",
-                          "    5,                       !- Number of Rows",
-                          "    2,                       !- Number of Columns",
-                          "    1.00000,                 !- Value 2",
-                          "    18.00000,                !- Value 3",
-                          "    8.00000,                 !- Value 4",
-                          "    36.00000,                !- <none>",
-                          "    12.00000,                !- <none>",
-                          "    54.00000,                !- <none>",
-                          "    12.00000,                !- <none>",
-                          "    76.50000,                !- <none>",
-                          "    8.00000;                 !- <none>",
 
                           "Matrix:TwoDimension,",
                           "    CFS_Glz_2035_TfSol,      !- Name",
@@ -7629,13 +7635,13 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
 
     Real64 T_in = 21.0;
     Real64 T_out = -18.0;
-    Real64 I_s = 0.0;
+    Real64 I_s = 20.0;
     Real64 v_ws = 5.5;
 
     // Overrides for testing
-    state->dataHeatBal->SurfCosIncAng.dimension(1, 1, 3, 1.0);
-    state->dataHeatBal->SurfSunlitFrac.dimension(1, 1, 3, 1.0);
-    state->dataHeatBal->SurfSunlitFracWithoutReveal.dimension(1, 1, 3, 1.0);
+    state->dataHeatBal->SurfCosIncAng.dimension(1, 1, 11, 1.0);
+    state->dataHeatBal->SurfSunlitFrac.dimension(1, 1, 11, 1.0);
+    state->dataHeatBal->SurfSunlitFracWithoutReveal.dimension(1, 1, 11, 1.0);
 
     state->dataSurface->SurfOutDryBulbTemp(winNum) = T_out;
     state->dataHeatBal->SurfTempEffBulkAir(winNum) = T_in;
@@ -7658,6 +7664,10 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
         state->dataEnvrn->SunIsUp = true;
     }
 
+    state->dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullInteriorExterior;
+
     HeatBalanceSurfaceManager::InitSolarHeatGains(*state);
+
+    state->dataHeatBal->SurfWinBackSurfaces(1, 1, 1, 7) = 11;
     SolarShading::CalcInteriorSolarDistribution(*state);
 }
