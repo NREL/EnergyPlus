@@ -108,22 +108,6 @@ enum class DeflectionCalculation : int
 constexpr int MMax = 5; // top m value for which "deflection sum" will be calculated
 constexpr int NMax = 5; // top n value for which "deflection sum" will be calculated
 
-enum class CalcForcedVentilation
-{
-    Invalid = -1,
-    Skip,
-    Allow,
-    Num
-};
-
-//  Calculation outcome
-enum class CalculationOutcome
-{
-    Invalid = -1,
-    OK,
-    Num
-};
-
 int constexpr NumOfIterations(100);
 
 // Program will examine convergence parameter in each iteration.  That convergence parameter should decrease each time.

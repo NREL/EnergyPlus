@@ -94,6 +94,38 @@ Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponen
                                                      "ZoneHVAC:EvaporativeCoolerUnit",
                                                      "ZoneHVAC:HybridUnitaryHVAC"});
 
+constexpr std::array<std::string_view, static_cast<int>(ZoneEquip::Num)> ZoneEquipTypeNamesUC = {"NONE",
+                                                                                                 "ZONEHVAC:FOURPIPEFANCOIL",
+                                                                                                 "ZONEHVAC:PACKAGEDTERMINALHEATPUMP",
+                                                                                                 "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",
+                                                                                                 "ZONEHVAC:WATERTOAIRHEATPUMP",
+                                                                                                 "ZONEHVAC:WINDOWAIRCONDITIONER",
+                                                                                                 "ZONEHVAC:UNITHEATER",
+                                                                                                 "ZONEHVAC:UNITVENTILATOR",
+                                                                                                 "ZONEHVAC:ENERGYRECOVERYVENTILATOR",
+                                                                                                 "ZONEHVAC:VENTILATEDSLAB",
+                                                                                                 "ZONEHVAC:OUTDOORAIRUNIT",
+                                                                                                 "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
+                                                                                                 "ZONEHVAC:IDEALLOADSAIRSYSTEM",
+                                                                                                 "ZONEHVAC:EVAPORATIVECOOLERUNIT",
+                                                                                                 "ZONEHVAC:HYBRIDUNITARYHVAC",
+                                                                                                 "ZONEHVAC:AIRDISTRIBUTIONUNIT",
+                                                                                                 "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
+                                                                                                 "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",
+                                                                                                 "ZONEHVAC:HIGHTEMPERATURERADIANT",
+                                                                                                 "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",
+                                                                                                 "FAN:ZONEEXHAUST",
+                                                                                                 "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
+                                                                                                 "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",
+                                                                                                 "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
+                                                                                                 "ZONEHVAC:DEHUMIDIFIER:DX",
+                                                                                                 "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
+                                                                                                 "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",
+                                                                                                 "ZONEHVAC:REFRIGERATIONCHILLERSET",
+                                                                                                 "ZONEHVAC:FORCEDAIR:USERDEFINED",
+                                                                                                 "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
+                                                                                                 "AIRLOOPHVAC:UNITARYSYSTEM"};
+
 void GetZoneEquipmentData(EnergyPlusData &state)
 {
 
@@ -108,7 +140,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // a zone
 
     // Using/Aliasing
-    using BranchNodeConnections::SetUpCompSets;
     using NodeInputManager::CheckUniqueNodeNames;
     using NodeInputManager::CheckUniqueNodeNumbers;
     using NodeInputManager::EndUniqueNodeCheck;
@@ -514,112 +545,21 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0) ++thisZoneEquipList.NumAvailHeatEquip;
                 if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0) ++thisZoneEquipList.NumAvailCoolEquip;
 
-                {
-                    auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(thisZoneEquipList.EquipType(ZoneEquipTypeNum)));
+                thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = static_cast<ZoneEquip>(
+                    getEnumerationValue(ZoneEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(thisZoneEquipList.EquipType(ZoneEquipTypeNum))));
 
-                    if (SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::AirDistUnit;
+                if (thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::ZoneUnitarySys) {
+                    UnitarySystems::UnitarySys thisSys;
+                    thisZoneEquipList.compPointer[ZoneEquipTypeNum] =
+                        thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
+                }
 
-                    } else if (SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER") { // Window Air Conditioner
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::WindowAC;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") { // Packaged Terminal Heat Pump
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER") { // Packaged Terminal Air Conditioner
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
-
-                    } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
-                        UnitarySystems::UnitarySys thisSys;
-                        thisZoneEquipList.compPointer[ZoneEquipTypeNum] =
-                            thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::ZoneDXDehumidifier;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP") { // Zone Water to Air Heat Pump
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:FOURPIPEFANCOIL") { // 4-Pipe Fan Coil
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::FanCoil4Pipe;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:UNITVENTILATOR") { // Unit Ventilator
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::UnitVentilator;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:UNITHEATER") { // Unit Heater
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::UnitHeater;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:IDEALLOADSAIRSYSTEM") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::PurchasedAir;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER") { // Hot Water Baseboard
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::BBWater;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER") { // Baseboard
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::BBWaterConvective;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC") { // Electric Baseboard
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::BBElectricConvective;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER") { // Simple Cooling Panel
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::CoolingPanel;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT") { // High Temperature Radiators
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::HiTempRadiant;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW") { // Low temperature radiant system (hydronic)
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::LoTempRadiant;
-
-                    } else if (SELECT_CASE_var ==
-                               "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW") { // Low temperature radiant system (hydronic, constant flow)
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::LoTempRadiant;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") { // Low temperature radiant system (electric)
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::LoTempRadiant;
-
-                    } else if (SELECT_CASE_var == "FAN:ZONEEXHAUST") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::ZoneExhaustFan;
-
-                    } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::HeatXchngr;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:ENERGYRECOVERYVENTILATOR") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::ERVStandAlone;
-
-                    } else if (SELECT_CASE_var == "WATERHEATER:HEATPUMP:PUMPEDCONDENSER") {
+                if (thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::Invalid) {
+                    if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ||
+                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
+                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = ZoneEquip::LoTempRadiant;
+                    } else if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
                         thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::HPWaterHeater;
-
-                    } else if (SELECT_CASE_var == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::HPWaterHeater;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:VENTILATEDSLAB") { // Ventilated Slab
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::VentilatedSlab;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM") { // Steam Baseboard
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::BBSteam;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:OUTDOORAIRUNIT") { // Outdoor Air Unit
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::OutdoorAirUnit;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC") { // Radiant electric Baseboard
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::BBElectric;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW") { // VRF AC System
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::VRFTerminalUnit;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:REFRIGERATIONCHILLERSET") { // Refrigeration chiller designed for warehouse applications
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::RefrigerationAirChillerSet;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:FORCEDAIR:USERDEFINED") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::UserDefinedZoneHVACForcedAir;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:HYBRIDUNITARYHVAC") {
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler;
-
                     } else {
                         ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError(state, "..Invalid Equipment Type = " + thisZoneEquipList.EquipType(ZoneEquipTypeNum));
