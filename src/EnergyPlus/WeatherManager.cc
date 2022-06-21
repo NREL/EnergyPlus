@@ -2051,7 +2051,7 @@ namespace WeatherManager {
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn ==
                     DataGlobalConstants::KindOfSim::RunPeriodDesign ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
-                for (int i = 0; i < state.dataWeatherManager->TodayOutDryBulbTemp.size(); ++i) {
+                for (size_t i = 0; i < state.dataWeatherManager->TodayOutDryBulbTemp.size(); ++i) {
                     if (state.dataWeatherManager->TodayOutDryBulbTemp[i] >
                         state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOATSizing) {
                         state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOATSizing =
