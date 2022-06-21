@@ -94,6 +94,37 @@ namespace EMSManager {
     // Using/Aliasing
     using namespace DataRuntimeLanguage;
 
+    constexpr std::array<std::string_view, static_cast<int>(EMSCallFrom::Num)> EMSCallFromNamesUC{"ENDOFZONESIZING",
+                                                                                                  "ENDOFSYSTEMSIZING",
+                                                                                                  "BEGINNEWENVIRONMENT",
+                                                                                                  "AFTERNEWENVIRONMENTWARMUPISCOMPLETE",
+                                                                                                  "BEGINTIMESTEPBEFOREPREDICTOR",
+                                                                                                  "AFTERPREDICTORBEFOREHVACMANAGERS",
+                                                                                                  "AFTERPREDICTORAFTERHVACMANAGERS",
+                                                                                                  "INSIDEHVACSYSTEMITERATIONLOOP",
+                                                                                                  "ENDOFSYSTEMTIMESTEPBEFOREHVACREPORTING",
+                                                                                                  "ENDOFSYSTEMTIMESTEPAFTERHVACREPORTING",
+                                                                                                  "ENDOFZONETIMESTEPBEFOREZONEREPORTING",
+                                                                                                  "ENDOFZONETIMESTEPAFTERZONEREPORTING",
+                                                                                                  "SETUPSIMULATION",
+                                                                                                  "EXTERNALINTERFACE",
+                                                                                                  "AFTERCOMPONENTINPUTREADIN",
+                                                                                                  "USERDEFINEDCOMPONENTMODEL",
+                                                                                                  "UNITARYSYSTEMSIZING",
+                                                                                                  "BEGINZONETIMESTEPBEFOREINITHEATBALANCE",
+                                                                                                  "BEGINZONETIMESTEPAFTERINITHEATBALANCE",
+                                                                                                  "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER"};
+
+    std::array<std::string, static_cast<int>(SPControlType::Num)> controlTypeName{"Temperature Setpoint",
+                                                                                  "Temperature Minimum Setpoint",
+                                                                                  "Temperature Maximum Setpoint",
+                                                                                  "Humidity Ratio Setpoint",
+                                                                                  "Humidity Ratio Minimum Setpoint",
+                                                                                  "Humidity Ratio Maximum Setpoint",
+                                                                                  "Mass Flow Rate Setpoint",
+                                                                                  "Mass Flow Rate Minimum Available Setpoint",
+                                                                                  "Mass Flow Rate Maximum Available Setpoint"};
+
     void CheckIfAnyEMS(EnergyPlusData &state)
     {
 
@@ -904,54 +935,9 @@ namespace EMSManager {
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).Name = cAlphaArgs(1);
 
-                {
-                    auto const SELECT_CASE_var(cAlphaArgs(2));
-
-                    if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginNewEnvironment;
-                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint =
-                            EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather;
-                    } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginNewEnvironmentAfterWarmUp;
-                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint =
-                            EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance;
-                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPAFTERINITHEATBALANCE") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint =
-                            EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance;
-                    } else if (SELECT_CASE_var == "BEGINTIMESTEPBEFOREPREDICTOR") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginTimestepBeforePredictor;
-                    } else if (SELECT_CASE_var == "AFTERPREDICTORBEFOREHVACMANAGERS") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeforeHVACManagers;
-                    } else if (SELECT_CASE_var == "AFTERPREDICTORAFTERHVACMANAGERS") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::AfterHVACManagers;
-                    } else if (SELECT_CASE_var == "INSIDEHVACSYSTEMITERATIONLOOP") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::HVACIterationLoop;
-                    } else if (SELECT_CASE_var == "ENDOFZONETIMESTEPBEFOREZONEREPORTING") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndZoneTimestepBeforeZoneReporting;
-                    } else if (SELECT_CASE_var == "ENDOFZONETIMESTEPAFTERZONEREPORTING") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndZoneTimestepAfterZoneReporting;
-                    } else if (SELECT_CASE_var == "ENDOFSYSTEMTIMESTEPBEFOREHVACREPORTING") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndSystemTimestepBeforeHVACReporting;
-                    } else if (SELECT_CASE_var == "ENDOFSYSTEMTIMESTEPAFTERHVACREPORTING") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndSystemTimestepAfterHVACReporting;
-                    } else if (SELECT_CASE_var == "ENDOFZONESIZING") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::ZoneSizing;
-                    } else if (SELECT_CASE_var == "ENDOFSYSTEMSIZING") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::SystemSizing;
-                    } else if (SELECT_CASE_var == "AFTERCOMPONENTINPUTREADIN") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::ComponentGetInput;
-                    } else if (SELECT_CASE_var == "USERDEFINEDCOMPONENTMODEL") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::UserDefinedComponentModel;
-                    } else if (SELECT_CASE_var == "UNITARYSYSTEMSIZING") {
-                        state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::UnitarySystemSizing;
-                    } else {
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ErrorsFound = true;
-                    }
-                }
+                state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint =
+                    static_cast<EMSCallFrom>(getEnumerationValue(EMSCallFromNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2))));
+                ErrorsFound = ErrorsFound || (state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint == EMSCallFrom::Invalid);
 
                 NumErlProgramsThisManager = NumAlphas - 2;
                 state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).NumErlPrograms = NumErlProgramsThisManager;
@@ -1647,35 +1633,6 @@ namespace EMSManager {
         }
     }
 
-    std::string controlTypeName(SPControlType const SetPointType)
-    {
-        std::string cControlTypeName;
-
-        auto const SELECT_CASE_var(SetPointType);
-
-        if (SELECT_CASE_var == SPControlType::TemperatureSetPoint) {
-            cControlTypeName = "Temperature Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::TemperatureMinSetPoint) {
-            cControlTypeName = "Temperature Minimum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::TemperatureMaxSetPoint) {
-            cControlTypeName = "Temperature Maximum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::HumidityRatioSetPoint) {
-            cControlTypeName = "Humidity Ratio Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::HumidityRatioMinSetPoint) {
-            cControlTypeName = "Humidity Ratio Minimum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::HumidityRatioMaxSetPoint) {
-            cControlTypeName = "Humidity Ratio Maximum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::MassFlowRateSetPoint) {
-            cControlTypeName = "Mass Flow Rate Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::MassFlowRateMinSetPoint) {
-            cControlTypeName = "Mass Flow Rate Minimum Available Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::MassFlowRateMaxSetPoint) {
-            cControlTypeName = "Mass Flow Rate Maximum Available Setpoint";
-        }
-
-        return cControlTypeName;
-    }
-
     bool CheckIfNodeSetPointManaged(EnergyPlusData &state, int const NodeNum, SPControlType const SetPointType, bool byHandle)
     {
 
@@ -1693,7 +1650,7 @@ namespace EMSManager {
 
         std::string cNodeName = state.dataLoopNodes->NodeID(NodeNum);
         std::string cComponentTypeName = "System Node Setpoint";
-        std::string cControlTypeName = controlTypeName(SetPointType);
+        std::string cControlTypeName = controlTypeName[static_cast<int>(SetPointType)];
 
         if (byHandle) {
             for (int Loop = 1; Loop <= state.dataRuntimeLang->numEMSActuatorsAvailable; ++Loop) {
@@ -1706,8 +1663,9 @@ namespace EMSManager {
                 }
             }
             if (!FoundControl) {
-                ShowWarningError(
-                    state, "Missing '" + controlTypeName(SetPointType) + "' for node named named '" + state.dataLoopNodes->NodeID(NodeNum) + "'.");
+                ShowWarningError(state,
+                                 "Missing '" + controlTypeName[static_cast<int>(SetPointType)] + "' for node named named '" +
+                                     state.dataLoopNodes->NodeID(NodeNum) + "'.");
             }
         } else {
             for (int Loop = 1; Loop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++Loop) {
@@ -1754,25 +1712,36 @@ namespace EMSManager {
                 auto &nodeSetpointCheck = state.dataLoopNodes->NodeSetpointCheck(NodeNum);
                 nodeSetpointCheck.needsSetpointChecking = true;
 
-                auto const SELECT_CASE_var(SetPointType);
-                if (SELECT_CASE_var == SPControlType::TemperatureSetPoint) {
+                switch (SetPointType) {
+                case SPControlType::TemperatureSetPoint: {
                     nodeSetpointCheck.checkTemperatureSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::TemperatureMinSetPoint) {
+                } break;
+                case SPControlType::TemperatureMinSetPoint: {
                     nodeSetpointCheck.checkTemperatureMinSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::TemperatureMaxSetPoint) {
+                } break;
+                case SPControlType::TemperatureMaxSetPoint: {
                     nodeSetpointCheck.checkTemperatureMaxSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::HumidityRatioSetPoint) {
+                } break;
+                case SPControlType::HumidityRatioSetPoint: {
                     nodeSetpointCheck.checkHumidityRatioSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::HumidityRatioMinSetPoint) {
+                } break;
+                case SPControlType::HumidityRatioMinSetPoint: {
                     nodeSetpointCheck.checkHumidityRatioMinSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::HumidityRatioMaxSetPoint) {
+                } break;
+                case SPControlType::HumidityRatioMaxSetPoint: {
                     nodeSetpointCheck.checkHumidityRatioMaxSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::MassFlowRateSetPoint) {
+                } break;
+                case SPControlType::MassFlowRateSetPoint: {
                     nodeSetpointCheck.checkMassFlowRateSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::MassFlowRateMinSetPoint) {
+                } break;
+                case SPControlType::MassFlowRateMinSetPoint: {
                     nodeSetpointCheck.checkMassFlowRateMinSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::MassFlowRateMaxSetPoint) {
+                } break;
+                case SPControlType::MassFlowRateMaxSetPoint: {
                     nodeSetpointCheck.checkMassFlowRateMaxSetPoint = true;
+                } break;
+                default:
+                    break;
                 }
             }
         }
