@@ -224,6 +224,9 @@ namespace UnitarySystems {
             Unitary,          // AirloopHVAC:UnitarySystem
             CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water
+            PackagedAC,       // ZoneHVAC:PackagedTerminalAirConditioner
+            PackagedHP,       // ZoneHVAC:PackagedTerminalHeatPump
+            PackagedWSHP,     // ZoneHVAC:WaterToAirHeatPump
             Num
         };
 

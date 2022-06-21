@@ -1698,6 +1698,12 @@ namespace UnitarySystems {
                     state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                     state.dataSize->DataIsDXCoil = true;
                 }
+                if ((this->m_sysType == SysType::PackagedWSHP) &&
+                    this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                    state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
+                    // VS coil model does not check for flow/capacity ratio, this will disable that test in Capacity sizer
+                    // state.dataSize->DataIsDXCoil = true;
+                }
                 CoolingCapacitySizer sizerCoolingCapacity;
                 sizerCoolingCapacity.overrideSizingString(SizingString);
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -1868,7 +1874,34 @@ namespace UnitarySystems {
             state.dataSize->DataFlowUsedForSizing = 0.0;
         }
 
-        // STEP 3: use the greater of cooling and heating air flow rates for system flow
+        // STEP 3A: Find VS cooling coil air flow to capacity ratio and adjust design air flow
+        // this does not use nominal speed level air flow (VarSpeedCoil(WhichCoil).NormSpedLevel), should it?
+        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+            Real64 coolingToHeatingCapRatio = 1.0;
+            if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+                int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NormSpedLevel;
+                Real64 coolingAirFlowToCapacityRatio =
+                    state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
+                EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
+                if (EqSizing.DesHeatingLoad > 0.0) coolingToHeatingCapRatio = EqSizing.DesCoolingLoad / EqSizing.DesHeatingLoad;
+            }
+            // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
+            if (((this->m_sysType == SysType::PackagedHP && this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
+                 (this->m_sysType == SysType::PackagedWSHP &&
+                  this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) &&
+                this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
+                int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
+                Real64 heatingAirFlowToCapacityRatio =
+                    state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
+                // is this a coincidence or does VS coil apply FlowToCap ratio to adjusted heating = cooling coil capacity?
+                EqSizing.DesHeatingLoad *= coolingToHeatingCapRatio;
+                EqSizing.HeatingAirVolFlow = EqSizing.DesHeatingLoad * heatingAirFlowToCapacityRatio;
+            }
+        }
+
+        // STEP 3B: use the greater of cooling and heating air flow rates for system flow
         // previous version of E+ used maximum flow rate for unitary systems. Keep this methodology for now.
         // Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow
         // rates (might require additional change to if block logic).
