@@ -858,6 +858,7 @@
     11.088084240584,         !- Coefficient2 w
     -1.75195196204063,       !- Coefficient3 x
     0.760820340847872,       !- Coefficient4 y
+    0.0,                     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -930,6 +931,7 @@
     -11.4496890368762,       !- Coefficient3 w
     -0.944804890543481,      !- Coefficient4 x
     0.739606605780884,       !- Coefficient5 y
+    0.0,                     !- Coefficient6 z
     -100,                    !- Minimum Value of v
     100,                     !- Maximum Value of v
     -100,                    !- Minimum Value of w
@@ -954,9 +956,9 @@
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     5.12,                    !- Gross Rated Cooling COP {W/W}
-    30.0,                   !- Rated Entering Water Temperature {C}
-    27.0,                !- Rated Entering Air Dry-Bulb Temperature {C}
-    19.0,                !- Rated Entering Air Wet-Bulb Temperature {C}
+    30.0,                    !- Rated Entering Water Temperature {C}
+    27.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                    !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name

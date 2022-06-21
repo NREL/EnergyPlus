@@ -57676,7 +57676,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 1,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57708,7 +57708,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 2,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57740,7 +57740,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 3,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57772,7 +57772,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 4,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57804,7 +57804,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 5,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57836,7 +57836,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 6,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57868,7 +57868,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 7,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57900,7 +57900,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 8,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57932,7 +57932,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 9,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57964,7 +57964,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve10,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -57996,7 +57996,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve11,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58028,7 +58028,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve12,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58060,7 +58060,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve13,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58092,7 +58092,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve14,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58124,7 +58124,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve15,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58156,7 +58156,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve16,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58188,7 +58188,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve17,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58220,7 +58220,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve18,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58252,7 +58252,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve19,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58284,7 +58284,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve20,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58316,7 +58316,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve21,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58348,7 +58348,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve22,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58380,7 +58380,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve23,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58412,7 +58412,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve24,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58444,7 +58444,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve25,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58476,7 +58476,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve26,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58508,7 +58508,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve27,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58540,7 +58540,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve28,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58572,7 +58572,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve29,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58604,7 +58604,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve30,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58636,7 +58636,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve31,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58668,7 +58668,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve32,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58700,7 +58700,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve33,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58732,7 +58732,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve34,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58764,7 +58764,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve35,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58796,7 +58796,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve36,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58828,7 +58828,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve37,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58860,7 +58860,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve38,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58892,7 +58892,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve39,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58924,7 +58924,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve40,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58956,7 +58956,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve41,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -58988,7 +58988,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve42,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59020,7 +59020,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve43,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59052,7 +59052,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve44,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59084,7 +59084,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve45,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59116,7 +59116,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve46,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59148,7 +59148,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve47,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59180,7 +59180,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve48,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59212,7 +59212,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve49,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59244,7 +59244,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve50,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59276,7 +59276,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve51,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59308,7 +59308,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve52,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59340,7 +59340,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve53,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59372,7 +59372,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve54,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59404,7 +59404,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve55,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59436,7 +59436,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve56,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59468,7 +59468,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve57,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59500,7 +59500,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve58,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59532,7 +59532,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve59,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59564,7 +59564,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve60,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59596,7 +59596,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve61,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59628,7 +59628,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve62,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59660,7 +59660,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve63,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59692,7 +59692,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve64,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59724,7 +59724,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve65,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59756,7 +59756,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve66,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59788,7 +59788,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve67,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59820,7 +59820,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve68,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59852,7 +59852,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve69,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59884,7 +59884,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve70,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59916,7 +59916,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve71,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59948,7 +59948,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve72,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -59980,7 +59980,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve73,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -60012,7 +60012,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve74,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -60044,7 +60044,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve75,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -60076,7 +60076,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve76,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -60108,7 +60108,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve77,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -60140,7 +60140,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve78,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -60172,7 +60172,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve79,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
@@ -60204,7 +60204,7 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve80,      !- Name
-    -5.64270843812028       !- Coefficient1 Constant
+    -5.64270843812028,       !- Coefficient1 Constant
     0.436278088630104,        !- Coefficient2 w
     5.80919185594373,       !- Coefficient3 x
     0.140731472492284,       !- Coefficient4 y
