@@ -2823,19 +2823,24 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 currBeamSolar(SurfNum) * state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) *
                 state.dataHeatBal->SurfCosIncidenceAngle(SurfNum);
 
+            Real64 GndSurfReflectance = 0.0;
+            if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
+                GndSurfReflectance = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum)).SurfsReflAvg;
+            } else {
+                GndSurfReflectance = state.dataEnvrn->GndReflectance;
+            }
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
             state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
                 state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
             state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
             // Incident diffuse solar from beam-to-diffuse reflection from ground
-            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
-                                                                          state.dataEnvrn->GndReflectance *
-                                                                          state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
+                state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance * state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
 
             // Incident diffuse solar from sky diffuse reflection from ground
             state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+                state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
             // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
             // in SkySolarInc.
             // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
