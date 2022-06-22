@@ -451,7 +451,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     ! Use the SurroundingSurfaces object saved fields F4 and F5 to create a new ground property object
                     CALL GetNewObjectDefInIDD('SURFACEPROPERTY:GROUNDSURFACES',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                     OutArgs(1) = 'Gnd-'//matchedSurroundingName
-                    OutArgs(2) = 'Gnd-'//matchedSurroundingName//'1'
+                    OutArgs(2) = 'Gnd-'//TRIM(matchedSurroundingName)//'-1'
                     OutArgs(3) = SurroundingField1
                     OutArgs(4) = SurroundingField2
                     CurArgs = 4
