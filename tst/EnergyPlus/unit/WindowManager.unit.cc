@@ -3225,7 +3225,7 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
 
                           "WindowMaterial:ComplexShade,",
                           "    Shade_45_Layer,          !- Name",
-                          "    Perforated,              !- Layer Type",
+                          "    BSDF,              !- Layer Type",
                           "    5.000000e-003,           !- Thickness {m}",
                           "    1.700000e+001,           !- Conductivity {W/m-K}",
                           "    0.000000e+000,           !- IR Transmittance",
@@ -7669,5 +7669,9 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     HeatBalanceSurfaceManager::InitSolarHeatGains(*state);
 
     state->dataHeatBal->SurfWinBackSurfaces(1, 1, 1, 7) = 11;
+
     SolarShading::CalcInteriorSolarDistribution(*state);
+
+    EXPECT_EQ(state->dataSolarShading->SurfWinAbsBeam(1), 0.000);
+    EXPECT_EQ(state->dataSolarShading->SurfWinAbsBeam(2), 0.000);
 }
