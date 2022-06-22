@@ -8959,6 +8959,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
                     state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface.ViewFactorSkyIR;
                     if (GndSurfsNum == 0) {
                         state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor = Surface.ViewFactorGroundIR;
+                        state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).IsGroundViewFactorSet = true;
                     }
                 }
                 if (GndSurfsNum > 0) {

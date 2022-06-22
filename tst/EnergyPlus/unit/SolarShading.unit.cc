@@ -3090,6 +3090,8 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SrdSurfsProperty.SurroundingSurfs(1).ViewFactor = 0.2;
     SrdSurfsProperty.SkyViewFactor = 0.0;
     SrdSurfsProperty.IsSkyViewFactorSet = false;
+    SrdSurfsProperty.GroundViewFactor = 0.0;
+    SrdSurfsProperty.IsGroundViewFactorSet = false;
 
     state->dataSurface->IsSurfPropertyGndSurfacesDefined.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->IsSurfPropertyGndSurfacesDefined = false;
@@ -3115,9 +3117,9 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
     // check surface property sky and ground view factors
     EXPECT_DOUBLE_EQ(0.4, SrdSurfsProperty.SkyViewFactor);
-    EXPECT_DOUBLE_EQ(0.4, SrdSurfsProperty.SkyViewFactor);
     EXPECT_TRUE(SrdSurfsProperty.IsSkyViewFactorSet);
-    EXPECT_TRUE(GndSurfsProperty.IsGroundViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty.GroundViewFactor);
+    EXPECT_FALSE(SrdSurfsProperty.IsGroundViewFactorSet);
     Real64 results_Surface_SkyViewFactor = 0.0;
     Real64 results_Surface_GndViewFactor = 0.0;
     // check exterior surfaces sky and ground view factors
