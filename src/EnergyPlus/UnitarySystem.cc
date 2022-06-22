@@ -1882,26 +1882,28 @@ namespace UnitarySystems {
 
         // STEP 3A: Find VS cooling coil air flow to capacity ratio and adjust design air flow
         // this does not use nominal speed level air flow (VarSpeedCoil(WhichCoil).NormSpedLevel), should it?
-        Real64 coolingToHeatingCapRatio = 1.0;
-        if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
-             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
-            this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
-            int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NormSpedLevel;
-            Real64 coolingAirFlowToCapacityRatio =
-                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
-            EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
-            if (EqSizing.DesHeatingLoad > 0.0) coolingToHeatingCapRatio = EqSizing.DesCoolingLoad / EqSizing.DesHeatingLoad;
-        }
-        // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
-        if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
-             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
-            this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
-            int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
-            Real64 heatingAirFlowToCapacityRatio =
-                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
-            // is this a coincidence or does VS coil apply FlowToCap ratio to adjusted heating = cooling coil capacity?
-            EqSizing.DesHeatingLoad *= coolingToHeatingCapRatio;
-            EqSizing.HeatingAirVolFlow = EqSizing.DesHeatingLoad * heatingAirFlowToCapacityRatio;
+        if (EqSizing.DesCoolingLoad > 0.0) {
+            Real64 coolingToHeatingCapRatio = 1.0;
+            if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+                int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NormSpedLevel;
+                Real64 coolingAirFlowToCapacityRatio =
+                    state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
+                EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
+                if (EqSizing.DesHeatingLoad > 0.0) coolingToHeatingCapRatio = EqSizing.DesCoolingLoad / EqSizing.DesHeatingLoad;
+            }
+            // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
+            if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                 this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
+                this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
+                int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
+                Real64 heatingAirFlowToCapacityRatio =
+                    state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
+                // is this a coincidence or does VS coil apply FlowToCap ratio to adjusted heating = cooling coil capacity?
+                EqSizing.DesHeatingLoad *= coolingToHeatingCapRatio;
+                EqSizing.HeatingAirVolFlow = EqSizing.DesHeatingLoad * heatingAirFlowToCapacityRatio;
+            }
         }
 
         // STEP 3B: use the greater of cooling and heating air flow rates for system flow
