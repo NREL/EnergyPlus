@@ -3497,7 +3497,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
 
     // autosized air flow and capacity, unitary system capacity matches coils
     EXPECT_NEAR(thisSys->m_MaxCoolAirVolFlow, 2.009436, 0.0001);
-    EXPECT_NEAR(thisSys->m_MaxHeatAirVolFlow, 2.009436, 0.0001);
+    EXPECT_NEAR(thisSys->m_MaxHeatAirVolFlow, 1.506653, 0.0001);
     EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 35971.0, 0.0001);
     Real64 designAirFlow = thisSys->m_DesignCoolingCapacity * state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(
                                                                   state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel);
@@ -15991,7 +15991,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
 
     EXPECT_NEAR(1.79645, thisSys->m_DesignFanVolFlowRate, 0.00001);
     EXPECT_NEAR(1.79645, thisSys->m_MaxCoolAirVolFlow, 0.00001);
-    EXPECT_NEAR(1.79645, thisSys->m_MaxHeatAirVolFlow, 0.00001);
+    EXPECT_NEAR(1.79486, thisSys->m_MaxHeatAirVolFlow, 0.00001);
     EXPECT_NEAR(1.79645, designAirFlow, 0.00001);
 
     Real64 results_noLoadHeatingFlowRatio = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(1) /
