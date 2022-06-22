@@ -8225,15 +8225,26 @@ namespace SurfaceGeometry {
                     SrdSurfsProp.SkyTempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 }
 
+                // N2: ground view factor
+                if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
+                    SrdSurfsProp.GroundViewFactor = state.dataIPShortCut->rNumericArgs(2);
+                    SrdSurfsProp.IsGroundViewFactorSet = true;
+                }
+
+                // A3: ground temp sch name
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    SrdSurfsProp.GroundTempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                }
+
                 // The object requires at least one srd surface input, each surface requires a set of 3 fields (2 Alpha fields Name and Temp Sch Name
                 // and 1 Num fields View Factor)
-                if (NumAlpha < 4) {
+                if (NumAlpha < 5) {
                     ShowSevereError(state, format("{} = \"{}\" is not defined correctly.", cCurrentModuleObject, SrdSurfsProp.Name));
                     ShowContinueError(state, "At lease one set of surrounding surface properties should be defined.");
                     ErrorsFound = true;
                     continue;
                 }
-                if ((NumAlpha - 2) / 2 != (NumNumeric - 1)) {
+                if ((NumAlpha - 3) / 2 != (NumNumeric - 2)) {
                     ShowSevereError(state, format("{} = \"{}\" is not defined correctly.", cCurrentModuleObject, SrdSurfsProp.Name));
                     ShowContinueError(state, "Check number of input fields for each surrounding surface.");
                     ErrorsFound = true;
@@ -8243,9 +8254,9 @@ namespace SurfaceGeometry {
                 SrdSurfsProp.TotSurroundingSurface = NumNumeric - 1;
                 SrdSurfsProp.SurroundingSurfs.allocate(SrdSurfsProp.TotSurroundingSurface);
                 for (int SurfLoop = 1; SurfLoop <= SrdSurfsProp.TotSurroundingSurface; ++SurfLoop) {
-                    SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 1);
-                    SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(SurfLoop + 1);
-                    SrdSurfsProp.SurroundingSurfs(SurfLoop).TempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2));
+                    SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2);
+                    SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(SurfLoop + 2);
+                    SrdSurfsProp.SurroundingSurfs(SurfLoop).TempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 3));
                 }
             }
         }
