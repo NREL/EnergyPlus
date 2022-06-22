@@ -455,8 +455,8 @@ struct SurfaceGeometryData : BaseGlobalStruct
     int ErrCount4 = 0; // counts of interzone area mismatches.
     bool ShowZoneSurfaceHeaders = true;
     int ErrCount5 = 0;
-    Real64 OldAspectRatio;
-    Real64 NewAspectRatio;
+    Real64 OldAspectRatio = 0.0;
+    Real64 NewAspectRatio = 0.0;
     std::string transformPlane;
     Array1D<Vectors::Vector> Triangle1 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
     Array1D<Vectors::Vector> Triangle2 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
@@ -466,8 +466,8 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D<Real64> A; // containers for convexity test
     Array1D<Real64> B;
     Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
-    int VertSize;                   // size of X,Y,Z,A,B arrays
-    Real64 ACosZero;                // set on firstTime
+    int VertSize = 0;               // size of X,Y,Z,A,B arrays
+    Real64 ACosZero = 0.0;          // set on firstTime
 
     void clear_state() override
     {

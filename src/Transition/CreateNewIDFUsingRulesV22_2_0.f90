@@ -137,6 +137,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: wahpEqFtCoolIndex = 0
   INTEGER :: wahpEqFtHeatIndex = 0
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
+  integer :: Num1
+  CHARACTER(len=MaxNameLength) :: SurroundingField1, SurroundingField2, matchedSurroundingName
   CHARACTER(len=20) :: PotentialRunPeriodName
   ! END OF TODO
 
@@ -422,8 +424,57 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with R, insert the rules here
 
               ! If your original object starts with S, insert the rules here
-              
+
               ! If your original object starts with S, insert the rules here
+              CASE('SURFACEPROPERTY:LOCALENVIRONMENT')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff = .false.
+                matchedSurroundingName = MakeUPPERCase(InArgs(4))
+
+                ! Write out the original SurfaceProperty:LocalEnvironment object, with new F6
+                OutArgs = InArgs
+                OutArgs(6) = 'Gnd-'//matchedSurroundingName
+                CurArgs = CurArgs + 1
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                written = .true.
+
+                ! Now search for the child surrounding surfaces object to get required data
+                DO Num1=1,NumIDFRecords
+                  IF (MakeUPPERCase(IDFRecords(Num1)%Name) /= 'SURFACEPROPERTY:SURROUNDINGSURFACES') CYCLE
+                  IF (MakeUPPERCase(IDFRecords(Num1)%Alphas(1)) == matchedSurroundingName) THEN
+
+                    ! Alright, so get the necessary fields from the SurroundingSurfaces object
+                    ! Note that the surrounding surfaces object is updated separately
+                    SurroundingField1 = IDFRecords(Num1)%Numbers(2)
+                    SurroundingField2 = IDFRecords(Num1)%Alphas(3)
+
+                    ! Use the SurroundingSurfaces object saved fields F4 and F5 to create a new ground property object
+                    CALL GetNewObjectDefInIDD('SURFACEPROPERTY:GROUNDSURFACES',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                    OutArgs(1) = 'Gnd-'//matchedSurroundingName
+                    OutArgs(2) = 'Gnd-'//matchedSurroundingName//'1'
+                    OutArgs(3) = SurroundingField1
+                    OutArgs(4) = SurroundingField2
+                    CurArgs = 4
+                    Call WriteOutIDFLines(DifLfn,'SurfaceProperty:GroundSurfaces',CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                    EXIT
+                  ENDIF
+                ENDDO
+
+              CASE('SURFACEPROPERTY:SURROUNDINGSURFACES')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! Only update the SurroundingSurfaces object if we find a matching LocalEnvironment object
+                ! The matching LocalEnvironment object is updated separately
+                DO Num1=1,NumIDFRecords
+                  IF (MakeUPPERCase(IDFRecords(Num1)%Name) /= 'SURFACEPROPERTY:LOCALENVIRONMENT') CYCLE
+                  IF (MakeUPPERCase(IDFRecords(Num1)%Alphas(4)) == MakeUPPERCase(InArgs(1))) THEN
+                    nodiff = .false.
+                    OutArgs(1:3) = InArgs(1:3)
+                    OutArgs(4:CurArgs-2) = InArgs(6:CurArgs)
+                    CurArgs = CurArgs - 2
+                    EXIT
+                  ENDIF
+                ENDDO
 
               ! If your original object starts with T, insert the rules here
 
