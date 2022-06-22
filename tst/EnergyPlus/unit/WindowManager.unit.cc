@@ -7602,7 +7602,7 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    state->dataEnvrn->OutBaroPress = 100000;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataHeatBalFanSys->ZTAV.allocate(1);
     state->dataHeatBalFanSys->ZT.allocate(1);
@@ -7616,50 +7616,30 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
 
     HeatBalanceManager::ManageHeatBalance(*state);
 
-    // This test will emulate NFRC 100 U-factor test
-    int winNum;
-
-    for (size_t i = 1; i <= state->dataSurface->Surface.size(); ++i) {
-        if (state->dataSurface->Surface(i).Class == DataSurfaces::SurfaceClass::Window) {
-            winNum = i;
-        }
-    }
-
-    int cNum;
-
-    for (size_t i = 1; i <= state->dataConstruction->Construct.size(); ++i) {
-        if (state->dataConstruction->Construct(i).TypeIsWindow) {
-            cNum = i;
-        }
-    }
-
     Real64 T_in = 21.0;
     Real64 T_out = -18.0;
     Real64 I_s = 20.0;
     Real64 v_ws = 5.5;
 
-    // Overrides for testing
+    // Override values
     state->dataHeatBal->SurfCosIncAng.dimension(1, 1, 11, 1.0);
     state->dataHeatBal->SurfSunlitFrac.dimension(1, 1, 11, 1.0);
     state->dataHeatBal->SurfSunlitFracWithoutReveal.dimension(1, 1, 11, 1.0);
 
-    state->dataSurface->SurfOutDryBulbTemp(winNum) = T_out;
-    state->dataHeatBal->SurfTempEffBulkAir(winNum) = T_in;
-    state->dataSurface->SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
+    for (size_t i = 1; i <= state->dataSurface->Surface.size(); ++i) {
+        if (state->dataSurface->Surface(i).Class == DataSurfaces::SurfaceClass::Window) {
+            int winNum = i;
+            state->dataSurface->SurfOutDryBulbTemp(winNum) = T_out;
+            state->dataHeatBal->SurfTempEffBulkAir(winNum) = T_in;
+            state->dataSurface->SurfWinIRfromParentZone(winNum) =
+                DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
+        }
+    }
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.01);
     state->dataHeatBalFanSys->ZoneAirHumRat.dimension(1, 0.01);
     state->dataHeatBalFanSys->MAT.dimension(1, T_in);
 
-    // initial guess temperatures
-    int numTemps = 2 + 2 * state->dataConstruction->Construct(cNum).TotGlassLayers;
-    Real64 inSurfTemp = T_in - (1.0 / (numTemps - 1)) * (T_in - T_out);
-    Real64 outSurfTemp = T_out + (1.0 / (numTemps - 1)) * (T_in - T_out);
-
-    Real64 h_exterior_f = 4 + v_ws * 4;
-    Real64 h_exterior;
-
     state->dataEnvrn->BeamSolarRad = I_s;
-
     if (I_s > 0.0) {
         state->dataEnvrn->SunIsUp = true;
     }
