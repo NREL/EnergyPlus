@@ -160,6 +160,56 @@ namespace FaultsManager {
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
+    enum class ChillerCheck
+    {
+        Invalid = -1,
+        ChillerElectric,
+        ChillerElectricEIR,
+        ChillerElectricReformulatedEIR,
+        ChillerConstantCOP,
+        ChillerEngineDriven,
+        ChillerCombustionTurbine,
+        ChillerAbsorption,
+        ChillerAbsorptionIndirect,
+        Num
+    };
+
+    enum class CoilCheck
+    {
+        Invalid = -1,
+        CoilHeatingElectric,
+        CoilHeatingFuel,
+        CoilHeatingDesuperheater,
+        CoilHeatingSteam,
+        CoilHeatingWater,
+        CoilCoolingWater,
+        CoilCoolingWaterDetailedgeometry,
+        CoilSystemCoolingDX,
+        CoilSystemHeatingDX,
+        AirLoopHVACUnitarySystem,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(ChillerCheck::Num)> ChillerCheckNamesUC{"CHILLER:ELECTRIC",
+                                                                                                    "CHILLER:ELECTRIC:EIR",
+                                                                                                    "CHILLER:ELECTRIC:REFORMULATEDEIR",
+                                                                                                    "CHILLER:CONSTANTCOP",
+                                                                                                    "CHILLER:ENGINEDRIVEN",
+                                                                                                    "CHILLER:COMBUSTIONTURBINE",
+                                                                                                    "CHILLER:ABSORPTION",
+                                                                                                    "CHILLER:ABSORPTION:INDIRECT"};
+
+    constexpr std::array<std::string_view, static_cast<int>(CoilCheck::Num)> CoilCheckNamesUC{"COIL:HEATING:ELECTRIC",
+                                                                                              "COIL:HEATING:FUEL",
+                                                                                              "COIL:HEATING:DESUPERHEATER",
+                                                                                              "COIL:HEATING:STEAM",
+                                                                                              "COIL:HEATING:WATER",
+                                                                                              "COIL:COOLING:WATER",
+                                                                                              "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+                                                                                              "COILSYSTEM:COOLING:DX",
+                                                                                              "COILSYSTEM:HEATING:DX",
+                                                                                              "AIRLOOPHVAC:UNITARYSYSTEM"};
+
     void CheckAndReadFaults(EnergyPlusData &state)
     {
 
@@ -356,33 +406,29 @@ namespace FaultsManager {
             }
 
             // Evaporative cooler check
-            {
-                auto const SELECT_CASE_VAR(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerType);
 
-                int EvapCoolerNum;
+            int EvapCoolerNum;
 
-                if (UtilityRoutines::SameString(SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil")) {
-                    // Read in evaporative cooler is not done yet
-                    if (state.dataEvapCoolers->GetInputEvapComponentsFlag) {
-                        EvaporativeCoolers::GetEvapInput(state);
-                        state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
-                    }
+            if (state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerType == "EvaporativeCooler:Indirect:WetCoil") {
+                // Read in evaporative cooler is not done yet
+                if (state.dataEvapCoolers->GetInputEvapComponentsFlag) {
+                    EvaporativeCoolers::GetEvapInput(state);
+                    state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
+                }
 
-                    // Check whether the evaporative cooler  name and type match each other;
-                    EvapCoolerNum =
-                        UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
-                                                        state.dataEvapCoolers->EvapCond,
-                                                        &EvaporativeCoolers::EvapConditions::Name);
-                    if (EvapCoolerNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-                        // Link the boiler with the fault model
-                        state.dataEvapCoolers->EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingFlag = true;
-                        state.dataEvapCoolers->EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingIndex = jFault_EvapCoolerFouling;
-                    }
+                // Check whether the evaporative cooler  name and type match each other;
+                EvapCoolerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
+                                                                state.dataEvapCoolers->EvapCond,
+                                                                &EvaporativeCoolers::EvapConditions::Name);
+                if (EvapCoolerNum <= 0) {
+                    ShowSevereError(state,
+                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                                        "\" not found.");
+                    state.dataFaultsMgr->ErrorsFound = true;
+                } else {
+                    // Link the boiler with the fault model
+                    state.dataEvapCoolers->EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingFlag = true;
+                    state.dataEvapCoolers->EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingIndex = jFault_EvapCoolerFouling;
                 }
             }
         }
@@ -458,199 +504,197 @@ namespace FaultsManager {
             }
 
             // Chiller check
-            {
-                auto const SELECT_CASE_VAR(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerType);
-
-                int ChillerNum;
-
-                if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric")) {
-                    // Check whether the chiller name and chiller type match each other
-                    ChillerNum = 0;
-                    int thisChil = 0;
-                    for (auto &ch : state.dataPlantChillers->ElectricChiller) {
-                        thisChil++;
-                        if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
-                            ChillerNum = thisChil;
-                        }
-                    }
-                    if (ChillerNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-
-                        if (state.dataPlantChillers->ElectricChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                            // The fault model is only applicable to the chillers with water based condensers
-                            ShowWarningError(
-                                state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
-
-                        } else {
-                            // Link the chiller with the fault model
-                            state.dataPlantChillers->ElectricChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            state.dataPlantChillers->ElectricChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
-                        }
-                    }
-
-                } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
-                    // Read in chiller if not done yet
-                    if (state.dataChillerElectricEIR->getInputFlag) {
-                        ChillerElectricEIR::GetElectricEIRChillerInput(state);
-                        state.dataChillerElectricEIR->getInputFlag = false;
-                    }
-
-                    // Check whether the chiller name and chiller type match each other
-                    ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
-                                                                 state.dataChillerElectricEIR->ElectricEIRChiller);
-                    if (ChillerNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-
-                        if (state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                            // The fault model is only applicable to the chillers with water based condensers
-                            ShowWarningError(
-                                state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
-
-                        } else {
-                            // Link the chiller with the fault model
-                            state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
-                        }
-                    }
-
-                } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR")) {
-
-                    // Read in chiller if not done yet
-                    if (state.dataChillerReformulatedEIR->GetInputREIR) {
-                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
-                        state.dataChillerReformulatedEIR->GetInputREIR = false;
-                    }
-
-                    // Check whether the chiller name and chiller type match each other
-                    ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
-                                                                 state.dataChillerReformulatedEIR->ElecReformEIRChiller);
-                    if (ChillerNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-
-                        if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).CondenserType !=
-                            DataPlant::CondenserType::WaterCooled) {
-                            // The fault model is only applicable to the chillers with water based condensers
-                            ShowWarningError(
-                                state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
-
-                        } else {
-                            // Link the chiller with the fault model
-                            state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
-                        }
-                    }
-
-                } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:ConstantCOP")) {
-                    // Check whether the chiller name and chiller type match each other
-                    ChillerNum = 0;
-                    int thisChil = 0;
-                    for (auto &ch : state.dataPlantChillers->ConstCOPChiller) {
-                        thisChil++;
-                        if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
-                            ChillerNum = thisChil;
-                        }
-                    }
-                    if (ChillerNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-
-                        if (state.dataPlantChillers->ConstCOPChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                            // The fault model is only applicable to the chillers with water based condensers
-                            ShowWarningError(
-                                state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
-
-                        } else {
-                            // Link the chiller with the fault model
-                            state.dataPlantChillers->ConstCOPChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            state.dataPlantChillers->ConstCOPChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
-                        }
-                    }
-
-                } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:EngineDriven")) {
-                    // Check whether the chiller name and chiller type match each other
-                    ChillerNum = 0;
-                    int thisChil = 0;
-                    for (auto &ch : state.dataPlantChillers->EngineDrivenChiller) {
-                        thisChil++;
-                        if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
-                            ChillerNum = thisChil;
-                        }
-                    }
-                    if (ChillerNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-
-                        if (state.dataPlantChillers->EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                            // The fault model is only applicable to the chillers with water based condensers
-                            ShowWarningError(
-                                state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
-
-                        } else {
-                            // Link the fault model with the water cooled chiller
-                            state.dataPlantChillers->EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            state.dataPlantChillers->EngineDrivenChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
-                        }
-                    }
-
-                } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:CombustionTurbine")) {
-                    // Check whether the chiller name and chiller type match each other
-                    ChillerNum = 0;
-                    int thisChil = 0;
-                    for (auto &ch : state.dataPlantChillers->GTChiller) {
-                        thisChil++;
-                        if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
-                            ChillerNum = thisChil;
-                        }
-                    }
-                    if (ChillerNum <= 0) {
-                        ShowSevereError(state,
-                                        cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
-                                            cAlphaArgs(5) + "\" not found.");
-                        state.dataFaultsMgr->ErrorsFound = true;
-                    } else {
-
-                        if (state.dataPlantChillers->GTChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                            // The fault model is only applicable to the chillers with water based condensers
-                            ShowWarningError(
-                                state,
-                                cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
-                                    "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
-
-                        } else {
-                            // Link the fault model with the water cooled chiller
-                            state.dataPlantChillers->GTChiller(ChillerNum).FaultyChillerFoulingFlag = true;
-                            state.dataPlantChillers->GTChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
-                        }
+            int ChillerNum;
+            ChillerCheck ChillerTypeCheck = static_cast<ChillerCheck>(getEnumerationValue(
+                ChillerCheckNamesUC, UtilityRoutines::MakeUPPERCase(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerType)));
+            switch (ChillerTypeCheck) {
+            case ChillerCheck::ChillerElectric: {
+                // Check whether the chiller name and chiller type match each other
+                ChillerNum = 0;
+                int thisChil = 0;
+                for (auto &ch : state.dataPlantChillers->ElectricChiller) {
+                    thisChil++;
+                    if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
+                        ChillerNum = thisChil;
                     }
                 }
+                if (ChillerNum <= 0) {
+                    ShowSevereError(state,
+                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                                        "\" not found.");
+                    state.dataFaultsMgr->ErrorsFound = true;
+                } else {
+
+                    if (state.dataPlantChillers->ElectricChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        // The fault model is only applicable to the chillers with water based condensers
+                        ShowWarningError(state,
+                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                                             cAlphaArgs(5) +
+                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+
+                    } else {
+                        // Link the chiller with the fault model
+                        state.dataPlantChillers->ElectricChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                        state.dataPlantChillers->ElectricChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                    }
+                }
+            } break;
+            case ChillerCheck::ChillerElectricEIR: {
+                // Read in chiller if not done yet
+                if (state.dataChillerElectricEIR->getInputFlag) {
+                    ChillerElectricEIR::GetElectricEIRChillerInput(state);
+                    state.dataChillerElectricEIR->getInputFlag = false;
+                }
+
+                // Check whether the chiller name and chiller type match each other
+                ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
+                                                             state.dataChillerElectricEIR->ElectricEIRChiller);
+                if (ChillerNum <= 0) {
+                    ShowSevereError(state,
+                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                                        "\" not found.");
+                    state.dataFaultsMgr->ErrorsFound = true;
+                } else {
+
+                    if (state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        // The fault model is only applicable to the chillers with water based condensers
+                        ShowWarningError(state,
+                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                                             cAlphaArgs(5) +
+                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+
+                    } else {
+                        // Link the chiller with the fault model
+                        state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                        state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                    }
+                }
+            } break;
+            case ChillerCheck::ChillerElectricReformulatedEIR: {
+                // Read in chiller if not done yet
+                if (state.dataChillerReformulatedEIR->GetInputREIR) {
+                    ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
+                    state.dataChillerReformulatedEIR->GetInputREIR = false;
+                }
+
+                // Check whether the chiller name and chiller type match each other
+                ChillerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName,
+                                                             state.dataChillerReformulatedEIR->ElecReformEIRChiller);
+                if (ChillerNum <= 0) {
+                    ShowSevereError(state,
+                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                                        "\" not found.");
+                    state.dataFaultsMgr->ErrorsFound = true;
+                } else {
+
+                    if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        // The fault model is only applicable to the chillers with water based condensers
+                        ShowWarningError(state,
+                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                                             cAlphaArgs(5) +
+                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+
+                    } else {
+                        // Link the chiller with the fault model
+                        state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                        state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                    }
+                }
+            } break;
+            case ChillerCheck::ChillerConstantCOP: {
+                // Check whether the chiller name and chiller type match each other
+                ChillerNum = 0;
+                int thisChil = 0;
+                for (auto &ch : state.dataPlantChillers->ConstCOPChiller) {
+                    thisChil++;
+                    if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
+                        ChillerNum = thisChil;
+                    }
+                }
+                if (ChillerNum <= 0) {
+                    ShowSevereError(state,
+                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                                        "\" not found.");
+                    state.dataFaultsMgr->ErrorsFound = true;
+                } else {
+
+                    if (state.dataPlantChillers->ConstCOPChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        // The fault model is only applicable to the chillers with water based condensers
+                        ShowWarningError(state,
+                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                                             cAlphaArgs(5) +
+                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+
+                    } else {
+                        // Link the chiller with the fault model
+                        state.dataPlantChillers->ConstCOPChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                        state.dataPlantChillers->ConstCOPChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                    }
+                }
+            } break;
+            case ChillerCheck::ChillerEngineDriven: {
+                // Check whether the chiller name and chiller type match each other
+                ChillerNum = 0;
+                int thisChil = 0;
+                for (auto &ch : state.dataPlantChillers->EngineDrivenChiller) {
+                    thisChil++;
+                    if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
+                        ChillerNum = thisChil;
+                    }
+                }
+                if (ChillerNum <= 0) {
+                    ShowSevereError(state,
+                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                                        "\" not found.");
+                    state.dataFaultsMgr->ErrorsFound = true;
+                } else {
+
+                    if (state.dataPlantChillers->EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        // The fault model is only applicable to the chillers with water based condensers
+                        ShowWarningError(state,
+                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                                             cAlphaArgs(5) +
+                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+
+                    } else {
+                        // Link the fault model with the water cooled chiller
+                        state.dataPlantChillers->EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                        state.dataPlantChillers->EngineDrivenChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                    }
+                }
+            } break;
+            case ChillerCheck::ChillerCombustionTurbine: {
+                // Check whether the chiller name and chiller type match each other
+                ChillerNum = 0;
+                int thisChil = 0;
+                for (auto &ch : state.dataPlantChillers->GTChiller) {
+                    thisChil++;
+                    if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
+                        ChillerNum = thisChil;
+                    }
+                }
+                if (ChillerNum <= 0) {
+                    ShowSevereError(state,
+                                    cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
+                                        "\" not found.");
+                    state.dataFaultsMgr->ErrorsFound = true;
+                } else {
+                    if (state.dataPlantChillers->GTChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        // The fault model is only applicable to the chillers with water based condensers
+                        ShowWarningError(state,
+                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
+                                             cAlphaArgs(5) +
+                                             "\". The specified chiller is not water cooled. The chiller fouling fault model will not be applied.");
+
+                    } else {
+                        // Link the fault model with the water cooled chiller
+                        state.dataPlantChillers->GTChiller(ChillerNum).FaultyChillerFoulingFlag = true;
+                        state.dataPlantChillers->GTChiller(ChillerNum).FaultyChillerFoulingIndex = jFault_ChillerFouling;
+                    }
+                }
+            } break;
+            default:
+                break;
             }
         }
 
