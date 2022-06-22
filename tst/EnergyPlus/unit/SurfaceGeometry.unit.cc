@@ -8935,6 +8935,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
                           "    SrdSurfs:FenesSurface,        !- Name",
                           "    0.5,                          !- Sky View Factor",
                           "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+                          "    ,                             !- Ground View Factor",
+                          "    ,                             !- Ground Temperature Schedule Name",
                           "    SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name",
                           "    0.1,                          !- Surrounding Surface 1 View Factor",
                           "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
@@ -9052,6 +9054,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
     // check sky view factors
     EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty.GroundViewFactor);
     // check surrounding surfaces view factors
     EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty.SurroundingSurfs(1).ViewFactor);
     // check ground surfaces view factors
