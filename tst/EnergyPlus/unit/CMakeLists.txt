@@ -243,6 +243,7 @@ set(test_src
     WeatherManager.unit.cc
     WinCalcEngine.unit.cc
     WindowAC.unit.cc
+    WindTurbine.unit.cc
     WindowEquivalentLayer.unit.cc
     WindowLayerEffectiveMultipliers.unit.cc
     WindowManagerExteriorThermal.unit.cc
