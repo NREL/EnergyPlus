@@ -2262,6 +2262,8 @@
     SrdSurfs:Zn003:Roof001,  !- Name
     0.0,                     !- Sky View Factor
     ,                        !- Sky Temperature Schedule Name
+    0.0,                     !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
     SurroundingSurface1,     !- Surrounding Surface 1 Name
     1.0,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 1;  !- Surrounding Surface 1 Temperature Schedule Name
@@ -2270,6 +2272,8 @@
     SrdSurfs:Zn005:Wall002,  !- Name
     0.1,                     !- Sky View Factor
     ,                        !- Sky Temperature Schedule Name
+    0.0,                     !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
     SurroundingSurface1,     !- Surrounding Surface 1 Name
     0.5,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 2,  !- Surrounding Surface 1 Temperature Schedule Name
@@ -2281,14 +2285,11 @@
     SrdSurfs:Zn005:Wall002:Win001,  !- Name
     0.5,                     !- Sky View Factor
     ,                        !- Sky Temperature Schedule Name
+    0.3,                     !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
     SurroundingSurface1,     !- Surrounding Surface 1 Name
     0.2,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 2;  !- Surrounding Surface 1 Temperature Schedule Name
-
- SurfaceProperty:GroundSurfaces,
-    GndSurfs:Zn005:Wall002:Win001,  !- Name
-    Gnd Surfs Wall002:Win001 Name,  !- Ground Surface 1 Name
-    0.3;                     !- Ground Surface 1 View Factor
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn005:Wall002,    !- Name
@@ -2302,8 +2303,7 @@
     Zn005:Wall002:Win001,    !- Exterior Surface Name
     ,                        !- External Shading Fraction Schedule Name
     SrdSurfs:Zn005:Wall002:Win001,  !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn005:Wall002:Win001;  !- Ground Surfaces Object Name
+    ;                        !- Outdoor Air Node Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn003:Roof001,    !- Name

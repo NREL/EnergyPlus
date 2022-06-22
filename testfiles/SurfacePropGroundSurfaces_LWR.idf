@@ -2273,6 +2273,8 @@
     SrdSurfs:Zn003:Roof001,  !- Name
     0.0,                     !- Sky View Factor
     ,                        !- Sky Temperature Schedule Name
+    ,                        !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name	
     SurroundingSurface1,     !- Surrounding Surface 1 Name
     1.0,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 1;  !- Surrounding Surface 1 Temperature Schedule Name
@@ -2281,6 +2283,8 @@
     SrdSurfs:Zn005:Wall002,  !- Name
     0.1,                     !- Sky View Factor
     ,                        !- Sky Temperature Schedule Name
+    ,                        !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
     SurroundingSurface1,     !- Surrounding Surface 1 Name
     0.5,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 2,  !- Surrounding Surface 1 Temperature Schedule Name
@@ -2292,6 +2296,8 @@
     SrdSurfs:Zn005:Wall002:Win001,  !- Name
     0.5,                     !- Sky View Factor
     ,                        !- Sky Temperature Schedule Name
+    ,                        !- Ground View Factor
+    ,                        !- Ground Temperature Schedule Name
     SurroundingSurface1,     !- Surrounding Surface 1 Name
     0.2,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 2;  !- Surrounding Surface 1 Temperature Schedule Name
