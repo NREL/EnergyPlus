@@ -2,9 +2,9 @@
  * See the LICENSE file for additional terms and conditions. */
 
 // Standard
+#include <algorithm>
 #include <iostream>
 #include <numeric>
-#include <algorithm>
 
 // btwxt
 #include "error.h"
@@ -28,8 +28,7 @@ GridPoint::GridPoint(GriddedData &grid_data_in)
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
       results(grid_data->num_tables),
-      hypercube_size_hash(0) {
-}
+      hypercube_size_hash(0) {}
 
 GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
     : grid_data(&grid_data_in),
@@ -102,16 +101,19 @@ void GridPoint::set_dim_floor(std::size_t dim) {
     point_floor[dim] = 0u;
   } else if (target[dim] > axis.extrapolation_limits.second) {
     is_inbounds[dim] = Bounds::OUTLAW;
-    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] =
+        std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else if (target[dim] < axis.grid[0]) {
     is_inbounds[dim] = Bounds::OUTBOUNDS;
     point_floor[dim] = 0;
   } else if (target[dim] > axis.grid.back()) {
     is_inbounds[dim] = Bounds::OUTBOUNDS;
-    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] =
+        std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else if (target[dim] == axis.grid.back()) {
     is_inbounds[dim] = Bounds::INBOUNDS;
-    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] =
+        std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else {
     is_inbounds[dim] = Bounds::INBOUNDS;
     std::vector<double>::const_iterator upper =
@@ -146,9 +148,9 @@ void GridPoint::consolidate_methods()
   if (target_is_set) {
     auto extrap_methods = grid_data->get_extrap_methods();
     for (std::size_t dim = 0; dim < ndims; dim++) {
-      if (is_inbounds[dim]==Bounds::OUTBOUNDS) {
+      if (is_inbounds[dim] == Bounds::OUTBOUNDS) {
         methods[dim] = extrap_methods[dim];
-      } else if (is_inbounds[dim]==Bounds::OUTLAW) {
+      } else if (is_inbounds[dim] == Bounds::OUTLAW) {
         // showMessage(MsgLevel::MSG_WARN, stringify("The target is outside the extrapolation limits
         // in dimension ", dim,
         //                                ". Will perform constant extrapolation."));
@@ -182,7 +184,7 @@ void GridPoint::set_hypercube(std::vector<Method> methods) {
     } else if (methods[dim] == Method::CUBIC) {
       options[dim] = {-1, 0, 1, 2};
     }
-    hypercube_size_hash += options[dim].size()*digit;
+    hypercube_size_hash += options[dim].size() * digit;
     digit *= 10;
   }
   hypercube = {{}};
@@ -213,8 +215,10 @@ void GridPoint::calculate_interp_coeffs() {
     if (methods[dim] == Method::CUBIC) {
       interp_coeffs[dim][0] = 2 * mu * mu * mu - 3 * mu * mu + 1;
       interp_coeffs[dim][1] = -2 * mu * mu * mu + 3 * mu * mu;
-      cubic_slope_coeffs[dim][0] = (mu * mu * mu - 2 * mu * mu + mu)*grid_data->get_axis_spacing_mult(dim, 0, point_floor[dim]);
-      cubic_slope_coeffs[dim][1] = (mu * mu * mu - mu * mu)*grid_data->get_axis_spacing_mult(dim, 1, point_floor[dim]);
+      cubic_slope_coeffs[dim][0] = (mu * mu * mu - 2 * mu * mu + mu) *
+                                   grid_data->get_axis_spacing_mult(dim, 0, point_floor[dim]);
+      cubic_slope_coeffs[dim][1] =
+          (mu * mu * mu - mu * mu) * grid_data->get_axis_spacing_mult(dim, 1, point_floor[dim]);
     } else {
       if (methods[dim] == Method::CONSTANT) {
         mu = mu < 0 ? 0 : 1;
@@ -237,8 +241,8 @@ void GridPoint::set_hypercube_values() {
     hypercube_values.resize(hypercube.size(), std::vector<double>(grid_data->num_tables));
     hypercube_cache.clear();
   }
-  if (hypercube_cache.count({floor_index,hypercube_size_hash})) {
-    hypercube_values = hypercube_cache.at({floor_index,hypercube_size_hash});
+  if (hypercube_cache.count({floor_index, hypercube_size_hash})) {
+    hypercube_values = hypercube_cache.at({floor_index, hypercube_size_hash});
     return;
   }
   std::size_t hypercube_index = 0;
@@ -246,7 +250,7 @@ void GridPoint::set_hypercube_values() {
     hypercube_values[hypercube_index] = grid_data->get_values_relative(point_floor, v);
     ++hypercube_index;
   }
-  hypercube_cache[{floor_index,hypercube_size_hash}] = hypercube_values;
+  hypercube_cache[{floor_index, hypercube_size_hash}] = hypercube_values;
 }
 
 void GridPoint::set_results() {
@@ -288,7 +292,7 @@ void GridPoint::normalize_grid_values_at_target(const double scalar) {
     return;
   }
   for (std::size_t table_index = 0; table_index < grid_data->num_tables; ++table_index) {
-    grid_data->normalize_value_table(table_index,results[table_index]*scalar);
+    grid_data->normalize_value_table(table_index, results[table_index] * scalar);
   }
   hypercube_cache.clear();
   set_results();
@@ -300,9 +304,10 @@ double GridPoint::normalize_grid_values_at_target(std::size_t table_num, const d
                 stringify("Cannot normalize grid values. No target has been set."));
     return scalar;
   }
-  // create a scalar which represents the product of the inverted normalization factor and the value in the table at the independent variable reference value
-  double total_scalar = results[table_num]*scalar;
-  grid_data->normalize_value_table(table_num,total_scalar);
+  // create a scalar which represents the product of the inverted normalization factor and the value
+  // in the table at the independent variable reference value
+  double total_scalar = results[table_num] * scalar;
+  grid_data->normalize_value_table(table_num, total_scalar);
   hypercube_cache.clear();
   set_results();
 

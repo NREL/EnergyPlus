@@ -22,12 +22,11 @@
   }
 
 namespace Btwxt {
-    template<typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
-    constexpr std::ostream& operator<<(std::ostream& stream, T e)
-    {
-        return stream << static_cast<typename std::underlying_type_t<T>>(e);
-    }
+template <typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
+constexpr std::ostream &operator<<(std::ostream &stream, T e) {
+  return stream << static_cast<typename std::underlying_type_t<T>>(e);
 }
+} // namespace Btwxt
 
 using namespace Btwxt;
 
@@ -49,48 +48,47 @@ protected:
 
 class OneDL0Fixture : public testing::Test {
 protected:
-    std::vector<std::vector<double>> grid;
-    std::vector<std::vector<double>> values;
+  std::vector<std::vector<double>> grid;
+  std::vector<std::vector<double>> values;
 
-    OneDL0Fixture() {
-        grid = {{}};
-        values = {{}};
-    }
+  OneDL0Fixture() {
+    grid = {{}};
+    values = {{}};
+  }
 };
-
 
 class OneDL1Fixture : public testing::Test {
 protected:
-    RegularGridInterpolator test_rgi;
-    GriddedData test_gridded_data;
-    std::vector<double> target;
+  RegularGridInterpolator test_rgi;
+  GriddedData test_gridded_data;
+  std::vector<double> target;
 
-    OneDL1Fixture() {
-        std::vector<std::vector<double>> grid = {{2}};
-        std::vector<std::vector<double>> values = {{5}};
+  OneDL1Fixture() {
+    std::vector<std::vector<double>> grid = {{2}};
+    std::vector<std::vector<double>> values = {{5}};
 
-        target = {2.5};
-        test_gridded_data = GriddedData(grid, values);
-        test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
-        test_rgi = RegularGridInterpolator(test_gridded_data);
-    }
+    target = {2.5};
+    test_gridded_data = GriddedData(grid, values);
+    test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
+    test_rgi = RegularGridInterpolator(test_gridded_data);
+  }
 };
 
 class OneDL2Fixture : public testing::Test {
 protected:
-    RegularGridInterpolator test_rgi;
-    GriddedData test_gridded_data;
-    std::vector<double> target;
+  RegularGridInterpolator test_rgi;
+  GriddedData test_gridded_data;
+  std::vector<double> target;
 
-    OneDL2Fixture() {
-        std::vector<std::vector<double>> grid = {{0, 10}};
-        std::vector<std::vector<double>> values = {{6, 3}};
+  OneDL2Fixture() {
+    std::vector<std::vector<double>> grid = {{0, 10}};
+    std::vector<std::vector<double>> values = {{6, 3}};
 
-        target = {2.5};
-        test_gridded_data = GriddedData(grid, values);
-        test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
-        test_rgi = RegularGridInterpolator(test_gridded_data);
-    }
+    target = {2.5};
+    test_gridded_data = GriddedData(grid, values);
+    test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
+    test_rgi = RegularGridInterpolator(test_gridded_data);
+  }
 };
 
 class TwoDFixture : public testing::Test {
@@ -115,29 +113,29 @@ protected:
 };
 
 class TwoDSimpleNormalizationFixture : public testing::Test {
-    // TODO: Create a fixture which this one can inherit from
-    // takes a vector of functions as a parameter (these become separate value tables)
-    // takes a vector of vectors which is the data structure that stores the grid
+  // TODO: Create a fixture which this one can inherit from
+  // takes a vector of functions as a parameter (these become separate value tables)
+  // takes a vector of vectors which is the data structure that stores the grid
 protected:
-    RegularGridInterpolator test_rgi;
-    GriddedData test_gridded_data;
-    double test_function (std::vector<double> target){
-        assert(target.size() == 2);
-        return target[0]*target[1];
-    }
+  RegularGridInterpolator test_rgi;
+  GriddedData test_gridded_data;
+  double test_function(std::vector<double> target) {
+    assert(target.size() == 2);
+    return target[0] * target[1];
+  }
 
-    TwoDSimpleNormalizationFixture() {
-        std::vector<std::vector<double>> grid = {{2.0, 7.0}, {1.0, 2.0, 3.0}};
-        std::vector<double> values;
-        for (auto x : grid[0]){
-            for (auto y : grid[1] ){
-                values.push_back(test_function({x,y}));
-            }
-        }
-        test_gridded_data = GriddedData(grid, {values});
-        test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
-        test_rgi = RegularGridInterpolator(test_gridded_data);
+  TwoDSimpleNormalizationFixture() {
+    std::vector<std::vector<double>> grid = {{2.0, 7.0}, {1.0, 2.0, 3.0}};
+    std::vector<double> values;
+    for (auto x : grid[0]) {
+      for (auto y : grid[1]) {
+        values.push_back(test_function({x, y}));
+      }
     }
+    test_gridded_data = GriddedData(grid, {values});
+    test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
+    test_rgi = RegularGridInterpolator(test_gridded_data);
+  }
 };
 
 class CubicFixture : public testing::Test {

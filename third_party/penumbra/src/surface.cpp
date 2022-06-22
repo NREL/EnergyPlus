@@ -32,11 +32,17 @@ TessData::TessData(const float *array, unsigned numVerts) : numVerts(numVerts) {
   vertices.insert(vertices.end(), (const float *)array, (const float *)array + numVerts);
 }
 
-Surface::Surface() { surface = std::make_shared<SurfacePrivate>(); }
+Surface::Surface() {
+  surface = std::make_shared<SurfacePrivate>();
+}
 
-Surface::Surface(const Polygon &polygon) { surface = std::make_shared<SurfacePrivate>(polygon); }
+Surface::Surface(const Polygon &polygon) {
+  surface = std::make_shared<SurfacePrivate>(polygon);
+}
 
-Surface::Surface(const Surface &srf) { surface = srf.surface; }
+Surface::Surface(const Surface &srf) {
+  surface = srf.surface;
+}
 
 Surface::~Surface() {}
 

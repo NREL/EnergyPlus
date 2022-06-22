@@ -356,7 +356,7 @@ FMT_BEGIN_DETAIL_NAMESPACE
 // (void)var does not work on many Intel compilers.
 template <typename... T> FMT_CONSTEXPR void ignore_unused(const T&...) {}
 
-constexpr FMT_INLINE auto is_constant_evaluated() FMT_NOEXCEPT -> bool {
+constexpr FMT_INLINE auto is_constant_evaluated() FMT_NOEXCEPT->bool {
 #ifdef __cpp_lib_is_constant_evaluated
   return std::is_constant_evaluated();
 #else
@@ -644,14 +644,14 @@ class basic_format_parse_context : private ErrorHandler {
     Returns an iterator to the beginning of the format string range being
     parsed.
    */
-  constexpr auto begin() const FMT_NOEXCEPT -> iterator {
+  constexpr auto begin() const FMT_NOEXCEPT->iterator {
     return format_str_.begin();
   }
 
   /**
     Returns an iterator past the end of the format string range being parsed.
    */
-  constexpr auto end() const FMT_NOEXCEPT -> iterator {
+  constexpr auto end() const FMT_NOEXCEPT->iterator {
     return format_str_.end();
   }
 
@@ -806,23 +806,23 @@ template <typename T> class buffer {
   buffer(const buffer&) = delete;
   void operator=(const buffer&) = delete;
 
-  auto begin() FMT_NOEXCEPT -> T* { return ptr_; }
-  auto end() FMT_NOEXCEPT -> T* { return ptr_ + size_; }
+  auto begin() FMT_NOEXCEPT->T* { return ptr_; }
+  auto end() FMT_NOEXCEPT->T* { return ptr_ + size_; }
 
-  auto begin() const FMT_NOEXCEPT -> const T* { return ptr_; }
-  auto end() const FMT_NOEXCEPT -> const T* { return ptr_ + size_; }
+  auto begin() const FMT_NOEXCEPT->const T* { return ptr_; }
+  auto end() const FMT_NOEXCEPT->const T* { return ptr_ + size_; }
 
   /** Returns the size of this buffer. */
-  constexpr auto size() const FMT_NOEXCEPT -> size_t { return size_; }
+  constexpr auto size() const FMT_NOEXCEPT->size_t { return size_; }
 
   /** Returns the capacity of this buffer. */
-  constexpr auto capacity() const FMT_NOEXCEPT -> size_t { return capacity_; }
+  constexpr auto capacity() const FMT_NOEXCEPT->size_t { return capacity_; }
 
   /** Returns a pointer to the buffer data. */
-  FMT_CONSTEXPR auto data() FMT_NOEXCEPT -> T* { return ptr_; }
+  FMT_CONSTEXPR auto data() FMT_NOEXCEPT->T* { return ptr_; }
 
   /** Returns a pointer to the buffer data. */
-  FMT_CONSTEXPR auto data() const FMT_NOEXCEPT -> const T* { return ptr_; }
+  FMT_CONSTEXPR auto data() const FMT_NOEXCEPT->const T* { return ptr_; }
 
   /** Clears this buffer. */
   void clear() { size_ = 0; }

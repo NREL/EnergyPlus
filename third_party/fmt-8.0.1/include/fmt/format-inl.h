@@ -1759,8 +1759,7 @@ template <> struct cache_accessor<double> {
       {0xfcf62c1dee382c42, 0x46729e03dd9ed7b5},
       {0x9e19db92b4e31ba9, 0x6c07a2c26a8346d1},
       {0xc5a05277621be293, 0xc7098b7305241885},
-      { 0xf70867153aa2db38,
-        0xb8cbee4fc66d1ea7 }
+      {0xf70867153aa2db38, 0xb8cbee4fc66d1ea7}
 #else
       {0xff77b1fcbebcdc4f, 0x25e8e89c13bb0f7b},
       {0xce5d73ff402d98e3, 0xfb0a3d212dc81290},

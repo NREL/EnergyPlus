@@ -32,8 +32,9 @@ public:
   Context(unsigned size = 512);
   ~Context();
   void showRendering(const unsigned surfaceIndex, mat4x4 sunView);
-  void setModel(const std::vector<float> &vertices, const std::vector<SurfaceBuffer> &surfaceBuffers);
-  float setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer=nullptr, bool clipFar = true);
+  void setModel(const std::vector<float> &vertices,
+                const std::vector<SurfaceBuffer> &surfaceBuffers);
+  float setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer = nullptr, bool clipFar = true);
   void bufferedQuery(const unsigned surfaceIndex);
   void bufferedQuery(const SurfaceBuffer &surfaceBuffer);
   void submitPSSA(const unsigned surfaceIndex, mat4x4 sunView);
@@ -42,12 +43,11 @@ public:
   float calculatePSSA(const unsigned surfaceIndex);
   std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
   std::vector<float> calculatePSSA();
-  std::map<unsigned, float>
-  calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaces,
-                         const std::vector<unsigned> &interiorSurfaces, mat4x4 sunView);
+  std::map<unsigned, float> calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaces,
+                                                   const std::vector<unsigned> &interiorSurfaces,
+                                                   mat4x4 sunView);
   void showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIndices,
-                             const unsigned interiorSurfaceIndex,
-                             mat4x4 sunView);
+                             const unsigned interiorSurfaceIndex, mat4x4 sunView);
   void clearModel();
   std::string vendorName();
 

@@ -79,6 +79,8 @@ TEST_F(CubicFixture, grid_point_interp_coeffs) {
   EXPECT_EQ(interp_coeffs[0][0], 2 * mu * mu * mu - 3 * mu * mu + 1);
   EXPECT_EQ(interp_coeffs[0][1], -2 * mu * mu * mu + 3 * mu * mu);
 
-  EXPECT_EQ(cubic_slope_coeffs[0][0], (mu * mu * mu - 2 * mu * mu + mu)*test_gridded_data.get_axis_spacing_mult(0,0,floor));
-  EXPECT_EQ(cubic_slope_coeffs[0][1], (mu * mu * mu - mu * mu)*test_gridded_data.get_axis_spacing_mult(0,1,floor));
+  EXPECT_EQ(cubic_slope_coeffs[0][0], (mu * mu * mu - 2 * mu * mu + mu) *
+                                          test_gridded_data.get_axis_spacing_mult(0, 0, floor));
+  EXPECT_EQ(cubic_slope_coeffs[0][1],
+            (mu * mu * mu - mu * mu) * test_gridded_data.get_axis_spacing_mult(0, 1, floor));
 }

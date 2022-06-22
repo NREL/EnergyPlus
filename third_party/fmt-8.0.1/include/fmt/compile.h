@@ -399,7 +399,9 @@ template <typename Char> struct arg_id_handler {
     return 0;
   }
 
-  constexpr void on_error(const char* message) { FMT_THROW(format_error(message)); }
+  constexpr void on_error(const char* message) {
+    FMT_THROW(format_error(message));
+  }
 };
 
 template <typename Char> struct parse_arg_id_result {

@@ -20,6 +20,8 @@ GLProgram::GLProgram(const char *vertexSource, const char *fragmentSource) {
 
 GLProgram::~GLProgram() {}
 
-GLuint GLProgram::getInt() { return program; }
+GLuint GLProgram::getInt() {
+  return program;
+}
 
 } // namespace Pumbra

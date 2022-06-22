@@ -18,7 +18,8 @@ using namespace Btwxt;
 
 TEST_F(ThreeDFixture, hypercube) {
   auto hypercube = test_rgi.get_hypercube();
-  EXPECT_EQ(hypercube.size(), 16u); }
+  EXPECT_EQ(hypercube.size(), 16u);
+}
 
 TEST_F(ThreeDFixture, test_hypercube) {
   auto hypercube = test_rgi.get_hypercube();
