@@ -1538,14 +1538,22 @@ namespace WindowComplexManager {
             Geom.SolSkyWt(I) = SkyWeight(Geom.sInc(J));
         }
         WtSum = sum(Geom.SolSkyWt({1, NSky}));
-        Geom.SolSkyWt({1, NSky}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyWt({1, NSky}) /= WtSum;
+        } else {
+            Geom.SolSkyWt({1, NSky}) = 0.0;
+        }
         // SkyGround Weights
         Geom.SolSkyGndWt.allocate(NGnd);
         for (I = 1; I <= NGnd; ++I) {
             Geom.SolSkyGndWt(I) = SkyGndWeight(Geom.GndPt(I));
         }
         WtSum = sum(Geom.SolSkyGndWt({1, NGnd}));
-        Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        } else {
+            Geom.SolSkyGndWt({1, NGnd}) = 0.0;
+        }
         //  Weights for beam reflected from ground are calculated after shading
         //  interval is determined
         // Transmitted Basis:
