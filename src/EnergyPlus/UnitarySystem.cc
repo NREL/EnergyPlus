@@ -2765,7 +2765,11 @@ namespace UnitarySystems {
             state.dataSize->UnitaryHeatCap = EqSizing.DesHeatingLoad;
 
         } else {
-            state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
+            if (state.dataSize->CurZoneEqNum == 0 || !isVarSpeedCoolCoil) {
+                state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
+            } else {
+                EqSizing.HeatingCapacity = false;
+            }
         }
 
         if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != UnitarySysCtrlType::CCMASHRAE) {
