@@ -2805,12 +2805,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
         for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
 
-            Real64 GndSurfReflectance = 0.0;
-            if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
-                GndSurfReflectance = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum)).SurfsReflAvg;
-            } else {
-                GndSurfReflectance = state.dataEnvrn->GndReflectance;
-            }
             // Regular surface
             currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
             // Cosine of incidence angle and solar incident on outside of surface, for reporting
