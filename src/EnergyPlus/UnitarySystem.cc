@@ -2765,8 +2765,8 @@ namespace UnitarySystems {
             state.dataSize->UnitaryHeatCap = EqSizing.DesHeatingLoad;
 
         } else {
-            if (state.dataSize->CurZoneEqNum == 0 || !isVarSpeedCoolCoil) {
-                state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
+            if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
+                state.dataSize->UnitaryHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
             } else {
                 EqSizing.HeatingCapacity = false;
             }
