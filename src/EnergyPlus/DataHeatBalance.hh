@@ -130,15 +130,6 @@ namespace DataHeatBalance {
     constexpr int DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
     constexpr int DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
-    // Parameters for Sky Radiance Distribution
-    enum class SkyRadDistribution
-    {
-        Invalid = -1,
-        Isotropic,
-        Anisotropic,
-        Num
-    };
-
     // Parameters for ZoneAirSolutionAlgo
     enum class SolutionAlgo
     {
@@ -622,7 +613,6 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
-        std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
         int zoneRadEnclosureFirst = -1;              // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
         int zoneRadEnclosureLast = -1;               // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
 
