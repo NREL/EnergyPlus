@@ -2766,8 +2766,10 @@ namespace UnitarySystems {
 
         } else {
             if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
+                // pass size to supplemental heater
                 state.dataSize->UnitaryHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
             } else {
+                // let supplemental heater size according to heating load
                 EqSizing.HeatingCapacity = false;
             }
         }
