@@ -783,8 +783,8 @@ void BoundaryCell::ifCellADI(const std::size_t dim, const std::size_t sdim, cons
     bVal = hc * Tair + hr * Trad + heatGain;
   } else {
     Alt = 0.0;
-    bVal = *(told_ptr + sign * stepsize[sdim]) * kcoeff[sdim][dir] / dist[sdim][dir] + hc * Tair +
-           hr * Trad + heatGain;
+    bVal = *(told_ptr + sign * stepsize[sdim]) * kcoeff[sdim][dir] / dist[sdim][dir] +
+           hc * Tair + hr * Trad + heatGain;
   }
 }
 
@@ -907,8 +907,8 @@ double BoundaryCell::ifCellExplicit(const std::size_t dim, const std::size_t &di
 
   int sign = (dir == 0) ? -1 : 1;
 
-  return (kcoeff[dim][dir] * *(told_ptr + sign * stepsize[dim]) / dist[dim][dir] + hc * Tair +
-          hr * Trad + heatGain) /
+  return (kcoeff[dim][dir] * *(told_ptr + sign * stepsize[dim]) / dist[dim][dir] +
+          hc * Tair + hr * Trad + heatGain) /
          (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 

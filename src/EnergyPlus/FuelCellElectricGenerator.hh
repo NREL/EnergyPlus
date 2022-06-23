@@ -62,18 +62,6 @@ namespace EnergyPlus {
 
 namespace FuelCellElectricGenerator {
 
-    enum class GasID
-    // This enum starts at 1 because it has to match Gas Phase ThermoChemistry Structure Array in DataGenerators & GeneratorFuelSupply
-    {
-        Invalid = -1,
-        CarbonDioxide = 1,
-        Nitrogen,
-        Oxygen,
-        Water,
-        Argon,
-        Num
-    };
-
     struct FCPowerModuleStruct
     {
         std::string Name;                      // name of this PowerModule data
@@ -128,7 +116,7 @@ namespace FuelCellElectricGenerator {
         Real64 TotFuelInEnthalphy; // Enthalpy of fuel coming into FCPM (watts)
         Real64 NdotProdGas;        // (kmol/sec)
         Array1D<Real64> ConstitMolalFract;
-        Array1D<GasID> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 TprodGasLeavingFCPM;
         Real64 NdotAir;           // molar air use rate    (kmol/sec)
         Real64 TotAirInEnthalphy; // Enthalpy of air coming nto FCPM energy balance (watts)
@@ -152,10 +140,9 @@ namespace FuelCellElectricGenerator {
               WaterSupplyCurveID(0), NdotDilutionAir(0.0), StackHeatLossToDilution(0.0), DilutionInletNode(0), DilutionExhaustNode(0), PelMin(0.0),
               PelMax(0.0), Pel(0.0), PelLastTimeStep(0.0), Eel(0.0), QdotStackCool(0.0), FractionalDayofLastStartUp(0.0),
               FractionalDayofLastShutDown(0.0), HasBeenOn(true), DuringShutDown(false), DuringStartUp(false), NdotFuel(0.0), TotFuelInEnthalphy(0.0),
-              NdotProdGas(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, GasID::Invalid), TprodGasLeavingFCPM(0.0), NdotAir(0.0),
-              TotAirInEnthalphy(0.0), NdotLiqwater(0.0), TwaterInlet(0.0), WaterInEnthalpy(0.0), DilutionAirInEnthalpy(0.0),
-              DilutionAirOutEnthalpy(0.0), PelancillariesAC(0.0), TotProdGasEnthalphy(0.0), WaterOutEnthalpy(0.0), SeqSubstitIter(0),
-              RegulaFalsiIter(0)
+              NdotProdGas(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, 0), TprodGasLeavingFCPM(0.0), NdotAir(0.0), TotAirInEnthalphy(0.0),
+              NdotLiqwater(0.0), TwaterInlet(0.0), WaterInEnthalpy(0.0), DilutionAirInEnthalpy(0.0), DilutionAirOutEnthalpy(0.0),
+              PelancillariesAC(0.0), TotProdGasEnthalphy(0.0), WaterOutEnthalpy(0.0), SeqSubstitIter(0), RegulaFalsiIter(0)
         {
         }
     };
@@ -178,7 +165,7 @@ namespace FuelCellElectricGenerator {
         Array1D_string ConstitName;
         Array1D<Real64> ConstitMolalFract;
         // Calculated values and input from elsewhere
-        Array1D<GasID> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 O2fraction;
         Real64 TairIntoBlower;  // temperature entering blower
         Real64 TairIntoFCPM;    // temperature leaving blower and entering FCPM
@@ -191,8 +178,7 @@ namespace FuelCellElectricGenerator {
             : SupNodeNum(0), BlowerPowerCurveID(0), BlowerHeatLossFactor(0.0), AirSupRateMode(DataGenerators::AirSupRateMode::Invalid), Stoics(0.0),
               AirFuncPelCurveID(0), AirTempCoeff(0.0), AirFuncNdotCurveID(0), IntakeRecoveryMode(DataGenerators::RecoverMode::Invalid),
               ConstituentMode(DataGenerators::ConstituentMode::Invalid), NumConstituents(0), ConstitName(14), ConstitMolalFract(14, 0.0),
-              GasLibID(14, GasID::Invalid), O2fraction(0.0), TairIntoBlower(0.0), TairIntoFCPM(0.0), PairCompEl(0.0), QskinLoss(0.0),
-              QintakeRecovery(0.0)
+              GasLibID(14, 0), O2fraction(0.0), TairIntoBlower(0.0), TairIntoFCPM(0.0), PairCompEl(0.0), QskinLoss(0.0), QintakeRecovery(0.0)
         {
         }
     };
@@ -241,15 +227,15 @@ namespace FuelCellElectricGenerator {
         Real64 TauxMix;
         Real64 NdotAuxMix;
         Array1D<Real64> ConstitMolalFract;
-        Array1D<GasID> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
-        Real64 QskinLoss;        // Heat lost to room
-        Real64 QairIntake;       // heat into intake air
+        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Real64 QskinLoss;     // Heat lost to room
+        Real64 QairIntake;    // heat into intake air
 
         // Default Constructor
         FCAuxilHeatDataStruct()
             : ZoneID(0), UASkin(0.0), ExcessAirRAT(0.0), ANC0(0.0), ANC1(0.0), SkinLossDestination(DataGenerators::LossDestination::Invalid),
               MaxPowerW(0.0), MinPowerW(0.0), MaxPowerkmolperSec(0.0), MinPowerkmolperSec(0.0), NumConstituents(0), TauxMix(0.0), NdotAuxMix(0.0),
-              ConstitMolalFract(14, 0.0), GasLibID(14, GasID::Invalid), QskinLoss(0.0), QairIntake(0.0)
+              ConstitMolalFract(14, 0.0), GasLibID(14, 0), QskinLoss(0.0), QairIntake(0.0)
         {
         }
     };
@@ -292,7 +278,7 @@ namespace FuelCellElectricGenerator {
         Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream.
         Real64 CondensateRate;     // water condensation rate.
         Array1D<Real64> ConstitMolalFract;
-        Array1D<GasID> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 NdotHXleaving;
         Real64 WaterOutletTemp;
         Real64 WaterOutletEnthalpy;
@@ -303,8 +289,7 @@ namespace FuelCellElectricGenerator {
               HXEffect(0.0), hxs0(0.0), hxs1(0.0), hxs2(0.0), hxs3(0.0), hxs4(0.0), h0gas(0.0), NdotGasRef(0.0), nCoeff(0.0), AreaGas(0.0),
               h0Water(0.0), NdotWaterRef(0.0), mCoeff(0.0), AreaWater(0.0), Fadjust(0.0), l1Coeff(0.0), l2Coeff(0.0), CondensationThresholdTemp(0.0),
               qHX(0.0), THXexh(0.0), WaterMassFlowRateDesign(0.0), WaterMassFlowRate(0.0), WaterInletTemp(0.0), WaterVaporFractExh(0.0),
-              CondensateRate(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, GasID::Invalid), NdotHXleaving(0.0), WaterOutletTemp(0.0),
-              WaterOutletEnthalpy(0.0)
+              CondensateRate(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, 0), NdotHXleaving(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0)
         {
         }
     };

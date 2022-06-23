@@ -77,11 +77,11 @@
 #define ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB 0x2054
 
 // WGL extension pointer typedefs
-typedef BOOL(WINAPI *PFNWGLSWAPINTERVALEXTPROC)(int);
-typedef BOOL(WINAPI *PFNWGLGETPIXELFORMATATTRIBIVARBPROC)(HDC, int, int, UINT, const int *, int *);
-typedef const char *(WINAPI *PFNWGLGETEXTENSIONSSTRINGEXTPROC)(void);
-typedef const char *(WINAPI *PFNWGLGETEXTENSIONSSTRINGARBPROC)(HDC);
-typedef HGLRC(WINAPI *PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC, HGLRC, const int *);
+typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC)(int);
+typedef BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBIVARBPROC)(HDC,int,int,UINT,const int*,int*);
+typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC)(void);
+typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC)(HDC);
+typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC,HGLRC,const int*);
 #define wglSwapIntervalEXT _glfw.wgl.SwapIntervalEXT
 #define wglGetPixelFormatAttribivARB _glfw.wgl.GetPixelFormatAttribivARB
 #define wglGetExtensionsStringEXT _glfw.wgl.GetExtensionsStringEXT
@@ -89,13 +89,13 @@ typedef HGLRC(WINAPI *PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC, HGLRC, const int *
 #define wglCreateContextAttribsARB _glfw.wgl.CreateContextAttribsARB
 
 // opengl32.dll function pointer typedefs
-typedef HGLRC(WINAPI *PFN_wglCreateContext)(HDC);
-typedef BOOL(WINAPI *PFN_wglDeleteContext)(HGLRC);
-typedef PROC(WINAPI *PFN_wglGetProcAddress)(LPCSTR);
-typedef HDC(WINAPI *PFN_wglGetCurrentDC)(void);
-typedef HGLRC(WINAPI *PFN_wglGetCurrentContext)(void);
-typedef BOOL(WINAPI *PFN_wglMakeCurrent)(HDC, HGLRC);
-typedef BOOL(WINAPI *PFN_wglShareLists)(HGLRC, HGLRC);
+typedef HGLRC (WINAPI * PFN_wglCreateContext)(HDC);
+typedef BOOL (WINAPI * PFN_wglDeleteContext)(HGLRC);
+typedef PROC (WINAPI * PFN_wglGetProcAddress)(LPCSTR);
+typedef HDC (WINAPI * PFN_wglGetCurrentDC)(void);
+typedef HGLRC (WINAPI * PFN_wglGetCurrentContext)(void);
+typedef BOOL (WINAPI * PFN_wglMakeCurrent)(HDC,HGLRC);
+typedef BOOL (WINAPI * PFN_wglShareLists)(HGLRC,HGLRC);
 #define wglCreateContext _glfw.wgl.CreateContext
 #define wglDeleteContext _glfw.wgl.DeleteContext
 #define wglGetProcAddress _glfw.wgl.GetProcAddress
@@ -105,54 +105,60 @@ typedef BOOL(WINAPI *PFN_wglShareLists)(HGLRC, HGLRC);
 #define wglShareLists _glfw.wgl.ShareLists
 
 #define _GLFW_RECREATION_NOT_NEEDED 0
-#define _GLFW_RECREATION_REQUIRED 1
+#define _GLFW_RECREATION_REQUIRED   1
 #define _GLFW_RECREATION_IMPOSSIBLE 2
 
-#define _GLFW_PLATFORM_CONTEXT_STATE _GLFWcontextWGL wgl
-#define _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE _GLFWlibraryWGL wgl
+#define _GLFW_PLATFORM_CONTEXT_STATE            _GLFWcontextWGL wgl
+#define _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE    _GLFWlibraryWGL wgl
+
 
 // WGL-specific per-context data
 //
-typedef struct _GLFWcontextWGL {
-  HDC dc;
-  HGLRC handle;
-  int interval;
+typedef struct _GLFWcontextWGL
+{
+    HDC       dc;
+    HGLRC     handle;
+    int       interval;
 
 } _GLFWcontextWGL;
 
 // WGL-specific global data
 //
-typedef struct _GLFWlibraryWGL {
-  HINSTANCE instance;
-  PFN_wglCreateContext CreateContext;
-  PFN_wglDeleteContext DeleteContext;
-  PFN_wglGetProcAddress GetProcAddress;
-  PFN_wglGetCurrentDC GetCurrentDC;
-  PFN_wglGetCurrentContext GetCurrentContext;
-  PFN_wglMakeCurrent MakeCurrent;
-  PFN_wglShareLists ShareLists;
+typedef struct _GLFWlibraryWGL
+{
+    HINSTANCE                           instance;
+    PFN_wglCreateContext                CreateContext;
+    PFN_wglDeleteContext                DeleteContext;
+    PFN_wglGetProcAddress               GetProcAddress;
+    PFN_wglGetCurrentDC                 GetCurrentDC;
+    PFN_wglGetCurrentContext            GetCurrentContext;
+    PFN_wglMakeCurrent                  MakeCurrent;
+    PFN_wglShareLists                   ShareLists;
 
-  PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT;
-  PFNWGLGETPIXELFORMATATTRIBIVARBPROC GetPixelFormatAttribivARB;
-  PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
-  PFNWGLGETEXTENSIONSSTRINGARBPROC GetExtensionsStringARB;
-  PFNWGLCREATECONTEXTATTRIBSARBPROC CreateContextAttribsARB;
-  GLFWbool EXT_swap_control;
-  GLFWbool EXT_colorspace;
-  GLFWbool ARB_multisample;
-  GLFWbool ARB_framebuffer_sRGB;
-  GLFWbool EXT_framebuffer_sRGB;
-  GLFWbool ARB_pixel_format;
-  GLFWbool ARB_create_context;
-  GLFWbool ARB_create_context_profile;
-  GLFWbool EXT_create_context_es2_profile;
-  GLFWbool ARB_create_context_robustness;
-  GLFWbool ARB_create_context_no_error;
-  GLFWbool ARB_context_flush_control;
+    PFNWGLSWAPINTERVALEXTPROC           SwapIntervalEXT;
+    PFNWGLGETPIXELFORMATATTRIBIVARBPROC GetPixelFormatAttribivARB;
+    PFNWGLGETEXTENSIONSSTRINGEXTPROC    GetExtensionsStringEXT;
+    PFNWGLGETEXTENSIONSSTRINGARBPROC    GetExtensionsStringARB;
+    PFNWGLCREATECONTEXTATTRIBSARBPROC   CreateContextAttribsARB;
+    GLFWbool                            EXT_swap_control;
+    GLFWbool                            EXT_colorspace;
+    GLFWbool                            ARB_multisample;
+    GLFWbool                            ARB_framebuffer_sRGB;
+    GLFWbool                            EXT_framebuffer_sRGB;
+    GLFWbool                            ARB_pixel_format;
+    GLFWbool                            ARB_create_context;
+    GLFWbool                            ARB_create_context_profile;
+    GLFWbool                            EXT_create_context_es2_profile;
+    GLFWbool                            ARB_create_context_robustness;
+    GLFWbool                            ARB_create_context_no_error;
+    GLFWbool                            ARB_context_flush_control;
 
 } _GLFWlibraryWGL;
 
+
 GLFWbool _glfwInitWGL(void);
 void _glfwTerminateWGL(void);
-GLFWbool _glfwCreateContextWGL(_GLFWwindow *window, const _GLFWctxconfig *ctxconfig,
-                               const _GLFWfbconfig *fbconfig);
+GLFWbool _glfwCreateContextWGL(_GLFWwindow* window,
+                               const _GLFWctxconfig* ctxconfig,
+                               const _GLFWfbconfig* fbconfig);
+

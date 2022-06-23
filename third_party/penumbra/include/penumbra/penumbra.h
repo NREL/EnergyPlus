@@ -22,7 +22,13 @@ const int MSG_INFO = 0;
 const int MSG_WARN = 1;
 const int MSG_ERR = 2;
 
-enum class VendorName { None, NVIDIA, AMD, Intel, VMware };
+enum class VendorName {
+  None,
+  NVIDIA,
+  AMD,
+  Intel,
+  VMware
+};
 
 typedef void (*PenumbraCallbackFunction)(const int messageType, const std::string &message,
                                          void *contextPtr);
@@ -62,9 +68,8 @@ public:
   float calculatePSSA(unsigned surfaceIndex);
   std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
   std::vector<float> calculatePSSA();
-  std::map<unsigned, float>
-  calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
-                         const std::vector<unsigned> &interiorSurfaceIndices);
+  std::map<unsigned, float> calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
+                                                   const std::vector<unsigned> &interiorSurfaceIndices);
   int renderScene(unsigned surfaceIndex); // Primarily for debug purposes
   int renderInteriorScene(
       std::vector<unsigned> transparentSurfaceIndices,

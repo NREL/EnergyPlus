@@ -32,8 +32,6 @@ GLShader::GLShader(GLenum type, const char *source) {
 
 GLShader::~GLShader() {}
 
-GLuint GLShader::getInt() {
-  return shader;
-}
+GLuint GLShader::getInt() { return shader; }
 
 } // namespace Pumbra

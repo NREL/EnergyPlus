@@ -9,17 +9,11 @@ namespace Pumbra {
 
 Sun::Sun() : azimuth(0.f), altitude(0.f), posSet(false) {}
 
-Sun::Sun(float azm, float alt) : azimuth(azm), altitude(alt), posSet(true) {
-  setView();
-}
+Sun::Sun(float azm, float alt) : azimuth(azm), altitude(alt), posSet(true) { setView(); }
 
-void Sun::setAzimuth(float azm) {
-  azimuth = azm;
-}
+void Sun::setAzimuth(float azm) { azimuth = azm; }
 
-void Sun::setAltitude(float alt) {
-  altitude = alt;
-}
+void Sun::setAltitude(float alt) { altitude = alt; }
 
 void Sun::setView(float azm, float alt) {
   setAzimuth(azm);
@@ -43,15 +37,9 @@ void Sun::setView() {
   mat4x4_look_at(view, eye, center, up);
 }
 
-mat4x4_ptr Sun::getView() {
-  return view;
-}
+mat4x4_ptr Sun::getView() { return view; }
 
-float Sun::getAzimuth() {
-  return azimuth;
-}
+float Sun::getAzimuth() { return azimuth; }
 
-float Sun::getAltitude() {
-  return altitude;
-}
+float Sun::getAltitude() { return altitude; }
 } // namespace Pumbra

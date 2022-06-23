@@ -22,12 +22,11 @@ namespace Pumbra {
 SurfaceBuffer::SurfaceBuffer(GLuint begin, GLuint count, GLint index)
     : begin(begin), count(count), index(index) {}
 
-GLModel::~GLModel() {
-  clearModel();
-}
+GLModel::~GLModel() { clearModel(); }
 
 void GLModel::clearModel() {
-  if (objectsSet) {
+  if (objectsSet)
+  {
     glDeleteVertexArraysX(1, &vao);
     glDeleteBuffers(1, &vbo);
   }
@@ -62,9 +61,7 @@ void GLModel::drawSurface(SurfaceBuffer surfaceBuffer) {
   glDrawArrays(GL_TRIANGLES, surfaceBuffer.begin, surfaceBuffer.count);
 }
 
-void GLModel::drawAll() {
-  glDrawArrays(GL_TRIANGLES, 0, numPoints);
-}
+void GLModel::drawAll() { glDrawArrays(GL_TRIANGLES, 0, numPoints); }
 
 void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
 
