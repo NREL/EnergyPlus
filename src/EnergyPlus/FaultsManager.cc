@@ -411,7 +411,8 @@ namespace FaultsManager {
 
             int EvapCoolerNum;
 
-            if (state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerType == "EvaporativeCooler:Indirect:WetCoil") {
+            if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerType,
+                                            "EvaporativeCooler:Indirect:WetCoil")) {
                 // Read in evaporative cooler is not done yet
                 if (state.dataEvapCoolers->GetInputEvapComponentsFlag) {
                     EvaporativeCoolers::GetEvapInput(state);
