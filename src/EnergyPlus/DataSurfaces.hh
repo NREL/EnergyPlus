@@ -1328,12 +1328,12 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;
-        Real64 SkyViewFactor = 0.0;      // sky view factor
-        Real64 GroundViewFactor = 0.0;   // ground view factor
-        int SkyTempSchNum = 0;           // schedule pointer
-        int GroundTempSchNum = 0;        // schedule pointer
-        int TotSurroundingSurface = 0;   // Total number of surrounding surfaces defined for an exterior surface
-        bool IsSkyViewFactorSet = false; // false if the sky view factor field is blank
+        Real64 SkyViewFactor = 0.0;         // sky view factor
+        Real64 GroundViewFactor = 0.0;      // ground view factor
+        int SkyTempSchNum = 0;              // schedule pointer
+        int GroundTempSchNum = 0;           // schedule pointer
+        int TotSurroundingSurface = 0;      // Total number of surrounding surfaces defined for an exterior surface
+        bool IsSkyViewFactorSet = false;    // false if the sky view factor field is blank
         bool IsGroundViewFactorSet = false; // false if the ground view factor field is blank
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
     };
