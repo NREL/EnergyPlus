@@ -50,8 +50,8 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/WindTurbine.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/WindTurbine.hh>
 
 using namespace EnergyPlus;
 
@@ -59,35 +59,33 @@ TEST_F(EnergyPlusFixture, WindTurbineTest)
 {
     // this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
     // set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
-    std::string const idf_objects = delimited_string({
-        "Generator:WindTurbine,",
-        "    WT1,                     !- Name",
-        "    ,               !- Availability Schedule Name",
-        "    HorizontalAxisWindTurbine,  !- Rotor Type",
-        "    FixedSpeedVariablePitch, !- Power Control",
-        "    41,                      !- Rated Rotor Speed {rev/min}",
-        "    19.2,                    !- Rotor Diameter {m}",
-        "    30.5,                    !- Overall Height {m}",
-        "    3,                       !- Number of Blades",
-        "    55000,                   !- Rated Power {W}",
-        "    11,                      !- Rated Wind Speed {m/s}",
-        "    3.5,                     !- Cut In Wind Speed {m/s}",
-        "    25,                      !- Cut Out Wind Speed {m/s}",
-        "    0.835,                   !- Fraction system Efficiency",
-        "    8,                       !- Maximum Tip Speed Ratio",
-        "    0.5,                     !- Maximum Power Coefficient",
-        "    6.4,                     !- Annual Local Average Wind Speed {m/s}",
-        "    50,                      !- Height for Local Average Wind Speed {m}",
-        "    ,                        !- Blade Chord Area {m2}",
-        "    ,                        !- Blade Drag Coefficient",
-        "    ,                        !- Blade Lift Coefficient",
-        "    0.5176,                  !- Power Coefficient C1",
-        "    116,                     !- Power Coefficient C2",
-        "    0.4,                     !- Power Coefficient C3",
-        "    0,                       !- Power Coefficient C4",
-        "    5,                       !- Power Coefficient C5",
-        "    21;                      !- Power Coefficient C6"
-    });
+    std::string const idf_objects = delimited_string({"Generator:WindTurbine,",
+                                                      "    WT1,                     !- Name",
+                                                      "    ,               !- Availability Schedule Name",
+                                                      "    HorizontalAxisWindTurbine,  !- Rotor Type",
+                                                      "    FixedSpeedVariablePitch, !- Power Control",
+                                                      "    41,                      !- Rated Rotor Speed {rev/min}",
+                                                      "    19.2,                    !- Rotor Diameter {m}",
+                                                      "    30.5,                    !- Overall Height {m}",
+                                                      "    3,                       !- Number of Blades",
+                                                      "    55000,                   !- Rated Power {W}",
+                                                      "    11,                      !- Rated Wind Speed {m/s}",
+                                                      "    3.5,                     !- Cut In Wind Speed {m/s}",
+                                                      "    25,                      !- Cut Out Wind Speed {m/s}",
+                                                      "    0.835,                   !- Fraction system Efficiency",
+                                                      "    8,                       !- Maximum Tip Speed Ratio",
+                                                      "    0.5,                     !- Maximum Power Coefficient",
+                                                      "    6.4,                     !- Annual Local Average Wind Speed {m/s}",
+                                                      "    50,                      !- Height for Local Average Wind Speed {m}",
+                                                      "    ,                        !- Blade Chord Area {m2}",
+                                                      "    ,                        !- Blade Drag Coefficient",
+                                                      "    ,                        !- Blade Lift Coefficient",
+                                                      "    0.5176,                  !- Power Coefficient C1",
+                                                      "    116,                     !- Power Coefficient C2",
+                                                      "    0.4,                     !- Power Coefficient C3",
+                                                      "    0,                       !- Power Coefficient C4",
+                                                      "    5,                       !- Power Coefficient C5",
+                                                      "    21;                      !- Power Coefficient C6"});
 
     ASSERT_TRUE(process_idf(idf_objects));
     WindTurbine::GetWindTurbineInput(*state);
