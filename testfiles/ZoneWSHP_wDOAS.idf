@@ -766,7 +766,6 @@
     4.03828937789764,        !- Coefficient3 x
     0.952179101682919,       !- Coefficient4 y
     0.0,                     !- Coefficient5 z
-    0.0,                     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x

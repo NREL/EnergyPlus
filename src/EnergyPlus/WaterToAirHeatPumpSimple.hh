@@ -279,6 +279,10 @@ namespace WaterToAirHeatPumpSimple {
                            Optional_int CompanionHeatingCoilNum = _  // Index to heating coil for cooling coil = SimpleWSHPNum
     );
 
+    void CheckSimpleWAHPRatedCurvesOutputs(EnergyPlusData &state,
+                                           std::string const &CoilName // must match coil names for the coil type
+    );
+
 } // namespace WaterToAirHeatPumpSimple
 
 struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct

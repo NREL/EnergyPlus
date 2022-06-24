@@ -398,21 +398,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:10) = InArgs(1:10)
-                 OutArgs(11) = '29.44'
-                 OutArgs(12) = 'Autosize'
-                 OutArgs(13) = 'Autosize'
+                 OutArgs(11) = '30.0'
+                 OutArgs(12) = '27.0'
+                 OutArgs(13) = '19.0'
                  OutArgs(14:CurArgs + 3) = InArgs(11:CurArgs)
                  CurArgs = CurArgs + 3
+                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
 
               CASE('COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:9) = InArgs(1:9)
                  OutArgs(10) = '20.0'
-                 OutArgs(11) = 'Autosize'
+                 OutArgs(11) = '20.0'
                  OutArgs(12) = '1.0'
                  OutArgs(13:CurArgs + 3) = InArgs(10:CurArgs)
                  CurArgs = CurArgs + 3
+                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
 
               ! If your original object starts with D, insert the rules here
 

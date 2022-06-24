@@ -1,17 +1,16 @@
-Reference Temperature Inputs for Water To Air Coils
+Rated Temperature Inputs for Water To Air Coils
 ================
 
 **Jeremy Lerond, Wooyoung Jung, and Jian Zhang, PNNL**
 
  - Original Date: 10/21/2021
- - Revision Date: 03/08/2021
-
+ - Revision Date: 06/22/2022
 
 ## Justification for New Feature ##
 
 When auto-sizing the capacity and power of the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects, EnergyPlus determines their total rated capacity by normalizing the total capacity at peak design conditions by the total capacity curve modifier at 85&deg;F Entering Water Temperature (EWT) and at the Entering Air Wet-bulb Temperature (EAWT) at peak design conditions. The total rated capacity is then used to determine the rated power which is in turn used in the simulation to calculate the coil's power by multiplying it by the power curve modifier.
 
-Water-source heat pumps are rated following the test procedures in ISO 13256-1. The rating conditions vary depending on the application of the water-source heat pump. For instance, for cooling operation, groundwater water-to-air heat pumps are rated at 59&deg;F EWT whereas water loop water-to-air heat pumps are rated at 86&deg;F EWT (see Figure 1). In fact, none of the water-to-air applications currently listed in ASHRAE Standard 90.1 are shown to be rated at 85&deg;F EWT. While ASHRAE 90.1 references the ISO standard, the AHRI certification program documentation specify that the applicable rating standard is ISO Standard 13256-1. Figure 3 shows a typical manufacturer equipment report which shows that the performance of water-to-air heat pumps are reported at different conditions based on their application.
+Water-source heat pumps are rated following the test procedures in ISO 13256-1. The rating conditions vary based upon the water-to-air heat pump application. For instance, for cooling operation, groundwater water-to-air heat pumps are rated at 59&deg;F EWT whereas water loop water-to-air heat pumps are rated at 86&deg;F EWT (see Figure 1). While ASHRAE 90.1 only references the ISO standard, the AHRI certification program documentation specify that the applicable rating standard is ISO Standard 13256-1. Figure 3 shows a typical manufacturer equipment report which shows that the performance of water-to-air heat pumps are reported at different conditions based on their application.
 
 ![ASHRAE 90.1 WSHP requirements](NFP-RefCondsWtrToAirCoils_901reqs.PNG)
 
@@ -25,23 +24,21 @@ _Figure 2 - Excerpt of the ISO 13256-1 rating conditions_
 
 _Figure 3 - Typical manufacturer equipment performance report ([source](https://www.climatemaster.com/download/18.274be999165850ccd5b5c48/1535543869128/lc517-climatemaster-commercial-tranquility-compact-belt-drive-tchv-series-water-source-heat-pump-submittal-set.pdf))_
 
-Since the rated power is calculated from the rated capacity, when auto-sizing water-to-air coils using these objects, users currently have to input a de-rated Coefficient Of Performance (COP) that is calculated at 85&deg;F EWT and peak design EAWT. Additionally, when both a cooling and heating coil are modeled, the rated capacity of the heating coil is set to be the same as the cooling coil, however, the rating conditions between cooling and heating operation are very different, this also requires users to input a de-rated heating COP.
+Since the rated power is calculated from the rated capacity and rated COP, when auto-sizing water-to-air coils using these objects the rated capacity should be calculated based on the design load on the coil and the design temperatures and not calculated assuming a 85&deg;F design EWT for all cases. Additionally, when both a cooling and heating coil are modeled, the rated capacity of the heating coil is currently set to be the same as the cooling coil, however, the rating conditions between cooling and heating operation are very different which typically results in very different rated heating and cooling capacity for a specific unit.
 
-This document proposes to add new reference or rated temperature inputs (in the code, EnergyPlus uses the "rated" terminology but "reference" might be more general) for both the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects. These new inputs would be used to, in conjunction with the capacity and COP inputs, determine the correct reference or rated power when auto-sizing these coil objects. This is mostly relevant, but not limited, to code compliance modeling where users rely on the simulation software the calculate the correct autosized rated capacity and power.
-
-In addition to the `Coil:*:WaterToAirHeatPump:EquationFit`, we propose to make the same changes to the `Coil:*:WaterToAirHeatPump:VariableSpeedEquationFit` because sizing is pretty similar even though the simulation for these objects is done differently.
+This document proposes to add new rated temperature inputs for both the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects. These new inputs would be used to, in conjunction with the capacity and COP inputs, make sure that the correct rated power when auto-sizing these coil objects is used in the simulation. This is mostly relevant, but not limited, to code compliance modeling where users rely on the simulation software to calculate the correct autosized rated capacity and power.
 
 ## E-mail and  Conference Call Conclusions ##
 
 ## Overview ##
 
-New reference or rated temperature inputs (EnergyPlus (I/O and code) uses the "rated" terminology but "reference" might be more general and is currently used by the chiller objects) for both the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects. These new inputs would be used in conjunction with the capacity and COP inputs to determine the correct reference or rated power when auto-sizing coils.
+Adding new rated temperature inputs for both the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects. These new inputs would be used in conjunction with the capacity and COP inputs to determine the correct rated power when auto-sizing coils.
 
 ## Approach ##
 
 ### Core Changes ###
 
-The reference or rated capacity is currently calculated as follows (in the `SizeHVACWaterToAir` function).
+The rated capacity is currently calculated as follows (in the `SizeHVACWaterToAir` function).
 
 ```
 ratioTWB = (MixWetBulb + 273.15) / 283.15;
@@ -55,131 +52,90 @@ RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac
 simpleWatertoAirHP.RatedPowerCool = simpleWatertoAirHP.RatedCapCoolTotal / simpleWatertoAirHP.RatedCOPCool;
 ```
 
-This approach assumes that the reference or rated capacity is calculated using the coil's peak mixed-air wet-bulb temperature and an entering water temperature of 85&deg;F. The proposed approach would calculate the reference (we propose to drop the _rated_ term) capacity and power using the user specified reference conditions, the input for gross rated COP would be changed to gross reference COP and would correspond to the coil's efficiency at these reference conditions. Below is a pseudo-code that illustrates how the code would be modified:
+This approach assumes that the rated capacity is calculated using the coil's peak mixed-air wet-bulb temperature and an entering water temperature of 85&deg;F. The proposed approach would calculate the rated capacity and power using the user specified rated conditions. Below is a pseudo-code that illustrates how the code would be modified:
 
 ```
-RefCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac
-CapCoolTotalDesAtRefCdts = RefCapCoolTotalDes * RefTotCapTempModFac
-RefPowerCool = CapCoolTotalDesAtRefCdts / (RefCOPCool * RefPowerTempModFac)
-PowerCoolAtRefCdts = RefPowerCool * RefPowerTempModFac
+RatedCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac
+CapCoolTotalDesAtRatedCdts = RatedCapCoolTotalDes * RatedTotCapTempModFac
+RatedPowerCool = CapCoolTotalDesAtRatedCdts / (RatedCOPCool * RatedPowerTempModFac)
+PowerCoolAtRatedCdts = RatedPowerCool * RatedPowerTempModFac
 ```
 
-- `PeakTotCapTempModFac` is the capacity modifier at peak design conditions. Currently, the peak design conditions correspond to the mixed air wet-bulb temperature and an entering water temperature of 85&deg;F. We propose to keep the former but to change the latter to be based on the user-specified reference entering water temperature (default to 30&deg;C, 86&deg;F).
-- `RefTotCapTempModFac` is the capacity modifier at the reference conditions. The reference conditions would correspond to the user-specified mixed air wet-bulb (default to 19&deg;C, 66.2&deg;F) and entering water temperature (default to 30&deg;C, 86&deg;F). The reference conditions could be the rating conditions for a specific water-to-air application (see Table 2 and 3 in ISO 13256-1) if the user provides a rated COP as input.
-- `RefPowerTempModFac` is the power modifier at the reference conditions. The reference conditions would correspond to the user-specified mixed air wet-bulb (default to 19&deg;C, 66.2&deg;F) and entering water temperature (default to 30&deg;C, 86&deg;F). The reference conditions could be the rating conditions for a specific water-to-air application (see Table 2 and 3 in ISO 13256-1) if the user provides a rated COP as input.
+- `PeakTotCapTempModFac` is the capacity modifier at peak design conditions. Currently, the peak design conditions correspond to the mixed air wet-bulb temperature and an entering water temperature of 85&deg;F. We propose to keep the former but to change the latter to be based on the user-specified design plant loop leaving fluid temperature.
+- `RatedTotCapTempModFac` is the capacity modifier at the rated conditions. The rated conditions would correspond to the user-specified mixed air wet-bulb (default to 19&deg;C, 66.2&deg;F) and entering water temperature (default to 30&deg;C, 86&deg;F). The rated conditions could be the rating conditions for a specific water-to-air application (see Table 2 and 3 in ISO 13256-1) if the user provides a rated COP as input. **The capacity modifier shall be equal to (or be very close to ) 1.0 at rated conditions so** `CapCoolTotalDesAtRatedCdts = RatedCapCoolTotalDes` **, a warning will be issued if the modifier differs by more than 2%**.
+- `RatedPowerTempModFac` is the power modifier at the rated conditions. The rated conditions would correspond to the user-specified mixed air wet-bulb (default to 19&deg;C, 66.2&deg;F) and entering water temperature (default to 30&deg;C, 86&deg;F). The rated conditions could be the rating conditions for a specific water-to-air application (see Table 2 and 3 in ISO 13256-1) if the user provides a rated COP as input. **The power modifier shall be equal to 1.0 (or be very close to) at rated conditions so** `PowerCoolAtRatedCdts = RatedPowerCool` **, a warning will be issued if the modifier differs by 2%**.
 
-The coil's sensible capacity is calculated similarly to the total capacity. The main difference being that it uses the sensible capacity/load at peak as the basis for the calculation. The same adjustments will be made to accurately calculate the reference sensible capacity.
+The coil's sensible capacity is calculated similarly to the total capacity. The main difference being that it uses the sensible capacity/load at peak as the basis for the calculation. The same adjustments will be made to accurately calculate the rated sensible capacity.
 
-When a heating coil is modeled along with a cooling coil and both are setup to have their capacity auto-sized, EnergyPlus currently sets the rated heating capacity to be the same as the cooling coil. However, rating conditions are different for heating coils, and also vary based on application. We propose a new input, solely for the heating coil, that would represent the ratio of heating reference capacity to reference cooling capacity. General guidelines on which value to use will be added to the I/O reference guide, values will be provided base on a review of equipment in the AHRI database. Figure 3 shows that for example that ratio is about 1.3 for water loop applications, 0.95 for ground water applications, and 0.8 for ground loop applications. The proposed approach would consider that the heating capacity is the same as the cooling capacity at peak conditions and the same "peak to reference" adjustments will be applied to determine the correct reference heating capacity and power.
+When a heating coil is modeled along with a cooling coil and both are setup to have their capacity auto-sized, EnergyPlus currently sets the rated heating capacity to be the same as the cooling coil. However, rating conditions are different for heating coils, and also vary based on the water-to-air heat pump application. We propose a new input, solely for the heating coil, that would represent the ratio of rated heating capacity to rated cooling capacity. General guidelines on which value to use will be added to the I/O reference guide, values will be provided based on a review of equipment in the AHRI database. Figure 3 shows that for example, the ratio is about 1.3 for water loop applications, 0.95 for ground water applications, and 0.8 for ground loop applications.
 
-The total cooling and heating coils capacity is currently solely based on cooling peak calculations. It is possible that in certain climate zones, and certain buildings, that heating load dominates cooling loads and thus that heating coils might end-up being undersized. We proposed to add a heating peak calculation to calculate the heating load that the coil would have to meet, and using the the ratio of heating reference capacity to reference cooling capacity calculate the corresponding reference cooling coil capacity and set the cooling capacity to be the maximum between this one and the one determined based on cooling peak calculations.
-
-### Example ###
-
-The following example illustrates the issue and proposed approach. Let's consider a model using a `Coil:Cooling:WaterToAirHeatPump:EquationFit` using the same performance curves as in the `ASHRAE901_ApartmentHighRise_STD2019_Denver.idf` file.
-
-Let's assume that:
-- The coil load at peak design conditions is `CoolCapAtPeak` = 1000W, 
-- The entering air wet-bulb temperature at peak design conditions is `MixWetBulb` = 15.6&deg;C, 
-- The entering air dry-bulb temperature at peak design conditions is `MixTemp` = 21.1&deg;C, 
-- The user-specified cooling COP at rated conditions is `RatedCOPCool` = 4.2
-
-#### Current Approach ###
-_Note: The current variable names are used below._
-
-- `PeakTotCapTempModFac` is calculated at 29.44&deg;C (85&deg;F) EWT and 15.6&deg;C (60&deg;F) EAWT and is about 0.873
-- `RatedCapCoolTotalDes` = 1000 / 0.873 = 1145 W
-- `RatedPowerCool` = 1145 / 4.2 = 273 W
-
-The rating conditions for water-to-air water loop heat pumps are 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F), at these conditions the `TotCapTempModFac` is 0.956 and `PowerTempModFac` is 1.006. When using these modifiers to calculate the operating capacity and power at these conditions we get a capacity of 1145 * 0.956 ~= 1095 W and a power of 274 * 1.006 ~= 274 W which correspond to a COP of 1095 / 274 ~= 4 which doesn't align with the user-specified COP of 4.2.
-
-#### Proposed Approach ####
-_Note: The proposed variable names are used below._
-
-- `PeakTotCapTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 15.6&deg;C (60&deg;F) EAWT and is about 0.869
-- `RefTotCapTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F) EAWT and is about 0.956 which corresponds to the total capacity modifier at the reference conditions which are the actual rating condition in this example.
-- `RefPowerTempModFac` is calculated at 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F) EAWT and is about 1.006 which corresponds to the power modifier at the reference conditions which are the actual rating condition in this example.
-- `RefCapCoolTotalDes` = 1000 / 0.869 = 1151 W
-- `RatedPowerCool` = 1151 * 0.956 / (4.2 * 1.006) = 260 W
-
-The rating conditions for water-to-air water loop heat pumps are 30&deg;C (86&deg;F) EWT and 19&deg;C (66.2&deg;F), at these conditions the `TotCapTempModFac` is 0.956 and `PowerTempModFac` is 1.006. When using these modifiers to calculate the operating capacity and power at these conditions we get a capacity (`CapCoolTotalDesAtRefCdts`) of 1151 * 0.956 = 1101 W and a power (`PowerCoolAtRefCdts`) of 260 * 1.006 ~= 262 W which correspond to a COP of 1101 / 262 ~= 4.2 which aligns with the user-specified COP of 4.2.
-
-### Additional Proposed Changes ###
-#### Coil:*:WaterToAirHeatPump:VariableSpeedEquationFit ####
-As previously mentioned the `Coil:*:WaterToAirHeatPump:VariableSpeedEquationFit` coil objects are sized similarly to the `Coil:*:WaterToAirHeatPump:EquationFit` coil objects so the same changes will be applied.
-
-Additionally, a review of the code helped identified another potential issue with the calculation of the rated capacity. PR [#7996](https://github.com/NREL/EnergyPlus/pull/7996) introduced an if statement (see code block below) checking if a coil has a valid condenser inlet node (probably aimed to identify if the coil is of `Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed` type as it has a field for `Rated Condenser Inlet Water Temperature`), if it does not, the outdoor air temperature at peak sizing conditions is used. A `Coil:*:WaterToAirHeatPump:VariableSpeedEquationFit` coil doesn't ever have a valid condenser node so the latter applies which is inconsistent with the type of variable that's expected by the model: a water temperature is expected, not an outdoor air temperature. See code snippet below for additional details.
-
-```
-if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
-     RatedSourceTempCool = state.dataVariableSpeedCoils->RatedInletWaterTemp;
-} else {
-     RatedSourceTempCool = OutTemp;
-}
-TotCapTempModFac = CurveValue(state,
-                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(
-                                   state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel),
-                              MixWetBulb,
-                              RatedSourceTempCool);
-[...]
-RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
-```
+The total cooling and heating coil capacity is currently solely based on cooling peak calculations. It is possible that in certain climate zones, and certain buildings, that heating load dominates cooling loads and thus that heating coils might end-up being undersized. We proposed to add a heating peak calculation to calculate the heating load that the coil would have to meet, and using the the ratio of heating rated capacity to rated cooling capacity calculate the corresponding rated cooling coil capacity and set the cooling capacity to be the maximum between this one and the one determined based on cooling peak calculations.
 
 ## Testing/Validation/Data Sources ##
 
-Unit tests will be added to test that the reference heating and cooling capacity of the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects (and variable speed versions) is correctly calculated using the user-input reference temperatures, and/or with the default values.
+Unit tests will be added to test that the rated heating and cooling capacity of the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects is correctly calculated using the user-input rated temperatures and that the capacities are determined according to the new ratio of rated heating capacity to cooling capacity.
 
 ## Input Output Reference Documentation ##
 
 Documentation for the new inputs will be added for both coil objects. The proposed documentation could be as follows:
 
-> This numeric field contains the reference entering air wet-bulb temperature. This field along with the next one is only used when the capacity is set to be autosized and is used to determine the coil's reference capacity. The COP should be entered at these conditions. If left blank, 19&deg;C is used (rating temperature for water loop water-to-air heat pumps in ISO-13256-1-2021).
+> This numeric field contains the entering air wet-bulb temperature at which the coil capacity, COP and power are rated at. As such, the coil's COP should be entered at this temperature. If left blank, 19 degrees C is used (rated temperature for water loop water-to-air heat pumps in ISO-13256-1-1998).
 
-> This numeric field contains the entering water temperature. This field along with the previous one is only used when the capacity is set to be autosized and is used to determine the coil's reference capacity. The COP should be entered at these conditions. If left blank, 30&deg;C is used (rating temperature for water loop water-to-air heat pumps in ISO-13256-1-2021).
+> This numeric field contains the entering water temperature at which the coil capacity, COP and power are rated at. As such, the coil's COP should be entered at this temperature. If left blank, 30 degrees C is used (rating temperature for water loop water-to-air heat pumps in ISO-13256-1-1998).
 
-> This numeric field contains the ratio of reference heating capacity to the reference cooling capacity at reference conditions. It is used to determine the autosized reference heating capacity from the reference cooling capacity. It is also used to determine the autosized reference cooling capacity when peak heating loads are dominating during sizing calculations. If both this object's and its associated cooling coil's capacity are provided by the user, this field not used. Typical value for this field depends on the application in which the coils are used. Here are some suggested values 1.23 for water loop applications, 0.89 for ground water applications, and 0.76 for ground loop applications (source: 2021 AHRI directory).
+> This numeric field contains the ratio of rated heating capacity to the rayed cooling capacity. It is used to determine the autosized rated heating capacity from the rated cooling capacity. It is also used to determine the autosized rated cooling capacity when peak heating loads are dominating during sizing calculations. If both this object's and its associated cooling coil's capacity are provided by the user, this field not used. Typical value for this field depends on the application in which the coils are used. Here are some suggested values 1.23 for water loop applications, 0.89 for ground water applications, and 0.76 for ground loop applications (source: 2021 AHRI directory).
+
 ## Input Description ##
 
-The following inputs will be added to the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects (and variable speed versions of them):
+The following inputs will be added to the `Coil:Cooling:WaterToAirHeatPump:EquationFit` and `Coil:Heating:WaterToAirHeatPump:EquationFit` objects:
 
 ```
 Coil:Cooling:WaterToAirHeatPump:EquationFit,
-   N*,  \field Reference Entering Water Temperature
-        \note Reference or rated entering water temperature corresponding to the water-to
+   N*,  \field Rated Entering Water Temperature
+        \note Rated entering water temperature corresponding to the water-to
         \note -air application for which this coil is used. For example: for water loop
-        \note applications, the rated temperature is 30 degree Celsius.
+        \note applications, the rated temperature is 30 degree Celsius
         \units C
         \type real
         \minimum> 0
         \default 30
-   N*,  \field Reference Entering Air Wet-Bulb Temperature
-        \note Reference or rated entering air wet-bulb temperature corresponding to the
+   N*,  \field Rated Entering Air Dry-Bulb Temperature
+        \note Rated entering air dry-bulb temperature corresponding to the
         \note water-to-air application for which this coil is used. For example: for
-        \note water loop applications, the rated temperature is 19 degree Celsius.
+        \note water loop applications, the rated temperature is 27 degree Celsius
         \units C
         \type real
+        \default 27
+        \minimum> 0
+   N*,  \field Rated Entering Air Wet-Bulb Temperature
+        \note Rated entering air wet-bulb temperature corresponding to the
+        \note water-to-air application for which this coil is used. For example: for
+        \note water loop applications, the rated temperature is 19 degree Celsius
+        \units C
+        \type real
+        \default 19.0
         \minimum> 0
 ```
 
 ```
 Coil:Heating:WaterToAirHeatPump:EquationFit,
-   N*,  \field Reference or Rated Entering Water Temperature
-        \note Reference or rated entering water temperature corresponding to the water-to
+   N*,  \field Rated Entering Water Temperature
+        \note Rated entering water temperature corresponding to the water-to
         \note -air application for which this coil is used. For example: for water loop
         \note applications, the rated temperature is 20 degree Celsius.
         \units C
         \type real
-        \minimum> 0
         \default 20
-   N*,  \field Reference or Rated Entering Air Dry-Bulb Temperature
-        \note Reference or rated entering air dry-bulb temperature corresponding to the
+   N*,  \field Rated Entering Air Dry-Bulb Temperature
+        \note Rated entering air dry-bulb temperature corresponding to the
         \note water-to-air application for which this coil is used. For example: for
-        \note water loop applications, the rated temperature is 15 degree Celsius.
+        \note water loop applications, the rated temperature is 20 degree Celsius.
         \units C
         \type real
+        \default 20
         \minimum> 0
-   N*,  \field Ratio of Reference Heating Capacity to Reference Cooling Capacity at Reference Conditions
-        \note Ratio of reference heating capacity to reference cooling capacity. This
+   N*,  \field Ratio of Rated Heating Capacity to Rated Cooling Capacity
+        \note Ratio of rated heating capacity to rated cooling capacity. This
         \note input is used to calculate the heating or cooling capacity when autosizing.
         \note This input is only used if a companion cooling coil of the same type 
         \note (Coil:Cooling:WaterToAirHeatPump:EquationFit) is used. This input is only
@@ -190,51 +146,162 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
         \default 1.0
 ```
 
-It is also proposed to remove `Rated` from all four coil objects inputs and replace it by `Reference`.
-
 ## Outputs Description ##
 
 This new feature proposal does not include any new outputs. The modified objects will evaluate the curves at the reference conditions and throw warnings if the outputs of the curves aren't close to 1.0.
 
 ## Engineering Reference ##
 
-The "Rated Total Cooling Capacity" subsection of the "Coil:Cooling:WaterToAirHeatPump:EquationFit Sizing" section will be modified as follows:
+The "Rated Total Cooling Capacity" subsection of "Coil:Cooling:WaterToAirHeatPump:EquationFit Sizing" will be modified as follows:
 
-> The calculation for coil operating temperatures (inlet and outlet) are identical to that done for \emph{Coil:Cooling:Water}. The following calculations are then performed to determine the rated total cooling capacity.
->
-> \begin{equation}
->   T_{WB,ratio,peak} = \frac{T_{WB,air,in,peak}+273.15C}{283.15C}
-> \end{equation}
->
-> \begin{equation}
->   T_{S,ratio,peak} = \frac{T_{water,in,peak}+273.15C}{283.15C}
-> \end{equation}
->
-> where:
->
-> $T_{WB,ratio,peak} = $ ratio of peak load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
->
-> $T_{S,ratio,peak} = $ ratio of peak source-side inlet water temperature in Kelvin to a reference temperature
->
-> $T_{WB,air,in,peak} = $ the peak load-side inlet air wet-bulb temperature, if not specified by the user, the peak design mixed air entering the coil will be used
->
-> $T_{S,air,in,peak} = $ the peak source-side inlet water temperature, if not specified by the user, 30&deg;C (86&deg;F; the peak value) is used which corresponds to the rating conditions of a water loop water-source heat pump according to ISO-13256-1
->
-> \begin{equation}
-> TotCapTempModFacPeak = \,TCC1 + TCC2\left( {{T_{WB,ratio,peak}}} \right) + TCC3\left( {{T_{S,ratio,peak}}} \right) + TCC4 + TCC5
-> \end{equation}
->
-> [...]
->
->\begin{equation}
->   \dot{Q}_{coil,des,total}   = \frac{\dot{m}_{air,des}\PB{H_{in}-H_{out}}}{TotCapTempModFacPeak} + \dot{Q}_{fan,heat,des}
->\end{equation}
+```
+The following calculations are performed to determine the rated total cooling capacity.
+
+\begin{equation}
+  T_{WB,ratio} = \frac{T_{WB,air,in,des}+273.15C}{283.15C}
+\end{equation}
+
+\begin{equation}
+  T_{S,ratio} = \frac{T_{EWT,in,des}+273.15C}{283.15C}
+\end{equation}
+
+where:
+
+\begin{itemize}
+\item $T_{WB,air,in,des}$: wet-bulb air temperature entering the coil at design conditions
+\item $T_{EWT,in,des}$: design entering water temperature obtained from the \emph{Sizing:Plant} object (\emph{Design Loop Exit Temperature} input)
+\item $T_{WB,ratio}$: ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
+\item $T_{S,ratio}$: ratio of source-side inlet water temperature in Kelvin to a reference temperature
+\end{itemize}
+
+\begin{equation}
+TotCapTempModFac = \,TCC1 + TCC2\left( {{T_{WB,ratio}}} \right) + TCC3\left( {{T_{S,ratio}}} \right) + TCC4 + TCC5
+\end{equation}
+
+where:
+
+TCC1 = user input for Total Cooling Capacity Coefficient 1
+
+TCC2 = user input for Total Cooling Capacity Coefficient 2
+
+TCC3 = user input for Total Cooling Capacity Coefficient 3
+
+TCC4 = user input for Total Cooling Capacity Coefficient 4
+
+TCC5 = user input for Total Cooling Capacity Coefficient 5
+
+
+The 4\(^{th}\) and 5\(^{th}\) coefficient (TCC4 and TCC5) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1. If the calculation for $TotCapTempModFac$ yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
+
+\begin{equation}
+  \dot{Q}_{coil,rated,total}   = \frac{\dot{m}_{air,des}\PB{H_{mix}-H_{sup}}+ \dot{Q}_{fan,heat,des}}{TotCapTempModFac}
+\end{equation}
+
+Where:
+
+\begin{itemize}
+\item \(H_{mix}\): mixed air enthalpy
+\item \(H_{sup}\): supply air enthalpy
+\item \(\dot{m}_{air,des}\): design cooling air mass flow rate
+\item \(\dot{Q}_{fan,heat,des}\): design fan heat (W) - see Section \ref{design-fan-heat}
+\end{itemize}
+
+If the cooling coil is modeled along with a \emph{Coil:Heating:WaterToAirHeatPump:EquationFit} object, the final cooling coil rated total capacity is determined as follow:
+
+\begin{equation}
+  \dot{Q}_{coil,rated,total} = max(\dot{Q}_{coil,rated,total,CDD}, \dot{Q}_{coil,rated,total,HDD})
+\end{equation}
+
+Where:
+
+\begin{itemize}
+\item \(\dot{Q}_{coil,rated,total,CDD}\): rated total cooling capacity determined based on cooling design day calculations
+\item \(\dot{Q}_{coil,rated,total,HDD}\): rated total cooling capacity determined based on the heating companion coil capacity (determined from heating design day calculations) divided by the user-specified \emph{Ratio of Rated Heating Capacity to Rated Cooling Capacity} input
+\end{itemize}
+
+If the design air flow used to determine the capacity is different from the system air flow ($= max($design cooling air flow rate, design heating air flow rate$)$) then the capacity is adjusted by the ratio of system air flow rate to design air flow rate.
+```
+
+The "Rated Sensible Cooling Capacity" subsection will be modified as follows:
+
+```
+The following calculations are performed to determine the rated sensible cooling capacity.
+
+\begin{equation}
+  T_{DB,ratio} = \frac{T_{DB,air,in,des}+273.15C}{283.15C}
+\end{equation}
+
+\begin{equation}
+  T_{S,ratio} = \frac{T_{EWT,in,des}+273.15C}{283.15C}
+\end{equation}
+
+where:
+
+\begin{itemize}
+\item $T_{DB,air,in,des}$: dry-bulb air temperature entering the coil at design conditions
+\item $T_{EWT,in,des}$: design entering water temperature obtain from the \emph{Sizing:Plant} object (\emph{Design Loop Exit Temperature} input)
+\item $T_{DB,ratio}$: ratio of load-side inlet air dry-bulb temperature in Kelvin to a reference temperature
+\end{itemize}
+
+\begin{equation}
+  \begin{array}{rl}
+    SensCapTempModFac &= SCC1 + SCC2\left( {{T_{DB,ratio}}} \right) + SCC3\left( {{T_{WB,ratio}}} \right) \\
+                      &+ SCC4\left( {{T_{S,ratio}}} \right) + SCC5 + SCC6
+  \end{array}
+\end{equation}
+
+where:
+
+SCC1 = user input for Sensible Cooling Capacity Coefficient 1
+
+SCC2 = user input for Sensible Cooling Capacity Coefficient 2
+
+SCC3 = user input for Sensible Cooling Capacity Coefficient 3
+
+SCC4 = user input for Sensible Cooling Capacity Coefficient 4
+
+SCC5 = user input for Sensible Cooling Capacity Coefficient 5
+
+SCC6 = user input for Sensible Cooling Capacity Coefficient 6
+
+
+The 5\(^{th}\) and 6\(^{th}\) coefficient (SCC5 and SCC6) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1. If the calculation for $SensCapTempModFac$ yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil sensible cooling capacity is set equal to 0.
+
+\begin{equation}
+  \dot{Q}_{coil,rated,sensible} = \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,mix}-T_{DB,sup}}+\dot{Q}_{fan,heat,des}}{SensCapTempModFac}
+\end{equation}
+
+Where:
+
+\begin{itemize}
+\item \(T_{DB,mix}\): mixed air temperature
+\item \(T_{DB,sup}\): supply air temperature
+\item \(\dot{m}_{air,des}\): design cooling air mass flow rate
+\item \(\dot{Q}_{fan,heat,des}\): design fan heat (W) - see Section \ref{design-fan-heat}
+\end{itemize}
+
+If the cooling coil is modeled along with a \emph{Coil:Heating:WaterToAirHeatPump:EquationFit} object, and the total cooling capacity is adjusted to be based on the rated total cooling capacity determined from the heating companion coil capacity, then the sensible capacity will also be adjusted so the sensible heat ratio is the same as the one determined following the cooling design day calculations.
+```
+
+And finally, the "Rated Total Heating Capacity" subsection of "Coil:Heating:WaterToAirHeatPump:EquationFit Sizing" will be modified as follows:
+
+```
+If the heating coil is modeled along with a \emph{Coil:Cooling:WaterToAirHeatPump:EquationFit} object, its capacity is determined using the rated total cooling capacity multiplied by the user-specified \emph{Ratio of Rated Heating Capacity to Rated Cooling Capacity} input.
+
+If the heating coil is modeled with a different type of coil or alone, a heating design day calculation is performed to determine the mixed air temperature ($T_{DB,mix}$). Knowing that, the design supply air temperature ($T_{DB,sup}$, determined from the \emph{Sizing:System} object inputs), the coil capacity modifier at the design conditions ($HeatCapTempModFac$), and the fan power can be used along with the design air mass flow rate to determine the rated heating coil capacity.
+
+\begin{equation}
+  \dot{Q}_{coil,rated,heating} = \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,mix}-T_{DB,sup}}- \dot{Q}_{fan,heat,des}}{HeatCapTempModFac}
+\end{equation}
+```
 
 ## Example File and Transition Changes ##
 
-Two existing example files will be modified to illustrate the proposed changes: a Ground Source Heat Pump (GSHP) application and a Water Source Heat Pump (WSHP) application.
+All example files will be modified to use the new inputs and be set to the correct rated temperature for the corresponding water-to-air application from ISO 13256-1:1998.
 
-The proposed approach plans on adding three new inputs in the middle of the `Coil:*:WaterToAirHeatPump:EquationFit` objects (and variable speed versions), so transition rules will be needed. Additionally, all mentions of "Rated" will be replaced by "Reference". The transition rule will set the new fields to the old hard-wired values.
+The proposed approach plans on adding three new inputs in the middle of the `Coil:*:WaterToAirHeatPump:EquationFit` objects, so transition rules will be needed. The transition rule will set the new temperature fields to the rated temperature from ISO 13256-1:1998 for water loop applications and issue a warning to let the users know that it might not align with their application.
+
+Note: While ISO 13256-1:2021 has been published (which contains slightly different rated temperatures), it has not yet made it's way into ASHRAE 90.1 so that is why we proposed to use values from ISO 13256-1:1998.
 
 ## References ##
 * ASHRAE. 2019. ANSI/ASHRAE/IES 90.1-2019, Energy Standard for Buildings Except Low-Rise
@@ -244,40 +311,39 @@ Residential Buildings. ASHRAE, Atlanta, GA
 * AHRI, 2021. AHRI Directory
 
 ## Design Document ##
-The changes below are described for the equation fit objects but similar changes will be made for the variable speed objects.
 
-### Modification to Cooling Coil Peak Load Calculation and Heating Reference Capacity ###
-Calculations of a reference heating capacity based on peak heating conditions will be added to the cooling coil section of `SizeHVACWaterToAir`. A reference cooling capacity will be calculated based on that reference heating capacity using the new proposed input ("Ratio of Reference Heating Capacity to Reference Cooling Capacity at Reference Conditions") by dividing the reference heating capacity by the new input. The actual autosized reference cooling capacity will be the maximum of the latter and the reference cooling capacity calculated based on the peak cooling conditions.
+### Heating Design Day Calculations ###
+Calculations of a rated heating capacity based on peak heating conditions will be added to the cooling coil section of `SizeHVACWaterToAir`. A rated cooling capacity will be calculated based on the rated heating capacity using the new proposed input ("Ratio of Rated Heating Capacity to Rated Cooling Capacity") by dividing the rated heating capacity by the new input. The actual autosized rated cooling capacity will be the maximum of the latter and the rated cooling capacity calculated based on the peak cooling conditions. Heating capacity will not be just set to be the rated cooling capacity as it is currently done but to be the rated cooling capacity multiplied by the new input. If the heating design day based cooling capacity is selected, the sensible capacity will be adjusted by assuming that the SHR is constant (i.e. same as for the cooling design day calculations).
 
-Heating capacity will not be just set to be the reference cooling capacity as it is currently done but to be the reference cooling capacity multiplied by the new input.
+The cooling and heating design day peak load will be calculated using the cooling and heating design air flow instead of the system air flow. The final capacities will be adjusted by the ratio of system (maximum of the cooling and heating design air flow) to design air flow to take into account that the system might operate a different air flow than the design one.
 
-### Peak to Reference Conditions Adjustments ###
-The following adjustments will be made to the current approach where `RatedCapCoolTotalDes` will be changed to `RefCapCoolTotalDes` and `RatedPowerCool` to `RefPowerCool`.
+### Curve Output at Rated Temperatures ###
+A new function, `CheckSimpleWAHPRatedCurvesOutputs`, will be created and called when getting the input for the coil object, the function will check the curve output at the rated conditions and issue a warning if they differ by more than 2%.
 
-```
-RefCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac
-CapCoolTotalDesAtRefCdts = RefCapCoolTotalDes * RefTotCapTempModFac
-RefPowerCool = CapCoolTotalDesAtRefCdts / (RefCOPCool * RefPowerTempModFac)
-PowerCoolAtRefCdts = RefPowerCool * RefPowerTempModFac
-```
+### New HTML Table ###
+A new table under the Equipment report will be created. The report will be titled "Water-to-Air Heat Pumps at Rated Temperatures Report" and will include the rated capacities, power, COP along with the user-specified rated temperatures. The rated characteristics will be reported at rated conditions, see the `***AtRatedCdts` variables defined below.
 
-Similarly `RefCapHeatDes` (currently `RatedCapHeatDes`) and `RefPowerHeat` (currently `RatedPowerHeat`) will be calculated as follows. Where `HeatToCoolRefCapRatio` is the new "Ratio of Reference Heating Capacity to Reference Cooling Capacity at Reference Conditions" user input.
+### Rated Characteristics ###
+The following adjustments will be made to the current approach:
 
 ```
-RefCapHeatDes = RefCapCoolTotalDes * HeatToCoolRefCapRatio
-CapHeatAtRefCdts = RefCapHeatDes * RefCapTempModFac
-RefPowerHeat = CapHeatAtRefCdts / (RefCOPHeat * RefPowerTempModFac)
-PowerHeatAtRefCdts = RefPowerHeat * RefPowerTempModFac
+RatedCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac
+CapCoolTotalDesAtRatedCdts = RefCapCoolTotalDes * RefTotCapTempModFac
+RatedPowerCool = CapCoolTotalDesAtRatedCdts / (RatedCapCoolAtRatedCdts * RatedPowerTempModFac)
+PowerCoolAtRatedCdts = RatedPowerCool * RatedPowerTempModFac
 ```
 
-### Variable Speed Object Source Temperature ###
-
-The following code prevents variable speed equation fit coils to use the correct source temperature because they don't a condenser inlet node input. A `elseif` statement will be added for these objects so the correct value can be retrieved (new user inputs).
+Similarly `RatedCapHeatDes` and `RatedPowerHeat` will be calculated as follows. Where `RatioRatedHeatRatedTotCoolCap` is the new "Ratio of Rated Heating Capacity to Rated Cooling Capacity" user input.
 
 ```
-if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum != 0) {
-RatedSourceTempCool = state.dataVariableSpeedCoils->RatedInletWaterTemp;
-} else {
-RatedSourceTempCool = OutTemp;
-}
+RatedCapHeatDes = RatedCapCoolTotalDes * RatioRatedHeatRatedTotCoolCap
+CapHeatAtRatedCdts = RatedCapHeatDes * RatedCapTempModFac
+RatedPowerHeat = CapHeatAtRatedCdts / (RatedCOPHeat * RatedPowerTempModFac)
+PowerHeatAtRatedCdts = RatedPowerHeat * RatedPowerTempModFac
 ```
+
+### Performance Curves in Example Files ###
+It was observed that the performance curves used for these objects in the example files are not normalized at the reference conditions. These curves will be re-normalized at rated temperature.
+
+### Curve Dataset ###
+Because the source(s?) for the performance curves used in the example files is hard to track down and the fact that they were not normalized to the rated temperature, a small dataset will be added which will contained performance curves for cooling and heating coil for water loop, ground water, and ground loop applications generated using publicly available manufacturer data.

@@ -539,7 +539,6 @@ Where \emph{D\(_{tube,outside}\)} is the tube outside diameter.
 
 The sizing of water cooling coil components wrapped in this coil system is done in function \textit{SizeWaterCoil} of module \textit{WaterCoils}. See component sizing sections for \textit{Coil:Cooling:Water} and \textit{Coil:Cooling:Water:DetailedGeometry}.
 
-
 \subsection{Coil:Cooling:WaterToAirHeatPump:EquationFit Sizing}\label{coilcoolingwatertoairheatpumpequationfit-sizing}
 
 The sizing is done in subroutine \emph{SizeHVACWaterToAir}.
@@ -554,21 +553,24 @@ The calculation is identical to that done for \emph{Coil:Cooling:Water}, which i
 
 \subsubsection{Rated Total Cooling Capacity}\label{rated-total-cooling-capacity}
 
-The calculation for coil operating temperatures (inlet and outlet) are identical to that done for \emph{Coil:Cooling:Water}. The following calculations are then performed to determine the rated total cooling capacity.
+The following calculations are performed to determine the rated total cooling capacity.
 
 \begin{equation}
   T_{WB,ratio} = \frac{T_{WB,air,in,des}+273.15C}{283.15C}
 \end{equation}
 
 \begin{equation}
-  T_{S,ratio} = \frac{29.44C+273.15C}{283.15C}
+  T_{S,ratio} = \frac{T_{EWT,in,des}+273.15C}{283.15C}
 \end{equation}
 
 where:
 
-$T_{WB,ratio} = $ ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
-
-$T_{S,ratio} = $ ratio of source-side inlet water temperature in Kelvin to a reference temperature
+\begin{itemize}
+\item $T_{WB,air,in,des}$: wet-bulb air temperature entering the coil at design conditions
+\item $T_{EWT,in,des}$: design entering water temperature obtained from the \emph{Sizing:Plant} object (\emph{Design Loop Exit Temperature} input)
+\item $T_{WB,ratio}$: ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
+\item $T_{S,ratio}$: ratio of source-side inlet water temperature in Kelvin to a reference temperature
+\end{itemize}
 
 \begin{equation}
 TotCapTempModFac = \,TCC1 + TCC2\left( {{T_{WB,ratio}}} \right) + TCC3\left( {{T_{S,ratio}}} \right) + TCC4 + TCC5
@@ -587,36 +589,55 @@ TCC4 = user input for Total Cooling Capacity Coefficient 4
 TCC5 = user input for Total Cooling Capacity Coefficient 5
 
 
-The 4\(^{th}\) and 5\(^{th}\) coefficient (TCC4 and TCC5) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
-
-The enthalpy of the entering air is then compared with the enthalpy of the exiting air. The calculations for air enthalpy are identical to that done for \emph{Coil:Cooling:Water}. If the entering air enthalpy is less than the exiting air enthalpy, a reference value of 48,000 J/kg is used as the entering air enthalpy. If the TotCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
+The 4\(^{th}\) and 5\(^{th}\) coefficient (TCC4 and TCC5) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1. If the calculation for $TotCapTempModFac$ yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil total cooling capacity is set equal to 0.
 
 \begin{equation}
-  \dot{Q}_{coil,des,total}   = \frac{\dot{m}_{air,des}\PB{H_{in}-H_{out}}}{TotCapTempModFac} + \dot{Q}_{fan,heat,des}
+  \dot{Q}_{coil,rated,total}   = \frac{\dot{m}_{air,des}\PB{H_{mix}-H_{sup}}+ \dot{Q}_{fan,heat,des}}{TotCapTempModFac}
 \end{equation}
 
 Where:
 
 \begin{itemize}
-\item
-  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
+\item \(H_{mix}\): mixed air enthalpy
+\item \(H_{sup}\): supply air enthalpy
+\item \(\dot{m}_{air,des}\): design cooling air mass flow rate
+\item \(\dot{Q}_{fan,heat,des}\): design fan heat (W) - see Section \ref{design-fan-heat}
 \end{itemize}
+
+If the cooling coil is modeled along with a \emph{Coil:Heating:WaterToAirHeatPump:EquationFit} object, the final cooling coil rated total capacity is determined as follow:
+
+\begin{equation}
+  \dot{Q}_{coil,rated,total} = max(\dot{Q}_{coil,rated,total,CDD}, \dot{Q}_{coil,rated,total,HDD})
+\end{equation}
+
+Where:
+
+\begin{itemize}
+\item \(\dot{Q}_{coil,rated,total,CDD}\): rated total cooling capacity determined based on cooling design day calculations
+\item \(\dot{Q}_{coil,rated,total,HDD}\): rated total cooling capacity determined based on the heating companion coil capacity (determined from heating design day calculations) divided by the user-specified \emph{Ratio of Rated Heating Capacity to Rated Cooling Capacity} input
+\end{itemize}
+
+If the design air flow used to determine the capacity is different from the system air flow ($= max($design cooling air flow rate, design heating air flow rate$)$) then the capacity is adjusted by the ratio of system air flow rate to design air flow rate.
 
 \subsubsection{Rated Sensible Cooling Capacity}\label{rated-sensible-cooling-capacity}
 
-The calculation for coil operating temperatures (inlet and outlet) are identical to that done for \emph{Coil:Cooling:Water}. The following calculations are then performed to determine the rated sensible cooling capacity.
+The following calculations are performed to determine the rated sensible cooling capacity.
 
 \begin{equation}
   T_{DB,ratio} = \frac{T_{DB,air,in,des}+273.15C}{283.15C}
 \end{equation}
 
 \begin{equation}
-  T_{S,ratio} = \frac{29.44C+273.15C}{283.15C}
+  T_{S,ratio} = \frac{T_{EWT,in,des}+273.15C}{283.15C}
 \end{equation}
 
 where:
- 
-$T_{DB,ratio} = $ ratio of load-side inlet air dry-bulb temperature in Kelvin to a reference temperature
+
+\begin{itemize}
+\item $T_{DB,air,in,des}$: dry-bulb air temperature entering the coil at design conditions
+\item $T_{EWT,in,des}$: design entering water temperature obtain from the \emph{Sizing:Plant} object (\emph{Design Loop Exit Temperature} input)
+\item $T_{DB,ratio}$: ratio of load-side inlet air dry-bulb temperature in Kelvin to a reference temperature
+\end{itemize}
 
 \begin{equation}
   \begin{array}{rl}
@@ -640,20 +661,22 @@ SCC5 = user input for Sensible Cooling Capacity Coefficient 5
 SCC6 = user input for Sensible Cooling Capacity Coefficient 6
 
 
-The 5\(^{th}\) and 6\(^{th}\) coefficient (SCC5 and SCC6) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
-
-The dry-bulb temperature of the entering air is then compared with the dry-bulb temperature of the exiting air. The calculations for air dry-bulb temperature are identical to that done for \emph{Coil:Cooling:Water}. If the entering air dry-bulb temperature is less than the exiting air dry-bulb temperature, a reference value of 24\(^{\circ}\)C is used as the entering air dry-bulb temperature. If the SensCapTempModFac calculation above yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil sensible cooling capacity is set equal to 0.
+The 5\(^{th}\) and 6\(^{th}\) coefficient (SCC5 and SCC6) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1. If the calculation for $SensCapTempModFac$ yields 0 as the result, a value of 1 is used in the following calculation. If the design air mass flow rate is determined to be less than a very small flow value (0.001 kg/s) or the capacity calculated here is less than 0, the coil sensible cooling capacity is set equal to 0.
 
 \begin{equation}
-  \dot{Q}_{coil,des,sensible} = \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,in}-T_{DB,out}}}{SensCapTempModFac} +\dot{Q}_{fan,heat,des}
+  \dot{Q}_{coil,rated,sensible} = \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,mix}-T_{DB,sup}}+\dot{Q}_{fan,heat,des}}{SensCapTempModFac}
 \end{equation}
 
 Where:
 
 \begin{itemize}
-\item
-  \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
+\item \(T_{DB,mix}\): mixed air temperature
+\item \(T_{DB,sup}\): supply air temperature
+\item \(\dot{m}_{air,des}\): design cooling air mass flow rate
+\item \(\dot{Q}_{fan,heat,des}\): design fan heat (W) - see Section \ref{design-fan-heat}
 \end{itemize}
+
+If the cooling coil is modeled along with a \emph{Coil:Heating:WaterToAirHeatPump:EquationFit} object, and the total cooling capacity is adjusted to be based on the rated total cooling capacity determined from the heating companion coil capacity, then the sensible capacity will also be adjusted so the sensible heat ratio is the same as the one determined following the cooling design day calculations.
 
 \subsection{Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit Sizing}\label{coilcoolingwatertoairheatpumpvariablespeedequationfit-sizing}
 
@@ -724,7 +747,13 @@ The calculation is identical to that done for \emph{Coil:Cooling:Water} , which 
 
 \subsubsection{Rated Total Heating Capacity}\label{rated-total-heating-capacity}
 
-The rated total heating capacity is set equal to the rated total cooling capacity.
+If the heating coil is modeled along with a \emph{Coil:Cooling:WaterToAirHeatPump:EquationFit} object, its capacity is determined using the rated total cooling capacity multiplied by the user-specified \emph{Ratio of Rated Heating Capacity to Rated Cooling Capacity} input.
+
+If the heating coil is modeled with a different type of coil or alone, a heating design day calculation is performed to determine the mixed air temperature ($T_{DB,mix}$). Knowing that, the design supply air temperature ($T_{DB,sup}$, determined from the \emph{Sizing:System} object inputs), the coil capacity modifier at the design conditions ($HeatCapTempModFac$), and the fan power can be used along with the design air mass flow rate to determine the rated heating coil capacity.
+
+\begin{equation}
+  \dot{Q}_{coil,rated,heating} = \frac{\dot{m}_{air,des}C_{p,air,des}\PB{T_{DB,mix}-T_{DB,sup}}- \dot{Q}_{fan,heat,des}}{HeatCapTempModFac}
+\end{equation}
 
 \subsection{Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit Sizing}\label{coilheatingwatertoairheatpumpvariablespeedequationfit-sizing}
 
