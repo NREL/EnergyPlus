@@ -2957,99 +2957,40 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
 
 //******************************************************************************
 
-Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-) const
+Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal) const
 {
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Chris L. Marshall, Jeffrey D. Spitler
-    //       DATE WRITTEN   1993
-    //       MODIFIED       August, 2000
-    //       RE-ENGINEERED Dan Fisher
+    // Purpose: interpolate between g-function values, with linear extrapolation above and below range
 
-    // PURPOSE OF THIS SUBROUTINE:
-    //    To interpolate or extrapolate data in GFILE
-    //    to find the correct g-function value for a
-    //    known value of the natural log of (T/Ts)
+    auto &x = this->myRespFactors->LNTTS;
+    auto &y = this->myRespFactors->GFNC;
 
-    //  REFERENCE:          Thermal Analysis of Heat Extraction
-    //                      Boreholes.  Per Eskilson, Dept. of
-    //                      Mathematical Physics, University of
-    //                      Lund, Sweden, June 1987.
+    auto x_begin = x.begin();
+    auto x_end = x.end();
+    double x_val = LnTTsVal;
+    auto upper_it = std::upper_bound(x_begin, x_end, x_val);
 
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    //          needs to be found for.
-    //          either extrapolation or interpolation
+    int l_idx = 0;
+    int u_idx = 0;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 gFuncVal;
-
-    // Binary Search Algorithms Variables
-    // REFERENCE      :  DATA STRUCTURES AND ALGORITHM ANALYSIS IN C BY MARK ALLEN WEISS
-
-    // The following IF loop determines the g-function for the case
-    // when LnTTsVal is less than the first element of the LnTTs array.
-    // In this case, the g-function must be found by extrapolation.
-
-    if (LnTTsVal <= this->myRespFactors->LNTTS(1)) {
-        gFuncVal = ((LnTTsVal - this->myRespFactors->LNTTS(1)) / (this->myRespFactors->LNTTS(2) - this->myRespFactors->LNTTS(1))) *
-                       (this->myRespFactors->GFNC(2) - this->myRespFactors->GFNC(1)) +
-                   this->myRespFactors->GFNC(1);
-        return gFuncVal;
+    if (upper_it == x_begin) {
+        // Linear extrapolation beyond the lower bound
+        l_idx = 0;
+        u_idx = 1;
+    } else if (upper_it == x_end) {
+        // Linear extrapolation beyond the upper bound
+        u_idx = x.size() - 1;
+        l_idx = u_idx - 1;
+    } else {
+        // In the middle of the range
+        u_idx = std::distance(x.begin(), upper_it);
+        l_idx = u_idx - 1;
     }
 
-    // The following IF loop determines the g-function for the case
-    // when LnTTsVal is greater than the last element of the LnTTs array.
-    // In this case, the g-function must be found by extrapolation.
-
-    int NPairs = this->myRespFactors->LNTTS.u1();
-
-    if (LnTTsVal > this->myRespFactors->LNTTS(NPairs)) {
-        gFuncVal = ((LnTTsVal - this->myRespFactors->LNTTS(NPairs)) / (this->myRespFactors->LNTTS(NPairs - 1) - this->myRespFactors->LNTTS(NPairs))) *
-                       (this->myRespFactors->GFNC(NPairs - 1) - this->myRespFactors->GFNC(NPairs)) +
-                   this->myRespFactors->GFNC(NPairs);
-        return gFuncVal;
-    }
-
-    // The following DO loop is for the case when LnTTsVal falls within
-    // the first and last elements of the LnTTs array, or is identically
-    // equal to one of the LnTTs elements.  In this case the g-function
-    // must be found by interpolation.
-    // USING BINARY SEARCH TO FIND THE ELEMENT
-    bool Found = false;
-    int Low = 1;
-    int High = NPairs;
-    int Mid;
-    while (Low <= High) {
-        Mid = (Low + High) / 2;
-        if (this->myRespFactors->LNTTS(Mid) < LnTTsVal) {
-            Low = Mid + 1;
-        } else {
-            if (this->myRespFactors->LNTTS(Mid) > LnTTsVal) {
-                High = Mid - 1;
-            } else {
-                Found = true;
-                break;
-            }
-        }
-    }
-    // LnTTsVal is identical to one of the LnTTS array elements return gFuncVal
-    // the gFuncVal after applying the correction
-    if (Found) {
-        gFuncVal = this->myRespFactors->GFNC(Mid);
-        return gFuncVal;
-    }
-
-    // LnTTsVal is in between any of the two LnTTS array elements find the
-    // g-function value by interpolation and apply the correction and return gFuncVal
-    else {
-        if (this->myRespFactors->LNTTS(Mid) < LnTTsVal) ++Mid;
-
-        gFuncVal = ((LnTTsVal - this->myRespFactors->LNTTS(Mid)) / (this->myRespFactors->LNTTS(Mid - 1) - this->myRespFactors->LNTTS(Mid))) *
-                       (this->myRespFactors->GFNC(Mid - 1) - this->myRespFactors->GFNC(Mid)) +
-                   this->myRespFactors->GFNC(Mid);
-
-        return gFuncVal;
-    }
+    double x_low = x[l_idx];
+    double x_high = x[u_idx];
+    double y_low = y[l_idx];
+    double y_high = y[u_idx];
+    return (x_val - x_low) / (x_high - x_low) * (y_high - y_low) + y_low;
 }
 
 //******************************************************************************
