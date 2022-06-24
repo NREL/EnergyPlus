@@ -71,6 +71,7 @@ set(test_src
     CondenserLoopTowers.unit.cc
     ConstructionInternalSource.unit.cc
     ConvectionCoefficients.unit.cc
+    CoolTower.unit.cc
     CrossVentMgr.unit.cc
     CurveManager.unit.cc
     DElightManager.unit.cc
