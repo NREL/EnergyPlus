@@ -5715,7 +5715,6 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     auto &ZoneRetPlenCond = state.dataZonePlenum->ZoneRetPlenCond;
     auto &ZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig;
     auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
-    auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
 
     MoistureMassFlowRate = 0.0;
     ZoneMassFlowRate = 0.0;
@@ -6488,7 +6487,6 @@ void CalcZoneSums(EnergyPlusData &state,
     // auto &MAT = state.dataHeatBalFanSys->MAT;
     auto &Node = state.dataLoopNodes->Node;
     auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
-    auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
 
     // Sum all convective internal gains: SumIntGain
     SumIntGain = SumAllInternalConvectionGains(state, ZoneNum);
