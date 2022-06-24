@@ -66,6 +66,7 @@
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/ChillerElectricASHRAE205.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -1025,6 +1026,15 @@ void GetPlantInput(EnergyPlusData &state)
                             this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state, CompNames(CompNum));
+                        break;
+                    }
+                    case PlantEquipmentType::Chiller_ElectricASHRAE205: {
+                        if (LoopSideNum == LoopSideLocation::Demand) {
+                            this_comp.CurOpSchemeType = OpScheme::Demand;
+                        } else if (LoopSideNum == LoopSideLocation::Supply) {
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        }
+                        this_comp.compPtr = ChillerElectricASHRAE205::ASHRAE205ChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
                     case PlantEquipmentType::Chiller_EngineDriven: {
