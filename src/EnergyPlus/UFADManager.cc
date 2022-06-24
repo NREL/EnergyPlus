@@ -1374,9 +1374,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
                 if (TempDepCoef == 0.0) { // B=0
                     ZTAveraged = thisZoneT1 + TempIndCoef / AirCap;
                 } else {
-                    ZTAveraged =
-                        (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
-                        TempIndCoef / TempDepCoef;
+                    ZTAveraged = (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {
@@ -1400,9 +1398,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
                 if (TempDepCoef == 0.0) { // B=0
                     ZTAveraged = thisZoneT1 + TempIndCoef / AirCap;
                 } else {
-                    ZTAveraged =
-                        (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
-                        TempIndCoef / TempDepCoef;
+                    ZTAveraged = (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {
@@ -1939,9 +1935,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
                 if (TempDepCoef == 0.0) { // B=0
                     ZTAveraged = thisZoneT1 + TempIndCoef / AirCap;
                 } else {
-                    ZTAveraged =
-                        (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
-                        TempIndCoef / TempDepCoef;
+                    ZTAveraged = (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {
@@ -1965,9 +1959,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
                 if (TempDepCoef == 0.0) { // B=0
                     ZTAveraged = thisZoneT1 + TempIndCoef / AirCap;
                 } else {
-                    ZTAveraged =
-                        (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
-                        TempIndCoef / TempDepCoef;
+                    ZTAveraged = (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {

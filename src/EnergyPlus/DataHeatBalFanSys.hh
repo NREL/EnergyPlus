@@ -95,7 +95,7 @@ namespace DataHeatBalFanSys {
     struct AirBalanceTemperatures
     {
         // Zone air drybulb conditions variables
-        Real64 XMAT = 0.0;         // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE
+        Real64 XMAT = 0.0; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE
         Real64 XM2T = 0.0;
         Real64 XM3T = 0.0;
         Real64 XM4T = 0.0;
@@ -125,13 +125,13 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneQElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
     Array1D<Real64> ZoneQCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
 
-     // Zone air drybulb conditions variables
+    // Zone air drybulb conditions variables
     Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
     Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
     Array1D<Real64> TempTstatAir; // temperature of air near the thermo stat
     Array1D<Real64> ZT;           // Zone Air Temperature Averaged over the System Time Increment
 
-    Array1D<Real64> ZTAVComf;     // Zone Air Temperature Averaged over the Zone Time step used
+    Array1D<Real64> ZTAVComf; // Zone Air Temperature Averaged over the Zone Time step used
     // in thermal comfort models (currently Fang model only)
     Array1D<Real64> ZoneAirHumRatAvgComf; // AIR Humidity Ratio averaged over the zone time
     // step used in thermal comfort models (currently Fang model only)
