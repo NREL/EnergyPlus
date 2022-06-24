@@ -92,6 +92,24 @@ namespace DataHeatBalFanSys {
         int DualPMVErrIndex = 0; // Dual PMV setpoint error index
     };
 
+    struct AirBalanceTemperatures
+    {
+        // Zone air drybulb conditions variables
+        Real64 XMAT = 0.0;         // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE
+        Real64 XM2T = 0.0;
+        Real64 XM3T = 0.0;
+        Real64 XM4T = 0.0;
+        Real64 DSXMAT = 0.0; // Down Stepped MAT history storage
+        Real64 DSXM2T = 0.0; // Down Stepped MAT history storage
+        Real64 DSXM3T = 0.0; // Down Stepped MAT history storage
+        Real64 DSXM4T = 0.0; // Down Stepped MAT history storage
+        Real64 XMPT = 0.0;   // Zone air temperature at previous time step
+        // Exact and Euler solutions
+        Real64 ZoneTMX = 0.0; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
+        Real64 ZoneTM2 = 0.0; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
+        Real64 ZoneT1 = 0.0;  // Zone temperature at the previous time step used in Exact and Euler method
+    };
+
 } // namespace DataHeatBalFanSys
 
 struct HeatBalFanSysData : BaseGlobalStruct
@@ -106,22 +124,14 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneQSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
     Array1D<Real64> ZoneQElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
     Array1D<Real64> ZoneQCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
-    // Zone air drybulb conditions variables
+
+     // Zone air drybulb conditions variables
     Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
     Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
     Array1D<Real64> TempTstatAir; // temperature of air near the thermo stat
     Array1D<Real64> ZT;           // Zone Air Temperature Averaged over the System Time Increment
-    Array1D<Real64> XMAT;         // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE
-    Array1D<Real64> XM2T;
-    Array1D<Real64> XM3T;
-    Array1D<Real64> XM4T;
-    Array1D<Real64> DSXMAT; // Down Stepped MAT history storage
-    Array1D<Real64> DSXM2T; // Down Stepped MAT history storage
-    Array1D<Real64> DSXM3T; // Down Stepped MAT history storage
-    Array1D<Real64> DSXM4T; // Down Stepped MAT history storage
-    Array1D<Real64> XMPT;   // Zone air temperature at previous time step
 
-    Array1D<Real64> ZTAVComf; // Zone Air Temperature Averaged over the Zone Time step used
+    Array1D<Real64> ZTAVComf;     // Zone Air Temperature Averaged over the Zone Time step used
     // in thermal comfort models (currently Fang model only)
     Array1D<Real64> ZoneAirHumRatAvgComf; // AIR Humidity Ratio averaged over the zone time
     // step used in thermal comfort models (currently Fang model only)
@@ -242,12 +252,9 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> PreviousMeasuredHumRat2; // Hybrid model zone humidity ratio at previous timestep
     Array1D<Real64> PreviousMeasuredHumRat3; // Hybrid model zone humidity ratio at previous timestep
     // Exact and Euler solutions
-    Array1D<Real64> ZoneTMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
-    Array1D<Real64> ZoneTM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
-    Array1D<Real64> ZoneT1;  // Zone temperature at the previous time step used in Exact and Euler method
-    Array1D<Real64> ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
-    Array1D<Real64> ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
-    Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
+    Array1D<Real64> ZoneWMX; // TEMPORARY Zone humidity ratio TO TEST CONVERGENCE in Exact and Euler method
+    Array1D<Real64> ZoneWM2; // TEMPORARY Zone humidity ratio at timestep t-2 in Exact and Euler method
+    Array1D<Real64> ZoneW1;  // Zone humidity ratio at the previous time step used in Exact and Euler method
     EPVector<DataHVACGlobals::ThermostatType> TempControlType;
     EPVector<int> TempControlTypeRpt;
     EPVector<DataHVACGlobals::ThermostatType> ComfortControlType;
@@ -272,6 +279,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<std::vector<Real64>> ZoneHighSETHours;
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
+    EPVector<DataHeatBalFanSys::AirBalanceTemperatures> HeatBalAirTemperatures;
 
     void clear_state() override
     {

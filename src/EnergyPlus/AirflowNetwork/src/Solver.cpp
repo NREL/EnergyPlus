@@ -5452,7 +5452,7 @@ namespace AirflowNetwork {
             if (simulation_control.type != ControlType::NoMultizoneOrDistribution) {
                 if (RollBackFlag) {
                     for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
-                        ANZT(i) = m_state.dataHeatBalFanSys->XMAT(i);
+                        ANZT(i) = m_state.dataHeatBalFanSys->HeatBalAirTemperatures(i).XMAT;
                         ANZW(i) = m_state.dataHeatBalFanSys->WZoneTimeMinus1(i);
                         if (m_state.dataContaminantBalance->Contaminant.CO2Simulation) ANCO(i) = m_state.dataContaminantBalance->CO2ZoneTimeMinus1(i);
                         if (m_state.dataContaminantBalance->Contaminant.GenericContamSimulation)

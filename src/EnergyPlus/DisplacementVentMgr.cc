@@ -949,6 +949,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
+        Real64 const thisZoneT1 = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum).ZoneT1;
         AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
         TempHistTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
                                  OneThird * state.dataHeatBalFanSys->ZTM3(ZoneNum));
@@ -965,15 +966,13 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
-                    ZTAveraged = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                    ZTAveraged = thisZoneT1 + TempIndCoef / AirCap;
                 } else {
-                    ZTAveraged =
-                        (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
-                        TempIndCoef / TempDepCoef;
+                    ZTAveraged = (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {
-                ZTAveraged = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                ZTAveraged = (AirCap * thisZoneT1 + TempIndCoef) / (AirCap + TempDepCoef);
             } break;
             default:
                 break;
@@ -993,15 +992,13 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
-                    ZTAveraged = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                    ZTAveraged = thisZoneT1 + TempIndCoef / AirCap;
                 } else {
-                    ZTAveraged =
-                        (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
-                        TempIndCoef / TempDepCoef;
+                    ZTAveraged = (thisZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {
-                ZTAveraged = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                ZTAveraged = (AirCap * thisZoneT1 + TempIndCoef) / (AirCap + TempDepCoef);
             } break;
             default:
                 break;

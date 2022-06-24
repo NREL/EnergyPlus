@@ -5942,15 +5942,6 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->DSXM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->XMPT.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->MCPI.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->MCPTI.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->MCPV.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -5972,8 +5963,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->ZoneTMX.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->ZoneTM2.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->HeatBalAirTemperatures.allocate(state.dataGlobal->NumOfZones);
         // Allocate this zone air humidity ratio
         state.dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
         state.dataHeatBalFanSys->ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);

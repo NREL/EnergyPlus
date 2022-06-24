@@ -5329,7 +5329,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         state.dataZoneEquip->ZHumRat(j) = state.dataHeatBalFanSys->ZoneAirHumRat(j);
         // This is only temporary fix for CR8867.  (L. Gu 8/12)
         if (SysTimestepLoop == 1) {
-            state.dataZoneEquip->ZMAT(j) = state.dataHeatBalFanSys->XMPT(j);
+            state.dataZoneEquip->ZMAT(j) = state.dataHeatBalFanSys->HeatBalAirTemperatures(j).XMPT;
             state.dataZoneEquip->ZHumRat(j) = state.dataHeatBalFanSys->WZoneTimeMinusP(j);
         }
     }
