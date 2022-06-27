@@ -3813,13 +3813,15 @@ namespace WaterToAirHeatPumpSimple {
                     CoilCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).RatedCapCoolTotal;
 
                     int CompanionHeatingCoil = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).CompanionHeatingCoilNum;
-                    if (CoilCapacity == DataSizing::AutoSize &&
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).WAHPPlantType ==
-                            DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).RatedCapHeat == DataSizing::AutoSize &&
-                        state.dataSize->DXCoolCap) {
-                        // Heating coil has not yet been sized, returning the temporary cooling capacity
-                        CoilCapacity = state.dataSize->DXCoolCap;
+                    if (CompanionHeatingCoil > 0) {
+                        if (CoilCapacity == DataSizing::AutoSize &&
+                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).WAHPPlantType ==
+                                DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
+                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).RatedCapHeat == DataSizing::AutoSize &&
+                            state.dataSize->DXCoolCap) {
+                            // Heating coil has not yet been sized, returning the temporary cooling capacity
+                            CoilCapacity = state.dataSize->DXCoolCap;
+                        }
                     }
                 }
             }
