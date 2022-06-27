@@ -2799,9 +2799,12 @@ namespace UnitarySystems {
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 TempSize = DataSizing::AutoSize;
-            } else if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
                 // pass design size to supplemental heater
                 state.dataSize->SuppHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
+            } else if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
+                state.dataSize->SuppHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
+            } else {
+                state.dataSize->SuppHeatCap = this->m_DesignSuppHeatingCapacity;
             }
 
             if (this->m_OKToPrintSizing) PrintFlag = true;
@@ -2815,9 +2818,6 @@ namespace UnitarySystems {
             state.dataSize->DataConstantUsedForSizing = 0.0;
             state.dataSize->DataFractionUsedForSizing = 0.0;
             state.dataSize->DataCoilIsSuppHeater = false;
-            if (!this->m_Humidistat || this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat) {
-                state.dataSize->SuppHeatCap = this->m_DesignSuppHeatingCapacity;
-            }
         }
 
         // register plant flow rate. Not sure this has ever been tested.
