@@ -2804,7 +2804,7 @@ namespace UnitarySystems {
             } else if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
                 state.dataSize->SuppHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
             } else {
-                state.dataSize->SuppHeatCap = this->m_DesignSuppHeatingCapacity;
+                state.dataSize->SuppHeatCap = this->m_DesignHeatingCapacity;
             }
 
             if (this->m_OKToPrintSizing) PrintFlag = true;
