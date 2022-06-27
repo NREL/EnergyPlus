@@ -4680,6 +4680,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->SysSizPeakDDNum.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
 
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
@@ -12429,6 +12430,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     state->dataSize->UnitarySysEqSizing.allocate(1);
     state->dataSize->OASysEqSizing.allocate(1);
     state->dataSize->SysSizPeakDDNum.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
 
     int AirLoopNum(1);
     bool FirstHVACIteration(true);

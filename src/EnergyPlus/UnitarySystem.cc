@@ -2769,8 +2769,17 @@ namespace UnitarySystems {
                 // pass size to supplemental heater
                 state.dataSize->UnitaryHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
             } else {
+                state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
                 // let supplemental heater size according to heating load
-                EqSizing.HeatingCapacity = false;
+                if (!this->m_HeatPump) {
+                    if (AirLoopNum > 0) {
+                        state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = false;
+                    } else if (state.dataSize->CurZoneEqNum > 0) {
+                        // should need to do something for zone equipment ?
+                        // would need to add this to HeatingCapacitySizing for zone equipment
+                        // state.dataSize->SuppHeatCap = this->m_DesignHeatingCapacity;
+                    }
+                }
             }
         }
 
