@@ -49,6 +49,7 @@ set(test_src
     Autosizing/SystemAirFlowSizing.unit.cc
     Autosizing/WaterHeatingCapacitySizing.unit.cc
     Autosizing/WaterHeatingCoilUASizing.unit.cc
+    BaseboardElectric.unit.cc
     BaseboardRadiator.unit.cc
     BoilerHotWater.unit.cc
     BoilerSteam.unit.cc
