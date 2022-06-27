@@ -2765,22 +2765,7 @@ namespace UnitarySystems {
             state.dataSize->UnitaryHeatCap = EqSizing.DesHeatingLoad;
 
         } else {
-            if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
-                // pass size to supplemental heater
-                state.dataSize->UnitaryHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
-            } else {
-                state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
-                // let supplemental heater size according to heating load
-                if (!this->m_HeatPump) {
-                    if (AirLoopNum > 0) {
-                        state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = false;
-                    } else if (state.dataSize->CurZoneEqNum > 0) {
-                        // should need to do something for zone equipment ?
-                        // would need to add this to HeatingCapacitySizing for zone equipment
-                        // state.dataSize->SuppHeatCap = this->m_DesignHeatingCapacity;
-                    }
-                }
-            }
+            state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
         }
 
         if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != UnitarySysCtrlType::CCMASHRAE) {
@@ -2814,9 +2799,13 @@ namespace UnitarySystems {
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 TempSize = DataSizing::AutoSize;
+            } else if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
+                // pass design size to supplemental heater
+                state.dataSize->SuppHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
             }
 
             if (this->m_OKToPrintSizing) PrintFlag = true;
+            state.dataSize->DataCoilIsSuppHeater = true;
             bool errorsFound = false;
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -2825,8 +2814,10 @@ namespace UnitarySystems {
             IsAutoSize = false;
             state.dataSize->DataConstantUsedForSizing = 0.0;
             state.dataSize->DataFractionUsedForSizing = 0.0;
-
-            state.dataSize->SuppHeatCap = this->m_DesignSuppHeatingCapacity;
+            state.dataSize->DataCoilIsSuppHeater = false;
+            if (!this->m_Humidistat || this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat) {
+                state.dataSize->SuppHeatCap = this->m_DesignSuppHeatingCapacity;
+            }
         }
 
         // register plant flow rate. Not sure this has ever been tested.
@@ -7519,7 +7510,7 @@ namespace UnitarySystems {
 
         if ((CoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (CoilType_Num == DataHVACGlobals::Coil_HeatingElectric)) {
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
+                state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
 
         } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
             HeatingCoils::SimulateHeatingCoilComponents(state,

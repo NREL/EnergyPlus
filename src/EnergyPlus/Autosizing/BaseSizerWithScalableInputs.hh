@@ -82,7 +82,7 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs
     Real64 dataFracOfAutosizedCoolingCapacity = 0.0;
     Real64 dataFracOfAutosizedHeatingCapacity = 0.0;
     Real64 dataCoolCoilCap = 0.0;
-    Real64 dataCoilIsSuppHeater = false;
+    bool dataCoilIsSuppHeater = false;
     Real64 suppHeatCap = 0.0;
     Real64 unitaryHeatCap = 0.0;
     int dataTotCapCurveIndex = 0;
