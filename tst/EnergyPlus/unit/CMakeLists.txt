@@ -82,6 +82,7 @@ set(test_src
     DataGlobalConstants.unit.cc
     DataHeatBalance.unit.cc
     DataPlant.unit.cc
+    DataRuntimeLanguage.unit.cc
     DataSizing.unit.cc
     DataSurfaceColors.unit.cc
     DataSurfaces.unit.cc
