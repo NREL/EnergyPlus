@@ -359,12 +359,21 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     // if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
     // stringOverride = preFixString + stringOverride;
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
+    if (this->original_input_specs.evaporator_air_flow_fraction < 1.0) {
+        state.dataSize->DataDXCoolsLowSpeedsAutozize = true;
+        state.dataSize->DataFractionUsedForSizing = this->original_input_specs.evaporator_air_flow_fraction;
+    }
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->evap_air_flow_rate = sizingCoolingAirFlow.size(state, this->evap_air_flow_rate, errorsFound);
 
     std::string SizingString = preFixString + "Gross Cooling Capacity [W]";
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
+    if (this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal < 1.0) {
+        state.dataSize->DataDXCoolsLowSpeedsAutozize = true;
+        state.dataSize->DataConstantUsedForSizing = -1.0;
+        state.dataSize->DataFractionUsedForSizing = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal;
+    }
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->rated_total_capacity = sizerCoolingCapacity.size(state, this->rated_total_capacity, errorsFound);
 
@@ -408,6 +417,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 
     // reset for next speed or coil
     state.dataSize->DataConstantUsedForSizing = 0.0;
+    state.dataSize->DataDXCoolsLowSpeedsAutozize = false;
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,
