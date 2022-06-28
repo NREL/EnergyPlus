@@ -1268,12 +1268,13 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     CheckSimpleWAHPRatedCurvesOutputs(*state, "WAHP 2");
 
     std::string const error_string = delimited_string(
-        {"   ** Warning ** CheckSimpleWAHPRatedCurvesOutputsCoil:Cooling:WaterToAirHeatPump:EquationFit=\"WAHP 2\"\n   **   ~~~   ** Total cooling "
+        {"   ** Warning ** CheckSimpleWAHPRatedCurvesOutputs: Coil:Cooling:WaterToAirHeatPump:EquationFit=\"WAHP 2\"\n   **   ~~~   ** Total cooling "
          "capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at rated conditions.\n   **   ~~~   ** Curve output at "
-         "rated conditions = 0.404\n   ** Warning ** CheckSimpleWAHPRatedCurvesOutputsCoil:Cooling:WaterToAirHeatPump:EquationFit=\"WAHP 2\"\n   **  "
+         "rated conditions = 0.404\n   ** Warning ** CheckSimpleWAHPRatedCurvesOutputs: Coil:Cooling:WaterToAirHeatPump:EquationFit=\"WAHP 2\"\n   "
+         "**  "
          " ~~~   ** Cooling power consumption as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at rated conditions.\n   **  "
          " ~~~   ** Curve output at rated conditions = 0.742\n   ** Warning ** "
-         "CheckSimpleWAHPRatedCurvesOutputsCoil:Cooling:WaterToAirHeatPump:EquationFit=\"WAHP 2\"\n   **   ~~~   ** Sensible cooling capacity as a "
+         "CheckSimpleWAHPRatedCurvesOutputs: Coil:Cooling:WaterToAirHeatPump:EquationFit=\"WAHP 2\"\n   **   ~~~   ** Sensible cooling capacity as a "
          "function of temperature curve output is not equal to 1.0 (+ or - 2%) at rated conditions.\n   **   ~~~   ** Curve output at rated "
          "conditions = 0.454"});
 

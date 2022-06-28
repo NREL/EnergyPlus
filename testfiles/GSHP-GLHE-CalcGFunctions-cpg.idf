@@ -726,7 +726,7 @@
     -3.50303494439906,            !- CoefficientC1
     -1.06706985019601,            !- CoefficientC2
     4.34837210589294,              !- CoefficientC3
-    0.952179101682919,             !- CoefficientC4
+    1.02529280547194,             !- CoefficientC4
     0.0,                     !- CoefficientC5
     -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w

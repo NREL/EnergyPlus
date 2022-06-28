@@ -2197,7 +2197,7 @@ namespace WaterToAirHeatPumpSimple {
                                       "Cooling Capacity Modifier  / "
                                       "Peak Design Total Cooling Capacity Modifier");
                     ShowContinueError(state,
-                                      "...Rated Sensible Cooling Capacity at Rated Conditions = Total Peak Design Sensible Load * Rated "
+                                      "...Rated Sensible Cooling Capacity at Rated Conditions = Peak Design Sensible Load * Rated "
                                       "Sensible Cooling "
                                       "Capacity Modifier  / Peak Design Sensible Cooling Capacity Modifier");
                     ShowContinueError(state, "Carefully review the Load Side Total, Sensible, and Latent heat transfer rates");
@@ -2234,7 +2234,7 @@ namespace WaterToAirHeatPumpSimple {
                                       "Cooling Capacity Modifier  / "
                                       "Peak Design Total Cooling Capacity Modifier");
                     ShowContinueError(state,
-                                      "...Rated Sensible Cooling Capacity at Rated Conditions = Total Peak Design Sensible Load * Rated "
+                                      "...Rated Sensible Cooling Capacity at Rated Conditions = Peak Design Sensible Load * Rated "
                                       "Sensible Cooling "
                                       "Capacity Modifier  / Peak Design Sensible Cooling Capacity Modifier");
                     ShowContinueError(state, "Carefully review the Load Side Total, Sensible, and Latent heat transfer rates");
@@ -4038,7 +4038,7 @@ namespace WaterToAirHeatPumpSimple {
                     Real64 RatedCoolPowerTempModFac = CurveManager::CurveValue(state, CoolPowCurveIndex, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                     if (RatedTotCapTempModFac > 1.02 || RatedTotCapTempModFac < 0.98) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + "Coil:Cooling:WaterToAirHeatPump:EquationFit" + "=\"" +
+                                         std::string{RoutineName} + ": Coil:Cooling:WaterToAirHeatPump:EquationFit" + "=\"" +
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name + "\"");
                         ShowContinueError(state,
                                           "Total cooling capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
@@ -4047,7 +4047,7 @@ namespace WaterToAirHeatPumpSimple {
                     }
                     if (RatedCoolPowerTempModFac > 1.02 || RatedCoolPowerTempModFac < 0.98) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + "Coil:Cooling:WaterToAirHeatPump:EquationFit" + "=\"" +
+                                         std::string{RoutineName} + ": Coil:Cooling:WaterToAirHeatPump:EquationFit" + "=\"" +
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name + "\"");
                         ShowContinueError(state,
                                           "Cooling power consumption as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
@@ -4062,7 +4062,7 @@ namespace WaterToAirHeatPumpSimple {
                             CurveManager::CurveValue(state, SensCoolCapCurveIndex, RatedratioTDB, RatedratioTWB, RatedratioTS, 1.0, 1.0);
                         if (RatedSensCapTempModFac > 1.02 || RatedSensCapTempModFac < 0.98) {
                             ShowWarningError(state,
-                                             std::string{RoutineName} + "Coil:Cooling:WaterToAirHeatPump:EquationFit" + "=\"" +
+                                             std::string{RoutineName} + ": Coil:Cooling:WaterToAirHeatPump:EquationFit" + "=\"" +
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name + "\"");
                             ShowContinueError(
                                 state,
@@ -4087,7 +4087,7 @@ namespace WaterToAirHeatPumpSimple {
                         CurveManager::CurveValue(state, HeatPowCurveIndex, RatedHeatratioTDB, RatedHeatratioTS, 1.0, 1.0);
                     if (RatedHeatCapTempModFac > 1.02 || RatedHeatCapTempModFac < 0.98) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + "Coil:Heating:WaterToAirHeatPump:EquationFit" + "=\"" +
+                                         std::string{RoutineName} + ": Coil:Heating:WaterToAirHeatPump:EquationFit" + "=\"" +
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name + "\"");
                         ShowContinueError(state,
                                           "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
@@ -4096,7 +4096,7 @@ namespace WaterToAirHeatPumpSimple {
                     }
                     if (RatedHeatPowerTempModFac > 1.02 || RatedHeatPowerTempModFac < 0.98) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + "Coil:Heating:WaterToAirHeatPump:EquationFit" + "=\"" +
+                                         std::string{RoutineName} + ": Coil:Heating:WaterToAirHeatPump:EquationFit" + "=\"" +
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).Name + "\"");
                         ShowContinueError(state,
                                           "Heating power consumption as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
