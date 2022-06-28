@@ -302,9 +302,6 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
     } else {
         this->wasAutoSized = false;
     }
-    if (this->dataDXCoolsLowSpeedsAutozize) {
-        this->wasAutoSized = true;
-    }
 }
 
 void BaseSizer::reportSizerOutput(EnergyPlusData &state,
