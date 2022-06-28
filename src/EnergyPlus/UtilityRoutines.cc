@@ -338,6 +338,33 @@ namespace UtilityRoutines {
         return ResultString;
     }
 
+    std::string MakeLowerCase(std::string_view const InputString)
+    {
+        // FUNCTION INFORMATION:
+        //       DATE WRITTEN   June 2022
+        //       RE-ENGINEERED  A mirror version of MakeUPPERCase()
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This function returns the Lower Case representation of the InputString.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the Intrinsic SCAN function to scan the uppercase representation of
+        // characters (DataStringGlobals) for each character in the given string.
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+        std::string ResultString(InputString);
+
+        for (std::string::size_type i = 0, e = len(InputString); i < e; ++i) {
+            int const curCharVal = int(InputString[i]);
+            if ((65 <= curCharVal && curCharVal <= 90) || (192 <= curCharVal && curCharVal <= 223)) { // uppercase ASCII and accented characters
+                ResultString[i] = char(curCharVal + 32);
+            }
+        }
+
+        return ResultString;
+    }
+
     void VerifyName(EnergyPlusData &state,
                     std::string const &NameToVerify,
                     Array1D_string const &NamesList,

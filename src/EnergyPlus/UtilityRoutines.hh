@@ -435,6 +435,8 @@ namespace UtilityRoutines {
 
     std::string MakeUPPERCase(std::string_view const InputString); // Input String
 
+    std::string MakeLowerCase(std::string_view const InputString); // Input String
+
     constexpr bool SameString(std::string_view const s, std::string_view const t)
     {
         // case insensitive comparison
