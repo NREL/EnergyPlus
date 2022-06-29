@@ -1882,9 +1882,9 @@ namespace UnitarySystems {
 
         bool isWSVarSpeedCoolCoil = this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
         bool isWSVarSpeedHeatCoil = this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit;
-        
+
         Real64 saveRawHeatingCapacity = HeatCapAtPeak;
-        
+
         // STEP 3A: Find VS cooling coil air flow to capacity ratio and adjust design air flow
         if (EqSizing.DesCoolingLoad > 0.0 && state.dataSize->CurZoneEqNum > 0 &&
             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {

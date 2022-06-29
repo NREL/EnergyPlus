@@ -3496,8 +3496,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].heatingVolFlowRatio[9], 1.0000, 0.00001);
 
     // autosized air flow and capacity, unitary sytsem capacity matches coils
-    EXPECT_NEAR(thisSys->m_MaxCoolAirVolFlow, 1.5, 0.0001);
-    EXPECT_NEAR(thisSys->m_MaxHeatAirVolFlow, 1.5, 0.0001);
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
+    EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
 
     // TotCapTempModFac is evaluated at the OutTemp which is 35°C
     // In the Fixture's SetUp: `DataSizing::DesDayWeath(1).Temp(1) = 35.0`
@@ -4676,7 +4676,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->SysSizPeakDDNum.allocate(1);
-    state->dataAirLoop->AirLoopControlInfo.allocate(1);
 
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
@@ -12426,7 +12425,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     state->dataSize->UnitarySysEqSizing.allocate(1);
     state->dataSize->OASysEqSizing.allocate(1);
     state->dataSize->SysSizPeakDDNum.allocate(1);
-    state->dataAirLoop->AirLoopControlInfo.allocate(1);
 
     int AirLoopNum(1);
     bool FirstHVACIteration(true);
