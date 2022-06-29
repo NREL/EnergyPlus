@@ -1,11 +1,11 @@
-Add Heat Balance for HVAC ZoneLists ~Subdivide Heat Balance by Space~
+Add Heat Balance for HVAC ZoneList ~Subdivide Heat Balance by Space~
 ================
 
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original April 22, 2022
  - Rev1 May 3, 2022 - Expand justification, make space heat balance calcs optional
- - **Rev2 June 29, 2022 - Plan Z, heat balances for zones only, add optional HVAC ZoneLists, make Zone Name optional for surfaces**
+ - **Rev2 June 29, 2022 - Plan Z, heat balances for zones only, add optional HVAC ZoneList to group Zones, make Zone Name optional for surfaces**
 
 ## Table of Contents ##
 
