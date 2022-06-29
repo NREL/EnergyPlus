@@ -223,7 +223,7 @@ namespace FileSystem {
 #endif
 
         extension.remove_prefix(extension.find_last_of('.') + 1);
-        return static_cast<FileTypes>(getEnumerationValueUpper(FileTypesExt, extension));
+        return static_cast<FileTypes>(getEnumerationValue(FileTypesExtUC, UtilityRoutines::MakeUPPERCase(extension)));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object

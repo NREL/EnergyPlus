@@ -608,13 +608,13 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
     return -1;
 }
 
-constexpr int getEnumerationValueUpper(const gsl::span<const std::string_view> sList, const std::string_view s)
-{
-    for (unsigned int i = 0; i < sList.size(); ++i) {
-        if (UtilityRoutines::MakeUPPERCase(sList[i]) == UtilityRoutines::MakeUPPERCase(s)) return i;
-    }
-    return -1;
-}
+//constexpr int getEnumerationValueUpper(const gsl::span<const std::string_view> sList, const std::string_view s)
+//{
+//    for (unsigned int i = 0; i < sList.size(); ++i) {
+//        if (UtilityRoutines::MakeUPPERCase(sList[i]) == UtilityRoutines::MakeUPPERCase(s)) return i;
+//    }
+//    return -1;
+//}
 
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
