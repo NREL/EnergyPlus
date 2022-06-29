@@ -160,7 +160,7 @@ namespace FaultsManager {
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-    enum class ChillerCheck
+    enum class ChillerType
     {
         Invalid = -1,
         ChillerElectric,
@@ -174,7 +174,7 @@ namespace FaultsManager {
         Num
     };
 
-    enum class CoilCheck
+    enum class CoilType
     {
         Invalid = -1,
         CoilHeatingElectric,
@@ -190,7 +190,7 @@ namespace FaultsManager {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(ChillerCheck::Num)> ChillerCheckNamesUC{"CHILLER:ELECTRIC",
+    constexpr std::array<std::string_view, static_cast<int>(ChillerType::Num)> ChillerTypeNamesUC{"CHILLER:ELECTRIC",
                                                                                                     "CHILLER:ELECTRIC:EIR",
                                                                                                     "CHILLER:ELECTRIC:REFORMULATEDEIR",
                                                                                                     "CHILLER:CONSTANTCOP",
@@ -199,7 +199,7 @@ namespace FaultsManager {
                                                                                                     "CHILLER:ABSORPTION",
                                                                                                     "CHILLER:ABSORPTION:INDIRECT"};
 
-    constexpr std::array<std::string_view, static_cast<int>(CoilCheck::Num)> CoilCheckNamesUC{"COIL:HEATING:ELECTRIC",
+    constexpr std::array<std::string_view, static_cast<int>(CoilType::Num)> CoilTypeNamesUC{"COIL:HEATING:ELECTRIC",
                                                                                               "COIL:HEATING:FUEL",
                                                                                               "COIL:HEATING:DESUPERHEATER",
                                                                                               "COIL:HEATING:STEAM",
@@ -508,10 +508,10 @@ namespace FaultsManager {
 
             // Chiller check
             int ChillerNum;
-            ChillerCheck ChillerTypeCheck = static_cast<ChillerCheck>(getEnumerationValue(
-                ChillerCheckNamesUC, UtilityRoutines::MakeUPPERCase(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerType)));
+            ChillerType ChillerTypeCheck = static_cast<ChillerType>(getEnumerationValue(
+                ChillerTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerType)));
             switch (ChillerTypeCheck) {
-            case ChillerCheck::ChillerElectric: {
+            case ChillerType::ChillerElectric: {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
@@ -542,7 +542,7 @@ namespace FaultsManager {
                     }
                 }
             } break;
-            case ChillerCheck::ChillerElectricEIR: {
+            case ChillerType::ChillerElectricEIR: {
                 // Read in chiller if not done yet
                 if (state.dataChillerElectricEIR->getInputFlag) {
                     ChillerElectricEIR::GetElectricEIRChillerInput(state);
@@ -573,7 +573,7 @@ namespace FaultsManager {
                     }
                 }
             } break;
-            case ChillerCheck::ChillerElectricReformulatedEIR: {
+            case ChillerType::ChillerElectricReformulatedEIR: {
                 // Read in chiller if not done yet
                 if (state.dataChillerReformulatedEIR->GetInputREIR) {
                     ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
@@ -604,7 +604,7 @@ namespace FaultsManager {
                     }
                 }
             } break;
-            case ChillerCheck::ChillerConstantCOP: {
+            case ChillerType::ChillerConstantCOP: {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
@@ -635,7 +635,7 @@ namespace FaultsManager {
                     }
                 }
             } break;
-            case ChillerCheck::ChillerEngineDriven: {
+            case ChillerType::ChillerEngineDriven: {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
@@ -666,7 +666,7 @@ namespace FaultsManager {
                     }
                 }
             } break;
-            case ChillerCheck::ChillerCombustionTurbine: {
+            case ChillerType::ChillerCombustionTurbine: {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
@@ -864,12 +864,12 @@ namespace FaultsManager {
             }
 
             // Coil check and link
-            CoilCheck CoilTypeCheck = static_cast<CoilCheck>(getEnumerationValue(
-                CoilCheckNamesUC, UtilityRoutines::MakeUPPERCase(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilType)));
+            CoilType CoilTypeCheck = static_cast<CoilType>(getEnumerationValue(
+                CoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilType)));
             switch (CoilTypeCheck) {
-            case CoilCheck::CoilHeatingElectric:
-            case CoilCheck::CoilHeatingFuel:
-            case CoilCheck::CoilHeatingDesuperheater: {
+            case CoilType::CoilHeatingElectric:
+            case CoilType::CoilHeatingFuel:
+            case CoilType::CoilHeatingDesuperheater: {
                 // Read in coil input if not done yet
                 if (state.dataHeatingCoils->GetCoilsInputFlag) {
                     HeatingCoils::GetHeatingCoilInput(state);
@@ -889,7 +889,7 @@ namespace FaultsManager {
                     state.dataHeatingCoils->HeatingCoil(CoilNum).FaultyCoilSATIndex = jFault_CoilSAT;
                 }
             } break;
-            case CoilCheck::CoilHeatingSteam: {
+            case CoilType::CoilHeatingSteam: {
                 // Read in coil input if not done yet
                 if (state.dataSteamCoils->GetSteamCoilsInputFlag) {
                     SteamCoils::GetSteamCoilInput(state);
@@ -919,9 +919,9 @@ namespace FaultsManager {
                     }
                 }
             } break;
-            case CoilCheck::CoilHeatingWater:
-            case CoilCheck::CoilCoolingWater:
-            case CoilCheck::CoilCoolingWaterDetailedgeometry: {
+            case CoilType::CoilHeatingWater:
+            case CoilType::CoilCoolingWater:
+            case CoilType::CoilCoolingWaterDetailedgeometry: {
                 // Read in coil input if not done yet
                 if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
                     WaterCoils::GetWaterCoilInput(state);
@@ -974,7 +974,7 @@ namespace FaultsManager {
                     }
                 }
             } break;
-            case CoilCheck::CoilSystemCoolingDX: {
+            case CoilType::CoilSystemCoolingDX: {
                 // see case CoilCheck::AirLoopHVACUnitarySystem: below
                 // UnitarySystem connects a different way. Make sure this works by testing a CoilSystem model.
                 // Read in DXCoolingSystem input if not done yet
@@ -997,7 +997,7 @@ namespace FaultsManager {
                 //    state.dataHVACDXSys->DXCoolingSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
                 //}
             } break;
-            case CoilCheck::CoilSystemHeatingDX: {
+            case CoilType::CoilSystemHeatingDX: {
                 // Read in DXCoolingSystem input if not done yet
                 if (state.dataHVACDXHeatPumpSys->GetInputFlag) {
                     HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput(state);
@@ -1018,7 +1018,7 @@ namespace FaultsManager {
                     state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
                 }
             } break;
-            case CoilCheck::AirLoopHVACUnitarySystem: {
+            case CoilType::AirLoopHVACUnitarySystem: {
                 // UnitarySystem model connects to FaultManager via function call to FaultsManager::SetFaultyCoilSATSensor
             } break;
             default:
@@ -1318,10 +1318,10 @@ namespace FaultsManager {
 
             // Chiller check
             int ChillerNum;
-            ChillerCheck ChillerTypeCheck = static_cast<ChillerCheck>(getEnumerationValue(
-                ChillerCheckNamesUC, UtilityRoutines::MakeUPPERCase(state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerType)));
+            ChillerType ChillerTypeCheck = static_cast<ChillerType>(getEnumerationValue(
+                ChillerTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerType)));
             switch (ChillerTypeCheck) {
-            case ChillerCheck::ChillerElectric: {
+            case ChillerType::ChillerElectric: {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
@@ -1342,7 +1342,7 @@ namespace FaultsManager {
                     state.dataPlantChillers->ElectricChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                 }
             } break;
-            case ChillerCheck::ChillerElectricEIR: {
+            case ChillerType::ChillerElectricEIR: {
                 // Read in chiller if not done yet
                 if (state.dataChillerElectricEIR->getInputFlag) {
                     ChillerElectricEIR::GetElectricEIRChillerInput(state);
@@ -1362,7 +1362,7 @@ namespace FaultsManager {
                     state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                 }
             } break;
-            case ChillerCheck::ChillerElectricReformulatedEIR: {
+            case ChillerType::ChillerElectricReformulatedEIR: {
                 // Read in chiller if not done yet
                 if (state.dataChillerReformulatedEIR->GetInputREIR) {
                     ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
@@ -1382,7 +1382,7 @@ namespace FaultsManager {
                     state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                 }
             } break;
-            case ChillerCheck::ChillerEngineDriven: {
+            case ChillerType::ChillerEngineDriven: {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
@@ -1403,7 +1403,7 @@ namespace FaultsManager {
                     state.dataPlantChillers->EngineDrivenChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                 }
             } break;
-            case ChillerCheck::ChillerCombustionTurbine: {
+            case ChillerType::ChillerCombustionTurbine: {
                 ChillerNum = 0;
                 int thisChil = 0;
                 for (auto &ch : state.dataPlantChillers->GTChiller) {
@@ -1423,7 +1423,7 @@ namespace FaultsManager {
                     state.dataPlantChillers->GTChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                 }
             } break;
-            case ChillerCheck::ChillerConstantCOP: {
+            case ChillerType::ChillerConstantCOP: {
                 ChillerNum = 0;
                 int thisChil = 0;
                 for (auto &ch : state.dataPlantChillers->ConstCOPChiller) {
@@ -1443,7 +1443,7 @@ namespace FaultsManager {
                     state.dataPlantChillers->ConstCOPChiller(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                 }
             } break;
-            case ChillerCheck::ChillerAbsorption: {
+            case ChillerType::ChillerAbsorption: {
                 // Read in chiller if not done yet
                 if (state.dataChillerAbsorber->getInput) {
                     ChillerAbsorption::GetBLASTAbsorberInput(state);
@@ -1463,7 +1463,7 @@ namespace FaultsManager {
                     state.dataChillerAbsorber->absorptionChillers(ChillerNum).FaultyChillerSWTIndex = jFault_ChillerSWT;
                 }
             } break;
-            case ChillerCheck::ChillerAbsorptionIndirect: {
+            case ChillerType::ChillerAbsorptionIndirect: {
                 // Read in chiller if not done yet
                 if (state.dataChillerIndirectAbsorption->GetInput) {
                     ChillerIndirectAbsorption::GetIndirectAbsorberInput(state);
