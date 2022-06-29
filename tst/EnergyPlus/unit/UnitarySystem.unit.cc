@@ -3495,19 +3495,15 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].coolingVolFlowRatio[9], 1.0000, 0.00001);
     EXPECT_NEAR(state->dataUnitarySystems->designSpecMSHP[0].heatingVolFlowRatio[9], 1.0000, 0.00001);
 
-    // autosized air flow and capacity, unitary system capacity matches coils
-    EXPECT_NEAR(thisSys->m_MaxCoolAirVolFlow, 2.009436, 0.0001);
-    EXPECT_NEAR(thisSys->m_MaxHeatAirVolFlow, 1.506653, 0.0001);
-    EXPECT_NEAR(thisSys->m_DesignCoolingCapacity, 35971.0, 0.0001);
-    Real64 designAirFlow = thisSys->m_DesignCoolingCapacity * state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(
-                                                                  state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel);
-    EXPECT_NEAR(thisSys->m_MaxCoolAirVolFlow, designAirFlow, 0.001);
+    // autosized air flow and capacity, unitary sytsem capacity matches coils
+    EXPECT_NEAR(thisSys->m_MaxCoolAirVolFlow, 1.5, 0.0001);
+    EXPECT_NEAR(thisSys->m_MaxHeatAirVolFlow, 1.5, 0.0001);
 
     // TotCapTempModFac is evaluated at the OutTemp which is 35°C
     // In the Fixture's SetUp: `DataSizing::DesDayWeath(1).Temp(1) = 35.0`
     Real64 RatedSourceTempCool = state->dataSize->DesDayWeath(1).Temp(1);
     EXPECT_EQ(RatedSourceTempCool, 35.0);
-    Real64 CoolCoolCapAtPeak = 33453.67913; // design load, before CapFT was applied
+    Real64 CoolCoolCapAtPeak = 33453.67913;
     Real64 TotCapTempModFac = CurveManager::CurveValue(
         *state,
         state->dataVariableSpeedCoils->VarSpeedCoil(1).MSCCapFTemp(state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel),
@@ -3526,7 +3522,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate,
               state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedCapCoolTotal *
                   state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(10));
-    Real64 fullFlow = designAirFlow;
+    Real64 fullFlow = 2.009436;
     EXPECT_NEAR(
         state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate, fullFlow, 0.00001);  // different than unitary system air volume flow rate
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, 1.70, 0.01); // VS DX heating coil was not autosized
@@ -15987,14 +15983,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
     int AirLoopNum = 0;
 
     thisSys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
-
-    Real64 designAirFlow = thisSys->m_DesignCoolingCapacity * state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(
-                                                                  state->dataVariableSpeedCoils->VarSpeedCoil(1).NormSpedLevel);
-
-    EXPECT_NEAR(1.79645, thisSys->m_DesignFanVolFlowRate, 0.00001);
-    EXPECT_NEAR(1.79645, thisSys->m_MaxCoolAirVolFlow, 0.00001);
-    EXPECT_NEAR(1.79486, thisSys->m_MaxHeatAirVolFlow, 0.00001);
-    EXPECT_NEAR(1.79645, designAirFlow, 0.00001);
+    EXPECT_EQ(1.500, thisSys->m_DesignFanVolFlowRate);
+    EXPECT_EQ(1.500, thisSys->m_MaxCoolAirVolFlow);
+    EXPECT_EQ(1.500, thisSys->m_MaxHeatAirVolFlow);
 
     Real64 results_noLoadHeatingFlowRatio = state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(1) /
                                             state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(5);
@@ -16004,8 +15995,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
 
     EXPECT_NEAR(results_noLoadFlowRatioMin, thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
     EXPECT_NEAR(0.17495, thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
-    EXPECT_NEAR(0.31428, thisSys->m_MaxNoCoolHeatAirVolFlow, 0.00001);
-    EXPECT_NEAR(0.31428, thisSys->m_MaxCoolAirVolFlow * thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
+    EXPECT_NEAR(0.26242, thisSys->m_MaxNoCoolHeatAirVolFlow, 0.00001);
+    EXPECT_NEAR(0.26242, thisSys->m_MaxCoolAirVolFlow * thisSys->m_NoLoadAirFlowRateRatio, 0.00001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSizing)
