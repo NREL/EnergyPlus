@@ -121,6 +121,7 @@ set(test_src
     GroundHeatExchangers.unit.cc
     HVACControllers.unit.cc
     HVACDXSystem.unit.cc
+    HVACDXHeatPumpSystem.unit.cc
     HVACFan.unit.cc
     HVACFourPipeBeam.unit.cc
     HVACHXAssistedCoolingCoil.unit.cc
