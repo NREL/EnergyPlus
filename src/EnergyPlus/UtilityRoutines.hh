@@ -435,8 +435,6 @@ namespace UtilityRoutines {
 
     std::string MakeUPPERCase(std::string_view const InputString); // Input String
 
-    std::string MakeLowerCase(std::string_view const InputString); // Input String
-
     constexpr bool SameString(std::string_view const s, std::string_view const t)
     {
         // case insensitive comparison
@@ -607,14 +605,6 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
     }
     return -1;
 }
-
-//constexpr int getEnumerationValueUpper(const gsl::span<const std::string_view> sList, const std::string_view s)
-//{
-//    for (unsigned int i = 0; i < sList.size(); ++i) {
-//        if (UtilityRoutines::MakeUPPERCase(sList[i]) == UtilityRoutines::MakeUPPERCase(s)) return i;
-//    }
-//    return -1;
-//}
 
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
