@@ -1884,9 +1884,12 @@ namespace UnitarySystems {
                                   this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
         bool isVarSpeedHeatCoil = this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
                                   this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit;
+        
+        Real64 saveRawHeatingCapacity = HeatCapAtPeak;
+        
         // STEP 3A: Find VS cooling coil air flow to capacity ratio and adjust design air flow
-        // this does not use nominal speed level air flow (VarSpeedCoil(WhichCoil).NormSpedLevel), should it?
-        if (EqSizing.DesCoolingLoad > 0.0) {
+        if (EqSizing.DesCoolingLoad > 0.0 && state.dataSize->CurZoneEqNum > 0 &&
+            this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
             Real64 coolingToHeatingCapRatio = 1.0;
             if (isVarSpeedCoolCoil && this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
                 int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NormSpedLevel;
@@ -1895,12 +1898,10 @@ namespace UnitarySystems {
                 EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
                 if (EqSizing.DesHeatingLoad > 0.0) coolingToHeatingCapRatio = EqSizing.DesCoolingLoad / EqSizing.DesHeatingLoad;
             }
-            // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
             if (isVarSpeedHeatCoil && this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
                 int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
                 Real64 heatingAirFlowToCapacityRatio =
                     state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
-                // is this a coincidence or does VS coil apply FlowToCap ratio to adjusted heating = cooling coil capacity?
                 EqSizing.DesHeatingLoad *= coolingToHeatingCapRatio;
                 EqSizing.HeatingAirVolFlow = EqSizing.DesHeatingLoad * heatingAirFlowToCapacityRatio;
             }
@@ -1910,7 +1911,7 @@ namespace UnitarySystems {
         // previous version of E+ used maximum flow rate for unitary systems. Keep this methodology for now.
         // Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow
         // rates (might require additional change to if block logic).
-        if (state.dataSize->CurZoneEqNum == 0 || !isVarSpeedCoolCoil) {
+        if (!isVarSpeedHeatCoil) {
             EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
             EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
         }
@@ -1922,10 +1923,13 @@ namespace UnitarySystems {
             EqSizing.AirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
             //            EqSizing.CoolingAirVolFlow = EqSizing.AirVolFlow;
             //            EqSizing.HeatingAirVolFlow = EqSizing.AirVolFlow;
-            EqSizing.Capacity = true;
-            EqSizing.DesCoolingLoad = max(EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad);
-            EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
-            state.dataSize->DXCoolCap = EqSizing.DesCoolingLoad;
+            if (this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit &&
+                this->m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
+                EqSizing.Capacity = true;
+                EqSizing.DesCoolingLoad = max(EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad);
+                EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
+                state.dataSize->DXCoolCap = EqSizing.DesCoolingLoad;
+            }
         } else if (!this->m_CoolCoilExists && state.dataSize->CurZoneEqNum > 0) {
             state.dataSize->DXCoolCap = EqSizing.DesHeatingLoad;
         }
@@ -1968,6 +1972,10 @@ namespace UnitarySystems {
             if (this->m_MaxHeatAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
             }
+            bool saveEqSizingAirFlow = EqSizing.AirFlow;
+            if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
+                EqSizing.AirFlow = false;
+            }
             FieldNum = 7; // N7 , \field Heating Supply Air Flow Rate
             state.dataSize->DataEMSOverrideON = this->m_MaxHeatAirVolFlowEMSOverrideOn;
             state.dataSize->DataEMSOverride = this->m_MaxHeatAirVolFlowEMSOverrideValue;
@@ -1982,6 +1990,9 @@ namespace UnitarySystems {
             this->m_MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             state.dataSize->DataEMSOverrideON = false;
             state.dataSize->DataConstantUsedForSizing = 0.0;
+            if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
+                EqSizing.AirFlow = saveEqSizingAirFlow;
+            }
         }
 
         if (this->m_CoolCoilExists) {
@@ -2804,7 +2815,11 @@ namespace UnitarySystems {
             } else if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
                 state.dataSize->SuppHeatCap = max(this->m_DesignCoolingCapacity, this->m_DesignHeatingCapacity);
             } else {
-                state.dataSize->SuppHeatCap = this->m_DesignHeatingCapacity;
+                if (state.dataSize->CurZoneEqNum > 0) {
+                    state.dataSize->SuppHeatCap = saveRawHeatingCapacity;
+                } else {
+                    state.dataSize->SuppHeatCap = this->m_DesignHeatingCapacity;
+                }
             }
 
             if (this->m_OKToPrintSizing) PrintFlag = true;
