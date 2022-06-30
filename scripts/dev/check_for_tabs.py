@@ -90,5 +90,19 @@ for root, dirs, files in os.walk(test_files_dir):
                         }))
                         num_issues_found += 1
 
+idd_path = os.path.join(current_script_dir, '..', '..', 'idd', 'Energy+.idd.in')
+with io.open(idd_path, 'r', encoding='utf-8', errors='strict') as fd:
+    for i, line in enumerate(fd):
+        if '\t' in line:
+            print(json.dumps({
+                'tool': 'check_for_tabs_in_idfs',
+                'filename': 'Energy+.idd.in',
+                'file': os.path.join('idd', 'Energy+.idd.in'),
+                'line': i + 1,
+                'messagetype': 'error',
+                'message': 'Tab character found in IDF, use spaces for indentation'
+            }))
+            num_issues_found += 1
+
 if num_issues_found > 0:
     sys.exit(1)
