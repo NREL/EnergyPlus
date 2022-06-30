@@ -150,7 +150,7 @@ namespace BoilerSteam {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static BoilerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
     void GetBoilerInput(EnergyPlusData &state);
