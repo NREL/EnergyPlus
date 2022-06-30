@@ -2958,7 +2958,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     int ControlledZoneNum;  // controlled zone index
     bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
     int LightNum;           // Lights object index
-    int SurfNum;            // Surface index
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -3026,11 +3025,15 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
                         break;
                     }
                 }
-                for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        ShowWarningError(
-                            state, "For zone=" + Zone(ZoneNum).Name + " return air heat gain from air flow windows will be applied to the zone air.");
-                        ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                        if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                            ShowWarningError(state,
+                                             "For zone=" + Zone(ZoneNum).Name +
+                                                 " return air heat gain from air flow windows will be applied to the zone air.");
+                            ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
+                        }
                     }
                 }
             }

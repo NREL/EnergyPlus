@@ -340,24 +340,30 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneID = ZoneNum;
 
             //   figure number of surfaces for this zone
-            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs =
-                state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs = 0;
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
+            }
             //   allocate nested derived type for surface info
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf.allocate(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs);
 
             //   Fill in what we know for nested structure for surfaces
-            for (thisSurfinZone = 1; thisSurfinZone <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++thisSurfinZone) {
-                thisHBsurfID = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + thisSurfinZone - 1;
-                if (state.dataSurface->Surface(thisHBsurfID).Class == DataSurfaces::SurfaceClass::IntMass) {
+            thisSurfinZone = 0;
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int thisHBsurfID = thisSpace.HTSurfaceFirst; thisHBsurfID <= thisSpace.HTSurfaceLast; ++thisHBsurfID) {
+                    ++thisSurfinZone;
+                    if (state.dataSurface->Surface(thisHBsurfID).Class == DataSurfaces::SurfaceClass::IntMass) {
+                        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).SurfID = thisHBsurfID;
+                        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = 0.5;
+                        continue;
+                    }
+
                     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).SurfID = thisHBsurfID;
-                    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = 0.5;
-                    continue;
+
+                    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = FigureNDheightInZone(state, thisHBsurfID);
                 }
-
-                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).SurfID = thisHBsurfID;
-
-                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = FigureNDheightInZone(state, thisHBsurfID);
-
             } // loop through surfaces in this zone
 
         } // loop through number of 'RoomAir:TemperaturePattern:UserDefined' objects
@@ -660,8 +666,6 @@ namespace RoomAirModelManager {
         int NumSurfsInvolved; // Number of surfaces involved with air nodes
         int SurfCount;        // Number of surfaces involved with air nodes
         // (used for checking error)
-        int SurfNum;     // Index number for surfaces
-        int SurfFirst;   // Index number for first surface of zones
         int NumOfSurfs;  // Index number for last surface of zones
         int ListSurfNum; // Index number of surfaces listed in the air node object
         bool SurfNeeded;
@@ -715,7 +719,11 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
             } else {
                 ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
-                NumOfSurfs = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
+                NumOfSurfs = 0;
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    NumOfSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
+                }
                 state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask.allocate(NumOfSurfs);
             }
 
@@ -790,8 +798,11 @@ namespace RoomAirModelManager {
 
                     // this air node is in this zone; hence, first get name of all surfaces in this zone
                     ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
-                    SurfFirst = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst;
-                    NumOfSurfs = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
+                    NumOfSurfs = 0;
+                    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        NumOfSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
+                    }
 
                     // terminate the program due to a severe error in the specified input
                     if ((NumSurfsInvolved) > NumOfSurfs) {
@@ -804,12 +815,14 @@ namespace RoomAirModelManager {
 
                     // relate surfaces to this air node and check to see whether surface names are specified correctly or not
                     SurfCount = 0;
-                    --SurfFirst;
                     for (ListSurfNum = 4; ListSurfNum <= NumAlphas; ++ListSurfNum) {
-                        for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                            if (state.dataIPShortCut->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfFirst + SurfNum).Name) {
-                                state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask(SurfNum) = true;
-                                ++SurfCount;
+                        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                            for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                                if (state.dataIPShortCut->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfNum).Name) {
+                                    ++SurfCount;
+                                    state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask(SurfCount) = true;
+                                }
                             }
                         }
                     }
@@ -1381,10 +1394,6 @@ namespace RoomAirModelManager {
         bool foundList;
         int NumSurfsThisNode;
         int NumOfSurfs;
-        int SurfCount;
-        int SurfFirst;
-        int ListSurfNum;
-        int SurfNum;
         int gainsLoop;
         int TypeNum;
         int numEquip;
@@ -1479,8 +1488,11 @@ namespace RoomAirModelManager {
             } else {
                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID = AirCntrlNodeNum;
             }
-            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).totNumSurfs =
-                state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
+            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).totNumSurfs = 0;
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).totNumSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
+            }
         } // loop thru NumOfRoomAirflowNetControl
 
         cCurrentModuleObject = "RoomAir:Node:AirflowNetwork";
@@ -1571,7 +1583,11 @@ namespace RoomAirModelManager {
                 if (RAFNNodeNum > 0) { // found it
                     foundList = true;
                     NumSurfsThisNode = NumAlphas - 1;
-                    NumOfSurfs = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
+                    NumOfSurfs = 0;
+                    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        NumOfSurfs += thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1;
+                    }
                     if (allocated(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask)) {
                         // throw error found twice
                         ShowSevereError(state,
@@ -1587,15 +1603,16 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask = false; // init
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasSurfacesAssigned = true;
                         // relate surfaces to this air node and check to see whether surface names are specified correctly or not
-                        SurfCount = 0;
-                        SurfFirst = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst - 1;
-                        for (ListSurfNum = 2; ListSurfNum <= NumAlphas; ++ListSurfNum) {
-                            for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                                // IF( cAlphaArgs( ListSurfNum ) == Surface( SurfFirst + SurfNum ).Name ) THEN
-                                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ListSurfNum),
-                                                                state.dataSurface->Surface(SurfFirst + SurfNum).Name)) {
-                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask(SurfNum) = true;
-                                    SurfCount = SurfCount + 1;
+                        int SurfCount = 0;
+                        for (int ListSurfNum = 2; ListSurfNum <= NumAlphas; ++ListSurfNum) {
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ListSurfNum),
+                                                                    state.dataSurface->Surface(SurfNum).Name)) {
+                                        ++SurfCount;
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask(SurfCount) = true;
+                                    }
                                 }
                             }
                         }
@@ -1961,8 +1978,6 @@ namespace RoomAirModelManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum; // DO loop counter for surfaces
-        int ZNum;    // DO loop counter for zones
         bool SetZoneAux;
         Array1D_int AuxSurf;
         int MaxSurf;
@@ -2026,7 +2041,7 @@ namespace RoomAirModelManager {
             state.dataUCSDShared->HDoor = 0.0;
 
             // Put the surface and zone information in Apos and PosZ arrays
-            for (ZNum = 1; ZNum <= state.dataGlobal->NumOfZones; ++ZNum) {
+            for (int ZNum = 1; ZNum <= state.dataGlobal->NumOfZones; ++ZNum) {
                 // advance ONE position in the arrays PosZ because this is a new zone
                 state.dataRoomAirModelMgr->contWallBegin = state.dataRoomAirModelMgr->contWall + 1;
                 state.dataRoomAirModelMgr->contFloorBegin = state.dataRoomAirModelMgr->contFloor + 1;
@@ -2037,54 +2052,57 @@ namespace RoomAirModelManager {
                 SetZoneAux = true;
 
                 // cycle in this zone for all the surfaces
-                for (SurfNum = state.dataHeatBal->Zone(ZNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZNum).HTSurfaceLast; ++SurfNum) {
-                    if (state.dataSurface->Surface(SurfNum).Class != DataSurfaces::SurfaceClass::IntMass) {
-                        // Recalculate lowest and highest height for the zone
-                        state.dataRoomAirModelMgr->Z1ofZone = std::numeric_limits<Real64>::max();
-                        state.dataRoomAirModelMgr->Z2ofZone = std::numeric_limits<Real64>::lowest();
-                        for (int i = 1, u = state.dataSurface->Surface(SurfNum).Sides; i <= u; ++i) {
-                            Real64 const z_i(state.dataSurface->Surface(SurfNum).Vertex(i).z);
-                            state.dataRoomAirModelMgr->Z1ofZone = std::min(state.dataRoomAirModelMgr->Z1ofZone, z_i);
-                            state.dataRoomAirModelMgr->Z2ofZone = std::max(state.dataRoomAirModelMgr->Z2ofZone, z_i);
+                for (int spaceNum : state.dataHeatBal->Zone(ZNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                        if (state.dataSurface->Surface(SurfNum).Class != DataSurfaces::SurfaceClass::IntMass) {
+                            // Recalculate lowest and highest height for the zone
+                            state.dataRoomAirModelMgr->Z1ofZone = std::numeric_limits<Real64>::max();
+                            state.dataRoomAirModelMgr->Z2ofZone = std::numeric_limits<Real64>::lowest();
+                            for (int i = 1, u = state.dataSurface->Surface(SurfNum).Sides; i <= u; ++i) {
+                                Real64 const z_i(state.dataSurface->Surface(SurfNum).Vertex(i).z);
+                                state.dataRoomAirModelMgr->Z1ofZone = std::min(state.dataRoomAirModelMgr->Z1ofZone, z_i);
+                                state.dataRoomAirModelMgr->Z2ofZone = std::max(state.dataRoomAirModelMgr->Z2ofZone, z_i);
+                            }
                         }
-                    }
 
-                    if (SetZoneAux) {
-                        // lowest height for the zone (for the first surface of the zone)
-                        state.dataRoomAirModelMgr->Z1ofZoneAux = state.dataRoomAirModelMgr->Z1ofZone;
-                        // highest height for the zone (for the first surface of the zone)
-                        state.dataRoomAirModelMgr->Z2ofZoneAux = state.dataRoomAirModelMgr->Z2ofZone;
-                        SetZoneAux = false;
-                    }
+                        if (SetZoneAux) {
+                            // lowest height for the zone (for the first surface of the zone)
+                            state.dataRoomAirModelMgr->Z1ofZoneAux = state.dataRoomAirModelMgr->Z1ofZone;
+                            // highest height for the zone (for the first surface of the zone)
+                            state.dataRoomAirModelMgr->Z2ofZoneAux = state.dataRoomAirModelMgr->Z2ofZone;
+                            SetZoneAux = false;
+                        }
 
-                    if (state.dataRoomAirModelMgr->Z1ofZone < state.dataRoomAirModelMgr->Z1ofZoneAux) {
-                        state.dataRoomAirModelMgr->Z1ofZoneAux = state.dataRoomAirModelMgr->Z1ofZone;
-                    }
-                    if (state.dataRoomAirModelMgr->Z2ofZone > state.dataRoomAirModelMgr->Z2ofZoneAux) {
-                        state.dataRoomAirModelMgr->Z2ofZoneAux = state.dataRoomAirModelMgr->Z2ofZone;
-                    }
-                    state.dataRoomAirModelMgr->Z1ofZone = state.dataRoomAirModelMgr->Z1ofZoneAux;
-                    state.dataRoomAirModelMgr->Z2ofZone = state.dataRoomAirModelMgr->Z2ofZoneAux;
+                        if (state.dataRoomAirModelMgr->Z1ofZone < state.dataRoomAirModelMgr->Z1ofZoneAux) {
+                            state.dataRoomAirModelMgr->Z1ofZoneAux = state.dataRoomAirModelMgr->Z1ofZone;
+                        }
+                        if (state.dataRoomAirModelMgr->Z2ofZone > state.dataRoomAirModelMgr->Z2ofZoneAux) {
+                            state.dataRoomAirModelMgr->Z2ofZoneAux = state.dataRoomAirModelMgr->Z2ofZone;
+                        }
+                        state.dataRoomAirModelMgr->Z1ofZone = state.dataRoomAirModelMgr->Z1ofZoneAux;
+                        state.dataRoomAirModelMgr->Z2ofZone = state.dataRoomAirModelMgr->Z2ofZoneAux;
 
-                    // Put the reference to this surface in the appropriate array
-                    if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
-                        ++state.dataRoomAirModelMgr->contFloor;
-                        state.dataUCSDShared->APos_Floor(state.dataRoomAirModelMgr->contFloor) = SurfNum;
-                    } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Wall) {
-                        ++state.dataRoomAirModelMgr->contWall;
-                        state.dataUCSDShared->APos_Wall(state.dataRoomAirModelMgr->contWall) = SurfNum;
-                    } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
-                        ++state.dataRoomAirModelMgr->contWindow;
-                        state.dataUCSDShared->APos_Window(state.dataRoomAirModelMgr->contWindow) = SurfNum;
-                    } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::IntMass) {
-                        ++state.dataRoomAirModelMgr->contInternal;
-                        state.dataUCSDShared->APos_Internal(state.dataRoomAirModelMgr->contInternal) = SurfNum;
-                    } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Door) {
-                        ++state.dataRoomAirModelMgr->contDoor;
-                        state.dataUCSDShared->APos_Door(state.dataRoomAirModelMgr->contDoor) = SurfNum;
-                    } else {
-                        ++state.dataRoomAirModelMgr->contCeiling;
-                        state.dataUCSDShared->APos_Ceiling(state.dataRoomAirModelMgr->contCeiling) = SurfNum;
+                        // Put the reference to this surface in the appropriate array
+                        if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
+                            ++state.dataRoomAirModelMgr->contFloor;
+                            state.dataUCSDShared->APos_Floor(state.dataRoomAirModelMgr->contFloor) = SurfNum;
+                        } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Wall) {
+                            ++state.dataRoomAirModelMgr->contWall;
+                            state.dataUCSDShared->APos_Wall(state.dataRoomAirModelMgr->contWall) = SurfNum;
+                        } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+                            ++state.dataRoomAirModelMgr->contWindow;
+                            state.dataUCSDShared->APos_Window(state.dataRoomAirModelMgr->contWindow) = SurfNum;
+                        } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::IntMass) {
+                            ++state.dataRoomAirModelMgr->contInternal;
+                            state.dataUCSDShared->APos_Internal(state.dataRoomAirModelMgr->contInternal) = SurfNum;
+                        } else if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Door) {
+                            ++state.dataRoomAirModelMgr->contDoor;
+                            state.dataUCSDShared->APos_Door(state.dataRoomAirModelMgr->contDoor) = SurfNum;
+                        } else {
+                            ++state.dataRoomAirModelMgr->contCeiling;
+                            state.dataUCSDShared->APos_Ceiling(state.dataRoomAirModelMgr->contCeiling) = SurfNum;
+                        }
                     }
                 } // Surfaces
 
@@ -2168,7 +2186,7 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, state.dataRoomAirModelMgr->Loop) = AuxSurf(state.dataRoomAirModelMgr->Loop);
                 if (AuxSurf(state.dataRoomAirModelMgr->Loop) != 0) {
                     Real64 const ceilingHeight(state.dataRoomAirMod->ZoneCeilingHeight((state.dataRoomAirModelMgr->Loop - 1) * 2 + 1));
-                    SurfNum = 1;
+                    int SurfNum = 1;
                     for (state.dataRoomAirModelMgr->Loop2 = 1; state.dataRoomAirModelMgr->Loop2 <= state.afn->NumOfLinksMultiZone;
                          ++state.dataRoomAirModelMgr->Loop2) {
                         if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Zone ==
@@ -2816,7 +2834,7 @@ namespace RoomAirModelManager {
                          ++state.dataRoomAirModelMgr->i) {
                         state.dataRoomAirModelMgr->N = state.afn->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->i).CompNum;
                         if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->N).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
-                            SurfNum = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->i).SurfNum;
+                            int SurfNum = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->i).SurfNum;
                             SetupOutputVariable(
                                 state,
                                 "Room Air Window Jet Region Average Air Velocity",

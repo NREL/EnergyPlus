@@ -14733,7 +14733,6 @@ void GetDelaySequences(EnergyPlusData &state,
 
     // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
     auto &ort(state.dataOutRptTab);
-    auto &Zone(state.dataHeatBal->Zone);
 
     if (!ort->initAdjFenDone) {
         state.dataOutRptTab->adjFenDone.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
@@ -14763,54 +14762,57 @@ void GetDelaySequences(EnergyPlusData &state,
             Real64 adjFeneSurfNetRadSeq = 0.0;
 
             // code from ComputeDelayedComponents starts
-            for (int jSurf = Zone(zoneIndex).HTSurfaceFirst; jSurf <= Zone(zoneIndex).HTSurfaceLast; ++jSurf) {
-                int radEnclosureNum = state.dataSurface->Surface(jSurf).RadEnclIndex;
+            for (int spaceNum : state.dataHeatBal->Zone(zoneIndex).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int jSurf = thisSpace.HTSurfaceFirst; jSurf <= thisSpace.HTSurfaceLast; ++jSurf) {
+                    int radEnclosureNum = state.dataSurface->Surface(jSurf).RadEnclIndex;
 
-                // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
-                Real64 peopleConvFromSurf = 0.0;
-                Real64 equipConvFromSurf = 0.0;
-                Real64 hvacLossConvFromSurf = 0.0;
-                Real64 powerGenConvFromSurf = 0.0;
-                Real64 lightLWConvFromSurf = 0.0;
-                Real64 lightSWConvFromSurf = 0.0;
-                Real64 feneSolarConvFromSurf = 0.0;
+                    // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
+                    Real64 peopleConvFromSurf = 0.0;
+                    Real64 equipConvFromSurf = 0.0;
+                    Real64 hvacLossConvFromSurf = 0.0;
+                    Real64 powerGenConvFromSurf = 0.0;
+                    Real64 lightLWConvFromSurf = 0.0;
+                    Real64 lightSWConvFromSurf = 0.0;
+                    Real64 feneSolarConvFromSurf = 0.0;
 
-                for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
-                    int sourceStep = kTimeStep - mStepBack + 1;
-                    Real64 thisQRadThermInAbsMult = ort->TMULTseq(desDaySelected, sourceStep, radEnclosureNum) *
-                                                    ort->ITABSFseq(desDaySelected, sourceStep, jSurf) * state.dataSurface->Surface(jSurf).Area *
-                                                    decayCurve(mStepBack, jSurf);
-                    peopleConvFromSurf += ort->peopleRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
-                    equipConvFromSurf += ort->equipRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
-                    hvacLossConvFromSurf += ort->hvacLossRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
-                    powerGenConvFromSurf += ort->powerGenRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
-                    lightLWConvFromSurf += ort->lightLWRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
-                    // short wave is already accumulated by surface
-                    lightSWConvFromSurf += ort->lightSWRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
-                    feneSolarConvFromSurf += ort->feneSolarRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
-                } // for mStepBack
+                    for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
+                        int sourceStep = kTimeStep - mStepBack + 1;
+                        Real64 thisQRadThermInAbsMult = ort->TMULTseq(desDaySelected, sourceStep, radEnclosureNum) *
+                                                        ort->ITABSFseq(desDaySelected, sourceStep, jSurf) * state.dataSurface->Surface(jSurf).Area *
+                                                        decayCurve(mStepBack, jSurf);
+                        peopleConvFromSurf += ort->peopleRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        equipConvFromSurf += ort->equipRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        hvacLossConvFromSurf += ort->hvacLossRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        powerGenConvFromSurf += ort->powerGenRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        lightLWConvFromSurf += ort->lightLWRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
+                        // short wave is already accumulated by surface
+                        lightSWConvFromSurf += ort->lightSWRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
+                        feneSolarConvFromSurf += ort->feneSolarRadSeq(desDaySelected, sourceStep, jSurf) * decayCurve(mStepBack, jSurf);
+                    } // for mStepBack
 
-                peopleConvIntoZone += peopleConvFromSurf;
-                equipConvIntoZone += equipConvFromSurf;
-                hvacLossConvIntoZone += hvacLossConvFromSurf;
-                powerGenConvIntoZone += powerGenConvFromSurf;
-                lightLWConvIntoZone += lightLWConvFromSurf;
-                lightSWConvIntoZone += lightSWConvFromSurf;
-                feneSolarConvIntoZone += feneSolarConvFromSurf;
-                // code from ComputeDelayedComponents ends
-                // determine the remaining convective heat from the surfaces that are not based
-                // on any of these other loads
-                // negative because heat from surface should be positive
-                surfDelaySeq(kTimeStep, jSurf) =
-                    -ort->loadConvectedNormal(desDaySelected, kTimeStep, jSurf) - ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf) -
-                    (peopleConvFromSurf + equipConvFromSurf + hvacLossConvFromSurf + powerGenConvFromSurf + lightLWConvFromSurf +
-                     lightSWConvFromSurf +
-                     feneSolarConvFromSurf); // remove net radiant for the surface
-                                             // also remove the net radiant component on the instanteous conduction for fenestration
-                if (state.dataSurface->Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
-                    adjFeneSurfNetRadSeq += ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf);
-                }
-            } // for jSurf
+                    peopleConvIntoZone += peopleConvFromSurf;
+                    equipConvIntoZone += equipConvFromSurf;
+                    hvacLossConvIntoZone += hvacLossConvFromSurf;
+                    powerGenConvIntoZone += powerGenConvFromSurf;
+                    lightLWConvIntoZone += lightLWConvFromSurf;
+                    lightSWConvIntoZone += lightSWConvFromSurf;
+                    feneSolarConvIntoZone += feneSolarConvFromSurf;
+                    // code from ComputeDelayedComponents ends
+                    // determine the remaining convective heat from the surfaces that are not based
+                    // on any of these other loads
+                    // negative because heat from surface should be positive
+                    surfDelaySeq(kTimeStep, jSurf) =
+                        -ort->loadConvectedNormal(desDaySelected, kTimeStep, jSurf) - ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf) -
+                        (peopleConvFromSurf + equipConvFromSurf + hvacLossConvFromSurf + powerGenConvFromSurf + lightLWConvFromSurf +
+                         lightSWConvFromSurf +
+                         feneSolarConvFromSurf); // remove net radiant for the surface
+                                                 // also remove the net radiant component on the instanteous conduction for fenestration
+                    if (state.dataSurface->Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
+                        adjFeneSurfNetRadSeq += ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf);
+                    }
+                } // for jSurf
+            }
             peopleDelaySeq(kTimeStep) = peopleConvIntoZone;
             equipDelaySeq(kTimeStep) = equipConvIntoZone;
             hvacLossDelaySeq(kTimeStep) = hvacLossConvIntoZone;
@@ -14873,7 +14875,6 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
     int curExtBoundCond;
     Real64 singleSurfDelay;
     auto &ort(state.dataOutRptTab);
-    auto &Zone(state.dataHeatBal->Zone);
 
     int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
@@ -14990,83 +14991,86 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
         // opaque surfaces - must combine individual surfaces by class and other side conditions
         delayOpaque = 0.0;
-        for (int kSurf = Zone(zoneIndex).HTSurfaceFirst; kSurf <= Zone(zoneIndex).HTSurfaceLast; ++kSurf) {
+        for (int spaceNum : state.dataHeatBal->Zone(zoneIndex).spaceIndexes) {
+            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            for (int kSurf = thisSpace.HTSurfaceFirst; kSurf <= thisSpace.HTSurfaceLast; ++kSurf) {
 
-            curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
-            // if exterior is other side coefficients using ground preprocessor terms then
-            // set it to ground instead of other side coefficients
-            if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
-                    curExtBoundCond = Ground;
+                curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
+                // if exterior is other side coefficients using ground preprocessor terms then
+                // set it to ground instead of other side coefficients
+                if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
+                    if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
+                        curExtBoundCond = Ground;
+                    }
                 }
-            }
-            seqData = surfDelaySeq(_, kSurf);
-            MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
-            singleSurfDelay = AvgData(timeOfMax);
-            switch (state.dataSurface->Surface(kSurf).Class) {
-            case SurfaceClass::Wall: {
-                switch (curExtBoundCond) {
-                case ExternalEnvironment: {
-                    delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
+                seqData = surfDelaySeq(_, kSurf);
+                MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
+                singleSurfDelay = AvgData(timeOfMax);
+                switch (state.dataSurface->Surface(kSurf).Class) {
+                case SurfaceClass::Wall: {
+                    switch (curExtBoundCond) {
+                    case ExternalEnvironment: {
+                        delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
+                    } break;
+                    case Ground:
+                    case GroundFCfactorMethod:
+                    case KivaFoundation: {
+                        delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
+                    } break;
+                    case OtherSideCoefNoCalcExt:
+                    case OtherSideCoefCalcExt:
+                    case OtherSideCondModeledExt: {
+                        delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
+                    } break;
+                    default: { // interzone
+                        delayOpaque(LoadCompRow::IntZonWall) += singleSurfDelay;
+                    } break;
+                    }
                 } break;
-                case Ground:
-                case GroundFCfactorMethod:
-                case KivaFoundation: {
-                    delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
+                case SurfaceClass::Floor: {
+                    switch (curExtBoundCond) {
+                    case ExternalEnvironment: {
+                        delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
+                    } break;
+                    case Ground:
+                    case GroundFCfactorMethod:
+                    case KivaFoundation: {
+                        delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
+                    } break;
+                    case OtherSideCoefNoCalcExt:
+                    case OtherSideCoefCalcExt:
+                    case OtherSideCondModeledExt: {
+                        delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
+                    } break;
+                    default: { // interzone
+                        delayOpaque(LoadCompRow::IntZonFlr) += singleSurfDelay;
+                    } break;
+                    }
                 } break;
-                case OtherSideCoefNoCalcExt:
-                case OtherSideCoefCalcExt:
-                case OtherSideCondModeledExt: {
-                    delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
+                case SurfaceClass::Roof: {
+                    switch (curExtBoundCond) {
+                    case ExternalEnvironment: {
+                        delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
+                    } break;
+                    case Ground:
+                    case GroundFCfactorMethod:
+                    case KivaFoundation:
+                    case OtherSideCoefNoCalcExt:
+                    case OtherSideCoefCalcExt:
+                    case OtherSideCondModeledExt: {
+                        delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
+                    } break;
+                    default: { // interzone
+                        delayOpaque(LoadCompRow::IntZonCeil) += singleSurfDelay;
+                    } break;
+                    }
                 } break;
-                default: { // interzone
-                    delayOpaque(LoadCompRow::IntZonWall) += singleSurfDelay;
+                case SurfaceClass::Door: {
+                    delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
                 } break;
+                default:
+                    break;
                 }
-            } break;
-            case SurfaceClass::Floor: {
-                switch (curExtBoundCond) {
-                case ExternalEnvironment: {
-                    delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
-                } break;
-                case Ground:
-                case GroundFCfactorMethod:
-                case KivaFoundation: {
-                    delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
-                } break;
-                case OtherSideCoefNoCalcExt:
-                case OtherSideCoefCalcExt:
-                case OtherSideCondModeledExt: {
-                    delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
-                } break;
-                default: { // interzone
-                    delayOpaque(LoadCompRow::IntZonFlr) += singleSurfDelay;
-                } break;
-                }
-            } break;
-            case SurfaceClass::Roof: {
-                switch (curExtBoundCond) {
-                case ExternalEnvironment: {
-                    delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
-                } break;
-                case Ground:
-                case GroundFCfactorMethod:
-                case KivaFoundation:
-                case OtherSideCoefNoCalcExt:
-                case OtherSideCoefCalcExt:
-                case OtherSideCondModeledExt: {
-                    delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
-                } break;
-                default: { // interzone
-                    delayOpaque(LoadCompRow::IntZonCeil) += singleSurfDelay;
-                } break;
-                }
-            } break;
-            case SurfaceClass::Door: {
-                delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
-            } break;
-            default:
-                break;
             }
         }
         for (int k = LoadCompRow::Roof; k <= LoadCompRow::OtherFlr; ++k) {
