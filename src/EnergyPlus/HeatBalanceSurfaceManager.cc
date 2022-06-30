@@ -2620,7 +2620,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 state.dataSurface->SurfReflFacBmToDiffSolGnd)); // For linear indexing
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
-            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
+            state.dataSurface->SurfSkySolarInc(SurfNum) =
+                state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * Surface(SurfNum).ViewFactorGround;
             state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
             state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = 0.0;
@@ -2632,8 +2633,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
             // For Complex Fenestrations:
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
-                state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataEnvrn->GndReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
+                state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier *
+                                                                    state.dataEnvrn->GndReflectance *
+                                                                    state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
                 state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                                                                    state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance *
                                                                    state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
@@ -2770,12 +2772,13 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
                 // Incident diffuse solar from beam-to-diffuse reflection from ground
-                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataEnvrn->SOLCOS(3) *
-                                                                              state.dataEnvrn->GndReflectance *
+                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                                                              state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance *
                                                                               state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
                 // Incident diffuse solar from sky diffuse reflection from ground
-                state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+                state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier *
+                                                                             state.dataEnvrn->GndReflectance *
+                                                                             state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
                 // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                 // in SkySolarInc.
                 state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
@@ -2802,17 +2805,18 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
             state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
-            state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
+                state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
             state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
             // Incident diffuse solar from beam-to-diffuse reflection from ground
-            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataEnvrn->SOLCOS(3) *
-                                                                          state.dataEnvrn->GndReflectance *
+            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                                                          state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance *
                                                                           state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
 
             // Incident diffuse solar from sky diffuse reflection from ground
-            state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-            state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+            state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier *
+                                                                         state.dataEnvrn->GndReflectance *
+                                                                         state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
             // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
             // in SkySolarInc.
             // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
@@ -2824,13 +2828,13 @@ void InitSolarHeatGains(EnergyPlusData &state)
             if (state.dataSurface->CalcSolRefl) {
                 // Incident beam solar from beam-to-beam (specular) reflection from obstructions
                 state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) =
-                  state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
+                    state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
                 // Incident diffuse solar from beam-to-diffuse reflection from obstructions
                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) =
-                  state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
+                    state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
                 // Incident diffuse solar from sky diffuse reflection from obstructions
                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum) =
-                  state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
+                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
                 // TH2 CR 9056: Add reflections from obstructions to the total incident
                 state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) += state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) +
                                                                      state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
@@ -2852,7 +2856,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                      TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarBeam) /
                                      state.dataConstruction->Construct(ConstrNum).TransDiff;
 
-            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
+            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier *
+                                                          state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
                                                           TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarAniso) /
                                                           state.dataConstruction->Construct(ConstrNum).TransDiff;
 
@@ -2868,13 +2873,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
             state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = state.dataSurface->SurfSkySolarInc(SurfNum);
-            Real64 CurrentIncidentSolarMultiplier = 1.0;
-            if (state.dataSurface->Surface(SurfNum).hasIncSolMultiplier) {
-                CurrentIncidentSolarMultiplier = GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
-                                                 state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
-            }
             state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
-//                CurrentIncidentSolarMultiplier *
                 (state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
                  state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum));
         }
@@ -2927,10 +2926,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             if (InShelfSurf > 0) { // Inside daylighting shelf
                                 // Shelf surface area is divided by 2 because only one side sees beam (Area was multiplied by 2 during init)
                                 state.dataHeatBalSurf->SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
-                                    state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * (0.5 * Surface(SurfNum).Area);
+                                    state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                    (0.5 * Surface(SurfNum).Area);
                             } else { // Regular surface
-                                state.dataHeatBalSurf->SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
-                                    state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * Surface(SurfNum).Area;
+                                state.dataHeatBalSurf->SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = state.dataSurface->SurfOpaqAI(SurfNum) *
+                                                                                                 state.dataEnvrn->BeamSolarRad *
+                                                                                                 SurfIncSolarMultiplier * Surface(SurfNum).Area;
                             }
                         }
                     } else {
@@ -3351,13 +3352,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     // BeamDivHorFaceIncIn - Beam solar on divider's horizontal inside projection faces (W/m2)
                                     // BeamDivVertFaceIncIn - Beam solar on divider's vertical inside projection faces (W/m2)
                                     Real64 BeamDivHorFaceIncIn =
-                                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngHorProj * state.dataSurface->FrameDivider(FrDivNum).HorDividers *
-                                        DivProjIn * (Surface(SurfNum).Width - state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth) *
-                                        FracSunLit / DivArea;
+                                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngHorProj *
+                                        state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivProjIn *
+                                        (Surface(SurfNum).Width - state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth) * FracSunLit /
+                                        DivArea;
                                     Real64 BeamDivVertFaceIncIn =
-                                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngVertProj * state.dataSurface->FrameDivider(FrDivNum).VertDividers *
-                                        DivProjIn * (Surface(SurfNum).Height - state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivWidth) *
-                                        FracSunLit / DivArea;
+                                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngVertProj *
+                                        state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivProjIn *
+                                        (Surface(SurfNum).Height - state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivWidth) * FracSunLit /
+                                        DivArea;
                                     DivIncSolarInBm = TransGl * (BeamDivHorFaceIncIn + BeamDivVertFaceIncIn);
                                     DivIncSolarInDif = TransDiffGl * DifSolarFaceInc * state.dataSurface->SurfWinProjCorrDivIn(SurfNum);
                                 }

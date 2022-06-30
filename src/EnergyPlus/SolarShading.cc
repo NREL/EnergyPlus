@@ -8466,14 +8466,6 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         // transmittance for sky and ground diffuse radiation (including beam radiation reflected from the ground)
                         // so these calculations should be correct
                         state.dataSurface->SurfWinDifSolar(SurfNum) = DifSolarInc * state.dataSolarShading->SurfWinTransDifSolar(SurfNum);
-                        Real64 CurrentIncidentSolarMultiplier = 1.0;
-                        if (state.dataSurface->Surface(SurfNum).hasIncSolMultiplier) {
-                            CurrentIncidentSolarMultiplier =
-                                GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
-                                state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
-                        }
-//                        state.dataSurface->SurfWinBmSolar(SurfNum) *= CurrentIncidentSolarMultiplier;
-//                        state.dataSurface->SurfWinDifSolar(SurfNum) *= CurrentIncidentSolarMultiplier;
                         state.dataSurface->SurfWinBmSolarEnergy(SurfNum) =
                             state.dataSurface->SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         state.dataSurface->SurfWinDifSolarEnergy(SurfNum) =
@@ -8718,13 +8710,6 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             state.dataSurface->SurfWinBmSolar(SurfNum) =
                 state.dataEnvrn->BeamSolarRad * (TBmBm + TBmDif) * state.dataSurface->Surface(SurfNum).Area * CosInc;
             state.dataSurface->SurfWinDifSolar(SurfNum) = DifSolarRadiation * Tdiff * state.dataSurface->Surface(SurfNum).Area;
-            Real64 CurrentIncidentSolarMultiplier = 1.0;
-            if (state.dataSurface->Surface(SurfNum).hasIncSolMultiplier) {
-                CurrentIncidentSolarMultiplier = GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
-                                                 state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
-            }
-//            state.dataSurface->SurfWinBmSolar(SurfNum) *= CurrentIncidentSolarMultiplier;
-//            state.dataSurface->SurfWinDifSolar(SurfNum) *= CurrentIncidentSolarMultiplier;
             state.dataSurface->SurfWinBmSolarEnergy(SurfNum) = state.dataSurface->SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             state.dataSurface->SurfWinDifSolarEnergy(SurfNum) = state.dataSurface->SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             state.dataSurface->SurfWinTransSolar(SurfNum) = state.dataSurface->SurfWinBmSolar(SurfNum) + state.dataSurface->SurfWinDifSolar(SurfNum);
