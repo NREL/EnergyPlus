@@ -593,9 +593,6 @@ namespace SimulationManager {
 
         if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteBegin(); // for final data to write
 
-#ifdef EP_Detailed_Timings
-        epStartTime("Closeout Reporting=");
-#endif
         SimCostEstimate(state);
 
         ComputeTariff(state); //     Compute the utility bills
@@ -617,9 +614,6 @@ namespace SimulationManager {
 
         DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
-#ifdef EP_Detailed_Timings
-        epStopTime("Closeout Reporting=");
-#endif
         CloseOutputFiles(state);
 
         // state.dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
