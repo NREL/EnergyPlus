@@ -1695,26 +1695,31 @@ namespace UnitarySystems {
                 SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                 state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
-                if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                // could probably move this up outside the IF and delete then next group below in the else
+                switch (this->m_CoolingCoilType_Num) {
+                case DataHVACGlobals::CoilDX_Cooling: {
                     state.dataSize->DataTotCapCurveIndex =
                         state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].getOpModeCapFTIndex(false);
                     state.dataSize->DataIsDXCoil = true;
-                } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-                           this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                           this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
-                           this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                } break;
+                case DataHVACGlobals::CoilDX_CoolingSingleSpeed:
+                case DataHVACGlobals::CoilDX_MultiSpeedCooling:
+                case DataHVACGlobals::CoilDX_CoolingTwoSpeed:
+                case DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl: {
                     state.dataSize->DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                     state.dataSize->DataIsDXCoil = true;
-                }
-                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                } break;
+                case DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed: {
                     state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                     state.dataSize->DataIsDXCoil = true;
-                }
-                if (this->m_sysType == SysType::PackagedWSHP &&
-                    this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                } break;
+                case DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit: {
                     state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                     // VS coil model does not check for flow/capacity ratio, this will disable that test in Capacity sizer
                     // state.dataSize->DataIsDXCoil = true;
+                } break;
+                default: {
+                } break;
                 }
                 CoolingCapacitySizer sizerCoolingCapacity;
                 sizerCoolingCapacity.overrideSizingString(SizingString);
@@ -1724,17 +1729,10 @@ namespace UnitarySystems {
                 // this probably needs to be more specific. Letting heating coil size itself if user has scalable sizing
                 if (this->m_HVACSizingIndex <= 0) state.dataSize->DXCoolCap = CoolCapAtPeak;
                 // CoilSystem does not size the cooling coil (#8761)
-
-                switch (this->m_sysType) {
-                case SysType::Unitary:
-                case SysType::PackagedAC:
-                case SysType::PackagedHP:
-                case SysType::PackagedWSHP:
+                if (BITF_TEST_ANY(BITF(this->m_sysType),
+                                  BITF(SysType::Unitary) | BITF(SysType::PackagedAC) | BITF(SysType::PackagedHP) | BITF(SysType::PackagedWSHP))) {
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = CoolCapAtPeak;
-                    break;
-                default:
-                    break;
                 }
             } else if (!HardSizeNoDesRun && (CoolingSAFlowMethod != DataSizing::FlowPerCoolingCapacity && this->m_DesignCoolingCapacity > 0.0)) {
                 // corrected code for #8756
@@ -1749,8 +1747,7 @@ namespace UnitarySystems {
                     state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                     state.dataSize->DataIsDXCoil = true;
                 }
-                if (this->m_sysType == SysType::PackagedWSHP &&
-                    this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
                     state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                     // VS coil model does not check for flow/capacity ratio, this will disable that test in Capacity sizer
                     // state.dataSize->DataIsDXCoil = true;
@@ -1918,30 +1915,25 @@ namespace UnitarySystems {
         }
 
         // STEP 3A: Find VS cooling coil air flow to capacity ratio and adjust design air flow
-        // this does not use nominal speed level air flow (VarSpeedCoil(WhichCoil).NormSpedLevel), should it?
-        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
-            Real64 coolingToHeatingCapRatio = 1.0;
-            if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
-                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
-                this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
-                int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NormSpedLevel;
-                Real64 coolingAirFlowToCapacityRatio =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
-                EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
-                if (EqSizing.DesHeatingLoad > 0.0) coolingToHeatingCapRatio = EqSizing.DesCoolingLoad / EqSizing.DesHeatingLoad;
-            }
-            // why doesn't the VS heating coil need this same adjustment (PackagedTerminalHeatPumpVSAS)?
-            if (((this->m_sysType == SysType::PackagedHP && this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
-                  (this->m_sysType == SysType::PackagedWSHP &&
-                      this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) &&
-                this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
-                int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
-                Real64 heatingAirFlowToCapacityRatio =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
-                // is this a coincidence or does VS coil apply FlowToCap ratio to adjusted heating = cooling coil capacity?
-                EqSizing.DesHeatingLoad *= coolingToHeatingCapRatio;
-                EqSizing.HeatingAirVolFlow = EqSizing.DesHeatingLoad * heatingAirFlowToCapacityRatio;
-            }
+        Real64 coolingToHeatingCapRatio = 1.0;
+        if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+            this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+            int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NormSpedLevel;
+            Real64 coolingAirFlowToCapacityRatio =
+                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
+            EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
+            if (EqSizing.DesHeatingLoad > 0.0) coolingToHeatingCapRatio = EqSizing.DesCoolingLoad / EqSizing.DesHeatingLoad;
+        }
+        if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
+            this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
+            int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
+            Real64 heatingAirFlowToCapacityRatio =
+                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
+            // is this a coincidence or does VS coil apply FlowToCap ratio to adjusted heating = cooling coil capacity?
+            EqSizing.DesHeatingLoad *= coolingToHeatingCapRatio;
+            EqSizing.HeatingAirVolFlow = EqSizing.DesHeatingLoad * heatingAirFlowToCapacityRatio;
         }
 
         // STEP 3B: if not a PTUnit use the greater of cooling and heating air flow rates for system flow
@@ -10813,7 +10805,7 @@ namespace UnitarySystems {
             Real64 TotalOutputDelta = 0.0;    // delta total output rate, {W}
             int ZoneInNode = this->m_ZoneInletNode;
             Real64 MassFlowRate = state.dataLoopNodes->Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
-            if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+            if (state.afn->distribution_simulated) {
                 DeltaMassRate = state.dataLoopNodes->Node(this->AirOutNode).MassFlowRate -
                                 state.dataLoopNodes->Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
                 if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -12815,7 +12807,7 @@ namespace UnitarySystems {
         Real64 DesOutHumRat = this->m_DesiredOutletHumRat;
         int CoilType_Num = this->m_CoolingCoilType_Num;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->distribution_simulated) {
             LoopDXCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
@@ -14463,7 +14455,7 @@ namespace UnitarySystems {
         this->m_CoolingCycRatio = CycRatio;
         this->m_DehumidificationMode = DehumidMode;
 
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->distribution_simulated) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
                 max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF, LoopDXCoilMaxRTFSave);
         }
@@ -14525,7 +14517,7 @@ namespace UnitarySystems {
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->distribution_simulated) {
             LoopHeatingCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
             LoopDXCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
@@ -15147,7 +15139,7 @@ namespace UnitarySystems {
         this->m_HeatingSpeedRatio = SpeedRatio;
         this->m_HeatingCycRatio = CycRatio;
 
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->distribution_simulated) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF =
                 max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
@@ -15213,7 +15205,7 @@ namespace UnitarySystems {
 
         Real64 LoopHeatingCoilMaxRTFSave = 0.0;
         Real64 LoopDXCoilMaxRTFSave = 0.0;
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->distribution_simulated) {
             LoopHeatingCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
             LoopDXCoilMaxRTFSave = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF;
@@ -15561,7 +15553,7 @@ namespace UnitarySystems {
         this->m_SuppHeatingSpeedRatio = SpeedRatio;
 
         // LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
-        if (state.afn->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->distribution_simulated) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF =
                 max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF, LoopHeatingCoilMaxRTFSave);
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF =
@@ -16247,8 +16239,7 @@ namespace UnitarySystems {
         this->m_ElecPower = locFanElecPower + elecCoolingPower + elecHeatingPower + suppHeatingPower + this->m_TotalAuxElecPower;
         this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
 
-        if (state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            state.afn->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.afn->distribution_simulated) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = state.dataUnitarySystems->CompOnMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = state.dataUnitarySystems->CompOffMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = this->m_FanOpMode;
@@ -16279,6 +16270,8 @@ namespace UnitarySystems {
             } else {
                 this->m_FirstPass = false;
             }
+            // reset the global system type flags
+            state.dataSize->ZoneEqDXCoil = false;
         }
 
         // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)

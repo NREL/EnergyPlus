@@ -111,6 +111,10 @@ using namespace DataVectorTypes;
 
 // Coefficients that modify the convection coeff based on surface roughness
 std::array<Real64, 6> const RoughnessMultiplier{2.17, 1.67, 1.52, 1.13, 1.11, 1.0};
+constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::RefTemp::Num)> RefTempNamesUC{
+    "MEANAIRTEMPERATURE", "ADJACENTAIRTEMPERATURE", "SUPPLYAIRTEMPERATURE"};
+constexpr std::array<std::string_view, static_cast<int>(ConvectionConstants::RefWind::Num)> RefWindNamesUC{
+    "WEATHERFILE", "HEIGHTADJUST", "PARALLELCOMPONENT", "PARALLELCOMPONENTHEIGHTADJUST"};
 
 enum class ConvSurfDeltaT
 {
@@ -135,6 +139,34 @@ enum class InConvFlowRegime
     Num
 };
 
+enum class SurfacesType
+{
+    Invalid = -1,
+    AllExteriorSurfaces,
+    AllExteriorWindows,
+    AllExteriorWalls,
+    AllExteriorRoofs,
+    AllExteriorFloors,
+    AllInteriorSurfaces,
+    AllInteriorWindows,
+    AllInteriorWalls,
+    AllInteriorRoofs,
+    AllInteriorCeilings,
+    AllInteriorFloors,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(SurfacesType::Num)> SurfacesTypeNamesUC{"ALLEXTERIORSURFACES",
+                                                                                                "ALLEXTERIORWINDOWS",
+                                                                                                "ALLEXTERIORWALLS",
+                                                                                                "ALLEXTERIORROOFS",
+                                                                                                "ALLEXTERIORFLOORS",
+                                                                                                "ALLINTERIORSURFACES",
+                                                                                                "ALLINTERIORWINDOWS",
+                                                                                                "ALLINTERIORWALLS",
+                                                                                                "ALLINTERIORROOFS",
+                                                                                                "ALLINTERIORCEILINGS",
+                                                                                                "ALLINTERIORFLOORS"};
 void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                   const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                   Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
@@ -300,15 +332,14 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             }
 
             if (standardAlgo) {
-                auto const SELECT_CASE_var1(algoNum);
-
-                if (SELECT_CASE_var1 == ConvectionConstants::HcInt_ASHRAESimple) {
+                switch (algoNum) {
+                case ConvectionConstants::HcInt_ASHRAESimple: {
                     CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
-
-                } else if (SELECT_CASE_var1 == ConvectionConstants::HcInt_ASHRAETARP) {
+                } break;
+                case ConvectionConstants::HcInt_ASHRAETARP: {
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                         CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                     } else {
@@ -318,22 +349,22 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
-
-                } else if (SELECT_CASE_var1 == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
-
+                } break;
+                case ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm: {
                     ManageInsideAdaptiveConvectionAlgo(state, SurfNum);
-
-                } else if ((SELECT_CASE_var1 == ConvectionConstants::HcInt_CeilingDiffuser) ||
-                           (SELECT_CASE_var1 == ConvectionConstants::HcInt_TrombeWall)) {
+                } break;
+                case ConvectionConstants::HcInt_CeilingDiffuser:
+                case ConvectionConstants::HcInt_TrombeWall: {
                     // Already done above and can't be at individual surface
-
-                } else if (SELECT_CASE_var1 == ConvectionConstants::HcInt_ASTMC1340) {
+                } break;
+                case ConvectionConstants::HcInt_ASTMC1340: {
                     CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
-
-                } else {
-
+                } break;
+                default: {
                     ShowFatalError(state, "Unhandled convection coefficient algorithm.");
+                } break;
                 }
+
             } else { // Interior convection has been set by the user with "value" or "schedule"
                 state.dataHeatBalSurf->SurfHConvInt(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
                 // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -935,20 +966,14 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         state.dataConvectionCoefficient->HcInsideUserCurve(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-            if (SELECT_CASE_var == "MEANAIRTEMPERATURE") {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = ConvectionConstants::RefTemp::MeanAirTemp;
-            } else if (SELECT_CASE_var == "ADJACENTAIRTEMPERATURE") {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = ConvectionConstants::RefTemp::AdjacentAirTemp;
-            } else if (SELECT_CASE_var == "SUPPLYAIRTEMPERATURE") {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = ConvectionConstants::RefTemp::SupplyAirTemp;
-            } else {
-                ShowSevereError(state,
-                                "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
-                                    state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ErrorsFound = true;
-            }
+
+        state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = static_cast<ConvectionConstants::RefTemp>(
+            getEnumerationValue(RefTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+        if (state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType == ConvectionConstants::RefTemp::Invalid) {
+            ShowSevereError(state,
+                            "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+            ErrorsFound = true;
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -1056,23 +1081,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
         state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-
-            if (SELECT_CASE_var == "WEATHERFILE") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = ConvectionConstants::RefWind::WeatherFile;
-            } else if (SELECT_CASE_var == "HEIGHTADJUST") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = ConvectionConstants::RefWind::AtZ;
-            } else if (SELECT_CASE_var == "PARALLELCOMPONENT") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = ConvectionConstants::RefWind::ParallelComp;
-            } else if (SELECT_CASE_var == "PARALLELCOMPONENTHEIGHTADJUST") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = ConvectionConstants::RefWind::ParallelCompAtZ;
-            } else {
-                ShowSevereError(state,
-                                "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
-                                    state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ErrorsFound = true;
-            }
+        state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = static_cast<ConvectionConstants::RefWind>(
+            getEnumerationValue(RefWindNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+        if (state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType == ConvectionConstants::RefWind::Invalid) {
+            ShowSevereError(state,
+                            "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+            ErrorsFound = true;
         }
 
         // A3 , \field Hf Function of Wind Speed Curve Name
@@ -1267,8 +1282,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         for (Pass = 1; Pass <= 2; ++Pass) {
 
             {
-                auto const SELECT_CASE_var(Alphas(Ptr));
-                if (SELECT_CASE_var == "OUTSIDE") {
+                if (Alphas(Ptr) == "OUTSIDE") {
                     if (Surface(Found).OSCPtr > 0) {
                         ShowSevereError(state,
                                         "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ", OUTSIDE " + CurrentModuleObject +
@@ -1370,7 +1384,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                         }
                     }
 
-                } else if (SELECT_CASE_var == "INSIDE") {
+                } else if (Alphas(Ptr) == "INSIDE") {
                     IntValue = 0;
                     PotentialAssignedValue = 0;
                     std::string equationName = Alphas(Ptr + 1);
@@ -1480,7 +1494,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                         state.dataSurface->SurfIntConvCoeffIndex(Found) = PotentialAssignedValue;
                     }
 
-                } else if (SELECT_CASE_var.empty()) { // Blank
+                } else if (Alphas(Ptr).empty()) { // Blank
 
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
@@ -1522,8 +1536,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         for (Pass = 1; Pass <= 2; ++Pass) {
 
             {
-                auto const SELECT_CASE_var(Alphas(Ptr));
-                if (SELECT_CASE_var == "OUTSIDE") {
+                if (Alphas(Ptr) == "OUTSIDE") {
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                         ExtValue = HcExt_ConvectionTypesMap.at(equationName);
@@ -1611,7 +1624,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                         ShowContinueError(state, "Check Input Entered :" + Alphas(Ptr + 1));
                         ErrorsFound = true;
                     }
-                } else if (SELECT_CASE_var == "INSIDE") {
+                } else if (Alphas(Ptr) == "INSIDE") {
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                         IntValue = HcInt_ConvectionTypesMap.at(equationName);
@@ -1712,7 +1725,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             }
                         }
                     }
-                } else if (SELECT_CASE_var.empty()) { // Blank
+                } else if (Alphas(Ptr).empty()) { // Blank
 
                 } else { // Error Case
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
@@ -2487,490 +2500,491 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
 
     auto &Surface(state.dataSurface->Surface);
 
-    {
-        auto const SELECT_CASE_var(SurfaceTypes);
+    SurfacesType SurfType = static_cast<SurfacesType>(getEnumerationValue(SurfacesTypeNamesUC, UtilityRoutines::MakeUPPERCase(SurfaceTypes)));
 
-        if (SELECT_CASE_var == "ALLEXTERIORSURFACES") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
+    switch (SurfType) {
+    case SurfacesType::AllExteriorSurfaces: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                     } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                        ++SurfaceCountOutside;
                     }
                 } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                     } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLEXTERIORWINDOWS") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                        ++SurfaceCountInside;
                     }
                 } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
                 }
             }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLEXTERIORWALLS") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLEXTERIORROOFS") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLEXTERIORFLOORS") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLINTERIORSURFACES") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLINTERIORWINDOWS") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLINTERIORWALLS") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if ((SELECT_CASE_var == "ALLINTERIORROOFS") || (SELECT_CASE_var == "ALLINTERIORCEILINGS")) {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else if (SELECT_CASE_var == "ALLINTERIORFLOORS") {
-            SurfacesOfType = false;
-            SurfaceCountOutside = 0;
-            SurfaceCountInside = 0;
-            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
-                SurfacesOfType = true;
-                if (ConvectionType == "OUTSIDE") {
-                    if (Surface(SurfNum).OSCPtr > 0) continue;
-                    if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountOutside;
-                        }
-                    } else {
-                        state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
-                    }
-                } else {
-                    if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                                 "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
-                        } else {
-                            ++SurfaceCountInside;
-                        }
-                    } else {
-                        state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
-                    }
-                }
-            }
-            if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
-                if (SurfaceCountOutside > 0) {
-                    OverwriteMessage = format("{} Outside", SurfaceCountOutside);
-                }
-                if (SurfaceCountInside > 0) {
-                    OverwriteMessage = format("{} Inside", SurfaceCountInside);
-                }
-                ShowWarningError(state,
-                                 "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
-                                     "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
-            }
-
-        } else {
-            SurfacesOfType = false;
         }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllExteriorWindows: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
+            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllExteriorWalls: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
+            if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllExteriorRoofs: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
+            if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllExteriorFloors: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
+            if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllInteriorSurfaces: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllInteriorWindows: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
+            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllInteriorWalls: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
+            if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllInteriorRoofs:
+    case SurfacesType::AllInteriorCeilings: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
+            if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    case SurfacesType::AllInteriorFloors: {
+        SurfacesOfType = false;
+        SurfaceCountOutside = 0;
+        SurfaceCountInside = 0;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
+            if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
+            SurfacesOfType = true;
+            if (ConvectionType == "OUTSIDE") {
+                if (Surface(SurfNum).OSCPtr > 0) continue;
+                if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountOutside;
+                    }
+                } else {
+                    state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = Value;
+                }
+            } else {
+                if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) != 0) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state,
+                                         "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                             "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
+                    } else {
+                        ++SurfaceCountInside;
+                    }
+                } else {
+                    state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = Value;
+                }
+            }
+        }
+        if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+            if (SurfaceCountOutside > 0) {
+                OverwriteMessage = format("{} Outside", SurfaceCountOutside);
+            }
+            if (SurfaceCountInside > 0) {
+                OverwriteMessage = format("{} Inside", SurfaceCountInside);
+            }
+            ShowWarningError(state,
+                             "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                 "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
+        }
+    } break;
+    default: {
+        SurfacesOfType = false;
+    } break;
     }
 
     if (!SurfacesOfType) {
@@ -3200,8 +3214,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
 
         // UCSD
         {
-            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-            if (SELECT_CASE_var == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
+            if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
                 TAirConv = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else {
                 // currently set to mean air temp but should add error warning here
