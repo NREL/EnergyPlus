@@ -372,6 +372,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     if (this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal < 1.0) {
         state.dataSize->DataDXCoolsLowSpeedsAutozize = true;
         state.dataSize->DataConstantUsedForSizing = -999.0;
+        state.dataSize->DataFlowUsedForSizing = this->parentModeRatedEvapAirFlowRate;
         state.dataSize->DataFractionUsedForSizing = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal;
     }
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
