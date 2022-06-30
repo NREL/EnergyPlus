@@ -104,7 +104,17 @@ namespace WindowComplexManager {
     using namespace Vectors;
     using namespace DataHeatBalFanSys;
 
-    // Functions
+    // Parameters for gas definitions
+    enum class GasCoeffs
+    {
+        Invalid = -1,
+        Custom,
+        Air,
+        Argon,
+        Krypton,
+        Xenon,
+        Num
+    };
 
     void InitBSDFWindows(EnergyPlusData &state)
     {
@@ -1528,14 +1538,22 @@ namespace WindowComplexManager {
             Geom.SolSkyWt(I) = SkyWeight(Geom.sInc(J));
         }
         WtSum = sum(Geom.SolSkyWt({1, NSky}));
-        Geom.SolSkyWt({1, NSky}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyWt({1, NSky}) /= WtSum;
+        } else {
+            Geom.SolSkyWt({1, NSky}) = 0.0;
+        }
         // SkyGround Weights
         Geom.SolSkyGndWt.allocate(NGnd);
         for (I = 1; I <= NGnd; ++I) {
             Geom.SolSkyGndWt(I) = SkyGndWeight(Geom.GndPt(I));
         }
         WtSum = sum(Geom.SolSkyGndWt({1, NGnd}));
-        Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        } else {
+            Geom.SolSkyGndWt({1, NGnd}) = 0.0;
+        }
         //  Weights for beam reflected from ground are calculated after shading
         //  interval is determined
         // Transmitted Basis:
@@ -2776,21 +2794,11 @@ namespace WindowComplexManager {
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
                         SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                        }
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                        }
-                        for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                             SrdSurfNum++) {
-                            SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(
-                                    state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                DataGlobalConstants::KelvinConv;
+                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                        for (SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                             DataGlobalConstants::KelvinConv;
                             OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
@@ -2860,7 +2868,7 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = static_cast<int>(DataComplexFenestration::GasCoeffs::Air);
+        GasType = static_cast<int>(GasCoeffs::Air);
         wght(iprop(1, 1)) = GasWght[GasType - 1];
         gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {

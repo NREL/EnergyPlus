@@ -5738,7 +5738,7 @@ namespace HeatBalanceManager {
                 DisplayString(state, "Initializing Response Factors");
                 InitConductionTransferFunctions(state); // Initialize the response factors
             }
-
+            HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(state);
             DisplayString(state, "Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(state); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties

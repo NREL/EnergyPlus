@@ -239,17 +239,6 @@ struct SimAirServingZonesData : BaseGlobalStruct
     Real64 Vou = 0.0;            // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
     Real64 Vot = 0.0;            // Required outdoor air intake at primary AHU per ASHRAE std 62.1
 
-    Array1D_int CtrlZoneNumsCool;
-    Array1D_int CtrlZoneNumsHeat;
-    Array1D_int ZoneInletNodesCool;
-    Array1D_int ZoneInletNodesHeat;
-    Array1D_int TermInletNodesCool;
-    Array1D_int TermInletNodesHeat;
-    Array1D_int TermUnitSizingNumsCool;
-    Array1D_int TermUnitSizingNumsHeat;
-    Array1D_int SupNode;
-    Array1D<DataZoneEquipment::AirNodeType> SupNodeType;
-
     int TUInNode = 0;            // inlet node number of a terminal unit
     Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
     Real64 OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
@@ -317,17 +306,6 @@ struct SimAirServingZonesData : BaseGlobalStruct
         this->ZoneEz = 1.0;
         this->Vou = 0.0;
         this->Vot = 0.0;
-
-        this->CtrlZoneNumsCool.clear();
-        this->CtrlZoneNumsHeat.clear();
-        this->ZoneInletNodesCool.clear();
-        this->ZoneInletNodesHeat.clear();
-        this->TermInletNodesCool.clear();
-        this->TermInletNodesHeat.clear();
-        this->TermUnitSizingNumsCool.clear();
-        this->TermUnitSizingNumsHeat.clear();
-        this->SupNode.clear();
-        this->SupNodeType.clear();
 
         this->TUInNode = 0;         // inlet node number of a terminal unit
         this->SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system

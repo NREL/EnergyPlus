@@ -201,6 +201,8 @@ namespace HeatBalanceSurfaceManager {
 
     Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum);
 
+    void InitSurfacePropertyViewFactors(EnergyPlusData &state);
+
 } // namespace HeatBalanceSurfaceManager
 
 struct HeatBalSurfMgr : BaseGlobalStruct

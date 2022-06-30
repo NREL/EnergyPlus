@@ -681,7 +681,7 @@ namespace DataSurfaces {
         Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
 
         // Boundary conditions and interconnections
-        bool HeatTransSurf;                      // True if surface is a heat transfer surface,
+        bool HeatTransSurf;                      // True if surface is a heat transfer surface (light shelf can also be IsShadowing)
         int OutsideHeatSourceTermSchedule;       // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
         int InsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
                                                  // False if a (detached) shadowing (sub)surface
@@ -714,7 +714,7 @@ namespace DataSurfaces {
         int OSCPtr;             // Pointer to OSC data structure
         int OSCMPtr;            // "Pointer" to OSCM data structure (other side conditions from a model)
         bool MirroredSurf;      // True if it is a mirrored surface
-        bool IsShadowing;       // True if a surface is a shadowing surface
+        bool IsShadowing;       // True if a surface is a shadowing surface (light shelf can also be HeatTransSurf)
         bool IsShadowPossibleObstruction; // True if a surface can be an exterior obstruction
 
         // Optional parameters specific to shadowing surfaces and subsurfaces (detached shading, overhangs, wings, etc.)
@@ -1333,12 +1333,16 @@ namespace DataSurfaces {
         Real64 SkyViewFactor;
         int SkyTempSchNum; // schedule pointer
         Real64 GroundViewFactor;
-        int GroundTempSchNum;      // schedule pointer
-        int TotSurroundingSurface; // Total number of surrounding surfaces defined for an exterior surface
+        int GroundTempSchNum;       // schedule pointer
+        int TotSurroundingSurface;  // Total number of surrounding surfaces defined for an exterior surface
+        bool IsSkyViewFactorSet;    // false if the sky view factor field is blank
+        bool IsGroundViewFactorSet; // false if the ground view factor field is blank
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
 
         // Default Constructor
-        SurroundingSurfacesProperty() : SkyViewFactor(-1.0), SkyTempSchNum(0), GroundViewFactor(-1.0), GroundTempSchNum(0), TotSurroundingSurface(0)
+        SurroundingSurfacesProperty()
+            : SkyViewFactor(0.0), SkyTempSchNum(0), GroundViewFactor(0.0), GroundTempSchNum(0), TotSurroundingSurface(0), IsSkyViewFactorSet(false),
+              IsGroundViewFactorSet(false)
         {
         }
     };
@@ -1388,30 +1392,30 @@ namespace DataSurfaces {
 
 struct SurfacesData : BaseGlobalStruct
 {
-    int TotSurfaces = 0;             // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
-    int TotWindows = 0;              // Total number of windows
-    int TotStormWin = 0;             // Total number of storm window blocks
-    int TotWinShadingControl = 0;    // Total number of window shading control blocks
-    int TotIntConvCoeff = 0;         // Total number of interior convection coefficient (overrides)
-    int TotExtConvCoeff = 0;         // Total number of exterior convection coefficient (overrides)
-    int TotOSC = 0;                  // Total number of Other Side Coefficient Blocks
-    int TotOSCM = 0;                 // Total number of Other Side Conditions Model Blocks.
-    int TotExtVentCav = 0;           // Total number of ExteriorNaturalVentedCavity
-    int TotSurfIncSolSSG = 0;        // Total number of scheduled surface gains for incident solar radiation on surface
+    int TotSurfaces = 0;           // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
+    int TotWindows = 0;            // Total number of windows
+    int TotStormWin = 0;           // Total number of storm window blocks
+    int TotWinShadingControl = 0;  // Total number of window shading control blocks
+    int TotIntConvCoeff = 0;       // Total number of interior convection coefficient (overrides) // TODO: Should just be a local variable I think
+    int TotExtConvCoeff = 0;       // Total number of exterior convection coefficient (overrides) // TODO: Should just be a local variable I think
+    int TotOSC = 0;                // Total number of Other Side Coefficient Blocks
+    int TotOSCM = 0;               // Total number of Other Side Conditions Model Blocks.
+    int TotExtVentCav = 0;         // Total number of ExteriorNaturalVentedCavity
+    int TotSurfIncSolSSG = 0;      // Total number of scheduled surface gains for incident solar radiation on surface
     int TotSurfIncSolMultiplier = 0; // Total number of surfaces with incident solar multipliers
-    int TotFenLayAbsSSG = 0;         // Total number of scheduled surface gains for absorbed solar radiation in window layers
-    int TotSurfLocalEnv = 0;         // Total number of surface level outdoor air node.
-    int Corner = 0;                  // Which corner is specified as the first vertex
-    int MaxVerticesPerSurface = 4;   // Maximum number of vertices allowed for a single surface (default -- can go higher)
-    int BuildingShadingCount = 0;    // Total number of Building External Shades
-    int FixedShadingCount = 0;       // Total number of Fixed External Shades
-    int AttachedShadingCount = 0;    // Total number of Shades attached to Zones
-    int ShadingSurfaceFirst = -1;    // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
-    int ShadingSurfaceLast = -1;     // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
-    bool AspectTransform = false;    // Set to true when GeometryTransform object is used
-    bool CalcSolRefl = false;        // Set to true when Solar Reflection Calculations object is used
-    bool CCW = false;                // True if vertices will be entered in CounterClockWise Order
-    bool WorldCoordSystem = false;   // True if vertices will be "World Coordinates". False means relative coordinates
+    int TotFenLayAbsSSG = 0;       // Total number of scheduled surface gains for absorbed solar radiation in window layers
+    int TotSurfLocalEnv = 0;       // Total number of surface level outdoor air node.
+    int Corner = 0;                // Which corner is specified as the first vertex
+    int MaxVerticesPerSurface = 4; // Maximum number of vertices allowed for a single surface (default -- can go higher)
+    int BuildingShadingCount = 0;  // Total number of Building External Shades
+    int FixedShadingCount = 0;     // Total number of Fixed External Shades
+    int AttachedShadingCount = 0;  // Total number of Shades attached to Zones
+    int ShadingSurfaceFirst = -1;  // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    int ShadingSurfaceLast = -1;   // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    bool AspectTransform = false;  // Set to true when GeometryTransform object is used
+    bool CalcSolRefl = false;      // Set to true when Solar Reflection Calculations object is used
+    bool CCW = false;              // True if vertices will be entered in CounterClockWise Order
+    bool WorldCoordSystem = false; // True if vertices will be "World Coordinates". False means relative coordinates
     bool DaylRefWorldCoordSystem = false; // True if Daylight Reference Point vertices will be "World Coordinates". False means relative coordinates
     int MaxRecPts = 0;                    // Max number of receiving points on a surface for solar reflection calc
     int MaxReflRays = 0;                  // Max number of rays from a receiving surface for solar reflection calc
@@ -1433,12 +1437,17 @@ struct SurfacesData : BaseGlobalStruct
         RepresentativeSurfaceMap; // A map that categorizes similar surfaces with
                                   // a single representative surface index
 
-    std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
-    std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
-    std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
-    std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
-    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
-    std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
+    std::vector<int> AllHTSurfaceList;                 // List of all heat transfer surfaces
+    std::vector<int> AllExtSolarSurfaceList;           // List of all exterior solar surfaces, all are heat transfer surfaces
+    std::vector<int> AllExtSolAndShadingSurfaceList;   // List of all exterior solar surfaces plus all shading surfaces
+    std::vector<int> AllShadowPossObstrSurfaceList;    // List of all IsShadoPossibleObstuction surfaces
+    std::vector<int> AllIZSurfaceList;                 // List of all interzone heat transfer surfaces
+    std::vector<int> AllHTNonWindowSurfaceList;        // List of all non-window heat transfer surfaces
+    std::vector<int> AllHTWindowSurfaceList;           // List of all window surfaces
+    std::vector<int> AllExtSolWindowSurfaceList;       // List of all exterior solar window surfaces
+    std::vector<int> AllExtSolWinWithFrameSurfaceList; // List of all exterior solar window surfaces with a frame and divider
+    std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva foundation surfaces
+    std::vector<int> AllSurfaceListReportOrder;        // List of all surfaces - output reporting order
 
     // Surface HB arrays
     Array1D<Real64> SurfOutDryBulbTemp; // Surface outside dry bulb air temperature, for surface heat balance (C)
@@ -1835,9 +1844,14 @@ struct SurfacesData : BaseGlobalStruct
         this->Z0.deallocate();
         this->RepresentativeSurfaceMap.clear();
         this->AllHTSurfaceList.clear();
+        this->AllExtSolarSurfaceList.clear();
+        this->AllExtSolAndShadingSurfaceList.clear();
+        this->AllShadowPossObstrSurfaceList.clear();
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
+        this->AllExtSolWindowSurfaceList.clear();
+        this->AllExtSolWinWithFrameSurfaceList.clear();
         this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
 
