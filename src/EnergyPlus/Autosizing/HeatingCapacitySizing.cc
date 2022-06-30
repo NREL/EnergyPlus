@@ -95,7 +95,12 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
             } else {
-                if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity) {
+                if (this->dataCoilIsSuppHeater && this->suppHeatCap > 0.0) {
+                    NominalCapacityDes = this->suppHeatCap;
+                    if (this->dataFlowUsedForSizing > 0.0) {
+                        DesVolFlow = this->dataFlowUsedForSizing;
+                    }
+                } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity) {
                     NominalCapacityDes = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
                     if (this->dataFlowUsedForSizing > 0.0) {
                         DesVolFlow = this->dataFlowUsedForSizing;
