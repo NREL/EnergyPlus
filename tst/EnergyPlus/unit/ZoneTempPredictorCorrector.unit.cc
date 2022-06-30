@@ -143,8 +143,11 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->ZT(1) = 24.0;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 2;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->spaceIntGainDevices.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 2;
     state->dataSurface->Surface.allocate(2);
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
@@ -1041,8 +1044,11 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->spaceIntGainDevices.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 3;
     state->dataSurface->Surface.allocate(3);
     state->dataHeatBalSurf->SurfHConvInt.allocate(3);
     state->dataLoopNodes->Node.allocate(4);

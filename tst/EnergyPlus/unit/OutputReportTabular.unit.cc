@@ -6897,8 +6897,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
     state->dataViewFactor->NumOfRadiantEnclosures = 4;
 
-    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
+    state->dataHeatBal->Zone(iZone).spaceIndexes.emplace_back(iZone);
+    state->dataHeatBal->space(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(iZone).HTSurfaceLast = 1;
     state->dataHeatBal->space(iZone).radiantEnclosureNum = 1;
 
     state->dataSurface->TotSurfaces = 4;
@@ -7059,8 +7060,10 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataHeatBal->Zone(1).FloorArea = 100.;
     // Trick E+ into not iterating on Surfaces
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 0;
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 0;
 
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
     state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
@@ -8270,8 +8273,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
     state->dataViewFactor->NumOfRadiantEnclosures = 1;
 
-    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
+    state->dataHeatBal->Zone(iZone).spaceIndexes.emplace_back(iZone);
+    state->dataHeatBal->space(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(iZone).HTSurfaceLast = 4;
     state->dataHeatBal->space(iZone).radiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 

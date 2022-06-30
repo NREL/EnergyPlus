@@ -773,6 +773,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->space.allocate(1);
 
     state->dataSurface->Surface(1).Area = 20.0;
     state->dataSurface->Surface(2).Area = 15.0;
@@ -789,8 +790,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     state->dataSurface->Surface(1).Zone = 1;
     state->dataSurface->Surface(2).Zone = 1;
     state->dataSurface->Surface(3).Zone = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 3;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(1) = 20.0;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(2) = 15.0;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(3) = 10.0;

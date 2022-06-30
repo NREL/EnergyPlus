@@ -152,12 +152,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
 
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(ZoneNum).spaceIndexes.emplace_back(ZoneNum);
+    state->dataHeatBal->space(ZoneNum).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).HTSurfaceLast = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrWinSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).OpaqOrWinSurfaceLast = 1;
 
     CalcOutsideSurfTemp(*state, SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
 
@@ -284,8 +286,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).WindowSurfaceFirst = 1;
+    state->dataHeatBal->space(1).WindowSurfaceLast = 1;
     state->dataHeatBal->Zone(1).zoneRadEnclosureFirst = 1;
     state->dataHeatBal->Zone(1).zoneRadEnclosureLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
@@ -336,10 +340,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(1).Construction = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
 
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;

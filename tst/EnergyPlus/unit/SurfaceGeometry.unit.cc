@@ -2469,7 +2469,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 6;
 
@@ -2605,7 +2607,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
@@ -2670,7 +2674,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
@@ -2734,7 +2740,9 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 4;
 
@@ -5573,15 +5581,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceFirst, Zone2Surface1);     // no air boundary surfaces in Zone 2
     EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceFirst, Zone3Surface1);     // air boundary surface
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceFirst, Zone1Surface1);      // first non-air boundary surface
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceFirst, Zone2Surface1);      // first non-air boundary surface
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, Zone3Floor);         // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceFirst, Zone1Surface1);      // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceFirst, Zone2Surface1);      // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceFirst, Zone3Floor);         // first non-air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceLast, Zone1Floor);
     EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceLast, Zone2Floor);
     EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceLast, Zone3Floor);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceLast, Zone1Floor);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceLast, Zone2Floor);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, Zone3Floor);
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceLast, Zone1Floor);
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceLast, Zone2Floor);
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceLast, Zone3Floor);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries3)
@@ -7848,12 +7856,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(windowEastWindow, 16);
     EXPECT_EQ(windowSouthWindow, 17);
     EXPECT_EQ(windowWestWindow, 18);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceFirst, 7);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceLast, 19);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst, 7);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast, 14);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceFirst, 15);
-    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceLast, 19);
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceLast, 19);
+    EXPECT_EQ(state->dataHeatBal->space(1).OpaqOrIntMassSurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->space(1).OpaqOrIntMassSurfaceLast, 14);
+    EXPECT_EQ(state->dataHeatBal->space(1).WindowSurfaceFirst, 15);
+    EXPECT_EQ(state->dataHeatBal->space(1).WindowSurfaceLast, 19);
 
     //  GARAGE ZONE:
     int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Interior"), state->dataSurface->Surface);
@@ -7871,12 +7879,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(floorGarageFloor, 24);
     EXPECT_EQ(ceilingGarageInterior, 25);
     EXPECT_EQ(intmassEVChargingStation, 26);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceFirst, 20);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceLast, 26);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).OpaqOrIntMassSurfaceFirst, 20);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).OpaqOrIntMassSurfaceLast, 26);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceFirst, 0);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceLast, -1);
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->space(2).OpaqOrIntMassSurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->space(2).OpaqOrIntMassSurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->space(2).WindowSurfaceFirst, 0);
+    EXPECT_EQ(state->dataHeatBal->space(2).WindowSurfaceLast, -1);
 
     //  ATTIC ZONE:
     int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastGable"), state->dataSurface->Surface);
@@ -7909,15 +7917,15 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofWestRoof, 38);
     EXPECT_EQ(nonwindowTubularDaylightingDome1, 40);
     EXPECT_EQ(windowAtticSkylight, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, wallEastGable);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, nonwindowTubularDaylightingDome1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceFirst, wallEastGable);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceLast, roofWestRoof);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, windowAtticSkylight);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, windowAtticSkylight);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrWinSurfaceLast, windowAtticSkylight);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeFirst, nonwindowTubularDaylightingDome1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeLast, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceLast, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->space(3).OpaqOrIntMassSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->space(3).OpaqOrIntMassSurfaceLast, roofWestRoof);
+    EXPECT_EQ(state->dataHeatBal->space(3).WindowSurfaceFirst, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->space(3).WindowSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->space(3).OpaqOrWinSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->space(3).TDDDomeFirst, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->space(3).TDDDomeLast, nonwindowTubularDaylightingDome1);
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:

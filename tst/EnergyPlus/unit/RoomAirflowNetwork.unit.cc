@@ -260,8 +260,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     state->dataHeatBal->Zone(ZoneNum).Volume = 100;
     state->dataHeatBal->Zone(ZoneNum).IsControlled = true;
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
+    state->dataHeatBal->space.allocate(ZoneNum);
+    state->dataHeatBal->space(ZoneNum).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(ZoneNum).HTSurfaceLast = 2;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
     state->dataHeatBal->Zone(ZoneNum).spaceIndexes.emplace_back(1);
 

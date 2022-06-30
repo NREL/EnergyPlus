@@ -1577,7 +1577,7 @@ namespace SurfaceGeometry {
         Array1D<bool> SurfaceTmpClassMoved; // Tmp class is moved
         SurfaceTmpClassMoved.dimension(state.dataSurface->TotSurfaces, false);
 
-        CreateMissingSpaces(state);
+        CreateMissingSpaces(state, state.dataSurfaceGeometry->SurfaceTmp);
 
         // Move all shading Surfaces to Front
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -2322,611 +2322,614 @@ namespace SurfaceGeometry {
                     }
                 }
             }
-            //  Surface First pointers are set, set last
-            if (state.dataGlobal->NumOfZones > 0) {
-                state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).AllSurfaceLast = state.dataSurface->TotSurfaces;
-                int lastSpaceNum = state.dataHeatBal->Zone(state.dataGlobal->NumOfZones)
-                                       .spaceIndexes(state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).spaceIndexes.size());
-                state.dataHeatBal->space(lastSpaceNum).AllSurfaceLast = state.dataSurface->TotSurfaces;
+            int firstSpaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
+            state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst = state.dataHeatBal->space(firstSpaceNum).AllSurfaceFirst;
+        }
+        //  Surface First pointers are set, set last
+        if (state.dataGlobal->NumOfZones > 0) {
+            state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).AllSurfaceLast = state.dataSurface->TotSurfaces;
+            int lastSpaceNum = state.dataHeatBal->Zone(state.dataGlobal->NumOfZones)
+                                   .spaceIndexes(state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).spaceIndexes.size());
+            state.dataHeatBal->space(lastSpaceNum).AllSurfaceLast = state.dataSurface->TotSurfaces;
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (ZoneNum < state.dataGlobal->NumOfZones) {
+                state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
             }
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (ZoneNum < state.dataGlobal->NumOfZones) {
-                    state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
-                }
-                auto &thisSpaceList = state.dataHeatBal->Zone(ZoneNum).spaceIndexes;
-                for (int spaceCount = 1; spaceCount <= thisSpaceList.size() - 1; ++spaceCount) {
+            auto &thisSpaceList = state.dataHeatBal->Zone(ZoneNum).spaceIndexes;
+            int numSpacesInZone = thisSpaceList.size();
+            if (numSpacesInZone > 1) {
+                for (int spaceCount = 1; spaceCount <= numSpacesInZone - 1; ++spaceCount) {
                     auto &thisSpace = state.dataHeatBal->space(thisSpaceList(spaceCount));
                     auto &nextSpace = state.dataHeatBal->space(thisSpaceList(spaceCount + 1));
                     thisSpace.AllSurfaceLast = nextSpace.AllSurfaceFirst - 1;
                 }
+                state.dataHeatBal->space(thisSpaceList(numSpacesInZone)).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
+            } else if (numSpacesInZone == 1) {
+                auto &thisSpace = state.dataHeatBal->space(thisSpaceList(numSpacesInZone));
+                thisSpace.AllSurfaceFirst = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst;
+                thisSpace.AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
             }
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                    if (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
-                        thisSpace.TDDDomeLast = thisSpace.AllSurfaceLast;
-                    } else if ((state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
-                               (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
-                               (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
-                        thisSpace.TDDDomeLast = -1;
-                        thisSpace.WindowSurfaceLast = thisSpace.AllSurfaceLast;
-                    } else {
-                        // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will
-                        // not execute. Same for TDDDome and its indices
-                        thisSpace.TDDDomeLast = -1;
-                        thisSpace.WindowSurfaceLast = -1;
-                        thisSpace.OpaqOrIntMassSurfaceLast = thisSpace.AllSurfaceLast;
-                    }
-                    thisSpace.OpaqOrWinSurfaceFirst = thisSpace.HTSurfaceFirst;
-                    thisSpace.OpaqOrWinSurfaceLast = std::max(thisSpace.OpaqOrIntMassSurfaceLast, thisSpace.WindowSurfaceLast);
-                    thisSpace.HTSurfaceLast = thisSpace.AllSurfaceLast;
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                if (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
+                    thisSpace.TDDDomeLast = thisSpace.AllSurfaceLast;
+                } else if ((state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
+                           (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                           (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
+                    thisSpace.TDDDomeLast = -1;
+                    thisSpace.WindowSurfaceLast = thisSpace.AllSurfaceLast;
+                } else {
+                    // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will
+                    // not execute. Same for TDDDome and its indices
+                    thisSpace.TDDDomeLast = -1;
+                    thisSpace.WindowSurfaceLast = -1;
+                    thisSpace.OpaqOrIntMassSurfaceLast = thisSpace.AllSurfaceLast;
+                }
+                thisSpace.OpaqOrWinSurfaceFirst = thisSpace.HTSurfaceFirst;
+                thisSpace.OpaqOrWinSurfaceLast = std::max(thisSpace.OpaqOrIntMassSurfaceLast, thisSpace.WindowSurfaceLast);
+                thisSpace.HTSurfaceLast = thisSpace.AllSurfaceLast;
+            }
+        }
+
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            int zoneSurfCount = 0;
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                if (thisSpace.HTSurfaceFirst > 0) {
+                    zoneSurfCount += (thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1);
+                }
+                if (zoneSurfCount == 0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + "Zone has no heat transfer surfaces, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
+                    SurfError = true;
                 }
             }
+        }
 
+        // Set up Floor Areas for Zones and Spaces
+        Real64 constexpr floorAreaTolerance(0.05);
+        Real64 constexpr floorAreaPercentTolerance(floorAreaTolerance * 100.0);
+        if (!SurfError) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                int zoneSurfCount = 0;
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
+                for (int spaceNum : thisZone.spaceIndexes) {
                     auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                    if (thisSpace.HTSurfaceFirst > 0) {
-                        zoneSurfCount += (thisSpace.HTSurfaceLast - thisSpace.HTSurfaceFirst + 1);
-                    }
-                    if (zoneSurfCount == 0) {
-                        ShowSevereError(
-                            state, std::string{RoutineName} + "Zone has no heat transfer surfaces, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
-                        SurfError = true;
+                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                        auto &thisSurf = state.dataSurface->Surface(SurfNum);
+                        if (thisSurf.Class == SurfaceClass::Floor) {
+                            thisZone.HasFloor = true;
+                            state.dataHeatBal->space(spaceNum).calcFloorArea += thisSurf.Area;
+                        }
+                        if (thisSurf.Class == SurfaceClass::Roof) {
+                            thisZone.CeilingArea += thisSurf.Area;
+                            thisZone.HasRoof = true;
+                        }
                     }
                 }
-
-                // Set up Floor Areas for Zones and Spaces
-                Real64 constexpr floorAreaTolerance(0.05);
-                Real64 constexpr floorAreaPercentTolerance(floorAreaTolerance * 100.0);
-                if (!SurfError) {
-                    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                        auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
-                        for (int spaceNum : thisZone.spaceIndexes) {
-                            auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                            for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                                auto &thisSurf = state.dataSurface->Surface(SurfNum);
-                                if (thisSurf.Class == SurfaceClass::Floor) {
-                                    thisZone.HasFloor = true;
-                                    state.dataHeatBal->space(spaceNum).calcFloorArea += thisSurf.Area;
+            }
+            ErrCount = 0;
+            for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+                if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                    // Check entered vs calculated
+                    if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea > 0.0) { // User entered Space floor area,
+                        // produce message if not near calculated
+                        if (state.dataHeatBal->space(spaceNum).calcFloorArea > 0.0) {
+                            Real64 diffp =
+                                std::abs(state.dataHeatBal->space(spaceNum).calcFloorArea - state.dataHeatBal->space(spaceNum).userEnteredFloorArea) /
+                                state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
+                            if (diffp > floorAreaTolerance) {
+                                ++ErrCount;
+                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Space Floor Area(s) differ more than {:.0R}% from calculated Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               floorAreaPercentTolerance));
+                                    ShowContinueError(state,
+                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.");
                                 }
-                                if (thisSurf.Class == SurfaceClass::Roof) {
-                                    thisZone.CeilingArea += thisSurf.Area;
-                                    thisZone.HasRoof = true;
+                                if (state.dataGlobal->DisplayExtraWarnings) {
+                                    // Warn user of using specified Space Floor Area
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Floor Area for Space=\"{}\" is {:.1R}% different from the calculated Floor Area.",
+                                               std::string(RoutineName),
+                                               state.dataHeatBal->space(spaceNum).Name,
+                                               diffp * 100.0));
+                                    ShowContinueError(state,
+                                                      format("Entered Space Floor Area={:.2R}, Calculated Space Floor Area={:.2R}, entered "
+                                                             "Floor Area will be used.",
+                                                             state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
+                                                             state.dataHeatBal->space(spaceNum).calcFloorArea));
                                 }
                             }
                         }
+                        state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
+                        state.dataHeatBal->space(spaceNum).hasFloor = true;
                     }
-                    ErrCount = 0;
-                    for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                        if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
-                            // Check entered vs calculated
-                            if (state.dataHeatBal->space(spaceNum).userEnteredFloorArea > 0.0) { // User entered Space floor area,
-                                // produce message if not near calculated
-                                if (state.dataHeatBal->space(spaceNum).calcFloorArea > 0.0) {
-                                    Real64 diffp = std::abs(state.dataHeatBal->space(spaceNum).calcFloorArea -
-                                                            state.dataHeatBal->space(spaceNum).userEnteredFloorArea) /
-                                                   state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
-                                    if (diffp > floorAreaTolerance) {
-                                        ++ErrCount;
-                                        if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                            ShowWarningError(
-                                                state,
-                                                format("{}Entered Space Floor Area(s) differ more than {:.0R}% from calculated Space Floor Area(s).",
-                                                       std::string(RoutineName),
-                                                       floorAreaPercentTolerance));
-                                            ShowContinueError(
-                                                state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.");
-                                        }
-                                        if (state.dataGlobal->DisplayExtraWarnings) {
-                                            // Warn user of using specified Space Floor Area
-                                            ShowWarningError(
-                                                state,
-                                                format("{}Entered Floor Area for Space=\"{}\" is {:.1R}% different from the calculated Floor Area.",
-                                                       std::string(RoutineName),
-                                                       state.dataHeatBal->space(spaceNum).Name,
-                                                       diffp * 100.0));
-                                            ShowContinueError(state,
-                                                              format("Entered Space Floor Area={:.2R}, Calculated Space Floor Area={:.2R}, entered "
-                                                                     "Floor Area will be used.",
-                                                                     state.dataHeatBal->space(spaceNum).userEnteredFloorArea,
-                                                                     state.dataHeatBal->space(spaceNum).calcFloorArea));
-                                        }
-                                    }
+                } else {
+                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea;
+                }
+            }
+            ErrCount = 0;
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                // Calculate zone floor area as sum of space floor areas
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    state.dataHeatBal->Zone(ZoneNum).CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                }
+                if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                    // Check entered vs calculated
+                    if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
+                        // produce message if not near calculated
+                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            Real64 diffp =
+                                std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea - state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
+                                state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                            if (diffp > 0.05) {
+                                ++ErrCount;
+                                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                    ShowWarningError(
+                                        state,
+                                        format("{}Entered Zone Floor Area(s) differ more than {:.0R}% from the sum of the Space Floor Area(s).",
+                                               std::string(RoutineName),
+                                               floorAreaPercentTolerance));
+                                    ShowContinueError(state,
+                                                      "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
                                 }
-                                state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).userEnteredFloorArea;
-                                state.dataHeatBal->space(spaceNum).hasFloor = true;
+                                if (state.dataGlobal->DisplayExtraWarnings) {
+                                    // Warn user of using specified Zone Floor Area
+                                    ShowWarningError(state,
+                                                     format("{}Entered Floor Area for Zone=\"{}\" is {:.1R}% different from the sum of the "
+                                                            "Space Floor Area(s).",
+                                                            std::string(RoutineName),
+                                                            state.dataHeatBal->Zone(ZoneNum).Name,
+                                                            diffp * 100.0));
+                                    ShowContinueError(state,
+                                                      format("Entered Zone Floor Area={:.2R}, Sum of Space Floor Area(s)={:.2R}",
+                                                             state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
+                                                             state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
+                                    ShowContinueError(
+                                        state, "Entered Zone Floor Area will be used and Space Floor Area(s) will be adjusted proportionately.");
+                                }
+                            }
+                        }
+                        state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
+                        state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
+
+                        // Adjust space floor areas to match zone floor area
+                        if (state.dataHeatBal->Zone(ZoneNum).numSpaces == 1) {
+                            // If the zone contains only one space, then set the Space area to the Zone area
+                            int spaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
+                            state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
+                        } else if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
+                            // Adjust space areas proportionately
+                            Real64 areaRatio = state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                                state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
                             }
                         } else {
-                            state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->space(spaceNum).calcFloorArea;
-                        }
-                    }
-                    ErrCount = 0;
-                    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                        // Calculate zone floor area as sum of space floor areas
-                        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                            state.dataHeatBal->Zone(ZoneNum).CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
-                        }
-                        if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
-                            // Check entered vs calculated
-                            if (state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
-                                // produce message if not near calculated
-                                if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
-                                    Real64 diffp = std::abs(state.dataHeatBal->Zone(ZoneNum).CalcFloorArea -
-                                                            state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea) /
-                                                   state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                                    if (diffp > 0.05) {
-                                        ++ErrCount;
-                                        if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                            ShowWarningError(
-                                                state,
-                                                format(
-                                                    "{}Entered Zone Floor Area(s) differ more than {:.0R}% from the sum of the Space Floor Area(s).",
-                                                    std::string(RoutineName),
-                                                    floorAreaPercentTolerance));
-                                            ShowContinueError(
-                                                state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
-                                        }
-                                        if (state.dataGlobal->DisplayExtraWarnings) {
-                                            // Warn user of using specified Zone Floor Area
-                                            ShowWarningError(state,
-                                                             format("{}Entered Floor Area for Zone=\"{}\" is {:.1R}% different from the sum of the "
-                                                                    "Space Floor Area(s).",
-                                                                    std::string(RoutineName),
-                                                                    state.dataHeatBal->Zone(ZoneNum).Name,
-                                                                    diffp * 100.0));
-                                            ShowContinueError(state,
-                                                              format("Entered Zone Floor Area={:.2R}, Sum of Space Floor Area(s)={:.2R}",
-                                                                     state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea,
-                                                                     state.dataHeatBal->Zone(ZoneNum).CalcFloorArea));
-                                            ShowContinueError(
-                                                state,
-                                                "Entered Zone Floor Area will be used and Space Floor Area(s) will be adjusted proportionately.");
-                                        }
-                                    }
-                                }
-                                state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).UserEnteredFloorArea;
-                                state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
-
-                                // Adjust space floor areas to match zone floor area
-                                if (state.dataHeatBal->Zone(ZoneNum).numSpaces == 1) {
-                                    // If the zone contains only one space, then set the Space area to the Zone area
-                                    int spaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
-                                    state.dataHeatBal->space(spaceNum).floorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
-                                } else if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0) {
-                                    // Adjust space areas proportionately
-                                    Real64 areaRatio = state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
-                                    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                                        state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
-                                    }
-                                } else {
-                                    if (state.dataGlobal->DisplayExtraWarnings) {
-                                        // Warn if calculated floor area was zero and there is more than one Space
-                                        ShowWarningError(state,
-                                                         std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
-                                                             state.dataHeatBal->Zone(ZoneNum).Name +
-                                                             "\" significantly different from sum of Space Floor Areas");
-                                        ShowContinueError(state,
-                                                          "But the sum of the Space Floor Areas is zero and there is more than one Space in the zone."
-                                                          "Unable to apportion the zone floor area. Space Floor Areas are zero.");
-                                    }
-                                }
-                            }
-                        } else {
-                            state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
-                        }
-                    }
-                }
-
-                for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
-                    if (state.dataSurface->Surface(SurfNum).Area < 1.e-06) {
-                        ShowSevereError(state,
-                                        format("{}Zero or negative surface area[{:.5R}], Surface={}",
-                                               RoutineName,
-                                               state.dataSurface->Surface(SurfNum).Area,
-                                               state.dataSurface->Surface(SurfNum).Name));
-                        SurfError = true;
-                    }
-                    if (state.dataSurface->Surface(SurfNum).Area >= 1.e-06 && state.dataSurface->Surface(SurfNum).Area < 0.001) {
-                        ShowWarningError(state,
-                                         format("{}Very small surface area[{:.5R}], Surface={}",
-                                                RoutineName,
-                                                state.dataSurface->Surface(SurfNum).Area,
-                                                state.dataSurface->Surface(SurfNum).Name));
-                    }
-                }
-
-                for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
-                    // GLASSDOORs and TDD:DIFFUSERs will be treated as windows in the subsequent heat transfer and daylighting
-                    // calculations. Reset class to 'Window' after saving the original designation in SurfaceWindow.
-
-                    state.dataSurface->SurfWinOriginalClass(SurfNum) = state.dataSurface->Surface(SurfNum).Class;
-
-                    if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::GlassDoor ||
-                        state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)
-                        state.dataSurface->Surface(SurfNum).Class = SurfaceClass::Window;
-
-                    if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
-                        // Reset the TDD:DOME subsurface to act as a base surface that can shade and be shaded
-                        // NOTE: This must be set early so that subsequent shading calculations are done correctly
-                        state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
-                    }
-                }
-
-                errFlag = false;
-                if (!SurfError) {
-                    for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
-                        if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
-                            WinShadingControlPtr =
-                                state.dataSurface->Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
-                            if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle) {
-                                state.dataSurface->SurfWinMovableSlats(SurfNum) = true;
-                                state.dataSurface->AnyMovableSlat = true;
-                                state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
-                            }
-                        }
-
-                        ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
-                        if (ConstrNumSh <= 0) continue;
-
-                        WinShadingType ShadingType = state.dataSurface->WindowShadingControl(WinShadingControlPtr).ShadingType;
-
-                        // only for blinds
-                        if (ANY_BLIND(ShadingType)) {
-
-                            // TH 1/7/2010. CR 7930
-                            // The old code did not consider between-glass blind. Also there should not be two blinds - both interior and exterior
-                            // Use the new generic code (assuming only one blind) as follows
-                            for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
-                                iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
-                                if (state.dataMaterial->Material(iTmp2).Group == DataHeatBalance::MaterialGroup::WindowBlind) {
-                                    BlNum = state.dataMaterial->Material(iTmp2).BlindDataPtr;
-                                    state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
-                                    // TH 2/18/2010. CR 8010
-                                    // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
-                                    //  the new blind is created only once, it can be shared by multiple windows though.
-                                    if (state.dataSurface->SurfWinMovableSlats(SurfNum) &&
-                                        state.dataHeatBal->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
-                                        errFlag = false;
-                                        AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
-                                        // point to the new blind
-                                        state.dataMaterial->Material(iTmp2).BlindDataPtr = BlNumNew;
-                                        // window surface points to new blind
-                                        state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
-                                    }
-                                    break;
-                                }
-                            }
-
-                            if (errFlag) {
-                                ErrorsFound = true;
+                            if (state.dataGlobal->DisplayExtraWarnings) {
+                                // Warn if calculated floor area was zero and there is more than one Space
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" +
+                                                     state.dataHeatBal->Zone(ZoneNum).Name +
+                                                     "\" significantly different from sum of Space Floor Areas");
                                 ShowContinueError(state,
-                                                  "WindowShadingControl " + state.dataSurface->WindowShadingControl(WinShadingControlPtr).Name +
-                                                      " has errors, program will terminate.");
+                                                  "But the sum of the Space Floor Areas is zero and there is more than one Space in the zone."
+                                                  "Unable to apportion the zone floor area. Space Floor Areas are zero.");
                             }
                         }
-                    } // End of surface loop
-
-                    // final associate fenestration surfaces referenced in WindowShadingControl
-                    FinalAssociateWindowShadingControlFenestration(state, ErrorsFound);
-                    CheckWindowShadingControlSimilarForWindow(state, ErrorsFound);
+                    }
+                } else {
+                    state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
                 }
+            }
 
-                // Check for zones with not enough surfaces
-                for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                    int OpaqueHTSurfs = 0;        // Number of floors, walls and roofs in a zone
-                    int OpaqueHTSurfsWithWin = 0; // Number of floors, walls and roofs with windows in a zone
-                    int InternalMassSurfs = 0;    // Number of internal mass surfaces in a zone
-                    int priorBaseSurfNum = 0;
+            for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+                if (state.dataSurface->Surface(SurfNum).Area < 1.e-06) {
+                    ShowSevereError(state,
+                                    format("{}Zero or negative surface area[{:.5R}], Surface={}",
+                                           RoutineName,
+                                           state.dataSurface->Surface(SurfNum).Area,
+                                           state.dataSurface->Surface(SurfNum).Name));
+                    SurfError = true;
+                }
+                if (state.dataSurface->Surface(SurfNum).Area >= 1.e-06 && state.dataSurface->Surface(SurfNum).Area < 0.001) {
+                    ShowWarningError(state,
+                                     format("{}Very small surface area[{:.5R}], Surface={}",
+                                            RoutineName,
+                                            state.dataSurface->Surface(SurfNum).Area,
+                                            state.dataSurface->Surface(SurfNum).Name));
+                }
+            }
 
-                    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                        if (thisSpace.HTSurfaceFirst == 0) continue; // Zone with no surfaces
-                        for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                            auto &thisSurf = state.dataSurface->Surface(SurfNum);
-                            if (thisSurf.Class == SurfaceClass::Floor || thisSurf.Class == SurfaceClass::Wall || thisSurf.Class == SurfaceClass::Roof)
-                                ++OpaqueHTSurfs;
-                            if (thisSurf.Class == SurfaceClass::IntMass) ++InternalMassSurfs;
-                            if (thisSurf.Class == SurfaceClass::Window) {
-                                // Count base surface only once for multiple windows on a wall
-                                int thisBaseSurfNum = thisSurf.BaseSurf;
-                                if (thisBaseSurfNum != priorBaseSurfNum) {
-                                    ++OpaqueHTSurfsWithWin;
-                                    priorBaseSurfNum = thisBaseSurfNum;
+            for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+                // GLASSDOORs and TDD:DIFFUSERs will be treated as windows in the subsequent heat transfer and daylighting
+                // calculations. Reset class to 'Window' after saving the original designation in SurfaceWindow.
+
+                state.dataSurface->SurfWinOriginalClass(SurfNum) = state.dataSurface->Surface(SurfNum).Class;
+
+                if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::GlassDoor ||
+                    state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)
+                    state.dataSurface->Surface(SurfNum).Class = SurfaceClass::Window;
+
+                if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
+                    // Reset the TDD:DOME subsurface to act as a base surface that can shade and be shaded
+                    // NOTE: This must be set early so that subsequent shading calculations are done correctly
+                    state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
+                }
+            }
+
+            errFlag = false;
+            if (!SurfError) {
+                for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+                    if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
+                        WinShadingControlPtr =
+                            state.dataSurface->Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
+                        if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle) {
+                            state.dataSurface->SurfWinMovableSlats(SurfNum) = true;
+                            state.dataSurface->AnyMovableSlat = true;
+                            state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
+                        }
+                    }
+
+                    ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
+                    if (ConstrNumSh <= 0) continue;
+
+                    WinShadingType ShadingType = state.dataSurface->WindowShadingControl(WinShadingControlPtr).ShadingType;
+
+                    // only for blinds
+                    if (ANY_BLIND(ShadingType)) {
+
+                        // TH 1/7/2010. CR 7930
+                        // The old code did not consider between-glass blind. Also there should not be two blinds - both interior and exterior
+                        // Use the new generic code (assuming only one blind) as follows
+                        for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
+                            iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
+                            if (state.dataMaterial->Material(iTmp2).Group == DataHeatBalance::MaterialGroup::WindowBlind) {
+                                BlNum = state.dataMaterial->Material(iTmp2).BlindDataPtr;
+                                state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
+                                // TH 2/18/2010. CR 8010
+                                // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
+                                //  the new blind is created only once, it can be shared by multiple windows though.
+                                if (state.dataSurface->SurfWinMovableSlats(SurfNum) &&
+                                    state.dataHeatBal->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
+                                    errFlag = false;
+                                    AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
+                                    // point to the new blind
+                                    state.dataMaterial->Material(iTmp2).BlindDataPtr = BlNumNew;
+                                    // window surface points to new blind
+                                    state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
                                 }
+                                break;
+                            }
+                        }
+
+                        if (errFlag) {
+                            ErrorsFound = true;
+                            ShowContinueError(state,
+                                              "WindowShadingControl " + state.dataSurface->WindowShadingControl(WinShadingControlPtr).Name +
+                                                  " has errors, program will terminate.");
+                        }
+                    }
+                } // End of surface loop
+
+                // final associate fenestration surfaces referenced in WindowShadingControl
+                FinalAssociateWindowShadingControlFenestration(state, ErrorsFound);
+                CheckWindowShadingControlSimilarForWindow(state, ErrorsFound);
+            }
+
+            // Check for zones with not enough surfaces
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                int OpaqueHTSurfs = 0;        // Number of floors, walls and roofs in a zone
+                int OpaqueHTSurfsWithWin = 0; // Number of floors, walls and roofs with windows in a zone
+                int InternalMassSurfs = 0;    // Number of internal mass surfaces in a zone
+                int priorBaseSurfNum = 0;
+
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    if (thisSpace.HTSurfaceFirst == 0) continue; // Zone with no surfaces
+                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                        auto &thisSurf = state.dataSurface->Surface(SurfNum);
+                        if (thisSurf.Class == SurfaceClass::Floor || thisSurf.Class == SurfaceClass::Wall || thisSurf.Class == SurfaceClass::Roof)
+                            ++OpaqueHTSurfs;
+                        if (thisSurf.Class == SurfaceClass::IntMass) ++InternalMassSurfs;
+                        if (thisSurf.Class == SurfaceClass::Window) {
+                            // Count base surface only once for multiple windows on a wall
+                            int thisBaseSurfNum = thisSurf.BaseSurf;
+                            if (thisBaseSurfNum != priorBaseSurfNum) {
+                                ++OpaqueHTSurfsWithWin;
+                                priorBaseSurfNum = thisBaseSurfNum;
                             }
                         }
                     }
-                    if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
-                        SurfError = true;
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + "Zone " + state.dataHeatBal->Zone(ZoneNum).Name +
-                                            " has only one floor, wall or roof, and this surface has a window.");
-                        ShowContinueError(state, "Add more floors, walls or roofs, or an internal mass surface.");
-                    }
                 }
-
-                // set up vertex of centroid for each surface.
-                CalcSurfaceCentroid(state);
-
-                SetupShadeSurfacesForSolarCalcs(state); // if shading surfaces are solar collectors or PV, then we need full solar calc.
-
-                GetMovableInsulationData(state, ErrorsFound);
-
-                if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
-
-                LayNumOutside = 0;
-                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                    // Check for EcoRoof and only 1 allowed to be used.
-                    if (state.dataSurface->Surface(SurfNum).Construction > 0)
-                        state.dataSurface->SurfExtEcoRoof(SurfNum) =
-                            state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsEcoRoof;
-                    if (!state.dataSurface->SurfExtEcoRoof(SurfNum)) continue;
-                    if (LayNumOutside == 0) {
-                        LayNumOutside = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1);
-                        continue;
-                    }
-                    if (LayNumOutside != state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1)) {
-                        ShowSevereError(state, std::string{RoutineName} + "Only one EcoRoof Material is currently allowed for all constructions.");
-                        ShowContinueError(state, "... first material=" + state.dataMaterial->Material(LayNumOutside).Name);
-                        ShowContinueError(
-                            state,
-                            "... conflicting Construction=" +
-                                state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).Name + " uses material=" +
-                                state.dataMaterial
-                                    ->Material(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1))
-                                    .Name);
-                        ErrorsFound = true;
-                    }
+                if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
+                    SurfError = true;
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + "Zone " + state.dataHeatBal->Zone(ZoneNum).Name +
+                                        " has only one floor, wall or roof, and this surface has a window.");
+                    ShowContinueError(state, "Add more floors, walls or roofs, or an internal mass surface.");
                 }
+            }
 
-                // Reserve space to avoid excess allocations
-                state.dataSurface->AllHTSurfaceList.reserve(state.dataSurface->TotSurfaces);
-                state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
-                state.dataSurface->AllShadowPossObstrSurfaceList.reserve(state.dataSurface->TotSurfaces);
-                state.dataSurface->AllIZSurfaceList.reserve(state.dataSurface->TotSurfaces);
-                state.dataSurface->AllHTNonWindowSurfaceList.reserve(state.dataSurface->TotSurfaces - state.dataSurface->TotWindows);
-                state.dataSurface->AllHTWindowSurfaceList.reserve(state.dataSurface->TotWindows);
-                state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
-                state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
-                state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
-                state.dataSurface->AllSurfaceListReportOrder.reserve(state.dataSurface->TotSurfaces);
+            // set up vertex of centroid for each surface.
+            CalcSurfaceCentroid(state);
 
-                // Set flag that determines whether a surface can be an exterior obstruction
-                // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
-                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                    state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = false;
-                    if (state.dataSurface->Surface(SurfNum).ExtSolar) {
-                        // This may include some attached shading surfaces
-                        state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
+            SetupShadeSurfacesForSolarCalcs(state); // if shading surfaces are solar collectors or PV, then we need full solar calc.
+
+            GetMovableInsulationData(state, ErrorsFound);
+
+            if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
+
+            LayNumOutside = 0;
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                // Check for EcoRoof and only 1 allowed to be used.
+                if (state.dataSurface->Surface(SurfNum).Construction > 0)
+                    state.dataSurface->SurfExtEcoRoof(SurfNum) =
+                        state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsEcoRoof;
+                if (!state.dataSurface->SurfExtEcoRoof(SurfNum)) continue;
+                if (LayNumOutside == 0) {
+                    LayNumOutside = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1);
+                    continue;
+                }
+                if (LayNumOutside != state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1)) {
+                    ShowSevereError(state, std::string{RoutineName} + "Only one EcoRoof Material is currently allowed for all constructions.");
+                    ShowContinueError(state, "... first material=" + state.dataMaterial->Material(LayNumOutside).Name);
+                    ShowContinueError(
+                        state,
+                        "... conflicting Construction=" + state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).Name +
+                            " uses material=" +
+                            state.dataMaterial
+                                ->Material(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1))
+                                .Name);
+                    ErrorsFound = true;
+                }
+            }
+
+            // Reserve space to avoid excess allocations
+            state.dataSurface->AllHTSurfaceList.reserve(state.dataSurface->TotSurfaces);
+            state.dataSurface->AllExtSolarSurfaceList.reserve(state.dataSurface->TotSurfaces);
+            state.dataSurface->AllShadowPossObstrSurfaceList.reserve(state.dataSurface->TotSurfaces);
+            state.dataSurface->AllIZSurfaceList.reserve(state.dataSurface->TotSurfaces);
+            state.dataSurface->AllHTNonWindowSurfaceList.reserve(state.dataSurface->TotSurfaces - state.dataSurface->TotWindows);
+            state.dataSurface->AllHTWindowSurfaceList.reserve(state.dataSurface->TotWindows);
+            state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
+            state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
+            state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
+            state.dataSurface->AllSurfaceListReportOrder.reserve(state.dataSurface->TotSurfaces);
+
+            // Set flag that determines whether a surface can be an exterior obstruction
+            // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = false;
+                if (state.dataSurface->Surface(SurfNum).ExtSolar) {
+                    // This may include some attached shading surfaces
+                    state.dataSurface->AllExtSolarSurfaceList.push_back(SurfNum);
+                }
+                if (state.dataSurface->Surface(SurfNum).HeatTransSurf) {
+                    // Outside light shelves get tagged later as HeatTransSurf=true but they haven't been processed yet
+                    state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
+                    int const zoneNum(state.dataSurface->Surface(SurfNum).Zone);
+                    auto &surfZone(state.dataHeatBal->Zone(zoneNum));
+                    surfZone.ZoneHTSurfaceList.push_back(SurfNum);
+                    // Sort window vs non-window surfaces
+                    if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
+                        state.dataSurface->AllHTWindowSurfaceList.push_back(SurfNum);
+                        surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
+                        if (state.dataSurface->Surface(SurfNum).ExtSolar) {
+                            state.dataSurface->AllExtSolWindowSurfaceList.push_back(SurfNum);
+                            if (state.dataSurface->Surface(SurfNum).FrameDivider > 0) {
+                                state.dataSurface->AllExtSolWinWithFrameSurfaceList.push_back(SurfNum);
+                            }
+                        }
+                    } else {
+                        state.dataSurface->AllHTNonWindowSurfaceList.push_back(SurfNum);
+                        surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                     }
-                    if (state.dataSurface->Surface(SurfNum).HeatTransSurf) {
-                        // Outside light shelves get tagged later as HeatTransSurf=true but they haven't been processed yet
-                        state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
-                        int const zoneNum(state.dataSurface->Surface(SurfNum).Zone);
-                        auto &surfZone(state.dataHeatBal->Zone(zoneNum));
-                        surfZone.ZoneHTSurfaceList.push_back(SurfNum);
+                    int const surfExtBoundCond(state.dataSurface->Surface(SurfNum).ExtBoundCond);
+                    // Build zone and interzone surface lists
+                    if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
+                        state.dataSurface->AllIZSurfaceList.push_back(SurfNum);
+                        surfZone.ZoneIZSurfaceList.push_back(SurfNum);
+                        auto &adjZone(state.dataHeatBal->Zone(state.dataSurface->Surface(surfExtBoundCond).Zone));
+                        adjZone.ZoneHTSurfaceList.push_back(SurfNum);
+                        adjZone.ZoneIZSurfaceList.push_back(SurfNum);
                         // Sort window vs non-window surfaces
                         if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-                            state.dataSurface->AllHTWindowSurfaceList.push_back(SurfNum);
-                            surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                            if (state.dataSurface->Surface(SurfNum).ExtSolar) {
-                                state.dataSurface->AllExtSolWindowSurfaceList.push_back(SurfNum);
-                                if (state.dataSurface->Surface(SurfNum).FrameDivider > 0) {
-                                    state.dataSurface->AllExtSolWinWithFrameSurfaceList.push_back(SurfNum);
-                                }
-                            }
+                            adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
                         } else {
-                            state.dataSurface->AllHTNonWindowSurfaceList.push_back(SurfNum);
-                            surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
-                        }
-                        int const surfExtBoundCond(state.dataSurface->Surface(SurfNum).ExtBoundCond);
-                        // Build zone and interzone surface lists
-                        if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
-                            state.dataSurface->AllIZSurfaceList.push_back(SurfNum);
-                            surfZone.ZoneIZSurfaceList.push_back(SurfNum);
-                            auto &adjZone(state.dataHeatBal->Zone(state.dataSurface->Surface(surfExtBoundCond).Zone));
-                            adjZone.ZoneHTSurfaceList.push_back(SurfNum);
-                            adjZone.ZoneIZSurfaceList.push_back(SurfNum);
-                            // Sort window vs non-window surfaces
-                            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-                                adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                            } else {
-                                adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
-                            }
+                            adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                         }
                     }
-                    // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
-                    if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) continue;
-                    if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == Ground) continue;
-                    if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == KivaFoundation) {
-                        state.dataSurface->AllHTKivaSurfaceList.push_back(SurfNum);
-                        if (!ErrorsFound)
-                            state.dataSurfaceGeometry->kivaManager.foundationInputs[state.dataSurface->Surface(SurfNum).OSCPtr].surfaces.push_back(
-                                SurfNum);
-                        continue;
-                    }
-                    if (state.dataSurface->Surface(SurfNum).HeatTransSurf &&
-                        state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt)
-                        continue;
-                    if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt)
-                        continue;
-                    // Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
-                    if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window ||
-                        state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Door)
-                        continue;
-                    // Exclude duplicate shading surfaces
-                    if (state.dataSurface->Surface(SurfNum).MirroredSurf) continue;
-                    // Exclude air boundary surfaces
-                    if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
-
-                    state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = true;
-                    state.dataSurface->AllShadowPossObstrSurfaceList.push_back(SurfNum);
                 }
+                // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
+                if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) continue;
+                if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == Ground) continue;
+                if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == KivaFoundation) {
+                    state.dataSurface->AllHTKivaSurfaceList.push_back(SurfNum);
+                    if (!ErrorsFound)
+                        state.dataSurfaceGeometry->kivaManager.foundationInputs[state.dataSurface->Surface(SurfNum).OSCPtr].surfaces.push_back(
+                            SurfNum);
+                    continue;
+                }
+                if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt)
+                    continue;
+                if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt)
+                    continue;
+                // Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
+                if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window ||
+                    state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Door)
+                    continue;
+                // Exclude duplicate shading surfaces
+                if (state.dataSurface->Surface(SurfNum).MirroredSurf) continue;
+                // Exclude air boundary surfaces
+                if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
 
-                // Check for IRT surfaces in invalid places.
-                iTmp1 = 0;
-                if (std::any_of(state.dataConstruction->Construct.begin(),
-                                state.dataConstruction->Construct.end(),
-                                [](Construction::ConstructionProps const &e) { return e.TypeIsIRT; })) {
-                    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                        if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue; // ignore shading surfaces
-                        if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
-                            continue; // interzone, not adiabatic surface
-                        if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsIRT) {
-                            continue;
-                        }
-                        if (!state.dataGlobal->DisplayExtraWarnings) {
-                            ++iTmp1;
-                        } else {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + "Surface=\"" + state.dataSurface->Surface(SurfNum).Name +
-                                                 "\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)");
-                        }
+                state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = true;
+                state.dataSurface->AllShadowPossObstrSurfaceList.push_back(SurfNum);
+            }
+
+            // Check for IRT surfaces in invalid places.
+            iTmp1 = 0;
+            if (std::any_of(state.dataConstruction->Construct.begin(),
+                            state.dataConstruction->Construct.end(),
+                            [](Construction::ConstructionProps const &e) { return e.TypeIsIRT; })) {
+                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                    if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue; // ignore shading surfaces
+                    if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                        continue; // interzone, not adiabatic surface
+                    if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsIRT) {
+                        continue;
                     }
-                    if (iTmp1 > 0) {
+                    if (!state.dataGlobal->DisplayExtraWarnings) {
+                        ++iTmp1;
+                    } else {
                         ShowWarningError(state,
-                                         format("{}Surfaces use InfraredTransparent constructions {} in non-interzone surfaces. (illegal use)",
-                                                RoutineName,
-                                                iTmp1));
-                        ShowContinueError(state, "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
+                                         std::string{RoutineName} + "Surface=\"" + state.dataSurface->Surface(SurfNum).Name +
+                                             "\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)");
                     }
                 }
-
-                // Note, could do same for Window Area and detecting if Interzone Surface in Zone
-
-                if (state.dataSurfaceGeometry->Warning1Count > 0) {
-                    ShowWarningMessage(state,
-                                       format("{}Window dimensions differ from Window 5/6 data file dimensions, {} times.",
-                                              RoutineName,
-                                              state.dataSurfaceGeometry->Warning1Count));
-                    ShowContinueError(state, "This will affect the frame heat transfer calculation if the frame in the Data File entry");
-                    ShowContinueError(state, "is not uniform, i.e., has sections with different geometry and/or thermal properties.");
-                    ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-                }
-                if (state.dataSurfaceGeometry->Warning2Count > 0) {
-                    ShowWarningMessage(state,
-                                       format("{}Exterior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
-                                              RoutineName,
-                                              state.dataSurfaceGeometry->Warning2Count));
-                    ShowContinueError(state, "Note that originally entered dimensions are overridden.");
-                    ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-                }
-                if (state.dataSurfaceGeometry->Warning3Count > 0) {
-                    ShowWarningMessage(state,
-                                       format("{}Interior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
-                                              RoutineName,
-                                              state.dataSurfaceGeometry->Warning3Count));
-                    ShowContinueError(state, "Note that originally entered dimensions are overridden.");
-                    ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-                }
-
-                if (state.dataErrTracking->TotalMultipliedWindows > 0) {
-                    ShowWarningMessage(state,
-                                       format("{}There are {} window/glass door(s) that may cause inaccurate shadowing due to Solar Distribution.",
-                                              RoutineName,
-                                              state.dataErrTracking->TotalMultipliedWindows));
-                    ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-                    state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalMultipliedWindows;
-                }
-                if (state.dataErrTracking->TotalCoincidentVertices > 0) {
-                    ShowWarningMessage(
-                        state,
-                        format("{}There are {} coincident/collinear vertices; These have been deleted unless the deletion would bring the "
-                               "number of surface sides < 3.",
-                               RoutineName,
-                               state.dataErrTracking->TotalCoincidentVertices));
-                    ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
-                    state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalCoincidentVertices;
-                }
-                if (state.dataErrTracking->TotalDegenerateSurfaces > 0) {
-                    ShowSevereMessage(state,
-                                      format("{}There are {} degenerate surfaces; Degenerate surfaces are those with number of sides < 3.",
-                                             RoutineName,
-                                             state.dataErrTracking->TotalDegenerateSurfaces));
-                    ShowContinueError(state, "These surfaces should be deleted.");
-                    ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
-                    state.dataErrTracking->TotalSevereErrors += state.dataErrTracking->TotalDegenerateSurfaces;
-                }
-
-                GetHTSurfExtVentedCavityData(state, ErrorsFound);
-
-                state.dataSurfaceGeometry->exposedFoundationPerimeter.getData(state, ErrorsFound);
-
-                GetSurfaceHeatTransferAlgorithmOverrides(state, ErrorsFound);
-
-                // Set up enclosures, process Air Boundaries if any
-                SetupEnclosuresAndAirBoundaries(
-                    state, state.dataViewFactor->EnclRadInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
-
-                GetSurfaceSrdSurfsData(state, ErrorsFound);
-
-                GetSurfaceLocalEnvData(state, ErrorsFound);
-
-                if (SurfError || ErrorsFound) {
-                    ErrorsFound = true;
-                    ShowFatalError(state, std::string{RoutineName} + "Errors discovered, program terminates.");
-                }
-
-                int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
-                                  TotOverhangsProjection + TotFins + TotFinsProjection;
-                int NumDElightCmplxFen =
-                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
-                if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
+                if (iTmp1 > 0) {
                     ShowWarningError(
-                        state, std::string{RoutineName} + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
+                        state,
+                        format("{}Surfaces use InfraredTransparent constructions {} in non-interzone surfaces. (illegal use)", RoutineName, iTmp1));
+                    ShowContinueError(state, "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
                 }
+            }
 
-                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                    // Initialize run time surface arrays
-                    state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
-                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
-                }
+            // Note, could do same for Window Area and detecting if Interzone Surface in Zone
 
-                // Representative surface calculations: Assign representative heat transfer surfaces
-                if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
-                    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
-                    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                            auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                            for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; surfNum++) {
-                                auto &surface(state.dataSurface->Surface(surfNum));
-                                // Conditions where surface always needs to be unique
-                                bool forceUniqueSurface = surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) ||
-                                                          state.dataConstruction->Construct(surface.Construction).SourceSinkPresent ||
-                                                          surface.Class == SurfaceClass::TDD_Dome ||
-                                                          (surface.Class == SurfaceClass::Window &&
-                                                           (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
-                                                            state.dataSurface->SurfWinWindowModelType(surfNum) != Window5DetailedModel ||
-                                                            state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
-                                                            state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
-                                if (!forceUniqueSurface) {
-                                    state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
-                                }
+            if (state.dataSurfaceGeometry->Warning1Count > 0) {
+                ShowWarningMessage(state,
+                                   format("{}Window dimensions differ from Window 5/6 data file dimensions, {} times.",
+                                          RoutineName,
+                                          state.dataSurfaceGeometry->Warning1Count));
+                ShowContinueError(state, "This will affect the frame heat transfer calculation if the frame in the Data File entry");
+                ShowContinueError(state, "is not uniform, i.e., has sections with different geometry and/or thermal properties.");
+                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+            }
+            if (state.dataSurfaceGeometry->Warning2Count > 0) {
+                ShowWarningMessage(state,
+                                   format("{}Exterior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
+                                          RoutineName,
+                                          state.dataSurfaceGeometry->Warning2Count));
+                ShowContinueError(state, "Note that originally entered dimensions are overridden.");
+                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+            }
+            if (state.dataSurfaceGeometry->Warning3Count > 0) {
+                ShowWarningMessage(state,
+                                   format("{}Interior Windows have been replaced with Window 5/6 two glazing systems, {} times.",
+                                          RoutineName,
+                                          state.dataSurfaceGeometry->Warning3Count));
+                ShowContinueError(state, "Note that originally entered dimensions are overridden.");
+                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+            }
+
+            if (state.dataErrTracking->TotalMultipliedWindows > 0) {
+                ShowWarningMessage(state,
+                                   format("{}There are {} window/glass door(s) that may cause inaccurate shadowing due to Solar Distribution.",
+                                          RoutineName,
+                                          state.dataErrTracking->TotalMultipliedWindows));
+                ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
+                state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalMultipliedWindows;
+            }
+            if (state.dataErrTracking->TotalCoincidentVertices > 0) {
+                ShowWarningMessage(state,
+                                   format("{}There are {} coincident/collinear vertices; These have been deleted unless the deletion would bring the "
+                                          "number of surface sides < 3.",
+                                          RoutineName,
+                                          state.dataErrTracking->TotalCoincidentVertices));
+                ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
+                state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalCoincidentVertices;
+            }
+            if (state.dataErrTracking->TotalDegenerateSurfaces > 0) {
+                ShowSevereMessage(state,
+                                  format("{}There are {} degenerate surfaces; Degenerate surfaces are those with number of sides < 3.",
+                                         RoutineName,
+                                         state.dataErrTracking->TotalDegenerateSurfaces));
+                ShowContinueError(state, "These surfaces should be deleted.");
+                ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
+                state.dataErrTracking->TotalSevereErrors += state.dataErrTracking->TotalDegenerateSurfaces;
+            }
+
+            GetHTSurfExtVentedCavityData(state, ErrorsFound);
+
+            state.dataSurfaceGeometry->exposedFoundationPerimeter.getData(state, ErrorsFound);
+
+            GetSurfaceHeatTransferAlgorithmOverrides(state, ErrorsFound);
+
+            // Set up enclosures, process Air Boundaries if any
+            SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->EnclRadInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
+
+            GetSurfaceSrdSurfsData(state, ErrorsFound);
+
+            GetSurfaceLocalEnvData(state, ErrorsFound);
+
+            if (SurfError || ErrorsFound) {
+                ErrorsFound = true;
+                ShowFatalError(state, std::string{RoutineName} + "Errors discovered, program terminates.");
+            }
+
+            int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
+                              TotOverhangsProjection + TotFins + TotFinsProjection;
+            int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
+            if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
+                ShowWarningError(state,
+                                 std::string{RoutineName} + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
+            }
+
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+                // Initialize run time surface arrays
+                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+            }
+
+            // Representative surface calculations: Assign representative heat transfer surfaces
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
+                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
+                for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                    for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; surfNum++) {
+                            auto &surface(state.dataSurface->Surface(surfNum));
+                            // Conditions where surface always needs to be unique
+                            bool forceUniqueSurface = surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) ||
+                                                      state.dataConstruction->Construct(surface.Construction).SourceSinkPresent ||
+                                                      surface.Class == SurfaceClass::TDD_Dome ||
+                                                      (surface.Class == SurfaceClass::Window &&
+                                                       (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
+                                                        state.dataSurface->SurfWinWindowModelType(surfNum) != Window5DetailedModel ||
+                                                        state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
+                                                        state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
+                            if (!forceUniqueSurface) {
+                                state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
                             }
                         }
                     }
                 }
-                // Initialize surface with movable insulation index list
-                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                    if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0 || state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
-                        state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
-                    }
+            }
+            // Initialize surface with movable insulation index list
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+                if (state.dataSurface->SurfMaterialMovInsulExt(SurfNum) > 0 || state.dataSurface->SurfMaterialMovInsulInt(SurfNum) > 0) {
+                    state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
                 }
             }
         }
     }
 
-    void CreateMissingSpaces(EnergyPlusData &state)
+    void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces)
     {
         // Scan surfaces to see if Space was assigned in input
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
-            auto &thisSurf = state.dataSurface->Surface(surfNum);
+            auto &thisSurf = Surfaces(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
             if (thisSurf.BaseSurf != surfNum) {
                 // Set space for subsurfaces
-                thisSurf.spaceNum = state.dataSurface->Surface(thisSurf.BaseSurf).spaceNum;
+                thisSurf.spaceNum = Surfaces(thisSurf.BaseSurf).spaceNum;
             }
             if (thisSurf.spaceNum > 0) {
                 state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithSpace = true;
@@ -2961,7 +2964,7 @@ namespace SurfaceGeometry {
 
         // Assign Spaces to surfaces without one
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
-            auto &thisSurf = state.dataSurface->Surface(surfNum);
+            auto &thisSurf = Surfaces(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
             if (thisSurf.spaceNum == 0) {
                 int const numSpaces = state.dataHeatBal->Zone(thisSurf.Zone).numSpaces;

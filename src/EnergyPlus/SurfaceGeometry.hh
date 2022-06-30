@@ -88,7 +88,7 @@ namespace SurfaceGeometry {
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CreateMissingSpaces(EnergyPlusData &state);
+    void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces);
 
     void createSpaceSurfaceLists(EnergyPlusData &state, bool &ErrorsFound);
 
