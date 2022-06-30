@@ -8362,7 +8362,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 if (state.dataSolarShading->SurfIntAbsFac(SurfNum) > 0.0 && state.dataSurface->Surface(SurfNum).HeatTransSurf) {
                     if (thisEnclosure.FloorArea > 0.0) {
                         // spread onto all floor surfaces, these may or may not be called "floor"
-                        state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * BTOTZone / thisEnclosure.FloorArea;
+                        state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) =
+                            state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * BTOTZone / thisEnclosure.FloorArea;
                     } else if (thisEnclosure.TotalSurfArea > 0.0) {
                         // spread onto all interior surfaces
                         state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) =
@@ -8399,14 +8400,16 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                         Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
                         // Exterior diffuse solar incident on window (W/m2)
-                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) +
-                                             state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
+                        Real64 DifSolarInc =
+                            state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) +
+                            state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
                         // Exterior diffuse sky solar transmitted by TDD (W/m2)
                         Real64 SkySolarTrans = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier *
                                                TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso) *
                                                state.dataSolarShading->SurfAnisoSkyMult(SurfNum2);
                         // Exterior diffuse ground solar transmitted by TDD (W/m2)
-                        Real64 GndSolarTrans = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
+                        Real64 GndSolarTrans = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier *
+                                               state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
                                                state.dataSurface->Surface(SurfNum2).ViewFactorGround;
 
                         state.dataSurface->SurfWinBmSolar(SurfNum) =
@@ -8439,9 +8442,10 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                              state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                             state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum) +
-                                             state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataSurface->Surface(SurfNum).ViewFactorGround +
-                                             ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
+                        Real64 DifSolarInc =
+                            state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum) +
+                            state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataSurface->Surface(SurfNum).ViewFactorGround +
+                            ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
                         state.dataSurface->SurfWinBmSolar(SurfNum) =
                             state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfWinTransBmSolar(SurfNum);
