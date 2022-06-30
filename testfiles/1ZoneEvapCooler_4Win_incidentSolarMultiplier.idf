@@ -219,6 +219,10 @@
     ROOF31,                  !- Name
     R31LAYER;                !- Outside Layer
 
+  Construction:WindowDataFile,
+    DoubleClear,             !- Name
+    ..\datasets\Window5DataFile.dat;  !- File Name
+
   Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;
 
   Zone,
@@ -260,6 +264,21 @@
     15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    DoubleClear,             !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    0.000000,0,4.5720,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0,0.2000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0,0.2000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,0,4.5720;  !- X,Y,Z ==> Vertex 4 {m}
+
   BuildingSurface:Detailed,
     Zn001:Wall002,           !- Name
     Wall,                    !- Surface Type
@@ -276,6 +295,21 @@
     15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
     15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall002:Win002,    !- Name
+    Window,                  !- Surface Type
+    DoubleClear,             !- Construction Name
+    Zn001:Wall002,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    15.24000,0,4.5720,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,0,0.2000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,15.24000,0.2000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,4.5720;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Wall003,           !- Name
@@ -294,6 +328,21 @@
     0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
 
+  FenestrationSurface:Detailed,
+    Zn001:Wall003:Win003,    !- Name
+    Window,                  !- Surface Type
+    DoubleClear,             !- Construction Name
+    Zn001:Wall003,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    15.24000,15.24000,4.5720,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,15.24000,0.2000,  !- X,Y,Z ==> Vertex 2 {m}
+    0,15.24000,0.2000,  !- X,Y,Z ==> Vertex 3 {m}
+    0,15.24000,4.5720;  !- X,Y,Z ==> Vertex 4 {m}
+
   BuildingSurface:Detailed,
     Zn001:Wall004,           !- Name
     Wall,                    !- Surface Type
@@ -310,6 +359,21 @@
     0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
     0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall004:Win004,    !- Name
+    Window,                  !- Surface Type
+    DoubleClear,             !- Construction Name
+    Zn001:Wall004,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    0,15.24000,4.5720,  !- X,Y,Z ==> Vertex 4 {m}
+    0,15.24000,0.1000,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0.2000,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,4.5720;  !- X,Y,Z ==> Vertex 1 {m}
 
   BuildingSurface:Detailed,
     Zn001:Flr001,            !- Name
@@ -336,7 +400,7 @@
     ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
+    NoSun,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
@@ -344,6 +408,28 @@
     0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}
     15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  SurfaceProperty:IncidentSolarMultiplier,
+    Zn001:Wall001:Win001,     !- Surface Name
+    1.0,                      !- Shading Multiplier
+    SolarMultConst;           !- Shading Multiplier Schedule Name
+
+  SurfaceProperty:IncidentSolarMultiplier,
+    Zn001:Wall002:Win002,     !- Surface Name
+    1.0,                      !- Shading Multiplier
+    SolarMultConst;           !- Shading Multiplier Schedule Name
+
+  SurfaceProperty:IncidentSolarMultiplier,
+    Zn001:Wall003:Win003,     !- Surface Name
+    1.0,                      !- Shading Multiplier
+    SolarMultConst;           !- Shading Multiplier Schedule Name
+
+  SurfaceProperty:IncidentSolarMultiplier,
+    Zn001:Wall004:Win004,     !- Surface Name
+    1.0,                      !- Shading Multiplier
+    SolarMultConst;           !- Shading Multiplier Schedule Name
+
+  Schedule:Constant,SolarMultConst,Fraction,1.0;
 
   ZoneInfiltration:DesignFlowRate,
     Main Zone Infiltration,  !- Name
@@ -594,29 +680,12 @@
 
   Output:Constructions,Constructions;
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
-
-  Output:Variable,*,Site Outdoor Air Wetbulb Temperature,hourly;
-
-  Output:Variable,*,Site Outdoor Air Humidity Ratio,hourly;
-
-  Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;
-
-  Output:Variable,*,Zone Mean Air Temperature,hourly;
-
-  Output:Variable,Supply Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,*,System Node Temperature,hourly;
-
-  Output:Variable,*,Baseboard Electricity Rate,hourly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
+  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Solar Radiation Rate per Area,hourly;
+  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Beam Solar Radiation Rate per Area,hourly;
+  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area,hourly;
+  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area,hourly;
+  Output:Variable,*,Zone Air System Sensible Heating Energy,hourly;
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly;
 
   OutputControl:Table:Style,
     TabAndHTML;              !- Column Separator
