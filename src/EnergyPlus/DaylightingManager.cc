@@ -6834,15 +6834,18 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             if (!state.dataSurface->Surface(IWin).HasShadeControl) continue;
             WinShadingType currentFlag = state.dataSurface->SurfWinShadingFlag(IWin);
             WinShadingType ShType = state.dataSurface->WindowShadingControl(ICtrl).ShadingType;
-            if (state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WindowShadingControlType::HiLumin_HiSolar_OffMidNight &&
-                    BITF_TEST_ANY(BITF(currentFlag),
-                                  BITF(WinShadingType::IntShadeConditionallyOff) |
-                                  BITF(WinShadingType::GlassConditionallyLightened) |
-                                  BITF(WinShadingType::ExtShadeConditionallyOff) |
-                                  BITF(WinShadingType::IntBlindConditionallyOff) |
-                                  BITF(WinShadingType::ExtBlindConditionallyOff) |
-                                  BITF(WinShadingType::BGShadeConditionallyOff) |
-                                  BITF(WinShadingType::BGBlindConditionallyOff))) {
+            if (BITF_TEST_ANY(BITF(state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType),
+                              BITF(WindowShadingControlType::HiLumin_HiSolar_OffMidNight) |
+                              BITF(WindowShadingControlType::HiLumin_HiSolar_OffSunset) |
+                              BITF(WindowShadingControlType::HiLumin_HiSolar_OffNextMorning)) &&
+                BITF_TEST_ANY(BITF(currentFlag),
+                              BITF(WinShadingType::IntShadeConditionallyOff) |
+                              BITF(WinShadingType::GlassConditionallyLightened) |
+                              BITF(WinShadingType::ExtShadeConditionallyOff) |
+                              BITF(WinShadingType::IntBlindConditionallyOff) |
+                              BITF(WinShadingType::ExtBlindConditionallyOff) |
+                              BITF(WinShadingType::BGShadeConditionallyOff) |
+                              BITF(WinShadingType::BGBlindConditionallyOff))) {
                 if (thisDaylightControl.SourceLumFromWinAtRefPt(loop, 1, 1) > state.dataSurface->WindowShadingControl(ICtrl).SetPoint2) {
                     // shade on if luminance of this window is above setpoint
                     state.dataSurface->SurfWinShadingFlag(IWin) = ShType;

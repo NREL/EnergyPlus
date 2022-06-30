@@ -176,6 +176,8 @@ namespace DataSurfaces {
         OnHiZoneTemp_HiSolarWindow,
         OnHiZoneTemp_HiHorzSolar,
         HiLumin_HiSolar_OffMidNight,
+        HiLumin_HiSolar_OffSunset,
+        HiLumin_HiSolar_OffNextMorning,
         Num
     };
 

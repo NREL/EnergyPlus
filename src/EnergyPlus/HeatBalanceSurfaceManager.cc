@@ -826,7 +826,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         "Between Glass Shade",
                         "Between Glass Blind",
                     };
-                    static constexpr std::array<std::string_view, 23> WindowShadingControlTypeStr = {"WindowShadingControl:Uncontrolled",
+                    static constexpr std::array<std::string_view, 25> WindowShadingControlTypeStr = {"WindowShadingControl:Uncontrolled",
                                                                             "WindowShadingControl:AlwaysOn",
                                                                             "WindowShadingControl:AlwaysOff",
                                                                             "WindowShadingControl:OnIfScheduleAllows",
@@ -848,7 +848,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                                                             "WindowShadingControl:OnIfHighOutdoorAirTempAndHighHorizontalSolar",
                                                                             "WindowShadingControl:OnIfHighZoneAirTempAndHighSolarOnWindow",
                                                                             "WindowShadingControl:OnIfHighZoneAirTempAndHighHorizontalSolar",
-                                                                            "WindowShadingControl:OnIfHighLuminanceOrHighSolarTillMidnight"};
+                                                                            "WindowShadingControl:OnIfHighLuminanceOrHighSolarTillMidnight",
+                                                                            "WindowShadingControl:OnIfHighLuminanceOrHighSolarTillSunset",
+                                                                            "WindowShadingControl:OnIfHighLuminanceOrHighSolarTillNextMorning"};
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscShading,
                                      surfName,

@@ -9524,7 +9524,9 @@ namespace SurfaceGeometry {
                                                                      "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHLUMINANCEORHIGHSOLARTILLMIDNIGHT"});
+                                                                     "ONIFHIGHLUMINANCEORHIGHSOLARTILLMIDNIGHT",
+                                                                     "ONIFHIGHLUMINANCEORHIGHSOLARTILLSUNSET",
+                                                                     "ONIFHIGHLUMINANCEORHIGHSOLARTILLNEXTMORNING"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine

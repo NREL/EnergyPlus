@@ -23,6 +23,8 @@ The current ASHRAE 90.1 narrative does not descibe sufficiently on the detail ab
 
 When interpreting "rest of the day" being "midnight", feedback collected during technicalities call suggests expanding the implementation to cover three additional shading off options: 1) sunset; 2) sunrise next day; and 3) when luminance value drops below a setpoint, which requires adding one more field 'Setpoint3' under WindowShadingControl. **The rest of this document describes the case of adding one new windows shading control option which accounts for the control option of shading off by midnight, other control options will be implemented in similar ways.**
 
+At this moment, we decided not to implement window shading control strategy that would turn off shade when luminance value drops below a setpoint in this NFP because 1) it requires adding more setpoints (e.g. a solar gain lower bound to turn off shades and a luminance lower bound to turn off shades to make them equal) to the WindowShadingControl object, which already has two setpoints fields; 2) turning on and off shades based on setpoints may cause shades to turn on and off frequently (oscillate) during a short period of time when luminance / solar gain value variates up and down.
+
 Feedback collected during technicalities call also suggests not adding luminance from different windows. We further confirm with lightning experts that the luminance control described in the code implies control for the maximum luminance through any window and adding luminance values from different windows view at the same reference point does not make sense.
 
 ## Overview
