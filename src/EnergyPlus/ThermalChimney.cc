@@ -669,9 +669,6 @@ namespace ThermalChimney {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Real local vaiables
-        int Loop;    // DO loop counter
-        int SurfNum; // DO loop counter for surfaces
-        int ZoneNum; // DO loop counter for zones
         int TCZoneNumCounter;
         int TCZoneNum;
         Real64 minorW; // width of enclosure (narrow dimension)
@@ -709,45 +706,48 @@ namespace ThermalChimney {
         Array1D<Real64> EquaConst(NTC);        // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
         Array1D<Real64> ThermChimSubTemp(NTC); // Air temperature of each thermal chimney air channel subregion
 
-        for (Loop = 1; Loop <= state.dataThermalChimneys->TotThermalChimney; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataThermalChimneys->TotThermalChimney; ++Loop) {
 
-            ZoneNum = state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr;
+            int ZoneNum = state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr;
             // start off with first surface in zone widths
-            majorW = state.dataSurface->Surface(state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst).Width;
+            int firstSpaceHTSurfaceFirst = state.dataHeatBal->space(state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1)).HTSurfaceFirst;
+            majorW = state.dataSurface->Surface(firstSpaceHTSurfaceFirst).Width;
             minorW = majorW;
             TempmajorW = 0.0;
             TemporaryWallSurfTemp = -10000.0;
 
             // determine major width and minor width
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
-                 ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Wall) continue;
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Wall) continue;
 
-                if (state.dataSurface->Surface(SurfNum).Width > majorW) {
-                    majorW = state.dataSurface->Surface(SurfNum).Width;
-                }
+                    if (state.dataSurface->Surface(SurfNum).Width > majorW) {
+                        majorW = state.dataSurface->Surface(SurfNum).Width;
+                    }
 
-                if (state.dataSurface->Surface(SurfNum).Width < minorW) {
-                    minorW = state.dataSurface->Surface(SurfNum).Width;
-                }
-            }
-
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).Width == majorW) {
-                    if (state.dataHeatBalSurf->SurfTempIn(SurfNum) > TemporaryWallSurfTemp) {
-                        TemporaryWallSurfTemp = state.dataHeatBalSurf->SurfTempIn(SurfNum);
-                        ConvTransCoeffWallFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
-                        SurfTempAbsorberWall = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                    if (state.dataSurface->Surface(SurfNum).Width < minorW) {
+                        minorW = state.dataSurface->Surface(SurfNum).Width;
                     }
                 }
-            }
 
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
-                    if (state.dataSurface->Surface(SurfNum).Width > TempmajorW) {
-                        TempmajorW = state.dataSurface->Surface(SurfNum).Width;
-                        ConvTransCoeffGlassFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
-                        SurfTempGlassCover = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    if (state.dataSurface->Surface(SurfNum).Width == majorW) {
+                        if (state.dataHeatBalSurf->SurfTempIn(SurfNum) > TemporaryWallSurfTemp) {
+                            TemporaryWallSurfTemp = state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                            ConvTransCoeffWallFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
+                            SurfTempAbsorberWall = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                        }
+                    }
+                }
+
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+                        if (state.dataSurface->Surface(SurfNum).Width > TempmajorW) {
+                            TempmajorW = state.dataSurface->Surface(SurfNum).Width;
+                            ConvTransCoeffGlassFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
+                            SurfTempGlassCover = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                        }
                     }
                 }
             }

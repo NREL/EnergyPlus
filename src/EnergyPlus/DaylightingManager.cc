@@ -2019,7 +2019,6 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     int IntWinHitNum;  // Surface number of interior window that is intersected
     bool hitIntWin;    // Ray from ref pt passes through interior window
     int PipeNum;       // TDD pipe object number
-    int IntWin;        // Interior window surface index
     Real64 COSBIntWin; // Cos of angle between int win outward normal and ray betw ref pt and
     //  exterior window element or between ref pt and sun
 
@@ -2125,25 +2124,28 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                     zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex;
                 }
                 // Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
-                for (IntWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst; IntWin <= state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-                     ++IntWin) {
-                    if (state.dataSurface->Surface(IntWin).ExtBoundCond >=
-                        1) { // in develop this was Surface(IntWin).Class == SurfaceClass::Window && Surface(IntWin).ExtBoundCond >= 1
-                        if (state.dataSurface->Surface(state.dataSurface->Surface(IntWin).ExtBoundCond).Zone ==
-                            state.dataSurface->Surface(IWin).Zone) {
-                            PierceSurface(state, IntWin, RREF, Ray, state.dataDaylightingManager->HitPtIntWin, hitIntWin);
-                            if (hitIntWin) {
-                                IntWinHitNum = IntWin;
-                                COSBIntWin = dot(state.dataSurface->Surface(IntWin).OutNormVec, Ray);
-                                if (COSBIntWin <= 0.0) {
-                                    hitIntWin = false;
-                                    IntWinHitNum = 0;
-                                    continue;
+                for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    for (int IntWin = thisSpace.WindowSurfaceFirst; IntWin <= thisSpace.WindowSurfaceLast; ++IntWin) {
+                        if (state.dataSurface->Surface(IntWin).ExtBoundCond >=
+                            1) { // in develop this was Surface(IntWin).Class == SurfaceClass::Window && Surface(IntWin).ExtBoundCond >= 1
+                            if (state.dataSurface->Surface(state.dataSurface->Surface(IntWin).ExtBoundCond).Zone ==
+                                state.dataSurface->Surface(IWin).Zone) {
+                                PierceSurface(state, IntWin, RREF, Ray, state.dataDaylightingManager->HitPtIntWin, hitIntWin);
+                                if (hitIntWin) {
+                                    IntWinHitNum = IntWin;
+                                    COSBIntWin = dot(state.dataSurface->Surface(IntWin).OutNormVec, Ray);
+                                    if (COSBIntWin <= 0.0) {
+                                        hitIntWin = false;
+                                        IntWinHitNum = 0;
+                                        continue;
+                                    }
+                                    TVISIntWin = General::POLYF(
+                                        COSBIntWin,
+                                        state.dataConstruction->Construct(state.dataSurface->Surface(IntWin).Construction).TransVisBeamCoef);
+                                    TVISB *= TVISIntWin;
+                                    break; // Ray passes thru interior window; exit from DO loop
                                 }
-                                TVISIntWin = General::POLYF(
-                                    COSBIntWin, state.dataConstruction->Construct(state.dataSurface->Surface(IntWin).Construction).TransVisBeamCoef);
-                                TVISB *= TVISIntWin;
-                                break; // Ray passes thru interior window; exit from DO loop
                             }
                         }
                     }
@@ -3418,24 +3420,28 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     // Does RAYCOS pass through interior window in zone containing RP?
                     // Loop over zone surfaces looking for interior windows between reference point and sun
                     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                    for (int IntWinDisk = thisZone.WindowSurfaceFirst, IntWinDisk_end = thisZone.WindowSurfaceLast; IntWinDisk <= IntWinDisk_end;
-                         ++IntWinDisk) {
-                        if (state.dataSurface->Surface(IntWinDisk).ExtBoundCond >= 1) {
-                            if (state.dataSurface->Surface(state.dataSurface->Surface(IntWinDisk).ExtBoundCond).Zone ==
-                                state.dataSurface->Surface(IWin2).Zone) {
-                                PierceSurface(state, IntWinDisk, RREF, RAYCOS, HitPtIntWinDisk, hitIntWinDisk);
-                                if (hitIntWinDisk) {
-                                    IntWinDiskHitNum = IntWinDisk;
-                                    COSBIntWin = dot(state.dataSurface->Surface(IntWinDisk).OutNormVec, RAYCOS);
-                                    if (COSBIntWin <= 0.0) {
-                                        hitIntWinDisk = false;
-                                        IntWinDiskHitNum = 0;
-                                        continue;
+                    for (int spaceNum : thisZone.spaceIndexes) {
+                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        for (int IntWinDisk = thisSpace.WindowSurfaceFirst, IntWinDisk_end = thisSpace.WindowSurfaceLast;
+                             IntWinDisk <= IntWinDisk_end;
+                             ++IntWinDisk) {
+                            if (state.dataSurface->Surface(IntWinDisk).ExtBoundCond >= 1) {
+                                if (state.dataSurface->Surface(state.dataSurface->Surface(IntWinDisk).ExtBoundCond).Zone ==
+                                    state.dataSurface->Surface(IWin2).Zone) {
+                                    PierceSurface(state, IntWinDisk, RREF, RAYCOS, HitPtIntWinDisk, hitIntWinDisk);
+                                    if (hitIntWinDisk) {
+                                        IntWinDiskHitNum = IntWinDisk;
+                                        COSBIntWin = dot(state.dataSurface->Surface(IntWinDisk).OutNormVec, RAYCOS);
+                                        if (COSBIntWin <= 0.0) {
+                                            hitIntWinDisk = false;
+                                            IntWinDiskHitNum = 0;
+                                            continue;
+                                        }
+                                        TVISIntWinDisk = POLYF(
+                                            COSBIntWin,
+                                            state.dataConstruction->Construct(state.dataSurface->Surface(IntWinDisk).Construction).TransVisBeamCoef);
+                                        break;
                                     }
-                                    TVISIntWinDisk = POLYF(
-                                        COSBIntWin,
-                                        state.dataConstruction->Construct(state.dataSurface->Surface(IntWinDisk).Construction).TransVisBeamCoef);
-                                    break;
                                 }
                             }
                         }
@@ -6171,14 +6177,15 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
         DayltgInteriorMapIllum(state);
     }
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-            state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-            if (IS_SHADED(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
-            } else {
+        for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            for (int SurfNum = thisSpace.WindowSurfaceFirst; SurfNum <= thisSpace.WindowSurfaceLast; ++SurfNum) {
                 state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
+                if (IS_SHADED(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
+                    state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
+                } else {
+                    state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
+                }
             }
         }
     }
@@ -7181,16 +7188,17 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
     // Loop again over windows and reset remaining shading flags that
     // are 10 or higher (i.e., conditionally off) to off
-    for (int IWin = state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).WindowSurfaceFirst;
-         IWin <= state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).WindowSurfaceLast;
-         ++IWin) {
-        if (state.dataSurface->Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
-        bool anyGlareControl = BITF_TEST_ANY(BITF(state.dataSurface->SurfWinShadingFlag(IWin)),
-                                             BITF(WinShadingType::IntShadeConditionallyOff) | BITF(WinShadingType::GlassConditionallyLightened) |
-                                                 BITF(WinShadingType::ExtShadeConditionallyOff) | BITF(WinShadingType::IntBlindConditionallyOff) |
-                                                 BITF(WinShadingType::ExtBlindConditionallyOff));
-        if (anyGlareControl) {
-            state.dataSurface->SurfWinShadingFlag(IWin) = WinShadingType::ShadeOff;
+    for (int spaceNum : state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).spaceIndexes) {
+        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        for (int IWin = thisSpace.WindowSurfaceFirst; IWin <= thisSpace.WindowSurfaceLast; ++IWin) {
+            if (state.dataSurface->Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
+            bool anyGlareControl = BITF_TEST_ANY(BITF(state.dataSurface->SurfWinShadingFlag(IWin)),
+                                                 BITF(WinShadingType::IntShadeConditionallyOff) | BITF(WinShadingType::GlassConditionallyLightened) |
+                                                     BITF(WinShadingType::ExtShadeConditionallyOff) | BITF(WinShadingType::IntBlindConditionallyOff) |
+                                                     BITF(WinShadingType::ExtBlindConditionallyOff));
+            if (anyGlareControl) {
+                state.dataSurface->SurfWinShadingFlag(IWin) = WinShadingType::ShadeOff;
+            }
         }
     }
 

@@ -158,9 +158,6 @@ namespace MundtSimMgr {
         //     initialize Mundt-model variables
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;            // index for surfaces
-        int SurfFirst;          // index number for the first surface in the specified zone
-        int NumOfSurfs;         // number of the first surface in the specified zone
         int NodeNum;            // index for air nodes
         int ZoneIndex;          // index for zones
         int NumOfAirNodes;      // total number of nodes in each zone
@@ -177,12 +174,9 @@ namespace MundtSimMgr {
         bool AirNodeFoundFlag;  // flag used for error check
         bool ErrorsFound;       // true if errors found in init
 
-        auto &Zone(state.dataHeatBal->Zone);
-
         // allocate and initialize zone data
         state.dataMundtSimMgr->ZoneData.allocate(state.dataGlobal->NumOfZones);
         for (auto &e : state.dataMundtSimMgr->ZoneData) {
-            e.SurfFirst = 0;
             e.NumOfSurfs = 0;
             e.MundtZoneIndex = 0;
         }
@@ -195,20 +189,26 @@ namespace MundtSimMgr {
         MaxNumOfRoomNodes = 0;
         ErrorsFound = false;
         for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
+            auto &thisZone = state.dataHeatBal->Zone(ZoneIndex);
             if (state.dataRoomAirMod->AirModel(ZoneIndex).AirModelType == DataRoomAirModel::RoomAirModel::Mundt) {
                 // find number of zones using the Mundt model
                 ++NumOfMundtZones;
                 // find maximum number of surfaces in zones using the Mundt model
-                SurfFirst = Zone(ZoneIndex).HTSurfaceFirst;
-                NumOfSurfs = Zone(ZoneIndex).HTSurfaceLast - SurfFirst + 1;
-                MaxNumOfSurfs = max(MaxNumOfSurfs, NumOfSurfs);
-                // fine maximum number of air nodes in zones using the Mundt model
-                NumOfAirNodes = state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneIndex);
-                MaxNumOfAirNodes = max(MaxNumOfAirNodes, NumOfAirNodes);
-                // assign zone data
-                state.dataMundtSimMgr->ZoneData(ZoneIndex).SurfFirst = SurfFirst;
-                state.dataMundtSimMgr->ZoneData(ZoneIndex).NumOfSurfs = NumOfSurfs;
-                state.dataMundtSimMgr->ZoneData(ZoneIndex).MundtZoneIndex = NumOfMundtZones;
+                int NumOfSurfs = 0;
+                for (int spaceNum : thisZone.spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; ++surfNum) {
+                        state.dataMundtSimMgr->ZoneData(ZoneIndex).HBsurfaceIndexes.emplace_back(surfNum);
+                        ++NumOfSurfs;
+                    }
+                    MaxNumOfSurfs = max(MaxNumOfSurfs, NumOfSurfs);
+                    // find maximum number of air nodes in zones using the Mundt model
+                    NumOfAirNodes = state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneIndex);
+                    MaxNumOfAirNodes = max(MaxNumOfAirNodes, NumOfAirNodes);
+                    // assign zone data
+                    state.dataMundtSimMgr->ZoneData(ZoneIndex).NumOfSurfs = NumOfSurfs;
+                    state.dataMundtSimMgr->ZoneData(ZoneIndex).MundtZoneIndex = NumOfMundtZones;
+                }
             }
         }
 
@@ -217,7 +217,7 @@ namespace MundtSimMgr {
         state.dataMundtSimMgr->TheseSurfIDs.allocate(MaxNumOfSurfs);
         state.dataMundtSimMgr->MundtAirSurf.allocate(MaxNumOfSurfs, NumOfMundtZones);
         state.dataMundtSimMgr->LineNode.allocate(MaxNumOfAirNodes, NumOfMundtZones);
-        for (SurfNum = 1; SurfNum <= MaxNumOfSurfs; ++SurfNum)
+        for (int SurfNum = 1; SurfNum <= MaxNumOfSurfs; ++SurfNum)
             state.dataMundtSimMgr->ID1dSurf(SurfNum) = SurfNum;
         for (auto &e : state.dataMundtSimMgr->MundtAirSurf) {
             e.Area = 0.0;
@@ -234,14 +234,13 @@ namespace MundtSimMgr {
 
         // get constant data (unchanged over time) for surfaces and air nodes
         for (MundtZoneIndex = 1; MundtZoneIndex <= NumOfMundtZones; ++MundtZoneIndex) {
-
             for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
-
+                auto &thisZone = state.dataHeatBal->Zone(ZoneIndex);
                 if (state.dataMundtSimMgr->ZoneData(ZoneIndex).MundtZoneIndex == MundtZoneIndex) {
                     // get surface data
-                    for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->ZoneData(ZoneIndex).NumOfSurfs; ++SurfNum) {
-                        state.dataMundtSimMgr->MundtAirSurf(SurfNum, MundtZoneIndex).Area =
-                            state.dataSurface->Surface(state.dataMundtSimMgr->ZoneData(ZoneIndex).SurfFirst + SurfNum - 1).Area;
+                    for (int surfNum = 1; surfNum <= state.dataMundtSimMgr->ZoneData(ZoneIndex).NumOfSurfs; ++surfNum) {
+                        state.dataMundtSimMgr->MundtAirSurf(surfNum, MundtZoneIndex).Area =
+                            state.dataSurface->Surface(state.dataMundtSimMgr->ZoneData(ZoneIndex).HBsurfaceIndexes(surfNum)).Area;
                     }
 
                     // get air node data
@@ -263,7 +262,7 @@ namespace MundtSimMgr {
 
                         AirNodeFoundFlag = false;
                         for (AirNodeNum = AirNodeBeginNum; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
-                            if (UtilityRoutines::SameString(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, Zone(ZoneIndex).Name)) {
+                            if (UtilityRoutines::SameString(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType =
                                     state.dataRoomAirMod->AirNode(AirNodeNum).ClassType;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName = state.dataRoomAirMod->AirNode(AirNodeNum).Name;
@@ -287,7 +286,7 @@ namespace MundtSimMgr {
 
                         // error check for debugging
                         if (!AirNodeFoundFlag) {
-                            ShowSevereError(state, "InitMundtModel: Air Node in Zone=\"" + Zone(ZoneIndex).Name + "\" is not found.");
+                            ShowSevereError(state, "InitMundtModel: Air Node in Zone=\"" + thisZone.Name + "\" is not found.");
                             ErrorsFound = true;
                             continue;
                         }
@@ -362,7 +361,6 @@ namespace MundtSimMgr {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;             // index for surfaces
         int NodeNum;             // index for air nodes
         Real64 SumSysMCp;        // zone sum of air system MassFlowRate*Cp
         Real64 SumSysMCpT;       // zone sum of air system MassFlowRate*Cp*T
@@ -441,11 +439,11 @@ namespace MundtSimMgr {
             -state.dataHeatBalFanSys->MCPI(ZoneNum) * (Zone(ZoneNum).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(ZoneNum));
 
         // get surface data
-        for (SurfNum = 1; SurfNum <= state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
             state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).Temp =
-                state.dataHeatBalSurf->SurfTempIn(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+                state.dataHeatBalSurf->SurfTempIn(state.dataMundtSimMgr->ZoneData(ZoneNum).HBsurfaceIndexes(SurfNum));
             state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).Hc =
-                state.dataHeatBalSurf->SurfHConvInt(state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+                state.dataHeatBalSurf->SurfHConvInt(state.dataMundtSimMgr->ZoneData(ZoneNum).HBsurfaceIndexes(SurfNum));
         }
     }
 
@@ -758,15 +756,11 @@ namespace MundtSimMgr {
         //     map data from air domain back to surface domain for each particular zone
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;      // index for surfaces
-        int SurfFirst;    // index number of the first surface in the zone
-        int NumOfSurfs;   // number of surfaces in the zone
         int ZoneNodeNum;  // index number of the zone node
         Real64 DeltaTemp; // dummy variable for temperature difference
 
         // get surface info
-        SurfFirst = state.dataMundtSimMgr->ZoneData(ZoneNum).SurfFirst;
-        NumOfSurfs = state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs;
+        int NumOfSurfs = state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs;
 
         if ((state.dataMundtSimMgr->SupplyAirVolumeRate > 0.0001) &&
             (state.dataMundtSimMgr->QsysCoolTot > 0.0001)) { // Controlled zone when the system is on
@@ -774,13 +768,13 @@ namespace MundtSimMgr {
             if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == DataRoomAirModel::CouplingScheme::Direct) {
                 // Use direct coupling scheme to report air temperatures back to surface/system domains
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
-                for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfFirst + SurfNum - 1) =
+                for (int SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
+                    int hbSurfNum = state.dataMundtSimMgr->ZoneData(ZoneNum).HBsurfaceIndexes(SurfNum);
+                    state.dataHeatBal->SurfTempEffBulkAir(hbSurfNum) =
                         state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).TMeanAir;
                     // set flag for reference air temperature
-                    state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-                    state.dataSurface->SurfTAirRefRpt(SurfFirst + SurfNum - 1) =
-                        DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1)];
+                    state.dataSurface->SurfTAirRef(hbSurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+                    state.dataSurface->SurfTAirRefRpt(hbSurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(hbSurfNum)];
                 }
                 // b) Average zone air temperature -> ZT(ZoneNum)
                 // For Mundt model, average room air is the weighted value of floor and ceiling air temps
@@ -796,15 +790,14 @@ namespace MundtSimMgr {
             } else {
                 // Use indirect coupling scheme to report air temperatures back to surface/system domains
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
-                for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
+                for (int SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
+                    int hbSurfNum = state.dataMundtSimMgr->ZoneData(ZoneNum).HBsurfaceIndexes(SurfNum);
                     DeltaTemp = state.dataMundtSimMgr->MundtAirSurf(SurfNum, state.dataMundtSimMgr->MundtZoneNum).TMeanAir -
                                 state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->TstatNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp;
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfFirst + SurfNum - 1) =
-                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
+                    state.dataHeatBal->SurfTempEffBulkAir(hbSurfNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                     // set flag for reference air temperature
-                    state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-                    state.dataSurface->SurfTAirRefRpt(SurfFirst + SurfNum - 1) =
-                        DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1)];
+                    state.dataSurface->SurfTAirRef(hbSurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+                    state.dataSurface->SurfTAirRefRpt(hbSurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(hbSurfNum)];
                 }
                 // b) Average zone air temperature -> ZT(ZoneNum)
                 // For Mundt model, average room air is the weighted value of floor and ceiling air temps
@@ -824,12 +817,12 @@ namespace MundtSimMgr {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
         } else { // Controlled zone when the system is off --> Use the mixing model instead of the Mundt model
             // Bulk air temperatures -> TempEffBulkAir(SurfNum)
-            for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                state.dataHeatBal->SurfTempEffBulkAir(SurfFirst + SurfNum - 1) = state.dataHeatBalFanSys->MAT(ZoneNum);
+            for (int SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
+                int hbSurfNum = state.dataMundtSimMgr->ZoneData(ZoneNum).HBsurfaceIndexes(SurfNum);
+                state.dataHeatBal->SurfTempEffBulkAir(hbSurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
                 // set flag for reference air temperature
-                state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
-                state.dataSurface->SurfTAirRefRpt(SurfFirst + SurfNum - 1) =
-                    DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfFirst + SurfNum - 1)];
+                state.dataSurface->SurfTAirRef(hbSurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+                state.dataSurface->SurfTAirRefRpt(hbSurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(hbSurfNum)];
             }
             // set flag to indicate that Mundt model is NOT used for this zone at the present time
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;

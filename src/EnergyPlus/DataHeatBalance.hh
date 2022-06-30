@@ -521,6 +521,31 @@ namespace DataHeatBalance {
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
+
+        // Pointers to Surface Data Structure
+        // |AllSurfF                                                                      |AllSurfL
+        // |            |HTSurfF                                                          |HTSurfL
+        // |            |OpaqOrWinMassSurfF                              |OpaqOrWinSurfL  |
+        // |            |OpaqOrIntMassSurfF      |OpaqOrIntMassSurfL                      |
+        // |            |                        ||WindowSurfF           |WindowSurfL     |
+        // |            |                        ||                      ||DomeF          |DomeL
+        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome       )]}
+        // HTSurfaceFirst == OpaqOrWinMassSurfaceFirst == OpaqOrIntMassSurfaceFirst
+        // WindowSurfaceFirst == OpaqOrIntMassSurfaceLast + 1
+        // TDDDomeFirst == OpaqOrWinSurfaceLast + 1 == WindowSurfaceLast + 1
+        // AllSurfaceLast == HTSurfaceLast = TDDDomeLast
+        int AllSurfaceFirst = 0;           // First surface in space including air boundaries
+        int AllSurfaceLast = -1;           // Last  surface in space including air boundaries
+        int HTSurfaceFirst = 0;            // First Heat Transfer Surface in space
+        int HTSurfaceLast = -1;            // Last  Heat Transfer Surface in space
+        int OpaqOrIntMassSurfaceFirst = 0; // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in space
+        int OpaqOrIntMassSurfaceLast = -1; // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in space
+        int WindowSurfaceFirst = 0;        // First Window Heat Transfer Surface in space
+        int WindowSurfaceLast = -1;        // Last  Window Heat Transfer Surface in space
+        int OpaqOrWinSurfaceFirst = 0;     // First opaque (including IntMass) or window (non TDD Dome) Surface in space
+        int OpaqOrWinSurfaceLast = -1;     // Last  opaque (including IntMass) or window (non TDD Dome) Surface in space
+        int TDDDomeFirst = 0;              // First TDD Dome Surface in space
+        int TDDDomeLast = -1;              // Last  TDD Dome Surface in space
     };
 
     struct SpaceListData
@@ -573,30 +598,8 @@ namespace DataHeatBalance {
         int ZoneEqNum = 0;                              // Controlled zone equip config number
         int PlenumCondNum = 0;                          // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex = 0;                // this is the index number for TempControlledZone structure for lookup
-        // Pointers to Surface Data Structure
-        // |AllSurfF                                                                      |AllSurfL
-        // |            |HTSurfF                                                          |HTSurfL
-        // |            |OpaqOrWinMassSurfF                              |OpaqOrWinSurfL  |
-        // |            |OpaqOrIntMassSurfF      |OpaqOrIntMassSurfL                      |
-        // |            |                        ||WindowSurfF           |WindowSurfL     |
-        // |            |                        ||                      ||DomeF          |DomeL
-        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome       )]}
-        // HTSurfaceFirst == OpaqOrWinMassSurfaceFirst == OpaqOrIntMassSurfaceFirst
-        // WindowSurfaceFirst == OpaqOrIntMassSurfaceLast + 1
-        // TDDDomeFirst == OpaqOrWinSurfaceLast + 1 == WindowSurfaceLast + 1
-        // AllSurfaceLast == HTSurfaceLast = TDDDomeLast
-        int AllSurfaceFirst = 0;           // First surface in zone including air boundaries
-        int AllSurfaceLast = -1;           // Last  surface in zone including air boundaries
-        int HTSurfaceFirst = 0;            // First Heat Transfer Surface in Zone
-        int HTSurfaceLast = -1;            // Last  Heat Transfer Surface in Zone
-        int OpaqOrIntMassSurfaceFirst = 0; // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
-        int OpaqOrIntMassSurfaceLast = -1; // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
-        int WindowSurfaceFirst = 0;        // First Window Heat Transfer Surface in Zone
-        int WindowSurfaceLast = -1;        // Last  Window Heat Transfer Surface in Zone
-        int OpaqOrWinSurfaceFirst = 0;     // First opaque (including IntMass) or window (non TDD Dome) Surface in Zone
-        int OpaqOrWinSurfaceLast = -1;     // Last  opaque (including IntMass) or window (non TDD Dome) Surface in Zone
-        int TDDDomeFirst = 0;              // First TDD Dome Surface in Zone
-        int TDDDomeLast = -1;              // Last  TDD Dome Surface in Zone
+        int AllSurfaceFirst = 0;                        // First surface in zone including air boundaries
+        int AllSurfaceLast = -1;                        // Last  surface in zone including air boundaries
         int InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple; // Ref: appropriate values for Inside Convection solution
         int NumSurfaces = 0;                                                // Number of surfaces for this zone
         int NumSubSurfaces = 0;     // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)

@@ -2138,13 +2138,16 @@ namespace ThermalComfort {
         // Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
         SumAET = 0.0;
         state.dataThermalComforts->ZoneAESum(ZoneNum) = 0.0;
-        for (SurfNum2 = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum2 <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum2) {
-            if (SurfNum2 != SurfNum) {
-                state.dataThermalComforts->SurfaceAE(SurfNum2) =
-                    state.dataSurface->Surface(SurfNum2).Area *
-                    state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
-                SumAET += state.dataThermalComforts->SurfaceAE(SurfNum2) * state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum2);
-                state.dataThermalComforts->ZoneAESum(ZoneNum) += state.dataThermalComforts->SurfaceAE(SurfNum2);
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            for (SurfNum2 = thisSpace.HTSurfaceFirst; SurfNum2 <= thisSpace.HTSurfaceLast; ++SurfNum2) {
+                if (SurfNum2 != SurfNum) {
+                    state.dataThermalComforts->SurfaceAE(SurfNum2) =
+                        state.dataSurface->Surface(SurfNum2).Area *
+                        state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                    SumAET += state.dataThermalComforts->SurfaceAE(SurfNum2) * state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum2);
+                    state.dataThermalComforts->ZoneAESum(ZoneNum) += state.dataThermalComforts->SurfaceAE(SurfNum2);
+                }
             }
         }
 

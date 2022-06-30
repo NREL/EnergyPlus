@@ -660,7 +660,6 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     Real64 ZMax;
     Real64 ZMin;
     int Count;
-    int SurfNum;
     Real64 Z1;
     Real64 Z2;
 
@@ -675,23 +674,26 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     ZMax = 0.0;
     ZMin = 0.0;
     Count = 0;
-    for (SurfNum = state.dataHeatBal->Zone(thisZone).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(thisZone).HTSurfaceLast; ++SurfNum) {
-        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
-            // Use Average Z for surface, more important for roofs than floors...
-            ++FloorCount;
-            Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-            Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
-            ZFlrAvg += (Z1 + Z2) / 2.0;
-        }
-        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Wall) {
-            // Use Wall calculation in case no floor in zone
-            ++Count;
-            if (Count == 1) {
-                ZMax = state.dataSurface->Surface(SurfNum).Vertex(1).z;
-                ZMin = ZMax;
+    for (int spaceNum : state.dataHeatBal->Zone(thisZone).spaceIndexes) {
+        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
+                // Use Average Z for surface, more important for roofs than floors...
+                ++FloorCount;
+                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                ZFlrAvg += (Z1 + Z2) / 2.0;
             }
-            ZMax = max(ZMax, maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
-            ZMin = min(ZMin, minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Wall) {
+                // Use Wall calculation in case no floor in zone
+                ++Count;
+                if (Count == 1) {
+                    ZMax = state.dataSurface->Surface(SurfNum).Vertex(1).z;
+                    ZMin = ZMax;
+                }
+                ZMax = max(ZMax, maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+                ZMin = min(ZMin, minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z));
+            }
         }
     }
     if (FloorCount > 0.0) {
@@ -774,14 +776,11 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SurfFirst; // index number of the first surface in the zone
-    int SurfLast;
     Real64 QRetAir;         // Heat to return air from lights
     Real64 CpAir;           // Air heat capacity [J/kg-K]
     Real64 TempRetAir;      // Return air temperature [C]
     Real64 TempZoneAir;     // Zone air temperature [C]
     int ZoneNode;           // Node number of controlled zone
-    int SurfNum;            // Surface number
     Real64 MassFlowRA;      // Return air mass flow [kg/s]
     Real64 FlowThisTS;      // Window gap air mass flow [kg/s]
     Real64 WinGapFlowToRA;  // Mass flow to return air from all airflow windows in zone [kg/s]
@@ -791,9 +790,6 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     Real64 RhoAir;          // Density of air (Kg/m3)
     Real64 ZoneMult;
     Real64 SumRetAirLatentGainRate;
-
-    SurfFirst = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst;
-    SurfLast = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
 
     // set air system leaving node conditions
     // this is not so easy.  THis task is normally done in CalcZoneLeavingConditions
@@ -832,16 +828,19 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         WinGapFlowTtoRA = 0.0;
 
         if (state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                    FlowThisTS = PsyRhoAirFnPbTdbW(state,
-                                                   state.dataEnvrn->OutBaroPress,
-                                                   state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
-                                                   state.dataLoopNodes->Node(ZoneNode).HumRat) *
-                                 state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
-                    WinGapFlowToRA += FlowThisTS;
-                    WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state,
+                                                       state.dataEnvrn->OutBaroPress,
+                                                       state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
+                                                       state.dataLoopNodes->Node(ZoneNode).HumRat) *
+                                     state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
+                        WinGapFlowToRA += FlowThisTS;
+                        WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+                    }
                 }
             }
         }
@@ -936,14 +935,22 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat;
 
     // set results for all surface
-    for (int i = SurfFirst, j = 1; i <= SurfLast; ++i, ++j) {
-        state.dataHeatBal->SurfTempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
+    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        int j = 1;
+        for (int i = thisSpace.HTSurfaceFirst; i <= thisSpace.HTSurfaceLast; ++i) {
+            ++j;
+            state.dataHeatBal->SurfTempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
+        }
     }
 
     // set flag for reference air temperature mode
-    for (int i = SurfFirst; i <= SurfLast; ++i) {
-        state.dataSurface->SurfTAirRef(i) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-        state.dataSurface->SurfTAirRefRpt(i) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(i)];
+    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        for (int i = thisSpace.HTSurfaceFirst; i <= thisSpace.HTSurfaceLast; ++i) {
+            state.dataSurface->SurfTAirRef(i) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+            state.dataSurface->SurfTAirRefRpt(i) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(i)];
+        }
     }
 }
 

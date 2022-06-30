@@ -4950,7 +4950,6 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
     int ZoneNode;             // Node number of controlled zone
     int ReturnNode;           // Node number of controlled zone's return air
     int ReturnNodeExhaustNum; // Asscoaited exhaust node number, corresponding to the return node
-    int SurfNum;              // Surface number
     Real64 MassFlowRA;        // Return air mass flow [kg/s]
     Real64 FlowThisTS;        // Window gap air mass flow [kg/s]
     Real64 WinGapFlowToRA;    // Mass flow to return air from all airflow windows in zone [kg/s]
@@ -5006,17 +5005,19 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             WinGapFlowTtoRA = 0.0;
 
             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
-                for (SurfNum = state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceLast;
-                     ++SurfNum) {
-                    if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(state,
-                                                       state.dataEnvrn->OutBaroPress,
-                                                       state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
-                                                       state.dataLoopNodes->Node(ZoneNode).HumRat) *
-                                     state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
-                        WinGapFlowToRA += FlowThisTS;
-                        WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                        if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                            state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                            FlowThisTS = PsyRhoAirFnPbTdbW(state,
+                                                           state.dataEnvrn->OutBaroPress,
+                                                           state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
+                                                           state.dataLoopNodes->Node(ZoneNode).HumRat) *
+                                         state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
+                            WinGapFlowToRA += FlowThisTS;
+                            WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+                        }
                     }
                 }
             }

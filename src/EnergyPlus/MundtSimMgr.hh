@@ -98,14 +98,9 @@ namespace MundtSimMgr {
     struct DefineZoneData
     {
         // Members
-        int SurfFirst;      // index for first surface of the zone
-        int NumOfSurfs;     // number of surfaces in the zone
-        int MundtZoneIndex; // index for zones using Mundt model
-
-        // Default Constructor
-        DefineZoneData() : SurfFirst(0), NumOfSurfs(0), MundtZoneIndex(0)
-        {
-        }
+        int NumOfSurfs = 0;             // number of surfaces in the zone
+        int MundtZoneIndex = 0;         // index for zones using Mundt model
+        EPVector<int> HBsurfaceIndexes; // list of surface indexes in this Mundt model zone
     };
 
     // Functions

@@ -6943,12 +6943,15 @@ namespace WindowManager {
 
         // init the surface convective and radiative adjustment ratio
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-                    int ConstrNum2 = state.dataSurface->Surface(SurfNum).Construction;
-                    state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum2);
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const firstSurfWin = thisSpace.WindowSurfaceFirst;
+                int const lastSurfWin = thisSpace.WindowSurfaceLast;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                        int ConstrNum2 = state.dataSurface->Surface(SurfNum).Construction;
+                        state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum2);
+                    }
                 }
             }
         }

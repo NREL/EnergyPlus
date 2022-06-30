@@ -5645,7 +5645,6 @@ namespace HeatBalanceManager {
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
         int StormWinNum; // Number of StormWindow object
-        int ZoneNum;
 
         if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(state); // Allocate the Module Arrays
@@ -5710,14 +5709,17 @@ namespace HeatBalanceManager {
                 state.dataHeatBalMgr->ChangeSet = true;
             }
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 &&
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::Window5DetailedModel) {
-                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
-                    } else {
-                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    int const firstSurfWin = thisSpace.WindowSurfaceFirst;
+                    int const lastSurfWin = thisSpace.WindowSurfaceLast;
+                    for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 &&
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::Window5DetailedModel) {
+                            state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+                        } else {
+                            state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                        }
                     }
                 }
             }
@@ -5782,7 +5784,7 @@ namespace HeatBalanceManager {
         // Set zone data to linked air node value if defined.
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataHeatBal->Zone(ZoneNum).HasLinkedOutAirNode) {
                     if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(
@@ -5818,7 +5820,7 @@ namespace HeatBalanceManager {
 
         // Overwriting surface and zone level environmental data with EMS override value
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideOn) {
                     state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideValue;
                 }
@@ -5836,12 +5838,15 @@ namespace HeatBalanceManager {
 
         if (state.dataGlobal->BeginSimFlag) {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
+                for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    int const firstSurfWin = thisSpace.WindowSurfaceFirst;
+                    int const lastSurfWin = thisSpace.WindowSurfaceLast;
+                    for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
+                        }
                     }
                 }
             }
@@ -8357,8 +8362,6 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int iSurf;
-        int iConst;
         int SchedPtr;         // scheduled surface gains pointer
         bool ZoneUnscheduled; // true if all surfaces in the zone are unscheduled
         bool ZoneScheduled;   // true if all surfaces in the zone are scheduled
@@ -8366,51 +8369,56 @@ namespace HeatBalanceManager {
         ZoneUnscheduled = false;
         ZoneScheduled = false;
 
-        for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
-            iConst = state.dataSurface->Surface(iSurf).Construction;
-            if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
-                SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
-            } else {
-                SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
-            }
-            if (iSurf == state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst) {
-                if (SchedPtr != 0) {
-                    ZoneScheduled = true;
-                    ZoneUnscheduled = false;
-                } else {
-                    ZoneScheduled = false;
-                    ZoneUnscheduled = true;
-                }
-            } else {
-                if (SchedPtr != 0) {
-                    ZoneUnscheduled = false;
-                } else {
-                    ZoneScheduled = false;
-                }
-            }
-
-            if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-                // zone is nor scheduled nor unscheduled
-                ShowWarningError(state,
-                                 "Zone " + state.dataHeatBal->Zone(ZoneNum).Name + " does not have all surfaces scheduled with surface gains.");
-                ShowContinueError(state,
-                                  "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone "
-                                  "should be scheduled as well.");
-                break;
-            }
-        }
-
-        if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-            for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
-                iConst = state.dataSurface->Surface(iSurf).Construction;
+        bool firstZoneSurface = true;
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            for (int iSurf = thisSpace.HTSurfaceFirst; iSurf <= thisSpace.HTSurfaceLast; ++iSurf) {
+                int iConst = state.dataSurface->Surface(iSurf).Construction;
                 if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
                 } else {
                     SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
                 }
+                if (firstZoneSurface) {
+                    if (SchedPtr != 0) {
+                        ZoneScheduled = true;
+                        ZoneUnscheduled = false;
+                    } else {
+                        ZoneScheduled = false;
+                        ZoneUnscheduled = true;
+                    }
+                    firstZoneSurface = false;
+                } else {
+                    if (SchedPtr != 0) {
+                        ZoneUnscheduled = false;
+                    } else {
+                        ZoneScheduled = false;
+                    }
+                }
+            }
+        }
+        if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
+            // zone is nor scheduled nor unscheduled
+            ShowWarningError(state, "Zone " + state.dataHeatBal->Zone(ZoneNum).Name + " does not have all surfaces scheduled with surface gains.");
+            ShowContinueError(state,
+                              "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone "
+                              "should be scheduled as well.");
+        }
 
-                if (SchedPtr == 0) {
-                    ShowContinueError(state, "Surface " + state.dataSurface->Surface(iSurf).Name + " does not have scheduled surface gains.");
+        if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int iSurf = thisSpace.HTSurfaceFirst; iSurf <= thisSpace.HTSurfaceLast; ++iSurf) {
+                    int iConst = state.dataSurface->Surface(iSurf).Construction;
+                    if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
+                        SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
+                    } else {
+                        SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
+                    }
+
+                    if (SchedPtr == 0) {
+                        ShowContinueError(state, "Surface " + state.dataSurface->Surface(iSurf).Name + " does not have scheduled surface gains.");
+                    }
                 }
             }
         }

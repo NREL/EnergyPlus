@@ -2731,13 +2731,9 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("InitZoneAirSetpoints: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop;
-    int ZoneNum;
     bool FirstSurfFlag;
     int TRefFlag; // Flag for Reference Temperature process in Zones
-    int SurfNum;
 
-    auto &Zone = state.dataHeatBal->Zone;
     auto &ZoneList = state.dataHeatBal->ZoneList;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
     auto &TempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint;
@@ -2829,95 +2825,101 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         ZoneSysEnergyDemand.allocate(NumOfZones);
         ZoneSysMoistureDemand.allocate(NumOfZones);
 
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             FirstSurfFlag = true;
-            for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).HTSurfaceLast; ++SurfNum) {
-                if (FirstSurfFlag) {
-                    TRefFlag = state.dataSurface->SurfTAirRef(SurfNum);
-                    FirstSurfFlag = false;
-                }
-                // for each particular zone, the reference air temperature(s) should be the same
-                // (either mean air, bulk air, or supply air temp).
-                if (state.dataSurface->SurfTAirRef(SurfNum) != TRefFlag) {
-                    ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + Zone(Loop).Name);
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    if (FirstSurfFlag) {
+                        TRefFlag = state.dataSurface->SurfTAirRef(SurfNum);
+                        FirstSurfFlag = false;
+                    }
+                    // for each particular zone, the reference air temperature(s) should be the same
+                    // (either mean air, bulk air, or supply air temp).
+                    if (state.dataSurface->SurfTAirRef(SurfNum) != TRefFlag) {
+                        ShowWarningError(state,
+                                         "Different reference air temperatures for difference surfaces encountered in zone " +
+                                             state.dataHeatBal->Zone(zoneNum).Name);
+                    }
                 }
             }
         }
 
         // CurrentModuleObject='Zone'
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            auto &thisZone = state.dataHeatBal->Zone(zoneNum);
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneSNLoadHeatEnergy(Loop),
+                                state.dataHeatBal->ZoneSNLoadHeatEnergy(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                Zone(Loop).Name,
+                                thisZone.Name,
                                 _,
                                 "ENERGYTRANSFER",
                                 "Heating",
                                 _,
                                 "Building",
-                                Zone(Loop).Name,
-                                Zone(Loop).Multiplier,
-                                Zone(Loop).ListMultiplier);
+                                thisZone.Name,
+                                thisZone.Multiplier,
+                                thisZone.ListMultiplier);
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneSNLoadCoolEnergy(Loop),
+                                state.dataHeatBal->ZoneSNLoadCoolEnergy(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                Zone(Loop).Name,
+                                thisZone.Name,
                                 _,
                                 "ENERGYTRANSFER",
                                 "Cooling",
                                 _,
                                 "Building",
-                                Zone(Loop).Name,
-                                Zone(Loop).Multiplier,
-                                Zone(Loop).ListMultiplier);
+                                thisZone.Name,
+                                thisZone.Multiplier,
+                                thisZone.ListMultiplier);
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneSNLoadHeatRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadHeatRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneSNLoadCoolRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadCoolRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Air Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataHeatBalFanSys->ZT(Loop),
+                                state.dataHeatBalFanSys->ZT(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Air Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataHeatBalFanSys->TempTstatAir(Loop),
+                                state.dataHeatBalFanSys->TempTstatAir(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Air Humidity Ratio",
                                 OutputProcessor::Unit::None,
-                                state.dataHeatBalFanSys->ZoneAirHumRat(Loop),
+                                state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Air Relative Humidity",
                                 OutputProcessor::Unit::Perc,
-                                state.dataZoneTempPredictorCorrector->ZoneAirRelHum(Loop),
+                                state.dataZoneTempPredictorCorrector->ZoneAirRelHum(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
 
             // The following output variables are for the predicted Heating/Cooling load for the zone which can be compared to actual load.
             // There are two sets of data available: one where zone and group multipliers have been applied and another where the multipliers have
@@ -2925,46 +2927,46 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneSNLoadPredictedRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadPredictedRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneSNLoadPredictedHSPRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadPredictedHSPRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneSNLoadPredictedCSPRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadPredictedCSPRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             // Second, these report variable ARE multiplied by zone and group multipliers
             SetupOutputVariable(state,
                                 "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneSysEnergyDemand(Loop).TotalOutputRequired,
+                                ZoneSysEnergyDemand(zoneNum).TotalOutputRequired,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneSysEnergyDemand(Loop).OutputRequiredToHeatingSP,
+                                ZoneSysEnergyDemand(zoneNum).OutputRequiredToHeatingSP,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneSysEnergyDemand(Loop).OutputRequiredToCoolingSP,
+                                ZoneSysEnergyDemand(zoneNum).OutputRequiredToCoolingSP,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
 
             // The following output variables are for the predicted moisture load for the zone with humidity controlled specified.
             // There are two sets of data available: one where zone and group multipliers have been applied and another where the multipliers have
@@ -2972,128 +2974,129 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->ZoneMoisturePredictedRate(Loop),
+                                state.dataHeatBal->ZoneMoisturePredictedRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->ZoneMoisturePredictedHumSPRate(Loop),
+                                state.dataHeatBal->ZoneMoisturePredictedHumSPRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->ZoneMoisturePredictedDehumSPRate(Loop),
+                                state.dataHeatBal->ZoneMoisturePredictedDehumSPRate(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             // Second, these report variable ARE multiplied by zone and group multipliers
             SetupOutputVariable(state,
                                 "Zone System Predicted Moisture Load Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                ZoneSysMoistureDemand(Loop).TotalOutputRequired,
+                                ZoneSysMoistureDemand(zoneNum).TotalOutputRequired,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                ZoneSysMoistureDemand(Loop).OutputRequiredToHumidifyingSP,
+                                ZoneSysMoistureDemand(zoneNum).OutputRequiredToHumidifyingSP,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                ZoneSysMoistureDemand(Loop).OutputRequiredToDehumidifyingSP,
+                                ZoneSysMoistureDemand(zoneNum).OutputRequiredToDehumidifyingSP,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
 
             SetupOutputVariable(state,
                                 "Zone Thermostat Control Type",
                                 OutputProcessor::Unit::None,
-                                TempControlTypeRpt(Loop),
+                                TempControlTypeRpt(zoneNum),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Heating Setpoint Temperature",
                                 OutputProcessor::Unit::C,
-                                ZoneThermostatSetPointLo(Loop),
+                                ZoneThermostatSetPointLo(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Cooling Setpoint Temperature",
                                 OutputProcessor::Unit::C,
-                                ZoneThermostatSetPointHi(Loop),
+                                ZoneThermostatSetPointHi(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Adaptive Comfort Operative Temperature Set Point",
                                 OutputProcessor::Unit::C,
-                                state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(Loop),
+                                state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(zoneNum),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load Room Air Correction Factor",
                                 OutputProcessor::Unit::None,
-                                state.dataHeatBalFanSys->LoadCorrectionFactor(Loop),
+                                state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Zone(Loop).Name);
+                                thisZone.Name);
 
             if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
-                if (state.dataZoneCtrls->StageZoneLogic(Loop)) {
+                if (state.dataZoneCtrls->StageZoneLogic(zoneNum)) {
                     SetupOutputVariable(state,
                                         "Zone Thermostat Staged Number",
                                         OutputProcessor::Unit::None,
-                                        ZoneSysEnergyDemand(Loop).StageNum,
+                                        ZoneSysEnergyDemand(zoneNum).StageNum,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
-                                        Zone(Loop).Name);
+                                        thisZone.Name);
                 }
             }
 
-        } // Loop
+        } // zoneNum
 
         // Thermal comfort control output
         if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
             // CurrentModuleObject='ZoneControl:Thermostat:ThermalComfort'
-            for (Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
-                ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+            for (int Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
+                int zoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Type",
                                     OutputProcessor::Unit::None,
-                                    state.dataHeatBalFanSys->ComfortControlTypeRpt(ZoneNum),
+                                    state.dataHeatBalFanSys->ComfortControlTypeRpt(zoneNum),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
-                                    Zone(ZoneNum).Name);
+                                    thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger Low Setpoint PMV",
                                     OutputProcessor::Unit::None,
-                                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ZoneNum).LowPMV,
+                                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(zoneNum).LowPMV,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
-                                    Zone(ZoneNum).Name);
+                                    thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger High Setpoint PMV",
                                     OutputProcessor::Unit::None,
-                                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ZoneNum).HighPMV,
+                                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(zoneNum).HighPMV,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
-                                    Zone(ZoneNum).Name);
+                                    thisZone.Name);
             }
         }
 
         // CurrentModuleObject='ZoneList'
-        for (Loop = 1; Loop <= state.dataHeatBal->NumOfZoneLists; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->NumOfZoneLists; ++Loop) {
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -3125,7 +3128,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         } // Loop
 
         // CurrentModuleObject='ZoneGroup'
-        for (Loop = 1; Loop <= state.dataHeatBal->NumOfZoneGroups; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->NumOfZoneGroups; ++Loop) {
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -3193,7 +3196,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             e.RemainingOutputRequired = 0.0;
             e.TotalOutputRequired = 0.0;
         }
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired)) ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = 0.0;
             if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
                 ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP = 0.0;
@@ -3224,7 +3227,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBalFanSys->SysDepZoneLoads = 0.0;
         state.dataHeatBalFanSys->SysDepZoneLoadsLagged = 0.0;
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum = 0.0;
-        for (auto &e : Zone)
+        for (auto &e : state.dataHeatBal->Zone)
             e.NoHeatToReturnAir = false;
         for (auto &e : state.dataHeatBalFanSys->HeatBalAirTemperatures)
             e.ZoneT1 = 0.0;
@@ -3254,7 +3257,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataZoneTempPredictorCorrector->MyDayFlag = true;
     }
 
-    for (Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
         if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
             if (!VerifyControlledZoneForThermostat(state, TempControlledZone(Loop).ZoneName)) {
                 ShowSevereError(state,
@@ -3267,7 +3270,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         }
 
         if (TempControlledZone(Loop).ManageDemand) {
-            ZoneNum = TempControlledZone(Loop).ActualZoneNum;
+            int ZoneNum = TempControlledZone(Loop).ActualZoneNum;
 
             switch (TempControlType(ZoneNum)) {
             case DataHVACGlobals::ThermostatType::SingleHeating:
@@ -3309,7 +3312,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         }
     }
 
-    for (Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
         if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
             if (!VerifyControlledZoneForThermostat(state, ComfortControlledZone(Loop).ZoneName)) {
                 ShowSevereError(state,
@@ -3321,7 +3324,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             }
         }
         if (ComfortControlledZone(Loop).ManageDemand) {
-            ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+            int ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
 
             switch (state.dataHeatBalFanSys->ComfortControlType(ZoneNum)) {
             case DataHVACGlobals::ThermostatType::SingleHeating:
@@ -4771,11 +4774,14 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
 
         // if no surface in the zone uses EMPD or HAMT then zero
         bool no_ht_EMPD_or_HAMT(true);
-        for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
-            auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-            if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
-                no_ht_EMPD_or_HAMT = false;
-                break;
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            for (int i = thisSpace.HTSurfaceFirst; i <= thisSpace.HTSurfaceLast; ++i) {
+                auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
+                if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
+                    no_ht_EMPD_or_HAMT = false;
+                    break;
+                }
             }
         }
         if (no_ht_EMPD_or_HAMT) {
@@ -5789,11 +5795,14 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
     // are currently set to zero to remind us where they need to be in the future
     bool no_ht_EMPD_or_HAMT(true);
-    for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
-        auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-        if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
-            no_ht_EMPD_or_HAMT = false;
-            break;
+    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        for (int i = thisSpace.HTSurfaceFirst; i <= thisSpace.HTSurfaceLast; ++i) {
+            auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
+            if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
+                no_ht_EMPD_or_HAMT = false;
+                break;
+            }
         }
     }
     if (no_ht_EMPD_or_HAMT) {
@@ -6598,108 +6607,112 @@ void CalcZoneSums(EnergyPlusData &state,
         SumSysMCpT /= ZoneMult;
     }
     // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-    for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-        HA = 0.0;
-        Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
+    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        for (SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+            HA = 0.0;
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
 
-        if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
-            auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+                auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
 
-            // Add to the convective internal gains
-            if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
-                // The shade area covers the area of the glazing plus the area of the dividers.
-                Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-                // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
-                // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
-                // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
-                // at the same time that the interaction between glass and shade is calculated.
-                SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
-            }
-
-            // Other convection term is applicable to equivalent layer window (ASHWAT) model
-            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL)
-                SumIntGain += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
-
-            // Convective heat gain from natural convection in gap between glass and interior shade or blind
-            if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
-
-            // Convective heat gain from airflow window
-            if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
-                if (Zone(ZoneNum).NoHeatToReturnAir) {
-                    SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
-                    state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
-                    if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
-                        state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
-                        state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
-                            state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                    } else {
-                        state.dataSurface->SurfWinHeatLossRep(SurfNum) = -state.dataSurface->SurfWinHeatGain(SurfNum);
-                        state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) =
-                            state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                    }
-                    state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
-                        state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                // Add to the convective internal gains
+                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
+                    // The shade area covers the area of the glazing plus the area of the dividers.
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
+                    // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
+                    // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
+                    // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
+                    // at the same time that the interaction between glass and shade is calculated.
+                    SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
                 }
-            }
 
-            // Add to the surface convection sums
-            if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                // Window frame contribution
-                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                     (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
-                SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-                HA += HA_surf;
-            }
+                // Other convection term is applicable to equivalent layer window (ASHWAT) model
+                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL)
+                    SumIntGain += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
 
-            if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
-                // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                     (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
-                SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempIn(SurfNum);
-                HA += HA_surf;
-            }
+                // Convective heat gain from natural convection in gap between glass and interior shade or blind
+                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
 
-        } // End of check if window
+                // Convective heat gain from airflow window
+                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
+                    if (Zone(ZoneNum).NoHeatToReturnAir) {
+                        SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
+                            state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
+                                state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                        } else {
+                            state.dataSurface->SurfWinHeatLossRep(SurfNum) = -state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) =
+                                state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                        }
+                        state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
+                            state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                    }
+                }
 
-        HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area;
-        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
+                // Add to the surface convection sums
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
+                    // Window frame contribution
+                    Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                         (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
+                    SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempIn(SurfNum);
+                    HA += HA_surf;
+                }
 
-        // determine reference air temperature for this surface
-        switch (state.dataSurface->SurfTAirRef(SurfNum)) {
-        case DataSurfaces::RefAirTemp::ZoneMeanAirTemp:
-            // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
-            RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            SumHA += HA;
-            break;
-        case DataSurfaces::RefAirTemp::AdjacentAirTemp:
-            RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-            SumHATref += HA * RefAirTemp;
-            break;
-        case DataSurfaces::RefAirTemp::ZoneSupplyAirTemp:
-            // check whether this zone is a controlled zone or not
-            if (!ControlledZoneAirFlag) {
-                ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
-                return;
-            }
-            // determine supply air temperature as a weighted average of the inlet temperatures.
-            if (SumSysMCp > 0.0) {
-                RefAirTemp = SumSysMCpT / SumSysMCp;
-                SumHATref += HA * RefAirTemp;
-            } else {
-                // no system flow (yet) so just use zone air temperature
-                // #5906
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
+                    // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
+                    Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                         (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
+                    SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempIn(SurfNum);
+                    HA += HA_surf;
+                }
+
+            } // End of check if window
+
+            HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area;
+            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
+
+            // determine reference air temperature for this surface
+            switch (state.dataSurface->SurfTAirRef(SurfNum)) {
+            case DataSurfaces::RefAirTemp::ZoneMeanAirTemp:
+                // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA += HA;
+                break;
+            case DataSurfaces::RefAirTemp::AdjacentAirTemp:
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+                SumHATref += HA * RefAirTemp;
+                break;
+            case DataSurfaces::RefAirTemp::ZoneSupplyAirTemp:
+                // check whether this zone is a controlled zone or not
+                if (!ControlledZoneAirFlag) {
+                    ShowFatalError(state,
+                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                    return;
+                }
+                // determine supply air temperature as a weighted average of the inlet temperatures.
+                if (SumSysMCp > 0.0) {
+                    RefAirTemp = SumSysMCpT / SumSysMCp;
+                    SumHATref += HA * RefAirTemp;
+                } else {
+                    // no system flow (yet) so just use zone air temperature
+                    // #5906
+                    SumHA += HA;
+                }
+                break;
+            default:
+                // currently set to mean air temp but should add error warning here
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                SumHA += HA;
+                break;
             }
-            break;
-        default:
-            // currently set to mean air temp but should add error warning here
-            RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            SumHA += HA;
-            break;
-        }
 
-    } // SurfNum
+        } // SurfNum
+    }
 }
 
 void CalcZoneComponentLoadSums(EnergyPlusData &state,
@@ -6761,7 +6774,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     bool ZoneSupPlenumAirFlag;
     Real64 RhoAir;
     Real64 CpAir; // Specific heat of air
-    int SurfNum;  // Surface number
     Real64 Area;  // Effective surface area
     int ADUListIndex;
     int ADUNum;
@@ -6906,67 +6918,70 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
                       state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
     // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-    for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
 
-        Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
-        Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
+            Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
 
-        if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
 
-            // Add to the convective internal gains
-            if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                // The shade area covers the area of the glazing plus the area of the dividers.
-                Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-                // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
-                // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
-                // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
-                // at the same time that the interaction between glass and shade is calculated.
-                SumIntGains += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
-            }
-
-            // Other convection term is applicable to equivalent layer window (ASHWAT) model
-            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL)
-                SumIntGains += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
-
-            // Convective heat gain from natural convection in gap between glass and interior shade or blind
-            if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)))
-                SumIntGains += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
-
-            // Convective heat gain from airflow window
-            if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                SumIntGains += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
-                if (Zone(ZoneNum).NoHeatToReturnAir) {
-                    SumIntGains += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                // Add to the convective internal gains
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
+                    // The shade area covers the area of the glazing plus the area of the dividers.
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
+                    // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
+                    // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
+                    // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
+                    // at the same time that the interaction between glass and shade is calculated.
+                    SumIntGains += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
                 }
+
+                // Other convection term is applicable to equivalent layer window (ASHWAT) model
+                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL)
+                    SumIntGains += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
+
+                // Convective heat gain from natural convection in gap between glass and interior shade or blind
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)))
+                    SumIntGains += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
+
+                // Convective heat gain from airflow window
+                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGains += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
+                    if (Zone(ZoneNum).NoHeatToReturnAir) {
+                        SumIntGains += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                    }
+                }
+
+                // Add to the surface convection sums
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
+                    // Window frame contribution
+
+                    SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                    (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
+                                    (state.dataSurface->SurfWinFrameTempIn(SurfNum) - RefAirTemp);
+                }
+
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
+                    !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
+                    // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
+                    SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                    (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
+                                    (state.dataSurface->SurfWinDividerTempIn(SurfNum) - RefAirTemp);
+                }
+
+            } // End of check if window
+
+            SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
+
+            // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
+                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyM;
+                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyF;
             }
-
-            // Add to the surface convection sums
-            if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                // Window frame contribution
-
-                SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - RefAirTemp);
-            }
-
-            if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                (state.dataSurface->SurfWinDividerTempIn(SurfNum) - RefAirTemp);
-            }
-
-        } // End of check if window
-
-        SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
-
-        // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
-        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
-            state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyM;
-            state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyF;
-        }
-    } // SurfNum
-
+        } // SurfNum
+    }
     // now calculate air energy storage source term.
     // capacitance is volume * density * heat capacity
     CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
