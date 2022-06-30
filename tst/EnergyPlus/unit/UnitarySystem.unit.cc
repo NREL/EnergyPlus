@@ -19221,7 +19221,6 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     // set up UnitarySystem
     state->dataSize->CurSysNum = 1;
     std::string compName = "UNITARY SYSTEM MODEL";
-    bool zoneEquipment = true;
     bool FirstHVACIteration = true;
     int AirLoopNum = 1;
     UnitarySystems::UnitarySys thisSys;
