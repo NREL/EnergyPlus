@@ -115,15 +115,15 @@ namespace EMSManager {
                                                                                                   "BEGINZONETIMESTEPAFTERINITHEATBALANCE",
                                                                                                   "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER"};
 
-    std::array<std::string, static_cast<int>(SPControlType::Num)> controlTypeName{"Temperature Setpoint",
-                                                                                  "Temperature Minimum Setpoint",
-                                                                                  "Temperature Maximum Setpoint",
-                                                                                  "Humidity Ratio Setpoint",
-                                                                                  "Humidity Ratio Minimum Setpoint",
-                                                                                  "Humidity Ratio Maximum Setpoint",
-                                                                                  "Mass Flow Rate Setpoint",
-                                                                                  "Mass Flow Rate Minimum Available Setpoint",
-                                                                                  "Mass Flow Rate Maximum Available Setpoint"};
+    std::array<std::string_view, static_cast<int>(SPControlType::Num)> controlTypeName{"Temperature Setpoint",
+                                                                                       "Temperature Minimum Setpoint",
+                                                                                       "Temperature Maximum Setpoint",
+                                                                                       "Humidity Ratio Setpoint",
+                                                                                       "Humidity Ratio Minimum Setpoint",
+                                                                                       "Humidity Ratio Maximum Setpoint",
+                                                                                       "Mass Flow Rate Setpoint",
+                                                                                       "Mass Flow Rate Minimum Available Setpoint",
+                                                                                       "Mass Flow Rate Maximum Available Setpoint"};
 
     void CheckIfAnyEMS(EnergyPlusData &state)
     {
@@ -1650,7 +1650,7 @@ namespace EMSManager {
 
         std::string cNodeName = state.dataLoopNodes->NodeID(NodeNum);
         std::string cComponentTypeName = "System Node Setpoint";
-        std::string cControlTypeName = controlTypeName[static_cast<int>(SetPointType)];
+        std::string_view cControlTypeName = controlTypeName[static_cast<int>(SetPointType)];
 
         if (byHandle) {
             for (int Loop = 1; Loop <= state.dataRuntimeLang->numEMSActuatorsAvailable; ++Loop) {
@@ -1664,7 +1664,7 @@ namespace EMSManager {
             }
             if (!FoundControl) {
                 ShowWarningError(state,
-                                 "Missing '" + controlTypeName[static_cast<int>(SetPointType)] + "' for node named named '" +
+                                 "Missing '" + format(controlTypeName[static_cast<int>(SetPointType)]) + "' for node named named '" +
                                      state.dataLoopNodes->NodeID(NodeNum) + "'.");
             }
         } else {
