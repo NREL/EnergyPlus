@@ -45,17 +45,39 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-//#define TIMER_CPU_TIME
-#define TIMER_F90_EPTIME
+// EnergyPlus::DataPlant Unit Tests
 
-#if defined(TIMER_F90_EPTIME)
-#define TSTART(x) x = epelapsedtime()
-#define TSTOP(x) x = epelapsedtime()
-#define TSTAMP(x) x = epelapsedtime()
-#elif defined(TIMER_CPU_TIME)
-#define TSTART(x) CPU_TIME(x)
-#define TSTOP(x) CPU_TIME(x)
-#define TSTAMP(x) CPU_TIME(x)
-#else
-NEED_TO_SPECIFY_TIMER
-#endif
+// Google Test Headers
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
+
+using namespace EnergyPlus;
+
+TEST_F(EnergyPlusFixture, ValidateEMSVariableName)
+{
+    bool error = false;
+    bool weirdSecondErrFlag = false;
+    std::string fieldValue = "GoodName";
+    DataRuntimeLanguage::ValidateEMSVariableName(*state, "ObjectName", fieldValue, "FieldName", error, weirdSecondErrFlag);
+    EXPECT_FALSE(error);
+    fieldValue = "1 .-+";
+    DataRuntimeLanguage::ValidateEMSVariableName(*state, "ObjectName", fieldValue, "FieldName", error, weirdSecondErrFlag);
+    EXPECT_TRUE(error);
+}
+
+TEST_F(EnergyPlusFixture, ValidateEMSProgramName)
+{
+    bool error = false;
+    bool weirdSecondErrFlag = false;
+    std::string fieldValue = "GoodName";
+    DataRuntimeLanguage::ValidateEMSProgramName(*state, "ObjectName", fieldValue, "FieldName", "subType", error, weirdSecondErrFlag);
+    EXPECT_FALSE(error);
+    fieldValue = "1 .-+";
+    DataRuntimeLanguage::ValidateEMSProgramName(*state, "ObjectName", fieldValue, "FieldName", "subType", error, weirdSecondErrFlag);
+    EXPECT_TRUE(error);
+}
