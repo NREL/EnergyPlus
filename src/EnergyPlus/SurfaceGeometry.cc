@@ -8129,7 +8129,7 @@ namespace SurfaceGeometry {
                         state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = SurfLocalEnv.ExtShadingSchedPtr;
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
-                        surface.SurfHasSurroundingSurfProperties = true;
+                        surface.SurfHasSurroundingSurfProperty = true;
                         state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = SurfLocalEnv.SurroundingSurfsPtr;
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {

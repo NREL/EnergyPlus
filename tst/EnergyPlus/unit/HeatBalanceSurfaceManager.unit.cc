@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = 1.0;
     state->dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) = 0.0;
     state->dataSurface->SurfMaterialMovInsulExt(SurfNum) = 1;
-    state->dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperties = false;
+    state->dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty = false;
 
     state->dataSurface->SurfOutDryBulbTemp = 0;
     state->dataEnvrn->SkyTemp = 23.0;

@@ -6649,7 +6649,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     }
                 }
                 // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperties) {
+                if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                     int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                     // Absolute temperature of the outside surface of an exterior surface
                     Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + DataGlobalConstants::KelvinConv;
@@ -8490,7 +8490,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     Real64 TSky = state.dataEnvrn->SkyTemp;
     Real64 TGround = state.dataEnvrn->OutDryBulbTemp;
 
-    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperties) {
+    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
@@ -8686,7 +8686,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     QRadLWOutSrdSurfsRep = 0;
     // Report LWR from surrounding surfaces for current exterior surf temp
     // Current exterior surf temp would be used for the next step LWR calculation.
-    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperties) {
+    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
             Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
@@ -8889,7 +8889,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         auto &Surface = state.dataSurface->Surface(SurfNum);
-        if (Surface.SurfHasSurroundingSurfProperties || Surface.IsSurfPropertyGndSurfacesDefined) {
+        if (Surface.SurfHasSurroundingSurfProperty || Surface.IsSurfPropertyGndSurfacesDefined) {
 
             int GndSurfsNum = 0;
             int SrdSurfsNum = 0;
@@ -8899,7 +8899,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
             bool IsSkyViewFactorSet = false;
             bool IsGroundViewFactorSet = false;
             bool SetGroundViewFactorObject = false;
-            if (Surface.SurfHasSurroundingSurfProperties) {
+            if (Surface.SurfHasSurroundingSurfProperty) {
                 SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                 auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                 SurfsSkyViewFactor = SrdSurfsProperty.SkyViewFactor;

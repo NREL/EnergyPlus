@@ -3094,7 +3094,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     win_Surface.SurfPropertyGndSurfIndex = 1;
     win_Surface.UseSurfPropertyGndSurfTemp = true;
     win_Surface.UseSurfPropertyGndSurfRefl = true;
-    win_Surface.SurfHasSurroundingSurfProperties = true;
+    win_Surface.SurfHasSurroundingSurfProperty = true;
 
     state->dataSurface->GroundSurfsProperty.allocate(1);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);

@@ -748,7 +748,7 @@ namespace DataSurfaces {
         bool UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
         bool UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
         Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
-        bool SurfHasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
+        bool SurfHasSurroundingSurfProperty; // true if surrounding surfaces properties are listed for an external surface
 
         // Default Constructor
         SurfaceData()
@@ -765,7 +765,7 @@ namespace DataSurfaces {
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
               ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false),
               SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
-              SurfHasSurroundingSurfProperties(false)
+              SurfHasSurroundingSurfProperty(false)
         {
         }
 

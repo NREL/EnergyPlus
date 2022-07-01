@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     surface.IsSurfPropertyGndSurfacesDefined = false;
     surface.UseSurfPropertyGndSurfTemp = false;
     surface.UseSurfPropertyGndSurfRefl = false;
-    surface.SurfHasSurroundingSurfProperties = false;
+    surface.SurfHasSurroundingSurfProperty = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 constexpr VentArea(0.1);  // Area available for venting the gap [m2]
