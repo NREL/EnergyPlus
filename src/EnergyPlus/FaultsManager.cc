@@ -191,24 +191,24 @@ namespace FaultsManager {
     };
 
     constexpr std::array<std::string_view, static_cast<int>(ChillerType::Num)> ChillerTypeNamesUC{"CHILLER:ELECTRIC",
-                                                                                                    "CHILLER:ELECTRIC:EIR",
-                                                                                                    "CHILLER:ELECTRIC:REFORMULATEDEIR",
-                                                                                                    "CHILLER:CONSTANTCOP",
-                                                                                                    "CHILLER:ENGINEDRIVEN",
-                                                                                                    "CHILLER:COMBUSTIONTURBINE",
-                                                                                                    "CHILLER:ABSORPTION",
-                                                                                                    "CHILLER:ABSORPTION:INDIRECT"};
+                                                                                                  "CHILLER:ELECTRIC:EIR",
+                                                                                                  "CHILLER:ELECTRIC:REFORMULATEDEIR",
+                                                                                                  "CHILLER:CONSTANTCOP",
+                                                                                                  "CHILLER:ENGINEDRIVEN",
+                                                                                                  "CHILLER:COMBUSTIONTURBINE",
+                                                                                                  "CHILLER:ABSORPTION",
+                                                                                                  "CHILLER:ABSORPTION:INDIRECT"};
 
     constexpr std::array<std::string_view, static_cast<int>(CoilType::Num)> CoilTypeNamesUC{"COIL:HEATING:ELECTRIC",
-                                                                                              "COIL:HEATING:FUEL",
-                                                                                              "COIL:HEATING:DESUPERHEATER",
-                                                                                              "COIL:HEATING:STEAM",
-                                                                                              "COIL:HEATING:WATER",
-                                                                                              "COIL:COOLING:WATER",
-                                                                                              "COIL:COOLING:WATER:DETAILEDGEOMETRY",
-                                                                                              "COILSYSTEM:COOLING:DX",
-                                                                                              "COILSYSTEM:HEATING:DX",
-                                                                                              "AIRLOOPHVAC:UNITARYSYSTEM"};
+                                                                                            "COIL:HEATING:FUEL",
+                                                                                            "COIL:HEATING:DESUPERHEATER",
+                                                                                            "COIL:HEATING:STEAM",
+                                                                                            "COIL:HEATING:WATER",
+                                                                                            "COIL:COOLING:WATER",
+                                                                                            "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+                                                                                            "COILSYSTEM:COOLING:DX",
+                                                                                            "COILSYSTEM:HEATING:DX",
+                                                                                            "AIRLOOPHVAC:UNITARYSYSTEM"};
 
     constexpr std::array<std::string_view, static_cast<int>(FouledCoil::Num)> FouledCoilNamesUC{"FOULEDUARATED", "FOULINGFACTOR"};
 
