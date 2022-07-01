@@ -1302,13 +1302,13 @@ namespace DataSurfaces {
     struct GroundSurfacesProperty
     {
         // Members
-        std::string Name;                     // name of multiple ground surfaces object
-        int NumGndSurfs = 0;                  // number of groundSurfaces
-        Array1D<GroundSurfacesData> GndSurfs; // ground surfaces data
-        Real64 SurfsTempAvg = 0.0;            // ground Surfaces average temperature at each time step
-        Real64 SurfsReflAvg = 0.0;            // ground Surfaces average reflectance at each time step
-        Real64 SurfsViewFactorSum = 0.0;      // sum of view factors of ground surfaces seen by an exterior surface
-        bool IsGroundViewFactorSet = false;   // true if the ground view factor field is not blank
+        std::string Name;                      // name of multiple ground surfaces object
+        int NumGndSurfs = 0;                   // number of groundSurfaces
+        EPVector<GroundSurfacesData> GndSurfs; // ground surfaces data
+        Real64 SurfsTempAvg = 0.0;             // ground Surfaces average temperature at each time step
+        Real64 SurfsReflAvg = 0.0;             // ground Surfaces average reflectance at each time step
+        Real64 SurfsViewFactorSum = 0.0;       // sum of view factors of ground surfaces seen by an exterior surface
+        bool IsGroundViewFactorSet = false;    // true if the ground view factor field is not blank
     };
 
     struct SurfaceLocalEnvironment
@@ -1334,14 +1334,14 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;
-        Real64 SkyViewFactor = 0.0;         // sky view factor
-        Real64 GroundViewFactor = 0.0;      // ground view factor
-        int SkyTempSchNum = 0;              // schedule pointer
-        int GroundTempSchNum = 0;           // schedule pointer
-        int TotSurroundingSurface = 0;      // Total number of surrounding surfaces defined for an exterior surface
-        bool IsSkyViewFactorSet = false;    // false if the sky view factor field is blank
-        bool IsGroundViewFactorSet = false; // false if the ground view factor field is blank
-        Array1D<SurroundingSurfProperty> SurroundingSurfs;
+        Real64 SkyViewFactor = 0.0;                         // sky view factor
+        Real64 GroundViewFactor = 0.0;                      // ground view factor
+        int SkyTempSchNum = 0;                              // schedule pointer
+        int GroundTempSchNum = 0;                           // schedule pointer
+        int TotSurroundingSurface = 0;                      // Total number of surrounding surfaces defined for an exterior surface
+        bool IsSkyViewFactorSet = false;                    // false if the sky view factor field is blank
+        bool IsGroundViewFactorSet = false;                 // false if the ground view factor field is blank
+        EPVector<SurroundingSurfProperty> SurroundingSurfs; // surrounding surfaces data
     };
 
     struct IntMassObject
