@@ -113,6 +113,19 @@ enum GeneralRoutinesEquipNums
     VentilatedSlabNum = 11
 };
 
+enum class AirLoopHVACCompType
+{
+    Invalid = -1,
+    Supplyplenum,
+    Zonesplitter,
+    Zonemixer,
+    Returnplenum,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(AirLoopHVACCompType::Num)> AirLoopHVACCompTypeNamesUC{
+    "AIRLOOPHVAC:SUPPLYPLENUM", "AIRLOOPHVAC:ZONESPLITTER", "AIRLOOPHVAC:ZONEMIXER", "AIRLOOPHVAC:RETURNPLENUM"};
+
 void ControlCompOutput(EnergyPlusData &state,
                        std::string const &CompName,           // the component Name
                        std::string const &CompType,           // Type of component
@@ -1435,77 +1448,76 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                   state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count),
                   PrimaryAirLoopName);
 
-            {
-                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count)));
+            AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumerationValue(
+                AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count))));
 
-                if (SELECT_CASE_var == "AIRLOOPHVAC:SUPPLYPLENUM") {
-                    for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneSupplyPlenums; ++Count2) {
-                        if (state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName !=
-                            state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
-                            continue;
-                        if (Count == 1 && AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).InletNode)) {
-                            ShowSevereError(state, "Error in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(BCount).Name);
-                            ShowContinueError(state, "For AirLoopHVAC:SupplyPlenum=" + state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName);
-                            ShowContinueError(state, "Expected inlet node (supply air path)=" + AirPathNodeName);
-                            ShowContinueError(state,
-                                              "Encountered node name (supply plenum)=" +
-                                                  state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).OutletNode(1)));
-                            ErrFound = true;
-                            ++NumErr;
-                        }
-                        print(state.files.bnd,
-                              "     #Outlet Nodes on Supply Air Path Component,{}\n",
-                              state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes);
-                        for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes; ++Count1) {
-                            print(state.files.bnd,
-                                  "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
-                                  Count1,
-                                  state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count),
-                                  state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count),
-                                  state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).InletNode),
-                                  state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).OutletNode(Count1)),
-                                  PrimaryAirLoopName);
-                        }
+            switch (CompType) {
+            case AirLoopHVACCompType::Supplyplenum: {
+                for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneSupplyPlenums; ++Count2) {
+                    if (state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName !=
+                        state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
+                        continue;
+                    if (Count == 1 && AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).InletNode)) {
+                        ShowSevereError(state, "Error in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(BCount).Name);
+                        ShowContinueError(state, "For AirLoopHVAC:SupplyPlenum=" + state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName);
+                        ShowContinueError(state, "Expected inlet node (supply air path)=" + AirPathNodeName);
+                        ShowContinueError(state,
+                                          "Encountered node name (supply plenum)=" +
+                                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).OutletNode(1)));
+                        ErrFound = true;
+                        ++NumErr;
                     }
-
-                } else if (SELECT_CASE_var == "AIRLOOPHVAC:ZONESPLITTER") {
-                    for (Count2 = 1; Count2 <= state.dataSplitterComponent->NumSplitters; ++Count2) {
-                        if (state.dataSplitterComponent->SplitterCond(Count2).SplitterName !=
-                            state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
-                            continue;
-                        if (Count == 1 &&
-                            AirPathNodeName != state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode)) {
-                            ShowSevereError(state, "Error in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(BCount).Name);
-                            ShowContinueError(state,
-                                              "For AirLoopHVAC:ZoneSplitter=" + state.dataSplitterComponent->SplitterCond(Count2).SplitterName);
-                            ShowContinueError(state, "Expected inlet node (supply air path)=" + AirPathNodeName);
-                            ShowContinueError(state,
-                                              "Encountered node name (zone splitter)=" +
-                                                  state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode));
-                            ErrFound = true;
-                            ++NumErr;
-                        }
+                    print(state.files.bnd,
+                          "     #Outlet Nodes on Supply Air Path Component,{}\n",
+                          state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes);
+                    for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes; ++Count1) {
                         print(state.files.bnd,
-                              "     #Outlet Nodes on Supply Air Path Component,{}\n",
-                              state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes);
-                        for (Count1 = 1; Count1 <= state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes; ++Count1) {
-                            print(state.files.bnd,
-                                  "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
-                                  Count1,
-                                  state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count),
-                                  state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count),
-                                  state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode),
-                                  state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).OutletNode(Count1)),
-                                  PrimaryAirLoopName);
-                        }
+                              "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
+                              Count1,
+                              state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count),
+                              state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count),
+                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).InletNode),
+                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).OutletNode(Count1)),
+                              PrimaryAirLoopName);
                     }
-
-                } else {
-                    ShowSevereError(state,
-                                    "Invalid Component Type in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count));
-                    ErrFound = true;
-                    ++NumErr;
                 }
+            } break;
+            case AirLoopHVACCompType::Zonesplitter: {
+                for (Count2 = 1; Count2 <= state.dataSplitterComponent->NumSplitters; ++Count2) {
+                    if (state.dataSplitterComponent->SplitterCond(Count2).SplitterName !=
+                        state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
+                        continue;
+                    if (Count == 1 && AirPathNodeName != state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode)) {
+                        ShowSevereError(state, "Error in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(BCount).Name);
+                        ShowContinueError(state, "For AirLoopHVAC:ZoneSplitter=" + state.dataSplitterComponent->SplitterCond(Count2).SplitterName);
+                        ShowContinueError(state, "Expected inlet node (supply air path)=" + AirPathNodeName);
+                        ShowContinueError(state,
+                                          "Encountered node name (zone splitter)=" +
+                                              state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode));
+                        ErrFound = true;
+                        ++NumErr;
+                    }
+                    print(state.files.bnd,
+                          "     #Outlet Nodes on Supply Air Path Component,{}\n",
+                          state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes);
+                    for (Count1 = 1; Count1 <= state.dataSplitterComponent->SplitterCond(Count2).NumOutletNodes; ++Count1) {
+                        print(state.files.bnd,
+                              "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
+                              Count1,
+                              state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count),
+                              state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count),
+                              state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).InletNode),
+                              state.dataLoopNodes->NodeID(state.dataSplitterComponent->SplitterCond(Count2).OutletNode(Count1)),
+                              PrimaryAirLoopName);
+                    }
+                }
+            } break;
+            default: {
+                ShowSevereError(state,
+                                "Invalid Component Type in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count));
+                ErrFound = true;
+                ++NumErr;
+            } break;
             }
         }
 
@@ -1766,121 +1778,119 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
         if (NumComp > 0) {
 
-            {
-                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp)));
+            AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumerationValue(
+                AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp))));
 
-                if (SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER") {
-                    for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
-                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) !=
-                            state.dataMixerComponent->MixerCond(Count2).MixerName)
-                            continue;
-                        // Found correct Mixer (by name), check outlet node vs. return air path outlet node
-                        if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode)) {
-                            ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
-                            ShowContinueError(state, "For Connector:Mixer=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
-                            ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
-                            ShowContinueError(state,
-                                              "Encountered node name (mixer)=" +
-                                                  state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode));
-                            ErrFound = true;
-                            ++NumErr;
-                        } else {
+            switch (CompType) {
+            case AirLoopHVACCompType::Zonemixer: {
+                for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
+                    if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) != state.dataMixerComponent->MixerCond(Count2).MixerName)
+                        continue;
+                    // Found correct Mixer (by name), check outlet node vs. return air path outlet node
+                    if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode)) {
+                        ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
+                        ShowContinueError(state, "For Connector:Mixer=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
+                        ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
+                        ShowContinueError(state,
+                                          "Encountered node name (mixer)=" +
+                                              state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode));
+                        ErrFound = true;
+                        ++NumErr;
+                    } else {
+                        ++CountNodes;
+                        AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).OutletNode;
+                        for (Loop = 1; Loop <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Loop) {
                             ++CountNodes;
-                            AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).OutletNode;
-                            for (Loop = 1; Loop <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Loop) {
-                                ++CountNodes;
-                                AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).InletNode(Loop);
-                            }
-                        }
-                        print(state.files.bnd,
-                              "     #Inlet Nodes on Return Air Path Component,{}\n",
-                              state.dataMixerComponent->MixerCond(Count2).NumInletNodes);
-                        for (Count1 = 1; Count1 <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Count1) {
-                            print(state.files.bnd,
-                                  "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
-                                  Count1,
-                                  state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp),
-                                  state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp),
-                                  state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).InletNode(Count1)),
-                                  state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode),
-                                  PrimaryAirLoopName);
+                            AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).InletNode(Loop);
                         }
                     }
-
-                } else if (SELECT_CASE_var == "AIRLOOPHVAC:RETURNPLENUM") {
-                    for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
-                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) !=
-                            state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
-                            continue;
-                        if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode)) {
-                            ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
-                            ShowContinueError(state,
-                                              "For AirLoopHVAC:ReturnPlenum=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
-                            ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
-                            ShowContinueError(state,
-                                              "Encountered node name (zone return plenum)=" +
-                                                  state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode));
-                            ErrFound = true;
-                            ++NumErr;
-                        } else {
-                            ++CountNodes;
-                            AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode;
-                            for (Loop = 1; Loop <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Loop) {
-                                ++CountNodes;
-                                AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Loop);
-                            }
-                        }
+                    print(state.files.bnd,
+                          "     #Inlet Nodes on Return Air Path Component,{}\n",
+                          state.dataMixerComponent->MixerCond(Count2).NumInletNodes);
+                    for (Count1 = 1; Count1 <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Count1) {
                         print(state.files.bnd,
-                              "     #Inlet Nodes on Return Air Path Component,{}\n",
-                              state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes);
-                        for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Count1) {
-                            print(state.files.bnd,
-                                  "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
-                                  Count1,
-                                  state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp),
-                                  state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp),
-                                  state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Count1)),
-                                  state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode),
-                                  PrimaryAirLoopName);
-                        }
+                              "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
+                              Count1,
+                              state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp),
+                              state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp),
+                              state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).InletNode(Count1)),
+                              state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode),
+                              PrimaryAirLoopName);
                     }
-
-                } else {
-                    // This already validated in GetReturnAirPath
                 }
+            } break;
+            case AirLoopHVACCompType::Returnplenum: {
+                for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
+                    if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) !=
+                        state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
+                        continue;
+                    if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode)) {
+                        ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
+                        ShowContinueError(state, "For AirLoopHVAC:ReturnPlenum=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
+                        ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
+                        ShowContinueError(state,
+                                          "Encountered node name (zone return plenum)=" +
+                                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode));
+                        ErrFound = true;
+                        ++NumErr;
+                    } else {
+                        ++CountNodes;
+                        AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode;
+                        for (Loop = 1; Loop <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Loop) {
+                            ++CountNodes;
+                            AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Loop);
+                        }
+                    }
+                    print(state.files.bnd,
+                          "     #Inlet Nodes on Return Air Path Component,{}\n",
+                          state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes);
+                    for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Count1) {
+                        print(state.files.bnd,
+                              "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
+                              Count1,
+                              state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp),
+                              state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp),
+                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Count1)),
+                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode),
+                              PrimaryAirLoopName);
+                    }
+                }
+            } break;
+            default: // This already validated in GetReturnAirPath
+                break;
             }
         }
 
         if (NumComp > 1) {
             for (Count3 = 1; Count3 <= NumComp - 1; ++Count3) {
-                {
-                    auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count3)));
 
-                    if (SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER") {
-                        for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
-                            if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) !=
-                                state.dataMixerComponent->MixerCond(Count2).MixerName)
-                                continue;
-                            for (Loop = 1; Loop <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Loop) {
-                                ++CountNodes;
-                                AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).InletNode(Loop);
-                            }
+                AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumerationValue(
+                    AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count3))));
+
+                switch (CompType) {
+                case AirLoopHVACCompType::Zonemixer: {
+                    for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
+                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) != state.dataMixerComponent->MixerCond(Count2).MixerName)
+                            continue;
+                        for (Loop = 1; Loop <= state.dataMixerComponent->MixerCond(Count2).NumInletNodes; ++Loop) {
+                            ++CountNodes;
+                            AllNodes(CountNodes) = state.dataMixerComponent->MixerCond(Count2).InletNode(Loop);
                         }
-
-                    } else if (SELECT_CASE_var == "AIRLOOPHVAC:RETURNPLENUM") {
-                        for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
-                            if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) !=
-                                state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
-                                continue;
-                            for (Loop = 1; Loop <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Loop) {
-                                ++CountNodes;
-                                AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Loop);
-                            }
-                        }
-
-                    } else {
-                        // This already validated in GetReturnAirPath
                     }
+                } break;
+                case AirLoopHVACCompType::Returnplenum: {
+                    for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
+                        if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) !=
+                            state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
+                            continue;
+                        for (Loop = 1; Loop <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Loop) {
+                            ++CountNodes;
+                            AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Loop);
+                        }
+                    }
+                } break;
+                default: // This already validated in GetReturnAirPath
+                    break;
                 }
             }
         }
