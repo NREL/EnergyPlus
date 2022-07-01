@@ -940,8 +940,6 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfICSPtr.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->GroundSurfsPropertyNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->UseSurfPropertyGndSurfTemp.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->UseSurfPropertyGndSurfRefl.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
@@ -959,8 +957,6 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfICSPtr(SurfNum) = 0;
             state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfNum) = false;
             state.dataSurface->SurfDaylightingShelfInd(SurfNum) = 0;
-            state.dataSurface->GroundSurfsPropertyNum(SurfNum) = 0;
-            state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
             state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
@@ -8141,9 +8137,9 @@ namespace SurfaceGeometry {
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
                         state.dataSurface->Surface(SurfLoop).IsSurfPropertyGndSurfacesDefined = true;
-                        state.dataSurface->UseSurfPropertyGndSurfTemp(SurfLoop) = true;
+                        state.dataSurface->Surface(SurfLoop).UseSurfPropertyGndSurfTemp = true;
                         state.dataSurface->UseSurfPropertyGndSurfRefl(SurfLoop) = true;
-                        state.dataSurface->GroundSurfsPropertyNum(SurfLoop) = SurfLocalEnv.GroundSurfsPtr;
+                        state.dataSurface->Surface(SurfLoop).GroundSurfsPropertyNum = SurfLocalEnv.GroundSurfsPtr;
                     }
                 }
             }

@@ -9050,7 +9050,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->SurfSurroundingSurfacesNum(SurfNum);
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-    GndSurfsNum = state->dataSurface->GroundSurfsPropertyNum(SurfNum);
+    GndSurfsNum = state->dataSurface->Surface(SurfNum).GroundSurfsPropertyNum;
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
     // check sky view factors
     EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);

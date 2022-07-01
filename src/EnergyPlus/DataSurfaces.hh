@@ -744,6 +744,8 @@ namespace DataSurfaces {
 
         SurfaceCalcHashKey calcHashKey;        // Hash key used for determining if this surface requires unique calculations.
         bool IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
+        int GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+        bool UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
         Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
 
         // Default Constructor
@@ -759,7 +761,8 @@ namespace DataSurfaces {
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
-              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false), GndReflSolarRad(0.0)
+              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false), GroundSurfsPropertyNum(0),
+              UseSurfPropertyGndSurfTemp(false), GndReflSolarRad(0.0)
         {
         }
 
@@ -1527,8 +1530,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsPool;                       // true if this is a pool
     Array1D<int> SurfICSPtr;                        // Index to ICS collector
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
-    Array1D<int> GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
-    Array1D<bool> UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
     Array1D<bool> UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
 
     // Surface ConvCoeff Properties
@@ -2143,8 +2144,6 @@ struct SurfacesData : BaseGlobalStruct
         this->IntMassObjects.deallocate();
         this->actualMaxSlatAngs = DataSurfaces::MaxSlatAngs;
         this->GroundSurfsProperty.deallocate();
-        this->GroundSurfsPropertyNum.deallocate();
-        this->UseSurfPropertyGndSurfTemp.deallocate();
         this->UseSurfPropertyGndSurfRefl.deallocate();
     }
 };

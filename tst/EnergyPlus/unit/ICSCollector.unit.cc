@@ -142,8 +142,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
     auto &Surface = state->dataSurface->Surface(SurfNum);
     Surface.IsSurfPropertyGndSurfacesDefined = false;
-    state->dataSurface->UseSurfPropertyGndSurfTemp.allocate(NumOfSurf);
-    state->dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
+    Surface.UseSurfPropertyGndSurfTemp = false;
     state->dataSurface->UseSurfPropertyGndSurfRefl.allocate(NumOfSurf);
     state->dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
 
