@@ -153,7 +153,7 @@ protected:
         state->dataLoopNodes->NodeID.allocate(50);
 
         state->dataHeatBalFanSys->TempControlType.allocate(numZones);
-        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
@@ -305,11 +305,9 @@ protected:
         // set up air loop
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumBranches = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumInletBranches = 1;
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum.allocate(1);
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum[0] = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumOutletBranches = 1;
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum.allocate(1);
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum[0] = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).TotalComponents = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp.allocate(1);
@@ -3869,8 +3867,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
               state->dataZoneEquip->ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
                   .InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCombinationRatio);
-    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
-    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
+    EXPECT_NEAR(11612.363, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
+    EXPECT_NEAR(11612.363, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
     EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
 
     // test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
@@ -4059,7 +4057,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo = 21.0;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType = 4;
+    state->dataHeatBalFanSys->TempControlType = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZT = 25.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
@@ -4099,7 +4097,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 LatOutputProvided);
     EXPECT_NEAR(SysOutputProvided,
                 state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
-                5.0); // system output should be less than 0 and approx = to VRF capacity * SHR
+                7.0); // system output should be less than 0 and approx = to VRF capacity * SHR
 
     // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
     int DXCoolingCoilIndex = 1;
@@ -5950,7 +5948,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
               0.0); // flow should be = 0 for cycling fan mode
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0; // set constant fan operating mode
@@ -8428,7 +8426,6 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->NumSteamCoils = 1;
     state->dataSteamCoils->SteamCoil.allocate(state->dataSteamCoils->NumSteamCoils);
     state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
     state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -8446,7 +8443,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
+    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::CoilControlType::ZoneLoadControl;
     state->dataSteamCoils->GetSteamCoilsInputFlag = false;
     state->dataSteamCoils->CheckEquipName.dimension(state->dataSteamCoils->NumSteamCoils, true);
     state->dataSteamCoils->MySizeFlag.allocate(CoilNum);

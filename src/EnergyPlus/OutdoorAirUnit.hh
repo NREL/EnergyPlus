@@ -333,23 +333,7 @@ struct OutdoorAirUnitData : BaseGlobalStruct
 
     void clear_state() override
     {
-        NumOfOAUnits = 0;
-        OAMassFlowRate = 0.0;
-        GetOutdoorAirUnitInputFlag = true;
-        MySizeFlag.deallocate();
-        CheckEquipName.deallocate();
-        MyOneTimeErrorFlag.deallocate();
-        OutAirUnit.deallocate();
-        SupplyFanUniqueNames.clear();
-        ExhaustFanUniqueNames.clear();
-        ComponentListUniqueNames.clear();
-        MyOneTimeFlag = true;
-        ZoneEquipmentListChecked = false;
-        this->MyEnvrnFlag.clear();
-        this->MyPlantScanFlag.clear();
-        this->MyZoneEqFlag.clear();
-        this->HeatActive = false;
-        this->CoolActive = false;
+        *this = OutdoorAirUnitData();
     }
 };
 

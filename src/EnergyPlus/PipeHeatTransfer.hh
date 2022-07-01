@@ -75,9 +75,6 @@ namespace PipeHeatTransfer {
     // Using/Aliasing
     using namespace GroundTemperatureManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     enum class EnvrnPtr
     {
         Invalid = -1,

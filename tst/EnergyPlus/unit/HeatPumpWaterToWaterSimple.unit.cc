@@ -826,7 +826,6 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                     state->dataGlobal->BeginDayFlag = false;
                     state->dataGlobal->BeginEnvrnFlag = false;
                     state->dataGlobal->BeginSimFlag = false;
-                    state->dataGlobal->BeginFullSimFlag = false;
 
                 } // TimeStep loop
 

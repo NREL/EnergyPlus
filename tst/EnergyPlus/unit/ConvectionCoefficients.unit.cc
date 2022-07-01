@@ -1051,6 +1051,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface(SurfNum).Zone = 1;
     state->dataSurface->Surface(SurfNum).Construction = 1;
     state->dataSurface->SurfTAirRef.allocate(1);
+    state->dataSurface->SurfTAirRefRpt.allocate(1);
     state->dataSurface->SurfTAirRef(SurfNum) = 0;
     state->dataConstruction->Construct(1).TypeIsWindow = false;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
@@ -1082,7 +1083,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
@@ -1094,7 +1095,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
@@ -1106,7 +1107,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Case 2 - High ACH
@@ -1122,7 +1123,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 4.122;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
@@ -1133,7 +1134,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 9.476;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
@@ -1144,7 +1145,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 3.212;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 }
 
@@ -1179,7 +1180,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 
     // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
-    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->SurfIntConvCoeffIndex(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
@@ -1190,7 +1191,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     EXPECT_NEAR(Hn, 1.520, 0.001);
 
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
-    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->SurfIntConvCoeffIndex(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
@@ -2837,4 +2838,112 @@ TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
         ASSERT_EQ(state->dataConvectionCoefficient->CalcBlockenWindwardErrorIDX, 1);
     }
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocation1)
+{
+    std::string const idf_objects = delimited_string({
+        "SurfaceProperty:ConvectionCoefficients:MultipleSurface,",
+        "AllExteriorWindows,      !- Surface Type",
+        "Inside,                 !- Convection Coefficient 1 Location",
+        "MoWitt,                  !- Convection Coefficient 1 Type",
+        ", !- Convection Coefficient 1",
+        ", !- Convection Coefficient 1 Schedule Name",
+        ", !- Convection Coefficient 1 User Curve Name",
+        "Inside,                 !- Convection Coefficient 2 Location",
+        "MoWitt,                  !- Convection Coefficient 2 Type",
+        ", !- Convection Coefficient 2",
+        ", !- Convection Coefficient 2 Schedule Name",
+        "; !- Convection Coefficient 2 User Curve Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(2);
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(2);
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 2u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 0u);
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocation2)
+{
+    std::string const idf_objects = delimited_string({
+        "SurfaceProperty:ConvectionCoefficients:MultipleSurface,",
+        "AllExteriorSurfaces,      !- Surface Type",
+        "Outside,                 !- Convection Coefficient 1 Location",
+        "MoWitt,                  !- Convection Coefficient 1 Type",
+        ", !- Convection Coefficient 1",
+        ", !- Convection Coefficient 1 Schedule Name",
+        ", !- Convection Coefficient 1 User Curve Name",
+        "Outside,                 !- Convection Coefficient 2 Location",
+        "MoWitt,                  !- Convection Coefficient 2 Type",
+        ", !- Convection Coefficient 2",
+        ", !- Convection Coefficient 2 Schedule Name",
+        "; !- Convection Coefficient 2 User Curve Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(2);
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(2);
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 0u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 2u);
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation1)
+{
+    std::string const idf_objects = delimited_string({"SurfaceProperty:ConvectionCoefficients,",
+                                                      "  FakeSurface, !- Surface Name",
+                                                      "  Inside, !- Convection Coefficient 1 Location",
+                                                      "  Value, !- Convection Coefficient 1 Type",
+                                                      "  1, !- Convection Coefficient 1",
+                                                      "  FakeSchName, !- Convection Coefficient 1 Schedule Name",
+                                                      "  FakeCurve, !- Convection Coefficient 1 User Curve Name",
+                                                      "  Outside, !- Convection Coefficient 2 Location",
+                                                      "  Value, !- Convection Coefficient 2 Type",
+                                                      "  10;   !- Convection Coefficient 2"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "FAKESURFACE";
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfIntConvCoeffIndex(1) = 0;
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfExtConvCoeffIndex(1) = 0;
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 1u);
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation2)
+{
+    std::string const idf_objects = delimited_string({"SurfaceProperty:ConvectionCoefficients,",
+                                                      "  FakeSurface, !- Surface Name",
+                                                      "  Outside, !- Convection Coefficient 1 Location",
+                                                      "  Value, !- Convection Coefficient 1 Type",
+                                                      "  1, !- Convection Coefficient 1",
+                                                      "  FakeSchName, !- Convection Coefficient 1 Schedule Name",
+                                                      "  FakeCurve, !- Convection Coefficient 1 User Curve Name",
+                                                      "  Inside, !- Convection Coefficient 2 Location",
+                                                      "  Value, !- Convection Coefficient 2 Type",
+                                                      "  10;   !- Convection Coefficient 2"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "FAKESURFACE";
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfIntConvCoeffIndex(1) = 0;
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfExtConvCoeffIndex(1) = 0;
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 1u);
 }
