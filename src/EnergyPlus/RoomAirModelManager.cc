@@ -245,7 +245,6 @@ namespace RoomAirModelManager {
         int Status;     // Notes if there was an error in processing the input
 
         int thisSurfinZone; // working variable for indexing surfaces within a ZoneRadiantInfo structure
-        int thisHBsurfID;   // working variable for indexing surfaces in main Surface structure
         int thisPattern;
 
         int i;        // do loop indexer
@@ -2834,7 +2833,6 @@ namespace RoomAirModelManager {
                          ++state.dataRoomAirModelMgr->i) {
                         state.dataRoomAirModelMgr->N = state.afn->AirflowNetworkLinkageData(state.dataRoomAirModelMgr->i).CompNum;
                         if (state.afn->AirflowNetworkCompData(state.dataRoomAirModelMgr->N).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
-                            int SurfNum = state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->i).SurfNum;
                             SetupOutputVariable(
                                 state,
                                 "Room Air Window Jet Region Average Air Velocity",

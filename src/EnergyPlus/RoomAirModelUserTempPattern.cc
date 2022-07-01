@@ -937,7 +937,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // set results for all surface
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
         auto &thisSpace = state.dataHeatBal->space(spaceNum);
-        int j = 1;
+        int j = 0;
         for (int i = thisSpace.HTSurfaceFirst; i <= thisSpace.HTSurfaceLast; ++i) {
             ++j;
             state.dataHeatBal->SurfTempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;

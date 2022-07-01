@@ -585,14 +585,14 @@ namespace SurfaceGeometry {
             nonInternalMassSurfacesPresent = false;
             TotSurfArea = 0.0;
             thisZone.Centroid = Vector(0.0, 0.0, 0.0);
-            // if (state.dataSurface->Surface(thisZone.AllSurfaceFirst).Sides > 0) {
-            //     thisZone.MinimumX = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).x;
-            //     thisZone.MaximumX = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).x;
-            //     thisZone.MinimumY = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).y;
-            //     thisZone.MaximumY = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).y;
-            //     thisZone.MinimumZ = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).z;
-            //     thisZone.MaximumZ = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).z;
-            // }
+            if (state.dataSurface->Surface(thisZone.AllSurfaceFirst).Sides > 0) {
+                thisZone.MinimumX = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).x;
+                thisZone.MaximumX = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).x;
+                thisZone.MinimumY = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).y;
+                thisZone.MaximumY = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).y;
+                thisZone.MinimumZ = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).z;
+                thisZone.MaximumZ = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).z;
+            }
             for (int spaceNum : thisZone.spaceIndexes) {
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
 
@@ -615,17 +615,17 @@ namespace SurfaceGeometry {
                     thisZone.MinimumZ = min(thisZone.MinimumZ, minval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z));
                     thisZone.MaximumZ = max(thisZone.MaximumZ, maxval(thisSurface.Vertex({1, thisSurface.Sides}), &Vector::z));
                 }
-                if (TotSurfArea > 0.0) {
-                    thisZone.Centroid.x /= TotSurfArea;
-                    thisZone.Centroid.y /= TotSurfArea;
-                    thisZone.Centroid.z /= TotSurfArea;
-                }
-                if (!nonInternalMassSurfacesPresent) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + "Zone=\"" + thisZone.Name +
-                                        "\" has only internal mass surfaces.  Need at least one other surface.");
-                    ErrorsFound = true;
-                }
+            }
+            if (TotSurfArea > 0.0) {
+                thisZone.Centroid.x /= TotSurfArea;
+                thisZone.Centroid.y /= TotSurfArea;
+                thisZone.Centroid.z /= TotSurfArea;
+            }
+            if (!nonInternalMassSurfacesPresent) {
+                ShowSevereError(state,
+                                std::string{RoutineName} + "Zone=\"" + thisZone.Name +
+                                    "\" has only internal mass surfaces.  Need at least one other surface.");
+                ErrorsFound = true;
             }
         }
 
@@ -724,7 +724,8 @@ namespace SurfaceGeometry {
             "{m},Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},Type,Zone Multiplier,Zone List "
             "Multiplier,Minimum X {m},Maximum X {m},Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume "
             "{m3},Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},Zone Outside Convection Algorithm "
-            "{Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST}, Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window "
+            "{Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST}, Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior "
+            "Window "
             "Area {m2}, Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces,  Part of Total Building Area");
         print(state.files.eio, "{}\n", Format_721);
 
@@ -1921,9 +1922,9 @@ namespace SurfaceGeometry {
                                                         " does not have the same materials in the reverse order as the construction " +
                                                         state.dataConstruction->Construct(ConstrNumFound).Name + " of adjacent surface " +
                                                         state.dataSurface->Surface(Found).Name);
-                                    ShowContinueError(
-                                        state,
-                                        "or the properties of the reversed layers are not correct due to differing layer front and back side values");
+                                    ShowContinueError(state,
+                                                      "or the properties of the reversed layers are not correct due to differing layer front and "
+                                                      "back side values");
                                     if (!state.dataConstruction->Construct(ConstrNum).ReverseConstructionLayersOrderWarning ||
                                         !state.dataConstruction->Construct(ConstrNumFound).ReverseConstructionLayersOrderWarning) {
                                         ShowContinueError(state, "...this problem for this pair will not be reported again.");
@@ -1938,9 +1939,9 @@ namespace SurfaceGeometry {
                                                          " does not have the same materials in the reverse order as the construction " +
                                                          state.dataConstruction->Construct(ConstrNumFound).Name + " of adjacent surface " +
                                                          state.dataSurface->Surface(Found).Name);
-                                    ShowContinueError(
-                                        state,
-                                        "or the properties of the reversed layers are not correct due to differing layer front and back side values");
+                                    ShowContinueError(state,
+                                                      "or the properties of the reversed layers are not correct due to differing layer front and "
+                                                      "back side values");
                                     ShowContinueError(
                                         state,
                                         format("...but Nominal U values are similar, diff=[{:.4R}] ... simulation proceeds.",

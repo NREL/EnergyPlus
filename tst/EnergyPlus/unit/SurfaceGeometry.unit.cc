@@ -5581,9 +5581,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceFirst, Zone2Surface1);     // no air boundary surfaces in Zone 2
     EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceFirst, Zone3Surface1);     // air boundary surface
-    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceFirst, Zone1Surface1);      // first non-air boundary surface
-    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceFirst, Zone2Surface1);      // first non-air boundary surface
-    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceFirst, Zone3Floor);         // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceFirst, Zone1Surface1);     // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceFirst, Zone2Surface1);     // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceFirst, Zone3Floor);        // first non-air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceLast, Zone1Floor);
     EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceLast, Zone2Floor);
     EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceLast, Zone3Floor);

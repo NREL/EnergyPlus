@@ -137,7 +137,6 @@ namespace DElightManagerF {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iNumDElightZones;   // Counter for Thermal Zones with hosted Daylighting:DElight objects
         int iNumOpaqueSurfs;    // Counter for opaque surfaces in each zone
-        int iSurfaceFirst;      // starting loop variable for surfaces
         int iNumWindows;        // Counter for windows hosted in each surface
         int iconstruct;         // Index for construction type of surfaces
         int iMatlLayer;         // Index for the outside (i.e., 1st) Material Layer for a Construction

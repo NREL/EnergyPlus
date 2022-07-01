@@ -3418,7 +3418,6 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
                                      const Array1D<Real64> &SurfaceTemperatures) // zone number for which coefficients are being calculated
 {
 
-    auto &Zone(state.dataHeatBal->Zone);
     auto &Surface(state.dataSurface->Surface);
 
     Real64 ACH = CalcCeilingDiffuserACH(state, ZoneNum);
@@ -4168,9 +4167,9 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
         } else {
             thisWWR = -999.0; // throw error?
         }
-        // first pass thru this zones surfaces to gather data
         for (int spaceNum : state.dataHeatBal->Zone(ZoneLoop).spaceIndexes) {
             auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            // first pass thru this zones surfaces to gather data
             for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
                 // first catch exterior walls and do summations
                 if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass::Wall)) {
@@ -4182,7 +4181,9 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                     ++ExtWindowCount;
                 }
             }
-
+        }
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneLoop).spaceIndexes) {
+            auto &thisSpace = state.dataHeatBal->space(spaceNum);
             // second pass thru zone surfs to fill data
             for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
                 // now fill values
