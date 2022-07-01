@@ -1381,8 +1381,8 @@ struct SurfacesData : BaseGlobalStruct
     int TotWindows = 0;            // Total number of windows
     int TotStormWin = 0;           // Total number of storm window blocks
     int TotWinShadingControl = 0;  // Total number of window shading control blocks
-    int TotIntConvCoeff = 0;       // Total number of interior convection coefficient (overrides)
-    int TotExtConvCoeff = 0;       // Total number of exterior convection coefficient (overrides)
+    int TotIntConvCoeff = 0;       // Total number of interior convection coefficient (overrides) // TODO: Should just be a local variable I think
+    int TotExtConvCoeff = 0;       // Total number of exterior convection coefficient (overrides) // TODO: Should just be a local variable I think
     int TotOSC = 0;                // Total number of Other Side Coefficient Blocks
     int TotOSCM = 0;               // Total number of Other Side Conditions Model Blocks.
     int TotExtVentCav = 0;         // Total number of ExteriorNaturalVentedCavity

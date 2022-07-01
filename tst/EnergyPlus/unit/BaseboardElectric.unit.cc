@@ -45,90 +45,57 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Boilers Unit Tests
+// EnergyPlus::Standalone ERV Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/Branch.hh>
-#include <EnergyPlus/Plant/Component.hh>
-
-#include "../Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::DataPlant;
+using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataZoneEnergyDemands;
 
-TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad)
+namespace EnergyPlus {
+
+TEST_F(EnergyPlusFixture, ExerciseBaseboardElectric)
 {
-    EnergyPlus::DataPlant::BranchData b;
-    b.Comp.allocate(3);
+    std::string const idf_objects = delimited_string({"ZoneHVAC:Baseboard:Convective:Electric,",
+                                                      "Zone1Baseboard,          !- Name",
+                                                      ",                        !- Availability Schedule Name",
+                                                      "HeatingDesignCapacity,   !- Heating Design Capacity Method",
+                                                      "5000,                    !- Heating Design Capacity {W}",
+                                                      ",                        !- Heating Design Capacity Per Floor Area {W/m2}",
+                                                      ",                        !- Fraction of Autosized Heating Design Capacity",
+                                                      "0.97;                    !- Efficiency"});
 
-    b.Comp[0].MyLoad = 20000;
-    b.Comp[1].MyLoad = 21000;
-    b.Comp[2].MyLoad = 22000;
-    Real64 maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
+    ASSERT_TRUE(process_idf(idf_objects));
 
-    b.Comp[0].MyLoad = 22000;
-    b.Comp[1].MyLoad = 21000;
-    b.Comp[2].MyLoad = 20000;
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataLoopNodes->Node.allocate(1);
+    state->dataLoopNodes->Node(1).Temp = 25.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 100;
 
-    b.Comp[0].MyLoad = 0;
-    b.Comp[1].MyLoad = -21000;
-    b.Comp[2].MyLoad = 22000;
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
-
-    b.Comp[0].MyLoad = 0;
-    b.Comp[1].MyLoad = 0;
-    b.Comp[2].MyLoad = -22000; // still highest via absolute value
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
-
-    b.Comp[0].MyLoad = 0;
-    b.Comp[1].MyLoad = 21000;
-    b.Comp[2].MyLoad = -22000;
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
+    int zoneNum = 1;
+    Real64 powerMet = 0.0;
+    int compIndex = 0;
+    BaseboardElectric::SimElectricBaseboard(*state, "ZONE1BASEBOARD", zoneNum, zoneNum, powerMet, compIndex);
 }
 
-TEST_F(EnergyPlusFixture, TestDetermineBranchFlowRequest)
-{
-    // create a branch to mess with
-    DataPlant::BranchData b;
-
-    // set up the nodes
-    b.NodeNumIn = 1;
-    b.NodeNumOut = 3;
-    state->dataLoopNodes->Node.allocate(3);
-    auto &nodeIn = state->dataLoopNodes->Node(1);
-    auto &nodeMiddle = state->dataLoopNodes->Node(2);
-    auto &nodeOut = state->dataLoopNodes->Node(3);
-
-    // allocate some components
-    b.TotalComponents = 2;
-    b.Comp.allocate(2);
-    b.Comp(1).NodeNumIn = 1;
-    b.Comp(2).NodeNumIn = 2;
-
-    nodeIn.MassFlowRateRequest = 1.0;
-    nodeIn.MassFlowRateMaxAvail = 5.0;
-    nodeMiddle.MassFlowRateRequest = 2.0;
-    nodeMiddle.MassFlowRateMaxAvail = 5.0;
-    nodeOut.MassFlowRateRequest = 3.0; // only the component inlet nodes are checked, so this shouldn't be used
-    nodeOut.MassFlowRateMaxAvail = 5.0;
-
-    // for non-series-active branch, it just takes the inlet node request
-    b.controlType = DataBranchAirLoopPlant::ControlType::Active;
-    Real64 flowRequest = b.DetermineBranchFlowRequest(*state);
-    EXPECT_NEAR(1.0, flowRequest, 0.001);
-
-    // for series-active branch, it takes the max of all of them
-    b.controlType = DataBranchAirLoopPlant::ControlType::SeriesActive;
-    flowRequest = b.DetermineBranchFlowRequest(*state);
-    EXPECT_NEAR(2.0, flowRequest, 0.001);
-}
+} // namespace EnergyPlus
