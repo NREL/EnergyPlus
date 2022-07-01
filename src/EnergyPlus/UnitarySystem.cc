@@ -1959,8 +1959,9 @@ namespace UnitarySystems {
         // previous version of E+ used maximum flow rate for unitary systems. Keep this methodology for now.
         // Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow
         // rates (might require additional change to if block logic).
-        if (!isWSVarSpeedHeatCoil && (this->m_sysType == SysType::PackagedAC && !isVarSpeedCoolCoil) &&
-            (this->m_sysType == SysType::PackagedHP && !isVarSpeedHeatCoil)) {
+        if (!isWSVarSpeedHeatCoil &&
+            ((this->m_sysType == SysType::PackagedAC && !isVarSpeedCoolCoil) && (this->m_sysType == SysType::PackagedHP && !isVarSpeedHeatCoil) ||
+             (this->m_sysType == SysType::Unitary && this->m_HeatPump))) {
             EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
             EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
         }
