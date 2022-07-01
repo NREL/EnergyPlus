@@ -2627,7 +2627,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
                 GndReflSolarRad =
                     GndSolarRadInc * state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum)).SurfsReflAvg;
-                state.dataSurface->GndReflSolarRad(SurfNum) = GndReflSolarRad;
+                Surface(SurfNum).GndReflSolarRad = GndReflSolarRad;
             } else {
                 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
             }
@@ -2908,7 +2908,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
             if (state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum)) {
-                GndReflSolarRad = state.dataSurface->GndReflSolarRad(SurfNum);
+                GndReflSolarRad = Surface(SurfNum).GndReflSolarRad;
             }
             // Add all reflected solar from the outside shelf to the ground solar
             // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!

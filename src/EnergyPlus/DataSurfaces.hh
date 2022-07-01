@@ -743,6 +743,7 @@ namespace DataSurfaces {
         ConvectionConstants::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
 
         SurfaceCalcHashKey calcHashKey; // Hash key used for determining if this surface requires unique calculations.
+        Real64 GndReflSolarRad; // ground surface reflected solar radiation on exterior surfaces
 
         // Default Constructor
         SurfaceData()
@@ -757,7 +758,7 @@ namespace DataSurfaces {
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
-              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
+              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), GndReflSolarRad(0.0)
         {
         }
 
@@ -1529,7 +1530,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
     Array1D<bool> UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
     Array1D<bool> UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
-    Array1D<Real64> GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
@@ -2147,7 +2147,6 @@ struct SurfacesData : BaseGlobalStruct
         this->UseSurfPropertyGndSurfTemp.deallocate();
         this->UseSurfPropertyGndSurfRefl.deallocate();
         this->IsSurfPropertyGndSurfacesDefined.deallocate();
-        this->GndReflSolarRad.deallocate();
     }
 };
 
