@@ -3096,9 +3096,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     win_Surface.IsSurfPropertyGndSurfacesDefined = true;
     win_Surface.GroundSurfsPropertyNum = 1;
     win_Surface.UseSurfPropertyGndSurfTemp = true;
-    state->dataSurface->UseSurfPropertyGndSurfRefl.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->UseSurfPropertyGndSurfRefl = false;
-    state->dataSurface->UseSurfPropertyGndSurfRefl(windowSurfNum) = true;
+    win_Surface.UseSurfPropertyGndSurfRefl = true;
     state->dataSurface->GroundSurfsProperty.allocate(1);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);
     state->dataSurface->TotSurfPropGndSurfs = 1;

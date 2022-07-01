@@ -140,11 +140,10 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = false;
     state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(NumOfSurf);
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
-    auto &Surface = state->dataSurface->Surface(SurfNum);
-    Surface.IsSurfPropertyGndSurfacesDefined = false;
-    Surface.UseSurfPropertyGndSurfTemp = false;
-    state->dataSurface->UseSurfPropertyGndSurfRefl.allocate(NumOfSurf);
-    state->dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
+    auto &surface = state->dataSurface->Surface(SurfNum);
+    surface.IsSurfPropertyGndSurfacesDefined = false;
+    surface.UseSurfPropertyGndSurfTemp = false;
+    surface.UseSurfPropertyGndSurfRefl = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 constexpr VentArea(0.1);  // Area available for venting the gap [m2]
