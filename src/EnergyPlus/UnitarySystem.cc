@@ -1755,6 +1755,10 @@ namespace UnitarySystems {
                     // VS coil model does not check for flow/capacity ratio, this will disable that test in Capacity sizer
                     // state.dataSize->DataIsDXCoil = true;
                 }
+                // PTUnit does not call CapacitySizer and adjust capacity based on flow per capacity limits
+                if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP) {
+                    state.dataSize->DataIsDXCoil = false;
+                }
                 SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                 state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                 if (this->m_CoolingCapMethod == DataSizing::CapacityPerFloorArea ||
@@ -1868,6 +1872,10 @@ namespace UnitarySystems {
                     // VS coil model does not check for flow/capacity ratio, this will disable that test in Capacity sizer
                     // state.dataSize->DataIsDXCoil = true;
                 }
+                // PTUnit does not call CapacitySizer and adjust capacity based on flow per capacity limits
+                if (this->m_sysType == SysType::PackagedHP) {
+                    state.dataSize->DataIsDXCoil = false;
+                }
                 if (state.dataSize->CurSysNum > 0)
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                         false; // set to false to allow calculation of actual heating capacity
@@ -1879,9 +1887,6 @@ namespace UnitarySystems {
                 if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
-                //} else if (this->m_DesignHeatingCapacity != DataSizing::AutoSize) {
-                //    EqSizing.HeatingCapacity = true;
-                //    EqSizing.DesHeatingLoad = this->m_DesignHeatingCapacity;
             } else {
                 if (!HardSizeNoDesRun &&
                     (HeatingSAFlowMethod != DataSizing::FlowPerHeatingCapacity && this->m_DesignHeatingCapacity != DataSizing::AutoSize)) {
@@ -1919,21 +1924,29 @@ namespace UnitarySystems {
 
         bool isWSVarSpeedCoolCoil = this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
         bool isWSVarSpeedHeatCoil = this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit;
+        bool isVarSpeedCoolCoil = this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+        bool isVarSpeedHeatCoil = this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed;
 
         Real64 saveRawHeatingCapacity = HeatCapAtPeak;
 
         // STEP 3A: Find VS cooling coil air flow to capacity ratio and adjust design air flow
         if (EqSizing.DesCoolingLoad > 0.0 && state.dataSize->CurZoneEqNum > 0 &&
-            this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+            (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ||
+             ((this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP) &&
+              this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed))) {
             Real64 coolingToHeatingCapRatio = 1.0;
-            if (isWSVarSpeedCoolCoil && this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+            if ((isWSVarSpeedCoolCoil && this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) ||
+                ((this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP) &&
+                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) {
                 int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NormSpedLevel;
                 Real64 coolingAirFlowToCapacityRatio =
                     state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
                 EqSizing.CoolingAirVolFlow = EqSizing.DesCoolingLoad * coolingAirFlowToCapacityRatio;
                 if (EqSizing.DesHeatingLoad > 0.0) coolingToHeatingCapRatio = EqSizing.DesCoolingLoad / EqSizing.DesHeatingLoad;
             }
-            if (isWSVarSpeedHeatCoil && this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
+            if (((isWSVarSpeedHeatCoil || isVarSpeedHeatCoil) && this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) ||
+                ((this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP) &&
+                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed)) {
                 int normSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
                 Real64 heatingAirFlowToCapacityRatio =
                     state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowPerRatedTotCap(normSpeed);
@@ -1946,7 +1959,8 @@ namespace UnitarySystems {
         // previous version of E+ used maximum flow rate for unitary systems. Keep this methodology for now.
         // Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow
         // rates (might require additional change to if block logic).
-        if (!isWSVarSpeedHeatCoil) {
+        if (!isWSVarSpeedHeatCoil && (this->m_sysType == SysType::PackagedAC && !isVarSpeedCoolCoil) &&
+            (this->m_sysType == SysType::PackagedHP && !isVarSpeedHeatCoil)) {
             EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
             EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
         }
@@ -1973,17 +1987,9 @@ namespace UnitarySystems {
         // state.dataSize->DataFanIndex = saveDataFanIndex;
 
         // Some parent objects report sizing, some do not
-        // other cases below will toggle on or off specific reports based on system type
         if (this->m_OKToPrintSizing) {
-            switch (this->m_sysType) {
-            case SysType::Unitary:
-            case SysType::PackagedAC:
-            case SysType::PackagedHP:
-            case SysType::PackagedWSHP:
+            if (this->m_sysType != SysType::CoilCoolingDX && this->m_sysType != SysType::CoilCoolingWater) {
                 PrintFlag = true;
-                break;
-            default:
-                break;
             }
         }
         // STEP 5: report system parameters (e.g., air flow rates, capacities, etc.)
@@ -2025,7 +2031,8 @@ namespace UnitarySystems {
         if (this->m_sysType >= SysType::PackagedAC) {
 
             if (this->m_CoolCoilExists) {
-
+                // allow design size to report
+                if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) EqSizing.CoolingAirFlow = false;
                 if (this->m_MaxCoolAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
                     this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
                 }
@@ -2044,7 +2051,8 @@ namespace UnitarySystems {
                 state.dataSize->DataConstantUsedForSizing = 0.0;
             }
             if (this->m_HeatCoilExists) {
-
+                // allow design size to report
+                if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) EqSizing.HeatingAirFlow = false;
                 SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
                 if (this->m_MaxHeatAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
                     this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -2074,7 +2082,7 @@ namespace UnitarySystems {
 
         } else {
 
-        if (this->m_HeatCoilExists) {
+            if (this->m_HeatCoilExists) {
 
                 SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
                 if (this->m_MaxHeatAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
