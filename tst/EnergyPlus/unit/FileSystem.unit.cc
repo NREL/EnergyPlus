@@ -108,6 +108,52 @@ TEST(FileSystem, getAbsolutePath)
     EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
 
+TEST(FileSystem, getFileType)
+{
+    fs::path filePath1("./schedulefileA.CSV");
+    auto ext = EnergyPlus::FileSystem::getFileType(filePath1);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::CSV == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+    EXPECT_TRUE(EnergyPlus::FileSystem::is_flat_file_type(ext));
+
+    fs::path filePath2("./schedulefileB.Csv");
+    ext = EnergyPlus::FileSystem::getFileType(filePath2);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::CSV == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+
+    fs::path filePath3("./schedulefileC.csv");
+    ext = EnergyPlus::FileSystem::getFileType(filePath3);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::CSV == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+
+    fs::path filePath4("./jsonfileA.JSON");
+    ext = EnergyPlus::FileSystem::getFileType(filePath4);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::JSON == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+    EXPECT_TRUE(EnergyPlus::FileSystem::is_all_json_type(ext));
+
+    fs::path filePath5("./jsonfileB.Json");
+    ext = EnergyPlus::FileSystem::getFileType(filePath5);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::JSON == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+    EXPECT_TRUE(EnergyPlus::FileSystem::is_all_json_type(ext));
+
+    fs::path filePath6("./jsonfileC.json");
+    ext = EnergyPlus::FileSystem::getFileType(filePath6);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::JSON == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+    EXPECT_TRUE(EnergyPlus::FileSystem::is_all_json_type(ext));
+
+    fs::path filePath7("./epjsonfileA.epJSON");
+    ext = EnergyPlus::FileSystem::getFileType(filePath7);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::EpJSON == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+    EXPECT_TRUE(EnergyPlus::FileSystem::is_all_json_type(ext));
+
+    fs::path filePath8("./epjsonfileB.EPJSON");
+    ext = EnergyPlus::FileSystem::getFileType(filePath8);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::EpJSON == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+    EXPECT_TRUE(EnergyPlus::FileSystem::is_all_json_type(ext));
+
+    fs::path filePath9("./epjsonfileC.epjson");
+    ext = EnergyPlus::FileSystem::getFileType(filePath9);
+    EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::EpJSON == static_cast<EnergyPlus::FileSystem::FileTypes>(ext));
+    EXPECT_TRUE(EnergyPlus::FileSystem::is_all_json_type(ext));
+}
+
 TEST(FileSystem, Others)
 {
     {
