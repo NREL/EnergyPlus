@@ -2,6 +2,297 @@ import json
 import argparse
 import math
 
+class JsonObject:
+    def to_json(self):
+        output = {}
+        for k,v in vars(self).items():
+            if v is not None:
+                output[k] = v
+        output.pop('name', None)
+        return output
+    @classmethod
+    def from_json(cls, obj):
+        new_object = cls()
+        v = vars(new_object)
+        for key, value in obj.items():
+            if key in v:
+                v[k] = value
+            else:
+                raise UnexpectedInput('Key input "%s" is unexpected' % key)
+        return new_object
+
+class SimpleOpening(JsonObject):
+    def __init__(self, name=None, coef=None, CD=0.78, expo=0.5):
+        self.name = name
+        self.air_mass_flow_coefficient_when_opening_is_closed = coef
+        self.air_mass_flow_exponent_when_opening_is_closed = expo
+        self.discharge_coefficient = CD
+
+
+class Crack(JsonObject):
+    def __init__(self, name=None, coef=None, expo=0.65):
+        self.name = name
+        self.air_mass_flow_coefficient_at_reference_conditions = coef
+        self.air_mass_flow_exponent = expo
+
+
+def repair_fenestration_surface_detailed(json_object):
+    n = json_object['number_of_vertices']
+    vertices = []
+    for i in range(1,n+1):
+        x_str = 'vertex_%d_x_coordinate' % i
+        y_str = 'vertex_%d_y_coordinate' % i
+        z_str = 'vertex_%d_z_coordinate' % i
+        x = json_object.pop(x_str)
+        y = json_object.pop(y_str)
+        z = json_object.pop(z_str)
+        vertices.append({'vertex_x_coordinate': x,
+                         'vertex_y_coordinate': y,
+                         'vertex_z_coordinate': z})
+    json_object['vertices'] = vertices
+
+
+class Vector3D:
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+    
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
+    def __add__(self, other):
+        return Vector3D(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __sub__(self, other):
+        return Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def __rmul__(self, other):
+        return Vector3D(self.x * other, self.y * other, self.z * other)
+
+    def __truediv__(self, other):
+        return Vector3D(self.x / other, self.y / other, self.z / other)
+
+    def dot(self, other):
+        return self.x * other.x + self.y * other.y + self.z * other.z
+
+    def mag2(self):
+        return self.x * self.x + self.y * self.y + self.z * self.z
+
+    def cross(self, other):
+        return Vector3D(self.y * other.z - self.z * other.y,
+                        self.z * other.x - self.x * other.z,
+                        self.x * other.y - self.y * other.x)
+
+
+def polygon_area_xy(verts):
+    # Need to check that this is at least a triangle
+    v_last = verts[-1]
+    v = verts[0]
+    result = 0.0
+    for v_next in verts[1:]:
+        result = result + v.x * (v_next.y - v_last.y)
+        v_last = v
+        v = v_next
+    v_next = verts[0]
+    result = result + v.x * (v_next.y - v_last.y)
+    return 0.5 * result
+
+def polygon_area_zx(verts):
+    # Need to check that this is at least a triangle
+    v_last = verts[-1]
+    v = verts[0]
+    result = 0.0
+    for v_next in verts[1:]:
+        result = result + v.z * (v_next.x - v_last.x)
+        v_last = v
+        v = v_next
+    v_next = verts[0]
+    result = result + v.z * (v_next.x - v_last.x)
+    return 0.5 * result
+
+def polygon_area_yz(verts):
+    # Need to check that this is at least a triangle
+    v_last = verts[-1]
+    v = verts[0]
+    result = 0.0
+    for v_next in verts[1:]:
+        result = result + v.y * (v_next.z - v_last.z)
+        v_last = v
+        v = v_next
+    v_next = verts[0]
+    result = result + v.y * (v_next.z - v_last.z)
+    return 0.5 * result
+
+
+def detailed_area(json_object):
+    # Should better check that this is at least a triangle
+    assert len(json_object['vertices']) >= 3, ('Detailed surface only has %d vertices' % len(json_object['vertices']))
+    vertices = []
+    for v in json_object['vertices']:
+        vertices.append(Vector3D(v['vertex_x_coordinate'],
+                                 v['vertex_y_coordinate'],
+                                 v['vertex_z_coordinate']))
+    a = vertices[1] - vertices[0]
+    b = vertices[2] - vertices[1]
+    c = a.cross(b)
+    normal = c / math.sqrt(c.mag2())
+
+    nx = abs(normal.x)
+    ny = abs(normal.y)
+    nz = abs(normal.z)
+    if nx > ny:
+        if nx > nz:
+            area = polygon_area_yz(vertices)/normal.x
+        else:
+            area = polygon_area_xy(vertices)/normal.z
+    elif ny > nz:
+        area = polygon_area_zx(vertices)/normal.y
+    else:
+        area = polygon_area_xy(vertices)/normal.z
+    return area, normal
+
+
+def tilt_to_elevation(tilt):
+    return 90.0 - tilt
+
+
+def simple_normal(json_object):
+    # The Azimuth Angle indicates the direction that the wall faces (outward normal).
+    # The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
+    azimuth = json_object['azimuth'] * math.pi / 180.0
+    tilt = json_object.get('tilt', 90.0)
+    if tilt == 0.0:
+        normal = Vector3D(0.0, 0.0, 1.0)
+    elif tilt == 180.0:
+        normal = Vector3D(0.0, 0.0, -1.0)
+    elif tilt == 90.0:
+        normal = Vector3D(math.sin(azimuth),
+                          math.cos(azimuth),
+                          0.0)
+    else:
+        elevation = tilt_to_elevation(tilt) * math.pi / 180.0
+        normal = Vector3D(math.sin(azimuth) * math.cos(elevation),
+                          math.cos(azimuth) * math.cos(elevation),
+                          math.sin(elevation))
+    return normal
+
+
+class Surface(JsonObject):
+    def __init__(self, name=None, surface_name=None, component_name=None, zone=None,
+                 external_node=None, area=None, json=None, other=None, normal=None,
+                 parent=None):
+        self.name = name
+        self.external_node_name = external_node
+        self.leakage_component_name = component_name
+        self.surface_name = surface_name
+        if name is None and surface_name is not None:
+            self.name = surface_name + '_AFN'
+        self.window_door_opening_factor_or_crack_factor = 1.0
+        self.area = area
+        self.zone = zone
+        self.json = json
+        self.normal = normal
+        self.parent = parent
+        self.other = other
+        if other is not None:
+            other.other = self
+    def to_json(self):
+        return {'surface_name': self.surface_name,
+                'leakage_component_name': self.component_name,
+                'window_door_opening_factor_or_crack_factor': self.window_door_opening_factor_or_crack_factor
+                }
+                
+    @classmethod
+    def from_envelope(cls, model, object_type, object_name, object_data, surfaces):
+        surface_name = object_name
+        area = object_data['length'] * object_data['height']
+        zone_name = object_data['zone_name']
+        normal = simple_normal(object_data)
+        return cls(surface_name=surface_name, area=area, zone=zone_name,
+                   json=object_data, normal=normal)
+    @classmethod
+    def from_partition(cls, model, object_type, object_name, object_data, surfaces):
+        surface_name = object_name
+        area = object_data['length'] * object_data['height']
+        zone_name = object_data['zone_name']
+        normal = simple_normal(object_data)
+        other_data = model[object_type].get(object_data['outside_boundary_condition_object'], None)
+        if other_data is None:
+            # Try other zone
+            other_zone = model['Zone'].get(object_data['outside_boundary_condition_object'], None)
+            if other_zone is None:
+                # Report issue?
+                return None
+            other_surface = cls(zone = other_zone)
+        else:
+            other_surface_name = object_data['outside_boundary_condition_object']
+            other_zone_name = other_data['zone_name']
+            other_surface = cls(surface_name=other_surface_name, zone=other_zone_name,
+                                json=other_data)
+        return cls(surface_name=surface_name, area=area, zone=zone_name,
+                   json=object_data, other=other_surface, normal=normal)
+    @classmethod
+    def from_detailed(cls, model, object_type, object_name, object_data, surfaces):
+        surface_name = object_name
+        area, normal = detailed_area(object_data)
+        zone_name = object_data['zone_name']
+        accepted_types = ['Surface', 'Outdoors'] # Might need to add one or more of the coeffs here
+        if object_data['outside_boundary_condition'] not in accepted_types:
+            return None
+        other_surface = None
+        if object_data['outside_boundary_condition'] == 'Surface':
+            other_data = model[object_type][object_data['outside_boundary_condition_object']]
+            other_surface_name = object_data['outside_boundary_condition_object']
+            other_zone_name = other_data['zone_name']
+            if other_surface_name == surface_name:
+                return None
+            other_surface = cls(surface_name=other_surface_name, zone=other_zone_name,
+                                json=other_data)
+        return cls(surface_name=surface_name, area=area, zone=zone_name,
+                   json=object_data, other=other_surface, normal=normal)
+    @classmethod
+    def from_detailed_fenestration(cls, model, object_type, object_name, object_data,
+                                   surfaces):
+        # This is going to fall down and go boom at some point, will need to
+        # refactor to account for the parent holding a lot of the info
+        surface_name = object_name
+        area, normal = detailed_area(object_data)
+        parent_surface_name = object_data['building_surface_name']
+        # Look for the parent surface in the surface objects
+        parent = None
+        for surf in surfaces:
+            if surf.surface_name == parent_surface_name:
+                parent = surf
+                break
+            if surf.other is not None:
+                if surf.other.surface_name == parent_surface_name:
+                    parent = surf
+                    break
+        assert parent is not None
+        zone_name = parent.zone
+        other_surface = None
+        if 'outside_boundary_condition_object' not in object_data:
+            if parent.other is not None:
+                other_zone_name = parent.other.zone
+                other_surface = cls(zone=other_zone_name)
+        else:
+            # It's going to be hard to tell if this is properly being handled to
+            # avoid doubling up the surfaces, maybe need to rethink approach
+            other_surface_name = object_data['outside_boundary_condition_object']
+            other_data = model[object_type].get(other_surface_name, None)
+            other_zone_name = None
+            if other_data is None:
+                # This is probably an error, need to verify
+                pass
+            else:
+                other_zone_name = other_data['zone_name'] # Is this really going to work?
+                other_surface = cls(surface_name=other_surface_name, zone=other_zone_name)
+        return cls(surface_name=surface_name, area=area, zone=zone_name,
+                   json=object_data, other=other_surface, normal=normal,
+                   parent=parent)
+
+
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='.')
@@ -172,7 +463,7 @@ if __name__ == '__main__':
         for j in range(i+1, n_zones):
             max_interzonal_area = max(max_interzonal_area, interzonal_area[i][j])
 
-    if verbose:
+    if args.verbose:
         print(interzonal_area)
         print(max_interzonal_area)
 
