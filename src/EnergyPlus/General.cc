@@ -91,6 +91,39 @@ using DataHVACGlobals::Bisection;
 // MODULE PARAMETER DEFINITIONS
 static constexpr std::string_view BlankString;
 
+enum class ReportType
+{
+    Invalid = -1,
+    DXF,
+    DXFWireFrame,
+    VRML,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(ReportType::Num)> ReportTypeNamesUC{"DXF", "DXF:WIREFRAME", "VRML"};
+
+enum class AvailRpt
+{
+    Invalid = -1,
+    None,
+    NotByUniqueKeyNames,
+    Verbose,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(AvailRpt::Num)> AvailRptNamesUC{"NONE", "NOTBYUNIQUEKEYNAMES", "VERBOSE"};
+
+enum class ERLdebugOutputLevel
+{
+    Invalid = -1,
+    None,
+    ErrorsOnly,
+    Verbose,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(ERLdebugOutputLevel::Num)> ERLdebugOutputLevelNamesUC{"NONE", "ERRORSONLY", "VERBOSE"};
+
 Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                      Array1S<Real64> const PropArray // Array of blind properties
 )
@@ -1468,34 +1501,27 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
+            ReportType checkReportType =
+                static_cast<ReportType>(getEnumerationValue(ReportTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
 
-                if (SELECT_CASE_var == "DXF") {
-                    state.dataGeneral->DXFReport = true;
-                    DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                    DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
-
-                } else if (SELECT_CASE_var == "DXF:WIREFRAME") {
-                    state.dataGeneral->DXFWFReport = true;
-                    DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                    DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
-
-                } else if (SELECT_CASE_var == "VRML") {
-                    state.dataGeneral->VRMLReport = true;
-                    VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
-                    VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
-
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": No " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
-
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "DXF", "DXF:WireFrame", "VRML".)");
-                }
+            switch (checkReportType) {
+            case ReportType::DXF: {
+                state.dataGeneral->DXFReport = true;
+                DXFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                DXFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+            } break;
+            case ReportType::DXFWireFrame: {
+                state.dataGeneral->DXFWFReport = true;
+                DXFWFOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                DXFWFOption2 = state.dataIPShortCut->cAlphaArgs(3);
+            } break;
+            case ReportType::VRML: {
+                state.dataGeneral->VRMLReport = true;
+                VRMLOption1 = state.dataIPShortCut->cAlphaArgs(2);
+                VRMLOption2 = state.dataIPShortCut->cAlphaArgs(3);
+            } break;
+            default:
+                break;
             }
         }
 
@@ -1574,86 +1600,67 @@ void ScanForReports(EnergyPlusData &state,
 
             state.dataGeneral->EMSoutput = true;
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
-
-                if (SELECT_CASE_var == "NONE") {
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = true;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                } else if (SELECT_CASE_var == "VERBOSE") {
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
-
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(1) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                    state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-                }
+            AvailRpt CheckAvailRpt =
+                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+            switch (CheckAvailRpt) {
+            case AvailRpt::None: {
+                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
+            } break;
+            case AvailRpt::NotByUniqueKeyNames: {
+                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = true;
+                state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
+            } break;
+            case AvailRpt::Verbose: {
+                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
+            } break;
+            default: {
+                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
+            } break;
             }
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-
-                if (SELECT_CASE_var == "NONE") {
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = true;
-                } else if (SELECT_CASE_var == "VERBOSE") {
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(2) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "NotByUniqueKeyNames", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                    state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-                }
+            CheckAvailRpt =
+                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            switch (CheckAvailRpt) {
+            case AvailRpt::None: {
+                state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
+            } break;
+            case AvailRpt::NotByUniqueKeyNames: {
+                state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                state.dataRuntimeLang->OutputEMSInternalVarsSmall = true;
+            } break;
+            case AvailRpt::Verbose: {
+                state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
+                state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
+            } break;
+            default: {
+                state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
+            } break;
             }
 
-            {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
-
-                if (SELECT_CASE_var == "NONE") {
-                    state.dataRuntimeLang->OutputEMSErrors = false;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                } else if (SELECT_CASE_var == "ERRORSONLY") {
-                    state.dataRuntimeLang->OutputEMSErrors = true;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                } else if (SELECT_CASE_var == "VERBOSE") {
-                    state.dataRuntimeLang->OutputFullEMSTrace = true;
-                    state.dataRuntimeLang->OutputEMSErrors = true;
-                } else if (SELECT_CASE_var.empty()) {
-                    ShowWarningError(state, cCurrentModuleObject + ": Blank " + state.dataIPShortCut->cAlphaFieldNames(3) + " supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSErrors = false;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                } else {
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\" supplied.");
-                    ShowContinueError(state, R"( Legal values are: "None", "ErrorsOnly", "Verbose". "None" will be used.)");
-                    state.dataRuntimeLang->OutputEMSErrors = false;
-                    state.dataRuntimeLang->OutputFullEMSTrace = false;
-                }
+            ERLdebugOutputLevel CheckERLlevel = static_cast<ERLdebugOutputLevel>(
+                getEnumerationValue(ERLdebugOutputLevelNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+            switch (CheckERLlevel) {
+            case ERLdebugOutputLevel::None: {
+                state.dataRuntimeLang->OutputEMSErrors = false;
+                state.dataRuntimeLang->OutputFullEMSTrace = false;
+            } break;
+            case ERLdebugOutputLevel::ErrorsOnly: {
+                state.dataRuntimeLang->OutputEMSErrors = true;
+                state.dataRuntimeLang->OutputFullEMSTrace = false;
+            } break;
+            case ERLdebugOutputLevel::Verbose: {
+                state.dataRuntimeLang->OutputFullEMSTrace = true;
+                state.dataRuntimeLang->OutputEMSErrors = true;
+            } break;
+            default: {
+                state.dataRuntimeLang->OutputEMSErrors = false;
+                state.dataRuntimeLang->OutputFullEMSTrace = false;
+            } break;
             }
         }
 
@@ -1663,56 +1670,101 @@ void ScanForReports(EnergyPlusData &state,
     // Process the Scan Request
     DoReport = false;
 
+    enum class ReportName
     {
-        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(reportName));
-        if (SELECT_CASE_var == "CONSTRUCTIONS") {
-            if (present(ReportKey)) {
-                if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
-                if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
-            }
-        } else if (SELECT_CASE_var == "VIEWFACTORINFO") {
-            DoReport = state.dataGeneral->ViewFactorInfo;
-            if (present(Option1)) Option1 = ViewRptOption1;
-        } else if (SELECT_CASE_var == "VARIABLEDICTIONARY") {
-            DoReport = state.dataGeneral->VarDict;
-            if (present(Option1)) Option1 = VarDictOption1;
-            if (present(Option2)) Option2 = VarDictOption2;
-            //    CASE ('SCHEDULES')
-            //     DoReport=SchRpt
-            //      IF (PRESENT(Option1)) Option1=SchRptOption
-        } else if (SELECT_CASE_var == "SURFACES") {
-            {
-                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey())); // Autodesk:OPTIONAL ReportKey used without PRESENT check
-                if (SELECT_CASE_var1 == "COSTINFO") {
-                    DoReport = state.dataGeneral->CostInfo;
-                } else if (SELECT_CASE_var1 == "DXF") {
-                    DoReport = state.dataGeneral->DXFReport;
-                    if (present(Option1)) Option1 = DXFOption1;
-                    if (present(Option2)) Option2 = DXFOption2;
-                } else if (SELECT_CASE_var1 == "DXF:WIREFRAME") {
-                    DoReport = state.dataGeneral->DXFWFReport;
-                    if (present(Option1)) Option1 = DXFWFOption1;
-                    if (present(Option2)) Option2 = DXFWFOption2;
-                } else if (SELECT_CASE_var1 == "VRML") {
-                    DoReport = state.dataGeneral->VRMLReport;
-                    if (present(Option1)) Option1 = VRMLOption1;
-                    if (present(Option2)) Option2 = VRMLOption2;
-                } else if (SELECT_CASE_var1 == "VERTICES") {
-                    DoReport = state.dataGeneral->SurfVert;
-                } else if (SELECT_CASE_var1 == "DETAILS") {
-                    DoReport = state.dataGeneral->SurfDet;
-                } else if (SELECT_CASE_var1 == "DETAILSWITHVERTICES") {
-                    DoReport = state.dataGeneral->SurfDetWVert;
-                } else if (SELECT_CASE_var1 == "LINES") {
-                    DoReport = state.dataGeneral->LineRpt;
-                    if (present(Option1)) Option1 = LineRptOption1;
-                } else {
-                }
-            }
-        } else if (SELECT_CASE_var == "ENERGYMANAGEMENTSYSTEM") {
-            DoReport = state.dataGeneral->EMSoutput;
-        } else {
+        Invalid = -1,
+        Constructions,
+        Viewfactorinfo,
+        Variabledictionary,
+        Surfaces,
+        Energymanagementsystem,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(ReportName::Num)> ReportNamesUC{
+        "CONSTRUCTIONS", "VIEWFACTORINFO", "VARIABLEDICTIONARY", "SURFACES", "ENERGYMANAGEMENTSYSTEM"};
+
+    enum class RptKey
+    {
+        Invalid = -1,
+        Costinfo,
+        DXF,
+        DXFwireframe,
+        VRML,
+        Vertices,
+        Details,
+        DetailsWithVertices,
+        Lines,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyNamesUC{
+        "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
+
+    ReportName rptName =
+        static_cast<ReportName>(getEnumerationValue(ReportNamesUC, UtilityRoutines::MakeUPPERCase(UtilityRoutines::MakeUPPERCase(reportName))));
+    switch (rptName) {
+    case ReportName::Constructions: {
+        if (present(ReportKey)) {
+            if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
+            if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
         }
+    } break;
+    case ReportName::Viewfactorinfo: {
+        DoReport = state.dataGeneral->ViewFactorInfo;
+        if (present(Option1)) Option1 = ViewRptOption1;
+    } break;
+    case ReportName::Variabledictionary: {
+        DoReport = state.dataGeneral->VarDict;
+        if (present(Option1)) Option1 = VarDictOption1;
+        if (present(Option2)) Option2 = VarDictOption2;
+        //    CASE ('SCHEDULES')
+        //     DoReport=SchRpt
+        //      IF (PRESENT(Option1)) Option1=SchRptOption
+    } break;
+    case ReportName::Surfaces: {
+        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, UtilityRoutines::MakeUPPERCase(ReportKey())));
+        switch (rptKey) { // Autodesk:OPTIONAL ReportKey used without PRESENT check
+        case RptKey::Costinfo: {
+            DoReport = state.dataGeneral->CostInfo;
+        } break;
+        case RptKey::DXF: {
+            DoReport = state.dataGeneral->DXFReport;
+            if (present(Option1)) Option1 = DXFOption1;
+            if (present(Option2)) Option2 = DXFOption2;
+        } break;
+        case RptKey::DXFwireframe: {
+            DoReport = state.dataGeneral->DXFWFReport;
+            if (present(Option1)) Option1 = DXFWFOption1;
+            if (present(Option2)) Option2 = DXFWFOption2;
+        } break;
+        case RptKey::VRML: {
+            DoReport = state.dataGeneral->VRMLReport;
+            if (present(Option1)) Option1 = VRMLOption1;
+            if (present(Option2)) Option2 = VRMLOption2;
+        } break;
+        case RptKey::Vertices: {
+            DoReport = state.dataGeneral->SurfVert;
+        } break;
+        case RptKey::Details: {
+            DoReport = state.dataGeneral->SurfDet;
+        } break;
+        case RptKey::DetailsWithVertices: {
+            DoReport = state.dataGeneral->SurfDetWVert;
+        } break;
+        case RptKey::Lines: {
+            DoReport = state.dataGeneral->LineRpt;
+            if (present(Option1)) Option1 = LineRptOption1;
+        } break;
+        default:
+            break;
+        }
+    } break;
+    case ReportName::Energymanagementsystem: {
+        DoReport = state.dataGeneral->EMSoutput;
+    } break;
+    default:
+        break;
     }
 }
 
