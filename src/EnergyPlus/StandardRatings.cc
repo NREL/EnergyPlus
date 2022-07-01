@@ -64,6 +64,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/CurveManager.cc>
 
 namespace EnergyPlus {
 
@@ -1134,6 +1135,7 @@ namespace StandardRatings {
         }
     }
 
+
     void SingleSpeedDXHeatingCoilStandardRatings(
         EnergyPlusData &state,
         Real64 const RatedTotalCapacity,                  // Reference capacity of DX coil [W]
@@ -1566,29 +1568,27 @@ namespace StandardRatings {
             TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
             NetCoolingCapRated = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
 
-            // SEER calculations:
-            TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
-            TotCoolingCapAHRI = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac;
-            EIRTempModFac = CurveValue(state, EIRFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
-            EIRFlowModFac = CurveValue(state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
-            if (RatedCOP > 0.0) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
-                EIR = EIRTempModFac * EIRFlowModFac / RatedCOP;
-            } else {
-                EIR = 0.0;
-            }
-            // Calculate net cooling capacity
-            NetCoolingCapAHRI = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
-            TotalElecPower = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
-            // Calculate SEER value from the Energy Efficiency Ratio (EER) at the AHRI test conditions and the part load factor.
-            // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
-            PartLoadFactorUser = CurveValue(state, PLFFPLRCurveIndex, PLRforSEER);
-            PartLoadFactorStandard = 1.0 - CyclicDegradationCoeff * (1.0 - PLRforSEER);
-            SEER_User = 0.0;
-            SEER_Standard = 0.0;
-            if (TotalElecPower > 0.0) {
-                SEER_User = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorUser;
-                SEER_Standard = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorStandard;
-            }
+            SEERSingleStageCalculation(TotCapTempModFac,
+                            state,
+                            CapFTempCurveIndex,
+                            TotCoolingCapAHRI,
+                            RatedTotalCapacity,
+                            TotCapFlowModFac,
+                            EIRTempModFac,
+                            EIRFTempCurveIndex,
+                            EIRFlowModFac,
+                            EIRFFlowCurveIndex,
+                            RatedCOP,
+                            EIR,
+                            NetCoolingCapAHRI,
+                            FanPowerPerEvapAirFlowRate,
+                            RatedAirVolFlowRate,
+                            TotalElecPower,
+                            PartLoadFactorUser,
+                            PLFFPLRCurveIndex,
+                            PartLoadFactorStandard,
+                            SEER_User,
+                            SEER_Standard);
 
             // EER calculations:
             // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
@@ -1646,6 +1646,100 @@ namespace StandardRatings {
                             "Standard Ratings: " + DXCoilType + ' ' + DXCoilName +
                                 " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
         }
+    }
+
+    void SEERSingleStageCalculation(Real64 &TotCapTempModFac,
+                         EnergyPlus::EnergyPlusData &state,
+                         const int &CapFTempCurveIndex,
+                         Real64 &TotCoolingCapAHRI,
+                         const Real64 &RatedTotalCapacity,
+                         const Real64 &TotCapFlowModFac,
+                         Real64 &EIRTempModFac,
+                         const int &EIRFTempCurveIndex,
+                         Real64 &EIRFlowModFac,
+                         const int &EIRFFlowCurveIndex,
+                         const Real64 &RatedCOP,
+                         Real64 &EIR,
+                         Real64 &NetCoolingCapAHRI,
+                         const Real64 &FanPowerPerEvapAirFlowRate,
+                         const Real64 &RatedAirVolFlowRate,
+                         Real64 &TotalElecPower,
+                         Real64 &PartLoadFactorUser,
+                         const int &PLFFPLRCurveIndex,
+                         Real64 &PartLoadFactorStandard,
+                         Real64 &SEER_User,
+                         Real64 &SEER_Standard)
+    {
+        // Using/Aliasing
+        using CurveManager::CurveValue;
+        // SEER calculations:
+        TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        TotCoolingCapAHRI = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac;
+        EIRTempModFac = CurveValue(state, EIRFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        EIRFlowModFac = CurveValue(state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
+        if (RatedCOP > 0.0) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
+            EIR = EIRTempModFac * EIRFlowModFac / RatedCOP;
+        } else {
+            EIR = 0.0;
+        }
+        // Calculate net cooling capacity
+        NetCoolingCapAHRI = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
+        TotalElecPower = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
+        // Calculate SEER value from the Energy Efficiency Ratio (EER) at the AHRI test conditions and the part load factor.
+        // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
+        PartLoadFactorUser = CurveValue(state, PLFFPLRCurveIndex, PLRforSEER);
+        PartLoadFactorStandard = 1.0 - CyclicDegradationCoeff * (1.0 - PLRforSEER);
+        SEER_User = 0.0;
+        SEER_Standard = 0.0;
+        if (TotalElecPower > 0.0) {
+            SEER_User = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorUser;
+            SEER_Standard = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorStandard;
+        }
+    }
+
+    void SEER2SingleStageCalculation(Real64 &TotCapTempModFac,
+                         EnergyPlus::EnergyPlusData &state,
+                         const int &CapFTempCurveIndex,
+                         Real64 &TotCoolingCapAHRI,
+                         const Real64 &RatedTotalCapacity,
+                         const Real64 &TotCapFlowModFac,
+                         Real64 &EIRTempModFac,
+                         const int &EIRFTempCurveIndex,
+                         Real64 &EIRFlowModFac,
+                         const int &EIRFFlowCurveIndex,
+                         const Real64 &RatedCOP,
+                         Real64 &EIR,
+                         Real64 &NetCoolingCapAHRI,
+                         const Real64 &FanPowerPerEvapAirFlowRate,
+                         const Real64 &RatedAirVolFlowRate,
+                         Real64 &TotalElecPower,
+                         Real64 &PartLoadFactorUser,
+                         const int &PLFFPLRCurveIndex,
+                         Real64 &PartLoadFactorStandard,
+                         Real64 &SEER_User,
+                         Real64 &SEER_Standard)
+    {
+        // Using/Aliasing
+        using CurveManager::CurveValue;
+       
+       /*  
+           For staging_type == StagingType.SINGLE_STAGE:
+           plf = 1.0 - 0.5*self.c_d_cooling # eq. 11.56 --> 11.63
+           seer = plf*self.net_cooling_cop(self.B_full_cond) # eq. 11.55 --> 11.62 (using COP to keep things in SI units for now)
+ 
+           PLF^x --> Part Load Factor for condition x, where x is blank,"Full" or "Low"
+           PLF(0.5) --> Part Load Factor for SEER2
+           PLF^x(tj) --> Part Load Factor for condition x at Temperature Bin j, where x is blank,"Full" or "Low"
+       */
+
+        // TODO 
+        Real64 c_d_cooling = 0.25; // ??
+        Real64 gross_total_cooling_capacity_Conditions; // ??
+        Real64 gross_cooling_power_conditions; // ??
+        Real64 net_cooling_cop__B_full_cond = gross_total_cooling_capacity_Conditions / gross_cooling_power_conditions; // ??
+
+        Real64 plf = 1.0 - 0.5 * c_d_cooling;
+        Real64 seer = plf * net_cooling_cop__B_full_cond;
     }
 
     void DXCoolingCoilDataCenterStandardRatings(
