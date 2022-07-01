@@ -471,7 +471,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         }
     }
     if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp) {
-        int gndSurfsNum = state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum;
+        int gndSurfsNum = state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
         TGround = state.dataSurface->GroundSurfsProperty(gndSurfsNum).SurfsTempAvg + DataGlobalConstants::KelvinConv;
     }
 

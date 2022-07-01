@@ -8138,7 +8138,7 @@ namespace SurfaceGeometry {
                         surface.IsSurfPropertyGndSurfacesDefined = true;
                         surface.UseSurfPropertyGndSurfTemp = true;
                         surface.UseSurfPropertyGndSurfRefl = true;
-                        surface.GroundSurfsPropertyNum = SurfLocalEnv.GroundSurfsPtr;
+                        surface.SurfPropertyGndSurfIndex = SurfLocalEnv.GroundSurfsPtr;
                     }
                 }
             }

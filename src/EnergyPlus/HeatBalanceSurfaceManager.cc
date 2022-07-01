@@ -2625,7 +2625,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
                 GndReflSolarRad =
-                    GndSolarRadInc * state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum).SurfsReflAvg;
+                    GndSolarRadInc * state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
                 Surface(SurfNum).GndReflSolarRad = GndReflSolarRad;
             } else {
                 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
@@ -2644,7 +2644,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 Real64 GndSurfReflectance = 0.0;
                 if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
                     GndSurfReflectance =
-                        state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum).SurfsReflAvg;
+                        state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
                 } else {
                     GndSurfReflectance = state.dataEnvrn->GndReflectance;
                 }
@@ -2772,7 +2772,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 Real64 GndSurfReflectance = 0.0;
                 if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
                     GndSurfReflectance =
-                        state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum).SurfsReflAvg;
+                        state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
                 } else {
                     GndSurfReflectance = state.dataEnvrn->GndReflectance;
                 }
@@ -2820,7 +2820,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             Real64 GndSurfReflectance = 0.0;
             if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
-                GndSurfReflectance = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum).SurfsReflAvg;
+                GndSurfReflectance = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
             } else {
                 GndSurfReflectance = state.dataEnvrn->GndReflectance;
             }
@@ -8500,7 +8500,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         }
     }
     if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp) {
-        TGround = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum).SurfsTempAvg;
+        TGround = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsTempAvg;
     }
 
     // Now, calculate the outside surface temperature using the proper heat balance equation.
@@ -8917,7 +8917,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
                 }
             }
             if (Surface.IsSurfPropertyGndSurfacesDefined) {
-                GndSurfsNum = state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum;
+                GndSurfsNum = state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
                 IsGroundViewFactorSet = state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet;
                 GroundSurfsViewFactor = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
                 SrdSurfsViewFactor += GroundSurfsViewFactor;
@@ -8991,7 +8991,7 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) continue;
-        auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum);
+        auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex);
         if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
             state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp = false;
             continue;
@@ -9031,7 +9031,7 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
         if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) continue;
-        auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum);
+        auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex);
         if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
             state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl = false;
             continue;
@@ -9059,7 +9059,7 @@ void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
     //  when the ground view factor input field is blank
 
     if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) return;
-    auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).GroundSurfsPropertyNum);
+    auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex);
     GndSurfsProperty.SurfsViewFactorSum = state.dataSurface->Surface(SurfNum).ViewFactorGroundIR;
 
     if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {

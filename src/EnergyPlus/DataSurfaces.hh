@@ -744,7 +744,7 @@ namespace DataSurfaces {
 
         SurfaceCalcHashKey calcHashKey;        // Hash key used for determining if this surface requires unique calculations.
         bool IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
-        int GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+        int SurfPropertyGndSurfIndex;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
         bool UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
         bool UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
         Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
@@ -762,7 +762,7 @@ namespace DataSurfaces {
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
-              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false), GroundSurfsPropertyNum(0),
+              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false), SurfPropertyGndSurfIndex(0),
               UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0)
         {
         }
