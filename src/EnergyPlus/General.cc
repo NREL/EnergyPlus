@@ -124,6 +124,37 @@ enum class ERLdebugOutputLevel
 
 constexpr std::array<std::string_view, static_cast<int>(ERLdebugOutputLevel::Num)> ERLdebugOutputLevelNamesUC{"NONE", "ERRORSONLY", "VERBOSE"};
 
+enum class ReportName
+{
+    Invalid = -1,
+    Constructions,
+    Viewfactorinfo,
+    Variabledictionary,
+    Surfaces,
+    Energymanagementsystem,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(ReportName::Num)> ReportNamesUC{
+    "CONSTRUCTIONS", "VIEWFACTORINFO", "VARIABLEDICTIONARY", "SURFACES", "ENERGYMANAGEMENTSYSTEM"};
+
+enum class RptKey
+{
+    Invalid = -1,
+    Costinfo,
+    DXF,
+    DXFwireframe,
+    VRML,
+    Vertices,
+    Details,
+    DetailsWithVertices,
+    Lines,
+    Num
+};
+
+constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyNamesUC{
+    "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
+
 Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                      Array1S<Real64> const PropArray // Array of blind properties
 )
@@ -1669,37 +1700,6 @@ void ScanForReports(EnergyPlusData &state,
 
     // Process the Scan Request
     DoReport = false;
-
-    enum class ReportName
-    {
-        Invalid = -1,
-        Constructions,
-        Viewfactorinfo,
-        Variabledictionary,
-        Surfaces,
-        Energymanagementsystem,
-        Num
-    };
-
-    constexpr std::array<std::string_view, static_cast<int>(ReportName::Num)> ReportNamesUC{
-        "CONSTRUCTIONS", "VIEWFACTORINFO", "VARIABLEDICTIONARY", "SURFACES", "ENERGYMANAGEMENTSYSTEM"};
-
-    enum class RptKey
-    {
-        Invalid = -1,
-        Costinfo,
-        DXF,
-        DXFwireframe,
-        VRML,
-        Vertices,
-        Details,
-        DetailsWithVertices,
-        Lines,
-        Num
-    };
-
-    constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyNamesUC{
-        "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
 
     ReportName rptName =
         static_cast<ReportName>(getEnumerationValue(ReportNamesUC, UtilityRoutines::MakeUPPERCase(UtilityRoutines::MakeUPPERCase(reportName))));
