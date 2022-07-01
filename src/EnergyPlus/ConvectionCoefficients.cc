@@ -463,7 +463,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
     TSky = state.dataEnvrn->SkyTempKelvin;
     TGround = TAir;
 
-    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperties) {
         SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +

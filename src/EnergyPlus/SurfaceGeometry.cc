@@ -927,7 +927,6 @@ namespace SurfaceGeometry {
         }
         state.dataSurface->SurfSchedExternalShadingFrac.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExternalShadingSchInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfHasSurroundingSurfProperties.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfSurroundingSurfacesNum.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHasLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
@@ -943,7 +942,6 @@ namespace SurfaceGeometry {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
             state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
-            state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = false;
             state.dataSurface->SurfSurroundingSurfacesNum(SurfNum) = 0;
             state.dataSurface->SurfHasLinkedOutAirNode(SurfNum) = false;
             state.dataSurface->SurfLinkedOutAirNode(SurfNum) = 0;
@@ -8121,6 +8119,7 @@ namespace SurfaceGeometry {
             for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 auto &SurfLocalEnv = state.dataSurface->SurfLocalEnvironment(Loop);
                 if (SurfLocalEnv.SurfPtr == SurfLoop) {
+                    auto &surface = state.dataSurface->Surface(SurfLoop);
                     if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
                         state.dataSurface->SurfHasLinkedOutAirNode(SurfLoop) = true;
                         state.dataSurface->SurfLinkedOutAirNode(SurfLoop) = SurfLocalEnv.OutdoorAirNodePtr;
@@ -8130,11 +8129,10 @@ namespace SurfaceGeometry {
                         state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = SurfLocalEnv.ExtShadingSchedPtr;
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
-                        state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
+                        surface.SurfHasSurroundingSurfProperties = true;
                         state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = SurfLocalEnv.SurroundingSurfsPtr;
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
-                        auto &surface = state.dataSurface->Surface(SurfLoop);
                         surface.IsSurfPropertyGndSurfacesDefined = true;
                         surface.UseSurfPropertyGndSurfTemp = true;
                         surface.UseSurfPropertyGndSurfRefl = true;
