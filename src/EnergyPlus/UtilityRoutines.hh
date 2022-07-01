@@ -222,6 +222,8 @@ namespace UtilityRoutines {
     {
     };
 
+    Real64 epElapsedTime();
+
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
     int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int NumItems);
