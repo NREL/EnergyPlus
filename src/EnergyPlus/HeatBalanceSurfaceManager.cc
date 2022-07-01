@@ -2481,7 +2481,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             state.dataSurface->SurfSkySolarInc(SurfNum) = 0.0;
             state.dataSurface->SurfGndSolarInc(SurfNum) = 0.0;
-            state.dataSurface->GndReflSolarRad(SurfNum) = 0.0;
         }
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
             state.dataHeatBal->ZoneTransSolar(enclNum) = 0.0;
@@ -8887,9 +8886,8 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
     }
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) || state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
-
-            auto &Surface = state.dataSurface->Surface(SurfNum);
+        auto &Surface = state.dataSurface->Surface(SurfNum);
+        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) || Surface.IsSurfPropertyGndSurfacesDefined) {
 
             int GndSurfsNum = 0;
             int SrdSurfsNum = 0;
@@ -8907,7 +8905,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
                 if (SurfsSkyViewFactor > 0.0) {
                     SrdSurfsViewFactor += SurfsSkyViewFactor;
                 }
-                if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
+                if (!Surface.IsSurfPropertyGndSurfacesDefined) {
                     SrdSurfsViewFactor += SrdSurfsProperty.GroundViewFactor;
                     IsGroundViewFactorSet = SrdSurfsProperty.IsGroundViewFactorSet;
                     GroundSurfsViewFactor = SrdSurfsProperty.GroundViewFactor;
@@ -8916,7 +8914,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
                     SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
                 }
             }
-            if (state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) {
+            if (Surface.IsSurfPropertyGndSurfacesDefined) {
                 GndSurfsNum = state.dataSurface->GroundSurfsPropertyNum(SurfNum);
                 IsGroundViewFactorSet = state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet;
                 GroundSurfsViewFactor = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
@@ -8990,7 +8988,7 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
     }
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) continue;
+        if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) continue;
         auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum));
         if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
             state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
@@ -9030,7 +9028,7 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
     }
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
-        if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) continue;
+        if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) continue;
         auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum));
         if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
             state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
@@ -9058,7 +9056,7 @@ void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
     //  the ground view factor value is set to the first element
     //  when the ground view factor input field is blank
 
-    if (!state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum)) return;
+    if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) return;
     auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->GroundSurfsPropertyNum(SurfNum));
     GndSurfsProperty.SurfsViewFactorSum = state.dataSurface->Surface(SurfNum).ViewFactorGroundIR;
 
