@@ -2909,7 +2909,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
             Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
             if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
-                GndReflSolarRad = Surface(SurfNum).GndReflSolarRad;
+                GndReflSolarRad = state.dataSurface->Surface(SurfNum).GndReflSolarRad;
             }
             // Add all reflected solar from the outside shelf to the ground solar
             // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
@@ -8900,7 +8900,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
             bool IsGroundViewFactorSet = false;
             bool SetGroundViewFactorObject = false;
             if (Surface.SurfHasSurroundingSurfProperty) {
-                SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+                SrdSurfsNum = Surface.SurfSurroundingSurfacesNum;
                 auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                 SurfsSkyViewFactor = SrdSurfsProperty.SkyViewFactor;
                 IsSkyViewFactorSet = SrdSurfsProperty.IsSkyViewFactorSet;
@@ -8917,7 +8917,7 @@ void InitSurfacePropertyViewFactors(EnergyPlusData &state)
                 }
             }
             if (Surface.IsSurfPropertyGndSurfacesDefined) {
-                GndSurfsNum = state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+                GndSurfsNum = Surface.SurfPropertyGndSurfIndex;
                 IsGroundViewFactorSet = state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet;
                 GroundSurfsViewFactor = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
                 SrdSurfsViewFactor += GroundSurfsViewFactor;
