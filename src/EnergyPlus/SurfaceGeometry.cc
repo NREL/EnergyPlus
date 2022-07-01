@@ -925,11 +925,6 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfSchedMovInsulExt(SurfNum) = 0;
             state.dataSurface->SurfSchedMovInsulInt(SurfNum) = 0;
         }
-        state.dataSurface->SurfSchedExternalShadingFrac.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExternalShadingSchInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfSurroundingSurfacesNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfHasLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtEcoRoof.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtCavityPresent.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtCavNum.allocate(state.dataSurface->TotSurfaces);
@@ -940,11 +935,6 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
-            state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
-            state.dataSurface->SurfSurroundingSurfacesNum(SurfNum) = 0;
-            state.dataSurface->SurfHasLinkedOutAirNode(SurfNum) = false;
-            state.dataSurface->SurfLinkedOutAirNode(SurfNum) = 0;
             state.dataSurface->SurfExtEcoRoof(SurfNum) = false;
             state.dataSurface->SurfExtCavityPresent(SurfNum) = false;
             state.dataSurface->SurfExtCavNum(SurfNum) = 0;
@@ -8121,16 +8111,16 @@ namespace SurfaceGeometry {
                 if (SurfLocalEnv.SurfPtr == SurfLoop) {
                     auto &surface = state.dataSurface->Surface(SurfLoop);
                     if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
-                        state.dataSurface->SurfHasLinkedOutAirNode(SurfLoop) = true;
-                        state.dataSurface->SurfLinkedOutAirNode(SurfLoop) = SurfLocalEnv.OutdoorAirNodePtr;
+                        surface.SurfHasLinkedOutAirNode = true;
+                        surface.SurfLinkedOutAirNode = SurfLocalEnv.OutdoorAirNodePtr;
                     }
                     if (SurfLocalEnv.ExtShadingSchedPtr != 0) {
-                        state.dataSurface->SurfSchedExternalShadingFrac(SurfLoop) = true;
-                        state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = SurfLocalEnv.ExtShadingSchedPtr;
+                        surface.SurfSchedExternalShadingFrac = true;
+                        surface.SurfExternalShadingSchInd = SurfLocalEnv.ExtShadingSchedPtr;
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         surface.SurfHasSurroundingSurfProperty = true;
-                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = SurfLocalEnv.SurroundingSurfsPtr;
+                        surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
                         surface.IsSurfPropertyGndSurfacesDefined = true;

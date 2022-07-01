@@ -448,7 +448,6 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
     Real64 Hf;             // Forced part of exterior convection
     Real64 rCalcPerimeter; // approximation for Perimeter
     int BaseSurf;
-    int SrdSurfsNum; // Srd surface counter
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &Surface(state.dataSurface->Surface);
@@ -464,7 +463,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
     TGround = TAir;
 
     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
                    DataGlobalConstants::KelvinConv;

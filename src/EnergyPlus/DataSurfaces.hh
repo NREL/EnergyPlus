@@ -748,7 +748,12 @@ namespace DataSurfaces {
         bool UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
         bool UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
         Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
-        bool SurfHasSurroundingSurfProperty; // true if surrounding surfaces properties are listed for an external surface
+        bool SurfHasSurroundingSurfProperty;   // true if surrounding surfaces properties are listed for an external surface
+        bool SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
+        bool SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
+        int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+        int SurfExternalShadingSchInd;         // Schedule for a the external shading
+        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
 
         // Default Constructor
         SurfaceData()
@@ -765,7 +770,8 @@ namespace DataSurfaces {
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
               ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false),
               SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
-              SurfHasSurroundingSurfProperty(false)
+              SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false), SurfHasLinkedOutAirNode(false),
+              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
         {
         }
 
@@ -1519,11 +1525,6 @@ struct SurfacesData : BaseGlobalStruct
 
     // Surface Properties
     Array1D<int> SurfDaylightingShelfInd;        // Pointer to daylighting shelf
-    Array1D<bool> SurfSchedExternalShadingFrac;  // true if the external shading is scheduled or calculated externally to be imported
-    Array1D<int> SurfExternalShadingSchInd;      // Schedule for a the external shading
-    Array1D<int> SurfSurroundingSurfacesNum;     // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
-    Array1D<bool> SurfHasLinkedOutAirNode;       // true if an OutdoorAir::Node is linked to the surface
-    Array1D<int> SurfLinkedOutAirNode;           // Index of the an OutdoorAir:Node
     Array1D<bool> SurfExtEcoRoof;                // True if the top outside construction material is of type Eco Roof
     Array1D<bool> SurfExtCavityPresent;          // true if there is an exterior vented cavity on surface
     Array1D<int> SurfExtCavNum;                  // index for this surface in ExtVentedCavity structure (if any)
@@ -1906,11 +1907,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWindDirEMSOverrideOn.deallocate();
         this->SurfWindDirEMSOverrideValue.deallocate();
         this->SurfDaylightingShelfInd.deallocate();
-        this->SurfSchedExternalShadingFrac.deallocate();
-        this->SurfExternalShadingSchInd.deallocate();
-        this->SurfSurroundingSurfacesNum.deallocate();
-        this->SurfHasLinkedOutAirNode.deallocate();
-        this->SurfLinkedOutAirNode.deallocate();
         this->SurfExtEcoRoof.deallocate();
         this->SurfExtCavityPresent.deallocate();
         this->SurfExtCavNum.deallocate();

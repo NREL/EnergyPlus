@@ -3077,9 +3077,6 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
 
     // add surface property object and test view factors change
     state->dataGlobal->AnyLocalEnvironmentsInModel = true;
-    state->dataSurface->SurfSurroundingSurfacesNum.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfSurroundingSurfacesNum = 0;
-    state->dataSurface->SurfSurroundingSurfacesNum(windowSurfNum) = 1;
     state->dataSurface->SurroundingSurfsProperty.allocate(1);
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(1);
     SrdSurfsProperty.TotSurroundingSurface = 1;
@@ -3095,6 +3092,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     win_Surface.UseSurfPropertyGndSurfTemp = true;
     win_Surface.UseSurfPropertyGndSurfRefl = true;
     win_Surface.SurfHasSurroundingSurfProperty = true;
+    win_Surface.SurfSurroundingSurfacesNum = 1;
 
     state->dataSurface->GroundSurfsProperty.allocate(1);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);
