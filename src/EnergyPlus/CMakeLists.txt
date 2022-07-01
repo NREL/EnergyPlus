@@ -214,7 +214,6 @@ set(SRC
     DataSurfaces.hh
     DataSystemVariables.cc
     DataSystemVariables.hh
-    DataTimings.cc
     DataTimings.hh
     DataUCSDSharedData.hh
     DataVectorTypes.hh
@@ -614,7 +613,6 @@ set(SRC
     ThermalEN673Calc.hh
     ThermalISO15099Calc.cc
     ThermalISO15099Calc.hh
-    Timer.h
     TranspiredCollector.cc
     TranspiredCollector.hh
     UFADManager.cc
