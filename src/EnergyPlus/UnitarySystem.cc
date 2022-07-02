@@ -1967,7 +1967,8 @@ namespace UnitarySystems {
               (this->m_sysType == SysType::Unitary && this->m_HeatPump))) ||
             (this->m_sysType == SysType::Unitary && (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted ||
                                                      this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling ||
-                                                     this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed))) {
+                                                     this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                                                     this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling))) {
             EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
             EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
         }
