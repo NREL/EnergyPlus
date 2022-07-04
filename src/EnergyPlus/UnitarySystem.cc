@@ -8437,7 +8437,8 @@ namespace UnitarySystems {
             this->controlUnitarySystemOutput(
                 state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompressorOn);
         }
-        if (state.dataLoopNodes->Node(this->AirOutNode).MassFlowRate < DataHVACGlobals::SmallMassFlow) {
+        if (state.dataLoopNodes->Node(this->AirOutNode).MassFlowRate < DataHVACGlobals::SmallMassFlow && this->m_sysType != SysType::PackagedAC &&
+            this->m_sysType != SysType::PackagedHP && this->m_sysType != SysType::PackagedWSHP) {
             state.dataUnitarySystems->CoolingLoad = false;
             state.dataUnitarySystems->HeatingLoad = false;
             state.dataUnitarySystems->MoistureLoad = 0.0;
@@ -10894,12 +10895,15 @@ namespace UnitarySystems {
 
         state.dataUnitarySystems->CoolingLoad = false;
         state.dataUnitarySystems->HeatingLoad = false;
-
-        if (QZnReq > this->m_SmallLoadTolerance) { // no need to check deadband flag, QZnReq is correct.
+        Real64 smallLoadTolerance = this->m_SmallLoadTolerance;
+        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+            smallLoadTolerance = DataHVACGlobals::SmallLoad;
+        }
+        if (QZnReq > smallLoadTolerance) { // no need to check deadband flag, QZnReq is correct.
             if (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling) {
                 state.dataUnitarySystems->HeatingLoad = true;
             }
-        } else if (QZnReq < -this->m_SmallLoadTolerance) {
+        } else if (QZnReq < -smallLoadTolerance) {
             if (state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
                 state.dataUnitarySystems->CoolingLoad = true;
             }
@@ -11031,7 +11035,7 @@ namespace UnitarySystems {
                 this->m_IterationMode[0] = NoCoolHeat;
             }
             // IF small loads to meet or not converging, just shut down unit
-            if (std::abs(ZoneLoad) < this->m_SmallLoadTolerance) {
+            if (std::abs(ZoneLoad) < smallLoadTolerance) {
                 ZoneLoad = 0.0;
                 state.dataUnitarySystems->CoolingLoad = false;
                 state.dataUnitarySystems->HeatingLoad = false;
@@ -12565,7 +12569,13 @@ namespace UnitarySystems {
         case DataHVACGlobals::Coil_HeatingSteam: {
             // this same CALL is made in the steam coil calc routine
             mdot = min(state.dataLoopNodes->Node(this->HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail, this->MaxHeatCoilFluidFlow * PartLoadRatio);
-            state.dataLoopNodes->Node(this->HeatCoilFluidInletNode).MassFlowRate = mdot;
+            if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+                // tried this to resolve the PackagedTerminalAirConditioner steam spike issue, no help, but this is the correct way to do this
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, this->HeatCoilFluidInletNode, this->HeatCoilFluidOutletNodeNum, this->HeatCoilPlantLoc);
+            } else {
+                state.dataLoopNodes->Node(this->HeatCoilFluidInletNode).MassFlowRate = mdot;
+            }
             SteamCoils::SimulateSteamCoilComponents(state,
                                                     CompName,
                                                     FirstHVACIteration,
