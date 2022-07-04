@@ -56,6 +56,7 @@
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -166,6 +167,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 OutTemp = 0.0;
                             if (DDNum > 0 && TimeStepNumAtMax > 0) {
                                 OutTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+                            }
+                            if (this->dataCoolCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                                OutTemp = VariableSpeedCoils::GetVSCoilRatedSourceTemp(state, this->dataCoolCoilIndex);
                             }
                             Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                             Real64 CoilOutEnth = Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
@@ -348,6 +352,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (this->dataDesInletAirHumRat > 0.0) CoilInHumRat = this->dataDesInletAirHumRat;
                         }
                         Real64 OutTemp = this->finalSysSizing(this->curSysNum).OutTempAtCoolPeak;
+                        if (this->dataCoolCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                            OutTemp = VariableSpeedCoils::GetVSCoilRatedSourceTemp(state, this->dataCoolCoilIndex);
+                        }
                         CoilOutTemp = min(CoilInTemp, CoilOutTemp);
                         CoilOutHumRat = min(CoilInHumRat, CoilOutHumRat);
                         Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
