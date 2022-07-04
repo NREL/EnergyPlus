@@ -64,7 +64,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/CurveManager.cc>
+#include <EnergyPlus/CurveManager.hh>
 
 namespace EnergyPlus {
 
@@ -1568,8 +1568,8 @@ namespace StandardRatings {
             TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
             NetCoolingCapRated = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
 
-            SEERSingleStageCalculation(TotCapTempModFac,
-                            state,
+            SEERSingleStageCalculation(state,
+                            TotCapTempModFac,
                             CapFTempCurveIndex,
                             TotCoolingCapAHRI,
                             RatedTotalCapacity,
@@ -1648,46 +1648,63 @@ namespace StandardRatings {
         }
     }
 
-    void SEERSingleStageCalculation(Real64 &TotCapTempModFac,
-                         EnergyPlus::EnergyPlusData &state,
-                         const int &CapFTempCurveIndex,
-                         Real64 &TotCoolingCapAHRI,
-                         const Real64 &RatedTotalCapacity,
-                         const Real64 &TotCapFlowModFac,
-                         Real64 &EIRTempModFac,
-                         const int &EIRFTempCurveIndex,
-                         Real64 &EIRFlowModFac,
-                         const int &EIRFFlowCurveIndex,
-                         const Real64 &RatedCOP,
-                         Real64 &EIR,
-                         Real64 &NetCoolingCapAHRI,
-                         const Real64 &FanPowerPerEvapAirFlowRate,
-                         const Real64 &RatedAirVolFlowRate,
-                         Real64 &TotalElecPower,
-                         Real64 &PartLoadFactorUser,
-                         const int &PLFFPLRCurveIndex,
-                         Real64 &PartLoadFactorStandard,
+    void SEERSingleStageCalculation(EnergyPlusData &state,
+                         Real64 TotCapTempModFac,
+                         int CapFTempCurveIndex,
+                         Real64 TotCoolingCapAHRI,
+                         Real64 RatedTotalCapacity,
+                         Real64 TotCapFlowModFac,
+                         Real64 EIRTempModFac,
+                         int EIRFTempCurveIndex,
+                         Real64 EIRFlowModFac,
+                         int EIRFFlowCurveIndex,
+                         Real64 RatedCOP,
+                         Real64 EIR,
+                         Real64 NetCoolingCapAHRI,
+                         Real64 FanPowerPerEvapAirFlowRate,
+                         Real64 RatedAirVolFlowRate,
+                         Real64 TotalElecPower,
+                         Real64 PartLoadFactorUser,
+                         int PLFFPLRCurveIndex,
+                         Real64 PartLoadFactorStandard,
                          Real64 &SEER_User,
                          Real64 &SEER_Standard)
     {
-        // Using/Aliasing
-        using CurveManager::CurveValue;
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Nigusse, FSEC
+        //       DATE WRITTEN   December 2012
+        //       MODIFIED
+        //       RE-ENGINEERED  Brijendra Singh
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Calculates the SEER values for single speed based on AHRI 210/230 2008
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // SEER calculations:
-        TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        TotCapTempModFac = CurveManager::CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
         TotCoolingCapAHRI = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac;
-        EIRTempModFac = CurveValue(state, EIRFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
-        EIRFlowModFac = CurveValue(state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
-        if (RatedCOP > 0.0) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
-            EIR = EIRTempModFac * EIRFlowModFac / RatedCOP;
-        } else {
-            EIR = 0.0;
-        }
+        EIRTempModFac = CurveManager::CurveValue(state, EIRFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        EIRFlowModFac = CurveManager::CurveValue(state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
+        EIR = (RatedCOP > 0.0) ? EIRTempModFac * EIRFlowModFac / RatedCOP : 0.0;
+        
         // Calculate net cooling capacity
         NetCoolingCapAHRI = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
         TotalElecPower = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
         // Calculate SEER value from the Energy Efficiency Ratio (EER) at the AHRI test conditions and the part load factor.
         // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
-        PartLoadFactorUser = CurveValue(state, PLFFPLRCurveIndex, PLRforSEER);
+        PartLoadFactorUser = CurveManager::CurveValue(state, PLFFPLRCurveIndex, PLRforSEER);
         PartLoadFactorStandard = 1.0 - CyclicDegradationCoeff * (1.0 - PLRforSEER);
         SEER_User = 0.0;
         SEER_Standard = 0.0;
@@ -1695,51 +1712,6 @@ namespace StandardRatings {
             SEER_User = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorUser;
             SEER_Standard = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorStandard;
         }
-    }
-
-    void SEER2SingleStageCalculation(Real64 &TotCapTempModFac,
-                         EnergyPlus::EnergyPlusData &state,
-                         const int &CapFTempCurveIndex,
-                         Real64 &TotCoolingCapAHRI,
-                         const Real64 &RatedTotalCapacity,
-                         const Real64 &TotCapFlowModFac,
-                         Real64 &EIRTempModFac,
-                         const int &EIRFTempCurveIndex,
-                         Real64 &EIRFlowModFac,
-                         const int &EIRFFlowCurveIndex,
-                         const Real64 &RatedCOP,
-                         Real64 &EIR,
-                         Real64 &NetCoolingCapAHRI,
-                         const Real64 &FanPowerPerEvapAirFlowRate,
-                         const Real64 &RatedAirVolFlowRate,
-                         Real64 &TotalElecPower,
-                         Real64 &PartLoadFactorUser,
-                         const int &PLFFPLRCurveIndex,
-                         Real64 &PartLoadFactorStandard,
-                         Real64 &SEER_User,
-                         Real64 &SEER_Standard)
-    {
-        // Using/Aliasing
-        using CurveManager::CurveValue;
-       
-       /*  
-           For staging_type == StagingType.SINGLE_STAGE:
-           plf = 1.0 - 0.5*self.c_d_cooling # eq. 11.56 --> 11.63
-           seer = plf*self.net_cooling_cop(self.B_full_cond) # eq. 11.55 --> 11.62 (using COP to keep things in SI units for now)
- 
-           PLF^x --> Part Load Factor for condition x, where x is blank,"Full" or "Low"
-           PLF(0.5) --> Part Load Factor for SEER2
-           PLF^x(tj) --> Part Load Factor for condition x at Temperature Bin j, where x is blank,"Full" or "Low"
-       */
-
-        // TODO 
-        Real64 c_d_cooling = 0.25; // ??
-        Real64 gross_total_cooling_capacity_Conditions; // ??
-        Real64 gross_cooling_power_conditions; // ??
-        Real64 net_cooling_cop__B_full_cond = gross_total_cooling_capacity_Conditions / gross_cooling_power_conditions; // ??
-
-        Real64 plf = 1.0 - 0.5 * c_d_cooling;
-        Real64 seer = plf * net_cooling_cop__B_full_cond;
     }
 
     void DXCoolingCoilDataCenterStandardRatings(
