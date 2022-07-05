@@ -1812,7 +1812,6 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_TRUE(process_idf(idf_objects, false));
 
     int coilIndex = CoilCoolingDX::factory(*state, "DX Cooling Coil");
     auto &this_dx_clg_coil = state->dataCoilCooingDX->coilCoolingDXs[coilIndex];
@@ -1869,10 +1868,6 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
 
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.0;
-
-    // Need this to prevent crash in Sizers
-    state->dataSize->UnitarySysEqSizing.allocate(1);
-    state->dataSize->OASysEqSizing.allocate(1);
 
     // size cooling coil dx
     this_dx_clg_coil.size(*state);
