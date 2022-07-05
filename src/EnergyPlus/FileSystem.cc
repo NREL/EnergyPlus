@@ -86,9 +86,9 @@ namespace FileSystem {
         "EPJSON", "JSON", "GLHE", "CBOR", "MSGPACK", "UBJSON", "BSON", "IDF", "IMF", "CSV", "TSV", "TXT", "ESO", "MTR"};
 
     static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
-    static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
-
     static_assert(FileTypesExtUC.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExtUC array.");
+
+    static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
     static_assert(!FileTypesExtUC.back().empty(), "Likely missing an enum from FileTypes in FileTypesExtUC array.");
 
     fs::path makeNativePath(fs::path const &path)
