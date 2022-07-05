@@ -3077,12 +3077,6 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
 
     // add surface property object and test view factors change
     state->dataGlobal->AnyLocalEnvironmentsInModel = true;
-    state->dataSurface->SurfHasSurroundingSurfProperties.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfHasSurroundingSurfProperties = false;
-    state->dataSurface->SurfHasSurroundingSurfProperties(windowSurfNum) = true;
-    state->dataSurface->SurfSurroundingSurfacesNum.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfSurroundingSurfacesNum = 0;
-    state->dataSurface->SurfSurroundingSurfacesNum(windowSurfNum) = 1;
     state->dataSurface->SurroundingSurfsProperty.allocate(1);
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(1);
     SrdSurfsProperty.TotSurroundingSurface = 1;
@@ -3093,18 +3087,13 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SrdSurfsProperty.GroundViewFactor = 0.0;
     SrdSurfsProperty.IsGroundViewFactorSet = false;
 
-    state->dataSurface->IsSurfPropertyGndSurfacesDefined.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->IsSurfPropertyGndSurfacesDefined = false;
-    state->dataSurface->IsSurfPropertyGndSurfacesDefined(windowSurfNum) = true;
-    state->dataSurface->GroundSurfsPropertyNum.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->GroundSurfsPropertyNum = 0;
-    state->dataSurface->GroundSurfsPropertyNum(windowSurfNum) = 1;
-    state->dataSurface->UseSurfPropertyGndSurfTemp.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->UseSurfPropertyGndSurfTemp = false;
-    state->dataSurface->UseSurfPropertyGndSurfTemp(windowSurfNum) = true;
-    state->dataSurface->UseSurfPropertyGndSurfRefl.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->UseSurfPropertyGndSurfRefl = false;
-    state->dataSurface->UseSurfPropertyGndSurfRefl(windowSurfNum) = true;
+    win_Surface.IsSurfPropertyGndSurfacesDefined = true;
+    win_Surface.SurfPropertyGndSurfIndex = 1;
+    win_Surface.UseSurfPropertyGndSurfTemp = true;
+    win_Surface.UseSurfPropertyGndSurfRefl = true;
+    win_Surface.SurfHasSurroundingSurfProperty = true;
+    win_Surface.SurfSurroundingSurfacesNum = 1;
+
     state->dataSurface->GroundSurfsProperty.allocate(1);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);
     state->dataSurface->TotSurfPropGndSurfs = 1;

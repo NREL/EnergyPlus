@@ -925,12 +925,6 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfSchedMovInsulExt(SurfNum) = 0;
             state.dataSurface->SurfSchedMovInsulInt(SurfNum) = 0;
         }
-        state.dataSurface->SurfSchedExternalShadingFrac.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExternalShadingSchInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfHasSurroundingSurfProperties.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfSurroundingSurfacesNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfHasLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtEcoRoof.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtCavityPresent.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtCavNum.allocate(state.dataSurface->TotSurfaces);
@@ -940,18 +934,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfICSPtr.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->IsSurfPropertyGndSurfacesDefined.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->GroundSurfsPropertyNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->UseSurfPropertyGndSurfTemp.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->UseSurfPropertyGndSurfRefl.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->GndReflSolarRad.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
-            state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
-            state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = false;
-            state.dataSurface->SurfSurroundingSurfacesNum(SurfNum) = 0;
-            state.dataSurface->SurfHasLinkedOutAirNode(SurfNum) = false;
-            state.dataSurface->SurfLinkedOutAirNode(SurfNum) = 0;
             state.dataSurface->SurfExtEcoRoof(SurfNum) = false;
             state.dataSurface->SurfExtCavityPresent(SurfNum) = false;
             state.dataSurface->SurfExtCavNum(SurfNum) = 0;
@@ -961,11 +944,6 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfICSPtr(SurfNum) = 0;
             state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfNum) = false;
             state.dataSurface->SurfDaylightingShelfInd(SurfNum) = 0;
-            state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfNum) = false;
-            state.dataSurface->GroundSurfsPropertyNum(SurfNum) = 0;
-            state.dataSurface->UseSurfPropertyGndSurfTemp(SurfNum) = false;
-            state.dataSurface->UseSurfPropertyGndSurfRefl(SurfNum) = false;
-            state.dataSurface->GndReflSolarRad(SurfNum) = 0.0;
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
@@ -8131,23 +8109,24 @@ namespace SurfaceGeometry {
             for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 auto &SurfLocalEnv = state.dataSurface->SurfLocalEnvironment(Loop);
                 if (SurfLocalEnv.SurfPtr == SurfLoop) {
+                    auto &surface = state.dataSurface->Surface(SurfLoop);
                     if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
-                        state.dataSurface->SurfHasLinkedOutAirNode(SurfLoop) = true;
-                        state.dataSurface->SurfLinkedOutAirNode(SurfLoop) = SurfLocalEnv.OutdoorAirNodePtr;
+                        surface.SurfHasLinkedOutAirNode = true;
+                        surface.SurfLinkedOutAirNode = SurfLocalEnv.OutdoorAirNodePtr;
                     }
                     if (SurfLocalEnv.ExtShadingSchedPtr != 0) {
-                        state.dataSurface->SurfSchedExternalShadingFrac(SurfLoop) = true;
-                        state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = SurfLocalEnv.ExtShadingSchedPtr;
+                        surface.SurfSchedExternalShadingFrac = true;
+                        surface.SurfExternalShadingSchInd = SurfLocalEnv.ExtShadingSchedPtr;
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
-                        state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
-                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = SurfLocalEnv.SurroundingSurfsPtr;
+                        surface.SurfHasSurroundingSurfProperty = true;
+                        surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
-                        state.dataSurface->IsSurfPropertyGndSurfacesDefined(SurfLoop) = true;
-                        state.dataSurface->UseSurfPropertyGndSurfTemp(SurfLoop) = true;
-                        state.dataSurface->UseSurfPropertyGndSurfRefl(SurfLoop) = true;
-                        state.dataSurface->GroundSurfsPropertyNum(SurfLoop) = SurfLocalEnv.GroundSurfsPtr;
+                        surface.IsSurfPropertyGndSurfacesDefined = true;
+                        surface.UseSurfPropertyGndSurfTemp = true;
+                        surface.UseSurfPropertyGndSurfRefl = true;
+                        surface.SurfPropertyGndSurfIndex = SurfLocalEnv.GroundSurfsPtr;
                     }
                 }
             }

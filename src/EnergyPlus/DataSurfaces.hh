@@ -742,7 +742,18 @@ namespace DataSurfaces {
 
         ConvectionConstants::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
 
-        SurfaceCalcHashKey calcHashKey; // Hash key used for determining if this surface requires unique calculations.
+        SurfaceCalcHashKey calcHashKey;        // Hash key used for determining if this surface requires unique calculations.
+        bool IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
+        int SurfPropertyGndSurfIndex;          // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+        bool UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
+        bool UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
+        Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
+        bool SurfHasSurroundingSurfProperty;   // true if surrounding surfaces properties are listed for an external surface
+        bool SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
+        bool SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
+        int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+        int SurfExternalShadingSchInd;         // Schedule for a the external shading
+        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
 
         // Default Constructor
         SurfaceData()
@@ -757,7 +768,10 @@ namespace DataSurfaces {
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
-              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
+              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false),
+              SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
+              SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false), SurfHasLinkedOutAirNode(false),
+              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
         {
         }
 
@@ -1510,26 +1524,15 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWindDirEMSOverrideValue;          // value to use for EMS override of outside wind direction (deg)
 
     // Surface Properties
-    Array1D<int> SurfDaylightingShelfInd;           // Pointer to daylighting shelf
-    Array1D<bool> SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
-    Array1D<int> SurfExternalShadingSchInd;         // Schedule for a the external shading
-    Array1D<bool> SurfHasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
-    Array1D<int> SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
-    Array1D<bool> SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
-    Array1D<int> SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
-    Array1D<bool> SurfExtEcoRoof;                   // True if the top outside construction material is of type Eco Roof
-    Array1D<bool> SurfExtCavityPresent;             // true if there is an exterior vented cavity on surface
-    Array1D<int> SurfExtCavNum;                     // index for this surface in ExtVentedCavity structure (if any)
-    Array1D<bool> SurfIsPV;                         // true if this is a photovoltaic surface (dxf output)
-    Array1D<bool> SurfIsICS;                        // true if this is an ICS collector
-    Array1D<bool> SurfIsPool;                       // true if this is a pool
-    Array1D<int> SurfICSPtr;                        // Index to ICS collector
-    Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
-    Array1D<bool> IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
-    Array1D<int> GroundSurfsPropertyNum;            // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
-    Array1D<bool> UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
-    Array1D<bool> UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
-    Array1D<Real64> GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
+    Array1D<int> SurfDaylightingShelfInd;        // Pointer to daylighting shelf
+    Array1D<bool> SurfExtEcoRoof;                // True if the top outside construction material is of type Eco Roof
+    Array1D<bool> SurfExtCavityPresent;          // true if there is an exterior vented cavity on surface
+    Array1D<int> SurfExtCavNum;                  // index for this surface in ExtVentedCavity structure (if any)
+    Array1D<bool> SurfIsPV;                      // true if this is a photovoltaic surface (dxf output)
+    Array1D<bool> SurfIsICS;                     // true if this is an ICS collector
+    Array1D<bool> SurfIsPool;                    // true if this is a pool
+    Array1D<int> SurfICSPtr;                     // Index to ICS collector
+    Array1D<bool> SurfIsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
@@ -1904,12 +1907,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWindDirEMSOverrideOn.deallocate();
         this->SurfWindDirEMSOverrideValue.deallocate();
         this->SurfDaylightingShelfInd.deallocate();
-        this->SurfSchedExternalShadingFrac.deallocate();
-        this->SurfExternalShadingSchInd.deallocate();
-        this->SurfHasSurroundingSurfProperties.deallocate();
-        this->SurfSurroundingSurfacesNum.deallocate();
-        this->SurfHasLinkedOutAirNode.deallocate();
-        this->SurfLinkedOutAirNode.deallocate();
         this->SurfExtEcoRoof.deallocate();
         this->SurfExtCavityPresent.deallocate();
         this->SurfExtCavNum.deallocate();
@@ -2143,11 +2140,6 @@ struct SurfacesData : BaseGlobalStruct
         this->IntMassObjects.deallocate();
         this->actualMaxSlatAngs = DataSurfaces::MaxSlatAngs;
         this->GroundSurfsProperty.deallocate();
-        this->GroundSurfsPropertyNum.deallocate();
-        this->UseSurfPropertyGndSurfTemp.deallocate();
-        this->UseSurfPropertyGndSurfRefl.deallocate();
-        this->IsSurfPropertyGndSurfacesDefined.deallocate();
-        this->GndReflSolarRad.deallocate();
     }
 };
 
