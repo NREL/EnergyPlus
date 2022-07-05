@@ -1815,32 +1815,14 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
 
     int coilIndex = CoilCoolingDX::factory(*state, "DX Cooling Coil");
     auto &this_dx_clg_coil = state->dataCoilCooingDX->coilCoolingDXs[coilIndex];
-
     // check dx cooling coil inputs
     EXPECT_EQ(this_dx_clg_coil.name, "DX COOLING COIL");
-    // dx cooling coil air inlet node
-    auto &InletNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("DX COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-    // dx cooling coil condenser air inlet node
-    auto &CondInletNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("DX COOLING COIL CONDENSER INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
-
-    // set dx cooling coil air inlet node conditions
-    InletNode.Temp = 28.5;
-    InletNode.Press = 101325;
-    InletNode.HumRat = 0.014;
-    InletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(InletNode.Temp, InletNode.HumRat);
 
     // set dx cooling coil condenser inlet air conditions
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0196;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutWetBulbTemp = 27.0932;
-    CondInletNode.Temp = state->dataEnvrn->OutDryBulbTemp;
-    CondInletNode.HumRat = state->dataEnvrn->OutHumRat;
-    CondInletNode.Press = state->dataEnvrn->OutBaroPress;
-    CondInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(CondInletNode.Temp, CondInletNode.HumRat);
-
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -1852,22 +1834,18 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.0075;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow = 0.80;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
-
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
-    state->dataSize->DataAirFlowUsedForSizing = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow;
-
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
     state->dataSize->NumSysSizInput = 1;
-
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataSize->DataAirFlowUsedForSizing = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow;
 
     // size cooling coil dx
     this_dx_clg_coil.size(*state);
