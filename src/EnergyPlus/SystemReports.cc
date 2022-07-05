@@ -5057,7 +5057,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
 
     // loop over air loops
     for (int sysNum = 1; sysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++sysNum) {
-        Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow * state.dataEnvrn->StdRhoAir;
+        Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow / state.dataEnvrn->StdRhoAir;
         state.dataSysRpts->SysMechVentFlow(sysNum) = mechVentFlow;
         state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotal += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotal +=

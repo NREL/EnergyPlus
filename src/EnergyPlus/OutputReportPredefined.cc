@@ -736,6 +736,8 @@ namespace OutputReportPredefined {
         s->pdchOaMvZoneArea = newPreDefColumn(state, s->pdstOAmechVentParByZone, "Zone Area [m2]");
         s->pdchOaMvDesZnOa = newPreDefColumn(state, s->pdstOAmechVentParByZone, "Design Zone Outdoor Airflow - Voz [m3/s]");
         s->pdchOaMvMinDynTrgVent = newPreDefColumn(state, s->pdstOAmechVentParByZone, "Minimum Dynamic Target Ventilation - Voz-dyn-min [m3/s]");
+        addFootNoteSubTable(
+            state, s->pdstOAmechVentParByZone, "Values shown for a single zone without multipliers. Total Facility includes multipliers");
 
         s->pdstOAtotAirByZone = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Total Outdoor Air by Zone");
         s->pdchOaTaBzMechVent = newPreDefColumn(state, s->pdstOAtotAirByZone, "Mechanical Ventilation [m3]");
@@ -748,6 +750,7 @@ namespace OutputReportPredefined {
         s->pdchOaTaBzTmAt = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time At Voz-dyn [hr]");
         s->pdchOaTaBzTmAbove = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Above Voz-dyn [hr]");
         s->pdchOaTaBzTmAboveUnocc = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Above Zero When Unoccupied [hr]");
+        addFootNoteSubTable(state, s->pdstOAtotAirByZone, "Values shown for a single zone without multipliers. Total Facility includes multipliers");
 
         s->pdstOAavgOccByZone = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Average Outdoor Air During Occupancy by Zone - Flow Rates");
         s->pdchOaOccBzMechVent = newPreDefColumn(state, s->pdstOAavgOccByZone, "Mechanical Ventilation [m3/s]");
@@ -759,11 +762,12 @@ namespace OutputReportPredefined {
         s->pdchOaOccBzTmBelow = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time Below Voz-dyn [hr]");
         s->pdchOaOccBzTmAt = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time At Voz-dyn [hr]");
         s->pdchOaOccBzTmAbove = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time Above Voz-dyn [hr]");
+        addFootNoteSubTable(state, s->pdstOAavgOccByZone, "Values shown for a single zone without multipliers. Total Facility includes multipliers");
 
         s->pdstOAtotAirByLoop = newPreDefSubTable(state, s->pdrOutsideAirDetails, "Total Outdoor Air by AirLoop");
         s->pdchOaTaAlMechVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Mechanical Ventilation [m3]");
-        s->pdchOaTaAlNatVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Natural Ventilation [m3/s]");
-        s->pdchOaTaAlTotVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Total Ventilation [m3/s]");
+        s->pdchOaTaAlNatVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Natural Ventilation [m3]");
+        s->pdchOaTaAlTotVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Total Ventilation [m3]");
         s->pdchOaTaAlSumDynTrgVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [m3]");
         s->pdchOaTaAlTmBelow = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Below Voz-sum-dyn [hr]");
         s->pdchOaTaAlTmAt = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time At Voz-sum-dyn [hr]");
