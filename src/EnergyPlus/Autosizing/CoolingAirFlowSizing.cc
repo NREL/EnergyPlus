@@ -371,7 +371,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             }
         }
     }
-    if (this->dataDXCoolsLowSpeedsAutozize) {
+    if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue *= this->dataFractionUsedForSizing;
     }
     this->select2StgDXHumCtrlSizerOutput(state, errorsFound);

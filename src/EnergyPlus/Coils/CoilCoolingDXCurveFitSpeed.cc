@@ -360,7 +360,6 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     // stringOverride = preFixString + stringOverride;
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
     if (this->original_input_specs.evaporator_air_flow_fraction < 1.0) {
-        state.dataSize->DataDXCoolsLowSpeedsAutozize = true;
         state.dataSize->DataFractionUsedForSizing = this->original_input_specs.evaporator_air_flow_fraction;
     }
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -370,7 +369,6 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
     if (this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal < 1.0) {
-        state.dataSize->DataDXCoolsLowSpeedsAutozize = true;
         state.dataSize->DataConstantUsedForSizing = -999.0;
         state.dataSize->DataFlowUsedForSizing = this->parentModeRatedEvapAirFlowRate;
         state.dataSize->DataFractionUsedForSizing = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal;
@@ -418,7 +416,6 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 
     // reset for next speed or coil
     state.dataSize->DataConstantUsedForSizing = 0.0;
-    state.dataSize->DataDXCoolsLowSpeedsAutozize = false;
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,

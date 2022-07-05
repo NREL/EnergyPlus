@@ -463,7 +463,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             errorsFound = true;
         }
     }
-    if (this->dataDXCoolsLowSpeedsAutozize) {
+    if (this->dataFractionUsedForSizing > 0.0) {
         this->autoSizedValue *= this->dataFractionUsedForSizing;
     }
     if (!this->hardSizeNoDesignRun || this->dataScalableSizingON || this->dataScalableCapSizingON) {
