@@ -1093,6 +1093,7 @@ struct SizingData : BaseGlobalStruct
     bool ZoneHeatingOnlyFan = false;                 // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
     bool ZoneSizingRunDone = false;                  // True if a zone sizing run has been successfully completed.
     bool DataErrorsFound = false;                    // used for simulation termination when errors are found
+    bool DataDXCoolsLowSpeedsAutozize = false;       // true allows reporting lower speed CoilCoolingCurveFits Autosize
     Real64 AutoVsHardSizingThreshold = 0.1;          // criteria threshold used to determine if user hard size and autosize disagree 10%
     Real64 AutoVsHardSizingDeltaTempThreshold = 1.5; // temperature criteria threshold for autosize versus hard size [C]
     Real64 DataCoilSizingAirInTemp = 0.0;            // saves sizing data for use in coil object reporting
@@ -1273,6 +1274,7 @@ struct SizingData : BaseGlobalStruct
         this->ZoneHeatingOnlyFan = false;
         this->ZoneSizingRunDone = false;
         this->DataErrorsFound = false;
+        this->DataDXCoolsLowSpeedsAutozize = false;
         this->AutoVsHardSizingThreshold = 0.1;
         this->AutoVsHardSizingDeltaTempThreshold = 1.5;
         this->DataCoilSizingAirInTemp = 0.0;
