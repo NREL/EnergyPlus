@@ -2063,6 +2063,10 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneSNLoadCoolEnergy;
     Array1D<Real64> ZoneSNLoadHeatRate;
     Array1D<Real64> ZoneSNLoadCoolRate;
+    Array1D<Real64> ZoneLTLoadHeatEnergy; // latent heating energy [J]
+    Array1D<Real64> ZoneLTLoadCoolEnergy; // latent cooling energy [J]
+    Array1D<Real64> ZoneLTLoadHeatRate;   // latent heating rate [W]
+    Array1D<Real64> ZoneLTLoadCoolRate;   // latent cooling rate [W]
     Array1D<Real64> ZoneSNLoadPredictedRate;
     Array1D<Real64> ZoneSNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
     Array1D<Real64> ZoneSNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)

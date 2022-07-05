@@ -388,7 +388,7 @@ void ManageSizing(EnergyPlusData &state)
 
                     } // ... End hour loop.
 
-                    if (state.dataGlobal->EndDayFlag) {
+                    if (state.dataGlobal->EndDayFlag && !state.dataGlobal->WarmupFlag) {
                         UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                     }
@@ -3001,6 +3001,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
             for (Item1 = 1; Item1 <= SizingZoneObjects(Item).NumOfZones; ++Item1) {
                 ++ZoneSizIndex;
+                auto &zoneSizingIndex = state.dataSize->ZoneSizingInput(ZoneSizIndex);
                 if (!SizingZoneObjects(Item).ZoneListActive) {
                     if (SizingZoneObjects(Item).ZoneOrZoneListPtr > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName = ZoneNames(SizingZoneObjects(Item).ZoneOrZoneListPtr);
@@ -3082,12 +3083,6 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod = SupplyAirTemperature;
                     } else if (heatingSATMethod == "TEMPERATUREDIFFERENCE") {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod = TemperatureDifference;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                        ShowContinueError(
-                            state, "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\"");
-                        ShowContinueError(state, "... valid values are SupplyAirTemperature or TemperatureDifference.");
-                        ErrorsFound = true;
                     }
                 }
                 //  N3, \field Zone Heating Design Supply Air Temperature
@@ -3482,22 +3477,80 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
-                // get zone sizing type, sensible, latent, or sensible only with no latent
+                zoneSizingIndex.zoneSizing = ZoneSizing::SensibleOnly;
+                // change to getEnumerationValue
                 if (NumAlphas > 9) {
                     auto const zoneSizingType(state.dataIPShortCut->cAlphaArgs(10));
-                    if (zoneSizingType == "SENSIBLE LOAD ONLY") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneLatentSizing = true;
+                    if (zoneSizingType == "SENSIBLE LOAD") {
+                        zoneSizingIndex.zoneSizing = ZoneSizing::Sensible;
+                    } else if (zoneSizingType == "LATENT LOAD") {
+                        zoneSizingIndex.zoneSizing = ZoneSizing::Latent;
                     } else if (zoneSizingType == "SENSIBLE AND LATENT LOAD") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneLatentSizing = true;
-                    } else if (zoneSizingType == "SENSIBLE LOAD ONLY NO LATENT LOAD") {
-                        // don't calculate any change in zone inlet humidity ratio
+                        zoneSizingIndex.zoneSizing = ZoneSizing::SensibleAndLatent;
+                    }
+                    if (zoneSizingType != "SENSIBLE LOAD ONLY NO LATENT LOAD") {
+                        zoneSizingIndex.zoneLatentSizing = true;
                     }
                 }
+                if (NumAlphas > 10) {
+                    zoneSizingIndex.ZnLatCoolDgnSAMethod =
+                        (state.dataIPShortCut->cAlphaArgs(11) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
+                }
                 if (NumNumbers > 18) {
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneRHDehumidifySetPoint = state.dataIPShortCut->rNumericArgs(19);
+                    zoneSizingIndex.CoolDesDehumHumRat = state.dataIPShortCut->rNumericArgs(19);
                 }
                 if (NumNumbers > 19) {
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).zoneRHHumidifySetPoint = state.dataIPShortCut->rNumericArgs(20);
+                    zoneSizingIndex.CoolDesHumRatDiff = state.dataIPShortCut->rNumericArgs(20);
+                }
+                if (NumAlphas > 11) {
+                    zoneSizingIndex.ZnLatHeatDgnSAMethod =
+                        (state.dataIPShortCut->cAlphaArgs(12) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
+                }
+                if (NumNumbers > 20) {
+                    zoneSizingIndex.HeatDesHumidifyHumRat = state.dataIPShortCut->rNumericArgs(21);
+                }
+                if (NumNumbers > 21) {
+                    zoneSizingIndex.HeatDesHumRatDiff = state.dataIPShortCut->rNumericArgs(22);
+                }
+                if (NumAlphas > 12) {
+                    zoneSizingIndex.zoneRHDehumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
+                    if (zoneSizingIndex.zoneRHDehumidifySchIndex == 0) {
+                        ShowWarningError(state,
+                                         format("{} = \"{}\", invalid Zone Humidistat Dehumidification Set Point Schedule Name = {}. Schedule will "
+                                                "not be used and simulation continues.",
+                                                cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                state.dataIPShortCut->cAlphaArgs(13)));
+                    }
+                }
+                if (NumAlphas > 13) {
+                    zoneSizingIndex.zoneRHHumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
+                    if (zoneSizingIndex.zoneRHHumidifySchIndex == 0) {
+                        ShowWarningError(state,
+                                         format("{} = \"{}\", invalid Zone Humidistat Humidification Set Point Schedule Name = {}. Schedule will "
+                                                "not be used and simulation continues.",
+                                                cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                state.dataIPShortCut->cAlphaArgs(14)));
+                    } else if (zoneSizingIndex.zoneRHDehumidifySchIndex) {
+                        // check max and min of each schedule and compare RHHumidify > RHDehumidify and warn
+                        Real64 maxHumidify = ScheduleManager::GetScheduleMaxValue(state, zoneSizingIndex.zoneRHHumidifySchIndex);
+                        Real64 minDehumidify = ScheduleManager::GetScheduleMinValue(state, zoneSizingIndex.zoneRHDehumidifySchIndex);
+                        if (maxHumidify > minDehumidify) {
+                            ShowWarningError(
+                                state,
+                                format("{} = \"{}\", maximum value ({}%) of Zone Humidistat Humidification Set Point Schedule Name = {} is "
+                                       "greater than minimum value ({}%) of Zone Humidistat Dehumidifcation Set Point Schedule Name = {}. "
+                                       "Humidification set point will be limited by Dehumidification set point during zone sizing and simulation "
+                                       "continues.",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       maxHumidify,
+                                       state.dataIPShortCut->cAlphaArgs(14),
+                                       minDehumidify,
+                                       state.dataIPShortCut->cAlphaArgs(13)));
+                        }
+                    }
                 }
             }
         }
