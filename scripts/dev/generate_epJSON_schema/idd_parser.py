@@ -427,9 +427,12 @@ def parse_field(data, token):
                     root['data_type'] = 'external_list'
                 else:
                     raise RuntimeError("Two external-lists?")
-            elif match_string(data, REAL_STR) or match_string(data, INTEGER_STR):
-                if 'type' not in root or 'type' != 'number':
+            elif match_string(data, REAL_STR):
+                if 'type' not in root or root['type'] != 'number':
                     root['type'] = 'number'
+            elif match_string(data, INTEGER_STR):
+                if 'type' not in root or root['type'] != 'integer':
+                    root['type'] = 'integer'
             elif match_string(data, NODE_STR):
                 root['type'] = 'string'
             else:
