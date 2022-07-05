@@ -95,6 +95,14 @@ using namespace TARCOGOutput;
 using namespace TARCOGGasses90;
 using namespace TarcogShading;
 
+//  Calculation outcome
+enum class CalculationOutcome
+{
+    Invalid = -1,
+    OK,
+    Num
+};
+
 void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Real64 &hcout, int const ibc)
 {
     //***********************************************************************

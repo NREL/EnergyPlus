@@ -370,6 +370,8 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataCoilSizingAirInHumRat = 0.0;
     state.dataSize->DataCoilSizingAirOutTemp = 0.0;
     state.dataSize->DataCoilSizingAirOutHumRat = 0.0;
+    state.dataSize->DataCoolCoilType = -1;
+    state.dataSize->DataCoolCoilIndex = -1;
 
     // These zone specific sizing variables are set in zone equipment to use for sizing.
     // Reset to avoid chance that second zone equipment will size using these variables set by first zone equipment to be sized

@@ -55,7 +55,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -128,6 +128,32 @@ using namespace DataZoneControls;
 using namespace FaultsManager;
 using namespace HybridModel;
 using ScheduleManager::GetCurrentScheduleValue;
+
+enum class ZoneControlTypes
+{
+    Invalid = -1,
+    TStat = 1,
+    TCTStat = 2,
+    OTTStat = 3,
+    HStat = 4,
+    TandHStat = 5,
+    StagedDual = 6,
+    Num
+};
+
+enum class AdaptiveComfortModel
+{
+    Invalid = -1,
+    ADAP_NONE = 1,
+    ASH55_CENTRAL = 2,
+    ASH55_UPPER_90 = 3,
+    ASH55_UPPER_80 = 4,
+    CEN15251_CENTRAL = 5,
+    CEN15251_UPPER_I = 6,
+    CEN15251_UPPER_II = 7,
+    CEN15251_UPPER_III = 8,
+    Num
+};
 
 static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::ThermostatType::Num)> ValidControlTypes = {
     "Uncontrolled",
@@ -2372,11 +2398,12 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 StageControlledZone(StageControlledZoneNum).HeatThroRange = rNumericArgs(2);
                 if (rNumericArgs(1) < 0.0) {
                     ShowSevereError(state,
-                                    format("{}=\"" + cAlphaArgs(1) + "\" negative value is found at {}=\"{:.1R}\"",
+                                    format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
+                                           cAlphaArgs(1),
                                            cCurrentModuleObject,
                                            cNumericFieldNames(2),
                                            rNumericArgs(2)));
-                    ShowContinueError(state, ".. The minumum value is 0.");
+                    ShowContinueError(state, ".. The minimum value is 0.");
                     ErrorsFound = true;
                 }
 
@@ -2400,7 +2427,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         if (i > 1) {
                             if (rNumericArgs(2 + i) >= rNumericArgs(1 + i)) {
                                 ShowSevereError(state,
-                                                format("{}=\"{}\" The value at {}=\"{:.1R}\" has to be less than ",
+                                                format(R"({}="{}" The value at {}="{:.1R}" has to be less than )",
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
                                                        cNumericFieldNames(2 + i),
@@ -4827,15 +4854,13 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum));
 
         // Assume that the system will have flow
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-             state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+        if (state.afn->multizone_always_simulated ||
+            (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
+             state.afn->AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
-            B = (LatentGain / H2OHtOfVap) + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrW +
-                state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrW + state.dataHeatBalFanSys->SumHmARaW(ZoneNum);
-            A = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr +
-                state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr + state.dataHeatBalFanSys->SumHmARa(ZoneNum);
+            B = (LatentGain / H2OHtOfVap) + state.afn->exchangeData(ZoneNum).SumMHrW + state.afn->exchangeData(ZoneNum).SumMMHrW +
+                state.dataHeatBalFanSys->SumHmARaW(ZoneNum);
+            A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr + state.dataHeatBalFanSys->SumHmARa(ZoneNum);
         } else {
             B = (LatentGain / H2OHtOfVap) +
                 ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
@@ -5196,8 +5221,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
-                TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
+            if (state.afn->distribution_simulated) {
+                TempIndCoef += state.afn->exchangeData(ZoneNum).TotalSen;
             }
             //    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
             //    TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
@@ -5295,8 +5320,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
             //      TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
-                TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
+            if (state.afn->distribution_simulated) {
+                TempIndCoef += state.afn->exchangeData(ZoneNum).TotalSen;
             }
             //      TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
             //      TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
@@ -5851,22 +5876,19 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) +
         state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
 
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-        state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-        (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-         state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+    if (state.afn->multizone_always_simulated ||
+        (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
+         state.afn->AirflowNetworkFanActivated)) {
         // Multizone airflow calculated in AirflowNetwork
-        B = (LatentGain / H2OHtOfVap) +
-            (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrW +
-             state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrW) +
+        B = (LatentGain / H2OHtOfVap) + (state.afn->exchangeData(ZoneNum).SumMHrW + state.afn->exchangeData(ZoneNum).SumMMHrW) +
             (MoistureMassFlowRate) + state.dataHeatBalFanSys->SumHmARaW(ZoneNum);
-        A = ZoneMassFlowRate + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr +
-            state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr + state.dataHeatBalFanSys->SumHmARa(ZoneNum);
+        A = ZoneMassFlowRate + state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr +
+            state.dataHeatBalFanSys->SumHmARa(ZoneNum);
     }
     C = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
-        B += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalLat;
+    if (state.afn->distribution_simulated) {
+        B += state.afn->exchangeData(ZoneNum).TotalLat;
     }
 
     // Use a 3rd order derivative to predict final zone humidity ratio and
@@ -6147,8 +6169,8 @@ void InverseModelTemperature(EnergyPlusData &state,
                 (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
-                TempIndCoef += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalSen;
+            if (state.afn->distribution_simulated) {
+                TempIndCoef += state.afn->exchangeData(ZoneNum).TotalSen;
             }
             // Calculate air capacity using DataHeatBalance::SolutionAlgo::AnalyticalSolution
             if (TempDepCoef == 0.0) {
@@ -6554,17 +6576,12 @@ void CalcZoneSums(EnergyPlusData &state,
               state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
 
     // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-        state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-        (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-         state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+    if (state.afn->multizone_always_simulated ||
+        (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
+         state.afn->AirflowNetworkFanActivated)) {
         // Multizone airflow calculated in AirflowNetwork
-        SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
-                 state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp +
-                 state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
-        SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
-                  state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT +
-                  state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
+        SumMCp = state.afn->exchangeData(ZoneNum).SumMCp + state.afn->exchangeData(ZoneNum).SumMVCp + state.afn->exchangeData(ZoneNum).SumMMCp;
+        SumMCpT = state.afn->exchangeData(ZoneNum).SumMCpT + state.afn->exchangeData(ZoneNum).SumMVCpT + state.afn->exchangeData(ZoneNum).SumMMCpT;
     }
 
     // Sum all system air flow: SumSysMCp, SumSysMCpT
@@ -6718,36 +6735,37 @@ void CalcZoneSums(EnergyPlusData &state,
         SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
         // determine reference air temperature for this surface
-        {
-            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-            if (SELECT_CASE_var == DataSurfaces::RefAirTemp::ZoneMeanAirTemp) {
-                // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
-                RefAirTemp = MAT(ZoneNum);
-                SumHA += HA;
-            } else if (SELECT_CASE_var == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+        switch (state.dataSurface->SurfTAirRef(SurfNum)) {
+        case DataSurfaces::RefAirTemp::ZoneMeanAirTemp:
+            // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
+            RefAirTemp = MAT(ZoneNum);
+            SumHA += HA;
+            break;
+        case DataSurfaces::RefAirTemp::AdjacentAirTemp:
+            RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+            SumHATref += HA * RefAirTemp;
+            break;
+        case DataSurfaces::RefAirTemp::ZoneSupplyAirTemp:
+            // check whether this zone is a controlled zone or not
+            if (!ControlledZoneAirFlag) {
+                ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                return;
+            }
+            // determine supply air temperature as a weighted average of the inlet temperatures.
+            if (SumSysMCp > 0.0) {
+                RefAirTemp = SumSysMCpT / SumSysMCp;
                 SumHATref += HA * RefAirTemp;
-            } else if (SELECT_CASE_var == DataSurfaces::RefAirTemp::ZoneSupplyAirTemp) {
-                // check whether this zone is a controlled zone or not
-                if (!ControlledZoneAirFlag) {
-                    ShowFatalError(state,
-                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
-                    return;
-                }
-                // determine supply air temperature as a weighted average of the inlet temperatures.
-                if (SumSysMCp > 0.0) {
-                    RefAirTemp = SumSysMCpT / SumSysMCp;
-                    SumHATref += HA * RefAirTemp;
-                } else {
-                    // no system flow (yet) so just use zone air temperature
-                    // #5906
-                    SumHA += HA;
-                }
             } else {
-                // currently set to mean air temp but should add error warning here
-                RefAirTemp = MAT(ZoneNum);
+                // no system flow (yet) so just use zone air temperature
+                // #5906
                 SumHA += HA;
             }
+            break;
+        default:
+            // currently set to mean air temp but should add error warning here
+            RefAirTemp = MAT(ZoneNum);
+            SumHA += HA;
+            break;
         }
 
     } // SurfNum
@@ -6871,18 +6889,13 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
                          MAT(ZoneNum)); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
 
     // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model (if used)
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-        state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-        (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
-         state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+    if (state.afn->multizone_always_simulated ||
+        (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
+         state.afn->AirflowNetworkFanActivated)) {
         // Multizone airflow calculated in AirflowNetwork
-        SumMCpDtInfil = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT +
-                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCpT -
-                        (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp +
-                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMVCp) *
-                            state.dataHeatBalFanSys->MAT(ZoneNum);
-        SumMCpDTzones = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT -
-                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp * MAT(ZoneNum);
+        SumMCpDtInfil = state.afn->exchangeData(ZoneNum).SumMCpT + state.afn->exchangeData(ZoneNum).SumMVCpT -
+                        (state.afn->exchangeData(ZoneNum).SumMCp + state.afn->exchangeData(ZoneNum).SumMVCp) * state.dataHeatBalFanSys->MAT(ZoneNum);
+        SumMCpDTzones = state.afn->exchangeData(ZoneNum).SumMMCpT - state.afn->exchangeData(ZoneNum).SumMMCp * MAT(ZoneNum);
     }
 
     // Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums
