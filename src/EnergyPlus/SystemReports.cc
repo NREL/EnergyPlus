@@ -1689,8 +1689,6 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
     state.dataSysRpts->MaxNoLoadHeatingByVent.allocate(state.dataGlobal->NumOfZones);
     state.dataSysRpts->MaxNoLoadCoolingByVent.allocate(state.dataGlobal->NumOfZones);
 
-    state.dataSysRpts->ZoneOAMassFlow.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->ZoneOAMass.allocate(state.dataGlobal->NumOfZones);
     state.dataSysRpts->ZoneOAVolFlowStdRho.allocate(state.dataGlobal->NumOfZones);
     state.dataSysRpts->ZoneOAVolStdRho.allocate(state.dataGlobal->NumOfZones);
     state.dataSysRpts->ZoneOAVolFlowCrntRho.allocate(state.dataGlobal->NumOfZones);
@@ -1782,8 +1780,6 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
         state.dataSysRpts->MaxNoLoadHeatingByVent(ZoneIndex) = 0.0;
         state.dataSysRpts->MaxNoLoadCoolingByVent(ZoneIndex) = 0.0;
 
-        state.dataSysRpts->ZoneOAMassFlow(ZoneIndex) = 0.0;
-        state.dataSysRpts->ZoneOAMass(ZoneIndex) = 0.0;
         state.dataSysRpts->ZoneOAVolFlowStdRho(ZoneIndex) = 0.0;
         state.dataSysRpts->ZoneOAVolStdRho(ZoneIndex) = 0.0;
         state.dataSysRpts->ZoneOAVolFlowCrntRho(ZoneIndex) = 0.0;
@@ -2272,7 +2268,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
-                            state.dataSysRpts->ZoneOAMassFlow(ZoneIndex),
+                            state.dataHeatBal->ZnAirRpt(ZoneIndex).ZoneOAMassFlow,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
@@ -2280,7 +2276,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Mass",
                             OutputProcessor::Unit::kg,
-                            state.dataSysRpts->ZoneOAMass(ZoneIndex),
+                            state.dataHeatBal->ZnAirRpt(ZoneIndex).ZoneOAMass,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
@@ -4418,8 +4414,8 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
     if (!state.dataSysRpts->VentLoadsReportEnabled) return;
     // following inits are array assignments across all controlled zones.
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        state.dataSysRpts->ZoneOAMassFlow(zoneNum) = 0.0;
-        state.dataSysRpts->ZoneOAMass(zoneNum) = 0.0;
+        state.dataHeatBal->ZnAirRpt(zoneNum).ZoneOAMassFlow = 0.0;
+        state.dataHeatBal->ZnAirRpt(zoneNum).ZoneOAMass = 0.0;
         state.dataSysRpts->ZoneOAVolFlowStdRho(zoneNum) = 0.0;
         state.dataSysRpts->ZoneOAVolStdRho(zoneNum) = 0.0;
         state.dataSysRpts->ZoneOAVolFlowCrntRho(zoneNum) = 0.0;
@@ -4826,6 +4822,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
             }
         }
 
+        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ActualZoneNum);
         // loop over the zone supply air path inlet nodes
         for (ZoneInNum = 1; ZoneInNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInNum) {
             Real64 AirSysEnthReturnAir = 0.0;    // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
@@ -4879,8 +4876,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                 }
                 state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=
                     termUnitOAFrac * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
-                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
-                                          state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen) /
+                Real64 naturalVentFlow = (thisZnAirRpt.VentilVolumeStdDensity + state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen) /
                                          (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataSysRpts->SysNatVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentFlow;
 
@@ -4924,17 +4920,16 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
         // now combine OA flow from zone forced air units with primary air system
         OutAirFlow = ZAirSysOutAirFlow + ZFAUOutAirFlow;
         // assign report variables
-        state.dataSysRpts->ZoneOAMassFlow(CtrlZoneNum) = OutAirFlow;
-        state.dataSysRpts->ZoneOAMass(CtrlZoneNum) = state.dataSysRpts->ZoneOAMassFlow(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisZnAirRpt.ZoneOAMassFlow = OutAirFlow;
+        thisZnAirRpt.ZoneOAMass = thisZnAirRpt.ZoneOAMassFlow * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // determine volumetric values from mass flow using standard density (adjusted for elevation)
-        state.dataSysRpts->ZoneOAVolFlowStdRho(CtrlZoneNum) = state.dataSysRpts->ZoneOAMassFlow(CtrlZoneNum) / state.dataEnvrn->StdRhoAir;
+        state.dataSysRpts->ZoneOAVolFlowStdRho(CtrlZoneNum) = thisZnAirRpt.ZoneOAMassFlow / state.dataEnvrn->StdRhoAir;
         state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) =
             state.dataSysRpts->ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
-        Real64 totMechNatVentVolStdRho = state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) +
-                                         state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
+        Real64 totMechNatVentVolStdRho = state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) + thisZnAirRpt.VentilVolumeStdDensity +
                                          state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen;
         Real64 targetVoz = state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
         // Allow 1% tolerance
@@ -4954,8 +4949,7 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
                                                   state.dataEnvrn->OutBaroPress,
                                                   state.dataHeatBalFanSys->MAT(ActualZoneNum),
                                                   state.dataHeatBalFanSys->ZoneAirHumRatAvg(ActualZoneNum));
-        if (currentZoneAirDensity > 0.0)
-            state.dataSysRpts->ZoneOAVolFlowCrntRho(CtrlZoneNum) = state.dataSysRpts->ZoneOAMassFlow(CtrlZoneNum) / currentZoneAirDensity;
+        if (currentZoneAirDensity > 0.0) state.dataSysRpts->ZoneOAVolFlowCrntRho(CtrlZoneNum) = thisZnAirRpt.ZoneOAMassFlow / currentZoneAirDensity;
         state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) =
             state.dataSysRpts->ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
         if (ZoneVolume > 0.0)
