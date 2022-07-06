@@ -1717,15 +1717,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            if (UtilityRoutines::SameString(AlphArray(10), "LossFactor")) {
-                tower.EvapLossMode = EvapLoss::UserFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(10), "SaturatedExit")) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
-                ErrorsFound = true;
-            }
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
 
             tower.UserEvapLossFactor = NumArray(23);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(24) / 100.0; //  N24, \field Drift Loss Percent
