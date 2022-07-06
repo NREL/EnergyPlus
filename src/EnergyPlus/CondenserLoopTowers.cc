@@ -237,6 +237,7 @@ namespace CondenserLoopTowers {
 
         constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> EvapLossNamesUC{"LOSSFACTOR", "SATURATEDEXIT"};
         constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"NOMINALCAPACITY", "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"};
+        constexpr std::array<std::string_view, static_cast<int>(Blowdown::Num)> BlowDownNamesUC = {"CONCENTRATIONRATIO", "SCHEDULEDRATE"};
 
         // Get number of all cooling towers specified in the input data file (idf)
         NumSingleSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
@@ -429,19 +430,11 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(25);             //  N17  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(7), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_SingleSpeed, tower.Name));
                 ErrorsFound = true;
             }
 
@@ -796,19 +789,11 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(33);             //  N21  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(7), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_TwoSpeed, tower.Name));
                 ErrorsFound = true;
             }
 
@@ -1446,19 +1431,11 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(17);                    //  N14  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(9), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(9), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(9))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(10));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_VariableSpeed, tower.Name));
                 ErrorsFound = true;
             }
 
@@ -1730,19 +1707,11 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(29);             //  N29  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(11), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(11), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(12));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + AlphArray(12));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(12), AlphArray(12)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_VariableSpeedMerkel, tower.Name));
                 ErrorsFound = true;
             }
 
