@@ -58,10 +58,13 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -9016,5 +9019,211 @@ TEST_F(EnergyPlusFixture, ZoneFloorAreaTest)
 
     EXPECT_NEAR(state->dataHeatBal->Zone(1).FloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(1).CalcFloorArea, 1.0, 0.001);
+}
 
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
+{
+    bool ErrorsFound(false);
+    std::string const idf_objects =
+        delimited_string({"  Material,",
+                          "    Concrete Block,               !- Name",
+                          "    MediumRough,                  !- Roughness",
+                          "    0.1014984,                    !- Thickness {m}",
+                          "    0.3805070,                    !- Conductivity {W/m-K}",
+                          "    608.7016,                     !- Density {kg/m3}",
+                          "    836.8000;                     !- Specific Heat {J/kg-K}",
+
+                          "  Construction,",
+                          "    WallConstruction,             !- Name",
+                          "    Concrete Block;               !- Outside Layer",
+
+                          "  WindowMaterial:SimpleGlazingSystem,",
+                          "    WindowMaterial,               !- Name",
+                          "    5.778,                        !- U-Factor {W/m2-K}",
+                          "    0.819,                        !- Solar Heat Gain Coefficient",
+                          "    0.881;                        !- Visible Transmittance",
+
+                          "  Construction,",
+                          "    WindowConstruction,           !- Name",
+                          "    WindowMaterial;               !- Outside Layer",
+
+                          "  WindowProperty:FrameAndDivider,",
+                          "    WindowFrame,                  !- Name",
+                          "    0.05,                         !- Frame Width {m}",
+                          "    0.00,                         !- Frame Outside Projection {m}",
+                          "    0.00,                         !- Frame Inside Projection {m}",
+                          "    5.0,                          !- Frame Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Frame Solar Absorptance",
+                          "    0.8,                          !- Frame Visible Absorptance",
+                          "    0.9,                          !- Frame Thermal Hemispherical Emissivity",
+                          "    DividedLite,                  !- Divider Type",
+                          "    0.02,                         !- Divider Width {m}",
+                          "    2,                            !- Number of Horizontal Dividers",
+                          "    2,                            !- Number of Vertical Dividers",
+                          "    0.00,                         !- Divider Outside Projection {m}",
+                          "    0.00,                         !- Divider Inside Projection {m}",
+                          "    5.0,                          !- Divider Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Divider Solar Absorptance",
+                          "    0.8,                          !- Divider Visible Absorptance",
+                          "    0.9;                          !- Divider Thermal Hemispherical Emissivity",
+
+                          "  FenestrationSurface:Detailed,",
+                          "    FenestrationSurface,          !- Name",
+                          "    Window,                       !- Surface Type",
+                          "    WindowConstruction,           !- Construction Name",
+                          "    Wall,                         !- Building Surface Name",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    WindowFrame,                  !- Frame and Divider Name",
+                          "    1.0,                          !- Multiplier",
+                          "    4,                            !- Number of Vertices",
+                          "    0.200000,0.0,9.900000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.200000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 2 {m}",
+                          "    9.900000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 3 {m}",
+                          "    9.900000,0.0,9.900000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  SurfaceProperty:LocalEnvironment,",
+                          "    LocEnv:FenestrationSurface,   !- Name",
+                          "    FenestrationSurface,          !- Exterior Surface Name",
+                          "    ,                             !- External Shading Fraction Schedule Name",
+                          "    SrdSurfs:FenesSurface,        !- Surrounding Surfaces Object Name",
+                          "    ,                             !- Outdoor Air Node Name",
+                          "    GndSurfs:FenesSurface;        !- Ground Surfaces Object Name",
+
+                          "  SurfaceProperty:SurroundingSurfaces,",
+                          "    SrdSurfs:FenesSurface,        !- Name",
+                          "    0.5,                          !- Sky View Factor",
+                          "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+                          "    ,                             !- Ground View Factor",
+                          "    ,                             !- Ground Temperature Schedule Name",
+                          "    SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name",
+                          "    0.1,                          !- Surrounding Surface 1 View Factor",
+                          "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+                          "  Schedule:Compact,",
+                          "    Surrounding Temp Sch 1,       !- Name",
+                          "    Any Number,                   !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 15.0;           !- Field 3",
+
+                          "  SurfaceProperty:GroundSurfaces,",
+                          "    GndSurfs:FenesSurface,        !-Name",
+                          "    GndSurfs GrassArea,           !-Ground Surface 1 Name",
+                          "    0.2,                          !-Ground Surface 1 View Factor",
+                          "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+                          "    ,                             !-Ground Surface 1 Reflectance Schedule Name",
+                          "    GndSurfs ParkingArea,         !-Ground Surface 2 Name",
+                          "    0.1,                          !-Ground Surface 2 View Factor",
+                          "    Ground Temp Sch,              !-Ground Surface 2 Temperature Schedule Name",
+                          "    ,                             !-Ground Surface 2 Reflectance Schedule Name",
+                          "    GndSurfs LakeArea,            !-Ground Surface 3 Name",
+                          "    0.1,                          !-Ground Surface 3 View Factor",
+                          "    Ground Temp Sch,              !-Ground Surface 3 Temperature Schedule Name",
+                          "    ;                             !-Ground Surface 3 Reflectance Schedule Name",
+
+                          "  Schedule:Compact,",
+                          "    Ground Temp Sch,              !- Name",
+                          "    Any Number,                   !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 15.0;           !- Field 3",
+
+                          "  BuildingSurface:Detailed,",
+                          "    Wall,                         !- Name",
+                          "    Wall,                         !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    SunExposed,                   !- Sun Exposure",
+                          "    WindExposed,                  !- Wind Exposure",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.0,0.000000,10.00000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.0,0.000000,0.0,             !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,0.0,0.0,             !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.0,10.00000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  BuildingSurface:Detailed,"
+                          "    Floor,                        !- Name",
+                          "    Floor,                        !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    NoSun,                        !- Sun Exposure",
+                          "    NoWind,                       !- Wind Exposure",
+                          "    1.0,                          !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.000000,0.000000,0,          !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.000000,10.000000,0,         !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  Zone,"
+                          "    Zone,                         !- Name",
+                          "    0,                            !- Direction of Relative North {deg}",
+                          "    6.000000,                     !- X Origin {m}",
+                          "    6.000000,                     !- Y Origin {m}",
+                          "    0,                            !- Z Origin {m}",
+                          "    1,                            !- Type",
+                          "    1,                            !- Multiplier",
+                          "    autocalculate,                !- Ceiling Height {m}",
+                          "    autocalculate;                !- Volume {m3}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->OutBaroPress = 100000;
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+    // test surface property object inputs
+    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
+    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
+    // set local derived data vars
+    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    // check sky view factors
+    EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty.GroundViewFactor);
+    // check surrounding surfaces view factors
+    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty.SurroundingSurfs(1).ViewFactor);
+    // check ground surfaces view factors
+    EXPECT_EQ("GNDSURFS GRASSAREA", GndSurfsProperty.GndSurfs(1).Name);
+    EXPECT_DOUBLE_EQ(0.2, GndSurfsProperty.GndSurfs(1).ViewFactor);
+    EXPECT_EQ("GNDSURFS PARKINGAREA", GndSurfsProperty.GndSurfs(2).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(2).ViewFactor);
+    EXPECT_EQ("GNDSURFS LAKEAREA", GndSurfsProperty.GndSurfs(3).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(3).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.4, GndSurfsProperty.SurfsViewFactorSum);
 }
