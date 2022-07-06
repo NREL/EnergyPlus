@@ -3077,29 +3077,38 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
 
     // add surface property object and test view factors change
     state->dataGlobal->AnyLocalEnvironmentsInModel = true;
-    state->dataSurface->SurfHasSurroundingSurfProperties.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfHasSurroundingSurfProperties = false;
-    state->dataSurface->SurfHasSurroundingSurfProperties(windowSurfNum) = true;
-    state->dataSurface->SurfSurroundingSurfacesNum.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfSurroundingSurfacesNum = 0;
-    state->dataSurface->SurfSurroundingSurfacesNum(windowSurfNum) = 1;
     state->dataSurface->SurroundingSurfsProperty.allocate(1);
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(1);
     SrdSurfsProperty.TotSurroundingSurface = 1;
     SrdSurfsProperty.SurroundingSurfs.allocate(1);
     SrdSurfsProperty.SurroundingSurfs(1).ViewFactor = 0.2;
     SrdSurfsProperty.SkyViewFactor = 0.0;
-    SrdSurfsProperty.GroundViewFactor = 0.0;
     SrdSurfsProperty.IsSkyViewFactorSet = false;
+    SrdSurfsProperty.GroundViewFactor = 0.0;
     SrdSurfsProperty.IsGroundViewFactorSet = false;
+
+    win_Surface.IsSurfPropertyGndSurfacesDefined = true;
+    win_Surface.SurfPropertyGndSurfIndex = 1;
+    win_Surface.UseSurfPropertyGndSurfTemp = true;
+    win_Surface.UseSurfPropertyGndSurfRefl = true;
+    win_Surface.SurfHasSurroundingSurfProperty = true;
+    win_Surface.SurfSurroundingSurfacesNum = 1;
+
+    state->dataSurface->GroundSurfsProperty.allocate(1);
+    auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);
+    state->dataSurface->TotSurfPropGndSurfs = 1;
+    GndSurfsProperty.GndSurfs.allocate(1);
+    GndSurfsProperty.NumGndSurfs = 1;
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
+    GndSurfsProperty.IsGroundViewFactorSet = false;
 
     // reset sky and ground view factors
     HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
     // check surface property sky and ground view factors
     EXPECT_DOUBLE_EQ(0.4, SrdSurfsProperty.SkyViewFactor);
-    EXPECT_DOUBLE_EQ(0.4, SrdSurfsProperty.SkyViewFactor);
     EXPECT_TRUE(SrdSurfsProperty.IsSkyViewFactorSet);
-    EXPECT_TRUE(SrdSurfsProperty.IsGroundViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty.GroundViewFactor);
+    EXPECT_FALSE(SrdSurfsProperty.IsGroundViewFactorSet);
     Real64 results_Surface_SkyViewFactor = 0.0;
     Real64 results_Surface_GndViewFactor = 0.0;
     // check exterior surfaces sky and ground view factors
