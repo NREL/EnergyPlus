@@ -416,9 +416,6 @@ namespace CondenserLoopTowers {
 
             // begin water use and systems get input
             tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
-            if (AlphArray(6).empty()) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            }
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
@@ -436,12 +433,6 @@ namespace CondenserLoopTowers {
                 tower.BlowdownMode = Blowdown::Schedule;
             } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
                 tower.BlowdownMode = Blowdown::Concentration;
-            } else if (AlphArray(7).empty()) {
-                tower.BlowdownMode = Blowdown::Concentration;
-                if ((NumNums < 21) && (tower.ConcentrationRatio == 0.0)) {
-                    // assume Concetratino ratio was omitted and should be defaulted
-                    tower.ConcentrationRatio = 3.0;
-                }
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
@@ -793,9 +784,6 @@ namespace CondenserLoopTowers {
 
             // begin water use and systems get input
             tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
-            if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            }
 
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
@@ -812,12 +800,6 @@ namespace CondenserLoopTowers {
                 tower.BlowdownMode = Blowdown::Schedule;
             } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
                 tower.BlowdownMode = Blowdown::Concentration;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                tower.BlowdownMode = Blowdown::Concentration;
-                if ((NumNums < 29) && (tower.ConcentrationRatio == 0.0)) {
-                    // assume concentration ratio was omitted and should be defaulted
-                    tower.ConcentrationRatio = 3.0;
-                }
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
@@ -1460,8 +1442,6 @@ namespace CondenserLoopTowers {
                 tower.EvapLossMode = EvapLoss::UserFactor;
             } else if (UtilityRoutines::SameString(AlphArray(8), "SaturatedExit")) {
                 tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
             } else {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -1477,8 +1457,6 @@ namespace CondenserLoopTowers {
             if (UtilityRoutines::SameString(AlphArray(9), "ScheduledRate")) {
                 tower.BlowdownMode = Blowdown::Schedule;
             } else if (UtilityRoutines::SameString(AlphArray(9), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
                 tower.BlowdownMode = Blowdown::Concentration;
             } else {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
@@ -1751,8 +1729,6 @@ namespace CondenserLoopTowers {
                 tower.EvapLossMode = EvapLoss::UserFactor;
             } else if (UtilityRoutines::SameString(AlphArray(10), "SaturatedExit")) {
                 tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
@@ -1774,12 +1750,6 @@ namespace CondenserLoopTowers {
                 tower.BlowdownMode = Blowdown::Schedule;
             } else if (UtilityRoutines::SameString(AlphArray(11), "ConcentrationRatio")) {
                 tower.BlowdownMode = Blowdown::Concentration;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                tower.BlowdownMode = Blowdown::Concentration;
-                if ((NumNums < 25) && (tower.ConcentrationRatio == 0.0)) {
-                    // assume concentration ratio was omitted and should be defaulted
-                    tower.ConcentrationRatio = 3.0;
-                }
             } else {
                 ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
