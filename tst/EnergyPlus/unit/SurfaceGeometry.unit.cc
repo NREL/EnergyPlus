@@ -8856,3 +8856,165 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     EXPECT_NEAR(state->dataHeatBal->space(4).calcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(4).floorArea, 20.0, 0.001);
 }
+
+TEST_F(EnergyPlusFixture, ZoneFloorAreaTest)
+{
+    // Issue 9515
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "FenestrationSurface:Detailed,                                   ",
+        "	Surface-1-Rectangle,     !- Name                             ",
+        "	Window,                  !- Surface Type                     ",
+        "	SINGLE PANE HW WINDOW,   !- Construction Name                ",
+        "	WallExample,             !- Building Surface Name            ",
+        "	,                        !- Outside Boundary Condition Object",
+        "	0.50000,                 !- View Factor to Ground            ",
+        "	,                        !- Frame and Divider Name           ",
+        "	1,                       !- Multiplier                       ",
+        "	4,                       !- Number of Vertices               ",
+        "	0.0, 11.4, 2.1,          !- X,Y,Z ==> Vertex 1 {m}           ",
+        "	0.0, 11.4, 0.9,          !- X,Y,Z ==> Vertex 2 {m}           ",
+        "	0.0, 3.8,  0.9,          !- X,Y,Z ==> Vertex 3 {m}           ",
+        "	0.0, 3.8,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",
+        "                                                                ",
+        "FenestrationSurface:Detailed,                                   ",
+        "	Surface-2-Trapzoid,      !- Name                             ",
+        "	Window,                  !- Surface Type                     ",
+        "	SINGLE PANE HW WINDOW,   !- Construction Name                ",
+        "	WallExample,             !- Building Surface Name            ",
+        "	,                        !- Outside Boundary Condition Object",
+        "	0.50000,                 !- View Factor to Ground            ",
+        "	,                        !- Frame and Divider Name           ",
+        "	1,                       !- Multiplier                       ",
+        "	4,                       !- Number of Vertices               ",
+        "	0.0, 11.2, 2.1,          !- X,Y,Z ==> Vertex 1 {m}           ",
+        "	0.0, 11.6, 0.9,          !- X,Y,Z ==> Vertex 2 {m}           ",
+        "	0.0, 3.6,  0.9,          !- X,Y,Z ==> Vertex 3 {m}           ",
+        "	0.0, 4.0,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",
+        "                                                                ",
+        "FenestrationSurface:Detailed,                                   ",
+        "	Surface-3-parallelogram, !- Name                             ",
+        "	Window,                  !- Surface Type                     ",
+        "	SINGLE PANE HW WINDOW,   !- Construction Name                ",
+        "	WallExample,             !- Building Surface Name            ",
+        "	,                        !- Outside Boundary Condition Object",
+        "	0.50000,                 !- View Factor to Ground            ",
+        "	,                        !- Frame and Divider Name           ",
+        "	1,                       !- Multiplier                       ",
+        "	4,                       !- Number of Vertices               ",
+        "	0.0, 11.4, 2.1,          !- X,Y,Z ==> Vertex 1 {m}           ",
+        "	0.0, 12.4, 0.9,          !- X,Y,Z ==> Vertex 2 {m}           ",
+        "	0.0, 4.8,  0.9,          !- X,Y,Z ==> Vertex 3 {m}           ",
+        "	0.0, 3.8,  2.1;          !- X,Y,Z ==> Vertex 4 {m}           ",
+        "                                                                ",
+        "BuildingSurface:Detailed,                                       ",
+        "	WallExample,   !- Name                                       ",
+        "	Wall,                    !- Surface Type                     ",
+        "	ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name     ",
+        "	ZoneExample,             !- Zone Name                        ",
+        "   ,                        !- Space Name",
+        "	Outdoors,                !- Outside Boundary Condition       ",
+        "	,                        !- Outside Boundary Condition Object",
+        "	NoSun,                   !- Sun Exposure                     ",
+        "	NoWind,                  !- Wind Exposure                    ",
+        "	,                        !- View Factor to Ground            ",
+        "	,                        !- Number of Vertices               ",
+        "	0.0, 15.2, 2.4,          !- X,Y,Z ==> Vertex 1 {m}           ",
+        "	0.0, 15.2, 0.0,          !- X,Y,Z ==> Vertex 2 {m}           ",
+        "	0.0, 0.0,  0.0,          !- X,Y,Z ==> Vertex 3 {m}           ",
+        "	0.0, 0.0,  2.4;          !- X,Y,Z ==> Vertex 4 {m}           ",
+        "	                                                             ",
+        "Floor:Adiabatic,                                       ",
+        "	FloorExample,            !- Name                             ",
+        "	ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name     ",
+        "	ZoneExample,             !- Zone Name                        ",
+        "   ,                        !- Space Name",
+        "	0,                       !- Azimuth Angle {deg} ",
+        "       180,                     !- Tilt Angle {deg}    ",
+        "       0,                       !- Starting X Coordinate {m}    ",
+        "       74,                      !- Starting Y Coordinate {m}    ",
+        "       0,                       !- Starting Z Coordinate {m}    ",
+        "       1,                       !- Length {m}    ",
+        "       1;                       !- Width {m}    ",
+        "                                                                ",
+        "Zone,                                                           ",
+        "	ZoneExample,             !- Name                             ",
+        "	0,                       !- Direction of Relative North {deg}",
+        "	0.0,                     !- X Origin {m}                     ",
+        "	0.0,                     !- Y Origin {m}                     ",
+        "	0.0,                     !- Z Origin {m}                     ",
+        "	,                        !- Type                             ",
+        "	,                        !- Multiplier                       ",
+        "	,                        !- Ceiling Height {m}               ",
+        "	,                        !- Volume {m3}                      ",
+        "	0.0;                        !- Floor Area {m2}                  ",
+        "                                                                ",
+        "Construction,                                                   ",
+        "	ExtSlabCarpet 4in ClimateZone 1-8,  !- Name                  ",
+        "	MAT-CC05 4 HW CONCRETE,  !- Outside Layer                    ",
+        "	CP02 CARPET PAD;         !- Layer 2                          ",
+        "                                                                ",
+        "Construction,                                                   ",
+        "	SINGLE PANE HW WINDOW,   !- Name                             ",
+        "	CLEAR 3MM;  !- Outside Layer                                 ",
+        "                                                                ",
+        "Material,                                                       ",
+        "	MAT-CC05 4 HW CONCRETE,  !- Name                             ",
+        "	Rough,                   !- Roughness                        ",
+        "	0.1016,                  !- Thickness {m}                    ",
+        "	1.311,                   !- Conductivity {W/m-K}             ",
+        "	2240,                    !- Density {kg/m3}                  ",
+        "	836.800000000001,        !- Specific Heat {J/kg-K}           ",
+        "	0.9,                     !- Thermal Absorptance              ",
+        "	0.85,                    !- Solar Absorptance                ",
+        "	0.85;                    !- Visible Absorptance              ",
+        "                                                                ",
+        "Material:NoMass,                                                ",
+        "	CP02 CARPET PAD,         !- Name                             ",
+        "	Smooth,                  !- Roughness                        ",
+        "	0.1,                     !- Thermal Resistance {m2-K/W}      ",
+        "	0.9,                     !- Thermal Absorptance              ",
+        "	0.8,                     !- Solar Absorptance                ",
+        "	0.8;                     !- Visible Absorptance              ",
+        "                                                                ",
+        "WindowMaterial:Glazing,                                                          ",
+        "	CLEAR 3MM,               !- Name                                              ",
+        "	SpectralAverage,         !- Optical Data Type                                 ",
+        "	,                        !- Window Glass Spectral Data Set Name               ",
+        "	0.003,                   !- Thickness {m}                                     ",
+        "	0.837,                   !- Solar Transmittance at Normal Incidence           ",
+        "	0.075,                   !- Front Side Solar Reflectance at Normal Incidence  ",
+        "	0.075,                   !- Back Side Solar Reflectance at Normal Incidence   ",
+        "	0.898,                   !- Visible Transmittance at Normal Incidence         ",
+        "	0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "	0.081,                   !- Back Side Visible Reflectance at Normal Incidence ",
+        "	0.0,                     !- Infrared Transmittance at Normal Incidence        ",
+        "	0.84,                    !- Front Side Infrared Hemispherical Emissivity      ",
+        "	0.84,                    !- Back Side Infrared Hemispherical Emissivity       ",
+        "	0.9;                     !- Conductivity {W/m-K}                              ",
+    });
+
+    // Prepare data for the test
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);
+    GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
+
+    EXPECT_NEAR(state->dataHeatBal->Zone(1).FloorArea, 1.0, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->Zone(1).CalcFloorArea, 1.0, 0.001);
+
+}
