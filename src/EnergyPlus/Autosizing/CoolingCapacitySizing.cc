@@ -298,7 +298,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     if (thisFinalSysSizing.CoolingCapMethod == DataSizing::CapacityPerFloorArea) {
                         NominalCapacityDes = thisFinalSysSizing.CoolingTotalCapacity;
                         this->autoSizedValue = NominalCapacityDes;
-                    } else if (thisFinalSysSizing.CoolingCapMethod == DataSizing::CoolingDesignCapacity && thisFinalSysSizing.CoolingTotalCapacity > 0.0) {
+                    } else if (thisFinalSysSizing.CoolingCapMethod == DataSizing::CoolingDesignCapacity &&
+                               thisFinalSysSizing.CoolingTotalCapacity > 0.0) {
                         NominalCapacityDes = thisFinalSysSizing.CoolingTotalCapacity;
                         this->autoSizedValue = NominalCapacityDes;
                     } else if (DesVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
@@ -339,7 +340,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                 }
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                                 CoilInTemp = OutAirFrac * thisFinalSysSizing.PrecoolTemp + (1.0 - OutAirFrac) * thisFinalSysSizing.RetTempAtCoolPeak;
-                                CoilInHumRat = OutAirFrac * thisFinalSysSizing.PrecoolHumRat + (1.0 - OutAirFrac) * thisFinalSysSizing.RetHumRatAtCoolPeak;
+                                CoilInHumRat =
+                                    OutAirFrac * thisFinalSysSizing.PrecoolHumRat + (1.0 - OutAirFrac) * thisFinalSysSizing.RetHumRatAtCoolPeak;
                             }
                             if (this->dataDesInletAirTemp > 0.0) CoilInTemp = this->dataDesInletAirTemp;
                             if (this->dataDesInletAirHumRat > 0.0) CoilInHumRat = this->dataDesInletAirHumRat;
