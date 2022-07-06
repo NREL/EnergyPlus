@@ -132,6 +132,8 @@ std::string IdfParser::encode(json const &root, json const &schema)
                 auto const &val = obj_in.value()[entry];
                 if (val.is_string()) {
                     encoded += val.get<std::string>();
+                } else if (val.is_number_integer()) {
+                    encoded += std::to_string(val.get<int>());
                 } else {
                     dtoa(val.get<double>(), s);
                     encoded += s;

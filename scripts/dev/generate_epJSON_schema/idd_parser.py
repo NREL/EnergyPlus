@@ -746,6 +746,8 @@ def parse_number(data):
         save_index += 1
 
     data.index += len(num)
+    if num.isdigit():
+        return int(num)
     return float(num)
 
 
