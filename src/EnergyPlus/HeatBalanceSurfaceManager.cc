@@ -6769,8 +6769,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         }
                     }
                     // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                        int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         // Absolute temperature of the outside surface of an exterior surface
                         Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + DataGlobalConstants::KelvinConv;
                         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
@@ -6815,46 +6815,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
-                        // Set variables used in the FD moisture balance and HAMT
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) =
-                            PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(
-                                  state,
-                                  state.dataEnvrn->OutBaroPress,
-                                  state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                  PsyWFnTdbRhPb(
-                                      state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameNoWind)) +
-                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                        state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
-                        state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
-                        state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
-                    }
-                }
-                // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                    int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                    // Absolute temperature of the outside surface of an exterior surface
-                    Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + DataGlobalConstants::KelvinConv;
-                    for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                         SrdSurfNum++) {
-                        // View factor of a surrounding surface
-                        Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                        // Absolute temperature of a surrounding surface
-                        Real64 SrdSurfTempAbs =
-                            GetCurrentScheduleValue(
-                                state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                            DataGlobalConstants::KelvinConv;
-                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +=
-                            DataGlobalConstants::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
-                    }
-                }
+                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataHeatBalSurf->SurfTempIn(SurfNum);
 
                         // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
 

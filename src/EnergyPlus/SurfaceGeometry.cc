@@ -2854,9 +2854,9 @@ namespace SurfaceGeometry {
             // Set up enclosures, process Air Boundaries if any
             SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->EnclRadInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
 
-        GetSurfaceGroundSurfsData(state, ErrorsFound);
+            GetSurfaceGroundSurfsData(state, ErrorsFound);
 
-        GetSurfaceSrdSurfsData(state, ErrorsFound);
+            GetSurfaceSrdSurfsData(state, ErrorsFound);
 
             GetSurfaceLocalEnvData(state, ErrorsFound);
 
