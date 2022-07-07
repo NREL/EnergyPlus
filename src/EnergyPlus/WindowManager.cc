@@ -2266,8 +2266,6 @@ namespace WindowManager {
         Real64 Tleft;           // For airflow windows, temperature of the glass faces adjacent
         Real64 Tright;
 
-        int SrdSurfsNum;       // Surrounding surfaces list number
-        int SrdSurfNum;        // Surrounding surface number DO loop counter
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;       // LWR from surrouding srfs
@@ -2629,10 +2627,10 @@ namespace WindowManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                        for (SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
                                              DataGlobalConstants::KelvinConv;
@@ -2795,9 +2793,9 @@ namespace WindowManager {
         Real64 rad_out_lw_srd_per_area = 0;
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-            if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+            if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+                for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                     SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs = GetCurrentScheduleValue(
                                          state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +

@@ -137,6 +137,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: wahpEqFtCoolIndex = 0
   INTEGER :: wahpEqFtHeatIndex = 0
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
+  integer :: Num1
+  CHARACTER(len=MaxNameLength) :: SurroundingField1, SurroundingField2, matchedSurroundingName
   CHARACTER(len=20) :: PotentialRunPeriodName
   ! END OF TODO
 
@@ -422,7 +424,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with R, insert the rules here
 
               ! If your original object starts with S, insert the rules here
-              
+
               ! If your original object starts with S, insert the rules here
 
               ! If your original object starts with T, insert the rules here

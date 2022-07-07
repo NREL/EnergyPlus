@@ -934,12 +934,6 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfSchedMovInsulExt(SurfNum) = 0;
             state.dataSurface->SurfSchedMovInsulInt(SurfNum) = 0;
         }
-        state.dataSurface->SurfSchedExternalShadingFrac.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExternalShadingSchInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfHasSurroundingSurfProperties.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfSurroundingSurfacesNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfHasLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfLinkedOutAirNode.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtEcoRoof.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtCavityPresent.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExtCavNum.allocate(state.dataSurface->TotSurfaces);
@@ -950,12 +944,6 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
-            state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
-            state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = false;
-            state.dataSurface->SurfSurroundingSurfacesNum(SurfNum) = 0;
-            state.dataSurface->SurfHasLinkedOutAirNode(SurfNum) = false;
-            state.dataSurface->SurfLinkedOutAirNode(SurfNum) = 0;
             state.dataSurface->SurfExtEcoRoof(SurfNum) = false;
             state.dataSurface->SurfExtCavityPresent(SurfNum) = false;
             state.dataSurface->SurfExtCavNum(SurfNum) = 0;
@@ -2866,7 +2854,9 @@ namespace SurfaceGeometry {
             // Set up enclosures, process Air Boundaries if any
             SetupEnclosuresAndAirBoundaries(state, state.dataViewFactor->EnclRadInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
 
-            GetSurfaceSrdSurfsData(state, ErrorsFound);
+        GetSurfaceGroundSurfsData(state, ErrorsFound);
+
+        GetSurfaceSrdSurfsData(state, ErrorsFound);
 
             GetSurfaceLocalEnvData(state, ErrorsFound);
 
@@ -8029,13 +8019,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
         int NumNumeric;
-        int Loop;
-        int SurfLoop;
         int IOStat;
-        int SurfNum;
-        int NodeNum;
-        int ExtShadingSchedNum;
-        int SurroundingSurfsNum;
 
         //-----------------------------------------------------------------------
         //                SurfaceProperty:LocalEnvironment
@@ -8052,7 +8036,10 @@ namespace SurfaceGeometry {
                 state.dataSurface->SurfLocalEnvironment.allocate(state.dataSurface->TotSurfLocalEnv);
             }
 
-            for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
+
+                auto &SurfLocalEnv = state.dataSurface->SurfLocalEnvironment(Loop);
+
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
@@ -8067,95 +8054,142 @@ namespace SurfaceGeometry {
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                state.dataSurface->SurfLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
+                SurfLocalEnv.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                          "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                                    format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           SurfLocalEnv.Name,
+                                           state.dataIPShortCut->cAlphaFieldNames(2)));
+                    ShowContinueError(
+                        state,
+                        format("{} entered value = \"{}\", no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.",
+                               state.dataIPShortCut->cAlphaFieldNames(2),
+                               state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 } else {
-                    state.dataSurface->SurfLocalEnvironment(Loop).SurfPtr = SurfNum;
+                    SurfLocalEnv.SurfPtr = SurfNum;
                 }
 
                 // Assign External Shading Schedule number
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                    int ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (ExtShadingSchedNum == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(3) + " has been found.");
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               SurfLocalEnv.Name,
+                                               state.dataIPShortCut->cAlphaFieldNames(3)));
                         ShowContinueError(state,
-                                          state.dataIPShortCut->cAlphaFieldNames(3) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                              "\" no corresponding schedule has been found in the input file.");
+                                          format("{} entered value = \"{}\", no corresponding shading schedule has been found in the input file.",
+                                                 state.dataIPShortCut->cAlphaFieldNames(3),
+                                                 state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr = ExtShadingSchedNum;
+                        SurfLocalEnv.ExtShadingSchedPtr = ExtShadingSchedNum;
                     }
                 }
 
                 // Assign surrounding surfaces object number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    SurroundingSurfsNum =
+                    int SurroundingSurfsNum =
                         UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->SurroundingSurfsProperty);
                     if (SurroundingSurfsNum == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(4) + " has been found.");
-                        ShowContinueError(state,
-                                          state.dataIPShortCut->cAlphaFieldNames(4) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(4) +
-                                              "\" no corresponding surrounding surfaces properties has been found in the input file.");
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               SurfLocalEnv.Name,
+                                               state.dataIPShortCut->cAlphaFieldNames(4)));
+                        ShowContinueError(
+                            state,
+                            format("{} entered value = \"{}\", no corresponding surrounding surfaces properties has been found in the input file.",
+                                   state.dataIPShortCut->cAlphaFieldNames(4),
+                                   state.dataIPShortCut->cAlphaArgs(4)));
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr = SurroundingSurfsNum;
+                        SurfLocalEnv.SurroundingSurfsPtr = SurroundingSurfsNum;
                     }
                 }
 
                 // Assign outdoor air node number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    NodeNum = GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(5),
-                                                ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::SurfacePropertyLocalEnvironment,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Air,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                ObjectIsParent);
+                    int NodeNum = GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(5),
+                                                    ErrorsFound,
+                                                    DataLoopNode::ConnectionObjectType::SurfacePropertyLocalEnvironment,
+                                                    SurfLocalEnv.Name,
+                                                    DataLoopNode::NodeFluidType::Air,
+                                                    DataLoopNode::ConnectionType::Inlet,
+                                                    NodeInputManager::CompFluidStream::Primary,
+                                                    ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(5) + " has been found.");
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               SurfLocalEnv.Name,
+                                               state.dataIPShortCut->cAlphaFieldNames(5)));
                         ShowContinueError(state,
-                                          state.dataIPShortCut->cAlphaFieldNames(5) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(5) +
-                                              "\" no corresponding outdoor air node has been found in the input file.");
+                                          format("{} entered value = \"{}\", no corresponding outdoor air node has been found in the input file.",
+                                                 state.dataIPShortCut->cAlphaFieldNames(5),
+                                                 state.dataIPShortCut->cAlphaArgs(5)));
                         ErrorsFound = true;
                     } else {
-                        state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr = NodeNum;
+                        SurfLocalEnv.OutdoorAirNodePtr = NodeNum;
+                    }
+                }
+
+                // get ground surfaces object number;
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                    int GndSurfsNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataSurface->GroundSurfsProperty);
+                    if (GndSurfsNum == 0) {
+                        ShowSevereError(state,
+                                        format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               SurfLocalEnv.Name,
+                                               state.dataIPShortCut->cAlphaFieldNames(6)));
+                        ShowContinueError(
+                            state,
+                            format("{} entered value = \"{}\", no corresponding ground surfaces object has been found in the input file.",
+                                   state.dataIPShortCut->cAlphaFieldNames(6),
+                                   state.dataIPShortCut->cAlphaArgs(6)));
+                        ErrorsFound = true;
+                    } else {
+                        SurfLocalEnv.GroundSurfsPtr = GndSurfsNum;
                     }
                 }
             }
         }
         // Link surface properties to surface object
-        for (SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-            for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
-                if (state.dataSurface->SurfLocalEnvironment(Loop).SurfPtr == SurfLoop) {
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
-                        state.dataSurface->SurfHasLinkedOutAirNode(SurfLoop) = true;
-                        state.dataSurface->SurfLinkedOutAirNode(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).OutdoorAirNodePtr;
+        for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
+                auto &SurfLocalEnv = state.dataSurface->SurfLocalEnvironment(Loop);
+                if (SurfLocalEnv.SurfPtr == SurfLoop) {
+                    auto &surface = state.dataSurface->Surface(SurfLoop);
+                    if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
+                        surface.SurfHasLinkedOutAirNode = true;
+                        surface.SurfLinkedOutAirNode = SurfLocalEnv.OutdoorAirNodePtr;
                     }
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr != 0) {
-                        state.dataSurface->SurfSchedExternalShadingFrac(SurfLoop) = true;
-                        state.dataSurface->SurfExternalShadingSchInd(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).ExtShadingSchedPtr;
+                    if (SurfLocalEnv.ExtShadingSchedPtr != 0) {
+                        surface.SurfSchedExternalShadingFrac = true;
+                        surface.SurfExternalShadingSchInd = SurfLocalEnv.ExtShadingSchedPtr;
                     }
-                    if (state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr != 0) {
-                        state.dataSurface->SurfHasSurroundingSurfProperties(SurfLoop) = true;
-                        state.dataSurface->SurfSurroundingSurfacesNum(SurfLoop) = state.dataSurface->SurfLocalEnvironment(Loop).SurroundingSurfsPtr;
+                    if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
+                        surface.SurfHasSurroundingSurfProperty = true;
+                        surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
+                    }
+                    if (SurfLocalEnv.GroundSurfsPtr != 0) {
+                        surface.IsSurfPropertyGndSurfacesDefined = true;
+                        surface.UseSurfPropertyGndSurfTemp = true;
+                        surface.UseSurfPropertyGndSurfRefl = true;
+                        surface.SurfPropertyGndSurfIndex = SurfLocalEnv.GroundSurfsPtr;
                     }
                 }
             }
@@ -8185,14 +8219,8 @@ namespace SurfaceGeometry {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
         int NumNumeric;
-        int Loop;
         int IOStat;
         int TotSrdSurfProperties;
-        int TotSrdSurf;
-        int SurfLoop;
-        int SurfNameArg;
-        int SurfVFArg;
-        int SurfTempArg;
 
         //-----------------------------------------------------------------------
         //                SurfaceProperty:SurroundingSurfaces
@@ -8207,7 +8235,10 @@ namespace SurfaceGeometry {
                 state.dataSurface->SurroundingSurfsProperty.allocate(TotSrdSurfProperties);
             }
 
-            for (Loop = 1; Loop <= TotSrdSurfProperties; ++Loop) {
+            for (int Loop = 1; Loop <= TotSrdSurfProperties; ++Loop) {
+
+                auto &SrdSurfsProp = state.dataSurface->SurroundingSurfsProperty(Loop);
+
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
@@ -8223,57 +8254,143 @@ namespace SurfaceGeometry {
                 UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // A1: Name
-                state.dataSurface->SurroundingSurfsProperty(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
+                SrdSurfsProp.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // N1: sky view factor
                 if (!state.dataIPShortCut->lNumericFieldBlanks(1)) {
-                    state.dataSurface->SurroundingSurfsProperty(Loop).SkyViewFactor = state.dataIPShortCut->rNumericArgs(1);
-                    state.dataSurface->SurroundingSurfsProperty(Loop).IsSkyViewFactorSet = true;
+                    SrdSurfsProp.SkyViewFactor = state.dataIPShortCut->rNumericArgs(1);
+                    SrdSurfsProp.IsSkyViewFactorSet = true;
                 }
 
                 // A2: sky temp sch name
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    state.dataSurface->SurroundingSurfsProperty(Loop).SkyTempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                    SrdSurfsProp.SkyTempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 }
 
                 // N2: ground view factor
                 if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
-                    state.dataSurface->SurroundingSurfsProperty(Loop).GroundViewFactor = state.dataIPShortCut->rNumericArgs(2);
-                    state.dataSurface->SurroundingSurfsProperty(Loop).IsGroundViewFactorSet = true;
+                    SrdSurfsProp.GroundViewFactor = state.dataIPShortCut->rNumericArgs(2);
+                    SrdSurfsProp.IsGroundViewFactorSet = true;
                 }
 
                 // A3: ground temp sch name
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    state.dataSurface->SurroundingSurfsProperty(Loop).GroundTempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                    SrdSurfsProp.GroundTempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 }
 
                 // The object requires at least one srd surface input, each surface requires a set of 3 fields (2 Alpha fields Name and Temp
                 // Sch Name and 1 Num fields View Factor)
                 if (NumAlpha < 5) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" is not defined correctly.");
+                    ShowSevereError(state, format("{} = \"{}\" is not defined correctly.", cCurrentModuleObject, SrdSurfsProp.Name));
                     ShowContinueError(state, "At lease one set of surrounding surface properties should be defined.");
                     ErrorsFound = true;
                     continue;
                 }
                 if ((NumAlpha - 3) / 2 != (NumNumeric - 2)) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" is not defined correctly.");
+                    ShowSevereError(state, format("{} = \"{}\" is not defined correctly.", cCurrentModuleObject, SrdSurfsProp.Name));
                     ShowContinueError(state, "Check number of input fields for each surrounding surface.");
                     ErrorsFound = true;
                     continue;
                 }
                 // Read surrounding surfaces properties
-                TotSrdSurf = NumNumeric - 2;
-                state.dataSurface->SurroundingSurfsProperty(Loop).TotSurroundingSurface = TotSrdSurf;
-                state.dataSurface->SurroundingSurfsProperty(Loop).SurroundingSurfs.allocate(TotSrdSurf);
-                for (SurfLoop = 1; SurfLoop <= TotSrdSurf; ++SurfLoop) {
-                    SurfNameArg = SurfLoop * 2 + 2; // A4, A6, A8, ...
-                    SurfVFArg = SurfLoop + 2;       // N3, N4, N5, ...
-                    SurfTempArg = SurfLoop * 2 + 3; // A5, A7, A9, ...
-                    state.dataSurface->SurroundingSurfsProperty(Loop).SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfNameArg);
-                    state.dataSurface->SurroundingSurfsProperty(Loop).SurroundingSurfs(SurfLoop).ViewFactor =
-                        state.dataIPShortCut->rNumericArgs(SurfVFArg);
-                    state.dataSurface->SurroundingSurfsProperty(Loop).SurroundingSurfs(SurfLoop).TempSchNum =
-                        GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfTempArg));
+                SrdSurfsProp.TotSurroundingSurface = NumNumeric - 1;
+                SrdSurfsProp.SurroundingSurfs.allocate(SrdSurfsProp.TotSurroundingSurface);
+                for (int SurfLoop = 1; SurfLoop <= SrdSurfsProp.TotSurroundingSurface; ++SurfLoop) {
+                    SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2);
+                    SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(SurfLoop + 2);
+                    SrdSurfsProp.SurroundingSurfs(SurfLoop).TempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 3));
+                }
+            }
+        }
+    }
+
+    void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound)
+    {
+
+        std::string cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
+        state.dataSurface->TotSurfPropGndSurfs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            if (state.dataSurface->TotSurfPropGndSurfs > 0) ErrorsFound = true;
+            return;
+        } else {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                GroundSurfacesProperty thisGndSurfsObj;
+                thisGndSurfsObj.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                auto groundSurfaces = fields.find("ground_surfaces");
+                if (groundSurfaces != fields.end()) {
+                    auto groundSurfacesArray = groundSurfaces.value();
+                    thisGndSurfsObj.NumGndSurfs = groundSurfacesArray.size();
+                    for (auto groundSurface : groundSurfacesArray) {
+                        GroundSurfacesData thisGndSurf;
+                        auto GndSurfName = groundSurface.find("ground_surface_name");
+                        if (GndSurfName != groundSurface.end()) {
+                            auto ground_surf_name = groundSurface.at("ground_surface_name").get<std::string>();
+                            if (!ground_surf_name.empty()) {
+                                thisGndSurf.Name = EnergyPlus::UtilityRoutines::MakeUPPERCase(ground_surf_name);
+                            }
+                        }
+                        auto groundSurfViewFactor = groundSurface.find("ground_surface_view_factor");
+                        if (groundSurfViewFactor != groundSurface.end()) {
+                            thisGndSurf.ViewFactor = groundSurface.at("ground_surface_view_factor").get<Real64>();
+                            thisGndSurfsObj.IsGroundViewFactorSet = true;
+                        }
+                        auto TempSchName = groundSurface.find("ground_surface_temperature_schedule_name");
+                        if (TempSchName != groundSurface.end()) {
+                            auto gnd_surf_TempSchName = groundSurface.at("ground_surface_temperature_schedule_name").get<std::string>();
+                            if (!gnd_surf_TempSchName.empty()) {
+                                thisGndSurf.TempSchPtr =
+                                    ScheduleManager::GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(gnd_surf_TempSchName));
+                            }
+                        }
+                        auto ReflSchName = groundSurface.find("ground_surface_reflectance_schedule_name");
+                        if (ReflSchName != groundSurface.end()) {
+                            auto gnd_surf_ReflSchName = groundSurface.at("ground_surface_reflectance_schedule_name").get<std::string>();
+                            if (!gnd_surf_ReflSchName.empty()) {
+                                thisGndSurf.ReflSchPtr =
+                                    ScheduleManager::GetScheduleIndex(state, EnergyPlus::UtilityRoutines::MakeUPPERCase(gnd_surf_ReflSchName));
+                            }
+                        }
+                        thisGndSurfsObj.GndSurfs.push_back(thisGndSurf);
+                    }
+                }
+                for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
+                    thisGndSurfsObj.SurfsViewFactorSum += thisGndSurfsObj.GndSurfs(gSurfNum).ViewFactor;
+                }
+                state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsObj);
+            }
+        }
+        // set report variables
+        if (state.dataSurface->TotSurfPropGndSurfs > 0) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotSurfPropGndSurfs; Loop++) {
+                bool SetTempSchReportVar = true;
+                bool SetReflSchReportVar = true;
+                auto &thisGndSurfsObj = state.dataSurface->GroundSurfsProperty(Loop);
+                for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
+                    if (thisGndSurfsObj.GndSurfs(gSurfNum).TempSchPtr != 0 && SetTempSchReportVar) {
+                        SetupOutputVariable(state,
+                                            "Surfaces Property Ground Surfaces Average Temperature",
+                                            OutputProcessor::Unit::C,
+                                            thisGndSurfsObj.SurfsTempAvg,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::State,
+                                            thisGndSurfsObj.Name);
+                        SetTempSchReportVar = false;
+                    }
+                    if (thisGndSurfsObj.GndSurfs(gSurfNum).ReflSchPtr != 0 && SetReflSchReportVar) {
+                        SetupOutputVariable(state,
+                                            "Surfaces Property Ground Surfaces Average Reflectance",
+                                            OutputProcessor::Unit::None,
+                                            thisGndSurfsObj.SurfsReflAvg,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::State,
+                                            thisGndSurfsObj.Name);
+                        SetReflSchReportVar = false;
+                    }
                 }
             }
         }
