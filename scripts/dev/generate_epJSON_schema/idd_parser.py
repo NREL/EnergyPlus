@@ -552,6 +552,14 @@ def parse_field(data, token):
             if 'enum' in root and has_default:
                 root['enum'].insert(0, '')
                 root['enum'].sort()
+            if 'type' in root and root['type'] == 'integer':
+                for fld in ['default', 'minimum', 'exclusiveMinimum', 'maximum', 'exclusiveMaximum']:
+                    if fld in root:
+                        try:
+                            root[fld] = int(root[fld])
+                        except ValueError:
+                            raise RuntimeError("found float %s for integer field" % fld)
+                    
             return root
 
 
@@ -746,8 +754,8 @@ def parse_number(data):
         save_index += 1
 
     data.index += len(num)
-    if num.isdigit():
-        return int(num)
+    #if num.isdigit():
+    #    return int(num)
     return float(num)
 
 
