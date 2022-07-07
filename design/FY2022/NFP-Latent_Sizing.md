@@ -5,7 +5,7 @@ Autosizing for High Latent Loads
 **Richard Raustad, FSEC Energy Research Center**
 
  - Initial NFP Original Date: 4/29/2022
- - Final NFP Revision Date: 7/5/22
+ - Final NFP Revision Date: 7/7/22
  
 
 ## Justification for New Feature ##
