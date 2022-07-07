@@ -420,14 +420,8 @@ namespace CondenserLoopTowers {
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
-
-            if ((NumNums < 20) && (tower.DriftLossFraction == 0.0)) {
-                // assume Drift loss not entered and should be defaulted
-                tower.DriftLossFraction = 0.008 / 100.0;
-            }
-
-            tower.ConcentrationRatio = NumArray(21); //  N13, \field Blowdown Concentration Ratio
-            tower.SizFac = NumArray(25);             //  N17  \field Sizing Factor
+            tower.ConcentrationRatio = NumArray(21);        //  N13, \field Blowdown Concentration Ratio
+            tower.SizFac = NumArray(25);                    //  N17  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
             tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
@@ -780,13 +774,8 @@ namespace CondenserLoopTowers {
 
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
-            if ((NumNums < 28) && (tower.DriftLossFraction == 0.0)) {
-                // assume Drift loss not entered and should be defaulted
-                tower.DriftLossFraction = 0.008 / 100.0;
-            }
-
-            tower.ConcentrationRatio = NumArray(29); //  N17, \field Blowdown Concentration Ratio
-            tower.SizFac = NumArray(33);             //  N21  \field Sizing Factor
+            tower.ConcentrationRatio = NumArray(29);        //  N17, \field Blowdown Concentration Ratio
+            tower.SizFac = NumArray(33);                    //  N21  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
             tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
@@ -1698,13 +1687,8 @@ namespace CondenserLoopTowers {
 
             tower.UserEvapLossFactor = NumArray(23);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(24) / 100.0; //  N24, \field Drift Loss Percent
-            if ((NumNums < 24) && (tower.DriftLossFraction == 0.0)) {
-                // assume Drift loss not entered and should be defaulted
-                tower.DriftLossFraction = 0.008 / 100.0;
-            }
-
-            tower.ConcentrationRatio = NumArray(25); //  N25, \field Blowdown Concentration Ratio
-            tower.SizFac = NumArray(29);             //  N29  \field Sizing Factor
+            tower.ConcentrationRatio = NumArray(25);        //  N25, \field Blowdown Concentration Ratio
+            tower.SizFac = NumArray(29);                    //  N29  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
             tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
