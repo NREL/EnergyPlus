@@ -228,7 +228,7 @@ namespace CondenserLoopTowers {
         Real64 UserEvapLossFactor = 0.0;               // simple model [%/Delt C]
         Real64 DriftLossFraction = 0.0;
         Blowdown BlowdownMode = Blowdown::Concentration; // sets how tower water blowdown is modeled
-        Real64 ConcentrationRatio = 0.0;                 // ratio of solids in blowdown vs make up water
+        Real64 ConcentrationRatio = 3.0;                 // ratio of solids in blowdown vs make up water
         int SchedIDBlowdown = 0;                         // index "pointer" to schedule of blowdown in [m3/s]
         bool SuppliedByWaterSystem = false;
         int WaterTankID = 0;          // index "pointer" to WaterStorage structure
