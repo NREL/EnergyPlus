@@ -665,8 +665,7 @@ namespace RoomAirModelManager {
         int NumSurfsInvolved; // Number of surfaces involved with air nodes
         int SurfCount;        // Number of surfaces involved with air nodes
         // (used for checking error)
-        int NumOfSurfs;  // Index number for last surface of zones
-        int ListSurfNum; // Index number of surfaces listed in the air node object
+        int NumOfSurfs; // Index number for last surface of zones
         bool SurfNeeded;
 
         if (!state.dataRoomAirMod->MundtModelUsed) return;
@@ -814,15 +813,22 @@ namespace RoomAirModelManager {
 
                     // relate surfaces to this air node and check to see whether surface names are specified correctly or not
                     SurfCount = 0;
-                    for (ListSurfNum = 4; ListSurfNum <= NumAlphas; ++ListSurfNum) {
+                    for (int ListSurfNum = 4; ListSurfNum <= NumAlphas; ++ListSurfNum) {
+                        int thisSurfinZone = 0;
+                        bool surfaceFound = false;
                         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                             auto &thisSpace = state.dataHeatBal->space(spaceNum);
                             for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                                ++thisSurfinZone;
                                 if (state.dataIPShortCut->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfNum).Name) {
+                                    ;
+                                    state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask(thisSurfinZone) = true;
                                     ++SurfCount;
-                                    state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask(SurfCount) = true;
+                                    surfaceFound = true;
+                                    break;
                                 }
                             }
+                            if (surfaceFound) break;
                         }
                     }
 
@@ -1603,16 +1609,22 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasSurfacesAssigned = true;
                         // relate surfaces to this air node and check to see whether surface names are specified correctly or not
                         int SurfCount = 0;
+                        int thisSurfinZone = 0;
+                        bool surfaceFound = false;
                         for (int ListSurfNum = 2; ListSurfNum <= NumAlphas; ++ListSurfNum) {
                             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
                                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                                    ++thisSurfinZone;
                                     if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ListSurfNum),
                                                                     state.dataSurface->Surface(SurfNum).Name)) {
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask(thisSurfinZone) = true;
                                         ++SurfCount;
-                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask(SurfCount) = true;
+                                        surfaceFound = true;
+                                        break;
                                     }
                                 }
+                                if (surfaceFound) break;
                             }
                         }
                         if (NumSurfsThisNode != SurfCount) {
