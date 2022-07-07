@@ -2777,6 +2777,8 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBal->ZoneSNLoadCoolRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneLTLoadHeatEnergy.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneLTLoadCoolEnergy.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSensibleHeatRatio.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneVaporPressureDifference.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneLTLoadHeatRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneLTLoadCoolRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneSNLoadPredictedRate.dimension(NumOfZones, 0.0);
@@ -2899,13 +2901,13 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Air System Latent Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneSNLoadHeatEnergy(Loop),
+                                state.dataHeatBal->ZoneLTLoadHeatEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(Loop).Name,
                                 _,
                                 "ENERGYTRANSFER",
-                                _,
+                                "Latent Heating",
                                 _,
                                 "Building",
                                 Zone(Loop).Name,
@@ -2914,13 +2916,13 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Air System Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneSNLoadCoolEnergy(Loop),
+                                state.dataHeatBal->ZoneLTLoadCoolEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(Loop).Name,
                                 _,
                                 "ENERGYTRANSFER",
-                                _,
+                                "Latent Cooling",
                                 _,
                                 "Building",
                                 Zone(Loop).Name,
@@ -2937,6 +2939,20 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Air System Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBal->ZoneLTLoadCoolRate(Loop),
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                Zone(Loop).Name);
+            SetupOutputVariable(state,
+                                "Zone Air System Sensible Heat Ratio",
+                                OutputProcessor::Unit::None,
+                                state.dataHeatBal->ZoneSensibleHeatRatio(Loop),
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                Zone(Loop).Name);
+            SetupOutputVariable(state,
+                                "Zone Air Vapor Pressure Difference",
+                                OutputProcessor::Unit::Pa,
+                                state.dataHeatBal->ZoneVaporPressureDifference(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
@@ -5946,10 +5962,22 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
 
     state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) = std::abs(min(LatentGain, 0.0));
     state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) = max(LatentGain, 0.0);
-    state.dataHeatBal->ZoneSNLoadHeatEnergy(ZoneNum) =
+    state.dataHeatBal->ZoneLTLoadHeatEnergy(ZoneNum) =
         state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    state.dataHeatBal->ZoneSNLoadCoolEnergy(ZoneNum) =
+    state.dataHeatBal->ZoneLTLoadCoolEnergy(ZoneNum) =
         state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
+    Real64 sensibleLoad = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) + state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
+    if ((sensibleLoad + LatentGain) != 0.0) {
+        state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = sensibleLoad / (sensibleLoad + LatentGain);
+    } else if (sensibleLoad != 0.0) {
+        state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 1.0;
+    } else {
+        state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 0.0;
+    }
+    Real64 pSat = PsyPsatFnTemp(state, ZT(ZoneNum), RoutineName);
+    Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum), state.dataEnvrn->StdBaroPress);
+    state.dataHeatBal->ZoneVaporPressureDifference(ZoneNum) = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
 }
 
 void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
