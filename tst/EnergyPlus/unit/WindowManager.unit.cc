@@ -79,6 +79,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -2836,6 +2837,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     // Calculate temperature based on supply flow rate
 
+    HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
+
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
 
     state->dataHeatBalSurf->SurfTempOut(surfNum2) = outSurfTemp;
@@ -2844,7 +2847,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 *
-                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))),
+                         (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas[0])),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->SurfQHeatEmiReport(surfNum2), 3);
 }
@@ -3056,7 +3059,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     for (auto varyInputU : legalInputUs) {
         state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
-        state->dataWindowManager->scon(1) = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
+        state->dataWindowManager->scon[0] = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.01);
     }
@@ -3118,4 +3121,77 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatAngle, 45.0, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatCurve, 0, 1e-5);
+}
+
+TEST_F(EnergyPlusFixture, SetupComplexWindowStateGeometry_Test)
+{
+    std::string const idf_objects = delimited_string({"WindowMaterial:ComplexShade,",
+                                                      "Shade_14_Layer,          !- Name",
+                                                      "VenetianHorizontal,      !- Layer Type",
+                                                      "1.016000e-003,           !- Thickness {m}",
+                                                      "1.592276e+002,           !- Conductivity {W / m - K}",
+                                                      "0.000000e+000,           !- IR Transmittance",
+                                                      "0.9,                     !- Front Emissivity",
+                                                      "0.9,                       !- Back Emissivity",
+                                                      "0.000000e+000,           !- Top Opening Multiplier",
+                                                      "0.000000e+000,           !- Bottom Opening Multiplier",
+                                                      "0.000000e+000,           !- Left Side Opening Multiplier",
+                                                      "0.000000e+000,           !- Right Side Opening Multiplier",
+                                                      "5.000000e-002,           !- Front Opening Multiplier",
+                                                      "0.0254,                  !- Slat Width {m}",
+                                                      "0.0201,                  !- Slat Spacing {m}",
+                                                      "0.0010,                  !- Slat Thickness {m}",
+                                                      "45.0000,                 !- Slat Angle {deg}",
+                                                      "159.2276,                !- Slat Conductivity {W / m - K}",
+                                                      "0.0000;                  !- Slat Curve {m}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool errors_found = false;
+    HeatBalanceManager::GetMaterialData(*state, errors_found);
+    EXPECT_FALSE(errors_found);
+
+    state->dataWindowComplexManager->NumComplexWind = 1;
+
+    int ISurf = 1;
+    state->dataSurface->TotSurfaces = 1;
+
+    state->dataSurface->Surface.allocate(ISurf);
+
+    state->dataSurface->SurfaceWindow.allocate(ISurf);
+
+    int NumStates = 1;
+    state->dataSurface->SurfaceWindow(ISurf).ComplexFen.State.allocate(NumStates);
+    state->dataBSDFWindow->ComplexWind.allocate(ISurf);
+    state->dataBSDFWindow->ComplexWind(ISurf).NumStates = NumStates;
+    state->dataBSDFWindow->ComplexWind(ISurf).Geom.allocate(NumStates);
+
+    int IState = 1;
+    int IConst = 1;
+    state->dataConstruction->Construct.allocate(IConst);
+    state->dataConstruction->Construct(IConst).BSDFInput.NumLayers = 3;
+
+    state->dataSurface->Surface(ISurf).Azimuth = 180.0;
+    state->dataSurface->Surface(ISurf).Tilt = 0.0;
+
+    state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).Inc.NBasis = 145;
+    state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).Inc.Grid.allocate(145);
+
+    state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).Trn.NBasis = 145;
+    state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).Trn.Grid.allocate(145);
+
+    WindowComplexManager::SetupComplexWindowStateGeometry(*state,
+                                                          ISurf,
+                                                          IState,
+                                                          IConst,
+                                                          state->dataBSDFWindow->ComplexWind(ISurf),
+                                                          state->dataBSDFWindow->ComplexWind(ISurf).Geom(IState),
+                                                          state->dataSurface->SurfaceWindow(ISurf).ComplexFen.State(IState));
+
+    EXPECT_EQ(state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).NSky, 145);
+    EXPECT_EQ(state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).NGnd, 0);
+
+    EXPECT_EQ(state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).SolSkyWt(1), 0.0068965517241379309);
+    EXPECT_EQ(state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).SolSkyWt(73), 0.0068965517241379309);
+    EXPECT_EQ(state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).SolSkyWt(145), 0.0068965517241379309);
+    EXPECT_EQ(state->dataBSDFWindow->ComplexWind(ISurf).Geom(1).SolSkyGndWt.size(), 0);
 }

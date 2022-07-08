@@ -1458,6 +1458,119 @@ Pressure control is achieved by varying either zone exhaust fan flow rate in a c
 
 4. If both maximum and minimum pressures are lower than the setpoint, then zero flow rate will be forced.
 
+\subsection{Duct Sizing}\label{duct-sizingl}
+
+There are two methods used to size duct diameter and cross section area by assuming round ducts. Each method is presented below.
+
+1. Maxiumum velocity
+
+The cross section area (A) is calculated below
+
+\begin{equation}
+A =  \frac{Q}{V} 
+\end{equation}
+
+where 
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$A$ &= Cross section area {m2}\\
+$Q$ &= Volumetric air flow rate {m3/s}\\
+$V $ &= Maximum velocity {m/s}\\
+\\
+\end{tabular}
+
+The duct diameter is calculated as
+
+\begin{equation}
+D = \sqrt{\frac{4Q}{V \pi } } 
+\end{equation}
+
+where
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$D$ &= Duct diameter {m}\\
+$Q$ &= Volumetric air flow rate {m3/s}\\
+$V $ &= Maximum velocity {m/s}\\
+\\
+\end{tabular}
+
+
+2. Pressure loss
+
+The total pressure loss across a duct may be expressed as
+
+\begin{equation}
+\Delta P =  \big( P_{1} +  \rho  \frac{V_{1}^2}{2}  )  - \big( P_{2} +  \rho  \frac{V_{2}^2}{2}  ) +  \rho g(z_{1} - z_{2} ) 
+\end{equation}
+
+where
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$\Delta P$ &= Total pressure loss in a truck or branch {Pa}\\
+$P_1, P_2$ &= Entry and exit static pressure {Pa}\\
+$V_1, V_2$ &= Entry and exit velocities {m/s}\\
+$\rho$ &= Air density {kg/m3}\\
+$g$ &= Acceleration of gravity {m/s2}\\
+$z_1, z_2$ &= Entry and exit elevations {m}\\
+\\
+\end{tabular}
+
+When entry and exit velocities and elevations are the same, the total pressure difference is equal to the static pressure difference. The assumption will be used for duct sizing. 
+
+The total pressure loss in either a truck or a branch can be calculated using Darcy-Weisbach Equation (Eq. 34 in Chpater 21, 2017 ASHRAE HOF)
+
+\begin{equation}
+\Delta P =  \big( \frac{ f L}{D} +  \Sigma C ) *  \frac{ \rho  V^{2} }{2}  
+\end{equation}
+
+where
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+$f$ &= Friction factor {dimensionless}\\
+$L$ &= Total length in a truck or branch {m}\\
+$D$ &= Hydraulic diameter {m}\\
+$V$ &= Velocity {m/s}\\
+$\rho$ &= Air density {kg/m3}\\
+$C$ &= Local loss coefficient for all ducts {dimensionless}\\
+\\
+\end{tabular}
+
+where the friction factor can be represented by Colebrrook's equation:
+
+\begin{equation}
+\frac{1}{\sqrt{f}} = -2 log\big( \frac{ \varepsilon }{3.7 D} +  \frac{2.51}{Re\sqrt{f}}) 
+\end{equation}
+
+where
+
+\begin{equation}
+Re = 66.4 *D *V
+\end{equation}
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+ $\varepsilon$ &= Surface Roughness {m}. Since each trunk or branch may have multiple ducts with different surface roughness, the maximum surface roughness is selected.\\
+\\
+\end{tabular}
+
+For a round duct:
+
+\begin{equation}
+V = Q/A = Q / (D^2 * \pi / 4)
+\end{equation}
+
+The cross section area
+
+\begin{equation}
+A = \frac{D^2 * \pi}{4}
+\end{equation}
+
+When ΔP given, and the relationship between D and V is also given, there is only a single unknow D. The value can be obtained through iteration. 
+
 \subsection{References}\label{afn-references}
 
 Atkins, R. E., J. A. Peterka, and J. E. Cermak. 1979. ``Averaged pressure coefficients for rectangular buildings,'' Wind Engineering, Proceedings of the Fifth International Conference 7:369-80, Fort Collins, CO. Pergamon Press, NY.

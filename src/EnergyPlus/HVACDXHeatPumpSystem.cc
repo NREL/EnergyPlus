@@ -182,38 +182,35 @@ namespace HVACDXHeatPumpSystem {
         // simulate DX Heating System
         CompName = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilName;
 
-        {
-            auto const SELECT_CASE_var(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType_Num);
-
-            if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
-
-                SimDXCoil(state,
-                          CompName,
-                          CompressorOperation::On,
-                          FirstHVACIteration,
-                          DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
-                          DXHeatPumpSystem(DXSystemNum).FanOpMode,
-                          DXHeatPumpSystem(DXSystemNum).PartLoadFrac);
-
-            } else if (SELECT_CASE_var == Coil_HeatingAirToAirVariableSpeed) { // Coil:Heating:DX:VariableSpeed
-                SimVariableSpeedCoils(state,
-                                      CompName,
-                                      DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
-                                      DXHeatPumpSystem(DXSystemNum).FanOpMode,
-                                      state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHour,
-                                      state.dataHVACDXHeatPumpSys->HPTimeConstant,
-                                      state.dataHVACDXHeatPumpSys->FanDelayTime,
-                                      CompressorOperation::On,
-                                      DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
-                                      DXHeatPumpSystem(DXSystemNum).SpeedNum,
-                                      DXHeatPumpSystem(DXSystemNum).SpeedRatio,
-                                      state.dataHVACDXHeatPumpSys->QZnReq,
-                                      state.dataHVACDXHeatPumpSys->QLatReq,
-                                      state.dataHVACDXHeatPumpSys->OnOffAirFlowRatio);
-
-            } else {
-                ShowFatalError(state, "SimDXCoolingSystem: Invalid DX Heating System/Coil=" + DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType);
-            }
+        switch (DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType_Num) {
+        case CoilDX_HeatingEmpirical: { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
+            SimDXCoil(state,
+                      CompName,
+                      CompressorOperation::On,
+                      FirstHVACIteration,
+                      DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                      DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                      DXHeatPumpSystem(DXSystemNum).PartLoadFrac);
+        } break;
+        case Coil_HeatingAirToAirVariableSpeed: { // Coil:Heating:DX:VariableSpeed
+            SimVariableSpeedCoils(state,
+                                  CompName,
+                                  DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                  DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                  state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHour,
+                                  state.dataHVACDXHeatPumpSys->HPTimeConstant,
+                                  state.dataHVACDXHeatPumpSys->FanDelayTime,
+                                  CompressorOperation::On,
+                                  DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
+                                  DXHeatPumpSystem(DXSystemNum).SpeedNum,
+                                  DXHeatPumpSystem(DXSystemNum).SpeedRatio,
+                                  state.dataHVACDXHeatPumpSys->QZnReq,
+                                  state.dataHVACDXHeatPumpSys->QLatReq,
+                                  state.dataHVACDXHeatPumpSys->OnOffAirFlowRatio);
+        } break;
+        default: {
+            ShowFatalError(state, "SimDXCoolingSystem: Invalid DX Heating System/Coil=" + DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType);
+        } break;
         }
         // set econo lockout flag
         // set econo lockout flag
@@ -653,9 +650,8 @@ namespace HVACDXHeatPumpSystem {
                 {
                     Real64 TempOut1;
 
-                    auto const SELECT_CASE_var(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType_Num);
-
-                    if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // Coil:Heating:DX:SingleSpeed
+                    switch (DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType_Num) {
+                    case CoilDX_HeatingEmpirical: { // Coil:Heating:DX:SingleSpeed
 
                         // Get no load result
                         PartLoadFrac = 0.0;
@@ -781,8 +777,8 @@ namespace HVACDXHeatPumpSystem {
                         } else if (PartLoadFrac < 0.0) {
                             PartLoadFrac = 0.0;
                         }
-
-                    } else if (SELECT_CASE_var == Coil_HeatingAirToAirVariableSpeed) {
+                    } break;
+                    case Coil_HeatingAirToAirVariableSpeed: {
                         // variable-speed air-to-air heating coil, begin -------------------------
                         // Get no load result
                         PartLoadFrac = 0.0;
@@ -1083,10 +1079,11 @@ namespace HVACDXHeatPumpSystem {
                         } else if (PartLoadFrac < 0.0) {
                             PartLoadFrac = 0.0;
                         }
-
-                    } else {
+                    } break;
+                    default: {
                         ShowFatalError(
                             state, "ControlDXHeatingSystem: Invalid DXHeatPumpSystem coil type = " + DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType);
+                    } break;
                     }
                 }
             } // End of cooling load type (sensible or latent) if block
