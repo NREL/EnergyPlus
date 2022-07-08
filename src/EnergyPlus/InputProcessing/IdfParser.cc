@@ -51,6 +51,7 @@
 #include <fmt/format.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
+#include <cmath>
 
 using json = nlohmann::json;
 
@@ -534,13 +535,72 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
     return convert_int(value);
 }
 
+
+json IdfParser::parse_integer(std::string_view idf, size_t &index)
+{
+    eat_whitespace(idf, index);
+
+    size_t save_i = index;
+
+    bool running = true;
+    while (running) {
+        if (save_i == idf_size) {
+            break;
+        }
+
+        char const c = idf[save_i];
+        switch (c) {
+        case '!':
+        case ',':
+        case ';':
+        case '\r':
+        case '\n':
+            running = false;
+            break;
+        default:
+            ++save_i;
+        }
+    }
+
+    auto diff = save_i - index;
+    auto value = idf.substr(index, diff);
+    index_into_cur_line += diff;
+    index = save_i;
+
+    auto const convert_int = [&index, this](std::string_view str) -> json {
+        auto const str_end = str.data() + str.size(); // have to do this for MSVC
+        int val;
+        auto result = FromChars::from_chars(str.data(), str.data() + str.size(), val);
+        if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
+            return rtrim(str);
+        } else if (result.ptr != str_end) {
+            size_t plus_sign = 0;
+            if (str.front() == '+') {
+                plus_sign = 1;
+            }
+            Real64 dval;
+            auto fresult = fast_float::from_chars(str.data() + plus_sign, str.data() + str.size(), dval);
+            if (fresult.ec == std::errc::invalid_argument || fresult.ec == std::errc::result_out_of_range) {
+                return rtrim(str);
+            }
+            val = static_cast<int>(std::round(dval));
+        }
+        return val;
+    };
+
+    return convert_int(value);
+}
+
+
 json IdfParser::parse_value(std::string_view idf, size_t &index, bool &success, json const &field_loc)
 {
     Token token;
     auto const &field_type = field_loc.find("type");
     if (field_type != field_loc.end()) {
-        if (field_type.value() == "number" || field_type.value() == "integer") {
-            token = Token::Num;
+        if (field_type.value() == "number") {
+            token = Token::NUMBER;
+        } else if (field_type.value() == "integer") {
+            token = Token::INTEGER;
         } else {
             token = Token::STRING;
         }
@@ -578,8 +638,11 @@ json IdfParser::parse_value(std::string_view idf, size_t &index, bool &success, 
         }
         return parsed_string;
     }
-    case Token::Num: {
+    case Token::NUMBER: {
         return parse_number(idf, index);
+    }
+    case Token::INTEGER: {
+        return parse_integer(idf, index);
     }
     case Token::NONE:
     case Token::END:
@@ -695,7 +758,7 @@ IdfParser::Token IdfParser::next_token(std::string_view idf, size_t &index)
     default:
         static constexpr std::string_view numeric(".-+0123456789");
         if (numeric.find_first_of(c) != std::string::npos) {
-            return Token::Num;
+            return Token::NUMBER;
         }
         return Token::STRING;
     }

@@ -559,7 +559,6 @@ def parse_field(data, token):
                             root[fld] = int(root[fld])
                         except ValueError:
                             raise RuntimeError("found float %s for integer field" % fld)
-                    
             return root
 
 
@@ -754,8 +753,6 @@ def parse_number(data):
         save_index += 1
 
     data.index += len(num)
-    #if num.isdigit():
-    #    return int(num)
     return float(num)
 
 

@@ -4622,8 +4622,8 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction Schedule Name",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal ADU,         !- Zone Equipment 2 Name",
-        " 2,                        !- Zone Equipment 2 Cooling Sequence",
-        " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " 2.1,                      !- Zone Equipment 2 Cooling Sequence",
+        " 1.9,                      !- Zone Equipment 2 Heating or No-Load Sequence",
         " ADU Cooling Fraction Schedule, !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
         " ADU Heating Fraction Schedule, !- Zone Equipment 2 Sequential Heating or No-Load Fraction Schedule Name",
         " Fan:ZoneExhaust,          !- Zone Equipment 2 Object Type",
@@ -4704,7 +4704,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
             EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
             EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
             EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
-            // The original input values above were 1.9 and 2.1, that no longe works
+            // Note the input values above are 1.9 and 2.1, the should round to the nearest integer
             EXPECT_EQ(coolSeqNums[1], 2);
             EXPECT_EQ(heatSeqNums[1], 2);
 
