@@ -563,32 +563,32 @@ json IdfParser::parse_integer(std::string_view idf, size_t &index)
     }
 
     auto diff = save_i - index;
-    auto value = idf.substr(index, diff);
+    auto string_value = idf.substr(index, diff);
     index_into_cur_line += diff;
     index = save_i;
 
-    auto const convert_int = [&index, this](std::string_view str) -> json {
-        auto const str_end = str.data() + str.size(); // have to do this for MSVC
-        int val;
-        auto result = FromChars::from_chars(str.data(), str.data() + str.size(), val);
-        if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
-            return rtrim(str);
-        } else if (result.ptr != str_end) {
-            size_t plus_sign = 0;
-            if (str.front() == '+') {
-                plus_sign = 1;
-            }
-            double dval;
-            auto fresult = fast_float::from_chars(str.data() + plus_sign, str.data() + str.size(), dval);
-            if (fresult.ec == std::errc::invalid_argument || fresult.ec == std::errc::result_out_of_range) {
-                return rtrim(str);
-            }
-            val = static_cast<int>(std::round(dval));
+    auto const string_end = string_value.data() + string_value.size(); // have to do this for MSVC
+    int int_value;
+    // Try using from_chars
+    auto result = FromChars::from_chars(string_value.data(), string_value.data() + string_value.size(), int_value);
+    if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
+        // Failure, return the string
+        return rtrim(string_value);
+    } else if (result.ptr != string_end) {
+        // Didn't use the entire string, try again via double conversion + rounding
+        size_t plus_sign = 0;
+        if (string_value.front() == '+') {
+            plus_sign = 1;
         }
-        return val;
-    };
-
-    return convert_int(value);
+        double double_value;
+        auto fresult = fast_float::from_chars(string_value.data() + plus_sign, string_value.data() + string_value.size(), double_value);
+        if (fresult.ec == std::errc::invalid_argument || fresult.ec == std::errc::result_out_of_range) {
+            // Failure, return the string
+            return rtrim(string_value);
+        }
+        int_value = static_cast<int>(std::round(double_value));
+    }
+    return int_value;
 }
 
 
