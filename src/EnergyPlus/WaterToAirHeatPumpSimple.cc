@@ -1656,7 +1656,6 @@ namespace WaterToAirHeatPumpSimple {
                     RatedCapCoolTotalDes = 0.0;
                 }
             }
-
             // size rated sensible cooling capacity
             if (simpleWatertoAirHP.RatedCapCoolSens == DataSizing::AutoSize && simpleWatertoAirHP.WatertoAirHPType == "COOLING") {
                 RatedCapCoolSensAutoSized = true;
@@ -3818,7 +3817,7 @@ namespace WaterToAirHeatPumpSimple {
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).WAHPPlantType ==
                                 DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).RatedCapHeat == DataSizing::AutoSize &&
-                            state.dataSize->DXCoolCap) {
+                            state.dataSize->DXCoolCap > 0) {
                             // Heating coil has not yet been sized, returning the temporary cooling capacity
                             CoilCapacity = state.dataSize->DXCoolCap;
                         }
