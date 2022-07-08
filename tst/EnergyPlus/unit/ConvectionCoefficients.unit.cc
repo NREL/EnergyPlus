@@ -2953,14 +2953,14 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
 {
 
     // Test for #9432
-    // So this is a perfect square. Expect I am going to rotate the building by 20 degrees (Not by building north axis, but by vertices adjustments)
+    // So this is a perfect square. Expect I am going to rotate the building by 15 degrees (Not by building north axis, but by vertices adjustments)
     // Surface.Vertex(1) will end up having the highest X and highest Y, and we will trigger a bug where if will fail
     // the XdYu ones (lo X, high Y), that is the top left corner [2] because  the RoofGeo BoundingBoxVertStruct are initialized to Vertex(1) and:
     //     vertex.x <= RoofGeo.XdYuZd.Vertex.x => True
     //     vertex.y => RoofGeo.XdYuZd.Vertex.y => False
     //
     //          y
-    //         ▲      ◄──┐ Rotate by 20 degres
+    //         ▲      ◄──┐ Rotate by 15 degrees
     //       10│         │
     // [2]┌────┼────┐[1]
     //    │    │    │
