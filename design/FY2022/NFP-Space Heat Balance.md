@@ -1,11 +1,10 @@
-Add Heat Balance for HVAC ZoneList ~Subdivide Heat Balance by Space~
+Subdivide Heat Balance by Space
 ================
 
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original April 22, 2022
  - Rev1 May 3, 2022 - Expand justification, make space heat balance calcs optional
- - **Rev2 June 29, 2022 - Plan Z, heat balances for zones only, add optional HVAC ZoneList to group Zones, make Zone Name optional for surfaces**
 
 ## Table of Contents ##
 
@@ -55,8 +54,6 @@ Q2: I still don't understand the need for this feature. If you want a finer reso
 
 A2: The difference comes in the HVAC system sizing and controls. For unitary systems, one can make each room a separate zone, size each zone's airflow separately, and then use the current unitary system inputs for control zone and control flow fraction to model the system. But for other types of HVAC systems, such as VAV, there is no equivalent way to control the VAV damper (and reheat coil) based on a thermostat in one Space and split the airflow to diffusers in other Spaces. In the early discussions for the original Space implementation, one of the proposed approaches was to use Zones for the room-level model and add a new HVAC-Zone concept to group rooms for HVAC control. Ultimately, it was decided to keep Zone aligned with the concept of a group of Spaces (rooms) that are an HVAC control Zone. This is the next step along that path. Regarding performance, see Q1.
 
-**A2b: Upon further discussion and code review, it makes more sense to keep the heat balance at the zone level, require a zone for every zone/space/room sizing result, and focus on how to group zones for HVAC control and distribution.**
-
 
 ## Overview ##
 
@@ -75,25 +72,23 @@ The current implementation of Space includes the following key features:
     * Internal gain output variables (by object, space, and zone)
     * Submeters by SpaceType (not by Space)
 
-The air heat balance is currently at the zone level only. While some components are already calculated and summed across spaces, the zone air heat balance, HVAC equipment simulation, and zone air temperature calculations are lumped for all spaces within the zone. ~This task will focus on refactoring the zone predictor/corrector functions to calculate air temperatures and heat balance components by Space as well as by Zone.~
-
-**This task will focus on some refactoring of the predictor/corrector along with adding an optional HVAC ZoneList for grouping zones for HVAC control and simulation.**
+The air heat balance is currently at the zone level only. While some components are already calculated and summed across spaces, the zone air heat balance, HVAC equipment simulation, and zone air temperature calculations are lumped for all spaces within the zone. This task will focus on refactoring the zone predictor/corrector functions to calculate air temperatures and heat balance components by Space as well as by Zone.
 
 ## Approach ##
 
-1. The first step will be to ensure that all components of the heat balance are allocated by space. This will require changing some objects to allow specification by space or zone, similar to what is already done for people, lights, etc. **This is needed regardless to completely flesh out the Space input options for ZoneInfiltration and ZoneVentilation.**
+1. The first step will be to ensure that all components of the heat balance are allocated by space. This will require changing some objects to allow specification by space or zone, similar to what is already done for people, lights, etc.
 
-2. ~The next step will be to calculate the Space air heat balance. This should be fairly straightforward, modifying existing calculation loops to sum components by Space instead of by Zone.~ **Further review and discussion of outputs and heat balance calculations has led to the conclusion that the heat balance should remain at the Zone level, not by Space. For example, there are many places in the code that loop over `Zone.HTSurfaceFirst to HTSurfaceLast`. Surfaces are currently sorted by zone, not by Space. And all of the sizing outputs and reports are by Zone.** 
+2. The next step will be to calculate the Space air heat balance. This should be fairly straightforward, modifying existing calculation loops to sum components by Space instead of by Zone.
 
-3. ~Combining the Space results for the Zone will be more challenging.~ **Add heat balance calculations for ZoneLists.**
+3. Combining the Space results for the Zone will be more challenging.
 
-  * Some results are simply a sum of the ~Space~ **Zone** results.
+  * Some Zone results are simply a sum of the Space results.
 
-  * ~During sizing, all Spaces in the Zone will be controlled to the same thermostat temperature, so combining Spaces into Zones will be straightforward, and all surfaces will see the same air temperature.~
+  * During sizing, all Spaces in the Zone will be controlled to the same thermostat temperature, so combining Spaces into Zones will be straightforward, and all surfaces will see the same air temperature.
 
-  * During the HVAC simulation, for this task, the ~Space~ **Zone** air masses will be lumped together for the Zone**List** heat balance. This will force all ~Spaces~ **Zones** in the Zone**List** to the same air temperature.
+  * During the HVAC simulation, for this task, the Space air masses will be lumped together for the Zone heat balance. This will force all Spaces in the Zone to the same air temperature.
   
-  * Future work may add ~Space~**ZoneList**-level HVAC distribution and thermostat control options to allow calculation of independent ~Space~ **Zone** air temperatures **for Zone within an HVAC ZoneList**.
+  * Future work may add Space-level HVAC distribution and thermostat control options to allow calculation of independent Space air temperatures.
 
 Key aspects of the surface and air heat balances are listed below with italics indicating required changes.
 
@@ -102,29 +97,29 @@ Key aspects of the surface and air heat balances are listed below with italics i
 * Solar and radiant internal gains to surfaces are simulated by enclosure.
 * Radiant exchange between surfaces is simulated by enclosure.
 * Surface convection to the air is currently to the zone air temperature (or suppply air temperature depending on the convection model). 
-  * ~*Change to space air temperature.*~
-  * ~*Surfaces which are assigned to an auto-generated space named "ZoneName-Remainder" may need special handling. If a Remainder space exists within a given zone, it may be necessary to lump the spaces in that zone together for the zone heat balance.*~
+  * *Change to space air temperature.*
+  * *Surfaces which are assigned to an auto-generated space named "ZoneName-Remainder" may need special handling. If a Remainder space exists within a given zone, it may be necessary to lump the spaces in that zone together for the zone heat balance.*
 
 ### Zone/Space Air Heat Balance ##
 
 * Surface convection to the air is currently to the zone air temperature. 
-  * ~*Change to space air temperature.*~
+  * *Change to space air temperature.*
 * Internal convective gains are already computed by space.
 * Zone airflows for infiltration and mixing are currently by zone (ZoneInfiltration, ZoneMixing, ZoneCrossMixing).
   * *Modify inputs to specify by zone or space (similar to internal gains, but allocated by volume or floor area depending on the input method).* 
 * Air volume is currently by zone. 
   * *Add input and calculations for Space volume. See [Issue #9362](https://github.com/NREL/EnergyPlus/issues/9362).*
 * AirflowNetwork inputs and simulation will remain at the zone level.
-  * ~*Allocate the impact on the air heat balance by space. For this phase AFN zones may need to use a lumped air heat balance.*~
+  * *Allocate the impact on the air heat balance by space. For this phase AFN zones may need to use a lumped air heat balance.*
 * ZoneAirBalance:OutdoorAir will remain a zone-level input, and the same method will be applied to all spaces in the zone.
 * ZoneRefrigerationDoorMixing is currently between two zones.
-  * ~*Modify inputs to specify by zone or space.*~
+  * *Modify inputs to specify by zone or space.*
 * ZoneEarthtube will remain at the zone level, because it it thermostatically controlled.
 * ZoneCoolTower:Shower is currently by zone.
-  * ~*Modify inputs to specify by zone or space.*~
+  * *Modify inputs to specify by zone or space.*
 * ZoneThermalChimney models a zone to represent the chimney which then draws from one or more other zones.
-  * ~*Require that the thermal chimney zone has only one space.~
-  * ~*Modify the inlet zone names to be zone or space.*~
+  * *Require that the thermal chimney zone has only one space.
+  * *Modify the inlet zone names to be zone or space.*
 
 
 ## Testing/Validation/Data Sources ##
@@ -135,16 +130,12 @@ Zone-level results should stay the same.
 No new objects are proposed. Several existing objects will have changes.
 
 ### HeatBalanceAlgorithm
-* ~*Add a new field for Air Heat Balance Detail - Zone (default), ZoneAndSpace*~
+* *Add a new field for Air Heat Balance Detail - Zone (default), ZoneAndSpace*
 
 ### Space
 * *Add new field for Volume.*
 * *Add new field for Ceiling Height.*
 * *Transition required.*
-
-### Surface objects
-* **Make the Zone Name field optional. If Zone Name is blank, then there must be a Space Name.**
-* **This change will allow Zoning to be changed more easily by changing the Zone Names in the Space objects without having to update all of the Surface objects.**
 
 ### ZoneInfiltration:DesignFlowRate
 * *Change field "Zone or ZoneList Name" to "Zone or ZoneList or Space or SpaceList Name."*
@@ -152,35 +143,28 @@ No new objects are proposed. Several existing objects will have changes.
 ### ZoneInfiltration:EffectiveLeakageArea and ZoneInfiltration:FlowCoefficient
 * *Change field "Zone Name" to "Zone or Space Name."*
 
-### ZoneVentilation:DesignFlowRate/WindandStackOpenArea
-* *Change field "Zone or ZoneList Name" to "Zone or ZoneList or Space or SpaceList Name."*
-
 ### ZoneMixing and ZoneCrossMixing
-* ~*Change field "Zone Name" to "Zone or Space Name."*~
+* *Change field "Zone Name" to "Zone or Space Name."*
 
-* ~*Change field "Source Zone Name" to "Source Zone or Space Name."*~
+* *Change field "Source Zone Name" to "Source Zone or Space Name."*
 
 ### ZoneRefrigerationDoorMixing
-* ~*Change field "Zone 1 Name" to "Zone or Space Name 1."*~
+* *Change field "Zone 1 Name" to "Zone or Space Name 1."*
 
-* ~*Change field "Zone 2 Name" to "Zone or Space Name 2."*~
+* *Change field "Zone 2 Name" to "Zone or Space Name 2."*
 
 ### ZoneCoolTower:Shower
-* ~*Change field "Zone Name" to "Zone or Space Name."*~
+* *Change field "Zone Name" to "Zone or Space Name."*
 
 ### ZoneThermalChimney
-* ~*Change field "Zone N Name" to "Inlet Zone or Space Name N."*~
+* *Change field "Zone N Name" to "Inlet Zone or Space Name N."*
 
 ### ZoneControl:Thermostat:\*
-* No change. ~Apply the same thermostat across all Spaces in the Zone.~ **Already accepts Zone or ZoneList Name.**
-
-### ZoneHVAC:EquipmentConnections
-* **Change field "Zone Name" to "Zone or ZoneList Name."**
-* **The intent here is that this would trigger predictor/corrector to do a lumped heat balance on the zones in the ZoneList and force them to the same air temperature (and humidity).**
+* No change. Apply the same thermostat across all Spaces in the Zone.
 
 ## Outputs Description ##
 
-~Space~ **ZoneList** equivalents will be added for **only a few of**  the following zone output variables and meters (not sure about some of these, seems excessive):
+Space equivalents will be added for the following zone output variables and meters (not sure about some of these, seems excessive):
 
 ```
 Zone,Average,Zone Outdoor Air Drybulb Temperature [C]
@@ -290,7 +274,7 @@ Output:Meter:Cumulative,GeneralLights:InteriorLights:Electricity:Zone:ZONE 1,hou
 
 ## Engineering Reference ##
 
-~Summary paragraphs or sentences will be added to indicate that references to "Zone" throughout the heat balance documentation are applicable to "Space or Zone".~
+Summary paragraphs or sentences will be added to indicate that references to "Zone" throughout the heat balance documentation are applicable to "Space or Zone".
 
 ## Example File and Transition Changes ##
 
@@ -300,13 +284,11 @@ Output:Meter:Cumulative,GeneralLights:InteriorLights:Electricity:Zone:ZONE 1,hou
 
 * Field name changes will be required for epJSON inputs.
 
-* The existing example file 5ZoneAirCooledWithSpaces **??** will demonstrate the new calculations.
+* The existing example file 5ZoneAirCooledWithSpaces will demonstrate the new calculations.
 
 * A new example file with zone air flow objects by space will also be added.
 
 ## Design ##
-
-**To be revised . . . some of the suggested refactoring may be done anyway here, if budget allows.**
 
 * The main calculations happen in ZoneTempPredictorCorrector.cc. The functions here will be refactored to calculate values by space, then aggregate them by zone.
 
