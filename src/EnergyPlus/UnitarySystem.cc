@@ -167,7 +167,7 @@ namespace UnitarySystems {
           m_HeatRecoveryOutletTemp(0.0), m_IterationCounter(0), m_DesiredOutletTemp(0.0), m_DesiredOutletHumRat(0.0), m_FrostControlStatus(0),
           m_CoolingCycRatio(0.0), m_CoolingSpeedRatio(0.0), m_CoolingSpeedNum(0), m_HeatingCycRatio(0.0), m_HeatingSpeedRatio(0.0),
           m_HeatingSpeedNum(0), m_SpeedNum(0), m_SuppHeatingCycRatio(0.0), m_SuppHeatingSpeedRatio(0.0), m_SuppHeatingSpeedNum(0),
-          m_EMSOverrideCoilSpeedNumOn(false), m_EMSOverrideCoilSpeedNumValue(0.0), m_CoilSpeedErrIdx(0), m_DehumidInducedHeatingDemandRate(0.0),
+          m_EMSOverrideCoilSpeedNumOn(false), m_EMSOverrideCoilSpeedNumValue(0.0), m_EMSOverrideSuppCoilSpeedNumOn(false), m_EMSOverrideSuppCoilSpeedNumValue(0.0), m_CoilSpeedErrIdx(0), m_DehumidInducedHeatingDemandRate(0.0),
           m_TotalAuxElecPower(0.0), m_HeatingAuxElecConsumption(0.0), m_CoolingAuxElecConsumption(0.0), m_ElecPower(0.0), m_ElecPowerConsumption(0.0),
           m_LastMode(0), m_FirstPass(true), m_TotCoolEnergyRate(0.0), m_SensCoolEnergyRate(0.0), m_LatCoolEnergyRate(0.0), m_TotHeatEnergyRate(0.0),
           m_SensHeatEnergyRate(0.0), m_LatHeatEnergyRate(0.0), m_DesignFanVolFlowRateEMSOverrideOn(false), m_MaxHeatAirVolFlowEMSOverrideOn(false),
@@ -17891,6 +17891,15 @@ namespace UnitarySystems {
                                              "[]",
                                              state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideCoilSpeedNumOn,
                                              state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideCoilSpeedNumValue);
+                        }
+                        if(state.dataUnitarySystems->unitarySys[sysNum].m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage){
+                            SetupEMSActuator(state,
+                                             "Supplemental Coil Speed Control",
+                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                             "Unitary System Supplemental Coil Stage Level",
+                                             "[]",
+                                             state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideSuppCoilSpeedNumOn,
+                                             state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideSuppCoilSpeedNumValue);
                         }
                     }
                     bool anyEMSRan;

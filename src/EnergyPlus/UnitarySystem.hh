@@ -378,6 +378,8 @@ namespace UnitarySystems {
 
         bool m_EMSOverrideCoilSpeedNumOn;
         Real64 m_EMSOverrideCoilSpeedNumValue;
+        bool m_EMSOverrideSuppCoilSpeedNumOn;
+        Real64 m_EMSOverrideSuppCoilSpeedNumValue;
         int m_CoilSpeedErrIdx;
 
         Real64 m_DehumidInducedHeatingDemandRate;
