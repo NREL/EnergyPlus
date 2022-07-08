@@ -238,6 +238,7 @@ namespace CondenserLoopTowers {
         constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> EvapLossNamesUC{"LOSSFACTOR", "SATURATEDEXIT"};
         constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"NOMINALCAPACITY", "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"};
         constexpr std::array<std::string_view, static_cast<int>(Blowdown::Num)> BlowDownNamesUC = {"CONCENTRATIONRATIO", "SCHEDULEDRATE"};
+        constexpr std::array<std::string_view, static_cast<int>(CellCtrl::Num)> CellCtrlNamesUC = {"MINIMALCELL", "MAXIMALCELL"};
 
         // Get number of all cooling towers specified in the input data file (idf)
         NumSingleSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
@@ -494,27 +495,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
 
-            if (NumAlphas >= 12) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(12) || AlphArray(12).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(12), "MinimalCell") || UtilityRoutines::SameString(AlphArray(12), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(12), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(12), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for single speed tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(12))));
             }
 
             //   High speed air flow rate must be greater than free convection air flow rate.
@@ -803,27 +786,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
 
-            if (NumAlphas >= 11) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(11), "MinimalCell") || UtilityRoutines::SameString(AlphArray(11), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(11), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(11), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for two speed tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
@@ -1445,27 +1410,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
 
-            if (NumAlphas >= 13) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(13) || AlphArray(13).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(13), "MinimalCell") || UtilityRoutines::SameString(AlphArray(13), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(13), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(13), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + AlphArray(13));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for variable speed tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(13))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
@@ -1716,27 +1663,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
             tower.TowerMassFlowRateMultiplier = tower.MaxFracFlowRate;
-            if (NumAlphas >= 15) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(15) || AlphArray(15).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(15), "MinimalCell") || UtilityRoutines::SameString(AlphArray(15), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(15), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(15), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(15) + " = " + AlphArray(15));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for variable speed Merkel tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(15))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
