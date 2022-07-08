@@ -58,10 +58,13 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -1171,6 +1174,18 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints)
     EXPECT_TRUE(isPointOnLineBetweenPoints(a, b, t));
 }
 
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints_FalsePositive)
+{
+    // cf #7383
+
+    DataVectorTypes::Vector a(0.0, 0.0, 0.0);
+    DataVectorTypes::Vector b(30.0, 0.0, 0.0);
+    DataVectorTypes::Vector t(15.0, 0.0, 0.3); // Notice wrong z, it's 30cm off!
+
+    EXPECT_FALSE(isPointOnLineBetweenPoints(a, b, t));
+    EXPECT_EQ(0.3, distanceFromPointToLine(a, b, t));
+}
+
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findIndexOfVertex)
 {
     DataVectorTypes::Vector a;
@@ -1917,8 +1932,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_makeListOfUniqueVertices_test
     zonePoly.SurfaceFace(6).FacePoints(4).y = 8.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 3.;
 
-    std::vector<Vector> uniqueVertices;
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
     EXPECT_EQ(size_t(8), uniqueVertices.size());
     EXPECT_EQ(Vector(0., 0., 3.), uniqueVertices.at(0));
@@ -2057,8 +2071,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_numberOfEdgesNotTwoForEnclose
     zonePoly.SurfaceFace(6).FacePoints(4).y = 8.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 3.;
 
-    std::vector<Vector> uniqueVertices;
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
     EXPECT_EQ(size_t(8), uniqueVertices.size());
 
@@ -2069,7 +2082,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_numberOfEdgesNotTwoForEnclose
     zonePoly.SurfaceFace(6).FacePoints(4).y = 0.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 0.;
 
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    uniqueVertices = makeListOfUniqueVertices(zonePoly);
     EXPECT_EQ(size_t(8), uniqueVertices.size());
 
     std::vector<EdgeOfSurf> e2 = edgesNotTwoForEnclosedVolumeTest(zonePoly, uniqueVertices);
@@ -2224,8 +2237,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_updateZonePolygonsForMissingC
     zonePoly.SurfaceFace(6).FacePoints(4).y = 8.;
     zonePoly.SurfaceFace(6).FacePoints(4).z = 3.;
 
-    std::vector<Vector> uniqueVertices;
-    makeListOfUniqueVertices(zonePoly, uniqueVertices);
+    std::vector<Vector> uniqueVertices = makeListOfUniqueVertices(zonePoly);
 
     EXPECT_EQ(size_t(10), uniqueVertices.size());
 
@@ -2237,135 +2249,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_updateZonePolygonsForMissingC
 
     std::vector<EdgeOfSurf> e2 = edgesNotTwoForEnclosedVolumeTest(updatedZonePoly, uniqueVertices);
     EXPECT_EQ(size_t(0), e2.size());
-}
-
-TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_insertVertexOnFace_test)
-{
-    DataVectorTypes::Face faceOfPoly;
-
-    // insert in first position
-
-    faceOfPoly.NSides = 4;
-    faceOfPoly.FacePoints.allocate(4);
-
-    faceOfPoly.FacePoints(1) = Vector(1., 1., 1.);
-    faceOfPoly.FacePoints(2) = Vector(2., 2., 2.);
-    faceOfPoly.FacePoints(3) = Vector(3., 3., 3.);
-    faceOfPoly.FacePoints(4) = Vector(4., 4., 4.);
-
-    insertVertexOnFace(faceOfPoly, 1, Vector(99., 99., 99.));
-
-    EXPECT_EQ(5, faceOfPoly.NSides);
-    EXPECT_EQ(Vector(99., 99., 99.), faceOfPoly.FacePoints(1));
-    EXPECT_EQ(Vector(1., 1., 1.), faceOfPoly.FacePoints(2));
-    EXPECT_EQ(Vector(2., 2., 2.), faceOfPoly.FacePoints(3));
-    EXPECT_EQ(Vector(3., 3., 3.), faceOfPoly.FacePoints(4));
-    EXPECT_EQ(Vector(4., 4., 4.), faceOfPoly.FacePoints(5));
-
-    faceOfPoly.FacePoints.deallocate();
-
-    // insert in second position
-
-    faceOfPoly.NSides = 4;
-    faceOfPoly.FacePoints.allocate(4);
-
-    faceOfPoly.FacePoints(1) = Vector(1., 1., 1.);
-    faceOfPoly.FacePoints(2) = Vector(2., 2., 2.);
-    faceOfPoly.FacePoints(3) = Vector(3., 3., 3.);
-    faceOfPoly.FacePoints(4) = Vector(4., 4., 4.);
-
-    insertVertexOnFace(faceOfPoly, 2, Vector(99., 99., 99.));
-
-    EXPECT_EQ(5, faceOfPoly.NSides);
-    EXPECT_EQ(Vector(1., 1., 1.), faceOfPoly.FacePoints(1));
-    EXPECT_EQ(Vector(99., 99., 99.), faceOfPoly.FacePoints(2));
-    EXPECT_EQ(Vector(2., 2., 2.), faceOfPoly.FacePoints(3));
-    EXPECT_EQ(Vector(3., 3., 3.), faceOfPoly.FacePoints(4));
-    EXPECT_EQ(Vector(4., 4., 4.), faceOfPoly.FacePoints(5));
-
-    faceOfPoly.FacePoints.deallocate();
-
-    // insert in third position
-
-    faceOfPoly.NSides = 4;
-    faceOfPoly.FacePoints.allocate(4);
-
-    faceOfPoly.FacePoints(1) = Vector(1., 1., 1.);
-    faceOfPoly.FacePoints(2) = Vector(2., 2., 2.);
-    faceOfPoly.FacePoints(3) = Vector(3., 3., 3.);
-    faceOfPoly.FacePoints(4) = Vector(4., 4., 4.);
-
-    insertVertexOnFace(faceOfPoly, 3, Vector(99., 99., 99.));
-
-    EXPECT_EQ(5, faceOfPoly.NSides);
-    EXPECT_EQ(Vector(1., 1., 1.), faceOfPoly.FacePoints(1));
-    EXPECT_EQ(Vector(2., 2., 2.), faceOfPoly.FacePoints(2));
-    EXPECT_EQ(Vector(99., 99., 99.), faceOfPoly.FacePoints(3));
-    EXPECT_EQ(Vector(3., 3., 3.), faceOfPoly.FacePoints(4));
-    EXPECT_EQ(Vector(4., 4., 4.), faceOfPoly.FacePoints(5));
-
-    faceOfPoly.FacePoints.deallocate();
-
-    // insert in fourth position
-
-    faceOfPoly.NSides = 4;
-    faceOfPoly.FacePoints.allocate(4);
-
-    faceOfPoly.FacePoints(1) = Vector(1., 1., 1.);
-    faceOfPoly.FacePoints(2) = Vector(2., 2., 2.);
-    faceOfPoly.FacePoints(3) = Vector(3., 3., 3.);
-    faceOfPoly.FacePoints(4) = Vector(4., 4., 4.);
-
-    insertVertexOnFace(faceOfPoly, 4, Vector(99., 99., 99.));
-
-    EXPECT_EQ(5, faceOfPoly.NSides);
-    EXPECT_EQ(Vector(1., 1., 1.), faceOfPoly.FacePoints(1));
-    EXPECT_EQ(Vector(2., 2., 2.), faceOfPoly.FacePoints(2));
-    EXPECT_EQ(Vector(3., 3., 3.), faceOfPoly.FacePoints(3));
-    EXPECT_EQ(Vector(99., 99., 99.), faceOfPoly.FacePoints(4));
-    EXPECT_EQ(Vector(4., 4., 4.), faceOfPoly.FacePoints(5));
-
-    faceOfPoly.FacePoints.deallocate();
-
-    // insert in zero position (invalid)
-
-    faceOfPoly.NSides = 4;
-    faceOfPoly.FacePoints.allocate(4);
-
-    faceOfPoly.FacePoints(1) = Vector(1., 1., 1.);
-    faceOfPoly.FacePoints(2) = Vector(2., 2., 2.);
-    faceOfPoly.FacePoints(3) = Vector(3., 3., 3.);
-    faceOfPoly.FacePoints(4) = Vector(4., 4., 4.);
-
-    insertVertexOnFace(faceOfPoly, 0, Vector(99., 99., 99.));
-
-    EXPECT_EQ(4, faceOfPoly.NSides);
-    EXPECT_EQ(Vector(1., 1., 1.), faceOfPoly.FacePoints(1));
-    EXPECT_EQ(Vector(2., 2., 2.), faceOfPoly.FacePoints(2));
-    EXPECT_EQ(Vector(3., 3., 3.), faceOfPoly.FacePoints(3));
-    EXPECT_EQ(Vector(4., 4., 4.), faceOfPoly.FacePoints(4));
-
-    faceOfPoly.FacePoints.deallocate();
-
-    // insert in fifth position (invalid)
-
-    faceOfPoly.NSides = 4;
-    faceOfPoly.FacePoints.allocate(4);
-
-    faceOfPoly.FacePoints(1) = Vector(1., 1., 1.);
-    faceOfPoly.FacePoints(2) = Vector(2., 2., 2.);
-    faceOfPoly.FacePoints(3) = Vector(3., 3., 3.);
-    faceOfPoly.FacePoints(4) = Vector(4., 4., 4.);
-
-    insertVertexOnFace(faceOfPoly, 5, Vector(99., 99., 99.));
-
-    EXPECT_EQ(4, faceOfPoly.NSides);
-    EXPECT_EQ(Vector(1., 1., 1.), faceOfPoly.FacePoints(1));
-    EXPECT_EQ(Vector(2., 2., 2.), faceOfPoly.FacePoints(2));
-    EXPECT_EQ(Vector(3., 3., 3.), faceOfPoly.FacePoints(3));
-    EXPECT_EQ(Vector(4., 4., 4.), faceOfPoly.FacePoints(4));
-
-    faceOfPoly.FacePoints.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_SimpleBox_test)
@@ -2502,6 +2385,84 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_BoxWithSplit
     // leave gap
     zonePoly.SurfaceFace(1).FacePoints(3) = Vector(9., 0., 0.);
     EXPECT_FALSE(isEnclosedVolume(zonePoly, edgeNot2));
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_VeryFlatShape)
+{
+    // Test for #7383
+    // This is a shoebox model that has a very flat aspect: a 30x10x0.3m one
+    // The south wall is split in two equal segments, the rest is just one surface per orientation
+
+    DataVectorTypes::Polyhedron zonePoly;
+
+    zonePoly.NumSurfaceFaces = 7;
+    zonePoly.SurfaceFace.allocate(7);
+
+    // 1-SOUTH-1
+    zonePoly.SurfaceFace(1).SurfNum = 2;
+    zonePoly.SurfaceFace(1).NSides = 4;
+    zonePoly.SurfaceFace(1).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(1).FacePoints(1) = Vector(0.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(1).FacePoints(2) = Vector(0.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(1).FacePoints(3) = Vector(15.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(1).FacePoints(4) = Vector(15.0, 0.0, 0.3);
+
+    // 1-SOUTH-2
+    zonePoly.SurfaceFace(2).SurfNum = 1;
+    zonePoly.SurfaceFace(2).NSides = 4;
+    zonePoly.SurfaceFace(2).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(2).FacePoints(1) = Vector(15.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(2).FacePoints(2) = Vector(15.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(2).FacePoints(3) = Vector(30.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(2).FacePoints(4) = Vector(30.0, 0.0, 0.3);
+
+    // 4-NORTH
+    zonePoly.SurfaceFace(3).SurfNum = 3;
+    zonePoly.SurfaceFace(3).NSides = 4;
+    zonePoly.SurfaceFace(3).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(3).FacePoints(1) = Vector(30.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(3).FacePoints(2) = Vector(30.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(3).FacePoints(3) = Vector(0.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(3).FacePoints(4) = Vector(0.0, 10.0, 0.3);
+
+    // 3-EAST
+    zonePoly.SurfaceFace(4).SurfNum = 4;
+    zonePoly.SurfaceFace(4).NSides = 4;
+    zonePoly.SurfaceFace(4).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(4).FacePoints(1) = Vector(30.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(4).FacePoints(2) = Vector(30.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(4).FacePoints(3) = Vector(30.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(4).FacePoints(4) = Vector(30.0, 10.0, 0.3);
+
+    // ROOF
+    zonePoly.SurfaceFace(5).SurfNum = 5;
+    zonePoly.SurfaceFace(5).NSides = 4;
+    zonePoly.SurfaceFace(5).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(5).FacePoints(1) = Vector(30.0, 0.0, 0.3);
+    zonePoly.SurfaceFace(5).FacePoints(2) = Vector(30.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(5).FacePoints(3) = Vector(0.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(5).FacePoints(4) = Vector(0.0, 0.0, 0.3);
+
+    // 2-WEST
+    zonePoly.SurfaceFace(6).SurfNum = 6;
+    zonePoly.SurfaceFace(6).NSides = 4;
+    zonePoly.SurfaceFace(6).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(6).FacePoints(1) = Vector(0.0, 10.0, 0.3);
+    zonePoly.SurfaceFace(6).FacePoints(2) = Vector(0.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(6).FacePoints(3) = Vector(0.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(6).FacePoints(4) = Vector(0.0, 0.0, 0.3);
+
+    // FLOOR
+    zonePoly.SurfaceFace(7).SurfNum = 7;
+    zonePoly.SurfaceFace(7).NSides = 4;
+    zonePoly.SurfaceFace(7).FacePoints.allocate(4);
+    zonePoly.SurfaceFace(7).FacePoints(1) = Vector(0.0, 0.0, 0.0);
+    zonePoly.SurfaceFace(7).FacePoints(2) = Vector(0.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(7).FacePoints(3) = Vector(30.0, 10.0, 0.0);
+    zonePoly.SurfaceFace(7).FacePoints(4) = Vector(30.0, 0.0, 0.0);
+
+    std::vector<EdgeOfSurf> edgeNot2;
+    EXPECT_TRUE(isEnclosedVolume(zonePoly, edgeNot2));
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
@@ -7951,15 +7912,15 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofWestRoof, 38);
     EXPECT_EQ(nonwindowTubularDaylightingDome1, 40);
     EXPECT_EQ(windowAtticSkylight, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, 27);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, 40);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceFirst, 27);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceLast, 38);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrWinSurfaceLast, 39);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeFirst, 40);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeLast, 40);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceFirst, wallEastGable);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceLast, roofWestRoof);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrWinSurfaceLast, windowAtticSkylight);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeFirst, nonwindowTubularDaylightingDome1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeLast, nonwindowTubularDaylightingDome1);
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:
@@ -8009,6 +7970,102 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofEastRoof, state->dataSurface->AllSurfaceListReportOrder[37]);
     EXPECT_EQ(windowAtticSkylight, state->dataSurface->AllSurfaceListReportOrder[38]);
     EXPECT_EQ(roofWestRoof, state->dataSurface->AllSurfaceListReportOrder[39]);
+
+    // Extend test to check other surface lists
+    auto &HTSurfaces = state->dataSurface->AllHTSurfaceList;
+    auto &ExtSolarSurfaces = state->dataSurface->AllExtSolarSurfaceList;
+    auto &ExtSolAndShadingSurfaces = state->dataSurface->AllExtSolAndShadingSurfaceList;
+    auto &ShadowPossObstrSurfaces = state->dataSurface->AllShadowPossObstrSurfaceList;
+    auto &IZSurfaces = state->dataSurface->AllIZSurfaceList;
+    auto &HTNonWindowSurfaces = state->dataSurface->AllHTNonWindowSurfaceList;
+    auto &HTWindowSurfaces = state->dataSurface->AllHTWindowSurfaceList;
+    auto &ExtSolWindowSurfaces = state->dataSurface->AllExtSolWindowSurfaceList;
+    auto &ExtSolWinWithFrameSurfaces = state->dataSurface->AllExtSolWinWithFrameSurfaceList;
+    auto &HTKivaSurfaces = state->dataSurface->AllHTKivaSurfaceList;
+
+    int thisSurface = siteShadeShadeFlatShadeSurface;
+    EXPECT_FALSE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_FALSE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = wallEastGable;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = doorWestDoor;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = wallGarageInterior;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_TRUE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = windowSouthWindow;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_FALSE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_TRUE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = windowTubularDaylightingDiffuser1;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_FALSE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_FALSE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_TRUE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
+
+    thisSurface = nonwindowTubularDaylightingDome1;
+    EXPECT_TRUE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
+    EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
+    EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
+    EXPECT_TRUE(std::find(HTNonWindowSurfaces.begin(), HTNonWindowSurfaces.end(), thisSurface) != HTNonWindowSurfaces.end());
+    EXPECT_FALSE(std::find(HTWindowSurfaces.begin(), HTWindowSurfaces.end(), thisSurface) != HTWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWindowSurfaces.begin(), ExtSolWindowSurfaces.end(), thisSurface) != ExtSolWindowSurfaces.end());
+    EXPECT_FALSE(std::find(ExtSolWinWithFrameSurfaces.begin(), ExtSolWinWithFrameSurfaces.end(), thisSurface) != ExtSolWinWithFrameSurfaces.end());
+    EXPECT_FALSE(std::find(HTKivaSurfaces.begin(), HTKivaSurfaces.end(), thisSurface) != HTKivaSurfaces.end());
 }
 
 TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
@@ -8801,4 +8858,211 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     EXPECT_NEAR(state->dataHeatBal->space(4).userEnteredFloorArea, DataGlobalConstants::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(4).calcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(4).floorArea, 20.0, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
+{
+    bool ErrorsFound(false);
+    std::string const idf_objects =
+        delimited_string({"  Material,",
+                          "    Concrete Block,               !- Name",
+                          "    MediumRough,                  !- Roughness",
+                          "    0.1014984,                    !- Thickness {m}",
+                          "    0.3805070,                    !- Conductivity {W/m-K}",
+                          "    608.7016,                     !- Density {kg/m3}",
+                          "    836.8000;                     !- Specific Heat {J/kg-K}",
+
+                          "  Construction,",
+                          "    WallConstruction,             !- Name",
+                          "    Concrete Block;               !- Outside Layer",
+
+                          "  WindowMaterial:SimpleGlazingSystem,",
+                          "    WindowMaterial,               !- Name",
+                          "    5.778,                        !- U-Factor {W/m2-K}",
+                          "    0.819,                        !- Solar Heat Gain Coefficient",
+                          "    0.881;                        !- Visible Transmittance",
+
+                          "  Construction,",
+                          "    WindowConstruction,           !- Name",
+                          "    WindowMaterial;               !- Outside Layer",
+
+                          "  WindowProperty:FrameAndDivider,",
+                          "    WindowFrame,                  !- Name",
+                          "    0.05,                         !- Frame Width {m}",
+                          "    0.00,                         !- Frame Outside Projection {m}",
+                          "    0.00,                         !- Frame Inside Projection {m}",
+                          "    5.0,                          !- Frame Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Frame Solar Absorptance",
+                          "    0.8,                          !- Frame Visible Absorptance",
+                          "    0.9,                          !- Frame Thermal Hemispherical Emissivity",
+                          "    DividedLite,                  !- Divider Type",
+                          "    0.02,                         !- Divider Width {m}",
+                          "    2,                            !- Number of Horizontal Dividers",
+                          "    2,                            !- Number of Vertical Dividers",
+                          "    0.00,                         !- Divider Outside Projection {m}",
+                          "    0.00,                         !- Divider Inside Projection {m}",
+                          "    5.0,                          !- Divider Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Divider Solar Absorptance",
+                          "    0.8,                          !- Divider Visible Absorptance",
+                          "    0.9;                          !- Divider Thermal Hemispherical Emissivity",
+
+                          "  FenestrationSurface:Detailed,",
+                          "    FenestrationSurface,          !- Name",
+                          "    Window,                       !- Surface Type",
+                          "    WindowConstruction,           !- Construction Name",
+                          "    Wall,                         !- Building Surface Name",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    WindowFrame,                  !- Frame and Divider Name",
+                          "    1.0,                          !- Multiplier",
+                          "    4,                            !- Number of Vertices",
+                          "    0.200000,0.0,9.900000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.200000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 2 {m}",
+                          "    9.900000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 3 {m}",
+                          "    9.900000,0.0,9.900000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  SurfaceProperty:LocalEnvironment,",
+                          "    LocEnv:FenestrationSurface,   !- Name",
+                          "    FenestrationSurface,          !- Exterior Surface Name",
+                          "    ,                             !- External Shading Fraction Schedule Name",
+                          "    SrdSurfs:FenesSurface,        !- Surrounding Surfaces Object Name",
+                          "    ,                             !- Outdoor Air Node Name",
+                          "    GndSurfs:FenesSurface;        !- Ground Surfaces Object Name",
+
+                          "  SurfaceProperty:SurroundingSurfaces,",
+                          "    SrdSurfs:FenesSurface,        !- Name",
+                          "    0.5,                          !- Sky View Factor",
+                          "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+                          "    ,                             !- Ground View Factor",
+                          "    ,                             !- Ground Temperature Schedule Name",
+                          "    SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name",
+                          "    0.1,                          !- Surrounding Surface 1 View Factor",
+                          "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+                          "  Schedule:Compact,",
+                          "    Surrounding Temp Sch 1,       !- Name",
+                          "    Any Number,                   !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 15.0;           !- Field 3",
+
+                          "  SurfaceProperty:GroundSurfaces,",
+                          "    GndSurfs:FenesSurface,        !-Name",
+                          "    GndSurfs GrassArea,           !-Ground Surface 1 Name",
+                          "    0.2,                          !-Ground Surface 1 View Factor",
+                          "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+                          "    ,                             !-Ground Surface 1 Reflectance Schedule Name",
+                          "    GndSurfs ParkingArea,         !-Ground Surface 2 Name",
+                          "    0.1,                          !-Ground Surface 2 View Factor",
+                          "    Ground Temp Sch,              !-Ground Surface 2 Temperature Schedule Name",
+                          "    ,                             !-Ground Surface 2 Reflectance Schedule Name",
+                          "    GndSurfs LakeArea,            !-Ground Surface 3 Name",
+                          "    0.1,                          !-Ground Surface 3 View Factor",
+                          "    Ground Temp Sch,              !-Ground Surface 3 Temperature Schedule Name",
+                          "    ;                             !-Ground Surface 3 Reflectance Schedule Name",
+
+                          "  Schedule:Compact,",
+                          "    Ground Temp Sch,              !- Name",
+                          "    Any Number,                   !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 15.0;           !- Field 3",
+
+                          "  BuildingSurface:Detailed,",
+                          "    Wall,                         !- Name",
+                          "    Wall,                         !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    SunExposed,                   !- Sun Exposure",
+                          "    WindExposed,                  !- Wind Exposure",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.0,0.000000,10.00000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.0,0.000000,0.0,             !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,0.0,0.0,             !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.0,10.00000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  BuildingSurface:Detailed,"
+                          "    Floor,                        !- Name",
+                          "    Floor,                        !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    NoSun,                        !- Sun Exposure",
+                          "    NoWind,                       !- Wind Exposure",
+                          "    1.0,                          !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.000000,0.000000,0,          !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.000000,10.000000,0,         !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  Zone,"
+                          "    Zone,                         !- Name",
+                          "    0,                            !- Direction of Relative North {deg}",
+                          "    6.000000,                     !- X Origin {m}",
+                          "    6.000000,                     !- Y Origin {m}",
+                          "    0,                            !- Z Origin {m}",
+                          "    1,                            !- Type",
+                          "    1,                            !- Multiplier",
+                          "    autocalculate,                !- Ceiling Height {m}",
+                          "    autocalculate;                !- Volume {m3}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataEnvrn->OutBaroPress = 100000;
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+    // test surface property object inputs
+    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
+    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
+    // set local derived data vars
+    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    // check sky view factors
+    EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty.GroundViewFactor);
+    // check surrounding surfaces view factors
+    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty.SurroundingSurfs(1).ViewFactor);
+    // check ground surfaces view factors
+    EXPECT_EQ("GNDSURFS GRASSAREA", GndSurfsProperty.GndSurfs(1).Name);
+    EXPECT_DOUBLE_EQ(0.2, GndSurfsProperty.GndSurfs(1).ViewFactor);
+    EXPECT_EQ("GNDSURFS PARKINGAREA", GndSurfsProperty.GndSurfs(2).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(2).ViewFactor);
+    EXPECT_EQ("GNDSURFS LAKEAREA", GndSurfsProperty.GndSurfs(3).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(3).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.4, GndSurfsProperty.SurfsViewFactorSum);
 }

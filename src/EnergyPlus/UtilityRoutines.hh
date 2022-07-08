@@ -63,6 +63,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -220,6 +221,8 @@ namespace UtilityRoutines {
     template <class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
     {
     };
+
+    Real64 epElapsedTime();
 
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
@@ -574,12 +577,12 @@ namespace UtilityRoutines {
     // For map, you'd only need the comparator
     struct case_insensitive_hasher
     {
-        size_t operator()(const std::string_view key) const noexcept;
+        size_t operator()(std::string_view key) const noexcept;
     };
 
     struct case_insensitive_comparator
     {
-        bool operator()(const std::string_view a, const std::string_view b) const noexcept;
+        bool operator()(std::string_view a, std::string_view b) const noexcept;
     };
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
@@ -605,13 +608,6 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
     return -1;
 }
 
-enum class BooleanSwitch
-{
-    Invalid = -1,
-    No,
-    Yes,
-    Num
-};
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
     constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
