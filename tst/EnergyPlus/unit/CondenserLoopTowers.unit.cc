@@ -4224,7 +4224,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(varSpd_tower.TowerType, DataPlant::PlantEquipmentType::CoolingTower_VarSpd);
     EXPECT_EQ(varSpd_tower.EvapLossMode, CondenserLoopTowers::EvapLoss::MoistTheory);
     EXPECT_EQ(varSpd_tower.BlowdownMode, CondenserLoopTowers::Blowdown::Concentration);
-    // EXPECT_EQ(varSpd_tower.DriftLossFraction, 0.008 / 100);
+    EXPECT_EQ(varSpd_tower.DriftLossFraction, 0.008 / 100);
     EXPECT_EQ(varSpd_tower.ConcentrationRatio, 3.0);
     EXPECT_EQ(varSpd_tower.NumCell, 1);
     EXPECT_EQ(varSpd_tower.MinFracFlowRate, 0.33);
