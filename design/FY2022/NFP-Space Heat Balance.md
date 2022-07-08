@@ -5,6 +5,8 @@ Subdivide Heat Balance by Space
 
  - Original April 22, 2022
  - Rev1 May 3, 2022 - Expand justification, make space heat balance calcs optional
+ - Rev2 June 29, 2022 - Plan Z, heat balances for zones only, add optional HVAC ZoneList to group Zones, make Zone Name optional for surfaces
+ - Rev3 July 8, 2022 - Revert Plan Z, stick with mostly original plan with optional space heat balance calcs
 
 ## Table of Contents ##
 
@@ -54,6 +56,8 @@ Q2: I still don't understand the need for this feature. If you want a finer reso
 
 A2: The difference comes in the HVAC system sizing and controls. For unitary systems, one can make each room a separate zone, size each zone's airflow separately, and then use the current unitary system inputs for control zone and control flow fraction to model the system. But for other types of HVAC systems, such as VAV, there is no equivalent way to control the VAV damper (and reheat coil) based on a thermostat in one Space and split the airflow to diffusers in other Spaces. In the early discussions for the original Space implementation, one of the proposed approaches was to use Zones for the room-level model and add a new HVAC-Zone concept to group rooms for HVAC control. Ultimately, it was decided to keep Zone aligned with the concept of a group of Spaces (rooms) that are an HVAC control Zone. This is the next step along that path. Regarding performance, see Q1.
 
+### June 29, 2022 Technicalities Call
+Plan Z was presented and challenged. Under Plan Z (heat balance only at the Zone level), if a user wanted room-by-room sizing data, then every room would need to be a Zone, and a new level of HVAC ZoneList would be used to group rooms (Zones) together for HVAC simulation and control. The question arose: "Why have Space then?" Further discussion revolved around the use case of room-by-room (Space-by-Space) sizing with Spaces grouped into large Zones for the HVAC simulation.
 
 ## Overview ##
 
