@@ -49,6 +49,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <numeric>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -4231,10 +4232,104 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     auto &NorthWestFacade = state.dataConvectionCoefficient->NorthWestFacade;
     auto &RoofGeo = state.dataConvectionCoefficient->RoofGeo;
 
+    // Calculate roof perimeter
+    {
+        std::vector<Vector> uniqueRoofVertices;
+        std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
+        for (const auto &surface : Surface) {
+            if (surface.Tilt < 45.0) { // TODO Double check tilt wrt outside vs inside
+                auto const &vertices = surface.Vertex;
+                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+
+                    auto itnext = std::next(it);
+                    if (itnext == std::end(vertices)) {
+                        itnext = std::begin(vertices);
+                    }
+
+                    auto curVertex = *it;
+                    auto nextVertex = *itnext;
+                    if (uniqueRoofVertices.size() == 0) {
+                        uniqueRoofVertices.emplace_back(curVertex);
+                    } else {
+                        auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
+                            return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
+                        });
+                        if (it2 == std::end(uniqueRoofVertices)) {
+                            uniqueRoofVertices.emplace_back(curVertex);
+                        }
+                    }
+
+                    SurfaceGeometry::EdgeOfSurf thisEdge;
+                    thisEdge.start = curVertex;
+                    thisEdge.end = nextVertex;
+                    thisEdge.count = 1;
+
+                    // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
+                    auto itEdge = std::find(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), thisEdge);
+                    if (itEdge == uniqEdgeOfSurfs.end()) {
+                        uniqEdgeOfSurfs.emplace_back(std::move(thisEdge));
+                    } else {
+                        ++(itEdge->count);
+                    }
+                }
+            }
+        }
+
+        // Remove the ones that are already used twice
+        uniqEdgeOfSurfs.erase(
+            std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+            uniqEdgeOfSurfs.end());
+
+        // Intersect with unique vertices as much as needed
+        bool insertedVertext = true;
+        while (insertedVertext) {
+            for (auto &edge : uniqEdgeOfSurfs) {
+
+                insertedVertext = false;
+
+                // now go through all the vertices and see if they are colinear with start and end vertices
+                for (const auto &testVertex : uniqueRoofVertices) {
+                    if (edge.containsPoints(testVertex)) {
+                        SurfaceGeometry::EdgeOfSurf newEdgeOfSurface;
+                        newEdgeOfSurface.start = testVertex;
+                        newEdgeOfSurface.end = edge.end;
+                        edge.end = testVertex;
+                        uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
+                        break;
+                    }
+                }
+                // Break out of the loop on edges, and start again at the while
+                if (insertedVertext) {
+                    break;
+                }
+            }
+        }
+
+        // recount
+        for (auto &edge : uniqEdgeOfSurfs) {
+            edge.count = std::count(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), edge);
+        }
+
+        uniqEdgeOfSurfs.erase(
+            std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+            uniqEdgeOfSurfs.end());
+
+        RoofGeo.Perimeter =
+            std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
+                return sum + edge.length();
+            });
+    }
+
+    int nRoofSurfaces = 0;
+
     // first pass over surfaces for outside face params
     for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
-        if (!Surface(SurfLoop).HeatTransSurf) continue;
+        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) {
+            continue;
+        }
+        if (!Surface(SurfLoop).HeatTransSurf) {
+            continue;
+        }
         thisAzimuth = Surface(SurfLoop).Azimuth;
         thisArea = Surface(SurfLoop).Area;
         thisZone = Surface(SurfLoop).Zone;
@@ -4320,6 +4415,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 NorthWestFacade.Xmin = min(x_min, NorthWestFacade.Xmin);
             }
         } else if (Surface(SurfLoop).Tilt < 45.0) { // TODO Double check tilt wrt outside vs inside
+
+            ++nRoofSurfaces;
 
             if (state.dataConvectionCoefficient->FirstRoofSurf) {
                 // #9432 - We can't just Init with anything in the group in the group (such as Vertex(1))
@@ -4554,7 +4651,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     TestDist(4) = distance(RoofGeo.XdYdZu.Vertex, RoofGeo.XdYuZu.Vertex);
     SideDLength = maxval(TestDist);
 
-    RoofGeo.Perimeter = SideALength + SideBLength + SideCLength + SideDLength;
+    // RoofGeo.Perimeter = SideALength + SideBLength + SideCLength + SideDLength;
 
     RoofGeo.Height = maxval(RoofBoundZvals) - minval(RoofBoundZvals);
 
@@ -4654,10 +4751,11 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     // now send to EIO if surface reporting selected
     ScanForReports(state, "Surfaces", DoReport, "Details");
     if (DoReport) { // echo out static geometry data related to convection models
-        static constexpr std::string_view Format_900(
-            "! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], Outside Perimeter [m], Outside Height "
-            "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
-            "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
+        static constexpr std::string_view Format_900("! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside "
+                                                     "Area [m2], Outside Perimeter [m], Outside Height "
+                                                     "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside "
+                                                     "Hydraulic Diameter [m], Window Wall Ratio, "
+                                                     "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
         print(state.files.eio, Format_900); // header
         for (int SurfLoop : state.dataSurface->AllSurfaceListReportOrder) {
             if (!Surface(SurfLoop).HeatTransSurf) continue;
@@ -4819,7 +4917,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthWestFacade.Zmin,
                   NorthWestFacade.Zmax);
             static constexpr std::string_view Format_8800(
-                "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, XdYdZu:Y, "
+                "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, "
+                "XdYdZu:Y, "
                 "XdYdZu:Z,XdYuZd:X, XdYuZd:Y, XdYuZd:Z,XdYuZu:X, XdYuZu:Y, XdYuZu:Z,XuYdZd:X, XuYdZd:Y, XuYdZd:Z,XuYuZd:X, XuYuZd:Y, "
                 "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
             print(state.files.eio, Format_8800); // header for roof
@@ -4924,7 +5023,8 @@ void SetupAdaptiveConvectionRadiantSurfaceData(EnergyPlusData &state)
     } // zone loop
 }
 
-void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, int const SurfNum) // surface number for which coefficients are being calculated
+void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state,
+                                        int const SurfNum) // surface number for which coefficients are being calculated
 {
 
     // SUBROUTINE INFORMATION:
@@ -8338,10 +8438,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
             ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
             ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
         }
-        ShowRecurringSevereErrorAtEnd(
-            state,
-            "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
-            state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2);
+        ShowRecurringSevereErrorAtEnd(state,
+                                      "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad perimeter "
+                                      "length and set to 9.999 [W/m2-K]",
+                                      state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2);
     }
     return CalcGoldsteinNovoselacCeilingDiffuserWindow(AirSystemFlowRate, ZoneExtPerimLength, WindWallRatio, WindowLocationType);
 }
@@ -8405,10 +8505,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
-                state,
-                "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad window location and set to 9.999 [W/m2-K]",
-                state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1);
+            ShowRecurringSevereErrorAtEnd(state,
+                                          "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad window "
+                                          "location and set to 9.999 [W/m2-K]",
+                                          state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1);
         }
     } else {
         if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 == 0) {
@@ -8418,10 +8518,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
             ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
             ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
         }
-        ShowRecurringSevereErrorAtEnd(
-            state,
-            "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
-            state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2);
+        ShowRecurringSevereErrorAtEnd(state,
+                                      "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad perimeter "
+                                      "length and set to 9.999 [W/m2-K]",
+                                      state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2);
     }
     return CalcGoldsteinNovoselacCeilingDiffuserWall(AirSystemFlowRate, ZoneExtPerimLength, WindowLocationType);
 }
@@ -8472,10 +8572,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(EnergyPlusData &state,
             ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
             ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
         }
-        ShowRecurringSevereErrorAtEnd(
-            state,
-            "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
-            state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX);
+        ShowRecurringSevereErrorAtEnd(state,
+                                      "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because bad perimeter "
+                                      "length and set to 9.999 [W/m2-K]",
+                                      state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX);
     }
     return CalcGoldsteinNovoselacCeilingDiffuserFloor(AirSystemFlowRate, ZoneExtPerimLength);
 }
@@ -9116,14 +9216,14 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
     Real64 Grc;       // Critical Grashof number
     Real64 DeltaTemp; // Temperature difference between TSurf and Tair
     Real64 L;         // Characteristic length: the length along the heat flow direction
-              // (the square root of surface area for floors and ceilings, average height for gables and walls, and length of pitched roof from soffit
-              // to ridge)
-    Real64 v;       // The velocity of the air stream in m/s, (for interior surfaces)
-                    // Surface Outside Face Outdoor Air Wind Speed (for exterior surfaces)
-    Real64 Pr;      // Prandtl number
-    Real64 beta_SI; // Volume coefficient of expansion of air, 1/K
-    Real64 rho_SI;  // Density of air, kg/m3
-    Real64 cp_SI;   // Specific heat of air, J/kg.k
+                      // (the square root of surface area for floors and ceilings, average height for gables and walls, and length of pitched roof
+                      // from soffit to ridge)
+    Real64 v;         // The velocity of the air stream in m/s, (for interior surfaces)
+                      // Surface Outside Face Outdoor Air Wind Speed (for exterior surfaces)
+    Real64 Pr;        // Prandtl number
+    Real64 beta_SI;   // Volume coefficient of expansion of air, 1/K
+    Real64 rho_SI;    // Density of air, kg/m3
+    Real64 cp_SI;     // Specific heat of air, J/kg.k
     Real64 dv;
     Real64 visc; // Kinematic viscosity of air, m2/s
     Real64 k_SI_n;
