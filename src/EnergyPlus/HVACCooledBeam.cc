@@ -201,7 +201,6 @@ namespace HVACCooledBeam {
         // Uses "Get" routines to read in data.
 
         // Using/Aliasing
-        using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
