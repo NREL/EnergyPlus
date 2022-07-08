@@ -137,6 +137,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: wahpEqFtCoolIndex = 0
   INTEGER :: wahpEqFtHeatIndex = 0
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
+  integer :: Num1
+  CHARACTER(len=MaxNameLength) :: SurroundingField1, SurroundingField2, matchedSurroundingName
   CHARACTER(len=20) :: PotentialRunPeriodName
   ! END OF TODO
 
