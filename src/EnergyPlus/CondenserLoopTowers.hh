@@ -219,14 +219,14 @@ namespace CondenserLoopTowers {
         //  through the tower sump
         // multi cell tower
         int NumCell = 0; // Number of cells in the cooling tower
-        CellCtrl CellCtrl_Num = CellCtrl::Invalid;
+        CellCtrl CellCtrl_Num = CellCtrl::MaxCell;
         int NumCellOn = 0;            // number of cells working
         Real64 MinFracFlowRate = 0.0; // Minimal fraction of design flow/cell allowable
         Real64 MaxFracFlowRate = 0.0; // Maximal ratio of design flow/cell allowable
         // begin water system interactions
-        EvapLoss EvapLossMode = EvapLoss::MoistTheory; // sets how tower water evaporation is modeled
-        Real64 UserEvapLossFactor = 0.0;               // simple model [%/Delt C]
-        Real64 DriftLossFraction = 0.0;
+        EvapLoss EvapLossMode = EvapLoss::MoistTheory;   // sets how tower water evaporation is modeled
+        Real64 UserEvapLossFactor = 0.0;                 // simple model [%/Delt C]
+        Real64 DriftLossFraction = 0.008;                // default value is 0.008%
         Blowdown BlowdownMode = Blowdown::Concentration; // sets how tower water blowdown is modeled
         Real64 ConcentrationRatio = 3.0;                 // ratio of solids in blowdown vs make up water
         int SchedIDBlowdown = 0;                         // index "pointer" to schedule of blowdown in [m3/s]
