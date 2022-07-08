@@ -578,7 +578,7 @@ json IdfParser::parse_integer(std::string_view idf, size_t &index)
             if (str.front() == '+') {
                 plus_sign = 1;
             }
-            Real64 dval;
+            double dval;
             auto fresult = fast_float::from_chars(str.data() + plus_sign, str.data() + str.size(), dval);
             if (fresult.ec == std::errc::invalid_argument || fresult.ec == std::errc::result_out_of_range) {
                 return rtrim(str);
