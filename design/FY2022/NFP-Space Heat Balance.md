@@ -56,8 +56,11 @@ Q2: I still don't understand the need for this feature. If you want a finer reso
 
 A2: The difference comes in the HVAC system sizing and controls. For unitary systems, one can make each room a separate zone, size each zone's airflow separately, and then use the current unitary system inputs for control zone and control flow fraction to model the system. But for other types of HVAC systems, such as VAV, there is no equivalent way to control the VAV damper (and reheat coil) based on a thermostat in one Space and split the airflow to diffusers in other Spaces. In the early discussions for the original Space implementation, one of the proposed approaches was to use Zones for the room-level model and add a new HVAC-Zone concept to group rooms for HVAC control. Ultimately, it was decided to keep Zone aligned with the concept of a group of Spaces (rooms) that are an HVAC control Zone. This is the next step along that path. Regarding performance, see Q1.
 
-### June 29, 2022 Technicalities Call
-Plan Z was presented and challenged. Under Plan Z (heat balance only at the Zone level), if a user wanted room-by-room sizing data, then every room would need to be a Zone, and a new level of HVAC ZoneList would be used to group rooms (Zones) together for HVAC simulation and control. The question arose: "Why have Space then?" Further discussion revolved around the use case of room-by-room (Space-by-Space) sizing with Spaces grouped into large Zones for the HVAC simulation.
+**June 29, 2022 Technicalities Call**
+
+Plan Z was presented and discussed. Under Plan Z (heat balance only at the Zone level), if a user wanted room-by-room sizing data, then every room would need to be a Zone, and a new level of HVAC ZoneList would be used to group rooms (Zones) together for HVAC simulation and control. The question arose: "Why have Space then?" Further discussion revolved around the use case of room-by-room (Space-by-Space) sizing with Spaces grouped into large Zones for the HVAC simulation.
+
+One of the implmentation hurdles discussed was that the current heat balance method loops over `Zone.HTSurfaceFirst:HTSurfaceLast` in multiple places. Converting this to `Space.HTSurfaceFirst:HTSurfaceLast` requires sorting surfaces by Space instead of by Zone. This coding has already been done.
 
 ## Overview ##
 
