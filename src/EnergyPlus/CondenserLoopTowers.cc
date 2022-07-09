@@ -497,7 +497,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for single speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(12))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(12))));
             }
 
             //   High speed air flow rate must be greater than free convection air flow rate.
@@ -788,7 +788,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for two speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
@@ -1412,7 +1412,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for variable speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(13))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(13))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
@@ -1665,7 +1665,7 @@ namespace CondenserLoopTowers {
             tower.TowerMassFlowRateMultiplier = tower.MaxFracFlowRate;
             //   cell control for variable speed Merkel tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                tower.CellCtrl_Num = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(15))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(15))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
@@ -4601,7 +4601,7 @@ namespace CondenserLoopTowers {
         // cap min at 1
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
@@ -4917,7 +4917,7 @@ namespace CondenserLoopTowers {
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
 
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
@@ -5088,7 +5088,7 @@ namespace CondenserLoopTowers {
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
 
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
@@ -5444,7 +5444,7 @@ namespace CondenserLoopTowers {
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
 
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;

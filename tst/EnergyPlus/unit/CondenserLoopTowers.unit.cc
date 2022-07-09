@@ -4199,7 +4199,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(singleSpd_tower.NumCell, 1);
     EXPECT_EQ(singleSpd_tower.MinFracFlowRate, 0.33);
     EXPECT_EQ(singleSpd_tower.MaxFracFlowRate, 2.50);
-    EXPECT_EQ(singleSpd_tower.CellCtrl_Num, CondenserLoopTowers::CellCtrl::MaxCell);
+    EXPECT_EQ(singleSpd_tower.cellCtrl, CondenserLoopTowers::CellCtrl::MaxCell);
     EXPECT_EQ(singleSpd_tower.EndUseSubcategory, "General");
 
     index = UtilityRoutines::FindItemInList("TWOSPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
@@ -4214,7 +4214,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(twoSpd_tower.NumCell, 1);
     EXPECT_EQ(twoSpd_tower.MinFracFlowRate, 0.33);
     EXPECT_EQ(twoSpd_tower.MaxFracFlowRate, 2.50);
-    EXPECT_EQ(twoSpd_tower.CellCtrl_Num, CondenserLoopTowers::CellCtrl::MaxCell);
+    EXPECT_EQ(twoSpd_tower.cellCtrl, CondenserLoopTowers::CellCtrl::MaxCell);
     EXPECT_EQ(twoSpd_tower.EndUseSubcategory, "General");
 
     index = UtilityRoutines::FindItemInList("VARSPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
@@ -4229,7 +4229,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(varSpd_tower.NumCell, 1);
     EXPECT_EQ(varSpd_tower.MinFracFlowRate, 0.33);
     EXPECT_EQ(varSpd_tower.MaxFracFlowRate, 2.50);
-    EXPECT_EQ(varSpd_tower.CellCtrl_Num, CondenserLoopTowers::CellCtrl::MaxCell);
+    EXPECT_EQ(varSpd_tower.cellCtrl, CondenserLoopTowers::CellCtrl::MaxCell);
     EXPECT_EQ(varSpd_tower.EndUseSubcategory, "General");
     EXPECT_EQ(varSpd_tower.PerformanceInputMethod_Num, CondenserLoopTowers::PIM::UFactor); // hard coded
     EXPECT_EQ(varSpd_tower.HeatRejectCapNomCapSizingRatio, 1.25);
@@ -4246,7 +4246,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(vSpdMerkel_tower.NumCell, 1);
     EXPECT_EQ(vSpdMerkel_tower.MinFracFlowRate, 0.33);
     EXPECT_EQ(vSpdMerkel_tower.MaxFracFlowRate, 2.50);
-    EXPECT_EQ(vSpdMerkel_tower.CellCtrl_Num, CondenserLoopTowers::CellCtrl::MaxCell);
+    EXPECT_EQ(vSpdMerkel_tower.cellCtrl, CondenserLoopTowers::CellCtrl::MaxCell);
     EXPECT_EQ(vSpdMerkel_tower.EndUseSubcategory, "General");
     EXPECT_EQ(vSpdMerkel_tower.PerformanceInputMethod_Num, CondenserLoopTowers::PIM::NominalCapacity);
     EXPECT_EQ(vSpdMerkel_tower.HeatRejectCapNomCapSizingRatio, 1.25);

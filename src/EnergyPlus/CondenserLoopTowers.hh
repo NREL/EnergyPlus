@@ -219,7 +219,7 @@ namespace CondenserLoopTowers {
         //  through the tower sump
         // multi cell tower
         int NumCell = 0; // Number of cells in the cooling tower
-        CellCtrl CellCtrl_Num = CellCtrl::MaxCell;
+        CellCtrl cellCtrl = CellCtrl::MaxCell;
         int NumCellOn = 0;            // number of cells working
         Real64 MinFracFlowRate = 0.0; // Minimal fraction of design flow/cell allowable
         Real64 MaxFracFlowRate = 0.0; // Maximal ratio of design flow/cell allowable
