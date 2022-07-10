@@ -47,11 +47,11 @@
 
 #include <EnergyPlus/FromChars.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <cmath>
 #include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
-#include <cmath>
 
 using json = nlohmann::json;
 
@@ -535,7 +535,6 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
     return convert_int(value);
 }
 
-
 json IdfParser::parse_integer(std::string_view idf, size_t &index)
 {
     eat_whitespace(idf, index);
@@ -590,7 +589,6 @@ json IdfParser::parse_integer(std::string_view idf, size_t &index)
     }
     return int_value;
 }
-
 
 json IdfParser::parse_value(std::string_view idf, size_t &index, bool &success, json const &field_loc)
 {
