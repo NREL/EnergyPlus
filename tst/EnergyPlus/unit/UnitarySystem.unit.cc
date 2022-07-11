@@ -19559,10 +19559,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_StagedThermostaTest)
     // Issue 9524
     // Cooling
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).StageNum = 1;
-    state->dataLoopNodes->Node(4).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow                                                                                  // Cooling coil air outlet node = 2
+    state->dataLoopNodes->Node(4).MassFlowRateMax =
+        thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow // Cooling coil air outlet node = 2
     state->dataLoopNodes->Node(2).TempSetPoint = 17.0;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
-    state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
+    state->dataGlobal->BeginEnvrnFlag = true;               // act as if simulation is beginning
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -19585,7 +19586,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_StagedThermostaTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).StageNum = 1;
     state->dataLoopNodes->Node(4).MassFlowRateMax =
-        thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow // Cooling coil air outlet node = 2
+        thisSys->m_DesignMassFlowRate;                      // max at fan outlet so fan won't limit flow // Cooling coil air outlet node = 2
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
     state->dataGlobal->BeginEnvrnFlag = true;               // act as if simulation is beginning
 
