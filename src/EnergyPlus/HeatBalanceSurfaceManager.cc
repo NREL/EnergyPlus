@@ -8856,8 +8856,12 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
 Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum)
 {
     if (state.dataSurface->Surface(SurfNum).hasIncSolMultiplier) {
-        return GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
-               state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
+        if (state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr > 0) {
+            return GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
+                   state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
+        } else {
+            return state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
+        }
     } else {
         return 1.0;
     }
