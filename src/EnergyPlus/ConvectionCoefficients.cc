@@ -4154,12 +4154,12 @@ RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state)
     // Intersect with unique vertices as much as needed
     bool insertedVertext = true;
     while (insertedVertext) {
+        insertedVertext = false;
+
         // Use an index-based loop because I may emplace_back inside the loop, and that invalidates the iterators
         for (size_t i = 0; i < uniqEdgeOfSurfs.size(); ++i) {
 
             auto &edge = uniqEdgeOfSurfs[i];
-
-            insertedVertext = false;
 
             // now go through all the vertices and see if they are colinear with start and end vertices
             for (const auto &testVertex : uniqueRoofVertices) {
@@ -4169,6 +4169,7 @@ RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state)
                     newEdgeOfSurface.end = edge.end;
                     edge.end = testVertex;
                     uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
+                    insertedVertext = true;
                     break;
                 }
             }
