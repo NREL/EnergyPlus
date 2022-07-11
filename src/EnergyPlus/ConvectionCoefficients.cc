@@ -4283,7 +4283,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
         // Intersect with unique vertices as much as needed
         bool insertedVertext = true;
         while (insertedVertext) {
-            for (auto &edge : uniqEdgeOfSurfs) {
+            // Use an index-based loop because I may emplace_back inside the loop, and that invalidates the iterators
+            for (size_t i = 0; i < uniqEdgeOfSurfs.size(); ++i) {
+
+                auto &edge = uniqEdgeOfSurfs[i];
 
                 insertedVertext = false;
 
