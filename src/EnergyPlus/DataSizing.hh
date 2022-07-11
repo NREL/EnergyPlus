@@ -488,12 +488,26 @@ namespace DataSizing {
         Real64 OutTempAtLatentHeatPeak;            // outdoor temp at max latent heating [C]
         Real64 ZoneHumRatAtLatentHeatPeak;         // zone humrat at max latent heating [kg/kg]
         Real64 OutHumRatAtLatentHeatPeak;          // outdoor humrat at max latent heating [kg/kg]
+        Real64 DesLatentHeatCoilInTemp;            // zone latent heating coil design air inlet temperature [C]
+        Real64 DesLatentCoolCoilInTemp;            // zone latent cooling coil design air inlet temperature [C]
+        Real64 DesLatentHeatCoilInHumRat;          // zone latent heating coil design air inlet humidity ratio [kg/kg]
+        Real64 DesLatentCoolCoilInHumRat;          // zone latent cooling coil design air inlet humidity ratio [kg/kg]
         int TimeStepNumAtLatentHeatMax;            // time step number (in day) at heating peak
         int TimeStepNumAtLatentCoolMax;            // time step number (in day) at cooling peak
+        int TimeStepNumAtLatentHeatNoDOASMax;      // time step number (in day) at latent heating peak without DOAS
+        int TimeStepNumAtLatentCoolNoDOASMax;      // time step number (in day) at Latent cooling peak without DOAS
         int LatentHeatDDNum;                       // design day index of design day causing heating peak
         int LatentCoolDDNum;                       // design day index of design day causing cooling peak
+        int LatentHeatNoDOASDDNum;                 // design day index of design day causing latent heating peak with no DOAS
+        int LatentCoolNoDOASDDNum;                 // design day index of design day causing latent cooling peak with no DOAS
         std::string cLatentHeatDDDate;             // date of design day causing heating peak
         std::string cLatentCoolDDDate;             // date of design day causing cooling peak
+        int TimeStepNumAtHeatNoDOASMax;            // time step number (in day) at Heating peak without DOAS
+        int TimeStepNumAtCoolNoDOASMax;            // time step number (in day) at cooling peak without DOAS
+        int HeatNoDOASDDNum;                       // design day index of design day causing heating peak without DOAS
+        int CoolNoDOASDDNum;                       // design day index of design day causing cooling peak without DOAS
+        std::string cHeatNoDOASDDDate;             // date of design day causing heating peak without DOAS
+        std::string cCoolNoDOASDDDate;             // date of design day causing cooling peak without DOAS
         Array1D<Real64> HeatLoadNoDOASSeq;         // daily sequence of zone heating load No DOAS (zone time step)
         Array1D<Real64> CoolLoadNoDOASSeq;         // daily sequence of zone cooling load No DOAS (zone time step)
         Array1D<Real64> HeatLatentLoadSeq;         // daily sequence of zone latent heating load (zone time step) [W]
@@ -515,8 +529,12 @@ namespace DataSizing {
         int ZnLatHeatDgnSAMethod;                  // choice of how to get zone latent heating design air humidity ratio;
         Real64 ZoneRetTempAtLatentCoolPeak;        // zone return temp at latent cooling peak time step
         Real64 ZoneRetTempAtLatentHeatPeak;        // zone return temp at latent heating peak time step
+        std::string CoolNoDOASDesDay;              // name of a cooling design day without DOAS
+        std::string HeatNoDOASDesDay;              // name of a heating design day without DOAS
         std::string LatCoolDesDay;                 // name of a cooling design day
         std::string LatHeatDesDay;                 // name of a heating design day
+        std::string LatCoolNoDOASDesDay;           // name of a cooling design day without DOAS
+        std::string LatHeatNoDOASDesDay;           // name of a heating design day without DOAS
 
         // Default Constructor
         ZoneSizingData()
@@ -550,11 +568,14 @@ namespace DataSizing {
               DesHeatLatentLoad(0.0), DesCoolLatentLoad(0.0), DesHeatLatentLoadNoDOAS(0.0), DesCoolLatentLoadNoDOAS(0.0), DesHeatLatentMassFlow(0.0),
               DesCoolLatentMassFlow(0.0), DesHeatLatentVolFlow(0.0), DesCoolLatentVolFlow(0.0), ZoneTempAtLatentCoolPeak(0.0),
               OutTempAtLatentCoolPeak(0.0), ZoneHumRatAtLatentCoolPeak(0.0), OutHumRatAtLatentCoolPeak(0.0), ZoneTempAtLatentHeatPeak(0.0),
-              OutTempAtLatentHeatPeak(0.0), ZoneHumRatAtLatentHeatPeak(0.0), OutHumRatAtLatentHeatPeak(0.0), TimeStepNumAtLatentHeatMax(0),
-              TimeStepNumAtLatentCoolMax(0), LatentHeatDDNum(0), LatentCoolDDNum(0), zoneLatentSizing(false), zoneRHDehumidifySetPoint(50.0),
-              zoneRHDehumidifySchIndex(0), zoneRHHumidifySetPoint(50.0), zoneRHHumidifySchIndex(0), CoolDesDehumHumRat(0.0), CoolDesHumRatDiff(0.005),
-              HeatDesHumidifyHumRat(0.0), HeatDesHumRatDiff(0.005), ZnLatCoolDgnSAMethod(0), ZnLatHeatDgnSAMethod(0),
-              ZoneRetTempAtLatentCoolPeak(0.0), ZoneRetTempAtLatentHeatPeak(0.0)
+              OutTempAtLatentHeatPeak(0.0), ZoneHumRatAtLatentHeatPeak(0.0), OutHumRatAtLatentHeatPeak(0.0), DesLatentHeatCoilInTemp(0.0),
+              DesLatentCoolCoilInTemp(0.0), DesLatentHeatCoilInHumRat(0.0), DesLatentCoolCoilInHumRat(0.0), TimeStepNumAtLatentHeatMax(0),
+              TimeStepNumAtLatentCoolMax(0), TimeStepNumAtLatentHeatNoDOASMax(0), TimeStepNumAtLatentCoolNoDOASMax(0), LatentHeatDDNum(0),
+              LatentCoolDDNum(0), LatentHeatNoDOASDDNum(0), LatentCoolNoDOASDDNum(0), TimeStepNumAtHeatNoDOASMax(0), TimeStepNumAtCoolNoDOASMax(0),
+              HeatNoDOASDDNum(0), CoolNoDOASDDNum(0), zoneLatentSizing(false), zoneRHDehumidifySetPoint(50.0), zoneRHDehumidifySchIndex(0),
+              zoneRHHumidifySetPoint(50.0), zoneRHHumidifySchIndex(0), CoolDesDehumHumRat(0.0), CoolDesHumRatDiff(0.005), HeatDesHumidifyHumRat(0.0),
+              HeatDesHumRatDiff(0.005), ZnLatCoolDgnSAMethod(0), ZnLatHeatDgnSAMethod(0), ZoneRetTempAtLatentCoolPeak(0.0),
+              ZoneRetTempAtLatentHeatPeak(0.0)
         {
         }
 

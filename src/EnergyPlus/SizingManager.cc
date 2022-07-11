@@ -3466,6 +3466,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     }
                     if (zoneSizingType != "SENSIBLE LOAD ONLY NO LATENT LOAD") {
                         zoneSizingIndex.zoneLatentSizing = true;
+                        state.dataHeatBal->DoLatentSizing = true;
                     }
                 }
                 if (NumAlphas > 10) {
