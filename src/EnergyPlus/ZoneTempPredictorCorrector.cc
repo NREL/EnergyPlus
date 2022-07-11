@@ -5914,10 +5914,6 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // smooth the changes using the zone air capacitance.
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        Real64 Num = (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
-                               (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
-                               (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum)));
-        Real64 Den = ((11.0 / 6.0) * C + A);
         state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
                                                                         (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
                                                                         (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum))) /
@@ -5966,7 +5962,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         Node(ZoneNodeNum).HumRat = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
         Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum));
     }
-
+    // these next 2 look backwards, check report variable outputs
     state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) = std::abs(min(LatentGain, 0.0));
     state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) = max(LatentGain, 0.0);
     state.dataHeatBal->ZoneLTLoadHeatEnergy(ZoneNum) =

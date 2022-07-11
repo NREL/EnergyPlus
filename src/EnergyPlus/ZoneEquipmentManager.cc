@@ -739,16 +739,14 @@ void SizeZoneEquipment(EnergyPlusData &state)
         ZoneNode = zoneEquipConfig.ZoneNode;
         RetTemp = (ReturnNode > 0) ? Node(ReturnNode).Temp : Node(ZoneNode).Temp;
         int ActualZoneNum = calcZoneSizing.ActualZoneNum;
-        auto &zoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+        auto &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
         if (calcZoneSizing.HeatLoad > 0.0) {
             calcZoneSizing.HeatZoneRetTemp = RetTemp;
-            calcZoneSizing.HeatTstatTemp =
-                (zoneThermostatSetPoint > 0.0) ? zoneThermostatSetPoint : state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
+            calcZoneSizing.HeatTstatTemp = (zoneTstatSP > 0.0) ? zoneTstatSP : state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
             calcZoneSizing.CoolTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
         } else if (calcZoneSizing.CoolLoad > 0.0) {
             calcZoneSizing.CoolZoneRetTemp = RetTemp;
-            calcZoneSizing.CoolTstatTemp =
-                (zoneThermostatSetPoint > 0.0) ? zoneThermostatSetPoint : state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
+            calcZoneSizing.CoolTstatTemp = (zoneTstatSP > 0.0) ? zoneTstatSP : state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
             calcZoneSizing.HeatTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
         } else {
             calcZoneSizing.CoolZoneRetTemp = RetTemp;
@@ -2679,7 +2677,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                       state.dataSize->SizingFileColSep,
                       state.dataSize->CalcFinalZoneSizing(I).ZoneName,
                       state.dataSize->CalcFinalZoneSizing(I).CoolNoDOASDesDay,
-                      ":Des Cool Load No DOAS [W]",
+                      ":Des Sens Cool Load No DOAS [W]",
                       state.dataSize->SizingFileColSep,
                       state.dataSize->CalcFinalZoneSizing(I).ZoneName,
                       state.dataSize->CalcFinalZoneSizing(I).LatHeatNoDOASDesDay,
@@ -2841,11 +2839,11 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         }
                         if (TimeStepIndex == state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtLatentHeatMax) {
                             state.dataSize->LatHeatPeakDateHrMin(CtrlZoneNum) =
-                                state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).cLatentHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
+                                calcFinalZoneSizing.cLatentHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
                         }
                         if (TimeStepIndex == state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtLatentCoolMax) {
                             state.dataSize->LatCoolPeakDateHrMin(CtrlZoneNum) =
-                                state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).cLatentCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
+                                calcFinalZoneSizing.cLatentCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
                         }
                     }
 
