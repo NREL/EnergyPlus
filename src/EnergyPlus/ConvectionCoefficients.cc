@@ -4080,6 +4080,112 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 }
 
+void getRoofGeometryInformation(EnergyPlusData &state)
+{
+    auto &Surface(state.dataSurface->Surface);
+
+    auto &RoofGeo = state.dataConvectionCoefficient->RoofGeo;
+
+    std::vector<Vector> uniqueRoofVertices;
+    std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
+    for (const auto &surface : Surface) {
+        if (surface.Tilt < 45.0) { // TODO Double check tilt wrt outside vs inside?
+            auto const &vertices = surface.Vertex;
+
+            auto const &thisArea = surface.Area;
+            Real64 const z_min(minval(vertices, &Vector::z));
+            Real64 const z_max(maxval(vertices, &Vector::z));
+            RoofGeo.Height += (z_max - z_min) * thisArea;
+            RoofGeo.Tilt += surface.Tilt * thisArea;
+            RoofGeo.Azimuth += surface.Azimuth * thisArea;
+            RoofGeo.Area += thisArea;
+
+            for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+
+                auto itnext = std::next(it);
+                if (itnext == std::end(vertices)) {
+                    itnext = std::begin(vertices);
+                }
+
+                auto curVertex = *it;
+                auto nextVertex = *itnext;
+                if (uniqueRoofVertices.size() == 0) {
+                    uniqueRoofVertices.emplace_back(curVertex);
+                } else {
+                    auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
+                        return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
+                    });
+                    if (it2 == std::end(uniqueRoofVertices)) {
+                        uniqueRoofVertices.emplace_back(curVertex);
+                    }
+                }
+
+                SurfaceGeometry::EdgeOfSurf thisEdge;
+                thisEdge.start = curVertex;
+                thisEdge.end = nextVertex;
+                thisEdge.count = 1;
+
+                // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
+                auto itEdge = std::find(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), thisEdge);
+                if (itEdge == uniqEdgeOfSurfs.end()) {
+                    uniqEdgeOfSurfs.emplace_back(std::move(thisEdge));
+                } else {
+                    ++(itEdge->count);
+                }
+            }
+        }
+    }
+
+    RoofGeo.Height /= RoofGeo.Area;
+    RoofGeo.Tilt /= RoofGeo.Area;
+    RoofGeo.Azimuth /= RoofGeo.Area;
+
+    // Remove the ones that are already used twice
+    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+                          uniqEdgeOfSurfs.end());
+
+    // Intersect with unique vertices as much as needed
+    bool insertedVertext = true;
+    while (insertedVertext) {
+        // Use an index-based loop because I may emplace_back inside the loop, and that invalidates the iterators
+        for (size_t i = 0; i < uniqEdgeOfSurfs.size(); ++i) {
+
+            auto &edge = uniqEdgeOfSurfs[i];
+
+            insertedVertext = false;
+
+            // now go through all the vertices and see if they are colinear with start and end vertices
+            for (const auto &testVertex : uniqueRoofVertices) {
+                if (edge.containsPoints(testVertex)) {
+                    SurfaceGeometry::EdgeOfSurf newEdgeOfSurface;
+                    newEdgeOfSurface.start = testVertex;
+                    newEdgeOfSurface.end = edge.end;
+                    edge.end = testVertex;
+                    uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
+                    break;
+                }
+            }
+            // Break out of the loop on edges, and start again at the while
+            if (insertedVertext) {
+                break;
+            }
+        }
+    }
+
+    // recount
+    for (auto &edge : uniqEdgeOfSurfs) {
+        edge.count = std::count(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), edge);
+    }
+
+    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+                          uniqEdgeOfSurfs.end());
+
+    RoofGeo.Perimeter =
+        std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
+            return sum + edge.length();
+        });
+}
+
 void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
 {
 
@@ -4102,8 +4208,6 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     using Vectors::VecLength;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;
-    int VertLoop;
     Real64 BldgVolumeSum;
     Real64 PerimExtLengthSum;
 
@@ -4115,32 +4219,13 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     Real64 thisAzimuth;
     Real64 thisArea;
     int thisZone;
-    Array1D<Real64> RoofBoundZvals(8);
-    Array1D<Real64> TestDist(4);
-    Real64 surfacearea;
-    Real64 BoundTilt;
-    Real64 BoundAzimuth;
     bool DoReport;
-    Real64 SideALength;
-    Real64 SideBLength;
-    Real64 SideCLength;
-    Real64 SideDLength;
-    std::string YesNo1;
-    std::string YesNo2;
-
-    // Object Data
-    Vector BoundNewellVec;
-    Vector BoundNewellAreaVec;
-    Vector dummy1;
-    Vector dummy2;
-    Vector dummy3;
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &Surface(state.dataSurface->Surface);
 
     BldgVolumeSum = 0.0;
-    RoofBoundZvals = 0.0;
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
 
         BldgVolumeSum += Zone(ZoneLoop).Volume * Zone(ZoneLoop).Multiplier * Zone(ZoneLoop).ListMultiplier;
         PerimExtLengthSum = 0.0; // init
@@ -4230,100 +4315,11 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     auto &SouthWestFacade = state.dataConvectionCoefficient->SouthWestFacade;
     auto &WestFacade = state.dataConvectionCoefficient->WestFacade;
     auto &NorthWestFacade = state.dataConvectionCoefficient->NorthWestFacade;
+
+    // Calculate roof perimeter, Area, weighted-by-area average height azimuth
+    getRoofGeometryInformation(state);
     auto &RoofGeo = state.dataConvectionCoefficient->RoofGeo;
-
-    // Calculate roof perimeter
-    {
-        std::vector<Vector> uniqueRoofVertices;
-        std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
-        for (const auto &surface : Surface) {
-            if (surface.Tilt < 45.0) { // TODO Double check tilt wrt outside vs inside
-                auto const &vertices = surface.Vertex;
-                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-
-                    auto itnext = std::next(it);
-                    if (itnext == std::end(vertices)) {
-                        itnext = std::begin(vertices);
-                    }
-
-                    auto curVertex = *it;
-                    auto nextVertex = *itnext;
-                    if (uniqueRoofVertices.size() == 0) {
-                        uniqueRoofVertices.emplace_back(curVertex);
-                    } else {
-                        auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
-                            return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
-                        });
-                        if (it2 == std::end(uniqueRoofVertices)) {
-                            uniqueRoofVertices.emplace_back(curVertex);
-                        }
-                    }
-
-                    SurfaceGeometry::EdgeOfSurf thisEdge;
-                    thisEdge.start = curVertex;
-                    thisEdge.end = nextVertex;
-                    thisEdge.count = 1;
-
-                    // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
-                    auto itEdge = std::find(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), thisEdge);
-                    if (itEdge == uniqEdgeOfSurfs.end()) {
-                        uniqEdgeOfSurfs.emplace_back(std::move(thisEdge));
-                    } else {
-                        ++(itEdge->count);
-                    }
-                }
-            }
-        }
-
-        // Remove the ones that are already used twice
-        uniqEdgeOfSurfs.erase(
-            std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
-            uniqEdgeOfSurfs.end());
-
-        // Intersect with unique vertices as much as needed
-        bool insertedVertext = true;
-        while (insertedVertext) {
-            // Use an index-based loop because I may emplace_back inside the loop, and that invalidates the iterators
-            for (size_t i = 0; i < uniqEdgeOfSurfs.size(); ++i) {
-
-                auto &edge = uniqEdgeOfSurfs[i];
-
-                insertedVertext = false;
-
-                // now go through all the vertices and see if they are colinear with start and end vertices
-                for (const auto &testVertex : uniqueRoofVertices) {
-                    if (edge.containsPoints(testVertex)) {
-                        SurfaceGeometry::EdgeOfSurf newEdgeOfSurface;
-                        newEdgeOfSurface.start = testVertex;
-                        newEdgeOfSurface.end = edge.end;
-                        edge.end = testVertex;
-                        uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
-                        break;
-                    }
-                }
-                // Break out of the loop on edges, and start again at the while
-                if (insertedVertext) {
-                    break;
-                }
-            }
-        }
-
-        // recount
-        for (auto &edge : uniqEdgeOfSurfs) {
-            edge.count = std::count(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), edge);
-        }
-
-        uniqEdgeOfSurfs.erase(
-            std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
-            uniqEdgeOfSurfs.end());
-
-        RoofGeo.Perimeter =
-            std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
-                return sum + edge.length();
-            });
-    }
-
-    int nRoofSurfaces = 0;
+    state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = RoofGeo.Azimuth;
 
     // first pass over surfaces for outside face params
     for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
@@ -4417,141 +4413,6 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                 NorthWestFacade.Xmax = max(x_max, NorthWestFacade.Xmax);
                 NorthWestFacade.Xmin = min(x_min, NorthWestFacade.Xmin);
             }
-        } else if (Surface(SurfLoop).Tilt < 45.0) { // TODO Double check tilt wrt outside vs inside
-
-            ++nRoofSurfaces;
-
-            if (state.dataConvectionCoefficient->FirstRoofSurf) {
-                // #9432 - We can't just Init with anything in the group in the group (such as Vertex(1))
-                // Otherwise if for eg the Vertex(1) has a higher X and Y than all other points, then we will not be able
-                // to find the XdYu ones (lo X, high Y), that is the top left corner because
-                //     vertex.x <= RoofGeo.XdYuZd.Vertex.x => True
-                //     vertex.y => RoofGeo.XdYuZd.Vertex.y => False
-                // So instead, we initialize to the Surface's Centroid...
-                RoofGeo.XdYdZd.SurfNum = SurfLoop;
-                RoofGeo.XdYdZd.VertNum = 0;
-                RoofGeo.XdYdZd.Vertex = Surface(SurfLoop).Centroid;
-
-                RoofGeo.XdYdZu.SurfNum = SurfLoop;
-                RoofGeo.XdYdZu.VertNum = 0;
-                RoofGeo.XdYdZu.Vertex = Surface(SurfLoop).Centroid;
-
-                RoofGeo.XdYuZd.SurfNum = SurfLoop;
-                RoofGeo.XdYuZd.VertNum = 0;
-                RoofGeo.XdYuZd.Vertex = Surface(SurfLoop).Centroid;
-
-                RoofGeo.XdYuZu.SurfNum = SurfLoop;
-                RoofGeo.XdYuZu.VertNum = 0;
-                RoofGeo.XdYuZu.Vertex = Surface(SurfLoop).Centroid;
-
-                RoofGeo.XuYdZd.SurfNum = SurfLoop;
-                RoofGeo.XuYdZd.VertNum = 0;
-                RoofGeo.XuYdZd.Vertex = Surface(SurfLoop).Centroid;
-
-                RoofGeo.XuYuZd.SurfNum = SurfLoop;
-                RoofGeo.XuYuZd.VertNum = 0;
-                RoofGeo.XuYuZd.Vertex = Surface(SurfLoop).Centroid;
-
-                RoofGeo.XuYdZu.SurfNum = SurfLoop;
-                RoofGeo.XuYdZu.VertNum = 0;
-                RoofGeo.XuYdZu.Vertex = Surface(SurfLoop).Centroid;
-
-                RoofGeo.XuYuZu.SurfNum = SurfLoop;
-                RoofGeo.XuYuZu.VertNum = 0;
-                RoofGeo.XuYuZu.Vertex = Surface(SurfLoop).Centroid;
-
-                state.dataConvectionCoefficient->FirstRoofSurf = false;
-            }
-            // treat as part of roof group
-            RoofGeo.Area += thisArea;
-
-            // I take the double by reference to avoid adding a rounding error on top of a rounding error (the centroid is calculated...)
-            auto lesserThanWithTol = [](const auto &lhs, const auto &rhs) { return lhs - rhs <= 0.000001; };
-            auto greaterThanWithTol = [](const auto &lhs, const auto &rhs) { return lhs - rhs >= -0.000001; };
-
-            for (VertLoop = 1; VertLoop <= Surface(SurfLoop).Sides; ++VertLoop) {
-
-                auto &vertex = Surface(SurfLoop).Vertex(VertLoop);
-                // 1 low x, low y, low z
-                if (lesserThanWithTol(vertex.x, RoofGeo.XdYdZd.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XdYdZd.Vertex.y) &&
-                    lesserThanWithTol(vertex.z, RoofGeo.XdYdZd.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XdYdZd.SurfNum = SurfLoop;
-                    RoofGeo.XdYdZd.VertNum = VertLoop;
-                    RoofGeo.XdYdZd.Vertex = vertex;
-                    RoofBoundZvals(1) = vertex.z;
-                }
-
-                // 2 low x, low y, hi z
-                if (lesserThanWithTol(vertex.x, RoofGeo.XdYdZu.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XdYdZu.Vertex.y) &&
-                    greaterThanWithTol(vertex.z, RoofGeo.XdYdZu.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XdYdZu.SurfNum = SurfLoop;
-                    RoofGeo.XdYdZu.VertNum = VertLoop;
-                    RoofGeo.XdYdZu.Vertex = vertex;
-                    RoofBoundZvals(2) = vertex.z;
-                }
-
-                // 3 low x, hi y, low z
-                if (lesserThanWithTol(vertex.x, RoofGeo.XdYuZd.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XdYuZd.Vertex.y) &&
-                    lesserThanWithTol(vertex.z, RoofGeo.XdYuZd.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XdYuZd.SurfNum = SurfLoop;
-                    RoofGeo.XdYuZd.VertNum = VertLoop;
-                    RoofGeo.XdYuZd.Vertex = vertex;
-                    RoofBoundZvals(3) = vertex.z;
-                }
-
-                // 4 low x, hi y, hi z
-                if (lesserThanWithTol(vertex.x, RoofGeo.XdYuZu.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XdYuZu.Vertex.y) &&
-                    greaterThanWithTol(vertex.z, RoofGeo.XdYuZu.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XdYuZu.SurfNum = SurfLoop;
-                    RoofGeo.XdYuZu.VertNum = VertLoop;
-                    RoofGeo.XdYuZu.Vertex = vertex;
-                    RoofBoundZvals(4) = vertex.z;
-                }
-
-                // 5 hi x, low y, low z
-                if (greaterThanWithTol(vertex.x, RoofGeo.XuYdZd.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XuYdZd.Vertex.y) &&
-                    lesserThanWithTol(vertex.z, RoofGeo.XuYdZd.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XuYdZd.SurfNum = SurfLoop;
-                    RoofGeo.XuYdZd.VertNum = VertLoop;
-                    RoofGeo.XuYdZd.Vertex = vertex;
-                    RoofBoundZvals(5) = vertex.z;
-                }
-
-                // 6 hi x, hi y, low z
-                if (greaterThanWithTol(vertex.x, RoofGeo.XuYuZd.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XuYuZd.Vertex.y) &&
-                    lesserThanWithTol(vertex.z, RoofGeo.XuYuZd.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XuYuZd.SurfNum = SurfLoop;
-                    RoofGeo.XuYuZd.VertNum = VertLoop;
-                    RoofGeo.XuYuZd.Vertex = vertex;
-                    RoofBoundZvals(6) = vertex.z;
-                }
-
-                // 7 hi x, low y, hi z
-                if (greaterThanWithTol(vertex.x, RoofGeo.XuYdZu.Vertex.x) && lesserThanWithTol(vertex.y, RoofGeo.XuYdZu.Vertex.y) &&
-                    greaterThanWithTol(vertex.z, RoofGeo.XuYdZu.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XuYdZu.SurfNum = SurfLoop;
-                    RoofGeo.XuYdZu.VertNum = VertLoop;
-                    RoofGeo.XuYdZu.Vertex = vertex;
-                    RoofBoundZvals(7) = vertex.z;
-                }
-
-                // 8 hi x, hi y, hi z
-                if (greaterThanWithTol(vertex.x, RoofGeo.XuYuZu.Vertex.x) && greaterThanWithTol(vertex.y, RoofGeo.XuYuZu.Vertex.y) &&
-                    greaterThanWithTol(vertex.z, RoofGeo.XuYuZu.Vertex.z)) {
-                    // this point is more toward this bound
-                    RoofGeo.XuYuZu.SurfNum = SurfLoop;
-                    RoofGeo.XuYuZu.VertNum = VertLoop;
-                    RoofGeo.XuYuZu.Vertex = vertex;
-                    RoofBoundZvals(8) = vertex.z;
-                }
-            }
         }
     } // fist loop over surfaces for outside face params
 
@@ -4590,111 +4451,6 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
         2.0 * std::sqrt(pow_2(NorthWestFacade.Xmax - NorthWestFacade.Xmin) + pow_2(NorthWestFacade.Ymax - NorthWestFacade.Ymin)) +
         2.0 * (NorthWestFacade.Zmax - NorthWestFacade.Zmin);
     NorthWestFacade.Height = NorthWestFacade.Zmax - NorthWestFacade.Zmin;
-
-    // Sanity check
-    if (RoofGeo.XdYdZd.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYdZd (lo x, lo y, lo z)");
-    }
-
-    if (RoofGeo.XdYdZu.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYdZu (lo x, lo y, hi z)");
-    }
-
-    if (RoofGeo.XdYuZd.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYuZd (lo x, hi y, lo z)");
-    }
-
-    if (RoofGeo.XdYuZu.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XdYuZu (lo x, hi y, hi z)");
-    }
-
-    if (RoofGeo.XuYdZd.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYdZd (hi x, lo y, lo z)");
-    }
-
-    if (RoofGeo.XuYuZd.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYuZd (hi x, hi y, lo z)");
-    }
-
-    if (RoofGeo.XuYdZu.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYdZu (hi x, lo y, hi z)");
-    }
-
-    if (RoofGeo.XuYuZu.VertNum == 0) {
-        ShowWarningMessage(state, "SetupAdaptiveConvectionStaticMetaData: Failed to Locate RoofGeo.XuYuZu (hi x, hi y, hi z)");
-    }
-
-    // now model roof perimeter
-    // move around bounding boxes side walls and find the longest of the four distances
-    // Side A: Y low -- uses XdYdZd, XdYdZu, XuYdZd, XuYdZu
-    TestDist(1) = distance(RoofGeo.XdYdZd.Vertex, RoofGeo.XuYdZd.Vertex);
-    TestDist(2) = distance(RoofGeo.XdYdZd.Vertex, RoofGeo.XuYdZu.Vertex);
-    TestDist(3) = distance(RoofGeo.XdYdZu.Vertex, RoofGeo.XuYdZd.Vertex);
-    TestDist(4) = distance(RoofGeo.XdYdZu.Vertex, RoofGeo.XuYdZu.Vertex);
-    SideALength = maxval(TestDist);
-
-    // Side B: X Hi -- uses XuYdZd, XuYuZd, XuYdZu, XuYuZu
-    TestDist(1) = distance(RoofGeo.XuYdZd.Vertex, RoofGeo.XuYuZd.Vertex);
-    TestDist(2) = distance(RoofGeo.XuYdZd.Vertex, RoofGeo.XuYuZu.Vertex);
-    TestDist(3) = distance(RoofGeo.XuYdZu.Vertex, RoofGeo.XuYuZd.Vertex);
-    TestDist(4) = distance(RoofGeo.XuYdZu.Vertex, RoofGeo.XuYuZu.Vertex);
-    SideBLength = maxval(TestDist);
-
-    // Side C: Y Hi -- uses XdYuZd, XdYuZu, XuYuZd, XuYuZu
-    TestDist(1) = distance(RoofGeo.XdYuZd.Vertex, RoofGeo.XuYuZd.Vertex);
-    TestDist(2) = distance(RoofGeo.XdYuZd.Vertex, RoofGeo.XuYuZu.Vertex);
-    TestDist(3) = distance(RoofGeo.XdYuZu.Vertex, RoofGeo.XuYuZd.Vertex);
-    TestDist(4) = distance(RoofGeo.XdYuZu.Vertex, RoofGeo.XuYuZu.Vertex);
-    SideCLength = maxval(TestDist);
-
-    // Side D: X Lo -- uses XdYdZd, XdYdZu, XdYuZd, XdYuZu
-    TestDist(1) = distance(RoofGeo.XdYdZd.Vertex, RoofGeo.XdYuZd.Vertex);
-    TestDist(2) = distance(RoofGeo.XdYdZd.Vertex, RoofGeo.XdYuZu.Vertex);
-    TestDist(3) = distance(RoofGeo.XdYdZu.Vertex, RoofGeo.XdYuZd.Vertex);
-    TestDist(4) = distance(RoofGeo.XdYdZu.Vertex, RoofGeo.XdYuZu.Vertex);
-    SideDLength = maxval(TestDist);
-
-    // RoofGeo.Perimeter = SideALength + SideBLength + SideCLength + SideDLength;
-
-    RoofGeo.Height = maxval(RoofBoundZvals) - minval(RoofBoundZvals);
-
-    // now find the longest bound face
-    if ((SideALength >= SideBLength) && (SideALength >= SideCLength) && (SideALength >= SideDLength)) {
-        // Side A: Y low -- uses XdYdZd, XdYdZu, XuYdZd, XuYdZu
-        RoofGeo.BoundSurf(1) = RoofGeo.XdYdZd.Vertex;
-        RoofGeo.BoundSurf(2) = RoofGeo.XuYdZd.Vertex;
-        RoofGeo.BoundSurf(3) = RoofGeo.XuYdZu.Vertex;
-        RoofGeo.BoundSurf(4) = RoofGeo.XdYdZu.Vertex;
-
-    } else if ((SideBLength >= SideALength) && (SideBLength >= SideCLength) && (SideBLength >= SideDLength)) {
-        // Side B: X Hi -- uses XuYdZd, XuYuZd, XuYdZu, XuYuZu
-        RoofGeo.BoundSurf(1) = RoofGeo.XuYdZd.Vertex;
-        RoofGeo.BoundSurf(2) = RoofGeo.XuYuZd.Vertex;
-        RoofGeo.BoundSurf(3) = RoofGeo.XuYuZu.Vertex;
-        RoofGeo.BoundSurf(4) = RoofGeo.XuYdZu.Vertex;
-    } else if ((SideCLength >= SideALength) && (SideCLength >= SideBLength) && (SideCLength >= SideDLength)) {
-        // Side C: Y Hi -- uses XdYuZd, XdYuZu, XuYuZd, XuYuZu
-        RoofGeo.BoundSurf(1) = RoofGeo.XdYuZd.Vertex;
-        RoofGeo.BoundSurf(2) = RoofGeo.XuYuZd.Vertex;
-        RoofGeo.BoundSurf(3) = RoofGeo.XuYuZu.Vertex;
-        RoofGeo.BoundSurf(4) = RoofGeo.XdYuZu.Vertex;
-    } else if ((SideDLength >= SideALength) && (SideDLength >= SideCLength) && (SideDLength >= SideBLength)) {
-        // Side D: X Lo Hi -- uses XdYuZd, XdYuZu, XuYuZd, XuYuZu
-        RoofGeo.BoundSurf(1) = RoofGeo.XdYuZd.Vertex;
-        RoofGeo.BoundSurf(2) = RoofGeo.XuYuZd.Vertex;
-        RoofGeo.BoundSurf(3) = RoofGeo.XuYuZu.Vertex;
-        RoofGeo.BoundSurf(4) = RoofGeo.XdYuZu.Vertex;
-    }
-
-    CreateNewellAreaVector(RoofGeo.BoundSurf, 4, BoundNewellAreaVec);
-    surfacearea = VecLength(BoundNewellAreaVec);
-    if (surfacearea > 0.001) { // Roof is not flat
-        CreateNewellSurfaceNormalVector(RoofGeo.BoundSurf, 4, BoundNewellVec);
-        DetermineAzimuthAndTilt(RoofGeo.BoundSurf, 4, BoundAzimuth, BoundTilt, dummy1, dummy2, dummy3, surfacearea, BoundNewellVec);
-        state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = BoundAzimuth;
-    } else {
-        state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = 0.0; // flat roofs don't really have azimuth
-    }
 
     for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
         if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
@@ -4761,17 +4517,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                                                      "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
         print(state.files.eio, Format_900); // header
         for (int SurfLoop : state.dataSurface->AllSurfaceListReportOrder) {
-            if (!Surface(SurfLoop).HeatTransSurf) continue;
-            if (state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfLoop)) {
-                YesNo1 = "Yes";
-            } else {
-                YesNo1 = "No";
+            if (!Surface(SurfLoop).HeatTransSurf) {
+                continue;
             }
-            if (state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfLoop)) {
-                YesNo2 = "Yes";
-            } else {
-                YesNo2 = "No";
-            }
+
             static constexpr std::string_view Format_901(
                 "Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
             print(state.files.eio,
@@ -4787,8 +4536,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfLoop),
                   state.dataSurface->SurfIntConvWindowWallRatio(SurfLoop),
                   state.dataSurface->SurfIntConvWindowLocation(SurfLoop),
-                  YesNo1,
-                  YesNo2);
+                  state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfLoop) ? "Yes" : "No",
+                  state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfLoop) ? "Yes" : "No");
 
             // [m] length of perimeter zone's exterior wall | [m] hydraulic diameter, usually 4 times the zone floor area div by
             // perimeter | [-] area of windows over area of exterior wall for zone | relative location of window in zone for
@@ -4920,48 +4669,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthWestFacade.Zmin,
                   NorthWestFacade.Zmax);
             static constexpr std::string_view Format_8800(
-                "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, "
-                "XdYdZu:Y, "
-                "XdYdZu:Z,XdYuZd:X, XdYuZd:Y, XdYuZd:Z,XdYuZu:X, XdYuZu:Y, XdYuZu:Z,XuYdZd:X, XuYdZd:Y, XuYdZd:Z,XuYuZd:X, XuYuZd:Y, "
-                "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
+                "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], Tilt [deg], Azimuth [deg]\n");
             print(state.files.eio, Format_8800); // header for roof
-            static constexpr std::string_view Format_8801(
-                "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
-            print(state.files.eio,
-                  Format_8801,
-                  RoofGeo.Area,
-                  RoofGeo.Perimeter,
-                  RoofGeo.Height,
-                  RoofGeo.XdYdZd.Vertex.x,
-                  RoofGeo.XdYdZd.Vertex.y,
-                  RoofGeo.XdYdZd.Vertex.z,
-                  RoofGeo.XdYdZu.Vertex.x,
-                  RoofGeo.XdYdZu.Vertex.y,
-                  RoofGeo.XdYdZu.Vertex.z,
-                  RoofGeo.XdYuZd.Vertex.x);
-            static constexpr std::string_view Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
-            print(state.files.eio,
-                  Format_88012,
-                  RoofGeo.XdYuZd.Vertex.y,
-                  RoofGeo.XdYuZd.Vertex.z,
-                  RoofGeo.XdYuZu.Vertex.x,
-                  RoofGeo.XdYuZu.Vertex.y,
-                  RoofGeo.XdYuZu.Vertex.z,
-                  RoofGeo.XuYdZd.Vertex.x,
-                  RoofGeo.XuYdZd.Vertex.y,
-                  RoofGeo.XuYdZd.Vertex.z,
-                  RoofGeo.XuYuZd.Vertex.x,
-                  RoofGeo.XuYuZd.Vertex.y);
-            static constexpr std::string_view Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
-            print(state.files.eio,
-                  Format_88013,
-                  RoofGeo.XuYuZd.Vertex.z,
-                  RoofGeo.XuYdZu.Vertex.x,
-                  RoofGeo.XuYdZu.Vertex.y,
-                  RoofGeo.XuYdZu.Vertex.z,
-                  RoofGeo.XuYuZu.Vertex.x,
-                  RoofGeo.XuYuZu.Vertex.y,
-                  RoofGeo.XuYuZu.Vertex.z);
+            static constexpr std::string_view Format_8801("Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}");
+            print(state.files.eio, Format_8801, RoofGeo.Area, RoofGeo.Perimeter, RoofGeo.Height, RoofGeo.Tilt, RoofGeo.Azimuth);
         }
     }
 }

@@ -220,23 +220,12 @@ namespace ConvectionCoefficients {
     struct RoofGeoCharacteristicsStruct
     {
         // Members
-        BoundingBoxVertStruct XdYdZd; // 1 low x, low y, low z
-        BoundingBoxVertStruct XdYdZu; // 2 low x, low y, hi z
-        BoundingBoxVertStruct XdYuZd; // 3 low x, hi y, low z
-        BoundingBoxVertStruct XdYuZu; // 4 low x, hi y, hi z
-        BoundingBoxVertStruct XuYdZd; // 5 hi x, low y, low z
-        BoundingBoxVertStruct XuYuZd; // 6 hi x, hi y, low z
-        BoundingBoxVertStruct XuYdZu; // 7 hi x, low y, hi z
-        BoundingBoxVertStruct XuYuZu; // 8 hi x, hi y, hi z
-        Array1D<Vector> BoundSurf;    // long edge of roof group bounding surface
-        Real64 Area = 0.0;
-        Real64 Perimeter = 0.0;
-        Real64 Height = 0.0;
-
-        // Default Constructor
-        RoofGeoCharacteristicsStruct() : BoundSurf(4)
-        {
-        }
+        Real64 Area = 0.0;      // Sum of all roof surface areas
+        Real64 Perimeter = 0.0; // Actual perimeter of all roof surfaces, after removing all edges that are used twice (and inserting vertices
+                                // to split surfaces as needed)
+        Real64 Height = 0.0;    // Weighted average mean height (for each surface, take the mean Z value, then do a weighted average by surface area)
+        Real64 Azimuth = 0.0;   // Weighted average azimuth
+        Real64 Tilt = 0.0;      // Weighted average tilt
     };
 
     struct FacadeGeoCharacteristicsStruct
@@ -401,6 +390,8 @@ namespace ConvectionCoefficients {
                                         Real64 SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
+
+    void getRoofGeometryInformation(EnergyPlusData &state);
 
     void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state);
 
