@@ -3382,3 +3382,202 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_WeirderShape)
 
     EXPECT_NEAR(actual_roof_perimeter, state->dataConvectionCoefficient->RoofGeo.Perimeter, 0.0001);
 }
+
+TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
+{
+
+    {
+        state->dataSurface->Surface.allocate(1);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(1).Name = "Normal Surface";
+        state->dataSurface->Surface(1).Sides = 4;
+        state->dataSurface->Surface(1).Vertex.dimension(4);
+        state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(1).Tilt = 0.0;
+        state->dataSurface->Surface(1).Azimuth = 0.0;
+        state->dataSurface->Surface(1).Area = 400.0;
+        state->dataSurface->Surface(1).Vertex(1) = Vector(10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(80.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    {
+        // Same, just translated by Vector(20.0, 0.0, 0.0) so that it's next to it (sharing one edge)
+        state->dataSurface->Surface.resize(2);
+        state->dataSurface->Surface(2).Name = "Translated Normal Surface";
+        state->dataSurface->Surface(2).Sides = 4;
+        state->dataSurface->Surface(2).Vertex.dimension(4);
+        state->dataSurface->Surface(2).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(2).Tilt = 0.0;
+        state->dataSurface->Surface(2).Azimuth = 0.0;
+        state->dataSurface->Surface(2).Area = 400.0;
+        state->dataSurface->Surface(2).Vertex(1) = Vector(30.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(2) = Vector(10.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(3) = Vector(10.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(4) = Vector(30.0, -10.0, 3.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(800.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(120.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    {
+        // Same, just translated by Vector(20.0, 0.0, 3.0) so that it's next to it but at a different height (not sharing an edge)
+        state->dataSurface->Surface.resize(3);
+        state->dataSurface->Surface(3).Name = "Translated Normal Surface different Z";
+        state->dataSurface->Surface(3).Sides = 4;
+        state->dataSurface->Surface(3).Vertex.dimension(4);
+        state->dataSurface->Surface(3).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(3).Tilt = 0.0;
+        state->dataSurface->Surface(3).Azimuth = 0.0;
+        state->dataSurface->Surface(3).Area = 400.0;
+        state->dataSurface->Surface(3).Vertex(1) = Vector(50.0, 10.0, 6.0);
+        state->dataSurface->Surface(3).Vertex(2) = Vector(30.0, 10.0, 6.0);
+        state->dataSurface->Surface(3).Vertex(3) = Vector(30.0, -10.0, 6.0);
+        state->dataSurface->Surface(3).Vertex(4) = Vector(50.0, -10.0, 6.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(1200.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(200.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    // This is getting confusing, let's clear and restart
+    state->dataSurface->Surface.deallocate();
+
+    {
+        state->dataSurface->Surface.allocate(1);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(1).Name = "Titled Roof 1";
+        state->dataSurface->Surface(1).Sides = 4;
+        state->dataSurface->Surface(1).Vertex.dimension(4);
+        state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(1).Tilt = 22.61986494804042;
+        state->dataSurface->Surface(1).Azimuth = 270.0;
+        state->dataSurface->Surface(1).Area = 130.0;
+        state->dataSurface->Surface(1).Vertex(1) = Vector(12.0, 10.0, 5.0);
+        state->dataSurface->Surface(1).Vertex(2) = Vector(0.0, 10.0, 0.0);
+        state->dataSurface->Surface(1).Vertex(3) = Vector(0.0, 0.0, 0.0);
+        state->dataSurface->Surface(1).Vertex(4) = Vector(12.0, 0.0, 5.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(130.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(5.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ((13.0 + 10.0) * 2.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(22.61986494804042, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(270, RoofGeo.Azimuth);
+    }
+    {
+        // This becomes a gabbled roof
+        state->dataSurface->Surface.resize(2);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(2).Name = "Titled Roof 2";
+        state->dataSurface->Surface(2).Sides = 4;
+        state->dataSurface->Surface(2).Vertex.dimension(4);
+        state->dataSurface->Surface(2).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(2).Tilt = 22.61986494804042;
+        state->dataSurface->Surface(2).Azimuth = 90.0;
+        state->dataSurface->Surface(2).Area = 130.0;
+        state->dataSurface->Surface(2).Vertex(1) = Vector(24.0, 10.0, 0.0);
+        state->dataSurface->Surface(2).Vertex(2) = Vector(12.0, 10.0, 5.0);
+        state->dataSurface->Surface(2).Vertex(3) = Vector(12.0, 0.0, 5.0);
+        state->dataSurface->Surface(2).Vertex(4) = Vector(24.0, 0.0, 0.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(260.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(5.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(13.0 * 4 + 10.0 * 2.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(22.61986494804042, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(180.0, RoofGeo.Azimuth);
+    }
+    {
+        // This becomes a gabbled roof + another surface that is flat (horizontal) and that has has the same area as the two gabbled ones combined
+        state->dataSurface->Surface.resize(3);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(3).Name = "Flat Roof";
+        state->dataSurface->Surface(3).Sides = 4;
+        state->dataSurface->Surface(3).Vertex.dimension(4);
+        state->dataSurface->Surface(3).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(3).Tilt = 0.0;
+        state->dataSurface->Surface(3).Azimuth = 0.0;
+        state->dataSurface->Surface(3).Area = 260.0;
+        state->dataSurface->Surface(3).Vertex(1) = Vector(50.0, 10.0, 0.0);
+        state->dataSurface->Surface(3).Vertex(2) = Vector(24.0, 10.0, 0.0);
+        state->dataSurface->Surface(3).Vertex(3) = Vector(24.0, 0.0, 0.0);
+        state->dataSurface->Surface(3).Vertex(4) = Vector(50.0, 0.0, 0.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(520.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(2.5, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(13.0 * 4 + 10.0 * 2.0 + 26.0 * 2, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(22.61986494804042 / 2.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(90.0, RoofGeo.Azimuth);
+    }
+
+    // This is getting confusing, let's clear and restart
+    state->dataSurface->Surface.deallocate();
+
+    {
+        state->dataSurface->Surface.allocate(1);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(1).Name = "Normal Surface";
+        state->dataSurface->Surface(1).Sides = 4;
+        state->dataSurface->Surface(1).Vertex.dimension(4);
+        state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(1).Tilt = 0.0;
+        state->dataSurface->Surface(1).Azimuth = 0.0;
+        state->dataSurface->Surface(1).Area = 400.0;
+        state->dataSurface->Surface(1).Vertex(1) = Vector(10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(80.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    {
+        // Same, just translated by Vector(30.0, 0.0, 0.0) so that it's detached
+        state->dataSurface->Surface.resize(2);
+        state->dataSurface->Surface(2).Name = "Translated Normal Surface not touching";
+        state->dataSurface->Surface(2).Sides = 4;
+        state->dataSurface->Surface(2).Vertex.dimension(4);
+        state->dataSurface->Surface(2).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(2).Tilt = 0.0;
+        state->dataSurface->Surface(2).Azimuth = 0.0;
+        state->dataSurface->Surface(2).Area = 400.0;
+        state->dataSurface->Surface(2).Vertex(1) = Vector(40.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(2) = Vector(20.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(3) = Vector(20.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(4) = Vector(40.0, -10.0, 3.0);
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(800.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(160.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+}

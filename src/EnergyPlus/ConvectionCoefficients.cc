@@ -4080,11 +4080,11 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 }
 
-void getRoofGeometryInformation(EnergyPlusData &state)
+RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state)
 {
     auto &Surface(state.dataSurface->Surface);
 
-    auto &RoofGeo = state.dataConvectionCoefficient->RoofGeo;
+    RoofGeoCharacteristicsStruct RoofGeo;
 
     std::vector<Vector> uniqueRoofVertices;
     std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
@@ -4095,7 +4095,8 @@ void getRoofGeometryInformation(EnergyPlusData &state)
             auto const &thisArea = surface.Area;
             Real64 const z_min(minval(vertices, &Vector::z));
             Real64 const z_max(maxval(vertices, &Vector::z));
-            RoofGeo.Height += (z_max - z_min) * thisArea;
+            Real64 const verticalHeight = z_max - z_min;
+            RoofGeo.Height += verticalHeight * thisArea;
             RoofGeo.Tilt += surface.Tilt * thisArea;
             RoofGeo.Azimuth += surface.Azimuth * thisArea;
             RoofGeo.Area += thisArea;
@@ -4184,6 +4185,8 @@ void getRoofGeometryInformation(EnergyPlusData &state)
         std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
             return sum + edge.length();
         });
+
+    return RoofGeo;
 }
 
 void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
@@ -4317,8 +4320,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     auto &NorthWestFacade = state.dataConvectionCoefficient->NorthWestFacade;
 
     // Calculate roof perimeter, Area, weighted-by-area average height azimuth
-    getRoofGeometryInformation(state);
     auto &RoofGeo = state.dataConvectionCoefficient->RoofGeo;
+    RoofGeo = getRoofGeometryInformation(state);
     state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = RoofGeo.Azimuth;
 
     // first pass over surfaces for outside face params

@@ -223,7 +223,8 @@ namespace ConvectionCoefficients {
         Real64 Area = 0.0;      // Sum of all roof surface areas
         Real64 Perimeter = 0.0; // Actual perimeter of all roof surfaces, after removing all edges that are used twice (and inserting vertices
                                 // to split surfaces as needed)
-        Real64 Height = 0.0;    // Weighted average mean height (for each surface, take the mean Z value, then do a weighted average by surface area)
+        Real64 Height = 0.0;    // Weighted average mean vertical height: for each surface, take max - Zmin value,
+                                // then do a weighted average by surface area
         Real64 Azimuth = 0.0;   // Weighted average azimuth
         Real64 Tilt = 0.0;      // Weighted average tilt
     };
@@ -391,7 +392,7 @@ namespace ConvectionCoefficients {
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
 
-    void getRoofGeometryInformation(EnergyPlusData &state);
+    RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state);
 
     void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state);
 
