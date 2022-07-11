@@ -850,7 +850,7 @@ namespace RoomAirModelManager {
 
             // this zone uses a nodal air model so get number of air nodes in each zone
             for (AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
-                if (UtilityRoutines::SameString(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone(ZoneNum).Name)) {
+                if (state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr == ZoneNum) {
                     ++state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneNum);
                 }
             }
@@ -1616,8 +1616,7 @@ namespace RoomAirModelManager {
                                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
                                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                                     ++thisSurfinZone;
-                                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ListSurfNum),
-                                                                    state.dataSurface->Surface(SurfNum).Name)) {
+                                    if (state.dataIPShortCut->cAlphaArgs(ListSurfNum) == state.dataSurface->Surface(SurfNum).Name) {
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask(thisSurfinZone) = true;
                                         ++SurfCount;
                                         surfaceFound = true;
