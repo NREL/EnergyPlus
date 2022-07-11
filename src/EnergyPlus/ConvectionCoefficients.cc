@@ -4137,9 +4137,15 @@ RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state)
         }
     }
 
-    RoofGeo.Height /= RoofGeo.Area;
-    RoofGeo.Tilt /= RoofGeo.Area;
-    RoofGeo.Azimuth /= RoofGeo.Area;
+    if (RoofGeo.Area > 0) {
+        RoofGeo.Height /= RoofGeo.Area;
+        RoofGeo.Tilt /= RoofGeo.Area;
+        RoofGeo.Azimuth /= RoofGeo.Area;
+    } else {
+        RoofGeo.Height = 0.0;
+        RoofGeo.Tilt = 0.0;
+        RoofGeo.Azimuth = 0.0;
+    }
 
     // Remove the ones that are already used twice
     uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
