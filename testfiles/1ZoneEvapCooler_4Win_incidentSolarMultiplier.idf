@@ -185,7 +185,7 @@
     Rough,                   !- Roughness
     2.290965,                !- Thermal Resistance {m2-K/W}
     0.9000000,               !- Thermal Absorptance
-    0.7500000,               !- Solar Absorptance
+    0.0000000,               !- Solar Absorptance
     0.7500000;               !- Visible Absorptance
 
   Material:NoMass,
@@ -193,7 +193,7 @@
     Rough,                   !- Roughness
     5.456,                   !- Thermal Resistance {m2-K/W}
     0.9000000,               !- Thermal Absorptance
-    0.7500000,               !- Solar Absorptance
+    0.0000000,               !- Solar Absorptance
     0.7500000;               !- Visible Absorptance
 
   Material,
@@ -411,22 +411,22 @@
 
   SurfaceProperty:IncidentSolarMultiplier,
     Zn001:Wall001:Win001,     !- Surface Name
-    1.0,                      !- Shading Multiplier
+    0.5,                      !- Shading Multiplier
     SolarMultConst;           !- Shading Multiplier Schedule Name
 
   SurfaceProperty:IncidentSolarMultiplier,
     Zn001:Wall002:Win002,     !- Surface Name
-    1.0,                      !- Shading Multiplier
+    0.5,                      !- Shading Multiplier
     SolarMultConst;           !- Shading Multiplier Schedule Name
 
   SurfaceProperty:IncidentSolarMultiplier,
     Zn001:Wall003:Win003,     !- Surface Name
-    1.0,                      !- Shading Multiplier
+    0.5,                      !- Shading Multiplier
     SolarMultConst;           !- Shading Multiplier Schedule Name
 
   SurfaceProperty:IncidentSolarMultiplier,
     Zn001:Wall004:Win004,     !- Surface Name
-    1.0,                      !- Shading Multiplier
+    0.5,                      !- Shading Multiplier
     SolarMultConst;           !- Shading Multiplier Schedule Name
 
   Schedule:Constant,SolarMultConst,Fraction,1.0;
@@ -680,10 +680,13 @@
 
   Output:Constructions,Constructions;
 
-  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Solar Radiation Rate per Area,hourly;
-  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Beam Solar Radiation Rate per Area,hourly;
-  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area,hourly;
-  Output:Variable,ZN001:WALL001:WIN001,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area,hourly;
+  Output:Variable,*,Surface Outside Face Incident Solar Radiation Rate per Area,hourly;
+  Output:Variable,*,Surface Outside Face Incident Beam Solar Radiation Rate per Area,hourly;
+  Output:Variable,*,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area,hourly;
+  Output:Variable,*,Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area,hourly;
+  Output:Variable,*,Surface Window Transmitted Solar Radiation Rate,hourly;
+  Output:Variable,*,Surface Window Transmitted Beam Solar Radiation Rate,hourly;
+  Output:Variable,*,Surface Window Transmitted Diffuse Solar Radiation Rate;
   Output:Variable,*,Zone Air System Sensible Heating Energy,hourly;
   Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly;
 
