@@ -15276,7 +15276,6 @@ namespace SurfaceGeometry {
         int J;   // Loop index
         int K;   // Loop index
         int Ind; // Location of surface vertex to be removed
-        bool SurfCollinearWarning;
 
         if (state.dataSurfaceGeometry->CheckConvexityFirstTime) {
             ACosZero = std::acos(0.0);
@@ -15359,7 +15358,6 @@ namespace SurfaceGeometry {
         }
 
         M = 0;
-        SurfCollinearWarning = false;
         for (n = 1; n <= NSides; ++n) { // perform convexity test in the plane determined above.
             V1len = std::sqrt(pow_2(A(n + 1) - A(n)) + pow_2(B(n + 1) - B(n)));
             V2len = std::sqrt(pow_2(A(n + 2) - A(n + 1)) + pow_2(B(n + 2) - B(n + 1)));
@@ -15377,11 +15375,9 @@ namespace SurfaceGeometry {
             } else if (Theta > (ACosZero + TurnThreshold)) {
                 SignFlag = false;
             } else { // Store the index of the collinear vertex for removal
-                if (!SurfCollinearWarning) {
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state, "CheckConvexity: Surface=\"" + surfaceTmp.Name + "\", Collinear points have been removed.");
-                    }
-                    SurfCollinearWarning = true;
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state,
+                                     format("CheckConvexity: Surface=\"{}\", vertex {} is colinear with previous and next.", surfaceTmp.Name, n + 1));
                 }
                 ++state.dataErrTracking->TotalCoincidentVertices;
                 ++M;
@@ -15424,6 +15420,10 @@ namespace SurfaceGeometry {
         if (M > 0) { // Remove the collinear points determined above
             if (NSides - M > 2) {
                 surfaceTmp.Sides = NSides - M;
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state,
+                                     format("CheckConvexity: Surface=\"{}\" has [{}] collinear points that have been removed.", surfaceTmp.Name, M));
+                }
             } else { // too many
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(state, format("CheckConvexity: Surface=\"{}\" has [{}] collinear points.", surfaceTmp.Name, M));
