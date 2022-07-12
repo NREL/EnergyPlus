@@ -15634,7 +15634,8 @@ Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
                                         FanStaticPressureRise);
         }
 
-        FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy;
+        FanHeatCorrection =
+            SupplyAirMassFlowRate * (state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy);
 
     } else {
 
