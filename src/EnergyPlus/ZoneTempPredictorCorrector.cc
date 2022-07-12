@@ -5963,24 +5963,26 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum));
     }
     // these next 2 look backwards, check report variable outputs
-    state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) = std::abs(min(LatentGain, 0.0));
-    state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) = max(LatentGain, 0.0);
-    state.dataHeatBal->ZoneLTLoadHeatEnergy(ZoneNum) =
-        state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    state.dataHeatBal->ZoneLTLoadCoolEnergy(ZoneNum) =
-        state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-
-    Real64 sensibleLoad = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) + state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
-    if ((sensibleLoad + LatentGain) != 0.0) {
-        state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = sensibleLoad / (sensibleLoad + LatentGain);
-    } else if (sensibleLoad != 0.0) {
-        state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 1.0;
-    } else {
-        state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 0.0;
+    if (!state.dataHeatBal->ZoneLTLoadHeatRate.empty()) {
+        state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) = std::abs(min(LatentGain, 0.0));
+        state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) = max(LatentGain, 0.0);
+        state.dataHeatBal->ZoneLTLoadHeatEnergy(ZoneNum) =
+            state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataHeatBal->ZoneLTLoadCoolEnergy(ZoneNum) =
+            state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 sensibleLoad = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) + state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
+        if ((sensibleLoad + LatentGain) != 0.0) {
+            state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = sensibleLoad / (sensibleLoad + LatentGain);
+        } else if (sensibleLoad != 0.0) {
+            state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 1.0;
+        } else {
+            state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 0.0;
+        }
+        Real64 pSat = PsyPsatFnTemp(state, ZT(ZoneNum), RoutineName);
+        Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum), state.dataEnvrn->StdBaroPress);
+        state.dataHeatBal->ZoneVaporPressureDifference(ZoneNum) = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
     }
-    Real64 pSat = PsyPsatFnTemp(state, ZT(ZoneNum), RoutineName);
-    Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum), state.dataEnvrn->StdBaroPress);
-    state.dataHeatBal->ZoneVaporPressureDifference(ZoneNum) = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
+
 }
 
 void DownInterpolate4HistoryValues(Real64 const OldTimeStep,

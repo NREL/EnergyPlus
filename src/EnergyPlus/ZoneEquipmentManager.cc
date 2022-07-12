@@ -2837,18 +2837,28 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         static constexpr std::string_view ZSizeFmt21(
                             "{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12."
                             "6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
-                        Real64 ZoneRHHeat = Psychrometrics::PsyRhFnTdbWPb(
-                                                state,
-                                                state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneTempSeq(TimeStepIndex),
-                                                state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneHumRatSeq(TimeStepIndex),
-                                                state.dataEnvrn->OutBaroPress) *
-                                            100.0;
-                        Real64 ZoneRHCool = Psychrometrics::PsyRhFnTdbWPb(
-                                                state,
-                                                state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneTempSeq(TimeStepIndex),
-                                                state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneHumRatSeq(TimeStepIndex),
-                                                state.dataEnvrn->OutBaroPress) *
-                                            100.0;
+                        Real64 ZoneRHHeat = 0.0;
+                        Real64 ZoneRHCool = 0.0;
+                        Real64 ZoneTHeat = 0.0;
+                        Real64 ZoneTCool = 0.0;
+                        if (calcFinalZoneSizing.HeatDDNum > 0) {
+                            ZoneTHeat = state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneTempSeq(TimeStepIndex);
+                            ZoneRHHeat = Psychrometrics::PsyRhFnTdbWPb(
+                                             state,
+                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneTempSeq(TimeStepIndex),
+                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneHumRatSeq(TimeStepIndex),
+                                             state.dataEnvrn->OutBaroPress) *
+                                         100.0;
+                        }
+                        if (calcFinalZoneSizing.CoolDDNum > 0) {
+                            ZoneTCool = state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneTempSeq(TimeStepIndex);
+                            ZoneRHCool = Psychrometrics::PsyRhFnTdbWPb(
+                                             state,
+                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneTempSeq(TimeStepIndex),
+                                             state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneHumRatSeq(TimeStepIndex),
+                                             state.dataEnvrn->OutBaroPress) *
+                                         100.0;
+                        }
                         print(state.files.zsz,
                               ZSizeFmt21,
                               state.dataSize->SizingFileColSep,
@@ -2876,11 +2886,11 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                               state.dataSize->SizingFileColSep,
                               calcFinalZoneSizing.CoolLatentLoadNoDOASSeq(TimeStepIndex),
                               state.dataSize->SizingFileColSep,
-                              state.dataSize->CalcZoneSizing(calcFinalZoneSizing.HeatDDNum, I).HeatZoneTempSeq(TimeStepIndex),
+                              ZoneTHeat,
                               state.dataSize->SizingFileColSep,
                               ZoneRHHeat,
                               state.dataSize->SizingFileColSep,
-                              state.dataSize->CalcZoneSizing(calcFinalZoneSizing.CoolDDNum, I).CoolZoneTempSeq(TimeStepIndex),
+                              ZoneTCool,
                               state.dataSize->SizingFileColSep,
                               ZoneRHCool);
                     }
