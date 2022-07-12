@@ -15363,6 +15363,9 @@ namespace SurfaceGeometry {
             V1len = std::sqrt(pow_2(A(n + 1) - A(n)) + pow_2(B(n + 1) - B(n)));
             V2len = std::sqrt(pow_2(A(n + 2) - A(n + 1)) + pow_2(B(n + 2) - B(n + 1)));
             if (V1len <= 1.e-8 || V2len <= 1.e-8) continue;
+            // TODO: Why is it using `V1.x * V2.y - V1.y * V2.x` ? That's a cross product! not a dot product as the name implies
+            // dot product is  `V1.x * V2.x + V1.y * V2.y`
+            // That explains why the ACosZero is needed...
             DotProd = (A(n + 1) - A(n)) * (B(n + 2) - B(n + 1)) - (B(n + 1) - B(n)) * (A(n + 2) - A(n + 1));
             cosarg = DotProd / (V1len * V2len);
             if (cosarg < -1.0) {
