@@ -15306,17 +15306,20 @@ namespace SurfaceGeometry {
             VertSize = state.dataSurface->MaxVerticesPerSurface;
         }
 
+        auto &surfaceTmp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+        auto &vertices = surfaceTmp.Vertex;
+
         for (n = 1; n <= NSides; ++n) {
-            X(n) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x;
-            Y(n) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y;
-            Z(n) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).z;
+            X(n) = vertices(n).x;
+            Y(n) = vertices(n).y;
+            Z(n) = vertices(n).z;
         }
-        X(NSides + 1) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1).x;
-        Y(NSides + 1) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1).y;
-        Z(NSides + 1) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1).z;
-        X(NSides + 2) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2).x;
-        Y(NSides + 2) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2).y;
-        Z(NSides + 2) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2).z;
+        X(NSides + 1) = vertices(1).x;
+        Y(NSides + 1) = vertices(1).y;
+        Z(NSides + 1) = vertices(1).z;
+        X(NSides + 2) = vertices(2).x;
+        Y(NSides + 2) = vertices(2).y;
+        Z(NSides + 2) = vertices(2).z;
 
         // Determine a suitable plane in which to do the tests
         Det = 0.0;
@@ -15344,10 +15347,10 @@ namespace SurfaceGeometry {
                     B = Z;
                 } else {
                     // This condition should not be reached if the surfaces are guaranteed to be planar already
-                    ShowSevereError(state, "CheckConvexity: Surface=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\" is non-planar.");
+                    ShowSevereError(state, "CheckConvexity: Surface=\"" + surfaceTmp.Name + "\" is non-planar.");
                     ShowContinueError(state, "Coincident Vertices will be removed as possible.");
-                    for (n = 1; n <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++n) {
-                        auto const &point(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n));
+                    for (n = 1; n <= surfaceTmp.Sides; ++n) {
+                        auto const &point(vertices(n));
                         static constexpr std::string_view ErrFmt(" ({:8.3F},{:8.3F},{:8.3F})");
                         ShowContinueError(state, EnergyPlus::format(ErrFmt, point.x, point.y, point.z));
                     }
@@ -15371,23 +15374,19 @@ namespace SurfaceGeometry {
             Theta = std::acos(cosarg);
             if (Theta < (ACosZero - TurnThreshold)) {
                 SignFlag = true;
-            } else {
-                if (Theta > (ACosZero + TurnThreshold)) {
-                    SignFlag = false;
-                } else { // Store the index of the collinear vertex for removal
-                    if (!SurfCollinearWarning) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             "CheckConvexity: Surface=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
-                                                 "\", Collinear points have been removed.");
-                        }
-                        SurfCollinearWarning = true;
+            } else if (Theta > (ACosZero + TurnThreshold)) {
+                SignFlag = false;
+            } else { // Store the index of the collinear vertex for removal
+                if (!SurfCollinearWarning) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowWarningError(state, "CheckConvexity: Surface=\"" + surfaceTmp.Name + "\", Collinear points have been removed.");
                     }
-                    ++state.dataErrTracking->TotalCoincidentVertices;
-                    ++M;
-                    SurfCollinearVerts(M) = n + 1;
-                    continue;
+                    SurfCollinearWarning = true;
                 }
+                ++state.dataErrTracking->TotalCoincidentVertices;
+                ++M;
+                SurfCollinearVerts(M) = n + 1;
+                continue;
             }
 
             if (n == 1) {
@@ -15397,13 +15396,11 @@ namespace SurfaceGeometry {
             }
 
             if (SignFlag != PrevSignFlag) {
-                if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal &&
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
+                if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal && surfaceTmp.ExtSolar) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state,
-                                         "CheckConvexity: Zone=\"" +
-                                             state.dataHeatBal->Zone(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone).Name + "\", Surface=\"" +
-                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\" is non-convex.");
+                                         "CheckConvexity: Zone=\"" + state.dataHeatBal->Zone(surfaceTmp.Zone).Name + "\", Surface=\"" +
+                                             surfaceTmp.Name + "\" is non-convex.");
                         Np1 = n + 1;
                         if (Np1 > NSides) Np1 -= NSides;
                         Np2 = n + 2;
@@ -15416,7 +15413,7 @@ namespace SurfaceGeometry {
                         //          CALL ShowContinueError(state, '...last theta angle=['//TRIM(format("{:.6R}", LastTheta))//']')
                     }
                 }
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).IsConvex = false;
+                surfaceTmp.IsConvex = false;
                 break;
             }
             PrevSignFlag = SignFlag;
@@ -15426,17 +15423,15 @@ namespace SurfaceGeometry {
         // must check to make sure don't remove NSides below 3
         if (M > 0) { // Remove the collinear points determined above
             if (NSides - M > 2) {
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = NSides - M;
+                surfaceTmp.Sides = NSides - M;
             } else { // too many
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowWarningError(
-                        state,
-                        format("CheckConvexity: Surface=\"{}\" has [{}] collinear points.", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name, M));
+                    ShowWarningError(state, format("CheckConvexity: Surface=\"{}\" has [{}] collinear points.", surfaceTmp.Name, M));
                     ShowContinueError(state, "...too many to remove all.  Will leave the surface with 3 sides. But this is now a degenerate surface");
                 }
                 ++state.dataErrTracking->TotalDegenerateSurfaces;
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = max(NSides - M, 3);
-                M = NSides - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
+                surfaceTmp.Sides = max(NSides - M, 3);
+                M = NSides - surfaceTmp.Sides;
             }
             for (J = 1; J <= M; ++J) {
                 Ind = SurfCollinearVerts(J);
@@ -15444,29 +15439,26 @@ namespace SurfaceGeometry {
                     Ind = Ind - NSides + M - 1;
                 }
                 for (K = Ind; K <= NSides - 1; ++K) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(K - J + 1).x =
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(K - J + 2).x;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(K - J + 1).y =
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(K - J + 2).y;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(K - J + 1).z =
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(K - J + 2).z;
+                    vertices(K - J + 1).x = vertices(K - J + 2).x;
+                    vertices(K - J + 1).y = vertices(K - J + 2).y;
+                    vertices(K - J + 1).z = vertices(K - J + 2).z;
                 }
             }
             // remove duplicated points and resize Vertex
             Array1D<Vector> OldVertex;
             OldVertex.allocate(NSides);
-            OldVertex = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.deallocate();
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(NSides - M);
+            OldVertex = vertices;
+            vertices.deallocate();
+            vertices.allocate(NSides - M);
             for (J = 1; J <= NSides - M; ++J) {
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(J) = OldVertex(J);
+                vertices(J) = OldVertex(J);
             }
             OldVertex.deallocate();
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state,
                                  format("CheckConvexity: Surface=\"{}\": The vertex points has been reprocessed as Sides = {}",
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
+                                        surfaceTmp.Name,
+                                        surfaceTmp.Sides));
             }
         }
     }
