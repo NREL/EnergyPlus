@@ -5982,7 +5982,6 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum), state.dataEnvrn->StdBaroPress);
         state.dataHeatBal->ZoneVaporPressureDifference(ZoneNum) = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
     }
-
 }
 
 void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
