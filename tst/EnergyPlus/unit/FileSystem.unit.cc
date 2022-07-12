@@ -56,6 +56,10 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
+using namespace EnergyPlus;
+
 TEST(FileSystem, movefile_test)
 {
     // test moveFile function, specifically on Windows
@@ -108,10 +112,14 @@ TEST(FileSystem, getAbsolutePath)
     EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
 
-TEST(FileSystem, getFileType)
+TEST_F(EnergyPlusFixture, FileSystemGetFileType)
 {
+    fs::path filePath0("/eplus/myfile.idf");
+    auto ext = EnergyPlus::FileSystem::getFileType(filePath0);
+    EXPECT_TRUE(compare_enums(EnergyPlus::FileSystem::FileTypes::IDF, ext));
+
     fs::path filePath1("./schedulefileA.CSV");
-    auto ext = EnergyPlus::FileSystem::getFileType(filePath1);
+    ext = EnergyPlus::FileSystem::getFileType(filePath1);
     EXPECT_TRUE(EnergyPlus::FileSystem::FileTypes::CSV == ext);
     EXPECT_TRUE(EnergyPlus::FileSystem::is_flat_file_type(ext));
 

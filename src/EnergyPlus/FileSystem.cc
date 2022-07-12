@@ -234,7 +234,8 @@ namespace FileSystem {
 #endif
 
         extension.remove_prefix(extension.find_last_of('.') + 1);
-        return static_cast<FileTypes>(getEnumerationValue(FileTypesExtUC, UtilityRoutines::MakeUPPERCase(extension)));
+        std::string stringExtension = std::string(extension);
+        return static_cast<FileTypes>(getEnumerationValue(FileTypesExtUC, UtilityRoutines::MakeUPPERCase(stringExtension)));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
