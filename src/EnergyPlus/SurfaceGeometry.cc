@@ -15355,13 +15355,21 @@ namespace SurfaceGeometry {
 
         M = 0;
         for (n = 1; n <= NSides; ++n) { // perform convexity test in the plane determined above.
-            V1len = std::sqrt(pow_2(A(n + 1) - A(n)) + pow_2(B(n + 1) - B(n)));
-            V2len = std::sqrt(pow_2(A(n + 2) - A(n + 1)) + pow_2(B(n + 2) - B(n + 1)));
+
+            DataVectorTypes::Vector_2d pt0(A(n), B(n));
+            DataVectorTypes::Vector_2d pt1(A(n + 1), B(n + 1));
+            DataVectorTypes::Vector_2d pt2(A(n + 2), B(n + 2));
+
+            DataVectorTypes::Vector_2d V1 = pt1 - pt0;
+            DataVectorTypes::Vector_2d V2 = pt2 - pt1;
+
+            V1len = V1.length(); // = norm_L2
+            V2len = V2.length();
             if (V1len <= 1.e-8 || V2len <= 1.e-8) {
+                // At least two points are coincident. Should this happen? GetVertices is supposed to pop these vertices
                 continue;
             }
-            // dot product is  `V1.x * V2.x + V1.y * V2.y`
-            DotProd = (A(n + 1) - A(n)) * (A(n + 2) - A(n + 1)) + (B(n + 1) - B(n)) * (B(n + 2) - B(n + 1));
+            DotProd = V1.dot(V2);
             cosarg = DotProd / (V1len * V2len);
             if (cosarg < -1.0) {
                 cosarg = -1.0;
