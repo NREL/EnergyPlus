@@ -15263,6 +15263,7 @@ namespace SurfaceGeometry {
         Real64 V2len;                           // Edge vector length
         bool SignFlag;                          // Direction of edge turn : true is right, false is left
         bool PrevSignFlag(false);               // Container for the sign of the previous iteration's edge turn
+        bool PrevSignFlagInitialized(false);    // Whether we picked a PrevSignFlag already or not
         auto &X = state.dataSurfaceGeometry->X; // containers for x,y,z vertices of the surface
         auto &Y = state.dataSurfaceGeometry->Y;
         auto &Z = state.dataSurfaceGeometry->Z;
@@ -15385,9 +15386,10 @@ namespace SurfaceGeometry {
                 continue;
             }
 
-            if (n == 1) {
+            if (!PrevSignFlagInitialized) {
                 PrevSignFlag = SignFlag;
                 LastTheta = Theta;
+                PrevSignFlagInitialized = true;
                 continue;
             }
 
