@@ -2068,7 +2068,6 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     case CompType::WaterCoil_Cooling:
                     case CompType::WaterCoil_DetailedCool:
                     case CompType::WaterCoil_CoolingHXAsst:
-                    case CompType::DXCoil_CoolingHXAsst:
                     case CompType::DXSystem:
                     case CompType::Furnace_UnitarySys_HeatCool:
                     case CompType::UnitarySystem_BypassVAVSys:

@@ -84,7 +84,6 @@ namespace SimAirServingZones {
         Coil_ElectricHeat,
         Coil_GasHeat,
         WaterCoil_CoolingHXAsst,
-        DXCoil_CoolingHXAsst,
         Coil_DeSuperHeat,
         DXSystem,
         HeatXchngr,
@@ -109,8 +108,19 @@ namespace SimAirServingZones {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SimAirServingZones::CompType::Num)> CompTypeNamesUC{"OUTDOORAIR:MIXER",
-                                                                                                                "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "COIL:COOLING:WATER",  };
+    constexpr std::array<std::string_view, static_cast<int>(SimAirServingZones::CompType::Num)> CompTypeNamesUC{
+        "OUTDOORAIR:MIXER",
+        "FAN:CONSTANTVOLUME",
+        "FAN:VARIABLEVOLUME",
+        "COIL:COOLING:WATER",
+        "COIL:HEATING:WATER",
+        "COIL:HEATING:STEAM",
+        "COIL:COOLING:WATER:DETAILEDGEOMETRY", 
+        "COIL:HEATING:ELECTRIC", 
+        "COIL:HEATING:FUEL",
+        "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED", };
+
+
     void ManageAirLoops(EnergyPlusData &state,
                         bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &SimAir,            // TRUE means air loops must be (re)simulated
