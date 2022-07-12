@@ -456,13 +456,9 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                     // Validate DEMAND MANAGER Type
                     ManagerType MgrType = static_cast<ManagerType>(
                         getEnumerationValue(ManagerNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
-
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5));
                     if (MgrType != ManagerType::Invalid) {
-
                         thisManager =
                             UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
-
                         if (thisManager == 0) {
                             ShowSevereError(state,
                                             format("{} = \"{}\" invalid {} = \"{}\" not found.",
@@ -472,7 +468,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                                                    state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6)));
                             ErrorsFound = true;
                         }
-
                     } else {
                         ShowSevereError(state,
                                         format("{} = \"{}\" invalid value {} = \"{}\".",
