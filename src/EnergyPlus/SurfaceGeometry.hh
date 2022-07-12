@@ -467,7 +467,6 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D<Real64> B;
     Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
     int VertSize = 0;               // size of X,Y,Z,A,B arrays
-    Real64 ACosZero = 0.0;          // set on firstTime
 
     void clear_state() override
     {

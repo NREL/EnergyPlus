@@ -15271,12 +15271,10 @@ namespace SurfaceGeometry {
         auto &B = state.dataSurfaceGeometry->B;
         auto &SurfCollinearVerts = state.dataSurfaceGeometry->SurfCollinearVerts; // Array containing indices of collinear vertices
         auto &VertSize = state.dataSurfaceGeometry->VertSize;                     // size of X,Y,Z,A,B arrays
-        auto &ACosZero = state.dataSurfaceGeometry->ACosZero;                     // set on firstTime
         Real64 cosarg;
         int M; // Array index / sze for SurfCollinearVerts container
 
         if (state.dataSurfaceGeometry->CheckConvexityFirstTime) {
-            ACosZero = std::acos(0.0);
             X.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             Y.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             Z.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
@@ -15359,11 +15357,11 @@ namespace SurfaceGeometry {
         for (n = 1; n <= NSides; ++n) { // perform convexity test in the plane determined above.
             V1len = std::sqrt(pow_2(A(n + 1) - A(n)) + pow_2(B(n + 1) - B(n)));
             V2len = std::sqrt(pow_2(A(n + 2) - A(n + 1)) + pow_2(B(n + 2) - B(n + 1)));
-            if (V1len <= 1.e-8 || V2len <= 1.e-8) continue;
-            // TODO: Why is it using `V1.x * V2.y - V1.y * V2.x` ? That's a cross product! not a dot product as the name implies
+            if (V1len <= 1.e-8 || V2len <= 1.e-8) {
+                continue;
+            }
             // dot product is  `V1.x * V2.x + V1.y * V2.y`
-            // That explains why the ACosZero is needed...
-            DotProd = (A(n + 1) - A(n)) * (B(n + 2) - B(n + 1)) - (B(n + 1) - B(n)) * (A(n + 2) - A(n + 1));
+            DotProd = (A(n + 1) - A(n)) * (A(n + 2) - A(n + 1)) + (B(n + 1) - B(n)) * (B(n + 2) - B(n + 1));
             cosarg = DotProd / (V1len * V2len);
             if (cosarg < -1.0) {
                 cosarg = -1.0;
@@ -15371,11 +15369,12 @@ namespace SurfaceGeometry {
                 cosarg = 1.0;
             }
             Theta = std::acos(cosarg);
-            if (Theta < (ACosZero - TurnThreshold)) {
+            if (Theta > TurnThreshold) {
                 SignFlag = true;
-            } else if (Theta > (ACosZero + TurnThreshold)) {
+            } else if (Theta < -TurnThreshold) {
                 SignFlag = false;
-            } else { // Store the index of the collinear vertex for removal
+            } else { // std::abs(Theta) < TurnThreshold
+                // Store the index of the collinear vertex for removal
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(state,
                                      format("CheckConvexity: Surface=\"{}\", vertex {} is colinear with previous and next.", surfaceTmp.Name, n + 1));
