@@ -15273,10 +15273,7 @@ namespace SurfaceGeometry {
         auto &VertSize = state.dataSurfaceGeometry->VertSize;                     // size of X,Y,Z,A,B arrays
         auto &ACosZero = state.dataSurfaceGeometry->ACosZero;                     // set on firstTime
         Real64 cosarg;
-        int M;   // Array index for SurfCollinearVerts container
-        int J;   // Loop index
-        int K;   // Loop index
-        int Ind; // Location of surface vertex to be removed
+        int M; // Array index / sze for SurfCollinearVerts container
 
         if (state.dataSurfaceGeometry->CheckConvexityFirstTime) {
             ACosZero = std::acos(0.0);
@@ -15438,12 +15435,12 @@ namespace SurfaceGeometry {
                 surfaceTmp.Sides = max(NSides - M, 3);
                 M = NSides - surfaceTmp.Sides;
             }
-            for (J = 1; J <= M; ++J) {
-                Ind = SurfCollinearVerts(J);
+            for (int J = 1; J <= M; ++J) {
+                int Ind = SurfCollinearVerts(J);
                 if (Ind > NSides) {
                     Ind = Ind - NSides + M - 1;
                 }
-                for (K = Ind; K <= NSides - 1; ++K) {
+                for (int K = Ind; K <= NSides - 1; ++K) {
                     vertices(K - J + 1).x = vertices(K - J + 2).x;
                     vertices(K - J + 1).y = vertices(K - J + 2).y;
                     vertices(K - J + 1).z = vertices(K - J + 2).z;
@@ -15455,7 +15452,7 @@ namespace SurfaceGeometry {
             OldVertex = vertices;
             vertices.deallocate();
             vertices.allocate(NSides - M);
-            for (J = 1; J <= NSides - M; ++J) {
+            for (int J = 1; J <= NSides - M; ++J) {
                 vertices(J) = OldVertex(J);
             }
             OldVertex.deallocate();
