@@ -1947,9 +1947,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     if (thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num == CompType::OAMixer_Num) {
                         FoundOASys = true;
                     }
-                    if (CompTypeNum == CompType::WaterCoil_SimpleCool || CompTypeNum == CompType::WaterCoil_Cooling ||
-                        CompTypeNum == CompType::WaterCoil_DetailedCool || CompTypeNum == CompType::WaterCoil_CoolingHXAsst ||
-                        CompTypeNum == CompType::DXSystem) {
+                    if (CompTypeNum == CompType::WaterCoil_Cooling || CompTypeNum == CompType::WaterCoil_DetailedCool ||
+                        CompTypeNum == CompType::WaterCoil_CoolingHXAsst || CompTypeNum == CompType::DXSystem) {
                         FoundCentralCoolCoil = true;
                     }
                     if (CompTypeNum == CompType::Fan_Simple_CV || CompTypeNum == CompType::Fan_Simple_VAV ||
@@ -2066,7 +2065,6 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     CompType CompTypeNum = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num;
                     std::string &CompName = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name;
                     switch (CompTypeNum) {
-                    case CompType::WaterCoil_SimpleCool:
                     case CompType::WaterCoil_Cooling:
                     case CompType::WaterCoil_DetailedCool:
                     case CompType::WaterCoil_CoolingHXAsst:

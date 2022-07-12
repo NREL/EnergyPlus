@@ -77,7 +77,6 @@ namespace SimAirServingZones {
         OAMixer_Num,
         Fan_Simple_CV,
         Fan_Simple_VAV,
-        WaterCoil_SimpleCool,
         WaterCoil_Cooling,
         WaterCoil_SimpleHeat,
         SteamCoil_AirHeat,
@@ -110,6 +109,8 @@ namespace SimAirServingZones {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(SimAirServingZones::CompType::Num)> CompTypeNamesUC{"OUTDOORAIR:MIXER",
+                                                                                                                "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "COIL:COOLING:WATER",  };
     void ManageAirLoops(EnergyPlusData &state,
                         bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &SimAir,            // TRUE means air loops must be (re)simulated
