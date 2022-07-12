@@ -68,6 +68,10 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <algorithm>
+#include <iterator>
+#include <vector>
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
@@ -3173,6 +3177,38 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_9118)
         EXPECT_EQ(actualVertices[++i], v);
     }
 
+    CheckConvexity(*state, 1, surface.Sides);
+
+    EXPECT_EQ(4, surface.Sides);
+    EXPECT_TRUE(surface.IsConvex);
+
+    for (int i = 1; i <= 4; ++i) {
+        EXPECT_EQ(baseVertices[i - 1], vertices(i)) << "Failed for Vertex " << i;
+    }
+
+    // Now perform the same test, except the first vertices is colinear, to ensure we also get that case covered
+    // We move all vertices in the clockwise order by one
+    //      y
+    //     ▲
+    //     │ [6]     [5]
+    //  10 o──────o──────o[4]
+    //     │             │
+    //     │             │
+    //     │             │
+    //   5 o [7]         o [3]
+    //     │             │
+    //     │             │
+    //     │ [8]  [1]    │ [2]
+    //     o──────o──────o───►
+    //   0        5      10   x
+    std::rotate(actualVertices.rbegin(), actualVertices.rbegin() + 1, actualVertices.rend());
+    surface.Azimuth = 0.0;
+    surface.Tilt = 0.0;
+    surface.Sides = 8;
+    surface.GrossArea = 100.0;
+    vertices.deallocate();
+    vertices.allocate(8);
+    vertices = actualVertices;
     CheckConvexity(*state, 1, surface.Sides);
 
     EXPECT_EQ(4, surface.Sides);
