@@ -15252,15 +15252,7 @@ namespace SurfaceGeometry {
 
         constexpr Real64 TurnThreshold(0.000001); // Sensitivity of convexity test, in radians
 
-        int n;                                  // Loop index
-        int Np1;                                // Loop index
-        int Np2;                                // Loop index
-        Real64 Det;                             // Determinant for picking projection plane
-        Real64 DotProd;                         // Dot product for determining angle
-        Real64 Theta;                           // Angle between edge vectors
-        Real64 LastTheta;                       // Angle between edge vectors
-        Real64 V1len;                           // Edge vector length
-        Real64 V2len;                           // Edge vector length
+        Real64 LastTheta = 0.0;                 // Angle between edge vectors
         bool SignFlag;                          // Direction of edge turn : true is right, false is left
         bool PrevSignFlag(false);               // Container for the sign of the previous iteration's edge turn
         bool PrevSignFlagInitialized(false);    // Whether we picked a PrevSignFlag already or not
@@ -15269,10 +15261,10 @@ namespace SurfaceGeometry {
         auto &Z = state.dataSurfaceGeometry->Z;
         auto &A = state.dataSurfaceGeometry->A; // containers for convexity test
         auto &B = state.dataSurfaceGeometry->B;
-        auto &SurfCollinearVerts = state.dataSurfaceGeometry->SurfCollinearVerts; // Array containing indices of collinear vertices
-        auto &VertSize = state.dataSurfaceGeometry->VertSize;                     // size of X,Y,Z,A,B arrays
-        Real64 cosarg;
-        int M; // Array index / sze for SurfCollinearVerts container
+        auto &VertSize = state.dataSurfaceGeometry->VertSize; // size of X,Y,Z,A,B arrays
+
+        std::vector<int> surfCollinearVerts; // index of vertices to remove, 1-indexed
+        surfCollinearVerts.reserve(NSides + 2);
 
         if (state.dataSurfaceGeometry->CheckConvexityFirstTime) {
             X.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
@@ -15280,7 +15272,6 @@ namespace SurfaceGeometry {
             Z.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             A.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             B.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            SurfCollinearVerts.allocate(state.dataSurface->MaxVerticesPerSurface);
             VertSize = state.dataSurface->MaxVerticesPerSurface;
             state.dataSurfaceGeometry->CheckConvexityFirstTime = false;
         }
@@ -15291,20 +15282,18 @@ namespace SurfaceGeometry {
             Z.deallocate();
             A.deallocate();
             B.deallocate();
-            SurfCollinearVerts.deallocate();
             X.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             Y.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             Z.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             A.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
             B.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            SurfCollinearVerts.allocate(state.dataSurface->MaxVerticesPerSurface);
             VertSize = state.dataSurface->MaxVerticesPerSurface;
         }
 
         auto &surfaceTmp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
         auto &vertices = surfaceTmp.Vertex;
 
-        for (n = 1; n <= NSides; ++n) {
+        for (int n = 1; n <= NSides; ++n) {
             X(n) = vertices(n).x;
             Y(n) = vertices(n).y;
             Z(n) = vertices(n).z;
@@ -15317,8 +15306,8 @@ namespace SurfaceGeometry {
         Z(NSides + 2) = vertices(2).z;
 
         // Determine a suitable plane in which to do the tests
-        Det = 0.0;
-        for (n = 1; n <= NSides; ++n) {
+        Real64 Det = 0.0;
+        for (int n = 1; n <= NSides; ++n) {
             Det += X(n) * Y(n + 1) - X(n + 1) * Y(n);
         }
         if (std::abs(Det) > 1.e-4) {
@@ -15326,7 +15315,7 @@ namespace SurfaceGeometry {
             B = Y;
         } else {
             Det = 0.0;
-            for (n = 1; n <= NSides; ++n) {
+            for (int n = 1; n <= NSides; ++n) {
                 Det += X(n) * Z(n + 1) - X(n + 1) * Z(n);
             }
             if (std::abs(Det) > 1.e-4) {
@@ -15334,7 +15323,7 @@ namespace SurfaceGeometry {
                 B = Z;
             } else {
                 Det = 0.0;
-                for (n = 1; n <= NSides; ++n) {
+                for (int n = 1; n <= NSides; ++n) {
                     Det += Y(n) * Z(n + 1) - Y(n + 1) * Z(n);
                 }
                 if (std::abs(Det) > 1.e-4) {
@@ -15344,7 +15333,7 @@ namespace SurfaceGeometry {
                     // This condition should not be reached if the surfaces are guaranteed to be planar already
                     ShowSevereError(state, "CheckConvexity: Surface=\"" + surfaceTmp.Name + "\" is non-planar.");
                     ShowContinueError(state, "Coincident Vertices will be removed as possible.");
-                    for (n = 1; n <= surfaceTmp.Sides; ++n) {
+                    for (int n = 1; n <= surfaceTmp.Sides; ++n) {
                         auto const &point(vertices(n));
                         static constexpr std::string_view ErrFmt(" ({:8.3F},{:8.3F},{:8.3F})");
                         ShowContinueError(state, EnergyPlus::format(ErrFmt, point.x, point.y, point.z));
@@ -15353,8 +15342,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        M = 0;
-        for (n = 1; n <= NSides; ++n) { // perform convexity test in the plane determined above.
+        for (int n = 1; n <= NSides; ++n) { // perform convexity test in the plane determined above.
 
             DataVectorTypes::Vector_2d pt0(A(n), B(n));
             DataVectorTypes::Vector_2d pt1(A(n + 1), B(n + 1));
@@ -15363,33 +15351,37 @@ namespace SurfaceGeometry {
             DataVectorTypes::Vector_2d V1 = pt1 - pt0;
             DataVectorTypes::Vector_2d V2 = pt2 - pt1;
 
-            V1len = V1.length(); // = norm_L2
-            V2len = V2.length();
+            Real64 V1len = V1.length(); // = norm_L2()
+            Real64 V2len = V2.length();
             if (V1len <= 1.e-8 || V2len <= 1.e-8) {
                 // At least two points are coincident. Should this happen? GetVertices is supposed to pop these vertices
                 continue;
             }
-            DotProd = V1.dot(V2);
-            cosarg = DotProd / (V1len * V2len);
+            Real64 DotProd = V1.dot(V2);
+            Real64 cosarg = DotProd / (V1len * V2len);
             if (cosarg < -1.0) {
                 cosarg = -1.0;
             } else if (cosarg > 1.0) {
                 cosarg = 1.0;
             }
-            Theta = std::acos(cosarg);
+            Real64 Theta = std::acos(cosarg);
             if (Theta > TurnThreshold) {
                 SignFlag = true;
             } else if (Theta < -TurnThreshold) {
                 SignFlag = false;
             } else { // std::abs(Theta) < TurnThreshold
                 // Store the index of the collinear vertex for removal
+                int colinearIndex = n + 1;
+                if (colinearIndex > NSides) {
+                    colinearIndex -= NSides;
+                }
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowWarningError(state,
-                                     format("CheckConvexity: Surface=\"{}\", vertex {} is colinear with previous and next.", surfaceTmp.Name, n + 1));
+                    ShowWarningError(
+                        state,
+                        format("CheckConvexity: Surface=\"{}\", vertex {} is colinear with previous and next.", surfaceTmp.Name, colinearIndex));
                 }
                 ++state.dataErrTracking->TotalCoincidentVertices;
-                ++M;
-                SurfCollinearVerts(M) = n + 1;
+                surfCollinearVerts.push_back(colinearIndex);
                 continue;
             }
 
@@ -15406,16 +15398,20 @@ namespace SurfaceGeometry {
                         ShowWarningError(state,
                                          "CheckConvexity: Zone=\"" + state.dataHeatBal->Zone(surfaceTmp.Zone).Name + "\", Surface=\"" +
                                              surfaceTmp.Name + "\" is non-convex.");
-                        Np1 = n + 1;
-                        if (Np1 > NSides) Np1 -= NSides;
-                        Np2 = n + 2;
-                        if (Np2 > NSides) Np2 -= NSides;
+                        int Np1 = n + 1;
+                        if (Np1 > NSides) {
+                            Np1 -= NSides;
+                        }
+                        int Np2 = n + 2;
+                        if (Np2 > NSides) {
+                            Np2 -= NSides;
+                        }
                         ShowContinueError(state, format("...vertex {} to vertex {} to vertex {}", n, Np1, Np2));
                         ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", n, X(n), Y(n), Z(n)));
                         ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np1, X(n + 1), Y(n + 1), Z(n + 1)));
                         ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np2, X(n + 2), Y(n + 2), Z(n + 2)));
-                        //          CALL ShowContinueError(state, '...theta angle=['//TRIM(format("{:.6R}", Theta))//']')
-                        //          CALL ShowContinueError(state, '...last theta angle=['//TRIM(format("{:.6R}", LastTheta))//']')
+                        // ShowContinueError(state, format("...theta angle=[{:.6R}]", Theta));
+                        // ShowContinueError(state, format("...last theta angle=[{:.6R}]", LastTheta));
                     }
                 }
                 surfaceTmp.IsConvex = false;
@@ -15426,8 +15422,9 @@ namespace SurfaceGeometry {
         }
 
         // must check to make sure don't remove NSides below 3
+        int M = surfCollinearVerts.size();
         if (M > 0) { // Remove the collinear points determined above
-            if (NSides - M > 2) {
+            if (NSides - M >= 3) {
                 surfaceTmp.Sides = NSides - M;
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(state,
@@ -15439,30 +15436,23 @@ namespace SurfaceGeometry {
                     ShowContinueError(state, "...too many to remove all.  Will leave the surface with 3 sides. But this is now a degenerate surface");
                 }
                 ++state.dataErrTracking->TotalDegenerateSurfaces;
-                surfaceTmp.Sides = max(NSides - M, 3);
-                M = NSides - surfaceTmp.Sides;
+                surfaceTmp.Sides = 3; // max(NSides - M, 3) = 3 since NSide - M is < 3;
+                surfCollinearVerts.resize(NSides - 3);
             }
-            for (int J = 1; J <= M; ++J) {
-                int Ind = SurfCollinearVerts(J);
-                if (Ind > NSides) {
-                    Ind = Ind - NSides + M - 1;
+
+            // remove duplicated points: For that we construct a new array of vertices, only copying indices that aren't in SurfCollinearVerts
+            // Then we move that array into the original one
+            Array1D<Vector> newVertices;
+            newVertices.allocate(surfaceTmp.Sides);
+
+            int n = 0;
+            for (int i = 1; i <= NSides; ++i) {
+                if (std::find(surfCollinearVerts.cbegin(), surfCollinearVerts.cend(), i) == surfCollinearVerts.cend()) {
+                    newVertices(++n) = vertices(i);
                 }
-                for (int K = Ind; K <= NSides - 1; ++K) {
-                    vertices(K - J + 1).x = vertices(K - J + 2).x;
-                    vertices(K - J + 1).y = vertices(K - J + 2).y;
-                    vertices(K - J + 1).z = vertices(K - J + 2).z;
-                }
             }
-            // remove duplicated points and resize Vertex
-            Array1D<Vector> OldVertex;
-            OldVertex.allocate(NSides);
-            OldVertex = vertices;
-            vertices.deallocate();
-            vertices.allocate(NSides - M);
-            for (int J = 1; J <= NSides - M; ++J) {
-                vertices(J) = OldVertex(J);
-            }
-            OldVertex.deallocate();
+            vertices = std::move(newVertices);
+
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state,
                                  format("CheckConvexity: Surface=\"{}\": The vertex points has been reprocessed as Sides = {}",
