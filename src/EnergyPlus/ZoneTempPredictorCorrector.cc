@@ -4815,7 +4815,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
 
     // if zone latent sizing is requested but no humidistat exists
     if (state.dataGlobal->DoingSizing && !ControlledHumidZoneFlag && state.dataHeatBal->DoLatentSizing) {
-        for (int zoneEqConfigNum = 1; zoneEqConfigNum <= state.dataZoneEquip->ZoneEquipConfig.size(); ++zoneEqConfigNum) {
+        for (size_t zoneEqConfigNum = 1; zoneEqConfigNum <= state.dataZoneEquip->ZoneEquipConfig.size(); ++zoneEqConfigNum) {
             auto &zoneEqConfig = state.dataZoneEquip->ZoneEquipConfig(zoneEqConfigNum);
             if (zoneEqConfig.ActualZoneNum != ZoneNum) continue;
             int ZoneSizNum =
