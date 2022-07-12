@@ -3110,6 +3110,79 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
     EXPECT_EQ(8.0, state->dataSurface->Surface(ThisSurf).Vertex(3).y);
 }
 
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_9118)
+{
+
+    // Test for #9118. The key point is that a collinear vertex should be found on the first occurence (that is vertex 2 is collinear with 1 and 3)
+    //      y
+    //     ▲
+    //     │ [5]     [4]
+    //  10 o──────o──────o[3]
+    //     │             │
+    //     │             │
+    //     │             │
+    //   5 o [6]         o [2]
+    //     │             │
+    //     │             │
+    //     │ [7]  [8]    │ [1]
+    //     o──────o──────o───►
+    //   0        5      10   x
+
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->MaxVerticesPerSurface = 8;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+    auto &surface = state->dataSurfaceGeometry->SurfaceTmp(1);
+    surface.Vertex.allocate(8);
+
+    surface.Azimuth = 0.0;
+    surface.Tilt = 0.0;
+    surface.Sides = 8;
+    surface.GrossArea = 100.0;
+
+    std::vector<Vector> baseVertices = {
+        {10.0, 0.0, 0.0},
+        {10.0, 10.0, 0.0},
+        {0.0, 10.0, 0.0},
+        {0.0, 0.0, 0.0},
+    };
+    int i = 0;
+    auto &vertices = surface.Vertex;
+
+    for (auto it = std::cbegin(baseVertices); it != std::cend(baseVertices); ++it) {
+        auto itnext = std::next(it);
+        if (itnext == std::cend(baseVertices)) {
+            itnext = std::cbegin(baseVertices);
+        }
+        vertices(++i) = *it;
+        Vector midPoint = (*it + *itnext) / 2.0; // V1 + (V2 - V1) / 2.0 == (V1 + V2) / 2.0
+        vertices(++i) = midPoint;
+    }
+
+    std::vector<Vector> actualVertices = {
+        {+10.0000, +0.0000, +0.0000},
+        {+10.0000, +5.0000, +0.0000},
+        {+10.0000, +10.0000, +0.0000},
+        {+5.0000, +10.0000, +0.0000},
+        {+0.0000, +10.0000, +0.0000},
+        {+0.0000, +5.0000, +0.0000},
+        {+0.0000, +0.0000, +0.0000},
+        {+5.0000, +0.0000, +0.0000},
+    };
+    i = -1;
+    for (const auto &v : vertices) {
+        EXPECT_EQ(actualVertices[++i], v);
+    }
+
+    CheckConvexity(*state, 1, surface.Sides);
+
+    EXPECT_EQ(4, surface.Sides);
+    EXPECT_TRUE(surface.IsConvex);
+
+    for (int i = 1; i <= 4; ++i) {
+        EXPECT_EQ(baseVertices[i - 1], vertices(i)) << "Failed for Vertex " << i;
+    }
+}
+
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
 {
     state->dataSurface->TotWinShadingControl = 3;
