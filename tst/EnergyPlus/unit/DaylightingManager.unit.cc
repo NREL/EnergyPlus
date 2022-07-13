@@ -3328,3 +3328,54 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(91), 1);
     EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(100), 1);
 }
+
+TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightConditions)
+{
+    // Test for #9060
+
+    state->dataDaylightingData->daylightControl.allocate(1);
+    auto &thisDaylightControl = state->dataDaylightingData->daylightControl(1);
+    int nRefPts = 1;
+    thisDaylightControl.TotalDaylRefPoints = nRefPts;
+    thisDaylightControl.DaylRefPtAbsCoord.allocate(3, nRefPts);
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataGlobal->numSpaces = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataDaylightingData->spacePowerReductionFactor.allocate(1);
+
+    thisDaylightControl.zoneIndex = 1;
+
+    thisDaylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    thisDaylightControl.LightControlType = DataDaylighting::LtgCtrlType::Stepped;
+    thisDaylightControl.LightControlProbability = 1.0;
+    thisDaylightControl.AvailSchedNum = -1; // Always Available
+    thisDaylightControl.LightControlSteps = 3;
+
+    thisDaylightControl.FracZoneDaylit.allocate(nRefPts);
+    thisDaylightControl.FracZoneDaylit(1) = 1.0;
+
+    thisDaylightControl.IllumSetPoint.allocate(nRefPts);
+    thisDaylightControl.IllumSetPoint(1) = 400.0;
+
+    thisDaylightControl.RefPtPowerReductionFactor.allocate(nRefPts);
+
+    thisDaylightControl.DaylIllumAtRefPt.allocate(nRefPts);
+    auto &illum = thisDaylightControl.DaylIllumAtRefPt(1);
+    state->dataDaylightingManager->DaylIllum.allocate(nRefPts);
+
+    illum = 1.0;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    illum = 1e-6;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    illum = 1e-20;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+}
