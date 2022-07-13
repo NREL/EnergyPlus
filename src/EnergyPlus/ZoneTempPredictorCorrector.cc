@@ -4909,9 +4909,6 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // the amount of moisture that must be removed by the system.
         // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
         WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
-        if (Zone(ZoneNum).SystemZoneNodeNumber > 0) {
-            state.dataLoopNodes->Node(Zone(ZoneNum).SystemZoneNodeNumber).HumRatMin = WZoneSetPoint;
-        }
         Real64 exp_700_A_C(0.0);
         if (ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             LoadToHumidifySetPoint =

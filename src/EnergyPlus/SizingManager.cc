@@ -3489,7 +3489,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (NumNumbers > 21) {
                     zoneSizingIndex.HeatDesHumRatDiff = state.dataIPShortCut->rNumericArgs(22);
                 }
-                if (NumAlphas > 12) {
+                if (NumAlphas > 12 && !state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     zoneSizingIndex.zoneRHDehumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
                     if (zoneSizingIndex.zoneRHDehumidifySchIndex == 0) {
                         ShowWarningError(state,
@@ -3500,7 +3500,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(13)));
                     }
                 }
-                if (NumAlphas > 13) {
+                if (NumAlphas > 13 && !state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                     zoneSizingIndex.zoneRHHumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
                     if (zoneSizingIndex.zoneRHHumidifySchIndex == 0) {
                         ShowWarningError(state,
