@@ -708,7 +708,7 @@ namespace DataHeatBalance {
 
         void SetWindDirAt(Real64 fac);
 
-        Real64 ZoneData::sumHATsurf(EnergyPlusData &state);
+        Real64 sumHATsurf(EnergyPlusData &state);
     };
 
     struct ZoneListData
