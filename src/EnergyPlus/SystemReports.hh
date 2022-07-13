@@ -288,10 +288,6 @@ struct SystemReportsData : BaseGlobalStruct
     Array1D<Real64> MaxNoLoadHeatingByVent;
     Array1D<Real64> MaxNoLoadCoolingByVent;
 
-    Array1D<Real64> SysTotZoneLoadHTNG;
-    Array1D<Real64> SysTotZoneLoadCLNG;
-    Array1D<Real64> SysOALoadHTNG;
-    Array1D<Real64> SysOALoadCLNG;
     Array1D<Real64> SysTotHTNG;
     Array1D<Real64> SysTotCLNG;
 
@@ -412,10 +408,6 @@ struct SystemReportsData : BaseGlobalStruct
         this->MaxOverheatingByVent.deallocate();
         this->MaxNoLoadHeatingByVent.deallocate();
         this->MaxNoLoadCoolingByVent.deallocate();
-        this->SysTotZoneLoadHTNG.deallocate();
-        this->SysTotZoneLoadCLNG.deallocate();
-        this->SysOALoadHTNG.deallocate();
-        this->SysOALoadCLNG.deallocate();
         this->SysTotHTNG.deallocate();
         this->SysTotCLNG.deallocate();
         this->SysTotH2OHOT.deallocate();

@@ -1710,10 +1710,6 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
     state.dataSysRpts->SysAnyZoneOccupied.allocate(NumPrimaryAirSys);
     state.dataSysRpts->SysPreDefRep.allocate(NumPrimaryAirSys);
 
-    state.dataSysRpts->SysTotZoneLoadHTNG.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysTotZoneLoadCLNG.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysOALoadHTNG.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysOALoadCLNG.allocate(NumPrimaryAirSys);
     state.dataSysRpts->SysTotHTNG.allocate(NumPrimaryAirSys);
     state.dataSysRpts->SysTotCLNG.allocate(NumPrimaryAirSys);
 
@@ -1803,10 +1799,6 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
         state.dataSysRpts->SysAnyZoneOccupied(SysIndex) = false;
 
         // SYSTEM LOADS REPORT
-        state.dataSysRpts->SysTotZoneLoadHTNG(SysIndex) = 0.0;
-        state.dataSysRpts->SysTotZoneLoadCLNG(SysIndex) = 0.0;
-        state.dataSysRpts->SysOALoadHTNG(SysIndex) = 0.0;
-        state.dataSysRpts->SysOALoadCLNG(SysIndex) = 0.0;
         state.dataSysRpts->SysTotHTNG(SysIndex) = 0.0;
         state.dataSysRpts->SysTotCLNG(SysIndex) = 0.0;
 
@@ -3519,10 +3511,6 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     if (!state.dataSysRpts->AirLoopLoadsReportEnabled) return;
 
     // SYSTEM LOADS REPORT
-    state.dataSysRpts->SysTotZoneLoadHTNG = 0.0;
-    state.dataSysRpts->SysTotZoneLoadCLNG = 0.0;
-    state.dataSysRpts->SysOALoadHTNG = 0.0;
-    state.dataSysRpts->SysOALoadCLNG = 0.0;
     state.dataSysRpts->SysTotHTNG = 0.0;
     state.dataSysRpts->SysTotCLNG = 0.0;
 
@@ -3657,14 +3645,6 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
             AirLoopNum = zecCtrlZone.InletNodeAirLoopNum(ZoneInNum);
             if (AirLoopNum == 0) continue;
 
-            // Zone cooling load - this will double count if there is more than one airloop serving the same zone - but not sure how to apportion
-            if (ZoneLoad < -SmallLoad) {
-                state.dataSysRpts->SysTotZoneLoadCLNG(AirLoopNum) += std::abs(ZoneLoad);
-
-                // Zone heating load
-            } else if (ZoneLoad > SmallLoad) {
-                state.dataSysRpts->SysTotZoneLoadHTNG(AirLoopNum) += std::abs(ZoneLoad);
-            }
             auto const &zecCtrlZoneCool = zecCtrlZone.AirDistUnitCool(ZoneInNum);
             auto const &zecCtrlZoneHeat = zecCtrlZone.AirDistUnitHeat(ZoneInNum);
 
@@ -4014,13 +3994,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
 
     switch (comp_type) {
     case AIRLOOPHVAC_OUTDOORAIRSYSTEM: // Outside Air System
-        if (CompLoadFlag) {
-            if (CompLoad > 0.0) {
-                state.dataSysRpts->SysOALoadCLNG(AirLoopNum) += std::abs(CompLoad);
-            } else {
-                state.dataSysRpts->SysOALoadHTNG(AirLoopNum) += std::abs(CompLoad);
-            }
-        }
+        // Not reported
         break;
     case OUTDOORAIR_MIXER: // Outdoor Air Mixer
         // No energy transfers to account for
