@@ -3353,7 +3353,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightCondition
     thisDaylightControl.LightControlType = DataDaylighting::LtgCtrlType::Stepped;
     thisDaylightControl.LightControlProbability = 1.0;
     thisDaylightControl.AvailSchedNum = -1; // Always Available
-    thisDaylightControl.LightControlSteps = 3;
+    thisDaylightControl.LightControlSteps = 4;
 
     thisDaylightControl.FracZoneDaylit.allocate(nRefPts);
     thisDaylightControl.FracZoneDaylit(1) = 1.0;
@@ -3376,6 +3376,21 @@ TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightCondition
     EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
 
     illum = 1e-20;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    // Test with Lighting Probability
+    illum = 101.0;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(0.75, thisDaylightControl.PowerReductionFactor);
+
+    // that way I KNOW that it'll try to set it one level higher no matter what random number is generated
+    thisDaylightControl.LightControlProbability = 0.00;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    // Ensure we don't go higher than 1.0
+    illum = 1.0;
     DayltgElecLightingControl(*state);
     EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
 }
