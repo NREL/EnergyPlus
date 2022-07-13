@@ -135,9 +135,6 @@ namespace EMSManager {
 
     void UpdateEMSTrendVariables(EnergyPlusData &state);
 
-    std::string controlTypeName(SPControlType SetPointType); // Maps int to the std::string equivalent
-                                                             // (eg TemperatureSetPoint => "Temperature Setpoint")
-
     bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
                                     int NodeNum, // index of node being checked.
                                     SPControlType SetPointType,
