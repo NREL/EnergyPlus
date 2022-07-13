@@ -147,4 +147,162 @@ TEST_F(EnergyPlusFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     EXPECT_NEAR(OptLoad, ExpectedOptLoad, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, ExerciseSingleSpeedEvapFluidCooler)
+{
+    std::string const idf_objects = delimited_string({"EvaporativeFluidcooler:SingleSpeed,",
+                                                      "Big EvaporativeFluidCooler,  !- Name",
+                                                      "Condenser EvaporativeFluidcooler Inlet Node,  !- Water Inlet Node Name",
+                                                      "Condenser EvaporativeFluidcooler Outlet Node,  !- Water Outlet Node Name",
+                                                      "3.02,                    !- Design Air Flow Rate {m3/s}",
+                                                      "2250,                    !- Design Air Flow Rate Fan Power {W}",
+                                                      "0.002208,                !- Design Spray Water Flow Rate {m3/s}",
+                                                      "UserSpecifiedDesignCapacity,  !- Performance Input Method",
+                                                      ",                        !- Outdoor Air Inlet Node Name",
+                                                      ",                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio",
+                                                      "1000,                        !- Standard Design Capacity {W}",
+                                                      ",                        !- Design Air Flow Rate U-factor Times Area Value {W/K}",
+                                                      "0.001703,                !- Design Water Flow Rate {m3/s}",
+                                                      "87921,                   !- User Specified Design Capacity {W}",
+                                                      "46.11,                   !- Design Entering Water Temperature {C}",
+                                                      "35,                      !- Design Entering Air Temperature {C}",
+                                                      "25.6;                    !- Design Entering Air Wet-bulb Temperature {C}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EvapFluidCoolerSpecs *ptr =
+        EvapFluidCoolerSpecs::factory(*state, DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd, "BIG EVAPORATIVEFLUIDCOOLER");
+
+    PlantLocation pl{1, EnergyPlus::DataPlant::LoopSideLocation::Demand, 1, 1};
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+
+    Real64 max, opt, min = 0.0;
+    ptr->getDesignCapacities(*state, pl, max, min, opt);
+    EXPECT_NEAR(max, 1250, 1.0);
+    EXPECT_NEAR(min, 0.0, 1.0);
+    EXPECT_NEAR(opt, 1000.0, 1.0);
+
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 2.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1000;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = ptr->WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = ptr->WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = ptr->Name;
+    state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 3;
+    state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
+    state->dataSize->CurLoopNum = 1;
+
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+
+    bool firstHVAC = true;
+    Real64 curLoad = 0.0;
+    ptr->plantLoc.loopNum = 1;
+    ptr->plantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
+    ptr->plantLoc.branchNum = 1;
+    ptr->plantLoc.compNum = 1;
+    ptr->DesWaterMassFlowRate = 3.141;
+    ptr->WaterMassFlowRate = 3.141;
+    ptr->onInitLoopEquip(*state, pl);
+    ptr->simulate(*state, pl, firstHVAC, curLoad, true);
+}
+TEST_F(EnergyPlusFixture, ExerciseTwoSpeedEvapFluidCooler)
+{
+    std::string const idf_objects = delimited_string({"EvaporativeFluidCooler:TwoSpeed,",
+                                                      "Central Tower,           !- Name",
+                                                      "Central Tower Inlet Node,!- Water Inlet Node Name",
+                                                      "Central Tower Outlet Node,  !- Water Outlet Node Name",
+                                                      "autosize,                !- High Fan Speed Air Flow Rate {m3/s}",
+                                                      "autosize,                !- High Fan Speed Fan Power {W}",
+                                                      "autocalculate,           !- Low Fan Speed Air Flow Rate {m3/s}",
+                                                      ",                        !- Low Fan Speed Air Flow Rate Sizing Factor",
+                                                      "autocalculate,           !- Low Fan Speed Fan Power {W}",
+                                                      ",                        !- Low Fan Speed Fan Power Sizing Factor",
+                                                      "0.002208,                !- Design Spray Water Flow Rate {m3/s}",
+                                                      "UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+                                                      ",                        !- Outdoor Air Inlet Node Name",
+                                                      "1.25,                    !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio",
+                                                      "1000,                        !- High Speed Standard Design Capacity {W}",
+                                                      "1000,                        !- Low Speed Standard Design Capacity {W}",
+                                                      "0.5,                     !- Low Speed Standard Capacity Sizing Factor",
+                                                      "autosize,                !- High Fan Speed U-factor Times Area Value {W/K}",
+                                                      "autocalculate,           !- Low Fan Speed U-factor Times Area Value {W/K}",
+                                                      "0.6,                     !- Low Fan Speed U-Factor Times Area Sizing Factor",
+                                                      "autosize,                !- Design Water Flow Rate {m3/s}",
+                                                      ",                        !- High Speed User Specified Design Capacity {W}",
+                                                      ",                        !- Low Speed User Specified Design Capacity {W}",
+                                                      "0.5,                     !- Low Speed User Specified Design Capacity Sizing Factor",
+                                                      ",                        !- Design Entering Water Temperature {C}",
+                                                      ",                        !- Design Entering Air Temperature {C}",
+                                                      ",                        !- Design Entering Air Wet-bulb Temperature {C}",
+                                                      "1,                       !- High Speed Sizing Factor",
+                                                      "SaturatedExit,           !- Evaporation Loss Mode",
+                                                      ",                        !- Evaporation Loss Factor {percent/K}",
+                                                      "0.008,                   !- Drift Loss Percent {percent}",
+                                                      "ConcentrationRatio,      !- Blowdown Calculation Mode",
+                                                      "3;                       !- Blowdown Concentration Ratio"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EvapFluidCoolerSpecs *ptr = EvapFluidCoolerSpecs::factory(*state, DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd, "CENTRAL TOWER");
+
+    PlantLocation pl{1, EnergyPlus::DataPlant::LoopSideLocation::Demand, 1, 1};
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+
+    Real64 max, opt, min = 0.0;
+    ptr->getDesignCapacities(*state, pl, max, min, opt);
+    EXPECT_NEAR(max, 1250, 1.0);
+    EXPECT_NEAR(min, 0.0, 1.0);
+    EXPECT_NEAR(opt, 1000.0, 1.0);
+
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 2.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1000;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = ptr->WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = ptr->WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = ptr->Name;
+    state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 3;
+    state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
+    state->dataSize->CurLoopNum = 1;
+
+    state->dataPlnt->PlantLoop(pl.loopNum).PlantSizNum = 1;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).ExitTemp = 35;
+
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+
+    bool firstHVAC = true;
+    Real64 curLoad = 0.0;
+    ptr->plantLoc.loopNum = 1;
+    ptr->plantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
+    ptr->plantLoc.branchNum = 1;
+    ptr->plantLoc.compNum = 1;
+    ptr->DesWaterMassFlowRate = 3.141;
+    ptr->WaterMassFlowRate = 3.141;
+    ptr->onInitLoopEquip(*state, pl);
+    ptr->simulate(*state, pl, firstHVAC, curLoad, true);
+}
+
 } // namespace EnergyPlus
