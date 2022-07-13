@@ -3798,7 +3798,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->DXCoil.allocate(2);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
-    state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
+    state->dataDXCoils->DXCoil(1).FuelTypeNum = UtilityRoutines::FuelType1::NaturalGas;
     state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
     state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;
     state->dataDXCoils->DXCoil(1).MSFuelWasteHeat = 1.0;

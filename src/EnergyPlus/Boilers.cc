@@ -93,7 +93,7 @@ namespace EnergyPlus::Boilers {
 // METHODOLOGY EMPLOYED:
 // The BLAST/DOE-2 empirical model based on mfg. data
 
-PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+BoilerSpecs *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data for boilers if it hasn't been done already
     if (state.dataBoilers->getBoilerInputFlag) {
@@ -210,18 +210,14 @@ void GetBoilerInput(EnergyPlusData &state)
         thisBoiler.Type = DataPlant::PlantEquipmentType::Boiler_Simple;
 
         // Validate fuel type input
-        bool FuelTypeError(false);
-        UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
-            state.dataIPShortCut->cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
-        if (FuelTypeError) {
+        thisBoiler.FuelType = static_cast<UtilityRoutines::FuelType1>(
+            getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+        if (thisBoiler.FuelType == UtilityRoutines::FuelType1::Invalid) {
             ShowSevereError(
                 state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
             // Set to Electric to avoid errors when setting up output variables
-            thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
-            thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
             ErrorsFound = true;
-            FuelTypeError = false;
         }
 
         thisBoiler.NomCap = state.dataIPShortCut->rNumericArgs(1);
@@ -371,6 +367,7 @@ void GetBoilerInput(EnergyPlusData &state)
 
 void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
 {
+    std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Boiler Heating Rate",
                         OutputProcessor::Unit::W,
@@ -391,21 +388,21 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         _,
                         "Plant");
     SetupOutputVariable(state,
-                        "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                        format("Boiler {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->FuelUsed,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        "Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
+                        format("Boiler {} Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->FuelConsumed,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
-                        this->BoilerFuelTypeForOutputVariable,
+                        sFuelType,
                         "Heating",
                         this->EndUseSubcategory,
                         "Plant");

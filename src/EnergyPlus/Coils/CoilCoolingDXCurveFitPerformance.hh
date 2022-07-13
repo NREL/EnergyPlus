@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -121,8 +122,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
-    DataGlobalConstants::ResourceType compressorFuelType = DataGlobalConstants::ResourceType::None;
-    std::string compressorFuelTypeForOutput;
+    UtilityRoutines::FuelType1 compressorFuelType = UtilityRoutines::FuelType1::Invalid;
     Real64 compressorFuelRate = 0.0;
     Real64 compressorFuelConsumption = 0.0;
 

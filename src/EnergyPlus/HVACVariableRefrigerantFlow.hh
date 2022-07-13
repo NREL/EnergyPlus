@@ -61,6 +61,7 @@
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -240,12 +241,11 @@ namespace HVACVariableRefrigerantFlow {
         int HRMaxTempLimitIndex;                            // Warning message recurring error index
         int CoolingMaxTempLimitIndex;                       // Warning message recurring error index
         int HeatingMaxTempLimitIndex;                       // Warning message recurring error index
-        std::string FuelType;                               // Fuel type
-        DataGlobalConstants::ResourceType FuelTypeNum;      // Fuel type number
-        Real64 SUMultiplier;                                // exponential timer for mode changes
-        Real64 TUCoolingLoad;                               // total TU cooling load for each VRF system
-        Real64 TUHeatingLoad;                               // total TU heating load for each VRF system
-        bool SwitchedMode;                                  // used to derate capacity/power when system changes operating mode
+        UtilityRoutines::FuelType1 FuelTypeNum = UtilityRoutines::FuelType1::Invalid; // Fuel type number
+        Real64 SUMultiplier;                                                          // exponential timer for mode changes
+        Real64 TUCoolingLoad;                                                         // total TU cooling load for each VRF system
+        Real64 TUHeatingLoad;                                                         // total TU heating load for each VRF system
+        bool SwitchedMode; // used to derate capacity/power when system changes operating mode
         // begin variables used for heat recovery mode
         Real64 OperatingCOP;         // Operating VRF heat pump COP (total TU capacity/total power)
         Real64 MinOATHeatRecovery;   // Minimum outdoor air temperature for heat recovery operation (C)
@@ -390,26 +390,26 @@ namespace HVACVariableRefrigerantFlow {
               CoolCombRatioPTR(0), HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0),
               CoolElecConsumption(0.0), HeatElecConsumption(0.0), CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0),
               EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0),
-              CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), FuelTypeNum(DataGlobalConstants::ResourceType::None), SUMultiplier(0.0),
-              TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0), MaxOATHeatRecovery(0.0),
-              HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0), HREIRFTCoolConst(1.1),
-              HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0), HRHeatCapTC(0.0),
-              HREIRFTHeat(0), HREIRFTHeatConst(1.1), HRInitialHeatEIRFrac(1.0), HRHeatEIRTC(0.0), HRCoolingActive(false), HRHeatingActive(false),
-              ModeChange(false), HRModeChange(false), HRTimer(0.0), HRTime(0.0), EIRFTempCoolErrorIndex(0), EIRFTempHeatErrorIndex(0),
-              DefrostHeatErrorIndex(0), EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
-              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), BasinHeaterPowerFTempDiff(0.0),
-              BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), BasinHeaterSchedulePtr(0),
-              EMSOverrideHPOperatingMode(false), EMSValueForHPOperatingMode(0.0), HPOperatingModeErrorIndex(0), VRFHeatRec(0.0),
-              VRFHeatEnergyRec(0.0), HeatCapFTErrorIndex(0), CoolCapFTErrorIndex(0), AlgorithmIUCtrl(1), CondensingTemp(44.0), CondTempFixed(0.0),
-              CoffEvapCap(1.0), CompActSpeed(0.0), CompMaxDeltaP(0.0), C1Te(0.0), C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0),
-              DiffOUTeTo(5), EffCompInverter(0.95), EvaporatingTemp(6.0), EvapTempFixed(0.0), HROUHexRatio(0.0), IUEvaporatingTemp(6.0),
-              IUCondensingTemp(44.0), IUEvapTempLow(4.0), IUEvapTempHigh(15.0), IUCondTempLow(42.0), IUCondTempHigh(46.0), IUCondHeatRate(0.0),
-              IUEvapHeatRate(0.0), Ncomp(0.0), NcompCooling(0.0), NcompHeating(0.0), OUEvapTempLow(-30.0), OUEvapTempHigh(20.0), OUCondTempLow(30.0),
-              OUCondTempHigh(96.0), OUAirFlowRate(0.0), OUAirFlowRatePerCapcity(0.0), OUCondHeatRate(0.0), OUEvapHeatRate(0.0), OUFanPower(0.0),
-              RatedEvapCapacity(40000.0), RatedHeatCapacity(0.0), RatedCompPower(14000.0), RatedCompPowerPerCapcity(0.35), RatedOUFanPower(0.0),
-              RatedOUFanPowerPerCapcity(0.0), RateBFOUEvap(0.45581), RateBFOUCond(0.21900), RefPipDiaSuc(0.0), RefPipDiaDis(0.0), RefPipLen(0.0),
-              RefPipEquLen(0.0), RefPipHei(0.0), RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0), SC(0.0), SCHE(0.0), SHLow(0.0), SCLow(0.0),
-              SHHigh(0.0), SCHigh(0.0), VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
+              CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0),
+              SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0), MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9),
+              HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0), HREIRFTCoolConst(1.1), HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0),
+              HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0), HRHeatCapTC(0.0), HREIRFTHeat(0), HREIRFTHeatConst(1.1),
+              HRInitialHeatEIRFrac(1.0), HRHeatEIRTC(0.0), HRCoolingActive(false), HRHeatingActive(false), ModeChange(false), HRModeChange(false),
+              HRTimer(0.0), HRTime(0.0), EIRFTempCoolErrorIndex(0), EIRFTempHeatErrorIndex(0), DefrostHeatErrorIndex(0),
+              EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateTankID(0),
+              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0),
+              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), BasinHeaterSchedulePtr(0), EMSOverrideHPOperatingMode(false),
+              EMSValueForHPOperatingMode(0.0), HPOperatingModeErrorIndex(0), VRFHeatRec(0.0), VRFHeatEnergyRec(0.0), HeatCapFTErrorIndex(0),
+              CoolCapFTErrorIndex(0), AlgorithmIUCtrl(1), CondensingTemp(44.0), CondTempFixed(0.0), CoffEvapCap(1.0), CompActSpeed(0.0),
+              CompMaxDeltaP(0.0), C1Te(0.0), C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), DiffOUTeTo(5), EffCompInverter(0.95),
+              EvaporatingTemp(6.0), EvapTempFixed(0.0), HROUHexRatio(0.0), IUEvaporatingTemp(6.0), IUCondensingTemp(44.0), IUEvapTempLow(4.0),
+              IUEvapTempHigh(15.0), IUCondTempLow(42.0), IUCondTempHigh(46.0), IUCondHeatRate(0.0), IUEvapHeatRate(0.0), Ncomp(0.0),
+              NcompCooling(0.0), NcompHeating(0.0), OUEvapTempLow(-30.0), OUEvapTempHigh(20.0), OUCondTempLow(30.0), OUCondTempHigh(96.0),
+              OUAirFlowRate(0.0), OUAirFlowRatePerCapcity(0.0), OUCondHeatRate(0.0), OUEvapHeatRate(0.0), OUFanPower(0.0), RatedEvapCapacity(40000.0),
+              RatedHeatCapacity(0.0), RatedCompPower(14000.0), RatedCompPowerPerCapcity(0.35), RatedOUFanPower(0.0), RatedOUFanPowerPerCapcity(0.0),
+              RateBFOUEvap(0.45581), RateBFOUCond(0.21900), RefPipDiaSuc(0.0), RefPipDiaDis(0.0), RefPipLen(0.0), RefPipEquLen(0.0), RefPipHei(0.0),
+              RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0), SC(0.0), SCHE(0.0), SHLow(0.0), SCLow(0.0), SHHigh(0.0), SCHigh(0.0),
+              VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
         {
         }
 

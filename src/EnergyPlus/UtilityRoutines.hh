@@ -209,7 +209,7 @@ void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
 
-    // This enum and paired string view arrays are a replacement for the ValidateFuelType function.
+    // This enum and paired string view arrays are a replacement for the ValidateFuelType* functions.
     // As the other fuel-based functionality is converted to enums, these should all be collected into a single enum where possible.
     enum class FuelType1
     {
@@ -636,11 +636,6 @@ namespace UtilityRoutines {
     };
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
-
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
-                                                   std::string &FuelTypeOutput,
-                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
-                                                   bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 

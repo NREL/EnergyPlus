@@ -4410,7 +4410,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
                                                                  DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-            if (DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
+            if (DXCoil(iCoil).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
             }
         } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
