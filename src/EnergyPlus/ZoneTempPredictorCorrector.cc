@@ -5960,7 +5960,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum));
     }
     // these next 2 look backwards, check report variable outputs
-    if (!state.dataHeatBal->ZoneLTLoadHeatRate.empty()) {
+    if (state.dataHeatBal->DoLatentSizing) {
         state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) = std::abs(min(LatentGain, 0.0));
         state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) = max(LatentGain, 0.0);
         state.dataHeatBal->ZoneLTLoadHeatEnergy(ZoneNum) =
