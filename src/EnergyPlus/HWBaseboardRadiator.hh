@@ -199,8 +199,6 @@ namespace HWBaseboardRadiator {
 
     void ReportHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
     void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
                                           int const BaseboardTypeNum,                 // type index
                                           std::string const &BaseboardName,           // component name

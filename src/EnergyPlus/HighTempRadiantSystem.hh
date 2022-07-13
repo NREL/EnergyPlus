@@ -192,8 +192,6 @@ namespace HighTempRadiantSystem {
     void ReportHighTempRadiantSystem(EnergyPlusData &state,
                                      int RadSysNum); // Index for the low temperature radiant system under consideration within the derived types
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
 } // namespace HighTempRadiantSystem
 
 struct HighTempRadiantSystemData : BaseGlobalStruct

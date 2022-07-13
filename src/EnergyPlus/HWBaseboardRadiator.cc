@@ -1779,55 +1779,6 @@ namespace HWBaseboardRadiator {
         HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-        // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
-        // and should be updated accordingly.
-
-        // Return value
-        Real64 SumHATsurf = 0.0;
-        Real64 Area = 0.0; // Effective surface area
-
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            auto &thisSpace = state.dataHeatBal->space(spaceNum);
-            for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                Area = state.dataSurface->Surface(SurfNum).Area;
-
-                if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-                    if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                        // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                        Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-                    }
-
-                    if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                        // Window frame contribution
-                        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                      (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-                    }
-
-                    if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
-                        !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                        // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                      (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                      state.dataSurface->SurfWinDividerTempIn(SurfNum);
-                    }
-                }
-
-                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-            }
-        }
-
-        return SumHATsurf;
-    }
-
     void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
                                           int const BaseboardTypeNum,                                  // type index
                                           std::string const &BaseboardName,                            // component name

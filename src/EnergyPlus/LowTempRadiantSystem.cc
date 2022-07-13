@@ -5179,7 +5179,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(state, this->ZonePtr) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(this->ZonePtr);
+        LoadMet = state.dataHeatBal->Zone(this->ZonePtr).sumHATsurf(state) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(this->ZonePtr);
     }
     // TODO Write unit tests for baseboard
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData &state, int RadSysNum)
@@ -5942,60 +5942,6 @@ namespace LowTempRadiantSystem {
                 }
             }
         }
-    }
-
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-        // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
-        // and should be updated accordingly.
-
-        // Using/Aliasing
-        using namespace DataSurfaces;
-        using namespace DataHeatBalance;
-
-        // Return value
-        Real64 sumHATsurf(0.0);
-
-        auto &Surface(state.dataSurface->Surface);
-
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            auto &thisSpace = state.dataHeatBal->space(spaceNum);
-            for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; ++surfNum) {
-                Real64 Area = Surface(surfNum).Area;
-
-                if (Surface(surfNum).Class == SurfaceClass::Window) {
-                    if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
-                        // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                        Area += state.dataSurface->SurfWinDividerArea(surfNum);
-                    }
-
-                    if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
-                        // Window frame contribution
-                        sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
-                                      (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFrameTempIn(surfNum);
-                    }
-
-                    if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0 &&
-                        !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
-                        // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                        sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
-                                      (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) *
-                                      state.dataSurface->SurfWinDividerTempIn(surfNum);
-                    }
-                }
-
-                sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(surfNum);
-            }
-        }
-
-        return sumHATsurf;
     }
 
     void VariableFlowRadiantSystemData::reportLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)

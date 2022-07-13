@@ -531,8 +531,6 @@ namespace LowTempRadiantSystem {
     void UpdateRadSysSourceValAvg(EnergyPlusData &state,
                                   bool &LowTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
 } // namespace LowTempRadiantSystem
 
 struct LowTempRadiantSystemData : BaseGlobalStruct
