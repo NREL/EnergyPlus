@@ -151,6 +151,52 @@ namespace SystemReports {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
     };
 
+    struct SysLoadReportVariables
+    {
+        // SYSTEM LOADS REPORT
+        Real64 SysTotHTNG = 0.0;
+        Real64 SysTotCLNG = 0.0;
+
+        // SYSTEM ENERGY USE REPORT
+        Real64 SysTotH2OHOT = 0.0;
+        Real64 SysTotH2OCOLD = 0.0;
+        Real64 SysTotElec = 0.0;
+        Real64 SysTotNaturalGas = 0.0;
+        Real64 SysTotPropane = 0.0;
+        Real64 SysTotSteam = 0.0;
+
+        // SYSTEM COMPONENT LOADS REPORT
+        Real64 SysHumidHTNG = 0.0;
+        Real64 SysHumidElec = 0.0;
+        Real64 SysHumidNaturalGas = 0.0;
+        Real64 SysHumidPropane = 0.0;
+        Real64 SysEvapCLNG = 0.0;
+        Real64 SysEvapElec = 0.0;
+        Real64 SysHeatExHTNG = 0.0;
+        Real64 SysHeatExCLNG = 0.0;
+        Real64 DesDehumidCLNG = 0.0;
+        Real64 DesDehumidElec = 0.0;
+        Real64 SysSolarCollectHeating = 0.0;
+        Real64 SysSolarCollectCooling = 0.0;
+        Real64 SysUserDefinedTerminalHeating = 0.0;
+        Real64 SysUserDefinedTerminalCooling = 0.0;
+
+        // SYSTEM COMPONENT ENERGY REPORT
+        Real64 SysFANCompHTNG = 0.0;
+        Real64 SysFANCompElec = 0.0;
+        Real64 SysCCCompCLNG = 0.0;
+        Real64 SysCCCompH2OCOLD = 0.0;
+        Real64 SysCCCompElec = 0.0;
+        Real64 SysHCCompH2OHOT = 0.0;
+        Real64 SysHCCompElec = 0.0;
+        Real64 SysHCCompElecRes = 0.0;
+        Real64 SysHCCompHTNG = 0.0;
+        Real64 SysHCCompNaturalGas = 0.0;
+        Real64 SysHCCompPropane = 0.0;
+        Real64 SysHCCompSteam = 0.0;
+        Real64 SysDomesticH2O = 0.0;
+    };
+
     // Functions
 
     void InitEnergyReports(EnergyPlusData &state);
@@ -288,45 +334,6 @@ struct SystemReportsData : BaseGlobalStruct
     Array1D<Real64> MaxNoLoadHeatingByVent;
     Array1D<Real64> MaxNoLoadCoolingByVent;
 
-    Array1D<Real64> SysTotHTNG;
-    Array1D<Real64> SysTotCLNG;
-
-    Array1D<Real64> SysTotH2OHOT;
-    Array1D<Real64> SysTotH2OCOLD;
-    Array1D<Real64> SysTotElec;
-    Array1D<Real64> SysTotNaturalGas;
-    Array1D<Real64> SysTotPropane;
-    Array1D<Real64> SysTotSteam;
-
-    Array1D<Real64> SysHumidHTNG;
-    Array1D<Real64> SysHumidElec;
-    Array1D<Real64> SysHumidNaturalGas;
-    Array1D<Real64> SysHumidPropane;
-    Array1D<Real64> SysEvapCLNG;
-    Array1D<Real64> SysEvapElec;
-    Array1D<Real64> SysHeatExHTNG;
-    Array1D<Real64> SysHeatExCLNG;
-    Array1D<Real64> DesDehumidCLNG;
-    Array1D<Real64> DesDehumidElec;
-    Array1D<Real64> SysSolarCollectHeating;
-    Array1D<Real64> SysSolarCollectCooling;
-    Array1D<Real64> SysUserDefinedTerminalHeating;
-    Array1D<Real64> SysUserDefinedTerminalCooling;
-
-    Array1D<Real64> SysFANCompHTNG;
-    Array1D<Real64> SysFANCompElec;
-    Array1D<Real64> SysCCCompCLNG;
-    Array1D<Real64> SysCCCompH2OCOLD;
-    Array1D<Real64> SysCCCompElec;
-    Array1D<Real64> SysHCCompH2OHOT;
-    Array1D<Real64> SysHCCompElec;
-    Array1D<Real64> SysHCCompElecRes;
-    Array1D<Real64> SysHCCompHTNG;
-    Array1D<Real64> SysHCCompNaturalGas;
-    Array1D<Real64> SysHCCompPropane;
-    Array1D<Real64> SysHCCompSteam;
-    Array1D<Real64> SysDomesticH2O;
-
     Array1D<Real64> ZoneOAMassFlow;               // zone mech vent mass flow rate {kg/s}
     Array1D<Real64> ZoneOAMass;                   // zone mech vent total mass for time {kg}
     Array1D<Real64> ZoneOAVolFlowStdRho;          // zone mech vent volume flow rate at standard density {m3/s}
@@ -375,6 +382,7 @@ struct SystemReportsData : BaseGlobalStruct
 
     EPVector<SystemReports::SummarizeLoads> Vent;
     EPVector<SystemReports::SysPreDefRepType> SysPreDefRep;
+    EPVector<SystemReports::SysLoadReportVariables> SysLoadRepVars;
 
     bool OneTimeFlag_FindFirstLastPtr = true;
     bool OneTimeFlag_InitEnergyReports = true;
@@ -410,41 +418,7 @@ struct SystemReportsData : BaseGlobalStruct
         this->MaxOverheatingByVent.deallocate();
         this->MaxNoLoadHeatingByVent.deallocate();
         this->MaxNoLoadCoolingByVent.deallocate();
-        this->SysTotHTNG.deallocate();
-        this->SysTotCLNG.deallocate();
-        this->SysTotH2OHOT.deallocate();
-        this->SysTotH2OCOLD.deallocate();
-        this->SysTotElec.deallocate();
-        this->SysTotNaturalGas.deallocate();
-        this->SysTotPropane.deallocate();
-        this->SysTotSteam.deallocate();
-        this->SysHumidHTNG.deallocate();
-        this->SysHumidElec.deallocate();
-        this->SysHumidNaturalGas.deallocate();
-        this->SysHumidPropane.deallocate();
-        this->SysEvapCLNG.deallocate();
-        this->SysEvapElec.deallocate();
-        this->SysHeatExHTNG.deallocate();
-        this->SysHeatExCLNG.deallocate();
-        this->DesDehumidCLNG.deallocate();
-        this->DesDehumidElec.deallocate();
-        this->SysSolarCollectHeating.deallocate();
-        this->SysSolarCollectCooling.deallocate();
-        this->SysUserDefinedTerminalHeating.deallocate();
-        this->SysUserDefinedTerminalCooling.deallocate();
-        this->SysFANCompHTNG.deallocate();
-        this->SysFANCompElec.deallocate();
-        this->SysCCCompCLNG.deallocate();
-        this->SysCCCompH2OCOLD.deallocate();
-        this->SysCCCompElec.deallocate();
-        this->SysHCCompH2OHOT.deallocate();
-        this->SysHCCompElec.deallocate();
-        this->SysHCCompElecRes.deallocate();
-        this->SysHCCompHTNG.deallocate();
-        this->SysHCCompNaturalGas.deallocate();
-        this->SysHCCompPropane.deallocate();
-        this->SysHCCompSteam.deallocate();
-        this->SysDomesticH2O.deallocate();
+        this->SysLoadRepVars.deallocate();
         this->ZoneOAMassFlow.deallocate();
         this->ZoneOAMass.deallocate();
         this->ZoneOAVolFlowStdRho.deallocate();

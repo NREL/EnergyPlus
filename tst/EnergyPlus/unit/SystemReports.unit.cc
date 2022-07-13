@@ -125,16 +125,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
     state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
 
-    state->dataSysRpts->SysHumidNaturalGas.allocate(1);
-    state->dataSysRpts->SysHCCompNaturalGas.allocate(1);
-    state->dataSysRpts->SysTotNaturalGas.allocate(1);
-    state->dataSysRpts->SysTotPropane.allocate(1);
-    state->dataSysRpts->SysHCCompPropane.allocate(1);
-    state->dataSysRpts->SysHumidPropane.allocate(1);
-
-    state->dataSysRpts->SysHumidNaturalGas(1) = 0;
-    state->dataSysRpts->SysHCCompNaturalGas(1) = 0;
-    state->dataSysRpts->SysTotNaturalGas(1) = 0;
+    state->dataSysRpts->SysLoadRepVars.allocate(1);
 
     // Calculate SysHumidNaturalGas ("Air System Humidifier NaturalGas Energy" Output Variable)
     CalcSystemEnergyUse(*state,
@@ -154,47 +145,17 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
                         CompLoad,
                         CompEnergyUse);
 
-    EXPECT_EQ(state->dataSysRpts->SysHumidNaturalGas(1), 100);
-    EXPECT_EQ(state->dataSysRpts->SysHCCompNaturalGas(1), 100);
-
-    // Allocate variables to run ReportSystemEnergyUse() function for SysTotNaturalGas ("Air System NaturalGas Energy")
-    state->dataSysRpts->SysTotHTNG.allocate(1);
-    state->dataSysRpts->SysFANCompHTNG.allocate(1);
-    state->dataSysRpts->SysHCCompHTNG.allocate(1);
-    state->dataSysRpts->SysHeatExHTNG.allocate(1);
-    state->dataSysRpts->SysHumidHTNG.allocate(1);
-    state->dataSysRpts->SysSolarCollectHeating.allocate(1);
-    state->dataSysRpts->SysUserDefinedTerminalHeating.allocate(1);
-    state->dataSysRpts->SysTotCLNG.allocate(1);
-    state->dataSysRpts->SysCCCompCLNG.allocate(1);
-    state->dataSysRpts->SysHeatExCLNG.allocate(1);
-    state->dataSysRpts->SysEvapCLNG.allocate(1);
-    state->dataSysRpts->DesDehumidCLNG.allocate(1);
-    state->dataSysRpts->SysSolarCollectCooling.allocate(1);
-    state->dataSysRpts->SysUserDefinedTerminalCooling.allocate(1);
-    state->dataSysRpts->SysTotElec.allocate(1);
-    state->dataSysRpts->SysFANCompElec.allocate(1);
-    state->dataSysRpts->SysHCCompElec.allocate(1);
-    state->dataSysRpts->SysCCCompElec.allocate(1);
-    state->dataSysRpts->SysHCCompElecRes.allocate(1);
-    state->dataSysRpts->SysHumidElec.allocate(1);
-    state->dataSysRpts->DesDehumidElec.allocate(1);
-    state->dataSysRpts->SysEvapElec.allocate(1);
-    state->dataSysRpts->SysTotSteam.allocate(1);
-    state->dataSysRpts->SysHCCompSteam.allocate(1);
-    state->dataSysRpts->SysTotH2OCOLD.allocate(1);
-    state->dataSysRpts->SysCCCompH2OCOLD.allocate(1);
-    state->dataSysRpts->SysTotH2OHOT.allocate(1);
-    state->dataSysRpts->SysHCCompH2OHOT.allocate(1);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHumidNaturalGas, 100);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHCCompNaturalGas, 100);
 
     // Calculate SysTotNaturalGas ("Air System NaturalGas Energy")
     ReportSystemEnergyUse(*state);
-    EXPECT_EQ(state->dataSysRpts->SysTotNaturalGas(1), 200);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysTotNaturalGas, 200);
 
     // Initialization for propane cases
-    state->dataSysRpts->SysHumidNaturalGas(1) = 0;
-    state->dataSysRpts->SysHCCompNaturalGas(1) = 0;
-    state->dataSysRpts->SysTotNaturalGas(1) = 0;
+    state->dataSysRpts->SysLoadRepVars(1).SysHumidNaturalGas = 0;
+    state->dataSysRpts->SysLoadRepVars(1).SysHCCompNaturalGas = 0;
+    state->dataSysRpts->SysLoadRepVars(1).SysTotNaturalGas = 0;
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
@@ -217,12 +178,12 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
                         CompLoad,
                         CompEnergyUse);
 
-    EXPECT_EQ(state->dataSysRpts->SysHumidPropane(1), 100);
-    EXPECT_EQ(state->dataSysRpts->SysHCCompPropane(1), 100);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHumidPropane, 100);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHCCompPropane, 100);
 
     // Calculate SysTotPropane ("Air System Propane Energy")
     ReportSystemEnergyUse(*state);
-    EXPECT_EQ(state->dataSysRpts->SysTotPropane(1), 200);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysTotPropane, 200);
 }
 TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
 {
