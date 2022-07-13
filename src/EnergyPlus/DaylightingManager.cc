@@ -7408,7 +7408,6 @@ void DayltgElecLightingControl(EnergyPlusData &state)
         } else { // controls not currently available
             TotReduction = 1.0;
         }
-        thisDaylightControl.PowerReductionFactor = TotReduction;
 
         // Set space power reduction factors
         if (thisDaylightControl.spaceIndex > 0) {
