@@ -7388,11 +7388,12 @@ void DayltgElecLightingControl(EnergyPlusData &state)
                 } else { // LSYSTP = 2
                     // Stepped system
                     FP = 0.0;
-                    if (state.dataDaylightingManager->DaylIllum(IL) > 0.0 &&
-                        state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL))
+                    // #9060: Use a tolerance, otherwise at very low (< 1e-12) daylighting conditions, you can get a multiplier > 1.0
+                    if (state.dataDaylightingManager->DaylIllum(IL) < 0.1) {
+                        FP = 1.0;
+                    } else if (state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL)) {
                         FP = double(int(thisDaylightControl.LightControlSteps * FL) + 1) / double(thisDaylightControl.LightControlSteps);
-
-                    if (state.dataDaylightingManager->DaylIllum(IL) == 0.0) FP = 1.0;
+                    }
 
                     if (thisDaylightControl.LightControlProbability < 1.0) {
                         // Manual operation.  Occupant sets lights one level too high a fraction of the time equal to
