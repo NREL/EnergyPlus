@@ -4747,8 +4747,7 @@ namespace FluidProperties {
 
             if (HiIndex == 1) {
                 for (LoopT = 1; LoopT <= NumOfTemps; ++LoopT) {
-                        InterpData(LoopT) =
-                            RawPropData(HiIndex, LoopT);
+                    InterpData(LoopT) = RawPropData(HiIndex, LoopT);
                 }
             } else if (std::abs(RawConcData(HiIndex) - RawConcData(HiIndex - 1)) >= ConcToler) {
                 InterpFrac = (RawConcData(HiIndex) - Concentration) / (RawConcData(HiIndex) - RawConcData(HiIndex - 1));
