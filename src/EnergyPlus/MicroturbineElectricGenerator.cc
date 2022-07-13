@@ -344,14 +344,13 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         // Validate fuel type input
-        bool FuelTypeError(false);
-        UtilityRoutines::ValidateFuelType(AlphArray(5), state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType, FuelTypeError);
-        if (FuelTypeError) {
+        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType =
+            static_cast<UtilityRoutines::FuelType1>(getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(AlphArray(5))));
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == UtilityRoutines::FuelType1::Invalid) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "  = " + AlphArray(5));
             ErrorsFound = true;
-            FuelTypeError = false;
         }
 
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);
@@ -882,6 +881,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
 void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 {
+    std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Rate",
                         OutputProcessor::Unit::W,
@@ -913,7 +913,7 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 
     //    Fuel specific report variables
     SetupOutputVariable(state,
-                        "Generator " + this->FuelType + " HHV Basis Rate",
+                        format("Generator {} HHV Basis Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->FuelEnergyUseRateHHV,
                         OutputProcessor::SOVTimeStepType::System,
@@ -921,20 +921,20 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Generator " + this->FuelType + " HHV Basis Energy",
+                        format("Generator {} HHV Basis Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->FuelEnergyHHV,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
-                        this->FuelType,
+                        sFuelType,
                         "COGENERATION",
                         _,
                         "Plant");
 
     SetupOutputVariable(state,
-                        "Generator " + this->FuelType + " Mass Flow Rate",
+                        format("Generator {} Mass Flow Rate", sFuelType),
                         OutputProcessor::Unit::kg_s,
                         this->FuelMdot,
                         OutputProcessor::SOVTimeStepType::System,

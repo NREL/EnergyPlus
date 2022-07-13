@@ -288,13 +288,12 @@ namespace ICEngineElectricGenerator {
             }
 
             // Validate fuel type input
-            bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(AlphArray(10), state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType, FuelTypeError);
-            if (FuelTypeError) {
+            state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType = static_cast<UtilityRoutines::FuelType1>(
+                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == UtilityRoutines::FuelType1::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecMaxTemp = NumArray(11);
@@ -307,6 +306,7 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
+        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
                             OutputProcessor::Unit::W,
@@ -329,7 +329,7 @@ namespace ICEngineElectricGenerator {
                             "Plant");
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Rate",
+                            format("Generator {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->FuelEnergyUseRate,
                             OutputProcessor::SOVTimeStepType::System,
@@ -337,14 +337,14 @@ namespace ICEngineElectricGenerator {
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Energy",
+                            format("Generator {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
-                            this->FuelType,
+                            sFuelType,
                             "COGENERATION",
                             _,
                             "Plant");
@@ -367,7 +367,7 @@ namespace ICEngineElectricGenerator {
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Mass Flow Rate",
+                            format("Generator {} Mass Flow Rate", sFuelType),
                             OutputProcessor::Unit::kg_s,
                             this->FuelMdot,
                             OutputProcessor::SOVTimeStepType::System,

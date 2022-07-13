@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     EngineDrivenChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumEngineDrivenChillers);
-    EXPECT_EQ(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, "Diesel");
+    EXPECT_TRUE(compare_enums(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, UtilityRoutines::FuelType1::Diesel));
 }
 
 TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
@@ -295,5 +295,5 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     GTChillerSpecs::getInput(*state);
 
     EXPECT_EQ(1, state->dataPlantChillers->NumGTChillers);
-    EXPECT_EQ(state->dataPlantChillers->GTChiller(1).FuelType, "NaturalGas");
+    EXPECT_TRUE(compare_enums(state->dataPlantChillers->GTChiller(1).FuelType, UtilityRoutines::FuelType1::NaturalGas));
 }

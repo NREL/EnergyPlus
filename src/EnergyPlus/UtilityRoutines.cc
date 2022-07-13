@@ -453,54 +453,6 @@ namespace UtilityRoutines {
         }
     }
 
-    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings
-
-        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelTypeInput));
-
-        if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electricity";
-
-        } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "NaturalGas";
-
-        } else if (SELECT_CASE_var == "DIESEL") {
-            FuelTypeOutput = "Diesel";
-
-        } else if (SELECT_CASE_var == "GASOLINE") {
-            FuelTypeOutput = "Gasoline";
-
-        } else if (SELECT_CASE_var == "COAL") {
-            FuelTypeOutput = "Coal";
-
-        } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOilNo1";
-
-        } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOilNo2";
-
-        } else if (SELECT_CASE_var == "PROPANE") {
-            FuelTypeOutput = "Propane";
-
-        } else if (SELECT_CASE_var == "OTHERFUEL1") {
-            FuelTypeOutput = "OtherFuel1";
-
-        } else if (SELECT_CASE_var == "OTHERFUEL2") {
-            FuelTypeOutput = "OtherFuel2";
-
-        } else {
-            FuelTypeErrorsFound = true;
-        }
-
-        return FuelTypeErrorsFound;
-    }
-
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
                                                    DataGlobalConstants::ResourceType &FuelTypeNum,

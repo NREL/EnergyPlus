@@ -2417,15 +2417,14 @@ namespace PlantChillers {
             thisChiller.DesignMinExitGasTemp = state.dataIPShortCut->rNumericArgs(24);
 
             // Validate fuel type input
-            bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(state.dataIPShortCut->cAlphaArgs(12), thisChiller.FuelType, FuelTypeError);
-            if (FuelTypeError) {
+            thisChiller.FuelType = static_cast<UtilityRoutines::FuelType1>(
+                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(12))));
+            if (thisChiller.FuelType == UtilityRoutines::FuelType1::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(
                     state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             thisChiller.FuelHeatingValue = state.dataIPShortCut->rNumericArgs(25);
@@ -2696,22 +2695,23 @@ namespace PlantChillers {
             }
         }
 
+        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Rate",
+                            format("Chiller {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->FuelEnergyUseRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Energy",
+                            format("Chiller {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
-                            this->FuelType,
+                            sFuelType,
                             "Cooling",
                             _,
                             "Plant");
@@ -2724,7 +2724,7 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Mass Flow Rate",
+                            format("Chiller {} Mass Flow Rate", sFuelType),
                             OutputProcessor::Unit::kg_s,
                             this->FuelMdot,
                             OutputProcessor::SOVTimeStepType::System,
@@ -4466,15 +4466,14 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(state.dataIPShortCut->cAlphaArgs(10), thisChiller.FuelType, FuelTypeError);
-            if (FuelTypeError) {
+            thisChiller.FuelType = static_cast<UtilityRoutines::FuelType1>(
+                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+            if (thisChiller.FuelType == UtilityRoutines::FuelType1::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(
                     state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             thisChiller.HeatRecMaxTemp = state.dataIPShortCut->rNumericArgs(46);
@@ -4684,8 +4683,9 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
+        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Rate",
+                            format("Chiller {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->FuelEnergyUsedRate,
                             OutputProcessor::SOVTimeStepType::System,
@@ -4693,27 +4693,27 @@ namespace PlantChillers {
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Energy",
+                            format("Chiller {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->FuelEnergyUsed,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
-                            this->FuelType,
+                            sFuelType,
                             "Cooling",
                             _,
                             "Plant");
 
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Mass Flow Rate",
+                            format("Chiller {} Mass Flow Rate", sFuelType),
                             OutputProcessor::Unit::kg_s,
                             this->FuelMassUsedRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Chiller " + this->FuelType + " Mass",
+                            format("Chiller {} Mass", sFuelType),
                             OutputProcessor::Unit::kg,
                             this->FuelMassUsed,
                             OutputProcessor::SOVTimeStepType::System,
