@@ -9613,9 +9613,8 @@ void WindowShadingManager(EnergyPlusData &state)
                 BeamSolarOnWindow = state.dataEnvrn->BeamSolarRad *
                                     state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, ISurf) *
                                     state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, ISurf);
-                Real64 SurfIncSolarMultiplier = HeatBalanceSurfaceManager::GetSurfIncidentSolarMultiplier(state, ISurf);
-                SolarOnWindow = BeamSolarOnWindow + SkySolarOnWindow +
-                                state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataSurface->Surface(ISurf).ViewFactorGround;
+                SolarOnWindow =
+                    BeamSolarOnWindow + SkySolarOnWindow + state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(ISurf).ViewFactorGround;
                 HorizSolar = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad;
             }
 
