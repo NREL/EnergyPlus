@@ -763,7 +763,7 @@ namespace HighTempRadiantSystem {
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
             state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
-                SumHATsurf(state, ZoneNum);                          // Set this to figure out what part of the load the radiant system meets
+                state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);  // Set this to figure out what part of the load the radiant system meets
             state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
             state.dataHighTempRadSys->LastQHTRadSrc(RadSysNum) =
                 0.0; // At the beginning of a time step, reset to zero so average calculation can start again
@@ -1235,7 +1235,7 @@ namespace HighTempRadiantSystem {
             LoadMet = 0.0; // System wasn't running so it can't meet a load
         } else {
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
-            LoadMet = (SumHATsurf(state, ZoneNum) - state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum)) +
+            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum)) +
                       state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
         }
     }

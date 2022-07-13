@@ -56,6 +56,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Material.hh>
@@ -96,6 +97,49 @@ using DataBSDFWindow::BSDFWindowInputStruct;
 
 // Functions
 
+Real64 SpaceData::sumHATsurf(EnergyPlusData &state)
+{
+    // PURPOSE OF THIS FUNCTION:
+    // This function calculates the space sum of Hc*Area*Tsurf.
+
+    Real64 sumHATsurf = 0.0;
+
+    for (int surfNum = this->HTSurfaceFirst; surfNum <= this->HTSurfaceLast; ++surfNum) {
+        Real64 Area = state.dataSurface->Surface(surfNum).Area;
+
+        if (state.dataSurface->Surface(surfNum).Class == DataSurfaces::SurfaceClass::Window) {
+            if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
+                    // The area is the shade or blind area = sum of the glazing area and the divider area (which is zero if no divider)
+                    Area += state.dataSurface->SurfWinDividerArea(surfNum);
+                } else {
+                    // Window divider contribution (only for window with divider and no interior shade or blind)
+                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) * state.dataSurface->SurfWinDividerTempIn(surfNum);
+                }
+            }
+
+            if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
+                // Window frame contribution
+                sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
+                              (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFrameTempIn(surfNum);
+            }
+        }
+
+        sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(surfNum);
+    }
+
+    return sumHATsurf;
+}
+
+Real64 ZoneData::sumHATsurf(EnergyPlusData &state)
+{
+    Real64 sumHATsurf = 0.0;
+    for (int spaceNum : this->spaceIndexes) {
+        sumHATsurf += state.dataHeatBal->space(spaceNum).sumHATsurf(state);
+    }
+    return sumHATsurf;
+}
 void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:

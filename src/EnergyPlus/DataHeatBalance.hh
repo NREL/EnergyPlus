@@ -546,6 +546,8 @@ namespace DataHeatBalance {
         int OpaqOrWinSurfaceLast = -1;     // Last  opaque (including IntMass) or window (non TDD Dome) Surface in space
         int TDDDomeFirst = 0;              // First TDD Dome Surface in space
         int TDDDomeLast = -1;              // Last  TDD Dome Surface in space
+
+        Real64 sumHATsurf(EnergyPlusData &state);
     };
 
     struct SpaceListData
@@ -705,6 +707,8 @@ namespace DataHeatBalance {
         void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
+
+        Real64 ZoneData::sumHATsurf(EnergyPlusData &state);
     };
 
     struct ZoneListData

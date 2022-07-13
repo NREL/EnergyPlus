@@ -1736,7 +1736,7 @@ namespace VentilatedSlab {
             // The first pass through in a particular time step
             ZoneNum = ventSlab.ZonePtr;
             state.dataVentilatedSlab->ZeroSourceSumHATsurf(ZoneNum) =
-                SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
+                state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
             for (RadSurfNum = 1; RadSurfNum <= ventSlab.NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = ventSlab.SurfacePtr(RadSurfNum);
                 state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)

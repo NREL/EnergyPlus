@@ -855,7 +855,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
         ZoneNum = ThisCP.ZonePtr;
-        state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf = SumHATsurf(state, ZoneNum);
+        state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
         ThisCP.CoolingPanelSrcAvg = 0.0;
         ThisCP.LastCoolingPanelSrc = 0.0;
         ThisCP.LastSysTimeElapsed = 0.0;
@@ -1437,8 +1437,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // that all energy radiated to people is converted to convective energy is
             // not very precise, but at least it conserves energy. The system impact to heat balance
             // should include this.
-            LoadMet = (SumHATsurf(state, ZoneNum) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) + (CoolingPanelCool * this->FracConvect) +
-                      (RadHeat * this->FracDistribPerson);
+            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) +
+                      (CoolingPanelCool * this->FracConvect) + (RadHeat * this->FracDistribPerson);
         }
         this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
 
