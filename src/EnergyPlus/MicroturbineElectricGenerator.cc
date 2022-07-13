@@ -345,7 +345,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
         // Validate fuel type input
         bool FuelTypeError(false);
-        UtilityRoutines::ValidateFuelType(state, AlphArray(5), state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType, FuelTypeError);
+        UtilityRoutines::ValidateFuelType(AlphArray(5), state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType, FuelTypeError);
         if (FuelTypeError) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");

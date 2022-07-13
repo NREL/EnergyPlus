@@ -453,8 +453,7 @@ namespace UtilityRoutines {
         }
     }
 
-    bool
-    ValidateFuelType([[maybe_unused]] EnergyPlusData &state, std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound)
+    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam

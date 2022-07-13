@@ -519,7 +519,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 
         // Validate fuel type input
         bool FuelTypeError(false);
-        UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
+        UtilityRoutines::ValidateFuelType(state.dataIPShortCut->cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
         if (FuelTypeError) {
             ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + '=' + state.dataIPShortCut->cAlphaArgs(17));
