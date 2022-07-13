@@ -2469,6 +2469,9 @@ namespace SurfaceGeometry {
                                                   "Unable to apportion the zone floor area. Space Floor Areas are zero.");
                             }
                         }
+                    } else {
+                        if (state.dataHeatBal->Zone(ZoneNum).CalcFloorArea > 0.0)
+                            state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
                     }
                 } else {
                     state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
