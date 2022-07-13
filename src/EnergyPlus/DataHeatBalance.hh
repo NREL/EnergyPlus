@@ -1597,9 +1597,6 @@ namespace DataHeatBalance {
         Real64 OABalanceFanElec = 0.0;       // Fan Electricity {W} due to OA air balance
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
-        // Mechanical ventilation
-        Real64 ZoneOAMassFlow = 0.0; // zone mech vent mass flow rate {kg/s}
-        Real64 ZoneOAMass = 0.0;     // zone mech vent total mass for time {kg}
     };
 
     struct ZonePreDefRepType

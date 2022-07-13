@@ -5693,7 +5693,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "*");
-        state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+        SystemReports::AllocateAndSetUpVentReports(*state);
         SystemReports::AllocateAndSetUpVentReports(*state);
         GetCustomMeterInput(*state, errors_found);
         EXPECT_FALSE(errors_found);

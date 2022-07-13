@@ -327,6 +327,8 @@ struct SystemReportsData : BaseGlobalStruct
     Array1D<Real64> SysHCCompSteam;
     Array1D<Real64> SysDomesticH2O;
 
+    Array1D<Real64> ZoneOAMassFlow;               // zone mech vent mass flow rate {kg/s}
+    Array1D<Real64> ZoneOAMass;                   // zone mech vent total mass for time {kg}
     Array1D<Real64> ZoneOAVolFlowStdRho;          // zone mech vent volume flow rate at standard density {m3/s}
     Array1D<Real64> ZoneOAVolStdRho;              // zone mech vent total volume OA at standard density {m3}
     Array1D<Real64> ZoneOAVolFlowCrntRho;         // zone mech vent volume flow rate at current density {m3/s}
@@ -443,6 +445,8 @@ struct SystemReportsData : BaseGlobalStruct
         this->SysHCCompPropane.deallocate();
         this->SysHCCompSteam.deallocate();
         this->SysDomesticH2O.deallocate();
+        this->ZoneOAMassFlow.deallocate();
+        this->ZoneOAMass.deallocate();
         this->ZoneOAVolFlowStdRho.deallocate();
         this->ZoneOAVolStdRho.deallocate();
         this->ZoneOAVolFlowCrntRho.deallocate();
