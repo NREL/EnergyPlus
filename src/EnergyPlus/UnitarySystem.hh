@@ -809,9 +809,10 @@ namespace UnitarySystems {
 
         void calcUnitarySuppHeatingSystem(EnergyPlusData &state,
                                           bool const FirstHVACIteration, // True when first HVAC iteration
-                                          Real64 const PartLoadRatio,    // coil operating part-load ratio
                                           Real64 const SuppCoilLoad      // adjusted supp coil load when outlet temp exceeds max (W)
         );
+
+        void UnitarySys::setEMSSuppCoilStagePLR(EnergyPlusData &state);
 
         void calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
         );
