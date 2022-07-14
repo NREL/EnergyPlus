@@ -1181,6 +1181,8 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
 
 TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
 {
+    // Test for Issue 9121
+
     state->dataFurnaces->Furnace.allocate(1);
     state->dataFurnaces->Furnace(1).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
 
@@ -1207,7 +1209,8 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
                         heatCoilIdx, // index of heating coil
                         ErrFound);   // GetInput logical that errors were found
 
-    EXPECT_TRUE(ErrFound == false);
+    EXPECT_FALSE(ErrFound);
+    // Would expect the following checks to be messed up if without the fix 
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
 }
