@@ -3423,6 +3423,11 @@ void WriteTableOfContents(EnergyPlusData &state)
                     }
                 }
             }
+
+            std::string ReportPeriodSummary = "Reporting Period Summary";
+            tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriodSummary, Entire_Facility) << "\">"
+                       << "Reporting Period Summary"
+                       << "</a>\n";
             AddTOCReportPeriod(
                 state.dataWeatherManager->TotThermalReportPers, "Thermal", state.dataWeatherManager->ThermalReportPeriodInput, tbl_stream);
             AddTOCReportPeriod(state.dataWeatherManager->TotCO2ReportPers, "CO2", state.dataWeatherManager->CO2ReportPeriodInput, tbl_stream);
@@ -12601,6 +12606,8 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     int constexpr reportperiodStart(4);
     int constexpr reportperiodEnd(5);
     int constexpr reportperiodElectricity(6);
+
+    WriteReportHeaders(state, "Reporting Period Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
     columnHead(reportperiodType) = "Report Type";
     columnHead(reportperiodId) = "Report Index";
