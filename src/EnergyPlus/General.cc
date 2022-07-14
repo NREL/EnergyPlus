@@ -1814,4 +1814,41 @@ std::vector<std::string> splitString(const std::string &string, char delimiter)
     return results;
 }
 
+bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx)
+{
+    int currentDate;
+    int reportStartDate = state.dataWeatherManager->ReportPeriodInput(periodIdx).startJulianDate;
+    int reportStartHour = state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour;
+    if (state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear > 0) {
+        currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+    } else {
+        currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+    }
+    return (currentDate == reportStartDate && state.dataGlobal->HourOfDay == reportStartHour);
+}
+
+void findReportPeriodIdx(EnergyPlusData &state,
+                         const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                         const int nReportPeriods,
+                         Array1D_bool &inReportPeriodFlags)
+{
+    // return an array of flags, indicating whether the current time is in reporting period i
+    int currentDate;
+    for (int i = 1; i <= nReportPeriods; i++) {
+        int reportStartDate = ReportPeriodInputData(i).startJulianDate;
+        int reportStartHour = ReportPeriodInputData(i).startHour;
+        int reportEndDate = ReportPeriodInputData(i).endJulianDate;
+        int reportEndHour = ReportPeriodInputData(i).endHour;
+        if (ReportPeriodInputData(i).startYear > 0) {
+            currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        } else {
+            currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        }
+        if (General::BetweenDateHoursLeftInclusive(
+                currentDate, state.dataGlobal->HourOfDay, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {
+            inReportPeriodFlags(i) = true;
+        }
+    }
+}
+
 } // namespace EnergyPlus::General

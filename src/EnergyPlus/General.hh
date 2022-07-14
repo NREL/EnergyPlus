@@ -76,7 +76,8 @@ namespace OutputProcessor {
 
 namespace WeatherManager {
     enum class DateType;
-}
+    struct ReportPeriodData;
+} // namespace WeatherManager
 
 namespace General {
 
@@ -505,6 +506,13 @@ namespace General {
     }
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
+
+    bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx);
+
+    void findReportPeriodIdx(EnergyPlusData &state,
+                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                             const int nReportPeriods,
+                             Array1D_bool &inReportPeriodFlags);
 
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {

@@ -111,7 +111,6 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
@@ -5486,7 +5485,7 @@ void ReportThermalResilience(EnergyPlusData &state)
 
     Array1D_bool reportPeriodFlags;
     reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
-    findReportPeriodIdx(state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
+    General::findReportPeriodIdx(state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
 
     auto &ort(state.dataOutRptTab);
     for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
@@ -5982,7 +5981,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                                                            state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
                                 state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
                                 state.dataHeatBalFanSys->lowSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
-                            } else if (isReportPeriodBeginning(state, ReportPeriodIdx)) { // or when it is the start of the period
+                            } else if (General::isReportPeriodBeginning(state, ReportPeriodIdx)) { // or when it is the start of the period
                                 General::EncodeMonDayHrMin(encodedMonDayHrMin,
                                                            state.dataEnvrn->Month,
                                                            state.dataEnvrn->DayOfMonth,
@@ -6017,7 +6016,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                                                            state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
                                 state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
                                 state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
-                            } else if (isReportPeriodBeginning(state, ReportPeriodIdx)) { // or when it is the start of the period
+                            } else if (General::isReportPeriodBeginning(state, ReportPeriodIdx)) { // or when it is the start of the period
                                 General::EncodeMonDayHrMin(encodedMonDayHrMin,
                                                            state.dataEnvrn->Month,
                                                            state.dataEnvrn->DayOfMonth,
@@ -6104,7 +6103,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
 
         Array1D_bool reportPeriodFlags;
         reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
-        findReportPeriodIdx(state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+        General::findReportPeriodIdx(state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
 
         auto &ort(state.dataOutRptTab);
         for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
@@ -6213,7 +6212,7 @@ void ReportVisualResilience(EnergyPlusData &state)
 
         Array1D_bool reportPeriodFlags;
         reportPeriodFlags.dimension(state.dataWeatherManager->TotVisualReportPers, false);
-        findReportPeriodIdx(
+        General::findReportPeriodIdx(
             state, state.dataWeatherManager->VisualReportPeriodInput, state.dataWeatherManager->TotVisualReportPers, reportPeriodFlags);
 
         auto &ort(state.dataOutRptTab);
@@ -6280,43 +6279,6 @@ void ReportVisualResilience(EnergyPlusData &state)
             }
         }
     } // loop over zones
-}
-
-bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx)
-{
-    int currentDate;
-    int reportStartDate = state.dataWeatherManager->ReportPeriodInput(periodIdx).startJulianDate;
-    int reportStartHour = state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour;
-    if (state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear > 0) {
-        currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-    } else {
-        currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-    }
-    return (currentDate == reportStartDate && state.dataGlobal->HourOfDay == reportStartHour);
-}
-
-void findReportPeriodIdx(EnergyPlusData &state,
-                         const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
-                         const int nReportPeriods,
-                         Array1D_bool &inReportPeriodFlags)
-{
-    // return an array of flags, indicating whether the current time is in reporting period i
-    int currentDate;
-    for (int i = 1; i <= nReportPeriods; i++) {
-        int reportStartDate = ReportPeriodInputData(i).startJulianDate;
-        int reportStartHour = ReportPeriodInputData(i).startHour;
-        int reportEndDate = ReportPeriodInputData(i).endJulianDate;
-        int reportEndHour = ReportPeriodInputData(i).endHour;
-        if (ReportPeriodInputData(i).startYear > 0) {
-            currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-        } else {
-            currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-        }
-        if (General::BetweenDateHoursLeftInclusive(
-                currentDate, state.dataGlobal->HourOfDay, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {
-            inReportPeriodFlags(i) = true;
-        }
-    }
 }
 
 void ReportSurfaceHeatBalance(EnergyPlusData &state)
