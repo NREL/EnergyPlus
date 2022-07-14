@@ -372,9 +372,6 @@ TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
     state->dataSurface->SurfMaterialMovInsulInt.dimension(numSurfs, 0);
     state->dataSurface->SurfSchedMovInsulExt.dimension(numSurfs, 0);
     state->dataSurface->SurfSchedMovInsulInt.dimension(numSurfs, 0);
-    state->dataSurface->SurfExternalShadingSchInd.dimension(numSurfs, 0);
-    state->dataSurface->SurfSurroundingSurfacesNum.dimension(numSurfs, 0);
-    state->dataSurface->SurfLinkedOutAirNode.dimension(numSurfs, 0);
 
     for (int SurfNum = 1; SurfNum <= numSurfs; SurfNum++) {
         state->dataSurface->Surface(SurfNum).set_representative_surface(*state, SurfNum);
