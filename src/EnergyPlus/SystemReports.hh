@@ -153,6 +153,17 @@ namespace SystemReports {
         Real64 ZoneTimeVentUnocc = 0.0;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
     };
 
+    struct SysVentReportVariables
+    {
+        Real64 SysMechVentFlow = 0.0;             // air loop mechanical vent total volume OA at standard density {m3/s}
+        Real64 SysNatVentFlow = 0.0;              // air loop natural vent total volume OA at standard density {m3/s}
+        Real64 SysTargetVentilationFlowVoz = 0.0; // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+        Real64 SysTimeBelowVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 SysTimeAtVozDyn = 0.0;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 SysTimeAboveVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 SysTimeVentUnocc = 0.0;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+        bool SysAnyZoneOccupied = false;          // true if any zone on system is occupied
+    };
     struct SysLoadReportVariables
     {
         // SYSTEM LOADS REPORT
@@ -358,15 +369,6 @@ struct SystemReportsData : BaseGlobalStruct
     Real64 AllZonesTimeAtVozDynOcc = 0.0;   // time [hrs] that all zones mech+nat vent is = VozTarget within 1% and > zero during occupied
     Real64 AnyZoneTimeAboveVozDynOcc = 0.0; // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1% during occupied
 
-    Array1D<Real64> SysMechVentFlow;             // air loop mechanical vent total volume OA at standard density {m3/s}
-    Array1D<Real64> SysNatVentFlow;              // air loop natural vent total volume OA at standard density {m3/s}
-    Array1D<Real64> SysTargetVentilationFlowVoz; // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
-    Array1D<Real64> SysTimeBelowVozDyn;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
-    Array1D<Real64> SysTimeAtVozDyn;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
-    Array1D<Real64> SysTimeAboveVozDyn;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
-    Array1D<Real64> SysTimeVentUnocc;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
-    Array1D<bool> SysAnyZoneOccupied;            // true if any zone on system is occupied
-
     bool AirLoopLoadsReportEnabled = true;
     bool VentLoadsReportEnabled = true;
     bool VentEnergyReportEnabled = false;
@@ -377,6 +379,7 @@ struct SystemReportsData : BaseGlobalStruct
 
     EPVector<SystemReports::SummarizeLoads> Vent;
     EPVector<SystemReports::ZoneVentReportVariables> ZoneVentRepVars;
+    EPVector<SystemReports::SysVentReportVariables> SysVentRepVars;
     EPVector<SystemReports::SysLoadReportVariables> SysLoadRepVars;
     EPVector<SystemReports::SysPreDefRepType> SysPreDefRep;
 
@@ -413,14 +416,6 @@ struct SystemReportsData : BaseGlobalStruct
         this->AnyZoneTimeBelowVozDynOcc = 0.0;
         this->AllZonesTimeAtVozDynOcc = 0.0;
         this->AnyZoneTimeAboveVozDynOcc = 0.0;
-        this->SysMechVentFlow = 0.0;
-        this->SysNatVentFlow = 0.0;
-        this->SysTargetVentilationFlowVoz.deallocate();
-        this->SysTimeBelowVozDyn.deallocate();
-        this->SysTimeAtVozDyn.deallocate();
-        this->SysTimeAboveVozDyn.deallocate();
-        this->SysTimeVentUnocc.deallocate();
-        this->SysAnyZoneOccupied.deallocate();
         this->AirLoopLoadsReportEnabled = true;
         this->VentLoadsReportEnabled = true;
         this->VentEnergyReportEnabled = false;
@@ -430,6 +425,7 @@ struct SystemReportsData : BaseGlobalStruct
         this->MaxCompArraySize = 500;
         this->Vent.deallocate();
         this->ZoneVentRepVars.deallocate();
+        this->SysVentRepVars.deallocate();
         this->SysLoadRepVars.deallocate();
         this->SysPreDefRep.deallocate();
         this->OneTimeFlag_FindFirstLastPtr = true;

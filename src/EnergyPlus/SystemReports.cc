@@ -1681,373 +1681,368 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Allocates Arrays and setup output variables related to Ventilation reports.
     state.dataSysRpts->ZoneVentRepVars.allocate(state.dataGlobal->NumOfZones);
-
     state.dataSysRpts->SysLoadRepVars.allocate(NumPrimaryAirSys);
-
-    state.dataSysRpts->SysMechVentFlow.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysNatVentFlow.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysTargetVentilationFlowVoz.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysTimeBelowVozDyn.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysTimeAtVozDyn.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysTimeAboveVozDyn.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysTimeVentUnocc.allocate(NumPrimaryAirSys);
-    state.dataSysRpts->SysAnyZoneOccupied.allocate(NumPrimaryAirSys);
+    state.dataSysRpts->SysVentRepVars.allocate(NumPrimaryAirSys);
     state.dataSysRpts->SysPreDefRep.allocate(NumPrimaryAirSys);
 
-    for (int SysIndex = 1; SysIndex <= NumPrimaryAirSys; ++SysIndex) {
-        state.dataSysRpts->SysMechVentFlow(SysIndex) = 0.0;
-        state.dataSysRpts->SysNatVentFlow(SysIndex) = 0.0;
-        state.dataSysRpts->SysTargetVentilationFlowVoz(SysIndex) = 0.0;
-        state.dataSysRpts->SysTimeBelowVozDyn(SysIndex) = 0.0;
-        state.dataSysRpts->SysTimeAtVozDyn(SysIndex) = 0.0;
-        state.dataSysRpts->SysTimeAboveVozDyn(SysIndex) = 0.0;
-        state.dataSysRpts->SysTimeVentUnocc(SysIndex) = 0.0;
-        state.dataSysRpts->SysAnyZoneOccupied(SysIndex) = false;
+    for (int sysIndex = 1; sysIndex <= NumPrimaryAirSys; ++sysIndex) {
+        auto &thisSysVentRepVars = state.dataSysRpts->SysVentRepVars(sysIndex);
+        thisSysVentRepVars.SysMechVentFlow = 0.0;
+        thisSysVentRepVars.SysNatVentFlow = 0.0;
+        thisSysVentRepVars.SysTargetVentilationFlowVoz = 0.0;
+        thisSysVentRepVars.SysTimeBelowVozDyn = 0.0;
+        thisSysVentRepVars.SysTimeAtVozDyn = 0.0;
+        thisSysVentRepVars.SysTimeAboveVozDyn = 0.0;
+        thisSysVentRepVars.SysTimeVentUnocc = 0.0;
+        thisSysVentRepVars.SysAnyZoneOccupied = false;
     }
 
     if (state.dataSysRpts->AirLoopLoadsReportEnabled) {
-        for (int SysIndex = 1; SysIndex <= NumPrimaryAirSys; ++SysIndex) {
+        for (int sysIndex = 1; sysIndex <= NumPrimaryAirSys; ++sysIndex) {
+            auto &thisSysLoadRepVars = state.dataSysRpts->SysLoadRepVars(sysIndex);
+            auto &thisSysVentRepVars = state.dataSysRpts->SysVentRepVars(sysIndex);
+            std::string const primaryAirSysName = state.dataAirSystemsData->PrimaryAirSystems(sysIndex).Name;
 
             // CurrentModuleObject='AirloopHVAC'
             // SYSTEM LOADS REPORT
             SetupOutputVariable(state,
                                 "Air System Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotHTNG,
+                                thisSysLoadRepVars.SysTotHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotCLNG,
+                                thisSysLoadRepVars.SysTotCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             // SYSTEM ENERGY USE REPORT
             SetupOutputVariable(state,
                                 "Air System Hot Water Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotH2OHOT,
+                                thisSysLoadRepVars.SysTotH2OHOT,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Steam Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotSteam,
+                                thisSysLoadRepVars.SysTotSteam,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Chilled Water Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotH2OCOLD,
+                                thisSysLoadRepVars.SysTotH2OCOLD,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotElec,
+                                thisSysLoadRepVars.SysTotElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotNaturalGas,
+                                thisSysLoadRepVars.SysTotNaturalGas,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Propane Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysTotPropane,
+                                thisSysLoadRepVars.SysTotPropane,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Water Volume",
                                 OutputProcessor::Unit::m3,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysDomesticH2O,
+                                thisSysLoadRepVars.SysDomesticH2O,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             // SYSTEM COMPONENT LOAD REPORT
             SetupOutputVariable(state,
                                 "Air System Fan Air Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysFANCompHTNG,
+                                thisSysLoadRepVars.SysFANCompHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysCCCompCLNG,
+                                thisSysLoadRepVars.SysCCCompCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHCCompHTNG,
+                                thisSysLoadRepVars.SysHCCompHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHeatExHTNG,
+                                thisSysLoadRepVars.SysHeatExHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHeatExCLNG,
+                                thisSysLoadRepVars.SysHeatExCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysSolarCollectHeating,
+                                thisSysLoadRepVars.SysSolarCollectHeating,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysSolarCollectCooling,
+                                thisSysLoadRepVars.SysSolarCollectCooling,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysUserDefinedTerminalHeating,
+                                thisSysLoadRepVars.SysUserDefinedTerminalHeating,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysUserDefinedTerminalCooling,
+                                thisSysLoadRepVars.SysUserDefinedTerminalCooling,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHumidHTNG,
+                                thisSysLoadRepVars.SysHumidHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysEvapCLNG,
+                                thisSysLoadRepVars.SysEvapCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Desiccant Dehumidifier Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).DesDehumidCLNG,
+                                thisSysLoadRepVars.DesDehumidCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             // SYSTEM COMPONENT ENERGY REPORT
             SetupOutputVariable(state,
                                 "Air System Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysFANCompElec,
+                                thisSysLoadRepVars.SysFANCompElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Hot Water Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHCCompH2OHOT,
+                                thisSysLoadRepVars.SysHCCompH2OHOT,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Chilled Water Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysCCCompH2OCOLD,
+                                thisSysLoadRepVars.SysCCCompH2OCOLD,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System DX Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHCCompElec,
+                                thisSysLoadRepVars.SysHCCompElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System DX Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysCCCompElec,
+                                thisSysLoadRepVars.SysCCCompElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHCCompElecRes,
+                                thisSysLoadRepVars.SysHCCompElecRes,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHCCompNaturalGas,
+                                thisSysLoadRepVars.SysHCCompNaturalGas,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Propane Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHCCompPropane,
+                                thisSysLoadRepVars.SysHCCompPropane,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Steam Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHCCompSteam,
+                                thisSysLoadRepVars.SysHCCompSteam,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHumidElec,
+                                thisSysLoadRepVars.SysHumidElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHumidNaturalGas,
+                                thisSysLoadRepVars.SysHumidNaturalGas,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Propane Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysHumidPropane,
+                                thisSysLoadRepVars.SysHumidPropane,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).SysEvapElec,
+                                thisSysLoadRepVars.SysEvapElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Desiccant Dehumidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->SysLoadRepVars(SysIndex).DesDehumidElec,
+                                thisSysLoadRepVars.DesDehumidElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Mechanical Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataSysRpts->SysMechVentFlow(SysIndex),
+                                thisSysVentRepVars.SysMechVentFlow,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Natural Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataSysRpts->SysNatVentFlow(SysIndex),
+                                thisSysVentRepVars.SysNatVentFlow,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Target Voz Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataSysRpts->SysTargetVentilationFlowVoz(SysIndex),
+                                thisSysVentRepVars.SysTargetVentilationFlowVoz,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation Below Target Voz Time",
                                 OutputProcessor::Unit::hr,
-                                state.dataSysRpts->SysTimeBelowVozDyn(SysIndex),
+                                thisSysVentRepVars.SysTimeBelowVozDyn,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation At Target Voz Time",
                                 OutputProcessor::Unit::hr,
-                                state.dataSysRpts->SysTimeAtVozDyn(SysIndex),
+                                thisSysVentRepVars.SysTimeAtVozDyn,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation Above Target Voz Time",
                                 OutputProcessor::Unit::hr,
-                                state.dataSysRpts->SysTimeAboveVozDyn(SysIndex),
+                                thisSysVentRepVars.SysTimeAboveVozDyn,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation When Unoccupied Time",
                                 OutputProcessor::Unit::hr,
-                                state.dataSysRpts->SysTimeVentUnocc(SysIndex),
+                                thisSysVentRepVars.SysTimeVentUnocc,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+                                primaryAirSysName);
         }
     }
     for (int ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
@@ -4276,14 +4271,15 @@ void ReportVentilationLoads(EnergyPlusData &state)
     state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = 0.0;
 
     for (int sysNum = 1; sysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++sysNum) {
-        state.dataSysRpts->SysMechVentFlow(sysNum) = 0.0;
-        state.dataSysRpts->SysNatVentFlow(sysNum) = 0.0;
-        state.dataSysRpts->SysTargetVentilationFlowVoz(sysNum) = 0.0;
-        state.dataSysRpts->SysTimeBelowVozDyn(sysNum) = 0.0;
-        state.dataSysRpts->SysTimeAtVozDyn(sysNum) = 0.0;
-        state.dataSysRpts->SysTimeAboveVozDyn(sysNum) = 0.0;
-        state.dataSysRpts->SysTimeVentUnocc(sysNum) = 0.0;
-        state.dataSysRpts->SysAnyZoneOccupied(sysNum) = false;
+        auto &thisSysVentRepVars = state.dataSysRpts->SysVentRepVars(sysNum);
+        thisSysVentRepVars.SysMechVentFlow = 0.0;
+        thisSysVentRepVars.SysNatVentFlow = 0.0;
+        thisSysVentRepVars.SysTargetVentilationFlowVoz = 0.0;
+        thisSysVentRepVars.SysTimeBelowVozDyn = 0.0;
+        thisSysVentRepVars.SysTimeAtVozDyn = 0.0;
+        thisSysVentRepVars.SysTimeAboveVozDyn = 0.0;
+        thisSysVentRepVars.SysTimeVentUnocc = 0.0;
+        thisSysVentRepVars.SysAnyZoneOccupied = false;
     }
 
     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
@@ -4601,14 +4597,15 @@ void ReportVentilationLoads(EnergyPlusData &state)
                         termUnitOAFrac = state.dataSize->TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
                     }
                 }
-                state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) += termUnitOAFrac * thisZoneVentRepVars.ZoneTargetVentilationFlowVoz;
+                state.dataSysRpts->SysVentRepVars(AirLoopNum).SysTargetVentilationFlowVoz +=
+                    termUnitOAFrac * thisZoneVentRepVars.ZoneTargetVentilationFlowVoz;
                 Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
                                           state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen) /
                                          (TimeStepSys * DataGlobalConstants::SecInHour);
-                state.dataSysRpts->SysNatVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentFlow;
+                state.dataSysRpts->SysVentRepVars(AirLoopNum).SysNatVentFlow += termUnitOAFrac * naturalVentFlow;
 
                 if (state.dataHeatBal->ZonePreDefRep(ActualZoneNum).isOccupied) {
-                    state.dataSysRpts->SysAnyZoneOccupied(AirLoopNum) = true;
+                    state.dataSysRpts->SysVentRepVars(AirLoopNum).SysAnyZoneOccupied = true;
                 }
             }
 
@@ -4775,41 +4772,41 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
     // loop over air loops
     for (int sysNum = 1; sysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++sysNum) {
+        auto &thisSysVentRepVars = state.dataSysRpts->SysVentRepVars(sysNum);
+        auto &thisSysPreDefRep = state.dataSysRpts->SysPreDefRep(sysNum);
         Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow / state.dataEnvrn->StdRhoAir;
-        state.dataSysRpts->SysMechVentFlow(sysNum) = mechVentFlow;
-        state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotal += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotal +=
-            state.dataSysRpts->SysNatVentFlow(sysNum) * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisSysVentRepVars.SysMechVentFlow = mechVentFlow;
+        thisSysPreDefRep.SysMechVentTotal += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisSysPreDefRep.SysNatVentTotal += thisSysVentRepVars.SysNatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
-        Real64 totMechNatVentVolFlowStdRho = mechVentFlow + state.dataSysRpts->SysNatVentFlow(sysNum);
+        Real64 totMechNatVentVolFlowStdRho = mechVentFlow + thisSysVentRepVars.SysNatVentFlow;
 
-        Real64 targetFlowVoz = state.dataSysRpts->SysTargetVentilationFlowVoz(sysNum);
-        state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVoz += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 targetFlowVoz = thisSysVentRepVars.SysTargetVentilationFlowVoz;
+        thisSysPreDefRep.SysTargetVentTotalVoz += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
         // Allow 1% tolerance
         if (totMechNatVentVolFlowStdRho < (0.99 * targetFlowVoz)) {
-            state.dataSysRpts->SysTimeBelowVozDyn(sysNum) = TimeStepSys;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeBelowVozDynTotal += TimeStepSys;
+            thisSysVentRepVars.SysTimeBelowVozDyn = TimeStepSys;
+            thisSysPreDefRep.SysTimeBelowVozDynTotal += TimeStepSys;
         } else if (totMechNatVentVolFlowStdRho > (1.01 * targetFlowVoz)) {
-            state.dataSysRpts->SysTimeAboveVozDyn(sysNum) = TimeStepSys;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAboveVozDynTotal += TimeStepSys;
+            thisSysVentRepVars.SysTimeAboveVozDyn = TimeStepSys;
+            thisSysPreDefRep.SysTimeAboveVozDynTotal += TimeStepSys;
         } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
-            state.dataSysRpts->SysTimeAtVozDyn(sysNum) = TimeStepSys;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtVozDynTotal += TimeStepSys;
+            thisSysVentRepVars.SysTimeAtVozDyn = TimeStepSys;
+            thisSysPreDefRep.SysTimeAtVozDynTotal += TimeStepSys;
         }
 
-        if (state.dataSysRpts->SysAnyZoneOccupied(sysNum)) {
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeOccupiedTotal += TimeStepSys;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotalOcc += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotalOcc +=
-                state.dataSysRpts->SysNatVentFlow(sysNum) * TimeStepSys * DataGlobalConstants::SecInHour;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVozOcc += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeBelowVozDynTotalOcc += state.dataSysRpts->SysTimeBelowVozDyn(sysNum);
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAboveVozDynTotalOcc += state.dataSysRpts->SysTimeAboveVozDyn(sysNum);
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtVozDynTotalOcc += state.dataSysRpts->SysTimeAtVozDyn(sysNum);
+        if (thisSysVentRepVars.SysAnyZoneOccupied) {
+            thisSysPreDefRep.SysTimeOccupiedTotal += TimeStepSys;
+            thisSysPreDefRep.SysMechVentTotalOcc += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSysPreDefRep.SysNatVentTotalOcc += thisSysVentRepVars.SysNatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSysPreDefRep.SysTargetVentTotalVozOcc += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSysPreDefRep.SysTimeBelowVozDynTotalOcc += thisSysVentRepVars.SysTimeBelowVozDyn;
+            thisSysPreDefRep.SysTimeAboveVozDynTotalOcc += thisSysVentRepVars.SysTimeAboveVozDyn;
+            thisSysPreDefRep.SysTimeAtVozDynTotalOcc += thisSysVentRepVars.SysTimeAtVozDyn;
         } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
-            state.dataSysRpts->SysTimeVentUnocc(sysNum) = TimeStepSys;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTimeVentUnoccTotal += TimeStepSys;
+            thisSysVentRepVars.SysTimeVentUnocc = TimeStepSys;
+            thisSysPreDefRep.SysTimeVentUnoccTotal += TimeStepSys;
         }
 
         // set time at OA limiting factors
@@ -4817,11 +4814,10 @@ void ReportVentilationLoads(EnergyPlusData &state)
             int thisOAControlNum = state.dataAirLoop->AirLoopControlInfo(sysNum).OACtrlNum;
             if (thisOAControlNum > 0) {
                 int limitFactorIndex = state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor;
-                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimit[limitFactorIndex] += TimeStepSys;
-                if (state.dataSysRpts->SysAnyZoneOccupied(sysNum)) {
-                    state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;
-                    state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotAtLimitOcc[limitFactorIndex] +=
-                        mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+                thisSysPreDefRep.SysTimeAtOALimit[limitFactorIndex] += TimeStepSys;
+                if (thisSysVentRepVars.SysAnyZoneOccupied) {
+                    thisSysPreDefRep.SysTimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;
+                    thisSysPreDefRep.SysMechVentTotAtLimitOcc[limitFactorIndex] += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
                 }
             }
         }
