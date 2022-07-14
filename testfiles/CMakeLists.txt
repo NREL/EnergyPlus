@@ -1020,4 +1020,10 @@ if (BUILD_FORTRAN)
             -x
             COST
             2)
+
+    add_test(NAME integration.5ZoneCAV_MaxTemp_JSON_Outputs.CompareOutputReports
+             COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/compare_output_reports.py" "${PROJECT_BINARY_DIR}/testfiles/5ZoneCAV_MaxTemp_JSON_Outputs/")
+
+    set_tests_properties("integration.5ZoneCAV_MaxTemp_JSON_Outputs.CompareOutputReports" PROPERTIES DEPENDS "integration.5ZoneCAV_MaxTemp_JSON_Outputs")
+
 endif ()
