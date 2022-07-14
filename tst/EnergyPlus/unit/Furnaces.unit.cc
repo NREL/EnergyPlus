@@ -1179,4 +1179,37 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     EXPECT_NEAR(45.0, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(1).FurnaceOutletNodeNum).Temp, 0.000001);
 }
 
+TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
+{
+    state->dataFurnaces->Furnace.allocate(1);
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
+
+    state->dataVariableSpeedCoils->GetCoilsInputFlag = false;
+
+    state->dataVariableSpeedCoils->VarSpeedCoil.allocate(1);
+    state->dataVariableSpeedCoils->VarSpeedCoil(1).MinOATCompressor = 30.0;
+
+    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = CoilVRF_Heating;
+
+    int coolCoilIdx = 1;
+    int heatCoilIdx = 2;
+    int FurnaceNum = 1;
+    std::string FurnaceName = "Furnace_1";
+    std::string cCurModObj = "Furnace_Test";
+
+    bool ErrFound = false;
+
+    SetMinOATCompressor(*state,
+                        FurnaceNum,  // index to furnace
+                        FurnaceName, // name of furnace
+                        cCurModObj,  // type of furnace
+                        coolCoilIdx, // index of cooling coil
+                        heatCoilIdx, // index of heating coil
+                        ErrFound);   // GetInput logical that errors were found
+
+    EXPECT_TRUE(ErrFound == false);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
+}
+
 } // namespace EnergyPlus
