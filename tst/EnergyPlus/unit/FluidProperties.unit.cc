@@ -120,8 +120,8 @@ TEST_F(EnergyPlusFixture, FluidProperties_GetSpecificHeatGlycol)
 TEST_F(EnergyPlusFixture, FluidProperties_InterpValuesForGlycolConc)
 {
     // Test fluid property interpolations with only one concentration
-    int const NumCon = 1;
-    int const NumTemp = 5;
+    int NumCon = 1;
+    int NumTemp = 5;
     Array1D<Real64> ConData = {1.0};
 
     Array2D<Real64> PropData;
