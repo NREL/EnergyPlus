@@ -995,6 +995,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                     state.dataSize->ZoneSizingInput(ZoneSizNum).DOASControlStrategy;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DOASLowSetpoint = state.dataSize->ZoneSizingInput(ZoneSizNum).DOASLowSetpoint;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DOASHighSetpoint = state.dataSize->ZoneSizingInput(ZoneSizNum).DOASHighSetpoint;
+                zoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
                 zoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
                 zoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
                 zoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -1040,6 +1041,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASLowSetpoint = state.dataSize->ZoneSizingInput(ZoneSizNum).DOASLowSetpoint;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASHighSetpoint =
                     state.dataSize->ZoneSizingInput(ZoneSizNum).DOASHighSetpoint;
+                calcZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
                 calcZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
                 calcZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
                 calcZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -1090,6 +1092,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DOASControlStrategy = state.dataSize->ZoneSizingInput(1).DOASControlStrategy;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DOASLowSetpoint = state.dataSize->ZoneSizingInput(1).DOASLowSetpoint;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DOASHighSetpoint = state.dataSize->ZoneSizingInput(1).DOASHighSetpoint;
+                zoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
                 zoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
                 zoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
                 zoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -1129,6 +1132,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASControlStrategy = state.dataSize->ZoneSizingInput(1).DOASControlStrategy;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASLowSetpoint = state.dataSize->ZoneSizingInput(1).DOASLowSetpoint;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASHighSetpoint = state.dataSize->ZoneSizingInput(1).DOASHighSetpoint;
+                calcZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
                 calcZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
                 calcZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
                 calcZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -1193,6 +1197,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation =
                 state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneSecondaryRecirculation;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneVentilationEff;
+            finalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
             finalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
             finalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
             finalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -1238,6 +1243,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DOASHighSetpoint = state.dataSize->ZoneSizingInput(ZoneSizNum).DOASHighSetpoint;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneADEffCooling = state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneADEffCooling;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneADEffHeating = state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneADEffHeating;
+            calcFinalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
             calcFinalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
             calcFinalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
             calcFinalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -1281,6 +1287,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneADEffHeating = state.dataSize->ZoneSizingInput(1).ZoneADEffHeating;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneSecondaryRecirculation = state.dataSize->ZoneSizingInput(1).ZoneSecondaryRecirculation;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = state.dataSize->ZoneSizingInput(1).ZoneVentilationEff;
+            finalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
             finalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
             finalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
             finalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -1320,6 +1327,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DOASHighSetpoint = state.dataSize->ZoneSizingInput(1).DOASHighSetpoint;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneADEffCooling = state.dataSize->ZoneSizingInput(1).ZoneADEffCooling;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneADEffHeating = state.dataSize->ZoneSizingInput(1).ZoneADEffHeating;
+            calcFinalZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
             calcFinalZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
             calcFinalZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
             calcFinalZoneSizing.zoneRHHumidifySetPoint = zoneSizingInput.zoneRHHumidifySetPoint;
@@ -2969,6 +2977,40 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             print(state.files.zsz, "\n");
             state.files.zsz.close();
         }
+
+        //// Move sizing data into final sizing array according to sizing method
+        // for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        //    if (!state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
+        //    if (!state.dataSize->CalcFinalZoneSizing(zoneNum).zoneLatentSizing) continue;
+        //    auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(zoneNum);
+        //    if (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::Latent) {
+        //        calcFinalZoneSizing.DesCoolVolFlow = calcFinalZoneSizing.DesCoolLatentVolFlow;
+        //        calcFinalZoneSizing.cCoolDDDate = calcFinalZoneSizing.cLatentCoolDDDate;
+        //        calcFinalZoneSizing.CoolDDNum = calcFinalZoneSizing.LatentCoolDDNum;
+        //        calcFinalZoneSizing.CoolFlowSeq = calcFinalZoneSizing.ZoneCoolLatentMassFlowSeq;
+
+        //        calcFinalZoneSizing.DesHeatVolFlow = calcFinalZoneSizing.DesHeatLatentVolFlow;
+        //        calcFinalZoneSizing.cHeatDDDate = calcFinalZoneSizing.cLatentHeatDDDate;
+        //        calcFinalZoneSizing.HeatDDNum = calcFinalZoneSizing.LatentHeatDDNum;
+        //        calcFinalZoneSizing.HeatFlowSeq = calcFinalZoneSizing.ZoneHeatLatentMassFlowSeq;
+        //        // add everything else needed for component sizing
+        //    } else if (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent) {
+        //        if (calcFinalZoneSizing.DesCoolLatentVolFlow > calcFinalZoneSizing.DesCoolVolFlow) {
+        //            calcFinalZoneSizing.DesCoolVolFlow = calcFinalZoneSizing.DesCoolLatentVolFlow;
+        //            calcFinalZoneSizing.cCoolDDDate = calcFinalZoneSizing.cLatentCoolDDDate;
+        //            calcFinalZoneSizing.CoolDDNum = calcFinalZoneSizing.LatentCoolDDNum;
+        //            calcFinalZoneSizing.CoolFlowSeq = calcFinalZoneSizing.ZoneCoolLatentMassFlowSeq;
+        //            // add everything else needed for component sizing
+        //        }
+        //        if (calcFinalZoneSizing.DesHeatLatentVolFlow > calcFinalZoneSizing.DesHeatVolFlow) {
+        //            calcFinalZoneSizing.DesHeatVolFlow = calcFinalZoneSizing.DesHeatLatentVolFlow;
+        //            calcFinalZoneSizing.cHeatDDDate = calcFinalZoneSizing.cLatentHeatDDDate;
+        //            calcFinalZoneSizing.HeatDDNum = calcFinalZoneSizing.LatentHeatDDNum;
+        //            calcFinalZoneSizing.HeatFlowSeq = calcFinalZoneSizing.ZoneHeatLatentMassFlowSeq;
+        //            // add everything else needed for component sizing
+        //        }
+        //    }
+        //}
 
         // Move data from Calc arrays to user modified arrays
 

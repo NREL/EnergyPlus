@@ -3453,42 +3453,20 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
-                zoneSizingIndex.zoneSizing = ZoneSizing::SensibleOnly;
-                // change to getEnumerationValue
-                if (NumAlphas > 9) {
-                    auto const zoneSizingType(state.dataIPShortCut->cAlphaArgs(10));
-                    if (zoneSizingType == "SENSIBLE LOAD") {
-                        zoneSizingIndex.zoneSizing = ZoneSizing::Sensible;
-                    } else if (zoneSizingType == "LATENT LOAD") {
-                        zoneSizingIndex.zoneSizing = ZoneSizing::Latent;
-                    } else if (zoneSizingType == "SENSIBLE AND LATENT LOAD") {
-                        zoneSizingIndex.zoneSizing = ZoneSizing::SensibleAndLatent;
-                    }
-                    if (zoneSizingType != "SENSIBLE LOAD ONLY NO LATENT LOAD") {
-                        zoneSizingIndex.zoneLatentSizing = true;
-                        state.dataHeatBal->DoLatentSizing = true;
-                    }
+                zoneSizingIndex.zoneSizingMethod = static_cast<DataSizing::ZoneSizing>(
+                    getEnumerationValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+                if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {
+                    zoneSizingIndex.zoneLatentSizing = true;
+                    state.dataHeatBal->DoLatentSizing = true;
                 }
-                if (NumAlphas > 10) {
-                    zoneSizingIndex.ZnLatCoolDgnSAMethod =
-                        (state.dataIPShortCut->cAlphaArgs(11) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
-                }
-                if (NumNumbers > 18) {
-                    zoneSizingIndex.CoolDesDehumHumRat = state.dataIPShortCut->rNumericArgs(19);
-                }
-                if (NumNumbers > 19) {
-                    zoneSizingIndex.CoolDesHumRatDiff = state.dataIPShortCut->rNumericArgs(20);
-                }
-                if (NumAlphas > 11) {
-                    zoneSizingIndex.ZnLatHeatDgnSAMethod =
-                        (state.dataIPShortCut->cAlphaArgs(12) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
-                }
-                if (NumNumbers > 20) {
-                    zoneSizingIndex.HeatDesHumidifyHumRat = state.dataIPShortCut->rNumericArgs(21);
-                }
-                if (NumNumbers > 21) {
-                    zoneSizingIndex.HeatDesHumRatDiff = state.dataIPShortCut->rNumericArgs(22);
-                }
+                zoneSizingIndex.ZnLatCoolDgnSAMethod =
+                    (state.dataIPShortCut->cAlphaArgs(11) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
+                zoneSizingIndex.CoolDesDehumHumRat = state.dataIPShortCut->rNumericArgs(19);
+                zoneSizingIndex.CoolDesHumRatDiff = state.dataIPShortCut->rNumericArgs(20);
+                zoneSizingIndex.ZnLatHeatDgnSAMethod =
+                    (state.dataIPShortCut->cAlphaArgs(12) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
+                zoneSizingIndex.HeatDesHumidifyHumRat = state.dataIPShortCut->rNumericArgs(21);
+                zoneSizingIndex.HeatDesHumRatDiff = state.dataIPShortCut->rNumericArgs(22);
                 if (NumAlphas > 12 && !state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     zoneSizingIndex.zoneRHDehumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
                     if (zoneSizingIndex.zoneRHDehumidifySchIndex == 0) {

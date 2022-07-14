@@ -197,6 +197,8 @@ namespace DataSizing {
         SensibleOnly,
         Num
     };
+    constexpr std::array<std::string_view, static_cast<int>(ZoneSizing::Num)> ZoneSizingMethodNamesUC{
+        "SENSIBLE LOAD", "LATENT LOAD", "SENSIBLE AND LATENT LOAD", "SENSIBLE LOAD ONLY NO LATENT LOAD"};
 
     // Types
 
@@ -261,7 +263,7 @@ namespace DataSizing {
         int ZnLatHeatDgnSAMethod;     // choice of how to get zone latent heating design air humidity ratio;
         int zoneRHDehumidifySchIndex; // index to zone RH dehumidifying schedule used for zone sizing
         int zoneRHHumidifySchIndex;   // index to zone RH humidifying schedule used for zone sizing
-        ZoneSizing zoneSizing;        // type of zone load to sizing on: sensible, latent, sensibleandlatent, sensibleonlynolatent
+        ZoneSizing zoneSizingMethod;  // type of zone load to sizing on: sensible, latent, sensibleandlatent, sensibleonlynolatent
 
         // Default Constructor
         ZoneSizingInputData()
@@ -273,7 +275,7 @@ namespace DataSizing {
               DOASControlStrategy(0), DOASLowSetpoint(0.0), DOASHighSetpoint(0.0), zoneLatentSizing(false), zoneRHDehumidifySetPoint(50.0),
               zoneRHHumidifySetPoint(50.0), CoolDesDehumHumRat(0.0), CoolDesHumRatDiff(0.005), HeatDesHumidifyHumRat(0.0), HeatDesHumRatDiff(0.005),
               ZnLatCoolDgnSAMethod(0), ZnLatHeatDgnSAMethod(0), zoneRHDehumidifySchIndex(0), zoneRHHumidifySchIndex(0),
-              zoneSizing(ZoneSizing::Invalid)
+              zoneSizingMethod(ZoneSizing::Invalid)
         {
         }
     };
@@ -535,6 +537,7 @@ namespace DataSizing {
         std::string LatHeatDesDay;                 // name of a heating design day
         std::string LatCoolNoDOASDesDay;           // name of a cooling design day without DOAS
         std::string LatHeatNoDOASDesDay;           // name of a heating design day without DOAS
+        ZoneSizing zoneSizingMethod;               // type of zone load to sizing on: sensible, latent, sensibleandlatent, sensibleonlynolatent
 
         // Default Constructor
         ZoneSizingData()
@@ -575,7 +578,7 @@ namespace DataSizing {
               HeatNoDOASDDNum(0), CoolNoDOASDDNum(0), zoneLatentSizing(false), zoneRHDehumidifySetPoint(50.0), zoneRHDehumidifySchIndex(0),
               zoneRHHumidifySetPoint(50.0), zoneRHHumidifySchIndex(0), CoolDesDehumHumRat(0.0), CoolDesHumRatDiff(0.005), HeatDesHumidifyHumRat(0.0),
               HeatDesHumRatDiff(0.005), ZnLatCoolDgnSAMethod(0), ZnLatHeatDgnSAMethod(0), ZoneRetTempAtLatentCoolPeak(0.0),
-              ZoneRetTempAtLatentHeatPeak(0.0)
+              ZoneRetTempAtLatentHeatPeak(0.0), zoneSizingMethod(ZoneSizing::Invalid)
         {
         }
 

@@ -685,3 +685,79 @@ The proposed result of zone sizing is to record both a zone sensible mass flow r
 
 The initial approach will be to choose a load and mass flow rate based on user inputs. The chosen data will be stored in the FinalZoneSizing.DesCoolMassFlowRate and FinalZoneSizing.DesCoolVolFlow variables (same for heating) at the end of the sizing calculation. This method is chosen simply to avoid carrying multiple variables throughout component sizing. Changes to code due to the addition of latent sizing would be complete at the end of zone sizing.
 
+Since there is a significant amount of code that utilizes the sizing information, the new latent sizing arrays will be substituted into the existing final sizing arrays and scalar variables based on the user choice of sizing method (i.e., sensible [do nothing], latent [use latent data], sensible or latent [use greater of either]). This substitution will occur at the very end of zone sizing just after eplusout.zsz gets written and right before the calc arrays get moved to the final arrays. The example below shows this concept where latent arrays and scalars are substituted into the final calc data if the user chooses to size on latent loads. If the user chooses to size on the greater of sensible or latent loads, the latent arrays will be substituted accordingly.
+
+The sizing information reported to eplusout.zsz has just been written to report sensible and latent loads. Example substitution logic is shown below. This occurs at the very end of `ZoneEquipmentManager::UpdateZoneSizing`.
+
+    case DataGlobalConstants::CallIndicator::EndZoneSizingCalc: {
+    
+    ** process sizing results and write results to eplusout.zsz **
+    
+    ** now perform the substitution **
+
+
+    // Move sizing data into final calc sizing array according to sizing method
+
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+    
+        if (!state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
+        if (!state.dataSize->CalcFinalZoneSizing(zoneNum).zoneLatentSizing) continue;
+        auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(zoneNum);
+
+        if (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::Latent) {
+            calcFinalZoneSizing.DesCoolVolFlow = calcFinalZoneSizing.DesCoolLatentVolFlow;
+            calcFinalZoneSizing.cCoolDDDate = calcFinalZoneSizing.cLatentCoolDDDate;
+            calcFinalZoneSizing.CoolDDNum = calcFinalZoneSizing.LatentCoolDDNum;
+            calcFinalZoneSizing.CoolFlowSeq = calcFinalZoneSizing.ZoneCoolLatentMassFlowSeq;
+            // add everything else needed for component sizing
+
+            calcFinalZoneSizing.DesHeatVolFlow = calcFinalZoneSizing.DesHeatLatentVolFlow;
+            calcFinalZoneSizing.cHeatDDDate = calcFinalZoneSizing.cLatentHeatDDDate;
+            calcFinalZoneSizing.HeatDDNum = calcFinalZoneSizing.LatentHeatDDNum;
+            calcFinalZoneSizing.HeatFlowSeq = calcFinalZoneSizing.ZoneHeatLatentMassFlowSeq;
+            // add everything else needed for component sizing
+
+        } else if (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent) {
+
+            if (calcFinalZoneSizing.DesCoolLatentVolFlow > calcFinalZoneSizing.DesCoolVolFlow) {
+                calcFinalZoneSizing.DesCoolVolFlow = calcFinalZoneSizing.DesCoolLatentVolFlow;
+                calcFinalZoneSizing.cCoolDDDate = calcFinalZoneSizing.cLatentCoolDDDate;
+                calcFinalZoneSizing.CoolDDNum = calcFinalZoneSizing.LatentCoolDDNum;
+                calcFinalZoneSizing.CoolFlowSeq = calcFinalZoneSizing.ZoneCoolLatentMassFlowSeq;
+                // add everything else needed for component sizing
+            }
+
+            if (calcFinalZoneSizing.DesHeatLatentVolFlow > calcFinalZoneSizing.DesHeatVolFlow) {
+                calcFinalZoneSizing.DesHeatVolFlow = calcFinalZoneSizing.DesHeatLatentVolFlow;
+                calcFinalZoneSizing.cHeatDDDate = calcFinalZoneSizing.cLatentHeatDDDate;
+                calcFinalZoneSizing.HeatDDNum = calcFinalZoneSizing.LatentHeatDDNum;
+                calcFinalZoneSizing.HeatFlowSeq = calcFinalZoneSizing.ZoneHeatLatentMassFlowSeq;
+                // add everything else needed for component sizing
+            }
+
+        }
+    }
+
+Existing code follows where the calc arrays are moved to the final sizing arrays:
+
+    // Move data from Calc arrays to user modified arrays
+
+    for (std::size_t i = 0; i < state.dataSize->ZoneSizing.size(); ++i) {
+        auto &z(state.dataSize->ZoneSizing[i]);
+        auto &c(state.dataSize->CalcZoneSizing[i]);
+        z.CoolDesDay = c.CoolDesDay;
+        z.HeatDesDay = c.HeatDesDay;
+        .. snip..
+    }
+
+    for (std::size_t i = 0; i < state.dataSize->FinalZoneSizing.size(); ++i) {
+        auto &z(state.dataSize->FinalZoneSizing[i]);
+        auto &c(state.dataSize->CalcFinalZoneSizing[i]);
+        z.CoolDesDay = c.CoolDesDay;
+        z.HeatDesDay = c.HeatDesDay;
+        .. snip..
+    }
+
+More final processing occurs at this point of EndZoneSizingCalc. This final processing code will be reviewed to determine the best location for the substitution described here and whether the final processing code needs updating or correction.
+
+At this point, latent sizing processing should be complete.
