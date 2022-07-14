@@ -4820,7 +4820,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
             if (zoneEqConfig.ActualZoneNum != ZoneNum) continue;
             int ZoneSizNum =
                 UtilityRoutines::FindItemInList(zoneEqConfig.ZoneName, state.dataSize->ZoneSizingInput, &DataSizing::ZoneSizingInputData::ZoneName);
-            // should use the first Sizing:Zone object if not found?
+            // should use the first Sizing:Zone object if not found
             if (ZoneSizNum == 0 && !state.dataSize->ZoneSizingInput.empty()) ZoneSizNum = 1;
             if (ZoneSizNum > 0) {
                 auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizNum);
