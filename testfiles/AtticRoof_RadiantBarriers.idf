@@ -732,8 +732,8 @@
     0.563030303030303,       !- Sensible Heat Fraction
     occupants activity schedule,  !- Activity Level Schedule Name
     0,                       !- Carbon Dioxide Generation Rate {m3/s-W}
-    ,                        !- Cold Stress Temperature Thresh [C],
-    ,                        !- Heat Stress Temperature Thresh [C],
+    ,                        !- Cold Stress Temperature Threshold [C],
+    ,                        !- Heat Stress Temperature Threshold [C],
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
 
