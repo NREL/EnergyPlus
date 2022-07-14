@@ -47,7 +47,6 @@
 
 // C++ Headers
 #include <cmath>
-#include <fstream>
 #include <vector>
 
 // ObjexxFCL Headers
