@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,13 +72,12 @@ namespace SimulationManager {
 
     void CheckForRequestedReporting(EnergyPlusData &state);
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &fileName);
+    std::unique_ptr<std::ostream>
+    OpenStreamFile(EnergyPlusData &state, const fs::path &fileName, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc));
 
     std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath);
 
     void OpenOutputFiles(EnergyPlusData &state);
-
-    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
     void CloseOutputFiles(EnergyPlusData &state);
 

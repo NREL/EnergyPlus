@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,39 +68,35 @@ struct EnergyPlusData;
 
 namespace ScheduleManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    int const MaxDayTypes(12);
+    int constexpr MaxDayTypes(12);
 
     enum class SchedType : int
     {
-        Unassigned = 0,
+        Invalid = -1,
         ScheduleInput_year = 1,
         ScheduleInput_compact = 2,
         ScheduleInput_file = 3,
         ScheduleInput_constant = 4,
-        ScheduleInput_external = 5
+        ScheduleInput_external = 5,
+        Num
     };
 
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // MODULE VARIABLE DECLARATIONS:
+    enum class OutputReportLevel
+    {
+        Invalid = -1,
+        Hourly,
+        TimeStep,
+        Num
+    };
 
     enum class ScheduleInterpolation
     {
+        Invalid = -1,
         No,      // no interpolation
         Average, // interpolation only to resolve time intervals not matching timestep lengths (this was previously interpolate:yes)
-        Linear   // linear interpolation from the previous time to the current time for the entire schedule
+        Linear,  // linear interpolation from the previous time to the current time for the entire schedule
+        Num
     };
-
-    // Derived Types Variables
-
-    // Types
 
     struct ScheduleTypeData
     {
@@ -151,22 +147,23 @@ namespace ScheduleManager {
     struct ScheduleData
     {
         // Members
-        std::string Name;                          // Schedule Name
-        int ScheduleTypePtr;                       // Index of Schedule Type
-        Array1D_int WeekSchedulePointer;           // one created for each day of possible simulation
-        SchedType SchType = SchedType::Unassigned; // what kind of object has been input.
-        bool Used;                                 // Indicator for this schedule being "used".
-        bool MaxMinSet;                            // Max/min values have been stored for this schedule
-        Real64 MaxValue;                           // Maximum value for this schedule
-        Real64 MinValue;                           // Minimum value for this schedule
-        Real64 CurrentValue;                       // For Reporting
-        bool EMSActuatedOn;                        // indicates if EMS computed
-        Real64 EMSValue;
+        std::string Name;                       // Schedule Name
+        int ScheduleTypePtr;                    // Index of Schedule Type
+        Array1D_int WeekSchedulePointer;        // one created for each day of possible simulation
+        SchedType SchType = SchedType::Invalid; // what kind of object has been input.
+        bool Used;                              // Indicator for this schedule being "used".
+        bool MaxMinSet;                         // Max/min values have been stored for this schedule
+        Real64 MaxValue;                        // Maximum value for this schedule
+        Real64 MinValue;                        // Minimum value for this schedule
+        Real64 CurrentValue;                    // For Reporting
+        bool EMSActuatedOn;                     // indicates if EMS computed
+        Real64 EMSValue;                        // EMS value
+        bool UseDaylightSaving;                 // Toggles between daylight saving option to be inclused as "No" or "Yes" (default)
 
         // Default Constructor
         ScheduleData()
             : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
-              EMSActuatedOn(false), EMSValue(0.0)
+              EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
         {
         }
     };
@@ -175,7 +172,7 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput(EnergyPlusData &state);
 
-    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(EnergyPlusData &state, OutputReportLevel const LevelOfDetail);
 
     // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex);
@@ -281,19 +278,17 @@ namespace ScheduleManager {
     );
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,            // Which Day Schedule being tested
-                                     Real64 const Minimum,               // Minimum desired value
-                                     std::string const &MinString,       // Minimum indicator ('>', '>=')
-                                     Optional<Real64 const> Maximum = _, // Maximum desired value
-                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin, // Minimum indicator ('>', '>=')
+                                     Real64 const Maximum,    // Maximum desired value
+                                     bool const exclusiveMax  // Maximum indicator ('<', ',=')
     );
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,            // Which Day Schedule being tested
-                                     Real32 const Minimum,               // Minimum desired value
-                                     std::string const &MinString,       // Minimum indicator ('>', '>=')
-                                     Optional<Real32 const> Maximum = _, // Maximum desired value
-                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin  // Minimum indicator ('>', '>=')
     );
 
     bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
@@ -346,8 +341,7 @@ struct ScheduleManagerData : BaseGlobalStruct
     int NumSchedules = 0;
 
     // Logical Variables for Module
-    bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
-    bool ScheduleDSTSFileWarningIssued = false;
+    bool ScheduleInputProcessed = false;       // This is false until the Schedule Input has been processed.
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
     // Object Data
@@ -371,7 +365,6 @@ struct ScheduleManagerData : BaseGlobalStruct
         NumSchedules = 0;
 
         ScheduleInputProcessed = false;
-        ScheduleDSTSFileWarningIssued = false;
         ScheduleFileShadingProcessed = false;
 
         ScheduleType.clear(); // Allowed Schedule Types

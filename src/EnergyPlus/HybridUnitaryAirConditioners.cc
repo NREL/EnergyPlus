@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -183,7 +183,6 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     using namespace Psychrometrics;
     auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
 
     // Locals
     int Loop;
@@ -226,13 +225,13 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     // set the availability status based on the availability manager list name
     if (allocated(ZoneComp)) {
         if (MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
-            ZoneComp(ZoneHybridEvaporativeCooler_Num).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
-            ZoneComp(ZoneHybridEvaporativeCooler_Num).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
             MyZoneEqFlag(UnitNum) = false;
         }
         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus =
-            ZoneComp(ZoneHybridEvaporativeCooler_Num).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;
     }
 
     // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
@@ -371,12 +370,11 @@ void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     bool UseOccSchFlag = true;
     bool UseMinOASchFlag = true;
 
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-    DesignMinVR = CalcDesignSpecificationOutdoorAir(state,
-                                                    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
-                                                    ZoneNum,
-                                                    UseOccSchFlag,
-                                                    UseMinOASchFlag); //[m3/s]
+    DesignMinVR = DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+                                                                ZoneNum,
+                                                                UseOccSchFlag,
+                                                                UseMinOASchFlag); //[m3/s]
     Real64 DesignMinVRMassFlow = 0;
     if (state.dataEnvrn->StdRhoAir > 1) {
         DesignMinVRMassFlow = DesignMinVR * state.dataEnvrn->StdRhoAir;
@@ -586,41 +584,41 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 GetOnlySingleNode(state,
                                   Alphas(9),
                                   ErrorsFound,
-                                  cCurrentModuleObject,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode =
                 GetOnlySingleNode(state,
                                   Alphas(10),
                                   ErrorsFound,
-                                  cCurrentModuleObject,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::OutsideAir,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  DataLoopNode::ConnectionType::OutsideAir,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode =
                 GetOnlySingleNode(state,
                                   Alphas(11),
                                   ErrorsFound,
-                                  cCurrentModuleObject,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode =
                 GetOnlySingleNode(state,
                                   Alphas(12),
                                   ErrorsFound,
-                                  cCurrentModuleObject,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::ReliefAir,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  DataLoopNode::ConnectionType::ReliefAir,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");

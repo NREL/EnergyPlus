@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -114,9 +114,8 @@ namespace PlantValves {
         this->calculate(state);
         PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
-        if (this->LoopNum > 0) {
-            PlantUtilities::SetComponentFlowRate(
-                state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        if (this->plantLoc.loopNum > 0) {
+            PlantUtilities::SetComponentFlowRate(state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->plantLoc);
         }
     }
 
@@ -175,53 +174,53 @@ namespace PlantValves {
             state.dataPlantValves->TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(state,
                                                                                          Alphas(2),
                                                                                          ErrorsFound,
-                                                                                         CurrentModuleObject,
+                                                                                         DataLoopNode::ConnectionObjectType::TemperingValve,
                                                                                          Alphas(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                                         DataLoopNode::ConnectionType::Inlet,
+                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                          ObjectIsNotParent);
             // Get Plant Outlet Node
             state.dataPlantValves->TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(state,
                                                                                           Alphas(3),
                                                                                           ErrorsFound,
-                                                                                          CurrentModuleObject,
+                                                                                          DataLoopNode::ConnectionObjectType::TemperingValve,
                                                                                           Alphas(1),
                                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                                          DataLoopNode::ConnectionType::Outlet,
+                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
             // Get Stream 2 Source Node
             state.dataPlantValves->TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(state,
                                                                                            Alphas(4),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::TemperingValve,
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                                           DataLoopNode::NodeConnectionType::Sensor,
-                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                           DataLoopNode::ConnectionType::Sensor,
+                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsNotParent);
             // Get Mixed water Setpoint
             state.dataPlantValves->TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(state,
                                                                                             Alphas(5),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject,
+                                                                                            DataLoopNode::ConnectionObjectType::TemperingValve,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType::SetPoint,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            DataLoopNode::ConnectionType::SetPoint,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent);
 
             // Get Pump outlet
             state.dataPlantValves->TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(state,
                                                                                               Alphas(6),
                                                                                               ErrorsFound,
-                                                                                              CurrentModuleObject,
+                                                                                              DataLoopNode::ConnectionObjectType::TemperingValve,
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType::Sensor,
-                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              DataLoopNode::ConnectionType::Sensor,
+                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
@@ -283,19 +282,8 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        DataPlant::TypeOf_ValveTempering,
-                                                        this->LoopNum,
-                                                        this->LoopSideNum,
-                                                        this->BranchNum,
-                                                        this->CompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, DataPlant::PlantEquipmentType::ValveTempering, this->plantLoc, errFlag, _, _, _, _, _);
 
                 if (errFlag) {
                     ShowFatalError(state, "InitPlantValves: Program terminated due to previous condition(s).");
@@ -317,10 +305,11 @@ namespace PlantValves {
                             branchCtr++;
                             for (auto &thisComp : thisBranch.Comp) {
 
-                                if ((thisComp.TypeOf_Num == DataPlant::TypeOf_ValveTempering) && (thisComp.Name == this->Name)) { // we found it.
+                                if ((thisComp.Type == DataPlant::PlantEquipmentType::ValveTempering) &&
+                                    (thisComp.Name == this->Name)) { // we found it.
 
                                     // is branch control type 'Active'
-                                    if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) IsBranchActive = true;
+                                    if (thisBranch.controlType == DataBranchAirLoopPlant::ControlType::Active) IsBranchActive = true;
 
                                     // is Valve inlet node an outlet node of a splitter
                                     if (thisLoopSide.Splitter.Exists) {
@@ -356,7 +345,7 @@ namespace PlantValves {
                                     for (auto &thisInnerBranch : thisLoopSide.Branch) {
                                         if (thisInnerBranch.NodeNumOut == this->PltPumpOutletNodeNum) {
                                             for (auto &thisInnerComp : thisInnerBranch.Comp) {
-                                                if (thisInnerComp.isPump()) {
+                                                if (DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(thisInnerComp.Type)]) {
                                                     PumpOutNodeOkay = true;
                                                 }
                                             }
@@ -423,15 +412,8 @@ namespace PlantValves {
 
             if ((InletNode > 0) && (OutletNode > 0)) {
                 //   Node(InletNode)%Temp = 0.0
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   state.dataLoopNodes->Node(PumpOutNode).MassFlowRateMax,
-                                                   this->PltInletNodeNum,
-                                                   this->PltOutletNodeNum,
-                                                   this->LoopNum,
-                                                   this->LoopSideNum,
-                                                   this->BranchNum,
-                                                   this->CompNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, state.dataLoopNodes->Node(PumpOutNode).MassFlowRateMax, this->PltInletNodeNum, this->PltOutletNodeNum);
             }
             this->environmentInit = false;
         }
@@ -476,7 +458,7 @@ namespace PlantValves {
 
         if (state.dataGlobal->KickOffSimulation) return;
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             Tin = this->InletTemp;
             Tset = this->SetPointTemp;
             Ts2 = this->Stream2SourceTemp;
@@ -490,8 +472,8 @@ namespace PlantValves {
                     this->FlowDivFract = 1.0;
                 }
             }
-        } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock ==
-                   DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
+        } else if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock ==
+                   DataPlant::FlowLock::Locked) { // don't recalc diversion, just reuse current flows
             if (this->MixedMassFlowRate > 0.0) {
                 this->FlowDivFract = state.dataLoopNodes->Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
             } else {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,13 +70,14 @@ namespace EnergyPlus {
 class EnergyPlusFixture;
 class ResultsFrameworkFixture;
 struct EnergyPlusData;
+struct JsonOutputFilePaths;
 
 namespace ResultsFramework {
 
     using json = nlohmann::json;
 
     // trim string
-    std::string trim(std::string str);
+    std::string trim(std::string_view const s);
 
     // base result object
     class BaseResultObject
@@ -116,12 +117,12 @@ namespace ResultsFramework {
                  const OutputProcessor::ReportingFrequency reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
-                 const OutputProcessor::Unit &units);
+                 OutputProcessor::Unit units);
         Variable(const std::string &VarName,
                  const OutputProcessor::ReportingFrequency reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
-                 const OutputProcessor::Unit &units,
+                 OutputProcessor::Unit units,
                  const std::string &customUnits);
 
         std::string variableName() const;
@@ -138,7 +139,7 @@ namespace ResultsFramework {
         void setReportID(const int Id);
 
         OutputProcessor::Unit units() const;
-        void setUnits(const OutputProcessor::Unit &units);
+        void setUnits(OutputProcessor::Unit units);
 
         std::string customUnits() const;
         void setCustomUnits(const std::string &customUnits);
@@ -153,7 +154,7 @@ namespace ResultsFramework {
         std::string varName;
         std::string sReportFreq;
         OutputProcessor::ReportingFrequency iReportFreq = OutputProcessor::ReportingFrequency::EachCall;
-        OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::TimeStepZone;
+        OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::Zone;
         int rptID = -1;
         OutputProcessor::Unit Units;
         std::string m_customUnits;
@@ -167,13 +168,13 @@ namespace ResultsFramework {
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units);
+                       OutputProcessor::Unit units);
 
         OutputVariable(const std::string &VarName,
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units,
+                       OutputProcessor::Unit units,
                        const std::string &customUnits);
     };
 
@@ -184,7 +185,7 @@ namespace ResultsFramework {
         MeterVariable(const std::string &VarName,
                       const OutputProcessor::ReportingFrequency reportFrequency,
                       const int ReportID,
-                      const OutputProcessor::Unit &units,
+                      OutputProcessor::Unit units,
                       const bool MeterOnly,
                       const bool Acculumative = false);
 
@@ -231,7 +232,7 @@ namespace ResultsFramework {
         json getVariablesJSON();
         json getJSON() const;
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack);
+        void writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack);
 
     protected:
         bool IDataFrameEnabled = false;
@@ -369,12 +370,12 @@ namespace ResultsFramework {
         void initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                     const Array1D<OutputProcessor::RealVariableType> &RVariableTypes,
                                     const int NumOfRVariable,
-                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
+                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
 
         void initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                     const Array1D<OutputProcessor::IntegerVariableType> &IVariableTypes,
                                     const int NumOfIVariable,
-                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
+                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
 
         void initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency);
 
@@ -416,9 +417,9 @@ namespace ResultsFramework {
         bool outputMsgPack = false;
         std::vector<std::string> outputVariables;
 
-        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
+        void writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths);
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams);
+        void writeReport(JsonOutputFilePaths &jsonOutputFilePaths);
 
         void writeCSVOutput(EnergyPlusData &state);
 

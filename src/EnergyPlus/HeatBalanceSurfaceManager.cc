@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,14 +57,12 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
-#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -117,9 +115,11 @@
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
+#include <EnergyPlus/WindowManagerExteriorThermal.hh>
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
+#include <WCETarcog.hpp>
 
 namespace EnergyPlus::HeatBalanceSurfaceManager {
 
@@ -157,7 +157,6 @@ using namespace DataSurfaces;
 // Use statements for access to subroutines in other modules
 using namespace ScheduleManager;
 using namespace SolarShading;
-using namespace DaylightingManager;
 using namespace WindowManager;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
@@ -218,7 +217,7 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
             int const ConstrNum = Surface(SurfNum).Construction;
             if (ConstrNum <= 0) continue;                                            // Shading surface, not really a heat transfer surface
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
-            if (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+            if (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
             state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).UpdateMoistureBalance();
         }
     }
@@ -257,13 +256,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     //       MODIFIED       Nov. 1999, FCW,
     //                      Move ComputeIntThermalAbsorpFactors
     //                      so called every timestep
-    //                      Jan 2004, RJH
-    //                      Added calls to alternative daylighting analysis using DElight
-    //                      All modifications demarked with RJH (Rob Hitchcock)
-    //                      RJH, Jul 2004: add error handling for DElight calls
     //       MODIFIED       Aug. 2017
     //                      Add initializations of surface data to linked air node value if defined
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for surface initializations within the
@@ -273,13 +267,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     // Uses the status flags to trigger record keeping events.
 
     // Using/Aliasing
-    using DataDElight::LUX2FC;
     using namespace SolarShading;
     using ConvectionCoefficients::InitInteriorConvectionCoeffs;
     using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
     using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
     using InternalHeatGains::ManageInternalHeatGains;
-    using namespace DElightManagerF;
 
     auto &Surface(state.dataSurface->Surface);
 
@@ -307,51 +299,12 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     //  END DO
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->SurfHasLinkedOutAirNode(SurfNum)) {
-                int const linkedNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
-                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirDryBulb;
-                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWetBulb;
-                state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindSpeed;
-                state.dataSurface->SurfOutWindDir(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindDir;
-            }
-
-            if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime && state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                Real64 SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                Real64 SrdSurfsViewFactor = 0;
-                if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
-                    SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                }
-                if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
-                    SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                }
-                for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                    SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                }
-                // Check if the sum of all defined view factors > 1.0
-                if (SrdSurfsViewFactor > 1.0) {
-                    ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
-                    ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
-                }
-                if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 &&
-                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
-                    // If both surface sky and ground view factor defined, overwrite with the defined value
-                    Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                    Surface(SurfNum).ViewFactorGroundIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                } else if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 &&
-                           state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor < 0) {
-                    // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
-                    Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                    Surface(SurfNum).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
-                } else if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor < 0 &&
-                           state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
-                    // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
-                    Surface(SurfNum).ViewFactorGroundIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                    Surface(SurfNum).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
-                } else {
-                    // If neither ground or sky view factor define, continue to use the original proportion.
-                    Surface(SurfNum).ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
-                    Surface(SurfNum).ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
-                }
+            if (state.dataSurface->Surface(SurfNum).SurfHasLinkedOutAirNode) {
+                auto &linkedNode = state.dataLoopNodes->Node(state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode);
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = linkedNode.OutAirDryBulb;
+                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = linkedNode.OutAirWetBulb;
+                state.dataSurface->SurfOutWindSpeed(SurfNum) = linkedNode.OutAirWindSpeed;
+                state.dataSurface->SurfOutWindDir(SurfNum) = linkedNode.OutAirWindDir;
             }
         }
     }
@@ -379,8 +332,10 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     // Do the Begin Simulation initializations
     if (state.dataGlobal->BeginSimFlag) {
         AllocateSurfaceHeatBalArrays(state); // Allocate the Module Arrays before any inits take place
-        state.dataHeatBalSurf->InterZoneWindow = std::any_of(
-            state.dataHeatBal->Zone.begin(), state.dataHeatBal->Zone.end(), [](DataHeatBalance::ZoneData const &e) { return e.HasInterZoneWindow; });
+        state.dataHeatBalSurf->InterZoneWindow =
+            std::any_of(state.dataViewFactor->EnclSolInfo.begin(),
+                        state.dataViewFactor->EnclSolInfo.end(),
+                        [](DataViewFactorInformation::EnclosureViewFactorInformation const &e) { return e.HasInterZoneWindow; });
         state.dataRoomAirMod->IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
         state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
         state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
@@ -415,6 +370,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     // There are no daily initializations done in this portion of the surface heat balance
 
     // There are no hourly initializations done in this portion of the surface heat balance
+
+    GetGroundSurfacesReflectanceAverage(state);
 
     // Need to be called each timestep in order to check if surface points to new construction (EMS) and if does then
     // complex fenestration needs to be initialized for additional states
@@ -453,180 +410,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         ComputeDifSolExcZonesWIZWindows(state, state.dataGlobal->NumOfZones);
     }
 
-    // For daylit zones, calculate interior daylight illuminance at reference points and
-    // simulate lighting control system to get overhead electric lighting reduction
-    // factor due to daylighting.
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-            if (Surface(SurfNum).ExtSolar) {
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-            }
-        }
-    }
-
-    for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-        if (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) continue;
-        state.dataDaylightingData->ZoneDaylight(NZ).DaylIllumAtRefPt = 0.0;
-        state.dataDaylightingData->ZoneDaylight(NZ).GlareIndexAtRefPt = 0.0;
-        state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor = 1.0;
-        state.dataDaylightingData->ZoneDaylight(NZ).InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
-        if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
-            state.dataDaylightingData->ZoneDaylight(NZ).TimeExceedingGlareIndexSPAtRefPt = 0.0;
-            state.dataDaylightingData->ZoneDaylight(NZ).TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
-        }
-
-        if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
-            if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
-            if (state.dataDaylightingManager->maxNumRefPtInAnyZone > 0) DayltgInteriorIllum(state, NZ);
-            if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
-        }
-
-        if (state.dataEnvrn->SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0 && NZ == 1) {
-            if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime)
-                DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
-            DayltgInteriorTDDIllum(state);
-        }
-
-        // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
-        // Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-        if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0 &&
-            (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting)) {
-            // Call DElight interior illuminance and electric lighting control subroutine
-            Real64 dPowerReducFac = 1.0; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
-            Real64 dHISKFFC = state.dataEnvrn->HISKF * LUX2FC;
-            Real64 dHISUNFFC = state.dataEnvrn->HISUNF * LUX2FC;
-            Real64 dSOLCOS1 = state.dataEnvrn->SOLCOS(1);
-            Real64 dSOLCOS2 = state.dataEnvrn->SOLCOS(2);
-            Real64 dSOLCOS3 = state.dataEnvrn->SOLCOS(3);
-            Real64 dLatitude = state.dataEnvrn->Latitude;
-            Real64 dCloudFraction = state.dataEnvrn->CloudFraction;
-            // Init Error Flag to 0 (no Warnings or Errors) (returned from DElight)
-            int iErrorFlag = 0;
-            bool elOpened;
-
-            int iReadStatus;       // Error File Read Status
-            std::string cErrorMsg; // Each DElight Error Message can be up to 200 characters long
-            bool bEndofErrFile;    // End of Error File flag
-
-            DElightElecLtgCtrl(len(state.dataHeatBal->Zone(NZ).Name),
-                               state.dataHeatBal->Zone(NZ).Name,
-                               dLatitude,
-                               dHISKFFC,
-                               dHISUNFFC,
-                               dCloudFraction,
-                               dSOLCOS1,
-                               dSOLCOS2,
-                               dSOLCOS3,
-                               dPowerReducFac,
-                               iErrorFlag);
-            // Check Error Flag for Warnings or Errors returning from DElight
-            // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
-            if (iErrorFlag != 0) {
-                // Open DElight Electric Lighting Error File for reading
-                auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp);
-                if (iDElightErrorFile.good()) {
-                    elOpened = true;
-                } else {
-                    elOpened = false;
-                }
-                //            IF (iwriteStatus /= 0) THEN
-                //              CALL ShowFatalError(state, 'InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output
-                //              (readwrite).')
-                //            ENDIF
-                //            Open(unit=iDElightErrorFile, file='eplusout.delighteldmp', action='READ')
-
-                // Sequentially read lines in DElight Electric Lighting Error File
-                // and process them using standard EPlus warning/error handling calls
-                bEndofErrFile = false;
-                iReadStatus = 0;
-                while (!bEndofErrFile && elOpened) {
-                    auto cErrorLine = iDElightErrorFile.readLine();
-                    if (cErrorLine.eof) {
-                        bEndofErrFile = true;
-                        continue;
-                    }
-
-                    // Is the current line a Warning message?
-                    if (has_prefix(cErrorLine.data, "WARNING: ")) {
-                        cErrorMsg = cErrorLine.data.substr(9);
-                        ShowWarningError(state, cErrorMsg);
-                    }
-                    // Is the current line an Error message?
-                    if (has_prefix(cErrorLine.data, "ERROR: ")) {
-                        cErrorMsg = cErrorLine.data.substr(7);
-                        ShowSevereError(state, cErrorMsg);
-                        iErrorFlag = 1;
-                    }
-                }
-
-                // Close DElight Error File and delete
-
-                if (elOpened) {
-                    iDElightErrorFile.close();
-                    FileSystem::removeFile(iDElightErrorFile.filePath);
-                }
-                // If any DElight Error occurred then ShowFatalError to terminate
-                if (iErrorFlag > 0) {
-                    ShowFatalError(state, "End of DElight Error Messages");
-                }
-            } else { // RJH 2008-03-07: No errors
-                // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
-                // Open DElight Electric Lighting Dump File for reading
-                auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp);
-                if (iDElightErrorFile.is_open()) {
-                    elOpened = true;
-                } else {
-                    elOpened = false;
-                }
-
-                // Sequentially read lines in DElight Electric Lighting Dump File
-                // and extract refpt illuminances for standard EPlus output handling
-                bEndofErrFile = false;
-                int iDElightRefPt = 0; // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
-                iReadStatus = 0;
-                while (!bEndofErrFile && elOpened) {
-                    auto line = iDElightErrorFile.read<Real64>();
-                    Real64 dRefPtIllum = line.data; // tmp var for reading RefPt illuminance
-                    if (line.eof) {
-                        bEndofErrFile = true;
-                        continue;
-                    }
-                    // Increment refpt counter
-                    ++iDElightRefPt;
-                    // Assure refpt index does not exceed number of refpts in this zone
-                    if (iDElightRefPt <= state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints) {
-                        state.dataDaylightingData->ZoneDaylight(NZ).DaylIllumAtRefPt(iDElightRefPt) = dRefPtIllum;
-                    }
-                }
-
-                // Close DElight Electric Lighting Dump File and delete
-                if (elOpened) {
-                    iDElightErrorFile.close();
-                    FileSystem::removeFile(iDElightErrorFile.filePath);
-                };
-            }
-            // Store the calculated total zone Power Reduction Factor due to DElight daylighting
-            // in the ZoneDaylight structure for later use
-            state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor = dPowerReducFac;
-        }
-        // RJH DElight Modification End - Call to DElight electric lighting control subroutine
-    }
-
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-            state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-            if (IS_SHADED(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
-            } else {
-                state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-            }
-        }
-    }
+    DaylightingManager::initDaylighting(state, state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime);
 
     CalcInteriorRadExchange(state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, _, "Main");
 
@@ -637,22 +421,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Solar Heat Gains");
 
     InitSolarHeatGains(state);
-    if (state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
-        for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-            if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
-                if (state.dataHeatBal->Zone(NZ).HasInterZoneWindow) {
-                    DayltgInterReflIllFrIntWins(state, NZ);
-                    DayltgGlareWithIntWins(state, state.dataDaylightingData->ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
-                }
-                if (state.dataDaylightingManager->maxNumRefPtInAnyZone > 0) DayltgElecLightingControl(state, NZ);
-            }
-        }
-    } else if (state.dataDaylightingData->mapResultsToReport && state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
-        for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-            ReportIllumMap(state, MapNum);
-        }
-        state.dataDaylightingData->mapResultsToReport = false;
-    }
+
+    DaylightingManager::manageDaylighting(state);
 
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Internal Heat Gains");
     ManageInternalHeatGains(state, false);
@@ -679,8 +449,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
         for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
             auto const &surface(Surface(SurfNum));
-            if (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF &&
-                surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD)
+            if (surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF &&
+                surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD)
                 continue;
             // Outside surface temp of "normal" windows not needed in Window5 calculation approach
             // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
@@ -725,8 +495,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                 int const ConstrNum = surface.Construction;
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
                 if (!construct.SourceSinkPresent) continue;
-                if (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF &&
-                    surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD)
+                if (surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF &&
+                    surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD)
                     continue;
                 state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum) = 0.0;
                 state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum) = 0.0;
@@ -734,7 +504,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                 for (int Term = 1; Term <= construct.NumCTFTerms; ++Term) {
                     Real64 const TH11(state.dataHeatBalSurf->SurfOutsideTempHist(Term + 1)(SurfNum));
                     Real64 const TH12(state.dataHeatBalSurf->SurfInsideTempHist(Term + 1)(SurfNum));
-                    Real64 const QsrcHist1(state.dataHeatBalSurf->QsrcHist(SurfNum, Term + 1));
+                    Real64 const QsrcHist1(state.dataHeatBalSurf->SurfQsrcHist(SurfNum, Term + 1));
 
                     state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) += construct.CTFSourceIn(Term) * QsrcHist1;
 
@@ -742,11 +512,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
                     state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum) +=
                         construct.CTFTSourceOut(Term) * TH11 + construct.CTFTSourceIn(Term) * TH12 + construct.CTFTSourceQ(Term) * QsrcHist1 +
-                        construct.CTFFlux(Term) * state.dataHeatBalSurf->TsrcHist(SurfNum, Term + 1);
+                        construct.CTFFlux(Term) * state.dataHeatBalSurf->SurfTsrcHist(SurfNum, Term + 1);
 
                     state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum) +=
                         construct.CTFTUserOut(Term) * TH11 + construct.CTFTUserIn(Term) * TH12 + construct.CTFTUserSource(Term) * QsrcHist1 +
-                        construct.CTFFlux(Term) * state.dataHeatBalSurf->TuserHist(SurfNum, Term + 1);
+                        construct.CTFFlux(Term) * state.dataHeatBalSurf->SurfTuserHist(SurfNum, Term + 1);
                 }
             }
         } // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
@@ -830,7 +600,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 frameArea;
     Real64 dividerArea;
     // counts for object count report
-    int SurfaceClassCount = int(SurfaceClass::Count);
+    int SurfaceClassCount = int(SurfaceClass::Num);
     Array1D_int numSurfaces(SurfaceClassCount);
     Array1D_int numExtSurfaces(SurfaceClassCount);
     int frameDivNum;
@@ -865,6 +635,43 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 intVistranArea(0.0);
     bool isNorth;
 
+    constexpr std::array<std::string_view, static_cast<int>(WinShadingType::Num)> WindowShadingTypeNames = {
+        "No Shade",  // 0
+        "Shade Off", // 1
+        "Interior Shade",
+        "Switchable Glazing",
+        "Exterior Shade",
+        "Exterior Screen",
+        "Interior Blind",
+        "Exterior Blind",
+        "Between Glass Shade",
+        "Between Glass Blind",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
+        "Uncontrolled",
+        "AlwaysOn",
+        "AlwaysOff",
+        "OnIfScheduleAllows",
+        "OnIfHighSolarOnWindow",
+        "OnIfHighHorizontalSolar",
+        "OnIfHighOutdoorAirTemperature",
+        "OnIfHighZoneAirTemperature",
+        "OnIfHighZoneCooling",
+        "OnIfHighGlare",
+        "MeetDaylightIlluminanceSetpoint",
+        "OnNightIfLowOutdoorTempAndOffDay",
+        "OnNightIfLowInsideTempAndOffDay",
+        "OnNightIfHeatingAndOffDay",
+        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+        "OnNightIfHeatingAndOnDayIfCooling",
+        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+        "OnIfHighZoneAirTempAndHighSolarOnWindow",
+        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
+
     auto &Surface(state.dataSurface->Surface);
 
     numSurfaces = 0;
@@ -873,214 +680,318 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     computedNetArea.allocate(state.dataSurface->TotSurfaces);
     computedNetArea = 0.0; // start at zero, add wall area and subtract window and door area
 
+    // set up for EIO <FenestrationAssembly> output
+    if (state.dataHeatBal->TotFrameDivider > 0 && state.dataGeneral->Constructions) {
+        print(state.files.eio,
+              "{}\n",
+              "! <FenestrationAssembly>,Construction Name,Frame and Divider Name,NFRC Product Type,"
+              "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+    }
+    static constexpr std::string_view FenestrationAssemblyFormat("FenestrationAssembly,{},{},{},{:.3R},{:.3R},{:.3R}\n");
+    std::vector<std::pair<int, int>> uniqConsFrame;
+    std::pair<int, int> consAndFrame;
+
+    // set up for EIO <FenestrationShadedState> output
+    bool fenestrationShadedStateHeaderShown(false);
+    static constexpr std::string_view FenestrationShadedStateFormat("FenestrationShadedState,{},{:.3R},{:.3R},{:.3R},{},{},{:.3R},{:.3R},{:.3R}\n");
+    std::vector<std::pair<int, int>> uniqShdConsFrame;
+    std::pair<int, int> shdConsAndFrame;
+
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         zonePt = Surface(iSurf).Zone;
         // only exterior surfaces including underground
         if ((Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == Ground) ||
             (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) || (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
             isExterior = true;
-            {
-                auto const SELECT_CASE_var(Surface(iSurf).Class);
-                if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) || (SELECT_CASE_var == SurfaceClass::Roof)) {
-                    surfName = Surface(iSurf).Name;
-                    curCons = Surface(iSurf).Construction;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                    PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
-                    PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchOpUfactNoFilm, surfName, state.dataHeatBal->NominalU(Surface(iSurf).Construction), 3);
-                    mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
-                    computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
-                    curAzimuth = Surface(iSurf).Azimuth;
-                    // Round to two decimals, like the display in tables
-                    // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
-                    curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpAzimuth, surfName, curAzimuth);
-                    curTilt = Surface(iSurf).Tilt;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpTilt, surfName, curTilt);
-                    if ((curTilt >= 60.0) && (curTilt < 180.0)) {
-                        if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "N");
-                        } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "E");
-                        } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "S");
-                        } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "W");
-                        }
+            switch (Surface(iSurf).Class) {
+            case SurfaceClass::Wall:
+            case SurfaceClass::Floor:
+            case SurfaceClass::Roof: {
+                surfName = Surface(iSurf).Name;
+                curCons = Surface(iSurf).Construction;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchOpUfactNoFilm, surfName, state.dataHeatBal->NominalU(Surface(iSurf).Construction), 3);
+                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
+                curAzimuth = Surface(iSurf).Azimuth;
+                // Round to two decimals, like the display in tables
+                // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
+                curAzimuth = round(curAzimuth * 100.0) / 100.0;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpAzimuth, surfName, curAzimuth);
+                curTilt = Surface(iSurf).Tilt;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpTilt, surfName, curTilt);
+                if ((curTilt >= 60.0) && (curTilt < 180.0)) {
+                    if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "N");
+                    } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "E");
+                    } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "S");
+                    } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "W");
                     }
-                } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                    surfName = Surface(iSurf).Name;
-                    curCons = Surface(iSurf).Construction;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                    zonePt = Surface(iSurf).Zone;
-                    mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
-                    // include the frame area if present
-                    windowArea = Surface(iSurf).GrossArea;
-                    frameArea = 0.0;
-                    dividerArea = 0.0;
-                    frameDivNum = Surface(iSurf).FrameDivider;
-                    if (frameDivNum != 0) {
-                        frameWidth = state.dataSurface->FrameDivider(frameDivNum).FrameWidth;
-                        frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
-                                    (Surface(iSurf).Height * Surface(iSurf).Width);
-                        windowArea += frameArea;
-                        dividerArea =
-                            state.dataSurface->FrameDivider(frameDivNum).DividerWidth *
-                            (state.dataSurface->FrameDivider(frameDivNum).HorDividers * Surface(iSurf).Width +
-                             state.dataSurface->FrameDivider(frameDivNum).VertDividers * Surface(iSurf).Height -
-                             state.dataSurface->FrameDivider(frameDivNum).HorDividers * state.dataSurface->FrameDivider(frameDivNum).VertDividers *
-                                 state.dataSurface->FrameDivider(frameDivNum).DividerWidth);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchFenFrameConductance,
-                                         surfName,
-                                         state.dataSurface->FrameDivider(frameDivNum).FrameConductance,
-                                         3);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchFenDividerConductance,
-                                         surfName,
-                                         state.dataSurface->FrameDivider(frameDivNum).DividerConductance,
-                                         3);
-                    }
-                    windowAreaWMult = windowArea * mult;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenFrameAreaOf1, surfName, frameArea);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDividerAreaOf1, surfName, dividerArea);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenGlassAreaOf1, surfName, windowArea - (frameArea + dividerArea));
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, surfName, windowAreaWMult);
-                    computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
-                    nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, surfName, nomUfact, 3);
-                    // if the construction report is requested the SummerSHGC is already calculated
-                    if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
-                        SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
-                        TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
-                    } else {
-                        // must calculate Summer SHGC
-                        if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
-                            CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
-                        }
-                    }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, surfName, SHGCSummer, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, surfName, TransVisNorm, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
-                    curAzimuth = Surface(iSurf).Azimuth;
-                    // Round to two decimals, like the display in tables
-                    curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAzimuth, surfName, curAzimuth);
-                    isNorth = false;
-                    curTilt = Surface(iSurf).Tilt;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenTilt, surfName, curTilt);
-                    if ((curTilt >= 60.0) && (curTilt < 180.0)) {
-                        if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "N");
-                            isNorth = true;
-                        } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "E");
-                        } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "S");
-                        } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "W");
-                        }
-                    }
-                    curWSC = Surface(iSurf).activeWindowShadingControl;
-                    // compute totals for area weighted averages
-                    fenTotArea += windowAreaWMult;
-                    ufactArea += nomUfact * windowAreaWMult;
-                    shgcArea += SHGCSummer * windowAreaWMult;
-                    vistranArea += TransVisNorm * windowAreaWMult;
-                    if (isNorth) {
-                        fenTotAreaNorth += windowAreaWMult;
-                        ufactAreaNorth += nomUfact * windowAreaWMult;
-                        shgcAreaNorth += SHGCSummer * windowAreaWMult;
-                        vistranAreaNorth += TransVisNorm * windowAreaWMult;
-                    } else {
-                        fenTotAreaNonNorth += windowAreaWMult;
-                        ufactAreaNonNorth += nomUfact * windowAreaWMult;
-                        shgcAreaNonNorth += SHGCSummer * windowAreaWMult;
-                        vistranAreaNonNorth += TransVisNorm * windowAreaWMult;
-                    }
-                    // shading
-                    if (Surface(iSurf).HasShadeControl) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
-                        PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchWscName, surfName, state.dataSurface->WindowShadingControl(curWSC).Name);
-                        // shading report
-                        std::vector<std::string> WindowShadingTypeStr = {
-                            "No Shade",  // 0
-                            "Shade Off", // 1
-                            "Interior Shade",
-                            "Switchable Glazing",
-                            "Exterior Shade",
-                            "Exterior Screen",
-                            "Interior Blind",
-                            "Exterior Blind",
-                            "Between Glass Shade",
-                            "Between Glass Blind",
-                        };
-                        std::vector<std::string> WindowShadingControlTypeStr = {"Uncontrolled",
-                                                                                "AlwaysOn",
-                                                                                "AlwaysOff",
-                                                                                "OnIfScheduleAllows",
-                                                                                "OnIfHighSolarOnWindow",
-                                                                                "OnIfHighHorizontalSolar",
-                                                                                "OnIfHighOutdoorAirTemperature",
-                                                                                "OnIfHighZoneAirTemperature",
-                                                                                "OnIfHighZoneCooling",
-                                                                                "OnIfHighGlare",
-                                                                                "MeetDaylightIlluminanceSetpoint",
-                                                                                "OnNightIfLowOutdoorTempAndOffDay",
-                                                                                "OnNightIfLowInsideTempAndOffDay",
-                                                                                "OnNightIfHeatingAndOffDay",
-                                                                                "OnNightIfLowOutdoorTempAndOnDayIfCooling",
-                                                                                "OnNightIfHeatingAndOnDayIfCooling",
-                                                                                "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
-                                                                                "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
-                                                                                "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
-                                                                                "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
-                                                                                "OnIfHighZoneAirTempAndHighSolarOnWindow",
-                                                                                "OnIfHighZoneAirTempAndHighHorizontalSolar"};
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWscShading,
-                                         surfName,
-                                         WindowShadingTypeStr[int(state.dataSurface->WindowShadingControl(curWSC).ShadingType)]);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWscControl,
-                                         surfName,
-                                         WindowShadingControlTypeStr[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
-
-                        // output list of all possible shading contructions for shaded windows including those with storms
-                        std::string names = "";
-                        for (auto construction : Surface(iSurf).shadedConstructionList) {
-                            if (!names.empty()) names.append("; ");
-                            names.append(state.dataConstruction->Construct(construction).Name);
-                        }
-                        for (auto construction : Surface(iSurf).shadedStormWinConstructionList) {
-                            if (!names.empty()) names.append("; ");
-                            names.append(state.dataConstruction->Construct(construction).Name);
-                        }
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShadCons, surfName, names);
-
-                        if (state.dataSurface->WindowShadingControl(curWSC).GlareControlIsActive) {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "Yes");
-                        } else {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "No");
-                        }
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "No");
-                    }
-                } else if (SELECT_CASE_var == SurfaceClass::Door) {
-                    surfName = Surface(iSurf).Name;
-                    curCons = Surface(iSurf).Construction;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                    PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchDrUfactNoFilm, surfName, state.dataHeatBal->NominalU(Surface(iSurf).Construction), 3);
-                    mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrGrArea, surfName, Surface(iSurf).GrossArea * mult);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrParent, surfName, Surface(iSurf).BaseSurfName);
-                    computedNetArea(Surface(iSurf).BaseSurf) -= Surface(iSurf).GrossArea * mult;
                 }
+            } break;
+            case SurfaceClass::Window:
+            case SurfaceClass::TDD_Dome: {
+                surfName = Surface(iSurf).Name;
+                curCons = Surface(iSurf).Construction;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                zonePt = Surface(iSurf).Zone;
+                // if the construction report is requested the SummerSHGC is already calculated
+                if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
+                    SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
+                    TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
+                } else {
+                    // must calculate Summer SHGC
+                    if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
+                        CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                        state.dataConstruction->Construct(curCons).SummerSHGC = SHGCSummer;
+                        state.dataConstruction->Construct(curCons).VisTransNorm = TransVisNorm;
+                        state.dataConstruction->Construct(curCons).SolTransNorm = TransSolNorm;
+                    }
+                }
+                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                // include the frame area if present
+                windowArea = Surface(iSurf).GrossArea;
+                frameArea = 0.0;
+                dividerArea = 0.0;
+                frameDivNum = Surface(iSurf).FrameDivider;
+                if (frameDivNum != 0) {
+                    frameWidth = state.dataSurface->FrameDivider(frameDivNum).FrameWidth;
+                    frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
+                                (Surface(iSurf).Height * Surface(iSurf).Width);
+                    windowArea += frameArea;
+                    dividerArea =
+                        state.dataSurface->FrameDivider(frameDivNum).DividerWidth *
+                        (state.dataSurface->FrameDivider(frameDivNum).HorDividers * Surface(iSurf).Width +
+                         state.dataSurface->FrameDivider(frameDivNum).VertDividers * Surface(iSurf).Height -
+                         state.dataSurface->FrameDivider(frameDivNum).HorDividers * state.dataSurface->FrameDivider(frameDivNum).VertDividers *
+                             state.dataSurface->FrameDivider(frameDivNum).DividerWidth);
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchFenFrameDivName, surfName, state.dataSurface->FrameDivider(frameDivNum).Name);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchFenFrameConductance,
+                                     surfName,
+                                     state.dataSurface->FrameDivider(frameDivNum).FrameConductance,
+                                     3);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchFenDividerConductance,
+                                     surfName,
+                                     state.dataSurface->FrameDivider(frameDivNum).DividerConductance,
+                                     3);
+
+                    // report the selected NRFC product type (specific sizes) and the NFRC rating for the assembly (glass + frame + divider)
+                    std::string_view NFRCname =
+                        DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
+
+                    Real64 uValueAssembly{0.0};
+                    Real64 shgcAssembly{0.0};
+                    Real64 vtAssembly{0.0};
+
+                    GetWindowAssemblyNfrcForReport(
+                        state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueAssembly, shgcAssembly, vtAssembly);
+                    if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+                        state.dataHeatBal->NominalU(Surface(iSurf).Construction) =
+                            GetIGUUValueForNFRCReport(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
+                        SHGCSummer = GetSHGCValueForNFRCReporting(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
+                    }
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueAssembly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcAssembly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtAssembly, 3);
+
+                    // output EIO <FenestrationAssembly> for each unique combination of construction and frame/divider
+                    if (state.dataGeneral->Constructions) {
+                        consAndFrame = std::make_pair(curCons, frameDivNum);
+                        if (std::find(uniqConsFrame.begin(), uniqConsFrame.end(), consAndFrame) == uniqConsFrame.end()) {
+                            uniqConsFrame.push_back(consAndFrame);
+                            print(state.files.eio,
+                                  FenestrationAssemblyFormat,
+                                  state.dataConstruction->Construct(curCons).Name,
+                                  state.dataSurface->FrameDivider(frameDivNum).Name,
+                                  NFRCname,
+                                  uValueAssembly,
+                                  shgcAssembly,
+                                  vtAssembly);
+                        }
+                    }
+                }
+                windowAreaWMult = windowArea * mult;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenFrameAreaOf1, surfName, frameArea);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDividerAreaOf1, surfName, dividerArea);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenGlassAreaOf1, surfName, windowArea - (frameArea + dividerArea));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, surfName, windowAreaWMult);
+                computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
+                nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, surfName, nomUfact, 3);
+
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, surfName, SHGCSummer, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, surfName, TransVisNorm, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
+                curAzimuth = Surface(iSurf).Azimuth;
+                // Round to two decimals, like the display in tables
+                curAzimuth = round(curAzimuth * 100.0) / 100.0;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAzimuth, surfName, curAzimuth);
+                isNorth = false;
+                curTilt = Surface(iSurf).Tilt;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenTilt, surfName, curTilt);
+                if ((curTilt >= 60.0) && (curTilt < 180.0)) {
+                    if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "N");
+                        isNorth = true;
+                    } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "E");
+                    } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "S");
+                    } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "W");
+                    }
+                }
+
+                // Report table for every shading control state
+                const auto totalStates{Surface(iSurf).windowShadingControlList.size()};
+                if (frameDivNum != 0) {
+                    for (unsigned int i = 0; i < totalStates; ++i) {
+                        const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+
+                        const int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
+                        const auto stateUValue{GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
+                        const auto stateSHGC{GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight)};
+                        std::string const &constructionName{state.dataConstruction->Construct(stateConstrNum).Name};
+
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchFenShdFrameDiv,
+                                         constructionName,
+                                         state.dataSurface->FrameDivider(frameDivNum).Name);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdUfact, constructionName, stateUValue, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, constructionName, stateSHGC, 3);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchFenShdVisTr,
+                                         constructionName,
+                                         state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                         3);
+
+                        Real64 stateAssemblyUValue{0.0};
+                        Real64 stateAssemblySHGC{0.0};
+                        Real64 stateAssemblyVT{0.0};
+
+                        GetWindowAssemblyNfrcForReport(
+                            state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
+
+                        std::string_view NFRCname =
+                            DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
+
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, constructionName, stateAssemblyUValue, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemSHGC, constructionName, stateAssemblySHGC, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemVisTr, constructionName, stateAssemblyVT, 3);
+
+                        if (state.dataGeneral->Constructions) {
+                            if (!fenestrationShadedStateHeaderShown) {
+                                print(state.files.eio,
+                                      "{}\n",
+                                      "! <FenestrationShadedState>,Construction Name,Glass U-Factor {W/m2-K},"
+                                      "Glass SHGC, Glass Visible Transmittance, Frame and Divider Name,NFRC Product Type,"
+                                      "Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
+                                fenestrationShadedStateHeaderShown = true;
+                            }
+
+                            shdConsAndFrame = std::make_pair(stateConstrNum, frameDivNum);
+                            if (std::find(uniqShdConsFrame.begin(), uniqShdConsFrame.end(), shdConsAndFrame) == uniqShdConsFrame.end()) {
+                                uniqShdConsFrame.push_back(shdConsAndFrame);
+                                print(state.files.eio,
+                                      FenestrationShadedStateFormat,
+                                      constructionName,
+                                      stateUValue,
+                                      stateSHGC,
+                                      state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
+                                      state.dataSurface->FrameDivider(frameDivNum).Name,
+                                      NFRCname,
+                                      stateAssemblyUValue,
+                                      stateAssemblySHGC,
+                                      stateAssemblyVT);
+                            }
+                        }
+                    }
+                }
+
+                curWSC = Surface(iSurf).activeWindowShadingControl;
+                // compute totals for area weighted averages
+                fenTotArea += windowAreaWMult;
+                ufactArea += nomUfact * windowAreaWMult;
+                shgcArea += SHGCSummer * windowAreaWMult;
+                vistranArea += TransVisNorm * windowAreaWMult;
+                if (isNorth) {
+                    fenTotAreaNorth += windowAreaWMult;
+                    ufactAreaNorth += nomUfact * windowAreaWMult;
+                    shgcAreaNorth += SHGCSummer * windowAreaWMult;
+                    vistranAreaNorth += TransVisNorm * windowAreaWMult;
+                } else {
+                    fenTotAreaNonNorth += windowAreaWMult;
+                    ufactAreaNonNorth += nomUfact * windowAreaWMult;
+                    shgcAreaNonNorth += SHGCSummer * windowAreaWMult;
+                    vistranAreaNonNorth += TransVisNorm * windowAreaWMult;
+                }
+                // shading
+                if (Surface(iSurf).HasShadeControl) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, state.dataSurface->WindowShadingControl(curWSC).Name);
+                    // shading report
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWscShading,
+                                     surfName,
+                                     WindowShadingTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingType)]);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWscControl,
+                                     surfName,
+                                     WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
+
+                    // output list of all possible shading contructions for shaded windows including those with storms
+                    std::string names = "";
+                    for (auto construction : Surface(iSurf).shadedConstructionList) {
+                        if (!names.empty()) names.append("; ");
+                        names.append(state.dataConstruction->Construct(construction).Name);
+                    }
+                    for (auto construction : Surface(iSurf).shadedStormWinConstructionList) {
+                        if (!names.empty()) names.append("; ");
+                        names.append(state.dataConstruction->Construct(construction).Name);
+                    }
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShadCons, surfName, names);
+
+                    if (state.dataSurface->WindowShadingControl(curWSC).GlareControlIsActive) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "Yes");
+                    } else {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "No");
+                    }
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "No");
+                }
+            } break;
+            case SurfaceClass::Door: {
+                surfName = Surface(iSurf).Name;
+                curCons = Surface(iSurf).Construction;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchDrUfactNoFilm, surfName, state.dataHeatBal->NominalU(Surface(iSurf).Construction), 3);
+                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrParent, surfName, Surface(iSurf).BaseSurfName);
+                computedNetArea(Surface(iSurf).BaseSurf) -= Surface(iSurf).GrossArea * mult;
+            } break;
+            default:
+                break;
             }
         } else {
             // interior surfaces
@@ -1170,7 +1081,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             }
         }
         int currSurfaceClass = int(Surface(iSurf).Class);
-        assert(currSurfaceClass < int(SurfaceClass::Count));
+        assert(currSurfaceClass < int(SurfaceClass::Num));
         assert(currSurfaceClass > int(SurfaceClass::None));
         ++numSurfaces(currSurfaceClass);
         if (isExterior) {
@@ -1382,38 +1293,38 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     state.dataHeatBalSurf->SurfTempOut.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfTempInMovInsRep.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QConvInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQConvInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotConvInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotConvInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotConvInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->QRadNetSurfInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadNetSurfInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQRadNetSurfInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotRadNetSurfInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->QRadSolarInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadSolarInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadSolarInRepPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQRadSolarInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotRadSolarInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->QRadLightsInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadLightsInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQRadLightsInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotRadLightsInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->QRadIntGainsInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadIntGainsInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQRadIntGainsInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotRadIntGainsInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     state.dataHeatBalSurf->AnyRadiantSystems.dimension(state.dataSurface->TotSurfaces, false);
     state.dataHeatBalSurf->SurfQRadHVACInReport.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotRadHVACInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotRadHVACInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->QConvOutReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQConvOutReport.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotConvOutPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotConvOutRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotConvOutRep.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->QdotRadOutRep.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QdotRadOutRepPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QRadOutReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotRadOutRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQdotRadOutRepPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQRadOutReport.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->QAirExtReport.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->QHeatEmiReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQAirExtReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfQHeatEmiReport.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     state.dataHeatBal->SurfOpaqSWOutAbsTotalReport.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SurfOpaqSWOutAbsEnergyReport.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1456,12 +1367,12 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
         state.dataHeatBalSurf->SurfTempSource.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataHeatBalSurf->SurfTempUserLoc.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataHeatBalSurf->TsrcHist.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
-        state.dataHeatBalSurf->TuserHist.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
-        state.dataHeatBalSurf->QsrcHist.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
-        state.dataHeatBalSurf->TsrcHistM.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
-        state.dataHeatBalSurf->TuserHistM.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
-        state.dataHeatBalSurf->QsrcHistM.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
+        state.dataHeatBalSurf->SurfTsrcHist.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
+        state.dataHeatBalSurf->SurfTuserHist.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
+        state.dataHeatBalSurf->SurfQsrcHist.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
+        state.dataHeatBalSurf->SurfTsrcHistM.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
+        state.dataHeatBalSurf->SurfTuserHistM.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
+        state.dataHeatBalSurf->SurfQsrcHistM.dimension(state.dataSurface->TotSurfaces, Construction::MaxCTFTerms, 0.0);
     }
 
     state.dataHeatBalFanSys->RadSysTiHBConstCoef.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1513,7 +1424,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     }
     state.dataHeatBalSurf->SurfAbsSolarExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalExt.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, DataSurfaces::SurfaceRoughness::Unassigned);
+    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, DataSurfaces::SurfaceRoughness::Invalid);
     state.dataHeatBalSurf->SurfAbsSolarInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalInt.dimension(state.dataSurface->TotSurfaces, 0.0);
 
@@ -1563,7 +1474,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Heat Gain Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBalSurf->QdotConvInRep(loop),
+                            state.dataHeatBalSurf->SurfQdotConvInRep(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::State,
                             Surface(loop).Name);
@@ -1577,7 +1488,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Heat Gain Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHeatBalSurf->QConvInReport(loop),
+                            state.dataHeatBalSurf->SurfQConvInReport(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             Surface(loop).Name);
@@ -1585,7 +1496,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBalSurf->QdotRadNetSurfInRep(loop),
+                            state.dataHeatBalSurf->SurfQdotRadNetSurfInRep(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::State,
                             Surface(loop).Name);
@@ -1599,7 +1510,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHeatBalSurf->QRadNetSurfInReport(loop),
+                            state.dataHeatBalSurf->SurfQRadNetSurfInReport(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             Surface(loop).Name);
@@ -1608,21 +1519,21 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Inside Face Solar Radiation Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBalSurf->QdotRadSolarInRep(loop),
+                                state.dataHeatBalSurf->SurfQdotRadSolarInRep(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Solar Radiation Heat Gain Rate per Area",
                                 OutputProcessor::Unit::W_m2,
-                                state.dataHeatBalSurf->QdotRadSolarInRepPerArea(loop),
+                                state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Solar Radiation Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBalSurf->QRadSolarInReport(loop),
+                                state.dataHeatBalSurf->SurfQRadSolarInReport(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Surface(loop).Name);
@@ -1630,7 +1541,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Inside Face Lights Radiation Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBalSurf->QdotRadLightsInRep(loop),
+                                state.dataHeatBalSurf->SurfQdotRadLightsInRep(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
@@ -1644,7 +1555,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Inside Face Lights Radiation Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBalSurf->QRadLightsInReport(loop),
+                                state.dataHeatBalSurf->SurfQRadLightsInReport(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Surface(loop).Name);
@@ -1653,7 +1564,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Internal Gains Radiation Heat Gain Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBalSurf->QdotRadIntGainsInRep(loop),
+                            state.dataHeatBalSurf->SurfQdotRadIntGainsInRep(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::State,
                             Surface(loop).Name);
@@ -1667,7 +1578,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Internal Gains Radiation Heat Gain Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHeatBalSurf->QRadIntGainsInReport(loop),
+                            state.dataHeatBalSurf->SurfQRadIntGainsInReport(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             Surface(loop).Name);
@@ -1726,7 +1637,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBalSurf->QdotConvOutRep(loop),
+                                state.dataHeatBalSurf->SurfQdotConvOutRep(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
@@ -1740,7 +1651,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBalSurf->QConvOutReport(loop),
+                                state.dataHeatBalSurf->SurfQConvOutReport(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Surface(loop).Name);
@@ -1754,21 +1665,21 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Net Thermal Radiation Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBalSurf->QdotRadOutRep(loop),
+                                state.dataHeatBalSurf->SurfQdotRadOutRep(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
                                 OutputProcessor::Unit::W_m2,
-                                state.dataHeatBalSurf->QdotRadOutRepPerArea(loop),
+                                state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Net Thermal Radiation Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBalSurf->QRadOutReport(loop),
+                                state.dataHeatBalSurf->SurfQRadOutReport(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Surface(loop).Name);
@@ -1796,14 +1707,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Air Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBalSurf->QAirExtReport(loop),
+                                state.dataHeatBalSurf->SurfQAirExtReport(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Heat Emission to Air Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBalSurf->QHeatEmiReport(loop),
+                                state.dataHeatBalSurf->SurfQHeatEmiReport(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
@@ -2050,7 +1961,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Reference Air Index",
                             OutputProcessor::Unit::None,
-                            state.dataSurface->SurfTAirRef(loop),
+                            state.dataSurface->SurfTAirRefRpt(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
                             Surface(loop).Name);
@@ -2186,30 +2097,30 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataHeatBalSurf->SurfHGrdExt(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfTempOut(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfTempInMovInsRep(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QConvInReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotConvInRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQConvInReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotConvInRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QRadNetSurfInReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QRadSolarInReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadSolarInRep(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadSolarInRepPerArea(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QRadLightsInReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadLightsInRep(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QRadIntGainsInReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQRadNetSurfInReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotRadNetSurfInRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQRadSolarInReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotRadSolarInRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQRadLightsInReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotRadLightsInRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQRadIntGainsInReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotRadIntGainsInRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->AnyRadiantSystems(SurfNum) = false;
             state.dataHeatBalSurf->SurfQRadHVACInReport(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfQdotRadHVACInRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QConvOutReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotConvOutRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQConvOutReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotConvOutRep(SurfNum) = 0.0;
             state.dataHeatBalSurf->SurfQdotConvOutPerArea(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QRadOutReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QAirExtReport(SurfNum) = 0.0;
-            state.dataHeatBalSurf->QHeatEmiReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQRadOutReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotRadOutRep(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQAirExtReport(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfQHeatEmiReport(SurfNum) = 0.0;
         } // end of  Surf array
         int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
@@ -2276,12 +2187,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                    state.dataHeatBalSurf->TsrcHist(SurfNum, CTFTermNum) = SurfInitialTemp;
-                    state.dataHeatBalSurf->TsrcHistM(SurfNum, CTFTermNum) = SurfInitialTemp;
-                    state.dataHeatBalSurf->TuserHist(SurfNum, CTFTermNum) = SurfInitialTemp;
-                    state.dataHeatBalSurf->TuserHistM(SurfNum, CTFTermNum) = SurfInitialTemp;
-                    state.dataHeatBalSurf->QsrcHist(SurfNum, CTFTermNum) = 0.0;
-                    state.dataHeatBalSurf->QsrcHistM(SurfNum, CTFTermNum) = 0.0;
+                    state.dataHeatBalSurf->SurfTsrcHist(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->SurfTsrcHistM(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->SurfTuserHist(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->SurfTuserHistM(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->SurfQsrcHist(SurfNum, CTFTermNum) = 0.0;
+                    state.dataHeatBalSurf->SurfQsrcHistM(SurfNum, CTFTermNum) = 0.0;
                 }
             }
         }
@@ -2315,13 +2226,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
             state.dataSurface->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
         }
-
-        // Initialize Kiva convection algorithms
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
-            state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
-        }
+    }
+    // Initialize Kiva convection algorithms
+    for (auto SurfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
     }
     if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -2458,11 +2368,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
     auto &AbsDiffWinGnd = state.dataHeatBalSurfMgr->AbsDiffWinGnd;
     auto &AbsDiffWinSky = state.dataHeatBalSurfMgr->AbsDiffWinSky;
 
-    Array1D<Real64> currCosInc(state.dataSurface->TotSurfaces);      // Cosine of incidence angle of beam solar on glass
-    Array1D<Real64> currBeamSolar(state.dataSurface->TotSurfaces);   // Local variable for BeamSolarRad
-    Array1D<Real64> currSkySolarInc(state.dataSurface->TotSurfaces); // Sky diffuse solar incident on a surface
-    Array1D<Real64> currGndSolarInc(state.dataSurface->TotSurfaces); // Ground diffuse solar incident on a surface
-
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         state.dataHeatBal->ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
         state.dataHeatBal->ZoneWinHeatLossRepEnergy(zoneNum) = 0.0;
@@ -2520,7 +2425,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGainFrameDividerToZoneRep(SurfNum) = 0.0;
-            state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) = 0.0;
@@ -2529,15 +2433,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
         }
         for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
             state.dataSurface->SurfWinHeatGain(SurfNum) = 0.0;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatGainRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatLossRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
-            state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
-            state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
         }
         for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -2679,7 +2580,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
         }
 
         // TTD domes are currently not considered in the window list of a zone
-        if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+        if ((int)state.dataDaylightingDevicesData->TDDPipe.size() > 0) {
             for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
                 e.TransSolBeam = 0.0;
                 e.TransSolDiff = 0.0;
@@ -2713,15 +2614,23 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataSurface->SurfWinSysSolAbsorptance(SurfNum) = 0.0;
         }
     }
-
     if (currSolRadPositive) { // Sun is up, calculate solar quantities
         assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs,
                                 state.dataSurface->SurfReflFacBmToDiffSolObs)); // For linear indexing
         assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs,
                                 state.dataSurface->SurfReflFacBmToDiffSolGnd)); // For linear indexing
+        Real64 GndReflSolarRad = 0.0;
+        Real64 GndSolarRadInc = max(state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad, 0.0);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
-            state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround;
+            if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
+                GndReflSolarRad = GndSolarRadInc *
+                                  state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
+                Surface(SurfNum).GndReflSolarRad = GndReflSolarRad;
+            } else {
+                GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+            }
+            state.dataSurface->SurfGndSolarInc(SurfNum) = GndReflSolarRad * Surface(SurfNum).ViewFactorGround;
             state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
             state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = 0.0;
         }
@@ -2731,10 +2640,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
             Array1D<Real64>::size_type lSP = state.dataSurface->SurfReflFacBmToBmSolObs.index(state.dataGlobal->PreviousHour, 1) - 1;
             // For Complex Fenestrations:
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+
+                Real64 GndSurfReflectance = 0.0;
+                if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
+                    GndSurfReflectance =
+                        state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
+                } else {
+                    GndSurfReflectance = state.dataEnvrn->GndReflectance;
+                }
                 state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
-                state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
-                                                                   state.dataEnvrn->GndReflectance *
+                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
+                state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
                                                                    state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
                 state.dataSurface->SurfBmToBmReflFacObs(SurfNum) =
                     state.dataGlobal->WeightNow * state.dataSurface->SurfReflFacBmToBmSolObs[lSH + SurfNum] +
@@ -2750,9 +2666,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                                                                                 state.dataSurface->SurfBmToDiffReflFacObs(SurfNum)) +
                                                                state.dataEnvrn->DifSolarRad * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
                 state.dataSurface->SurfGndSolarInc(SurfNum) =
-                    state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance *
+                    state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
                         state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum) +
-                    state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
+                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
                 state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum) = state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
             }
         }
@@ -2849,8 +2765,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
         //        DifIncInsSurfIntensRep(SurfNum)
         //      DifIncInsSurfAmountRepEnergy(SurfNum) = DifIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec
         //    END DO
+
+        // Calculate Exterior Incident Short Wave (i.e. Solar) Radiation on shading surfaces
         if (state.dataSurface->BuildingShadingCount || state.dataSurface->FixedShadingCount || state.dataSurface->AttachedShadingCount) {
             for (int SurfNum = state.dataSurface->ShadingSurfaceFirst; SurfNum <= state.dataSurface->ShadingSurfaceLast; SurfNum++) {
+                Real64 GndSurfReflectance = 0.0;
+                if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
+                    GndSurfReflectance =
+                        state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
+                } else {
+                    GndSurfReflectance = state.dataEnvrn->GndReflectance;
+                }
                 // Cosine of incidence angle and solar incident on outside of surface, for reporting
                 Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
                 state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = CosInc;
@@ -2865,11 +2790,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
                 // Incident diffuse solar from beam-to-diffuse reflection from ground
                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
-                                                                              state.dataEnvrn->GndReflectance *
-                                                                              state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+                                                                              GndSurfReflectance * state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
                 // Incident diffuse solar from sky diffuse reflection from ground
                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
                 // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                 // in SkySolarInc.
                 state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
@@ -2877,98 +2801,106 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
             }
         }
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            for (int SurfNum : state.dataHeatBal->Zone(zoneNum).ZoneExtSolarSurfaceList) {
-                // Regular surface
-                currCosInc(SurfNum) = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
-                currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
-                currSkySolarInc(SurfNum) = state.dataSurface->SurfSkySolarInc(SurfNum);
-                currGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
-                // Cosine of incidence angle and solar incident on outside of surface, for reporting
-                state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = currCosInc(SurfNum);
-                // Report variables for various incident solar quantities
-                // Incident direct (unreflected) beam
-                state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) =
-                    currBeamSolar(SurfNum) * state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) *
-                    currCosInc(SurfNum);
 
-                // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
-                // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
-                state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = currGndSolarInc(SurfNum);
-                // Incident diffuse solar from beam-to-diffuse reflection from ground
-                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
-                                                                              state.dataEnvrn->GndReflectance *
-                                                                              state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+        Array1D<Real64> currBeamSolar(state.dataSurface->TotSurfaces); // Local variable for BeamSolarRad
 
-                // Incident diffuse solar from sky diffuse reflection from ground
-                state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
-                // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
-                // in SkySolarInc.
-                // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
-                // TH2 CR 9056
-                state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
-                    state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
-                    state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
+        for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
 
-                if (state.dataSurface->CalcSolRefl) {
-                    // Incident beam solar from beam-to-beam (specular) reflection from obstructions
-                    state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) =
-                        state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
-                    // Incident diffuse solar from beam-to-diffuse reflection from obstructions
-                    state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) =
-                        state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
-                    // Incident diffuse solar from sky diffuse reflection from obstructions
-                    state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum) =
-                        state.dataEnvrn->DifSolarRad * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
-                    // TH2 CR 9056: Add reflections from obstructions to the total incident
-                    state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) += state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) +
-                                                                         state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
-                                                                         state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum);
-                }
+            // Regular surface
+            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
+            // Cosine of incidence angle and solar incident on outside of surface, for reporting
+            state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) =
+                state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
+
+            // Report variables for various incident solar quantities
+            // Incident direct (unreflected) beam
+            state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) =
+                currBeamSolar(SurfNum) * state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) *
+                state.dataHeatBal->SurfCosIncidenceAngle(SurfNum);
+
+            Real64 GndSurfReflectance = 0.0;
+            if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
+                GndSurfReflectance =
+                    state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
+            } else {
+                GndSurfReflectance = state.dataEnvrn->GndReflectance;
+            }
+            // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
+            state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
+                state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
+            // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
+            state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
+            // Incident diffuse solar from beam-to-diffuse reflection from ground
+            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
+                state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance * state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+
+            // Incident diffuse solar from sky diffuse reflection from ground
+            state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
+                state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+            // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
+            // in SkySolarInc.
+            // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
+            // TH2 CR 9056
+            state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
+                state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
+                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
+
+            if (state.dataSurface->CalcSolRefl) {
+                // Incident beam solar from beam-to-beam (specular) reflection from obstructions
+                state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) =
+                    state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
+                // Incident diffuse solar from beam-to-diffuse reflection from obstructions
+                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) =
+                    state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
+                // Incident diffuse solar from sky diffuse reflection from obstructions
+                state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum) =
+                    state.dataEnvrn->DifSolarRad * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
+                // TH2 CR 9056: Add reflections from obstructions to the total incident
+                state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) += state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) +
+                                                                     state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
+                                                                     state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum);
             }
         }
-        for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+        for (int PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
             int const SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser; // TDD: Diffuser object number
             int const SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;    // TDD: DOME object number
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
             // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
             // by dividing out diffuse solar transmittance of TDD:DIFFUSER
-            currCosInc(SurfNum) = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
-            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad *
-                                     TransTDD(state, PipeNum, currCosInc(SurfNum), DataDaylightingDevices::iRadType::SolarBeam) /
+            Real64 ConInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
+
+            state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = ConInc;
+            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarBeam) /
                                      state.dataConstruction->Construct(ConstrNum).TransDiff;
 
-            currSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
-                                       TransTDD(state, PipeNum, currCosInc(SurfNum), DataDaylightingDevices::iRadType::SolarAniso) /
-                                       state.dataConstruction->Construct(ConstrNum).TransDiff;
+            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
+                                                          TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarAniso) /
+                                                          state.dataConstruction->Construct(ConstrNum).TransDiff;
 
-            currGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum2).ViewFactorGround *
-                                       state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso /
-                                       state.dataConstruction->Construct(ConstrNum).TransDiff;
+            state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum2) *
+                                                          state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso /
+                                                          state.dataConstruction->Construct(ConstrNum).TransDiff;
             // Incident direct (unreflected) beam
             state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) = currBeamSolar(SurfNum) *
                                                                     state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay,
                                                                                                       state.dataGlobal->TimeStep,
                                                                                                       SurfNum2) *
-                                                                    currCosInc(SurfNum); // NOTE: sunlit and coninc array set to SurfNum2
+                                                                    ConInc; // NOTE: sunlit and coninc array set to SurfNum2
 
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-            state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = currSkySolarInc(SurfNum);
+            state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = state.dataSurface->SurfSkySolarInc(SurfNum);
             state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
                 state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
         }
 
-        for (int ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+        for (int ShelfNum = 1; ShelfNum <= (int)state.dataDaylightingDevicesData->Shelf.size(); ++ShelfNum) {
             int SurfNum = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;       // Daylighting shelf object number
             int OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
-            currCosInc(SurfNum) = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
+            state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) =
+                state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
             currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
-            currSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             // Shelf diffuse solar radiation
             Real64 ShelfSolarRad = (state.dataEnvrn->BeamSolarRad *
                                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, OutShelfSurf) *
@@ -2976,12 +2908,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
+            Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+            if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
+                GndReflSolarRad = state.dataSurface->Surface(SurfNum).GndReflSolarRad;
+            }
             // Add all reflected solar from the outside shelf to the ground solar
             // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
-            currGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround +
-                                       ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
+            state.dataSurface->SurfGndSolarInc(SurfNum) =
+                GndReflSolarRad * Surface(SurfNum).ViewFactorGround + ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
         }
 
+        // Calculate Exterior and Interior Absorbed Short Wave Radiation
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
@@ -2990,12 +2927,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 if (Surface(SurfNum).ExtSolar) {
                     Real64 AbsExt =
                         state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum); // Absorptivity of outer most layer (or movable insulation if present)
-                    state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) = state.dataSurface->SurfOpaqAO(SurfNum) * state.dataEnvrn->BeamSolarRad +
-                                                                           AbsExt * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum));
-                    state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) =
-                        state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
-                    state.dataHeatBal->SurfOpaqSWOutAbsEnergyReport(SurfNum) =
-                        state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                    state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) =
+                        state.dataSurface->SurfOpaqAO(SurfNum) * state.dataEnvrn->BeamSolarRad +
+                        AbsExt * (state.dataSurface->SurfSkySolarInc(SurfNum) + state.dataSurface->SurfGndSolarInc(SurfNum));
                 }
                 if (ConstrNum > 0) {
                     int SurfSolIncPtr = SurfaceScheduledSolarInc(state, SurfNum, ConstrNum);
@@ -3028,10 +2962,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 if (Surface(SurfNum).ExtSolar || state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                     // Exclude special shading surfaces which required SurfOpaqQRadSWOut calculations above
                     int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
-                    Real64 CosInc = currCosInc(SurfNum);           // Cosine of incidence angle of beam solar on glass
-                    Real64 BeamSolar = currBeamSolar(SurfNum);     // Local variable for BeamSolarRad
-                    Real64 SkySolarInc = currSkySolarInc(SurfNum); // Sky diffuse solar incident on a surface
-                    Real64 GndSolarInc = currGndSolarInc(SurfNum); // Ground diffuse solar incident on a surface
+                    Real64 CosInc = state.dataHeatBal->SurfCosIncidenceAngle(SurfNum); // Cosine of incidence angle of beam solar on glass
+                    Real64 BeamSolar = currBeamSolar(SurfNum);                         // Local variable for BeamSolarRad
+                    Real64 SkySolarInc = state.dataSurface->SurfSkySolarInc(SurfNum);  // Sky diffuse solar incident on a surface
+                    Real64 GndSolarInc = state.dataSurface->SurfGndSolarInc(SurfNum);  // Ground diffuse solar incident on a surface
 
                     WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
@@ -3371,7 +3305,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         // DivProjIn will be zero in this case.)
                         if (DivArea > 0.0) {                                                         // Solar absorbed by window divider
                             Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                            if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                            if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                                 // Suspended (between-glass) divider; account for effect glass on outside of divider
                                 // (note that outside and inside projection for this type of divider are both zero)
                                 int MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(1); // Outer glass layer material number
@@ -3523,20 +3457,100 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 } // Surface(SurfNum)%ExtSolar
             }     // end of surface window loop
         }         // end of zone loop
-        for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+        for (int PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
             int const SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome; // TDD: DOME object number
             int const ConstrNum = Surface(SurfNum).Construction;
             int const TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                 AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay);
-                state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = AbsDiffWin(Lay) * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum)) +
-                                                                       state.dataSurface->SurfWinA(SurfNum, Lay) * currBeamSolar(SurfNum);
+                state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
+                    AbsDiffWin(Lay) * (state.dataSurface->SurfSkySolarInc(SurfNum) + state.dataSurface->SurfGndSolarInc(SurfNum)) +
+                    state.dataSurface->SurfWinA(SurfNum, Lay) * currBeamSolar(SurfNum);
                 state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
                     state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay);
                 state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
                     state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+            }
+        }
+
+        // Average absorbed solar for representative surfaces
+        if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                int firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+                for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+                    auto &surface(state.dataSurface->Surface(surfNum));
+                    if (surface.ConstituentSurfaceNums.size() > 1) {
+                        Real64 QoutAtot = 0.0;
+                        Real64 QinAtot = 0.0;
+                        Real64 Atot = 0.0;
+                        for (auto constSurfNum : surface.ConstituentSurfaceNums) {
+                            QoutAtot += state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(constSurfNum) * state.dataSurface->Surface(constSurfNum).Area;
+                            QinAtot += state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(constSurfNum) * state.dataSurface->Surface(constSurfNum).Area;
+                            Atot += state.dataSurface->Surface(constSurfNum).Area;
+                        }
+
+                        state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(surfNum) = QoutAtot / Atot;
+                        state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) = QinAtot / Atot;
+                    }
+                }
+                firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+                lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+                for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+                    auto &surface(state.dataSurface->Surface(surfNum));
+                    if (surface.ExtSolar && surface.ConstituentSurfaceNums.size() > 1) {
+                        auto &surface(state.dataSurface->Surface(surfNum));
+
+                        // Absorbed in glazing
+                        int totalGlassLayers = state.dataConstruction->Construct(state.dataSurface->SurfActiveConstruction(surfNum)).TotGlassLayers;
+                        for (int layer = 1; layer <= totalGlassLayers; ++layer) {
+                            Real64 QAtot = 0.0;
+                            Real64 Atot = 0.0;
+                            for (auto constSurfNum : surface.ConstituentSurfaceNums) {
+                                QAtot += state.dataHeatBal->SurfWinQRadSWwinAbs(constSurfNum, layer) * state.dataSurface->Surface(constSurfNum).Area;
+                                Atot += state.dataSurface->Surface(constSurfNum).Area;
+                            }
+
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(surfNum, layer) = QAtot / Atot;
+                        }
+
+                        // Absorbed by frame and dividers
+                        if (surface.FrameDivider > 0) {
+                            if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
+                                Real64 QoutAtot = 0.0;
+                                Real64 QinAtot = 0.0;
+                                Real64 Atot = 0.0;
+                                for (auto constSurfNum : surface.ConstituentSurfaceNums) {
+                                    QoutAtot +=
+                                        state.dataSurface->SurfWinFrameQRadOutAbs(constSurfNum) * state.dataSurface->SurfWinFrameArea(constSurfNum);
+                                    QinAtot +=
+                                        state.dataSurface->SurfWinFrameQRadInAbs(constSurfNum) * state.dataSurface->SurfWinFrameArea(constSurfNum);
+                                    Atot += state.dataSurface->SurfWinFrameArea(constSurfNum);
+                                }
+
+                                state.dataSurface->SurfWinFrameQRadOutAbs(surfNum) = QoutAtot / Atot;
+                                state.dataSurface->SurfWinFrameQRadInAbs(surfNum) = QinAtot / Atot;
+                            }
+                            if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0) {
+                                Real64 QoutAtot = 0.0;
+                                Real64 QinAtot = 0.0;
+                                Real64 Atot = 0.0;
+                                for (auto constSurfNum : surface.ConstituentSurfaceNums) {
+                                    QoutAtot += state.dataSurface->SurfWinDividerQRadOutAbs(constSurfNum) *
+                                                state.dataSurface->SurfWinDividerArea(constSurfNum);
+                                    QinAtot += state.dataSurface->SurfWinDividerQRadInAbs(constSurfNum) *
+                                               state.dataSurface->SurfWinDividerArea(constSurfNum);
+                                    Atot += state.dataSurface->SurfWinDividerArea(constSurfNum);
+                                }
+
+                                state.dataSurface->SurfWinDividerQRadOutAbs(surfNum) = QoutAtot / Atot;
+                                state.dataSurface->SurfWinDividerQRadInAbs(surfNum) = QinAtot / Atot;
+                            }
+                        }
+                    }
+                }
             }
         }
     } // End of sun-up check
@@ -3677,20 +3691,10 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) *
                     ((state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +
                      (1 - state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar));
-                state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) =
-                    state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
-                state.dataHeatBal->SurfOpaqSWOutAbsEnergyReport(SurfNum) =
-                    state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
             // RJH 08/30/07 - Add SurfWinInitialDifSolInAbs, SurfWinInitialDifSolwinAbs, and SurfWinInitialDifSolAbsByShade
             // calced in CalcWinTransDifSolInitialDistribution to SurfOpaqQRadSWInAbs, SurfWinQRadSWwinAbs, and SurfWinIntSWAbsByShade here
             state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) += state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs(SurfNum);
-            // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
-            state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) =
-                state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs(SurfNum) * Surface(SurfNum).Area;
-            // Total Shortwave Radiation Absorbed on Inside of Surface[W]
-            state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) * Surface(SurfNum).Area;
-
         } // end of opaque
 
         int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
@@ -3816,7 +3820,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {                     // Window has dividers
                     Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum);    // Window divider thermal absorptance
                     Real64 DividerSolAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                    if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {          // Suspended divider; account for inside glass
+                    if (state.dataSurface->SurfWinDividerType(SurfNum) ==
+                        DataSurfaces::FrameDividerType::Suspended) { // Suspended divider; account for inside glass
                         Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                             state.dataConstruction->Construct(ConstrNum).TotLayers);   // Glass layer material number
                         Real64 TransGl = state.dataMaterial->Material(MatNumGl).Trans; // Glass layer solar transmittance, reflectance, absorptance
@@ -3956,74 +3961,6 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 }
             }
 
-            // report variables for surface absorbed short wave radiation
-            state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) = 0.0;
-            state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) = 0.0;
-            state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
-            state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) = 0.0;
-            state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) +=
-                state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * Surface(SurfNum).Area;
-            if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
-                int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
-                int TotGlassLayers;
-                if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
-                    TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
-                } else {
-                    TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
-                }
-                WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-                if (NOT_SHADED(ShadeFlag) || state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // No window shading
-                    for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                        // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
-                        state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                        // Total Shortwave Radiation Absorbed on Inside of Surface[W]
-                        state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                        // Total Shortwave Absorbed:All Glass Layers[W]
-                        state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                    }
-                } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
-                    for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
-                        // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
-                        state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                        // Total Shortwave Radiation Absorbed on Inside of Surface[W]
-                        state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                        // Total Shortwave Absorbed:All Glass Layers[W]
-                        state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                    }
-                } else {
-                    // Interior, exterior or between-glass shade, screen or blind in place
-                    for (int IGlass = 1; IGlass <= state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers; ++IGlass) {
-                        // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
-                        state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                        // Total Shortwave Radiation Absorbed on Inside of Surface[W]
-                        state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                        // Total Shortwave Absorbed:All Glass Layers[W]
-                        state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) * Surface(SurfNum).Area;
-                    }
-                }    // End of shading flag check
-            } else { // IF (SurfaceWindow(SurfNum)%WindowModelType == WindowEQLModel) THEN
-                int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
-                for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
-                    // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
-                    state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) +=
-                        state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
-                    // Total Shortwave Radiation Absorbed on Inside of Surface[W]
-                    state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) +=
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
-                    // Total Shortwave Absorbed:All solid Layers[W]
-                    state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) +=
-                        state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
-                }
-            }
         } // End of window
     }
     DistributeTDDAbsorbedSolar(state);
@@ -4115,7 +4052,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                 Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
                 // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
-                if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended)
+                if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended)
                     DividerThermAbs = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     // Interior shade or blind in place
@@ -4292,7 +4229,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                                 (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum));
                     if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                         Real64 DividerAbs = state.dataSurface->SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
-                        if (state.dataSurface->SurfWinDividerType(SurfNum) == Suspended) {
+                        if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended) {
                             // Suspended (between-glass) divider: account for glass on inside of divider
                             Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
                                 state.dataConstruction->Construct(ConstrNum).TotLayers); // Glass material number
@@ -4380,8 +4317,8 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
         if (Surface(SurfNum).ExtBoundCond == SurfNum) continue;
         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff <= 0.0) continue;
 
-        int surfZoneNum = Surface(SurfNum).Zone;
-        if (!state.dataHeatBal->Zone(surfZoneNum).HasInterZoneWindow) continue;
+        int surfEnclNum = Surface(SurfNum).SolarEnclIndex;
+        if (!state.dataViewFactor->EnclSolInfo(surfEnclNum).HasInterZoneWindow) continue;
         int NZ = Surface(SurfNum).SolarEnclIndex;
         int MZ = Surface(Surface(SurfNum).ExtBoundCond).SolarEnclIndex;
         state.dataHeatBalSurf->ZoneFractDifShortZtoZ(NZ, MZ) +=
@@ -4608,8 +4545,8 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                 if (!state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum)) {
                     // check if constructions appear compatible
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF ||
+                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
                         // compare old construction to new construction and see if terms match
                         // set as okay and turn false if find a big problem
                         state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
@@ -4682,7 +4619,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                             Surface(SurfNum).Construction = state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum);
                         }
 
-                    } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+                    } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
                         state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
                             true;
                         state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
@@ -4735,7 +4672,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                             Surface(SurfNum).Construction = state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum);
                         }
 
-                    } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) { // don't allow
+                    } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) { // don't allow
                         ShowSevereError(state,
                                         "InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer "
                                         "algorithm CombinedHeatAndMoistureFiniteElement.");
@@ -4747,7 +4684,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                         state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
                             false;
 
-                    } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::Kiva) { // don't allow
+                    } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) { // don't allow
                         ShowSevereError(state,
                                         "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with "
                                         "Foundation Outside Boundary Condition.");
@@ -4808,12 +4745,16 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
         }
     }
 
+    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+        UpdateNonRepresentativeSurfaceResults(state, ZoneToResimulate);
+    }
+
     // Set normalized properties used for reporting
 
-    // Heat transfer surfaces
+    // Opaque or window surfaces (Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.)
     for (int zoneNum = firstZone; zoneNum <= lastZone; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
-        int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast; // Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.
+        int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) =
                 -state.dataHeatBalSurf->SurfHConvInt(surfNum) *
@@ -4825,8 +4766,164 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-            state.dataHeatBalSurf->QdotRadSolarInRepPerArea(surfNum) =
+            state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) =
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum);
+        }
+    }
+    // Inside face conduction calculation for Kiva surfaces
+    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) =
+            -(state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
+              state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum));
+    }
+}
+
+void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
+{
+    int firstZone = 1;
+    int lastZone = state.dataGlobal->NumOfZones;
+
+    if (present(ZoneToResimulate)) {
+        firstZone = ZoneToResimulate;
+        lastZone = ZoneToResimulate;
+    }
+
+    for (int zoneNum = firstZone; zoneNum <= lastZone; ++zoneNum) {
+        // Heat transfer surfaces
+        int firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+        int lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            auto &surface(state.dataSurface->Surface(surfNum));
+            int repSurfNum = surface.RepresentativeCalcSurfNum;
+
+            if (surfNum != repSurfNum) {
+#if 0
+                // Check for divergence
+                Real64 surfConv = -state.dataHeatBalSurf->SurfHConvInt(surfNum) *
+                                  (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum));
+                Real64 repSurfConv = -state.dataHeatBalSurf->SurfHConvInt(repSurfNum) *
+                                     (state.dataHeatBalSurf->SurfTempIn(repSurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(repSurfNum));
+                Real64 diff = surfConv - repSurfConv;
+                if (std::abs(diff) > 3.0 && state.dataSurface->Surface(repSurfNum).ConstituentSurfaceNums.size() == 2) {
+                    ShowWarningError(state, format("Difference in representative surface convection {:.3R} W/m2", diff));
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state, format("  Original Surface: {}", surface.Name));
+                    ShowContinueError(state, format("    Inside surface temperature: {:.3R} C", state.dataHeatBalSurf->SurfTempIn(surfNum)));
+                    ShowContinueError(state,
+                                      format("    Inside convection coefficient: {:.3R} W/m2-K", state.dataHeatBalSurf->SurfHConvInt(surfNum)));
+                    ShowContinueError(state,
+                                      format("    Sunlit fraction: {:.3R}",
+                                             state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, surfNum)));
+                    ShowContinueError(state, format("    Outside absorbed solar: {:.3R} W/m2", state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(surfNum)));
+                    ShowContinueError(state,
+                                      format("    Outside long wave radiation: {:.3R} W/m2", state.dataHeatBalSurf->QdotRadOutRepPerArea(surfNum)));
+                    ShowContinueError(state, format("  Representative Surface: {}", state.dataSurface->Surface(repSurfNum).Name));
+                    ShowContinueError(state, format("    Inside surface temperature: {:.3R} C", state.dataHeatBalSurf->SurfTempIn(repSurfNum)));
+                    ShowContinueError(state,
+                                      format("    Inside convection coefficient: {:.3R} W/m2-K", state.dataHeatBalSurf->SurfHConvInt(repSurfNum)));
+                    ShowContinueError(state,
+                                      format("    Sunlit fraction: {:.3R}",
+                                             state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, repSurfNum)));
+                    ShowContinueError(state,
+                                      format("    Outside absorbed solar: {:.3R} W/m2", state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(repSurfNum)));
+                    ShowContinueError(
+                        state, format("    Outside long wave radiation: {:.3R} W/m2", state.dataHeatBalSurf->QdotRadOutRepPerArea(repSurfNum)));
+                }
+#endif
+
+                // Surface Heat Balance Arrays
+                state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempIn(repSurfNum);
+                state.dataHeatBalSurf->SurfTempOut(surfNum) = state.dataHeatBalSurf->SurfTempOut(repSurfNum);
+                state.dataHeatBal->SurfTempEffBulkAir(surfNum) = state.dataHeatBal->SurfTempEffBulkAir(repSurfNum);
+                state.dataHeatBalSurf->SurfHConvInt(surfNum) = state.dataHeatBalSurf->SurfHConvInt(repSurfNum);
+                state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) = state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(repSurfNum);
+                state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) = state.dataHeatBal->SurfQdotRadIntGainsInPerArea(repSurfNum);
+                state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) = state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(repSurfNum);
+
+                state.dataHeatBalSurf->SurfQdotConvOutPerArea(surfNum) = state.dataHeatBalSurf->SurfQdotConvOutPerArea(repSurfNum);
+                state.dataHeatBalSurf->SurfHcExt(surfNum) = state.dataHeatBalSurf->SurfHcExt(repSurfNum);
+                state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(surfNum) = state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(repSurfNum);
+                state.dataHeatBalSurf->SurfHAirExt(surfNum) = state.dataHeatBalSurf->SurfHAirExt(repSurfNum);
+                state.dataHeatBalSurf->SurfHSkyExt(surfNum) = state.dataHeatBalSurf->SurfHSkyExt(repSurfNum);
+                state.dataHeatBalSurf->SurfHGrdExt(surfNum) = state.dataHeatBalSurf->SurfHGrdExt(repSurfNum);
+
+                state.dataSurface->SurfTAirRef(surfNum) = state.dataSurface->SurfTAirRef(repSurfNum);
+                if (state.dataSurface->SurfTAirRef(surfNum) != DataSurfaces::RefAirTemp::Invalid) {
+                    state.dataSurface->SurfTAirRefRpt(surfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(surfNum)];
+                }
+
+                state.dataSurface->SurfOutConvHfModelEq(surfNum) = state.dataSurface->SurfOutConvHfModelEq(repSurfNum);
+                state.dataSurface->SurfOutConvHnModelEq(surfNum) = state.dataSurface->SurfOutConvHnModelEq(repSurfNum);
+
+                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) = state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(repSurfNum);
+                state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(surfNum) =
+                    state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(repSurfNum);
+
+                // Internal (non reporting variables)
+                state.dataHeatBalSurf->SurfTempInTmp(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(repSurfNum);
+                state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = state.dataHeatBalSurfMgr->RefAirTemp(repSurfNum);
+            }
+        }
+
+        // Opaque surfaces
+        firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+        lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            auto &surface(state.dataSurface->Surface(surfNum));
+            int repSurfNum = surface.RepresentativeCalcSurfNum;
+
+            if (surfNum != repSurfNum) {
+                // Surface Heat Balance Arrays
+                state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum) = state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(repSurfNum);
+                state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(repSurfNum);
+                state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(repSurfNum);
+            }
+        }
+
+        // Window surfaces
+        firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+        lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            auto &surface(state.dataSurface->Surface(surfNum));
+            int repSurfNum = surface.RepresentativeCalcSurfNum;
+
+            if (surfNum != repSurfNum) {
+                auto areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
+
+                // Glazing
+                state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainConvGlazToZoneRep(repSurfNum) * areaRatio;
+                state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainIRGlazToZoneRep(repSurfNum) * areaRatio;
+
+                // Frame
+                Real64 frameHeatGain = 0.0;
+                if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
+                    auto frameAreaRatio = state.dataSurface->SurfWinFrameArea(surfNum) / state.dataSurface->SurfWinFrameArea(repSurfNum);
+                    state.dataSurface->SurfWinFrameHeatGain(surfNum) = state.dataSurface->SurfWinFrameHeatGain(repSurfNum) * frameAreaRatio;
+                    state.dataSurface->SurfWinFrameHeatLoss(surfNum) = state.dataSurface->SurfWinFrameHeatLoss(repSurfNum) * frameAreaRatio;
+                    state.dataSurface->SurfWinFrameTempIn(surfNum) = state.dataSurface->SurfWinFrameTempIn(repSurfNum);
+                    state.dataSurface->SurfWinFrameTempSurfOut(surfNum) = state.dataSurface->SurfWinFrameTempSurfOut(repSurfNum);
+                    frameHeatGain = state.dataSurface->SurfWinFrameHeatGain(surfNum) - state.dataSurface->SurfWinFrameHeatLoss(surfNum);
+                }
+
+                // Divider
+                Real64 dividerHeatGain = 0.0;
+                if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0) {
+                    auto dividerAreaRatio = state.dataSurface->SurfWinDividerArea(surfNum) / state.dataSurface->SurfWinDividerArea(repSurfNum);
+                    state.dataSurface->SurfWinDividerHeatGain(surfNum) = state.dataSurface->SurfWinDividerHeatGain(repSurfNum) * dividerAreaRatio;
+                    state.dataSurface->SurfWinDividerHeatLoss(surfNum) = state.dataSurface->SurfWinDividerHeatLoss(repSurfNum) * dividerAreaRatio;
+                    state.dataSurface->SurfWinDividerTempIn(surfNum) = state.dataSurface->SurfWinDividerTempIn(repSurfNum);
+                    state.dataSurface->SurfWinDividerTempSurfOut(surfNum) = state.dataSurface->SurfWinDividerTempSurfOut(repSurfNum);
+                    dividerHeatGain = state.dataSurface->SurfWinDividerHeatGain(surfNum) - state.dataSurface->SurfWinDividerHeatLoss(surfNum);
+                }
+
+                state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = frameHeatGain + dividerHeatGain;
+
+                // Whole window
+                state.dataSurface->SurfWinHeatGain(surfNum) =
+                    (state.dataSurface->SurfWinHeatGain(repSurfNum) - state.dataSurface->SurfWinGainFrameDividerToZoneRep(repSurfNum) * areaRatio) +
+                    state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum);
+            }
         }
     }
 }
@@ -4934,8 +5031,8 @@ void UpdateThermalHistories(EnergyPlusData &state)
             // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
             auto const &surface(Surface(SurfNum));
 
-            if ((surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) &&
-                (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD))
+            if ((surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) &&
+                (surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD))
                 continue;
 
             int const ConstrNum(surface.Construction);
@@ -4959,7 +5056,7 @@ void UpdateThermalHistories(EnergyPlusData &state)
             // surface.Class == SurfaceClass::IntMass || surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) checks are
             // reduncant.
             if (construct.SourceSinkPresent) {
-                SurfInsideFluxHistCurr += state.dataHeatBalSurf->QsrcHist(SurfNum, 1) * construct.CTFSourceIn(0);
+                SurfInsideFluxHistCurr += state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) * construct.CTFSourceIn(0);
             }
             state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) = surface.Area * SurfInsideFluxHistCurr;
             state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = SurfInsideFluxHistCurr; // for reporting
@@ -4967,12 +5064,13 @@ void UpdateThermalHistories(EnergyPlusData &state)
 
             // Update the temperature at the source/sink location (if one is present)
             if (construct.SourceSinkPresent) {
-                state.dataHeatBalSurf->SurfTempSource(SurfNum) = state.dataHeatBalSurf->TsrcHist(SurfNum, 1) =
+                state.dataHeatBalSurf->SurfTempSource(SurfNum) = state.dataHeatBalSurf->SurfTsrcHist(SurfNum, 1) =
                     SurfOutsideTempCurr * construct.CTFTSourceOut(0) + state.dataHeatBalSurf->SurfTempIn(SurfNum) * construct.CTFTSourceIn(0) +
-                    state.dataHeatBalSurf->QsrcHist(SurfNum, 1) * construct.CTFTSourceQ(0) + state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                state.dataHeatBalSurf->SurfTempUserLoc(SurfNum) = state.dataHeatBalSurf->TuserHist(SurfNum, 1) =
+                    state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) * construct.CTFTSourceQ(0) + state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
+                state.dataHeatBalSurf->SurfTempUserLoc(SurfNum) = state.dataHeatBalSurf->SurfTuserHist(SurfNum, 1) =
                     SurfOutsideTempCurr * construct.CTFTUserOut(0) + state.dataHeatBalSurf->SurfTempIn(SurfNum) * construct.CTFTUserIn(0) +
-                    state.dataHeatBalSurf->QsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) + state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum);
+                    state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) +
+                    state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum);
             }
 
             if (surface.ExtBoundCond > 0) continue; // Don't need to evaluate outside for partitions
@@ -4981,7 +5079,7 @@ void UpdateThermalHistories(EnergyPlusData &state)
             if (construct.SourceSinkPresent) {
                 state.dataHeatBalSurf->SurfOutsideFluxHist(1)(SurfNum) =
                     SurfOutsideTempCurr * construct.CTFOutside(0) - state.dataHeatBalSurf->SurfTempIn(SurfNum) * construct.CTFCross(0) +
-                    state.dataHeatBalSurf->QsrcHist(SurfNum, 1) * construct.CTFSourceOut(0) +
+                    state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) * construct.CTFSourceOut(0) +
                     state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum); // Heat source/sink term for radiant systems
             } else {
                 state.dataHeatBalSurf->SurfOutsideFluxHist(1)(SurfNum) = SurfOutsideTempCurr * construct.CTFOutside(0) -
@@ -5025,8 +5123,8 @@ void UpdateThermalHistories(EnergyPlusData &state)
         int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
         for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
             // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
-            if ((Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) &&
-                (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD))
+            if ((Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) &&
+                (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD))
                 continue;
             if (state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) == 0) { // First time step in a block for a surface, update arrays
                 state.dataHeatBalSurfMgr->TempExt1(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
@@ -5043,13 +5141,13 @@ void UpdateThermalHistories(EnergyPlusData &state)
             int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
-                if ((Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) &&
-                    (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD))
+                if ((Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) &&
+                    (Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD))
                     continue;
                 if (state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) == 0) { // First time step in a block for a surface, update arrays
-                    state.dataHeatBalSurfMgr->Tsrc1(SurfNum) = state.dataHeatBalSurf->TsrcHist(SurfNum, 1);
-                    state.dataHeatBalSurfMgr->Tuser1(SurfNum) = state.dataHeatBalSurf->TuserHist(SurfNum, 1);
-                    state.dataHeatBalSurfMgr->Qsrc1(SurfNum) = state.dataHeatBalSurf->QsrcHist(SurfNum, 1);
+                    state.dataHeatBalSurfMgr->Tsrc1(SurfNum) = state.dataHeatBalSurf->SurfTsrcHist(SurfNum, 1);
+                    state.dataHeatBalSurfMgr->Tuser1(SurfNum) = state.dataHeatBalSurf->SurfTuserHist(SurfNum, 1);
+                    state.dataHeatBalSurfMgr->Qsrc1(SurfNum) = state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1);
                 }
             }
         } // ...end of loop over all (heat transfer) surfaces...
@@ -5063,8 +5161,8 @@ void UpdateThermalHistories(EnergyPlusData &state)
         for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
             auto const &surface(Surface(SurfNum));
 
-            if ((surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) &&
-                (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD))
+            if ((surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) &&
+                (surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD))
                 continue;
 
             int const ConstrNum(surface.Construction);
@@ -5155,62 +5253,68 @@ void UpdateThermalHistories(EnergyPlusData &state)
                 int const ConstrNum(surface.Construction);
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
                 if (!construct.SourceSinkPresent) continue;
-                if ((surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) &&
-                    (surface.HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD))
+                if ((surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) &&
+                    (surface.HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD))
                     continue;
 
                 if (state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) == 0) { // First time step in a block for a surface, update arrays
                     if (construct.NumCTFTerms > 1) {
                         int const numCTFTerms(construct.NumCTFTerms);
-                        auto m(state.dataHeatBalSurf->TsrcHistM.index(SurfNum, numCTFTerms));
+                        auto m(state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms));
                         auto m1(m + 1);
                         for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing
-                            // TsrcHist( SurfNum, HistTerm ) = TsrcHistM( SurfNum, HHistTerm ) = TsrcHistM( SurfNum, HistTermNum - 1 );
-                            // QsrcHist( SurfNum, HistTerm ) = QsrcHistM( SurfNum, HHistTerm ) = QsrcHistM( SurfNum, HistTermNum - 1 );
-                            state.dataHeatBalSurf->TsrcHist[m1] = state.dataHeatBalSurf->TsrcHistM[m1] = state.dataHeatBalSurf->TsrcHistM[m];
-                            state.dataHeatBalSurf->QsrcHist[m1] = state.dataHeatBalSurf->QsrcHistM[m1] = state.dataHeatBalSurf->QsrcHistM[m];
-                            state.dataHeatBalSurf->TuserHist[m1] = state.dataHeatBalSurf->TuserHistM[m1] = state.dataHeatBalSurf->TuserHistM[m];
+                            // SurfTsrcHist( SurfNum, HistTerm ) = SurfTsrcHistM( SurfNum, HHistTerm ) = SurfTsrcHistM( SurfNum, HistTermNum - 1 );
+                            // SurfQsrcHist( SurfNum, HistTerm ) = SurfQsrcHistM( SurfNum, HHistTerm ) = SurfQsrcHistM( SurfNum, HistTermNum - 1 );
+                            state.dataHeatBalSurf->SurfTsrcHist[m1] = state.dataHeatBalSurf->SurfTsrcHistM[m1] =
+                                state.dataHeatBalSurf->SurfTsrcHistM[m];
+                            state.dataHeatBalSurf->SurfQsrcHist[m1] = state.dataHeatBalSurf->SurfQsrcHistM[m1] =
+                                state.dataHeatBalSurf->SurfQsrcHistM[m];
+                            state.dataHeatBalSurf->SurfTuserHist[m1] = state.dataHeatBalSurf->SurfTuserHistM[m1] =
+                                state.dataHeatBalSurf->SurfTuserHistM[m];
                         }
                     }
-                    state.dataHeatBalSurf->TsrcHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Tsrc1(SurfNum);
-                    state.dataHeatBalSurf->TuserHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Tuser1(SurfNum);
-                    state.dataHeatBalSurf->QsrcHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Qsrc1(SurfNum);
-                    state.dataHeatBalSurf->TsrcHist(SurfNum, 2) = state.dataHeatBalSurf->TsrcHistM(SurfNum, 2);
-                    state.dataHeatBalSurf->TuserHist(SurfNum, 2) = state.dataHeatBalSurf->TuserHistM(SurfNum, 2);
-                    state.dataHeatBalSurf->QsrcHist(SurfNum, 2) = state.dataHeatBalSurf->QsrcHistM(SurfNum, 2);
+                    state.dataHeatBalSurf->SurfTsrcHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Tsrc1(SurfNum);
+                    state.dataHeatBalSurf->SurfTuserHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Tuser1(SurfNum);
+                    state.dataHeatBalSurf->SurfQsrcHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Qsrc1(SurfNum);
+                    state.dataHeatBalSurf->SurfTsrcHist(SurfNum, 2) = state.dataHeatBalSurf->SurfTsrcHistM(SurfNum, 2);
+                    state.dataHeatBalSurf->SurfTuserHist(SurfNum, 2) = state.dataHeatBalSurf->SurfTuserHistM(SurfNum, 2);
+                    state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 2) = state.dataHeatBalSurf->SurfQsrcHistM(SurfNum, 2);
                 } else {
                     Real64 const sum_steps(state.dataHeatBalSurfMgr->SumTime(SurfNum) / construct.CTFTimeStep);
 
                     if (construct.NumCTFTerms > 1) {
                         int const numCTFTerms(construct.NumCTFTerms);
-                        auto m(state.dataHeatBalSurf->TsrcHistM.index(SurfNum, numCTFTerms));
+                        auto m(state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms));
                         auto m1(m + 1);
                         for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing [ l ] == ()
-                            // Real64 const TsrcHistM_elem( TsrcHistM( SurfNum, HistTermNum ) );
-                            // TsrcHist( SurfNum, HistTermNum ) = TsrcHistM_elem - ( TsrcHistM_elem - TsrcHistM( SurfNum, HistTermNum - 1 ) ) *
-                            // sum_steps;  Real64 const QsrcHistM_elem( QsrcHistM( SurfNum, HistTermNum ) );  QsrcHist( SurfNum, HistTermNum ) =
-                            // QsrcHistM_elem - ( QsrcHistM_elem - QsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
-                            Real64 const TsrcHistM_m1(state.dataHeatBalSurf->TsrcHistM[m1]);
-                            state.dataHeatBalSurf->TsrcHist[m1] = TsrcHistM_m1 - (TsrcHistM_m1 - state.dataHeatBalSurf->TsrcHistM[m]) * sum_steps;
-                            Real64 const QsrcHistM_m1(state.dataHeatBalSurf->QsrcHistM[m1]);
-                            state.dataHeatBalSurf->QsrcHist[m1] = QsrcHistM_m1 - (QsrcHistM_m1 - state.dataHeatBalSurf->QsrcHistM[m]) * sum_steps;
-                            Real64 const TuserHistM_m1(state.dataHeatBalSurf->TuserHistM[m1]);
-                            state.dataHeatBalSurf->TuserHist[m1] = TuserHistM_m1 - (TuserHistM_m1 - state.dataHeatBalSurf->TuserHistM[m]) * sum_steps;
+                            // Real64 const SurfTsrcHistM_elem( SurfTsrcHistM( SurfNum, HistTermNum ) );
+                            // SurfTsrcHist( SurfNum, HistTermNum ) = SurfTsrcHistM_elem - ( SurfTsrcHistM_elem - SurfTsrcHistM( SurfNum, HistTermNum
+                            // - 1 ) ) * sum_steps;  Real64 const QsrcHistM_elem( SurfQsrcHistM( SurfNum, HistTermNum ) );  SurfQsrcHist( SurfNum,
+                            // HistTermNum ) = QsrcHistM_elem - ( QsrcHistM_elem - SurfQsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
+                            Real64 const TsrcHistM_m1(state.dataHeatBalSurf->SurfTsrcHistM[m1]);
+                            state.dataHeatBalSurf->SurfTsrcHist[m1] =
+                                TsrcHistM_m1 - (TsrcHistM_m1 - state.dataHeatBalSurf->SurfTsrcHistM[m]) * sum_steps;
+                            Real64 const QsrcHistM_m1(state.dataHeatBalSurf->SurfQsrcHistM[m1]);
+                            state.dataHeatBalSurf->SurfQsrcHist[m1] =
+                                QsrcHistM_m1 - (QsrcHistM_m1 - state.dataHeatBalSurf->SurfQsrcHistM[m]) * sum_steps;
+                            Real64 const TuserHistM_m1(state.dataHeatBalSurf->SurfTuserHistM[m1]);
+                            state.dataHeatBalSurf->SurfTuserHist[m1] =
+                                TuserHistM_m1 - (TuserHistM_m1 - state.dataHeatBalSurf->SurfTuserHistM[m]) * sum_steps;
                         }
                     }
                     // Tuned Linear indexing
-                    // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 ) - ( TsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
-                    // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 ) - ( QsrcHistM( SurfNum, 2 ) - Qsrc1( SurfNum ) ) * sum_steps;
-                    auto const l2(state.dataHeatBalSurf->TsrcHist.index(SurfNum, 2));
-                    state.dataHeatBalSurf->TsrcHist[l2] =
-                        state.dataHeatBalSurf->TsrcHistM[l2] -
-                        (state.dataHeatBalSurf->TsrcHistM[l2] - state.dataHeatBalSurfMgr->Tsrc1(SurfNum)) * sum_steps;
-                    state.dataHeatBalSurf->QsrcHist[l2] =
-                        state.dataHeatBalSurf->QsrcHistM[l2] -
-                        (state.dataHeatBalSurf->QsrcHistM[l2] - state.dataHeatBalSurfMgr->Qsrc1(SurfNum)) * sum_steps;
-                    state.dataHeatBalSurf->TuserHist[l2] =
-                        state.dataHeatBalSurf->TuserHistM[l2] -
-                        (state.dataHeatBalSurf->TuserHistM[l2] - state.dataHeatBalSurfMgr->Tuser1(SurfNum)) * sum_steps;
+                    // SurfTsrcHist( SurfNum, 2 ) = SurfTsrcHistM( SurfNum, 2 ) - ( SurfTsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
+                    // SurfQsrcHist( SurfNum, 2 ) = SurfQsrcHistM( SurfNum, 2 ) - ( SurfQsrcHistM( SurfNum, 2 ) - Qsrc1( SurfNum ) ) * sum_steps;
+                    auto const l2(state.dataHeatBalSurf->SurfTsrcHist.index(SurfNum, 2));
+                    state.dataHeatBalSurf->SurfTsrcHist[l2] =
+                        state.dataHeatBalSurf->SurfTsrcHistM[l2] -
+                        (state.dataHeatBalSurf->SurfTsrcHistM[l2] - state.dataHeatBalSurfMgr->Tsrc1(SurfNum)) * sum_steps;
+                    state.dataHeatBalSurf->SurfQsrcHist[l2] =
+                        state.dataHeatBalSurf->SurfQsrcHistM[l2] -
+                        (state.dataHeatBalSurf->SurfQsrcHistM[l2] - state.dataHeatBalSurfMgr->Qsrc1(SurfNum)) * sum_steps;
+                    state.dataHeatBalSurf->SurfTuserHist[l2] =
+                        state.dataHeatBalSurf->SurfTuserHistM[l2] -
+                        (state.dataHeatBalSurf->SurfTuserHistM[l2] - state.dataHeatBalSurfMgr->Tuser1(SurfNum)) * sum_steps;
                 }
             }
         } // ...end of loop over all (heat transfer) surfaces...
@@ -5572,14 +5676,7 @@ void ReportVisualResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
         }
         state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime = false;
-        bool hasDayLighting = false;
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::NoDaylighting) {
-                hasDayLighting = true;
-                break;
-            }
-        }
-        if (!hasDayLighting) {
+        if ((int)state.dataDaylightingData->daylightControl.size() == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
@@ -5597,34 +5694,38 @@ void ReportVisualResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) = state.dataHeatBal->People(iPeople).NumberOfPeople *
                                                            GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
+        // Accumulate across daylighting controls first
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            // Place holder
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) continue;
-
-            Array1D<Real64> ZoneIllumRef = state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllumAtRefPt;
-            Real64 ZoneIllum = 0.0;
-            for (size_t i = 1; i <= ZoneIllumRef.size(); i++) {
-                ZoneIllum += ZoneIllumRef(i);
-            }
-            ZoneIllum /= ZoneIllumRef.size();
-
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).ZonePowerReductionFactor > 0) {
-                Array1D<Real64> ZoneIllumSetpoint = state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumSetPoint;
-                ZoneIllum = 0.0;
-                for (size_t i = 1; i <= ZoneIllumSetpoint.size(); i++) {
-                    ZoneIllum += ZoneIllumSetpoint(i);
+            state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum = 0.0;
+        }
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
+            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+            if (thisDaylightControl.PowerReductionFactor > 0) {
+                for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
+                    state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
+                        thisDaylightControl.IllumSetPoint(refPt);
                 }
-                ZoneIllum /= ZoneIllumSetpoint.size();
+            } else {
+                for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
+                    state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
+                        thisDaylightControl.DaylIllumAtRefPt(refPt);
+                }
             }
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
+            // Now divide by total reference points to get average
+            Real64 avgZoneIllum =
+                state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum / state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts;
 
             int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
-            if (ZoneIllum <= 100) {
+            if (avgZoneIllum <= 100) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
-            } else if (ZoneIllum > 100 && ZoneIllum <= 300) {
+            } else if (avgZoneIllum > 100 && avgZoneIllum <= 300) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[1] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[1] += NumOcc * state.dataGlobal->TimeStepZone;
-            } else if (ZoneIllum > 300 && ZoneIllum <= 500) {
+            } else if (avgZoneIllum > 300 && avgZoneIllum <= 500) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[2] += NumOcc * state.dataGlobal->TimeStepZone;
             } else {
@@ -5648,6 +5749,10 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     using SolarShading::ReportSurfaceShading;
     ReportSurfaceShading(state);
 
+    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+        ReportNonRepresentativeSurfaceResults(state);
+    }
+
     // Set derived surface output variables and other record keeping - after iterations are complete - all HT surfaces
 
     // Opaque or window surfaces
@@ -5657,36 +5762,37 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             auto &surface(state.dataSurface->Surface(surfNum));
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            state.dataHeatBalSurf->QdotConvInRep(surfNum) = surface.Area * state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum);
-            state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBalSurf->SurfQdotConvInRep(surfNum) = surface.Area * state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum);
+            state.dataHeatBalSurf->SurfQConvInReport(surfNum) = state.dataHeatBalSurf->SurfQdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
-            state.dataHeatBalSurf->QdotRadNetSurfInRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) * surface.Area;
-            state.dataHeatBalSurf->QRadNetSurfInReport(surfNum) =
-                state.dataHeatBalSurf->QdotRadNetSurfInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBalSurf->SurfQdotRadNetSurfInRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) * surface.Area;
+            state.dataHeatBalSurf->SurfQRadNetSurfInReport(surfNum) =
+                state.dataHeatBalSurf->SurfQdotRadNetSurfInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
-            state.dataHeatBalSurf->QdotRadIntGainsInRep(surfNum) = state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) * surface.Area;
-            state.dataHeatBalSurf->QRadIntGainsInReport(surfNum) =
-                state.dataHeatBalSurf->QdotRadIntGainsInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBalSurf->SurfQdotRadIntGainsInRep(surfNum) = state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) * surface.Area;
+            state.dataHeatBalSurf->SurfQRadIntGainsInReport(surfNum) =
+                state.dataHeatBalSurf->SurfQdotRadIntGainsInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
             state.dataHeatBalSurf->SurfQdotRadHVACInRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) * surface.Area;
             state.dataHeatBalSurf->SurfQRadHVACInReport(surfNum) =
                 state.dataHeatBalSurf->SurfQdotRadHVACInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
-            state.dataHeatBalSurf->QdotConvOutRep(surfNum) = state.dataHeatBalSurf->SurfQdotConvOutPerArea(surfNum) * surface.Area;
+            state.dataHeatBalSurf->SurfQdotConvOutRep(surfNum) = state.dataHeatBalSurf->SurfQdotConvOutPerArea(surfNum) * surface.Area;
 
-            state.dataHeatBalSurf->QConvOutReport(surfNum) = state.dataHeatBalSurf->QdotConvOutRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBalSurf->SurfQConvOutReport(surfNum) =
+                state.dataHeatBalSurf->SurfQdotConvOutRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
-            state.dataHeatBalSurf->QdotRadOutRep(surfNum) = state.dataHeatBalSurf->QdotRadOutRepPerArea(surfNum) * surface.Area;
-            state.dataHeatBalSurf->QRadOutReport(surfNum) = state.dataHeatBalSurf->QdotRadOutRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBalSurf->SurfQdotRadOutRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(surfNum) * surface.Area;
+            state.dataHeatBalSurf->SurfQRadOutReport(surfNum) = state.dataHeatBalSurf->SurfQdotRadOutRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
             // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
-            state.dataHeatBalSurf->QAirExtReport(surfNum) =
+            state.dataHeatBalSurf->SurfQAirExtReport(surfNum) =
                 surface.Area * state.dataHeatBalSurf->SurfHAirExt(surfNum) *
                 (state.dataHeatBalSurf->SurfTempOut(surfNum) - state.dataSurface->SurfOutDryBulbTemp(surfNum));
 
-            // Subtract since QdotConvOutRep's convention is opposite (positive values indicate heat transfer from the outside to the surface)
-            state.dataHeatBalSurf->QHeatEmiReport(surfNum) =
-                state.dataHeatBalSurf->QAirExtReport(surfNum) - state.dataHeatBalSurf->QdotConvOutRep(surfNum);
+            // Subtract since SurfQdotConvOutRep's convention is opposite (positive values indicate heat transfer from the outside to the surface)
+            state.dataHeatBalSurf->SurfQHeatEmiReport(surfNum) =
+                state.dataHeatBalSurf->SurfQAirExtReport(surfNum) - state.dataHeatBalSurf->SurfQdotConvOutRep(surfNum);
         }
     }
 
@@ -5694,7 +5800,8 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         state.dataHeatBalSurf->SumSurfaceHeatEmission = 0.0;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-                state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                state.dataHeatBalSurf->SumSurfaceHeatEmission +=
+                    state.dataHeatBalSurf->SurfQHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
         }
     }
@@ -5704,7 +5811,38 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-            // auto &surface(state.dataSurface->Surface(surfNum));
+            auto &surface(state.dataSurface->Surface(surfNum));
+            state.dataHeatBal->SurfWinInitialDifSolInTransReport(surfNum) =
+                state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(surfNum) * surface.Area;
+
+            // Absorbed short wave radiation
+            int TotGlassLayers;
+            int const constrNum = state.dataSurface->SurfActiveConstruction(surfNum);
+            int const constrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(surfNum);
+            WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(surfNum);
+            if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowEQLModel) {
+                TotGlassLayers = state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(constrNum).EQLConsPtr).NL;
+            } else if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowBSDFModel) {
+                TotGlassLayers = state.dataConstruction->Construct(constrNum).TotSolidLayers;
+            } else if (NOT_SHADED(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
+                TotGlassLayers = state.dataConstruction->Construct(constrNum).TotGlassLayers;
+            } else {
+                // Interior, exterior or between-glass shade, screen or blind in place
+                TotGlassLayers = state.dataConstruction->Construct(constrNumSh).TotGlassLayers;
+            }
+            state.dataHeatBal->SurfWinSWwinAbsTotalReport(surfNum) = 0.0;
+            state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) = 0.0;
+            state.dataHeatBal->SurfInitialDifSolInAbsReport(surfNum) = 0.0;
+            for (int lay = 1; lay <= TotGlassLayers; ++lay) {
+                // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
+                state.dataHeatBal->SurfInitialDifSolInAbsReport(surfNum) +=
+                    state.dataHeatBal->SurfWinInitialDifSolwinAbs(surfNum, lay) * surface.Area;
+                // Total Shortwave Radiation Absorbed on Inside of Surface[W]
+                state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) += state.dataHeatBal->SurfWinQRadSWwinAbs(surfNum, lay) * surface.Area;
+                // Total Shortwave Absorbed:All solid Layers[W]
+                state.dataHeatBal->SurfWinSWwinAbsTotalReport(surfNum) += state.dataHeatBal->SurfWinQRadSWwinAbs(surfNum, lay) * surface.Area;
+            }
+
             // Window heat gain/loss
             if (state.dataSurface->SurfWinHeatGain(surfNum) >= 0.0) {
                 state.dataSurface->SurfWinHeatGainRep(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
@@ -5733,12 +5871,23 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             auto &surface(state.dataSurface->Surface(surfNum));
-            state.dataHeatBalSurf->QdotRadSolarInRep(surfNum) = state.dataHeatBalSurf->QdotRadSolarInRepPerArea(surfNum) * surface.Area;
-            state.dataHeatBalSurf->QRadSolarInReport(surfNum) = state.dataHeatBalSurf->QdotRadSolarInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
-            state.dataHeatBalSurf->QdotRadLightsInRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum) * surface.Area;
-            state.dataHeatBalSurf->QRadLightsInReport(surfNum) =
-                state.dataHeatBalSurf->QdotRadLightsInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(surfNum) * surface.Area;
+            state.dataHeatBal->SurfOpaqSWOutAbsEnergyReport(surfNum) =
+                state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(surfNum) * state.dataGlobal->TimeStepZoneSec;
+
+            state.dataHeatBalSurf->SurfQdotRadSolarInRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) * surface.Area;
+            state.dataHeatBalSurf->SurfQRadSolarInReport(surfNum) =
+                state.dataHeatBalSurf->SurfQdotRadSolarInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+
+            state.dataHeatBalSurf->SurfQdotRadLightsInRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum) * surface.Area;
+            state.dataHeatBalSurf->SurfQRadLightsInReport(surfNum) =
+                state.dataHeatBalSurf->SurfQdotRadLightsInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+
+            // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
+            state.dataHeatBal->SurfInitialDifSolInAbsReport(surfNum) = state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs(surfNum) * surface.Area;
+            // Total Shortwave Radiation Absorbed on Inside of Surface[W]
+            state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) * surface.Area;
 
             // inside face conduction updates
             state.dataHeatBalSurf->SurfOpaqInsFaceCond(surfNum) = state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) * surface.Area;
@@ -5805,9 +5954,9 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             int lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                 state.dataOutRptTab->lightSWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                    state.dataHeatBalSurf->QdotRadLightsInRep(surfNum);
+                    state.dataHeatBalSurf->SurfQdotRadLightsInRep(surfNum);
                 state.dataOutRptTab->feneSolarRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                    state.dataHeatBalSurf->QdotRadSolarInRep(surfNum);
+                    state.dataHeatBalSurf->SurfQdotRadSolarInRep(surfNum);
             }
             firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
             lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
@@ -5816,10 +5965,10 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 if (!state.dataGlobal->WarmupFlag) {
                     if (state.dataGlobal->isPulseZoneSizing) {
                         state.dataOutRptTab->loadConvectedWithPulse(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                            state.dataHeatBalSurf->QdotConvInRep(surfNum);
+                            state.dataHeatBalSurf->SurfQdotConvInRep(surfNum);
                     } else {
                         state.dataOutRptTab->loadConvectedNormal(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
-                            state.dataHeatBalSurf->QdotConvInRep(surfNum);
+                            state.dataHeatBalSurf->SurfQdotConvInRep(surfNum);
                         state.dataOutRptTab->netSurfRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
                             state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum) * surface.Area;
                     }
@@ -5854,6 +6003,41 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(zoneNum) = -state.dataHeatBal->ZoneOpaqSurfExtFaceCond(zoneNum);
                 state.dataHeatBal->ZnOpqSurfExtFaceCondLsRepEnrg(zoneNum) =
                     state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
+            }
+        }
+    }
+}
+
+void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state)
+{
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        // Heat transfer surfaces
+        int firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+        int lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            auto &surface(state.dataSurface->Surface(surfNum));
+            int repSurfNum = surface.RepresentativeCalcSurfNum;
+            if (surfNum != repSurfNum) {
+                state.dataSurface->SurfIntConvClassificationRpt(surfNum) = state.dataSurface->SurfIntConvClassificationRpt(repSurfNum);
+                state.dataSurface->SurfOutConvClassificationRpt(surfNum) = state.dataSurface->SurfOutConvClassificationRpt(repSurfNum);
+            }
+        }
+
+        // Windows
+        if (state.dataGlobal->DisplayAdvancedReportVariables) {
+            firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+            for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+                auto &surface(state.dataSurface->Surface(surfNum));
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (surfNum != repSurfNum) {
+                    auto areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
+                    state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
+                        state.dataSurface->SurfWinGainConvGlazToZoneRep(repSurfNum) * areaRatio;
+                    state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainIRGlazToZoneRep(repSurfNum) * areaRatio;
+                    state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) =
+                        state.dataSurface->SurfWinLossSWZoneToOutWinRep(repSurfNum) * areaRatio;
+                }
             }
         }
     }
@@ -5945,6 +6129,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
     bool MovInsulErrorFlag = false; // Movable Insulation error flag
 
+    // set ground surfaces average temperature
+    GetGroundSurfacesTemperatureAverage(state);
+
     auto &Surface(state.dataSurface->Surface);
 
     if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
@@ -5953,12 +6140,12 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
             // the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
             // This must be done at this location so that this is always updated correctly.
             if (Surface(SurfNum).Area > 0.0)
-                state.dataHeatBalSurf->QsrcHist(SurfNum, 1) =
+                state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) =
                     state.dataHeatBalFanSys->QRadSysSource(SurfNum) / Surface(SurfNum).Area; // Make sure we don't divide by zero...
 
             // next we add source (actually a sink) from any integrated PV
             if (Surface(SurfNum).Area > 0.0)
-                state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +=
+                state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +=
                     state.dataHeatBalFanSys->QPVSysSource(SurfNum) / Surface(SurfNum).Area; // Make sure we don't divide by zero...
         }
     }
@@ -6003,458 +6190,401 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
             // Calculate the current outside surface temperature TH(SurfNum,1,1) for the
             // various different boundary conditions
-            {
-                auto const SELECT_CASE_var(Surface(SurfNum).ExtBoundCond);
+            switch (Surface(SurfNum).ExtBoundCond) {
+            case Ground: { // Surface in contact with ground
+                state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEnvrn->GroundTemp;
 
-                if (SELECT_CASE_var == Ground) { // Surface in contact with ground
+                // Set the only radiant system heat balance coefficient that is non-zero for this case
+                if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
+                    state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
-                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEnvrn->GroundTemp;
+                // start HAMT
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                    // Set variables used in the HAMT moisture balance
+                    state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
+                    state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTemp, 1.0, HBSurfManGroundHAMT);
+                    state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
 
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
-                        state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                    state.dataMstBal->HMassConvExtFD(SurfNum) =
+                        state.dataMstBal->HConvExtFD(SurfNum) /
+                        ((PsyRhoAirFnPbTdbW(
+                              state,
+                              state.dataEnvrn->OutBaroPress,
+                              state.dataEnvrn->GroundTemp,
+                              PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTemp)) +
+                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
 
-                    // start HAMT
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                        // Set variables used in the HAMT moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTemp, 1.0, HBSurfManGroundHAMT);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
+                    state.dataMstBal->HSkyFD(SurfNum) = HSky;
+                    state.dataMstBal->HGrndFD(SurfNum) = HGround;
+                    state.dataMstBal->HAirFD(SurfNum) = HAir;
+                }
+                // end HAMT
 
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(
-                                  state,
-                                  state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTemp,
-                                  PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTemp)) +
-                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
+                    // Set variables used in the FD moisture balance
+                    state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
+                    state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTemp, 1.0);
+                    state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
+                    state.dataMstBal->HMassConvExtFD(SurfNum) =
+                        state.dataMstBal->HConvExtFD(SurfNum) /
+                        ((PsyRhoAirFnPbTdbW(
+                              state,
+                              state.dataEnvrn->OutBaroPress,
+                              state.dataEnvrn->GroundTemp,
+                              PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTemp)) +
+                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                    state.dataMstBal->HSkyFD(SurfNum) = HSky;
+                    state.dataMstBal->HGrndFD(SurfNum) = HGround;
+                    state.dataMstBal->HAirFD(SurfNum) = HAir;
+                }
+                // Added for FCfactor grounds
+            } break;
+            case GroundFCfactorMethod: { // Surface in contact with ground
+                state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEnvrn->GroundTempFC;
 
-                        state.dataMstBal->HSkyFD(SurfNum) = HSky;
-                        state.dataMstBal->HGrndFD(SurfNum) = HGround;
-                        state.dataMstBal->HAirFD(SurfNum) = HAir;
-                    }
-                    // end HAMT
+                // Set the only radiant system heat balance coefficient that is non-zero for this case
+                if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
+                    state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
-                        // Set variables used in the FD moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTemp, 1.0);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(
-                                  state,
-                                  state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTemp,
-                                  PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTemp)) +
-                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                        state.dataMstBal->HSkyFD(SurfNum) = HSky;
-                        state.dataMstBal->HGrndFD(SurfNum) = HGround;
-                        state.dataMstBal->HAirFD(SurfNum) = HAir;
-                    }
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                    // Set variables used in the HAMT moisture balance
+                    state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
+                    state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTempFC, 1.0, HBSurfManGroundHAMT);
+                    state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
 
-                    // Added for FCfactor grounds
-                } else if (SELECT_CASE_var == GroundFCfactorMethod) { // Surface in contact with ground
+                    state.dataMstBal->HMassConvExtFD(SurfNum) =
+                        state.dataMstBal->HConvExtFD(SurfNum) /
+                        ((PsyRhoAirFnPbTdbW(
+                              state,
+                              state.dataEnvrn->OutBaroPress,
+                              state.dataEnvrn->GroundTempFC,
+                              PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTempFC, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTempFC)) +
+                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
 
-                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEnvrn->GroundTempFC;
+                    state.dataMstBal->HSkyFD(SurfNum) = HSky;
+                    state.dataMstBal->HGrndFD(SurfNum) = HGround;
+                    state.dataMstBal->HAirFD(SurfNum) = HAir;
+                }
 
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
-                        state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
+                    // Set variables used in the FD moisture balance
+                    state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
+                    state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTempFC, 1.0);
+                    state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
+                    state.dataMstBal->HMassConvExtFD(SurfNum) =
+                        state.dataMstBal->HConvExtFD(SurfNum) /
+                        ((PsyRhoAirFnPbTdbW(
+                              state,
+                              state.dataEnvrn->OutBaroPress,
+                              state.dataEnvrn->GroundTempFC,
+                              PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTempFC, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTempFC)) +
+                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                    state.dataMstBal->HSkyFD(SurfNum) = HSky;
+                    state.dataMstBal->HGrndFD(SurfNum) = HGround;
+                    state.dataMstBal->HAirFD(SurfNum) = HAir;
+                }
+            } break;
+            case OtherSideCoefNoCalcExt: {
+                // Use Other Side Coefficients to determine the surface film coefficient and
+                // the exterior boundary condition temperature
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                        // Set variables used in the HAMT moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTempFC, 1.0, HBSurfManGroundHAMT);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
+                int OPtr = Surface(SurfNum).OSCPtr;
+                // Set surface temp from previous timestep
+                if (state.dataGlobal->BeginTimeStepFlag) {
+                    state.dataSurface->OSC(OPtr).TOutsideSurfPast = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                }
 
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(
-                                  state,
-                                  state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTempFC,
-                                  PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTempFC, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTempFC)) +
-                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                if (state.dataSurface->OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
+                    state.dataSurface->OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, state.dataSurface->OSC(OPtr).ConstTempScheduleIndex);
+                }
 
-                        state.dataMstBal->HSkyFD(SurfNum) = HSky;
-                        state.dataMstBal->HGrndFD(SurfNum) = HGround;
-                        state.dataMstBal->HAirFD(SurfNum) = HAir;
-                    }
+                //  Allow for modification of TemperatureCoefficient with unitary sine wave.
+                Real64 ConstantTempCoef;                                    // Temperature Coefficient as input or modified using sine wave COP mod
+                if (state.dataSurface->OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
+                    ConstantTempCoef =
+                        std::sin(2 * DataGlobalConstants::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
+                } else {
+                    ConstantTempCoef = state.dataSurface->OSC(OPtr).ConstTempCoef;
+                }
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
-                        // Set variables used in the FD moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTempFC, 1.0);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(
-                                  state,
-                                  state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTempFC,
-                                  PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTempFC, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTempFC)) +
-                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                        state.dataMstBal->HSkyFD(SurfNum) = HSky;
-                        state.dataMstBal->HGrndFD(SurfNum) = HGround;
-                        state.dataMstBal->HAirFD(SurfNum) = HAir;
-                    }
+                state.dataSurface->OSC(OPtr).OSCTempCalc =
+                    (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(zoneNum) +
+                     state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
+                     ConstantTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
+                     state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
+                     state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) *
+                         state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
+                     state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
 
-                } else if (SELECT_CASE_var == OtherSideCoefNoCalcExt) {
-                    // Use Other Side Coefficients to determine the surface film coefficient and
-                    // the exterior boundary condition temperature
-
-                    int OPtr = Surface(SurfNum).OSCPtr;
-                    // Set surface temp from previous timestep
-                    if (state.dataGlobal->BeginTimeStepFlag) {
-                        state.dataSurface->OSC(OPtr).TOutsideSurfPast = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
-                    }
-
-                    if (state.dataSurface->OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                        state.dataSurface->OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, state.dataSurface->OSC(OPtr).ConstTempScheduleIndex);
-                    }
-
-                    //  Allow for modification of TemperatureCoefficient with unitary sine wave.
-                    Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
-                    if (state.dataSurface->OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                        ConstantTempCoef =
-                            std::sin(2 * DataGlobalConstants::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
-                    } else {
-                        ConstantTempCoef = state.dataSurface->OSC(OPtr).ConstTempCoef;
-                    }
-
+                // Enforce max/min limits if applicable
+                if (state.dataSurface->OSC(OPtr).MinLimitPresent)
                     state.dataSurface->OSC(OPtr).OSCTempCalc =
-                        (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(zoneNum) +
-                         state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
-                         ConstantTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
-                         state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
-                         state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) *
-                             state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
-                         state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
-
-                    // Enforce max/min limits if applicable
-                    if (state.dataSurface->OSC(OPtr).MinLimitPresent)
-                        state.dataSurface->OSC(OPtr).OSCTempCalc =
-                            max(state.dataSurface->OSC(OPtr).MinTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
-                    if (state.dataSurface->OSC(OPtr).MaxLimitPresent)
-                        state.dataSurface->OSC(OPtr).OSCTempCalc =
-                            min(state.dataSurface->OSC(OPtr).MaxTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
-
-                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataSurface->OSC(OPtr).OSCTempCalc;
-
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
-                        state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
-
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                        // Set variables used in the FD moisture balance and HAMT
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) =
-                            PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state,
-                                                                                        state.dataEnvrn->OutBaroPress,
-                                                                                        state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                                        PsyWFnTdbRhPb(state,
-                                                                                                      state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                                                      1.0,
-                                                                                                      state.dataEnvrn->OutBaroPress,
-                                                                                                      RoutineNameOtherSideCoefNoCalcExt)) +
-                                                                      state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                                                                     PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                        state.dataMstBal->HSkyFD(SurfNum) = HSky;
-                        state.dataMstBal->HGrndFD(SurfNum) = HGround;
-                        state.dataMstBal->HAirFD(SurfNum) = HAir;
-                    }
-
-                    // This ends the calculations for this surface and goes on to the next SurfNum
-
-                } else if (SELECT_CASE_var == OtherSideCoefCalcExt) { // A surface with other side coefficients that define the outside environment
-
-                    // First, set up the outside convection coefficient and the exterior temperature
-                    // boundary condition for the surface
-                    int OPtr = Surface(SurfNum).OSCPtr;
-                    // Set surface temp from previous timestep
-                    if (state.dataGlobal->BeginTimeStepFlag) {
-                        state.dataSurface->OSC(OPtr).TOutsideSurfPast = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
-                    }
-
-                    if (state.dataSurface->OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                        state.dataSurface->OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, state.dataSurface->OSC(OPtr).ConstTempScheduleIndex);
-                    }
-
-                    state.dataHeatBalSurf->SurfHcExt(SurfNum) = state.dataSurface->OSC(OPtr).SurfFilmCoef;
-
+                        max(state.dataSurface->OSC(OPtr).MinTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
+                if (state.dataSurface->OSC(OPtr).MaxLimitPresent)
                     state.dataSurface->OSC(OPtr).OSCTempCalc =
-                        (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(zoneNum) +
-                         state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
-                         state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
-                         state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
-                         state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) *
-                             state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
-                         state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
+                        min(state.dataSurface->OSC(OPtr).MaxTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
 
-                    // Enforce max/min limits if applicable
-                    if (state.dataSurface->OSC(OPtr).MinLimitPresent)
-                        state.dataSurface->OSC(OPtr).OSCTempCalc =
-                            max(state.dataSurface->OSC(OPtr).MinTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
-                    if (state.dataSurface->OSC(OPtr).MaxLimitPresent)
-                        state.dataSurface->OSC(OPtr).OSCTempCalc =
-                            min(state.dataSurface->OSC(OPtr).MaxTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
+                state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataSurface->OSC(OPtr).OSCTempCalc;
 
-                    Real64 TempExt = state.dataSurface->OSC(OPtr).OSCTempCalc;
+                // Set the only radiant system heat balance coefficient that is non-zero for this case
+                if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
+                    state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
-                        state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                    Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                    // Set variables used in the FD moisture balance and HAMT
+                    state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                    state.dataMstBal->RhoVaporAirOut(SurfNum) =
+                        PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
+                    state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
+                    state.dataMstBal->HMassConvExtFD(SurfNum) =
+                        state.dataMstBal->HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state,
+                                                                                    state.dataEnvrn->OutBaroPress,
+                                                                                    state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                    PsyWFnTdbRhPb(state,
+                                                                                                  state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                                  1.0,
+                                                                                                  state.dataEnvrn->OutBaroPress,
+                                                                                                  RoutineNameOtherSideCoefNoCalcExt)) +
+                                                                  state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                                                                 PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                    state.dataMstBal->HSkyFD(SurfNum) = HSky;
+                    state.dataMstBal->HGrndFD(SurfNum) = HGround;
+                    state.dataMstBal->HAirFD(SurfNum) = HAir;
+                }
+                // This ends the calculations for this surface and goes on to the next SurfNum
+            } break;
+            case OtherSideCoefCalcExt: { // A surface with other side coefficients that define the outside environment
+                // First, set up the outside convection coefficient and the exterior temperature
+                // boundary condition for the surface
+                int OPtr = Surface(SurfNum).OSCPtr;
+                // Set surface temp from previous timestep
+                if (state.dataGlobal->BeginTimeStepFlag) {
+                    state.dataSurface->OSC(OPtr).TOutsideSurfPast = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                }
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                        // Set variables used in the FD moisture balance and HAMT
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) =
-                            PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state,
-                                                                                        state.dataEnvrn->OutBaroPress,
-                                                                                        state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                                        PsyWFnTdbRhPb(state,
-                                                                                                      state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                                                      1.0,
-                                                                                                      state.dataEnvrn->OutBaroPress,
-                                                                                                      RoutineNameOtherSideCoefCalcExt)) +
-                                                                      state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                                                                     PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                        state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
-                        state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
-                        state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
+                if (state.dataSurface->OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
+                    state.dataSurface->OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, state.dataSurface->OSC(OPtr).ConstTempScheduleIndex);
+                }
+
+                state.dataHeatBalSurf->SurfHcExt(SurfNum) = state.dataSurface->OSC(OPtr).SurfFilmCoef;
+
+                state.dataSurface->OSC(OPtr).OSCTempCalc =
+                    (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataHeatBalFanSys->MAT(zoneNum) +
+                     state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
+                     state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
+                     state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
+                     state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) *
+                         state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
+                     state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
+
+                // Enforce max/min limits if applicable
+                if (state.dataSurface->OSC(OPtr).MinLimitPresent)
+                    state.dataSurface->OSC(OPtr).OSCTempCalc =
+                        max(state.dataSurface->OSC(OPtr).MinTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
+                if (state.dataSurface->OSC(OPtr).MaxLimitPresent)
+                    state.dataSurface->OSC(OPtr).OSCTempCalc =
+                        min(state.dataSurface->OSC(OPtr).MaxTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
+
+                Real64 TempExt = state.dataSurface->OSC(OPtr).OSCTempCalc;
+
+                // Set the only radiant system heat balance coefficient that is non-zero for this case
+                if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
+                    state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                    Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                    // Set variables used in the FD moisture balance and HAMT
+                    state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
+                    state.dataMstBal->RhoVaporAirOut(SurfNum) =
+                        PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
+                    state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
+                    state.dataMstBal->HMassConvExtFD(SurfNum) =
+                        state.dataMstBal->HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state,
+                                                                                    state.dataEnvrn->OutBaroPress,
+                                                                                    state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                    PsyWFnTdbRhPb(state,
+                                                                                                  state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                                  1.0,
+                                                                                                  state.dataEnvrn->OutBaroPress,
+                                                                                                  RoutineNameOtherSideCoefCalcExt)) +
+                                                                  state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                                                                 PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                    state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
+                    state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
+                    state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
+                }
+
+                // Call the outside surface temp calculation and pass the necessary terms
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF ||
+                    Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
+                    CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
+                    if (MovInsulErrorFlag) ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                }
+                // This ends the calculations for this surface and goes on to the next SurfNum
+            } break;
+            case OtherSideCondModeledExt: { // A surface with other side conditions determined from seperate, dynamic component
+                // modeling that defines the "outside environment"
+                // First, set up the outside convection coefficient and the exterior temperature
+                // boundary condition for the surface
+                int OPtr = Surface(SurfNum).OSCMPtr;
+                // EMS overrides
+                if (state.dataSurface->OSCM(OPtr).EMSOverrideOnTConv)
+                    state.dataSurface->OSCM(OPtr).TConv = state.dataSurface->OSCM(OPtr).EMSOverrideTConvValue;
+                if (state.dataSurface->OSCM(OPtr).EMSOverrideOnHConv)
+                    state.dataSurface->OSCM(OPtr).HConv = state.dataSurface->OSCM(OPtr).EMSOverrideHConvValue;
+                if (state.dataSurface->OSCM(OPtr).EMSOverrideOnTRad)
+                    state.dataSurface->OSCM(OPtr).TRad = state.dataSurface->OSCM(OPtr).EMSOverrideTRadValue;
+                if (state.dataSurface->OSCM(OPtr).EMSOverrideOnHrad)
+                    state.dataSurface->OSCM(OPtr).HRad = state.dataSurface->OSCM(OPtr).EMSOverrideHradValue;
+                state.dataHeatBalSurf->SurfHcExt(SurfNum) = state.dataSurface->OSCM(OPtr).HConv;
+
+                Real64 TempExt = state.dataSurface->OSCM(OPtr).TConv;
+
+                // Set the only radiant system heat balance coefficient that is non-zero for this case
+                if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
+                    state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                    Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                    // Set variables used in the FD moisture balance and HAMT
+                    state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
+                    state.dataMstBal->RhoVaporAirOut(SurfNum) =
+                        PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
+                    state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
+                    state.dataMstBal->HMassConvExtFD(SurfNum) =
+                        state.dataMstBal->HConvExtFD(SurfNum) /
+                        ((PsyRhoAirFnPbTdbW(
+                              state,
+                              state.dataEnvrn->OutBaroPress,
+                              state.dataMstBal->TempOutsideAirFD(SurfNum),
+                              PsyWFnTdbRhPb(
+                                  state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameOSCM)) +
+                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                    state.dataMstBal->HSkyFD(SurfNum) = state.dataSurface->OSCM(OPtr).HRad; // CR 8046, use sky term for surface to baffle IR
+                    state.dataMstBal->HGrndFD(SurfNum) = 0.0; // CR 8046, null out and use only sky term for surface to baffle IR
+                    state.dataMstBal->HAirFD(SurfNum) = 0.0;  // CR 8046, null out and use only sky term for surface to baffle IR
+                }
+
+                // Call the outside surface temp calculation and pass the necessary terms
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF ||
+                    Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
+
+                    if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
+                        CalcExteriorVentedCavity(state, SurfNum);
                     }
 
-                    // Call the outside surface temp calculation and pass the necessary terms
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
-                        CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
-                        if (MovInsulErrorFlag) ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                    CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
+                    if (MovInsulErrorFlag) ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+
+                } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                           Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                    if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
+                        CalcExteriorVentedCavity(state, SurfNum);
                     }
+                }
+                // This ends the calculations for this surface and goes on to the next SurfNum
+            } break;
+            case ExternalEnvironment: {
+                // checking the EcoRoof presented in the external environment
+                // recompute each load by calling ecoroof
 
-                    // This ends the calculations for this surface and goes on to the next SurfNum
+                Real64 TempExt;
 
-                } else if (SELECT_CASE_var ==
-                           OtherSideCondModeledExt) { // A surface with other side conditions determined from seperate, dynamic component
-                    // modeling that defines the "outside environment"
+                if (state.dataSurface->SurfExtEcoRoof(SurfNum)) {
+                    CalcEcoRoof(state, SurfNum, zoneNum, ConstrNum, TempExt);
+                    continue;
+                }
+                // Roughness index of the exterior surface
+                DataSurfaces::SurfaceRoughness RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
+                // Thermal absoptance of the exterior surface
+                Real64 AbsThermSurf = state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum);
+                HMovInsul = 0;
+                // Check for outside movable insulation
+                if (state.dataSurface->AnyMovableInsulation && state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum)) {
+                    HMovInsul = state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum);
+                }
 
-                    // First, set up the outside convection coefficient and the exterior temperature
-                    // boundary condition for the surface
-                    int OPtr = Surface(SurfNum).OSCMPtr;
-                    // EMS overrides
-                    if (state.dataSurface->OSCM(OPtr).EMSOverrideOnTConv)
-                        state.dataSurface->OSCM(OPtr).TConv = state.dataSurface->OSCM(OPtr).EMSOverrideTConvValue;
-                    if (state.dataSurface->OSCM(OPtr).EMSOverrideOnHConv)
-                        state.dataSurface->OSCM(OPtr).HConv = state.dataSurface->OSCM(OPtr).EMSOverrideHConvValue;
-                    if (state.dataSurface->OSCM(OPtr).EMSOverrideOnTRad)
-                        state.dataSurface->OSCM(OPtr).TRad = state.dataSurface->OSCM(OPtr).EMSOverrideTRadValue;
-                    if (state.dataSurface->OSCM(OPtr).EMSOverrideOnHrad)
-                        state.dataSurface->OSCM(OPtr).HRad = state.dataSurface->OSCM(OPtr).EMSOverrideHradValue;
-                    state.dataHeatBalSurf->SurfHcExt(SurfNum) = state.dataSurface->OSCM(OPtr).HConv;
+                // Check for exposure to wind (exterior environment)
+                if (Surface(SurfNum).ExtWind) {
 
-                    Real64 TempExt = state.dataSurface->OSCM(OPtr).TConv;
+                    // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in subroutine)
+                    InitExteriorConvectionCoeff(state,
+                                                SurfNum,
+                                                HMovInsul,
+                                                RoughSurf,
+                                                AbsThermSurf,
+                                                state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
+                                                state.dataHeatBalSurf->SurfHcExt(SurfNum),
+                                                state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                                state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum));
 
-                    // Set the only radiant system heat balance coefficient that is non-zero for this case
-                    if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
-                        state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                    if (state.dataEnvrn->IsRain) { // Raining: since wind exposed, outside surface gets wet
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                        // Set variables used in the FD moisture balance and HAMT
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) =
-                            PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
-                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
-                        state.dataMstBal->HMassConvExtFD(SurfNum) =
-                            state.dataMstBal->HConvExtFD(SurfNum) /
-                            ((PsyRhoAirFnPbTdbW(
-                                  state,
-                                  state.dataEnvrn->OutBaroPress,
-                                  state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                  PsyWFnTdbRhPb(
-                                      state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameOSCM)) +
-                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                        state.dataMstBal->HSkyFD(SurfNum) = state.dataSurface->OSCM(OPtr).HRad; // CR 8046, use sky term for surface to baffle IR
-                        state.dataMstBal->HGrndFD(SurfNum) = 0.0; // CR 8046, null out and use only sky term for surface to baffle IR
-                        state.dataMstBal->HAirFD(SurfNum) = 0.0;  // CR 8046, null out and use only sky term for surface to baffle IR
-                    }
-
-                    // Call the outside surface temp calculation and pass the necessary terms
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
-
-                        if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
-                            CalcExteriorVentedCavity(state, SurfNum);
+                        if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) <= 0) { // Reset SurfHcExt because of wetness
+                            state.dataHeatBalSurf->SurfHcExt(SurfNum) = 1000.0;
+                        } else { // User set
+                            state.dataHeatBalSurf->SurfHcExt(SurfNum) = SetExtConvectionCoeff(state, SurfNum);
                         }
 
-                        CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
-                        if (MovInsulErrorFlag) ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                        TempExt = state.dataSurface->SurfOutWetBulbTemp(SurfNum);
 
-                    } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                               Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                        if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
-                            CalcExteriorVentedCavity(state, SurfNum);
+                        // start HAMT
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                            // Set variables used in the HAMT moisture balance
+                            state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
+                            state.dataMstBal->RhoVaporAirOut(SurfNum) =
+                                PsyRhovFnTdbRh(state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, HBSurfManRainHAMT);
+                            state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
+                            state.dataMstBal->HMassConvExtFD(SurfNum) =
+                                state.dataMstBal->HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state,
+                                                                                            state.dataEnvrn->OutBaroPress,
+                                                                                            state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                            PsyWFnTdbRhPb(state,
+                                                                                                          state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                                          1.0,
+                                                                                                          state.dataEnvrn->OutBaroPress,
+                                                                                                          RoutineNameExtEnvWetSurf)) +
+                                                                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                                                                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                            state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
+                            state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
+                            state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
                         }
-                    }
-
-                    // This ends the calculations for this surface and goes on to the next SurfNum
-                } else if (SELECT_CASE_var == ExternalEnvironment) {
-
-                    // checking the EcoRoof presented in the external environment
-                    // recompute each load by calling ecoroof
-
-                    Real64 TempExt;
-
-                    if (state.dataSurface->SurfExtEcoRoof(SurfNum)) {
-                        CalcEcoRoof(state, SurfNum, zoneNum, ConstrNum, TempExt);
-                        continue;
-                    }
-                    // Roughness index of the exterior surface
-                    DataSurfaces::SurfaceRoughness RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
-                    // Thermal absoptance of the exterior surface
-                    Real64 AbsThermSurf = state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum);
-                    HMovInsul = 0;
-                    // Check for outside movable insulation
-                    if (state.dataSurface->AnyMovableInsulation && state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum)) {
-                        HMovInsul = state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum);
-                    }
-
-                    // Check for exposure to wind (exterior environment)
-                    if (Surface(SurfNum).ExtWind) {
-
-                        // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in subroutine)
-                        InitExteriorConvectionCoeff(state,
-                                                    SurfNum,
-                                                    HMovInsul,
-                                                    RoughSurf,
-                                                    AbsThermSurf,
-                                                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHcExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHAirExt(SurfNum));
-
-                        if (state.dataEnvrn->IsRain) { // Raining: since wind exposed, outside surface gets wet
-
-                            if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) <= 0) { // Reset SurfHcExt because of wetness
-                                state.dataHeatBalSurf->SurfHcExt(SurfNum) = 1000.0;
-                            } else { // User set
-                                state.dataHeatBalSurf->SurfHcExt(SurfNum) = SetExtConvectionCoeff(state, SurfNum);
-                            }
-
-                            TempExt = state.dataSurface->SurfOutWetBulbTemp(SurfNum);
-
-                            // start HAMT
-                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                                // Set variables used in the HAMT moisture balance
-                                state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
-                                state.dataMstBal->RhoVaporAirOut(SurfNum) =
-                                    PsyRhovFnTdbRh(state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, HBSurfManRainHAMT);
-                                state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
-                                state.dataMstBal->HMassConvExtFD(SurfNum) =
-                                    state.dataMstBal->HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(state,
-                                                        state.dataEnvrn->OutBaroPress,
-                                                        state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                        PsyWFnTdbRhPb(state,
-                                                                      state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                      1.0,
-                                                                      state.dataEnvrn->OutBaroPress,
-                                                                      RoutineNameExtEnvWetSurf)) +
-                                      state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                                state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
-                                state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
-                                state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
-                            }
-                            // end HAMT
-                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
-                                // Set variables used in the FD moisture balance
-                                state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
-                                state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0);
-                                state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
-                                state.dataMstBal->HMassConvExtFD(SurfNum) =
-                                    state.dataMstBal->HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(state,
-                                                        state.dataEnvrn->OutBaroPress,
-                                                        state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                        PsyWFnTdbRhPb(state,
-                                                                      state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                      1.0,
-                                                                      state.dataEnvrn->OutBaroPress,
-                                                                      RoutineNameExtEnvWetSurf)) +
-                                      state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                                state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
-                                state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
-                                state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
-                            }
-
-                        } else { // Surface is dry, use the normal correlation
-
-                            TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
-
-                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                                Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                                // Set variables used in the FD moisture balance and HAMT
-                                state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
-                                state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(
-                                    state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
-                                state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
-                                state.dataMstBal->HMassConvExtFD(SurfNum) =
-                                    state.dataMstBal->HConvExtFD(SurfNum) /
-                                    ((PsyRhoAirFnPbTdbW(state,
-                                                        state.dataEnvrn->OutBaroPress,
-                                                        state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                        PsyWFnTdbRhPb(state,
-                                                                      state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                      1.0,
-                                                                      state.dataEnvrn->OutBaroPress,
-                                                                      RoutineNameExtEnvDrySurf)) +
-                                      state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                                //  check for saturation conditions of air
-                                // Local temporary saturated vapor density for checking
-                                Real64 RhoVaporSat = PsyRhovFnTdbRh(state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, HBSurfManDrySurfCondFD);
-                                if (state.dataMstBal->RhoVaporAirOut(SurfNum) > RhoVaporSat) state.dataMstBal->RhoVaporAirOut(SurfNum) = RhoVaporSat;
-                                state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
-                                state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
-                                state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
-                            }
+                        // end HAMT
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
+                            // Set variables used in the FD moisture balance
+                            state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
+                            state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0);
+                            state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
+                            state.dataMstBal->HMassConvExtFD(SurfNum) =
+                                state.dataMstBal->HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state,
+                                                                                            state.dataEnvrn->OutBaroPress,
+                                                                                            state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                            PsyWFnTdbRhPb(state,
+                                                                                                          state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                                          1.0,
+                                                                                                          state.dataEnvrn->OutBaroPress,
+                                                                                                          RoutineNameExtEnvWetSurf)) +
+                                                                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                                                                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                            state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
+                            state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
+                            state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
                         }
 
-                    } else { // No wind
-
-                        // Calculate exterior heat transfer coefficients for windspeed = 0
-                        InitExteriorConvectionCoeff(state,
-                                                    SurfNum,
-                                                    HMovInsul,
-                                                    RoughSurf,
-                                                    AbsThermSurf,
-                                                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHcExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                    } else { // Surface is dry, use the normal correlation
 
                         TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
+                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                             // Set variables used in the FD moisture balance and HAMT
                             state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
                             state.dataMstBal->RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(
@@ -6468,46 +6598,22 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                                                                                           state.dataMstBal->TempOutsideAirFD(SurfNum),
                                                                                                           1.0,
                                                                                                           state.dataEnvrn->OutBaroPress,
-                                                                                                          RoutineNameNoWind)) +
+                                                                                                          RoutineNameExtEnvDrySurf)) +
                                                                           state.dataMstBal->RhoVaporAirOut(SurfNum)) *
                                                                          PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                            //  check for saturation conditions of air
+                            // Local temporary saturated vapor density for checking
+                            Real64 RhoVaporSat = PsyRhovFnTdbRh(state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, HBSurfManDrySurfCondFD);
+                            if (state.dataMstBal->RhoVaporAirOut(SurfNum) > RhoVaporSat) state.dataMstBal->RhoVaporAirOut(SurfNum) = RhoVaporSat;
                             state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
                             state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
                             state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
                         }
                     }
-                    // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                        int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                        // Absolute temperature of the outside surface of an exterior surface
-                        Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + DataGlobalConstants::KelvinConv;
-                        for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                             SrdSurfNum++) {
-                            // View factor of a surrounding surface
-                            Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            // Absolute temperature of a surrounding surface
-                            Real64 SrdSurfTempAbs =
-                                GetCurrentScheduleValue(
-                                    state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                DataGlobalConstants::KelvinConv;
-                            state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +=
-                                DataGlobalConstants::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
-                        }
-                    }
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
-                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD ||
-                        Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
-                        CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
-                        if (MovInsulErrorFlag) ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
-                    }
+                } else { // No wind
 
-                } else if (SELECT_CASE_var == KivaFoundation) {
-                    DataSurfaces::SurfaceRoughness RoughSurf =
-                        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
-                    Real64 AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-
-                    // Set Kiva exterior convection algorithms
+                    // Calculate exterior heat transfer coefficients for windspeed = 0
                     InitExteriorConvectionCoeff(state,
                                                 SurfNum,
                                                 HMovInsul,
@@ -6519,67 +6625,132 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
                                                 state.dataHeatBalSurf->SurfHAirExt(SurfNum));
 
-                } else { // for interior or other zone surfaces
+                    TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
-                    if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                        // Set variables used in the FD moisture balance and HAMT
+                        state.dataMstBal->TempOutsideAirFD(SurfNum) = TempExt;
+                        state.dataMstBal->RhoVaporAirOut(SurfNum) =
+                            PsyRhovFnTdbWPb(state.dataMstBal->TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
+                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHcExt(SurfNum);
+                        state.dataMstBal->HMassConvExtFD(SurfNum) =
+                            state.dataMstBal->HConvExtFD(SurfNum) /
+                            ((PsyRhoAirFnPbTdbW(
+                                  state,
+                                  state.dataEnvrn->OutBaroPress,
+                                  state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                  PsyWFnTdbRhPb(
+                                      state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameNoWind)) +
+                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                        state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
+                        state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
+                        state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
+                    }
+                }
+                // Calculate LWR from surrounding surfaces if defined for an exterior surface
+                if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                    int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+                    // Absolute temperature of the outside surface of an exterior surface
+                    Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + DataGlobalConstants::KelvinConv;
+                    for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
+                         SrdSurfNum++) {
+                        // View factor of a surrounding surface
+                        Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                        // Absolute temperature of a surrounding surface
+                        Real64 SrdSurfTempAbs =
+                            GetCurrentScheduleValue(
+                                state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                            DataGlobalConstants::KelvinConv;
+                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +=
+                            DataGlobalConstants::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
+                    }
+                }
 
-                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF ||
+                    Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD ||
+                    Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
+                    CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
+                    if (MovInsulErrorFlag) ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                }
+            } break;
+            case KivaFoundation: {
+                DataSurfaces::SurfaceRoughness RoughSurf =
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
+                Real64 AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
 
-                        // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
+                // Set Kiva exterior convection algorithms
+                InitExteriorConvectionCoeff(state,
+                                            SurfNum,
+                                            HMovInsul,
+                                            RoughSurf,
+                                            AbsThermSurf,
+                                            state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
+                                            state.dataHeatBalSurf->SurfHcExt(SurfNum),
+                                            state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                            state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                            state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+            } break;
+            default: { // for interior or other zone surfaces
 
-                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                            // Set variables used in the FD moisture balance HAMT
-                            state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataHeatBalSurf->SurfTempIn(SurfNum);
-                            state.dataMstBal->RhoVaporAirOut(SurfNum) = state.dataMstBal->RhoVaporAirIn(SurfNum);
-                            state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
-                            state.dataMstBal->HMassConvExtFD(SurfNum) =
-                                state.dataMstBal->HConvExtFD(SurfNum) /
-                                ((PsyRhoAirFnPbTdbW(
-                                      state,
-                                      state.dataEnvrn->OutBaroPress,
-                                      state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                      PsyWFnTdbRhPb(
-                                          state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameOther)) +
-                                  state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                                 PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                            state.dataMstBal->HSkyFD(SurfNum) = 0.0;
-                            state.dataMstBal->HGrndFD(SurfNum) = 0.0;
-                            state.dataMstBal->HAirFD(SurfNum) = 0.0;
-                        }
+                if (Surface(SurfNum).ExtBoundCond == SurfNum) { // Regular partition/internal mass
 
-                    } else { // Interzone partition
+                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataHeatBalSurf->SurfTempIn(SurfNum);
 
-                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) =
-                            state.dataHeatBalSurf->SurfInsideTempHist(1)(Surface(SurfNum).ExtBoundCond);
+                    // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
 
-                        // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
-
-                        if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                            Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
-                            // Set variables used in the FD moisture balance and HAMT
-                            state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataHeatBalSurf->SurfInsideTempHist(1)(Surface(SurfNum).ExtBoundCond);
-                            state.dataMstBal->RhoVaporAirOut(SurfNum) = state.dataMstBal->RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
-                            state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(Surface(SurfNum).ExtBoundCond);
-                            state.dataMstBal->HMassConvExtFD(SurfNum) =
-                                state.dataMstBal->HConvExtFD(SurfNum) / ((PsyRhoAirFnPbTdbW(state,
-                                                                                            state.dataEnvrn->OutBaroPress,
-                                                                                            state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                                            PsyWFnTdbRhPb(state,
-                                                                                                          state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                                                                                          1.0,
-                                                                                                          state.dataEnvrn->OutBaroPress,
-                                                                                                          RoutineNameIZPart)) +
-                                                                          state.dataMstBal->RhoVaporAirOut(SurfNum)) *
-                                                                         PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                            state.dataMstBal->HSkyFD(SurfNum) = 0.0;
-                            state.dataMstBal->HGrndFD(SurfNum) = 0.0;
-                            state.dataMstBal->HAirFD(SurfNum) = 0.0;
-                        }
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                        // Set variables used in the FD moisture balance HAMT
+                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                        state.dataMstBal->RhoVaporAirOut(SurfNum) = state.dataMstBal->RhoVaporAirIn(SurfNum);
+                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
+                        state.dataMstBal->HMassConvExtFD(SurfNum) =
+                            state.dataMstBal->HConvExtFD(SurfNum) /
+                            ((PsyRhoAirFnPbTdbW(
+                                  state,
+                                  state.dataEnvrn->OutBaroPress,
+                                  state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                  PsyWFnTdbRhPb(
+                                      state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameOther)) +
+                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                        state.dataMstBal->HSkyFD(SurfNum) = 0.0;
+                        state.dataMstBal->HGrndFD(SurfNum) = 0.0;
+                        state.dataMstBal->HAirFD(SurfNum) = 0.0;
                     }
 
-                    // This ends the calculations for this surface and goes on to the next SurfNum
+                } else { // Interzone partition
+
+                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) =
+                        state.dataHeatBalSurf->SurfInsideTempHist(1)(Surface(SurfNum).ExtBoundCond);
+
+                    // No need to set any radiant system heat balance coefficients here--will be done during inside heat balance
+
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                        Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
+                        // Set variables used in the FD moisture balance and HAMT
+                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataHeatBalSurf->SurfInsideTempHist(1)(Surface(SurfNum).ExtBoundCond);
+                        state.dataMstBal->RhoVaporAirOut(SurfNum) = state.dataMstBal->RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
+                        state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(Surface(SurfNum).ExtBoundCond);
+                        state.dataMstBal->HMassConvExtFD(SurfNum) =
+                            state.dataMstBal->HConvExtFD(SurfNum) /
+                            ((PsyRhoAirFnPbTdbW(
+                                  state,
+                                  state.dataEnvrn->OutBaroPress,
+                                  state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                  PsyWFnTdbRhPb(
+                                      state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameIZPart)) +
+                              state.dataMstBal->RhoVaporAirOut(SurfNum)) *
+                             PsyCpAirFnW(state.dataEnvrn->OutHumRat));
+                        state.dataMstBal->HSkyFD(SurfNum) = 0.0;
+                        state.dataMstBal->HGrndFD(SurfNum) = 0.0;
+                        state.dataMstBal->HAirFD(SurfNum) = 0.0;
+                    }
                 }
+                // This ends the calculations for this surface and goes on to the next SurfNum
+            } break;
             }
 
             state.dataHeatBalSurf->SurfQdotConvOutPerArea(SurfNum) = GetQdotConvOutPerArea(state, SurfNum);
@@ -6627,8 +6798,8 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
             auto const &zone(state.dataHeatBal->Zone(iZone));
             for (int iSurf = zone.HTSurfaceFirst, eSurf = zone.HTSurfaceLast; iSurf <= eSurf; ++iSurf) {
                 auto const alg(Surface(iSurf).HeatTransferAlgorithm);
-                if ((alg == DataSurfaces::iHeatTransferModel::CondFD) || (alg == DataSurfaces::iHeatTransferModel::HAMT) ||
-                    (alg == DataSurfaces::iHeatTransferModel::Kiva)) {
+                if ((alg == DataSurfaces::HeatTransferModel::CondFD) || (alg == DataSurfaces::HeatTransferModel::HAMT) ||
+                    (alg == DataSurfaces::HeatTransferModel::Kiva)) {
                     state.dataHeatBalSurf->Zone_has_mixed_HT_models[iZone] = true;
                     break;
                 }
@@ -6744,16 +6915,13 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     // Only for Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window
     for (int surfNum : HTWindowSurfs) {
         state.dataSurface->SurfWinHeatGain(surfNum) = 0.0;
-        state.dataSurface->SurfWinHeatTransfer(surfNum) = 0.0;
         state.dataSurface->SurfWinHeatGainRep(surfNum) = 0.0;
         state.dataSurface->SurfWinHeatLossRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
-        state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
-        state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinFrameQRadOutAbs(surfNum) = 0.0;
         state.dataSurface->SurfWinFrameQRadInAbs(surfNum) = 0.0;
@@ -6790,8 +6958,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
         if (state.dataHeatBal->AnyKiva) {
             for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
-                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) =
-                    kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv; // TODO: Use average radiant temp? Trad?
+                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - DataGlobalConstants::KelvinConv;
             }
         }
 
@@ -6826,8 +6993,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 // Calculate the inside surface moisture quantities
                 // calculate the inside surface moisture transfer conditions
                 // check for saturation conditions of air
-                if ((surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) ||
-                    (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT)) {
+                if ((surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) ||
+                    (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT)) {
                     int ZoneNum = Surface(SurfNum).Zone;
                     Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(ZoneNum));
                     Real64 const ZoneAirHumRat_zone(max(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), 1.0e-5));
@@ -6858,8 +7025,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             //   (c) the CondFD calc (SolutionAlgo = UseCondFD)
             //   (d) the HAMT calc (solutionalgo = UseHAMT).
 
-            int const ZoneNum = Surface(SurfNum).Zone;
             auto &surface(Surface(SurfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (SurfNum != repSurfNum) continue;
+            }
+            int const ZoneNum = Surface(SurfNum).Zone;
             Real64 &TH11(state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum));
             int const ConstrNum = surface.Construction;
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -6869,10 +7040,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             if (surface.ExtBoundCond == SurfNum) {
                 // CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
                 // Surface is adiabatic
-                if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
-                    surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) { // Regular CTF Surface and/or EMPD surface
+                if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF ||
+                    surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) { // Regular CTF Surface and/or EMPD surface
 
-                    if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
+                    if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
                         MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(
                             state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), MAT_zone, SurfTempInSat);
                     }
@@ -6893,7 +7064,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                          (std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum)) < PoolIsOperatingLimit))) {
                         if (construct.SourceSinkPresent) {
                             state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
-                                (TempTerm + construct.CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
+                                (TempTerm + construct.CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
                                  IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum)) *
                                 TempDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW radiation
                             // from internal sources | Convection from surface to zone air | Net radiant exchange with other zone
@@ -6922,7 +7093,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         // non-pool equation for details) | Iterative damping term (for stability) |
                         // Conduction term (both partition sides same temp) | Pool and damping term
                     }
-                    if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
+                    if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) -=
                             state.dataMstBalEMPD->HeatFluxLatent(SurfNum) * TempDiv; // Conduction term (both partition sides same temp) |
                         // Conduction term (both partition sides same temp) |
@@ -6956,16 +7127,16 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         // term (both partition sides same temp) | Convection and damping term
                     }
 
-                } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                           surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
+                } else if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                           surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
 
-                    if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT)
+                    if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT)
                         HeatBalanceHAMTManager::ManageHeatBalHAMT(state,
                                                                   SurfNum,
                                                                   state.dataHeatBalSurf->SurfTempInTmp(SurfNum),
                                                                   TempSurfOutTmp); // HAMT
 
-                    if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+                    if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
                         HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(
                             state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), TempSurfOutTmp);
                     }
@@ -6979,10 +7150,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 bool movableInsulPresent = state.dataSurface->AnyMovableInsulation && state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum);
                 if (!movableInsulPresent) { // No movable insulation present, normal heat balance equation
 
-                    if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF ||
-                        surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) { // Regular CTF Surface and/or EMPD surface
+                    if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF ||
+                        surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) { // Regular CTF Surface and/or EMPD surface
 
-                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
                             MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(
                                 state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), MAT_zone, SurfTempInSat);
                         }
@@ -7003,7 +7174,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                              (std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum)) < PoolIsOperatingLimit))) {
                             if (construct.SourceSinkPresent) {
                                 state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
-                                    (TempTerm + construct.CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
+                                    (TempTerm + construct.CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
                                      IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum) + construct.CTFCross(0) * TH11) *
                                     TempDiv; // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
                                 // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
@@ -7035,7 +7206,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             // stability) | Current conduction from | the outside surface |
                             // Coefficient for conduction (current time) | Pool and damping term
                         }
-                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
                             state.dataHeatBalSurf->SurfTempInTmp(SurfNum) -=
                                 state.dataMstBalEMPD->HeatFluxLatent(SurfNum) *
                                 TempDiv; // Coefficient for conduction (current time) | Convection and damping term
@@ -7093,10 +7264,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             }
                         }
 
-                    } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
-                               surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
+                    } else if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
+                               surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
 
-                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                             if (surface.ExtBoundCond > 0) {
                                 // HAMT get the correct other side zone zone air temperature --
                                 int OtherSideSurfNum = surface.ExtBoundCond;
@@ -7107,18 +7278,16 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             HeatBalanceHAMTManager::ManageHeatBalHAMT(state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), TempSurfOutTmp);
                         }
 
-                        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD)
+                        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD)
                             HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(
                                 state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), TempSurfOutTmp);
 
                         TH11 = TempSurfOutTmp;
 
-                    } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::Kiva) {
+                    } else if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
                         // Read Kiva results for each surface
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
                             state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
-                        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) =
-                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
 
                         TH11 = 0.0;
                     }
@@ -7171,6 +7340,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         }
         for (int SurfNum : HTWindowSurfs) {
             auto &surface(Surface(SurfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (SurfNum != repSurfNum) continue;
+            }
             Real64 &TH11(state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum));
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum); // Not const, because storm window may change this
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -7213,7 +7386,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         state.dataConstruction->Construct(surface.Construction).TransDiff;
                 // Transmitted solar | Convection | IR exchange | IR
                 // Zone diffuse interior shortwave reflected back into the TDD
-                state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
 
                 // fill out report vars for components of Window Heat Gain
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) =
@@ -7361,7 +7533,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
         for (int SurfNum : HTNonWindowSurfs) {
             MaxDelTemp = max(std::abs(state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurf->SurfTempInsOld(SurfNum)), MaxDelTemp);
-            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
                 // also check all internal nodes as well as surface faces
                 MaxDelTemp = max(MaxDelTemp, state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).MaxNodeDelTemp);
             }
@@ -7431,7 +7603,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             auto const &surface(Surface(SurfNum));
             int ZoneNum = surface.Zone;
 
-            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
+            if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                 HeatBalanceHAMTManager::UpdateHeatBalHAMT(state, SurfNum);
 
                 Real64 const FD_Area_fac(state.dataMstBal->HMassConvInFD(SurfNum) * surface.Area);
@@ -7462,7 +7634,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 state.dataHeatBalFanSys->SumHmARaW(ZoneNum) +=
                     FD_Area_fac * state.dataMstBal->RhoVaporSurfIn(SurfNum); // old eq'n: FD_Area_fac * RhoAirZone * Wsurf;
 
-            } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
+            } else if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
                 // need to calculate the amount of moisture that is entering or
                 // leaving the zone  Qm [kg/sec] = hmi * Area * (Del Rhov)
                 // {Hmi [m/sec];     Area [m2];    Rhov [kg moist/m3]  }
@@ -7541,6 +7713,11 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         // determine reference air temperatures and other variable terms - loop over all surfaces
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            auto &surface(Surface(surfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (surfNum != repSurfNum) continue;
+            }
 
             int const ConstrNum = Surface(surfNum).Construction;
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -7549,7 +7726,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             state.dataHeatBalSurf->SurfCTFSourceIn0(surfNum) = construct.CTFSourceIn(0);
             state.dataHeatBalSurf->SurfTempOutHist(surfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum);
             if (construct.SourceSinkPresent) {
-                state.dataHeatBalSurf->SurfQSourceSinkHist(surfNum) = state.dataHeatBalSurf->QsrcHist(surfNum, 1);
+                state.dataHeatBalSurf->SurfQSourceSinkHist(surfNum) = state.dataHeatBalSurf->SurfQsrcHist(surfNum, 1);
             }
 
             if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum))
@@ -7576,16 +7753,13 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         int const lastWindowSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int surfNum = firstWindowSurf; surfNum <= lastWindowSurf; ++surfNum) {
             state.dataSurface->SurfWinHeatGain(surfNum) = 0.0;
-            state.dataSurface->SurfWinHeatTransfer(surfNum) = 0.0;
             state.dataSurface->SurfWinHeatGainRep(surfNum) = 0.0;
             state.dataSurface->SurfWinHeatLossRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
-            state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
-            state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinFrameQRadOutAbs(surfNum) = 0.0;
             state.dataSurface->SurfWinFrameQRadInAbs(surfNum) = 0.0;
@@ -7610,6 +7784,11 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         Real64 const iterDampConstant = IterDampConst;                        // local for vectorization
         // this loop auto-vectorizes
         for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
+            auto &surface(Surface(surfNum));
+            if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (surfNum != repSurfNum) continue;
+            }
 
             // Pre-calculate a few terms before the iteration loop
             state.dataHeatBalSurf->SurfTempTerm(surfNum) =
@@ -7655,6 +7834,11 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 Real64 const iterDampConstant = IterDampConst;                        // local for vectorization
                 // this loop auto-vectorizes
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+                    auto &surface(Surface(surfNum));
+                    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                        int repSurfNum = surface.RepresentativeCalcSurfNum;
+                        if (surfNum != repSurfNum) continue;
+                    }
 
                     state.dataHeatBalSurf->SurfTempTerm(surfNum) =
                         state.dataHeatBalSurf->SurfCTFConstInPart(surfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(surfNum) +
@@ -7696,7 +7880,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 // For adiabatic surface:
                 // Adiabatic:   TempDiv = (1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf + IterDampConst));
                 // Adiabatic:   SurfTempInTmp(SurfNum) = (TempTerm + IterDampConst * SurfTempInsOld(SurfNum)) * TempDiv;
-                // Ad+Source:   SurfTempInTmp(SurfNum) = (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst *
+                // Ad+Source:   SurfTempInTmp(SurfNum) = (TempTerm + construct.CTFSourceIn(0) * SurfQsrcHist(SurfNum, 1) + IterDampConst *
                 // SurfTempInsOld(SurfNum)) * TempDiv; Ad+Pool:     TempDiv = (1.0 / (construct.CTFInside(0) - construct.CTFCross(0) +
                 // PoolHeatTransCoefs(SurfNum) + IterDampConst); Ad+Pool:     SurfTempInTmp(SurfNum) = (SurfCTFConstInPart(SurfNum) +
                 // QPoolSurfNumerator(SurfNum) + IterDampConst * SurfTempInsOld(SurfNum)) * TempDiv;
@@ -7704,7 +7888,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 // For standard or interzone surface:
                 // Standard:    TempDiv = (1.0 / (construct.CTFInside(0) + HConvIn_surf + IterDampConst));
                 // Standard:    SurfTempInTmp(SurfNum) = (TempTerm + IterDampConst * SurfTempInsOld(SurfNum) + construct.CTFCross(0) * TH11) *
-                // TempDiv; Std+Source:  SurfTempInTmp(SurfNum) = (TempTerm + construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IterDampConst *
+                // TempDiv; Std+Source:  SurfTempInTmp(SurfNum) = (TempTerm + construct.CTFSourceIn(0) * SurfQsrcHist(SurfNum, 1) + IterDampConst *
                 // SurfTempInsOld(SurfNum)) * TempDiv; Std+Pool:    TempDiv = (1.0 / (construct.CTFInside(0) + PoolHeatTransCoefs(SurfNum) +
                 // IterDampConst); Std+Pool:    SurfTempInTmp(SurfNum) = (SurfCTFConstInPart(SurfNum) + QPoolSurfNumerator(SurfNum) + IterDampConst*
                 // SurfTempInsOld(SurfNum) + construct.CTFCross(0) * TH11) * TempDiv;
@@ -7712,7 +7896,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 // Composite with Adiabatic/Source/Pool flags:
                 //              TempDiv = (1.0 / (construct.CTFInside(0) - SurfIsAdiabatic*construct.CTFCross(0)+
                 //              SurfIsOperatingPool*PoolHeatTransCoefs(SurfNum) + IsNotPoolSurf*HConvIn_surf + IterDampConst)); SurfTempInTmp(SurfNum)
-                //              = (IsNotPoolSurf*TempTerm + IsSource*construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) +
+                //              = (IsNotPoolSurf*TempTerm + IsSource*construct.CTFSourceIn(0) * SurfQsrcHist(SurfNum, 1) +
                 //              SurfIsOperatingPool*SurfCTFConstInPart(SurfNum) + SurfIsOperatingPool*QPoolSurfNumerator(SurfNum)
                 //                                        + IterDampConst * SurfTempInsOld(SurfNum)+ IsNotAdiabatic*IsNotSource*construct.CTFCross(0)
                 //                                        * TH11) * TempDiv;
@@ -7818,6 +8002,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             int const lastWindowSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             for (int surfNum = firstWindowSurf; surfNum <= lastWindowSurf; ++surfNum) {
                 auto &surface(Surface(surfNum));
+                if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                    int repSurfNum = surface.RepresentativeCalcSurfNum;
+                    if (surfNum != repSurfNum) continue;
+                }
                 Real64 &TH11(state.dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum));
                 int const ConstrNum = state.dataSurface->SurfActiveConstruction(surfNum);
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -7859,7 +8047,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
                             state.dataConstruction->Construct(surface.Construction).TransDiff; // Transmitted solar | Convection | IR exchange | IR
                     // Zone diffuse interior shortwave reflected back into the TDD
-                    state.dataSurface->SurfWinHeatTransfer(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
 
                     // fill out report vars for components of Window Heat Gain
                     state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
@@ -8084,7 +8271,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                         } else {
                             ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains));
                         }
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                             ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                             ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                         } else {
@@ -8127,7 +8314,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                         } else {
                             ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains));
                         }
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                             ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                             ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                         } else {
@@ -8183,7 +8370,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                     } else {
                         ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains / zone.FloorArea));
                     }
-                    if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                    if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                         ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                         ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                     } else {
@@ -8208,7 +8395,7 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
                     } else {
                         ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains / zone.FloorArea));
                     }
-                    if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                    if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                         ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
                         ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                     } else {
@@ -8304,14 +8491,17 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     Real64 TSky = state.dataEnvrn->SkyTemp;
     Real64 TGround = state.dataEnvrn->OutDryBulbTemp;
 
-    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-        int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
         }
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
             TGround = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
         }
+    }
+    if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp) {
+        TGround = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsTempAvg;
     }
 
     // Now, calculate the outside surface temperature using the proper heat balance equation.
@@ -8335,9 +8525,9 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         // Absorbed shortwave radiation is treated similar to a regular window, but only 1 glass layer is allowed.
         //   SurfOpaqQRadSWOutAbs(SurfNum) does not apply for TDD:DOME, must use SurfWinQRadSWwinAbs(SurfNum,1)/2.0 instead.
         //+Construct(ConstrNum)%CTFSourceOut(0)     &   TDDs cannot be radiant systems
-        // *QsrcHist(1,SurfNum)                     &
+        // *SurfQsrcHist(1,SurfNum)                     &
         //+Construct(ConstrNum)%CTFSourceIn(0) &   TDDs cannot be radiant systems
-        // *QsrcHist(1,SurfNum)                &
+        // *SurfQsrcHist(1,SurfNum)                &
         TH11 = (state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, 1) / 2.0 + state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
                 (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                 state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
@@ -8360,7 +8550,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
                         (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                         state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround + construct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum) +
-                        construct.CTFSourceOut(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1)) /
+                        construct.CTFSourceOut(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1)) /
                        (construct.CTFOutside(0) + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
                         state.dataHeatBalSurf->SurfHSkyExt(SurfNum) +
                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum)); // ODB used to approx ground surface temp
@@ -8387,7 +8577,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfHcExt(SurfNum) * TempExt +
                         state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + HRad * RadTemp +
                         construct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum) +
-                        construct.CTFSourceOut(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1)) /
+                        construct.CTFSourceOut(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1)) /
                        (construct.CTFOutside(0) + state.dataHeatBalSurf->SurfHcExt(SurfNum) + HRad);
             } else {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfHcExt(SurfNum) * TempExt +
@@ -8400,19 +8590,19 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     } else if ((!MovInsulPresent) && (QuickConductionSurf)) {
         if (Surface(SurfNum).OSCMPtr == 0) {
             if (construct.SourceSinkPresent) {
-                TH11 =
-                    (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                     state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
-                     (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
-                     state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
-                     state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround + construct.CTFSourceOut(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
-                     F1 * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
-                           state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
-                           state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
-                           state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum))) /
-                    (construct.CTFOutside(0) + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                     state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) -
-                     F1 * construct.CTFCross(0)); // ODB used to approx ground surface temp | MAT use here is problem for room air models
+                TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
+                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+                        (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
+                        state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
+                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround +
+                        construct.CTFSourceOut(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
+                        F1 * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
+                              state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
+                              state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
+                              state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum))) /
+                       (construct.CTFOutside(0) + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) -
+                        F1 * construct.CTFCross(0)); // ODB used to approx ground surface temp | MAT use here is problem for room air models
             } else {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
                         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
@@ -8436,10 +8626,10 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
             if (construct.SourceSinkPresent) {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfHcExt(SurfNum) * TempExt +
                         state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + HRad * RadTemp +
-                        construct.CTFSourceOut(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
+                        construct.CTFSourceOut(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
                         F1 * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                               state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
-                              construct.CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
+                              construct.CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
                               state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
                               state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum))) /
                        (construct.CTFOutside(0) + state.dataHeatBalSurf->SurfHcExt(SurfNum) + HRad -
@@ -8497,8 +8687,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     QRadLWOutSrdSurfsRep = 0;
     // Report LWR from surrounding surfaces for current exterior surf temp
     // Current exterior surf temp would be used for the next step LWR calculation.
-    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-        int SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
             Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
             Real64 SrdSurfTempAbs =
@@ -8509,7 +8699,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
                                     SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + DataGlobalConstants::KelvinConv));
         }
     }
-    state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = HExtSurf_fac + QRadLWOutSrdSurfsRep;
+    state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = HExtSurf_fac + QRadLWOutSrdSurfsRep;
 
     // Set the radiant system heat balance coefficients if this surface is also a radiant system
     if (construct.SourceSinkPresent) {
@@ -8681,6 +8871,204 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
             state.dataOutRptTab->ITABSFseq(state.dataSize->CurOverallSimDay, TimeStepInDay, jSurf) = state.dataHeatBalSurf->SurfAbsThermalInt(jSurf);
         }
     }
+}
+
+void InitSurfacePropertyViewFactors(EnergyPlusData &state)
+{
+
+    // purpuse:
+    //   Initializes sky and ground surfaces view factors of exterior surfaces
+    //   used by SurfaceProperty:LocalEnvironment
+    //   view factors are constant hence should be set only once
+
+    if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
+        return;
+    }
+    if (!state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) {
+        return;
+    }
+
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        auto &Surface = state.dataSurface->Surface(SurfNum);
+        if (Surface.SurfHasSurroundingSurfProperty || Surface.IsSurfPropertyGndSurfacesDefined) {
+
+            int GndSurfsNum = 0;
+            int SrdSurfsNum = 0;
+            Real64 SrdSurfsViewFactor = 0.0;
+            Real64 SurfsSkyViewFactor = 0.0;
+            Real64 GroundSurfsViewFactor = 0.0;
+            bool IsSkyViewFactorSet = false;
+            bool IsGroundViewFactorSet = false;
+            bool SetGroundViewFactorObject = false;
+            if (Surface.SurfHasSurroundingSurfProperty) {
+                SrdSurfsNum = Surface.SurfSurroundingSurfacesNum;
+                auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                SurfsSkyViewFactor = SrdSurfsProperty.SkyViewFactor;
+                IsSkyViewFactorSet = SrdSurfsProperty.IsSkyViewFactorSet;
+                if (SurfsSkyViewFactor > 0.0) {
+                    SrdSurfsViewFactor += SurfsSkyViewFactor;
+                }
+                if (!Surface.IsSurfPropertyGndSurfacesDefined) {
+                    SrdSurfsViewFactor += SrdSurfsProperty.GroundViewFactor;
+                    IsGroundViewFactorSet = SrdSurfsProperty.IsGroundViewFactorSet;
+                    GroundSurfsViewFactor = SrdSurfsProperty.GroundViewFactor;
+                }
+                for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                    SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                }
+            }
+            if (Surface.IsSurfPropertyGndSurfacesDefined) {
+                GndSurfsNum = Surface.SurfPropertyGndSurfIndex;
+                IsGroundViewFactorSet = state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet;
+                GroundSurfsViewFactor = state.dataSurface->GroundSurfsProperty(GndSurfsNum).SurfsViewFactorSum;
+                SrdSurfsViewFactor += GroundSurfsViewFactor;
+            }
+
+            // Check if the sum of all defined view factors > 1.0
+            if (SrdSurfsViewFactor > 1.0) {
+                ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface.Name + ".");
+                ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than or equal to 1.0.");
+            }
+            if (IsSkyViewFactorSet && IsGroundViewFactorSet) {
+                // If both surface sky and ground view factor defined, overwrite with the defined value
+                Surface.ViewFactorSkyIR = SurfsSkyViewFactor;
+                Surface.ViewFactorGroundIR = GroundSurfsViewFactor;
+            } else if (IsSkyViewFactorSet && !IsGroundViewFactorSet) {
+                // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
+                Surface.ViewFactorSkyIR = SurfsSkyViewFactor;
+                Surface.ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
+                if (GndSurfsNum > 0) {
+                    SetGroundViewFactorObject = true;
+                    state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
+                } else {
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor = Surface.ViewFactorGroundIR;
+                }
+            } else if (!IsSkyViewFactorSet && IsGroundViewFactorSet) {
+                // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
+                Surface.ViewFactorGroundIR = GroundSurfsViewFactor;
+                Surface.ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
+                if (SrdSurfsNum > 0) {
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).IsSkyViewFactorSet = true;
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface.ViewFactorSkyIR;
+                }
+            } else {
+                // If neither ground nor sky view factor specified, continue to use the original proportion.
+                Surface.ViewFactorSkyIR *= 1 - SrdSurfsViewFactor;
+                Surface.ViewFactorGroundIR *= 1 - SrdSurfsViewFactor;
+                if (SrdSurfsNum > 0) {
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).IsSkyViewFactorSet = true;
+                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor = Surface.ViewFactorSkyIR;
+                    if (GndSurfsNum == 0) {
+                        state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor = Surface.ViewFactorGroundIR;
+                        state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).IsGroundViewFactorSet = true;
+                    }
+                }
+                if (GndSurfsNum > 0) {
+                    SetGroundViewFactorObject = true;
+                    state.dataSurface->GroundSurfsProperty(GndSurfsNum).IsGroundViewFactorSet = true;
+                }
+            }
+            if (SetGroundViewFactorObject) {
+                ReSetGroundSurfacesViewFactor(state, SurfNum);
+            }
+        }
+    }
+}
+
+void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
+{
+    //  returns ground surfaces average temperature (deg C)
+    //  ground surfaces viewed by a building exterior surface
+    //  ground surfaces temperature weighed using view factors
+
+    // local vars
+    Real64 GndSurfaceTemp;
+    Real64 GndSurfViewFactor;
+    Real64 GndSurfaceTempSum;
+
+    if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
+        return;
+    }
+
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) continue;
+        auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex);
+        if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
+            state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp = false;
+            continue;
+        }
+        GndSurfaceTemp = 0.0;
+        GndSurfViewFactor = 0.0;
+        GndSurfaceTempSum = 0.0;
+        for (int gSurfNum = 1; gSurfNum <= GndSurfsProperty.NumGndSurfs; gSurfNum++) {
+            GndSurfViewFactor = GndSurfsProperty.GndSurfs(gSurfNum).ViewFactor;
+            if (GndSurfViewFactor == 0.0) continue;
+            if (GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr == 0) continue;
+            GndSurfaceTemp = ScheduleManager::GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr);
+            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp + DataGlobalConstants::KelvinConv);
+        }
+        if (GndSurfaceTempSum == 0.0) {
+            GndSurfsProperty.SurfsTempAvg = 0.0;
+            state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp = false;
+            continue;
+        }
+        GndSurfsProperty.SurfsTempAvg = root_4(GndSurfaceTempSum / GndSurfsProperty.SurfsViewFactorSum) - DataGlobalConstants::KelvinConv;
+    }
+}
+
+void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
+{
+    //  returns ground surfaces average reflectance (dimenssionless)
+    //  ground reflectance viewed by a building exterior surface
+    //  ground surfaces reflectance weighed using view factors
+
+    // local vars
+    Real64 GndSurfRefl;
+    Real64 GndSurfsReflSum;
+
+    if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
+        return;
+    }
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+
+        if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) continue;
+        auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex);
+        if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
+            state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl = false;
+            continue;
+        }
+        GndSurfRefl = 0.0;
+        GndSurfsReflSum = 0.0;
+        for (int gSurfNum = 1; gSurfNum <= GndSurfsProperty.NumGndSurfs; gSurfNum++) {
+            if (GndSurfsProperty.GndSurfs(gSurfNum).ReflSchPtr == 0) continue;
+            GndSurfRefl = ScheduleManager::GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).ReflSchPtr);
+            GndSurfsReflSum += GndSurfsProperty.GndSurfs(gSurfNum).ViewFactor * GndSurfRefl;
+        }
+        if (GndSurfsReflSum == 0.0) {
+            GndSurfsProperty.SurfsReflAvg = 0.0;
+            state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl = false;
+            continue;
+        }
+        GndSurfsProperty.SurfsReflAvg = GndSurfsReflSum / GndSurfsProperty.SurfsViewFactorSum;
+    }
+}
+
+void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
+{
+    //  resets ground veiew factors based on view factors identity
+    //  the ground view factor value is set to the first element
+    //  when the ground view factor input field is blank
+
+    if (!state.dataSurface->Surface(SurfNum).IsSurfPropertyGndSurfacesDefined) return;
+    auto &GndSurfsProperty = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex);
+    GndSurfsProperty.SurfsViewFactorSum = state.dataSurface->Surface(SurfNum).ViewFactorGroundIR;
+
+    if (GndSurfsProperty.SurfsViewFactorSum == 0.0) {
+        state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl = false;
+        state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp = false;
+        return;
+    }
+    GndSurfsProperty.GndSurfs(1).ViewFactor = GndSurfsProperty.SurfsViewFactorSum;
 }
 
 } // namespace EnergyPlus::HeatBalanceSurfaceManager

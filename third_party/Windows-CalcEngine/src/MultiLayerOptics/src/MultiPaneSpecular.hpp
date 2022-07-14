@@ -35,7 +35,8 @@ namespace MultiLayerOptics
 
         FenestrationCommon::CSeries Abs(size_t Index);
 
-        FenestrationCommon::CSeries AbsBySide(size_t Index, FenestrationCommon::Side side);
+        FenestrationCommon::CSeries iplus(size_t Index);
+        FenestrationCommon::CSeries iminus(size_t Index);
 
     private:
         CEquivalentLayerSingleComponentMW m_Layer;

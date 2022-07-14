@@ -5,8 +5,9 @@ namespace SingleLayerOptics
 {
     CDirectionalDiffuseCell::CDirectionalDiffuseCell(
       const std::shared_ptr<CMaterial> & t_MaterialProperties,
-      const std::shared_ptr<ICellDescription> & t_Cell) :
-        CBaseCell(t_MaterialProperties, t_Cell)
+      const std::shared_ptr<ICellDescription> & t_Cell,
+      double rotation) :
+        CBaseCell(t_MaterialProperties, t_Cell, rotation)
     {}
 
     double CDirectionalDiffuseCell::T_dir_dif(const FenestrationCommon::Side t_Side,
@@ -39,11 +40,11 @@ namespace SingleLayerOptics
     {
         double cellT = CBaseCell::T_dir_dir(t_Side, t_IncomingDirection);
 
-        std::vector<double> result;
-
         auto materialBandValues = m_Material->getBandProperties(
           FenestrationCommon::Property::T, t_Side, t_IncomingDirection, t_OutgoingDirection);
 
+        std::vector<double> result;
+        result.reserve(materialBandValues.size());
         for(auto materialBandValue : materialBandValues)
         {
             result.push_back(cellT + (1 - cellT) * materialBandValue);
@@ -60,11 +61,11 @@ namespace SingleLayerOptics
         double cellT = CBaseCell::T_dir_dir(t_Side, t_IncomingDirection);
         double cellR = CBaseCell::R_dir_dir(t_Side, t_IncomingDirection);
 
-        std::vector<double> result;
-
         auto materialBandValues = m_Material->getBandProperties(
           FenestrationCommon::Property::R, t_Side, t_IncomingDirection, t_OutgoingDirection);
 
+        std::vector<double> result;
+        result.reserve(materialBandValues.size());
         for(auto materialBandValue : materialBandValues)
         {
             result.push_back(cellR + (1 - cellT) * materialBandValue);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -194,8 +194,6 @@ namespace UtilityRoutines {
         // for most inputs -- they are automatically turned to UPPERCASE.
         // If you need case insensitivity use FindItem.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
         }
@@ -217,8 +215,6 @@ namespace UtilityRoutines {
         // found.  This routine is not case insensitive and doesn't need
         // for most inputs -- they are automatically turned to UPPERCASE.
         // If you need case insensitivity use FindItem.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
@@ -312,36 +308,6 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    std::string MakeUPPERCase(std::string_view const InputString)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This function returns the Upper Case representation of the InputString.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the Intrinsic SCAN function to scan the lowercase representation of
-        // characters (DataStringGlobals) for each character in the given string.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        std::string ResultString(InputString);
-
-        for (std::string::size_type i = 0, e = len(InputString); i < e; ++i) {
-            int const curCharVal = int(InputString[i]);
-            if ((97 <= curCharVal && curCharVal <= 122) || (224 <= curCharVal && curCharVal <= 255)) { // lowercase ASCII and accented characters
-                ResultString[i] = char(curCharVal - 32);
-            }
-        }
-
-        return ResultString;
-    }
-
     void VerifyName(EnergyPlusData &state,
                     std::string const &NameToVerify,
                     Array1D_string const &NamesList,
@@ -403,12 +369,9 @@ namespace UtilityRoutines {
         // list of names for this item (i.e., that there isn't one of that
         // name already and that this name is not blank).
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Found;
-
         ErrorFound = false;
         if (NumOfNames > 0) {
-            Found = FindItem(NameToVerify, NamesList, NumOfNames);
+            int Found = FindItem(NameToVerify, NamesList, NumOfNames);
             if (Found != 0) {
                 ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
@@ -458,7 +421,7 @@ namespace UtilityRoutines {
             return;
         }
 
-        // accumuate the row until ready to be written to the file.
+        // accumulate the row until ready to be written to the file.
         state.dataUtilityRoutines->appendPerfLog_headerRow = state.dataUtilityRoutines->appendPerfLog_headerRow + colHeader + ",";
         state.dataUtilityRoutines->appendPerfLog_valuesRow = state.dataUtilityRoutines->appendPerfLog_valuesRow + colValue + ",";
 
@@ -494,7 +457,7 @@ namespace UtilityRoutines {
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
-                          bool const &AllowSteamAndDistrict)
+                          bool const AllowSteamAndDistrict)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -615,6 +578,39 @@ namespace UtilityRoutines {
         return FuelTypeErrorsFound;
     }
 
+    Real64 epElapsedTime()
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   February 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // An alternative method for timing elapsed times is to call the standard
+        // Date_And_Time routine and set the "time".
+
+        // Return value
+        Real64 calctime; // calculated time based on hrs, minutes, seconds, milliseconds
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Array1D<Int32> clockvalues(8);
+        // value(1)   Current year
+        // value(2)   Current month
+        // value(3)   Current day
+        // value(4)   Time difference with respect to UTC in minutes (0-59)
+        // value(5)   Hour of the day (0-23)
+        // value(6)   Minutes (0-59)
+        // value(7)   Seconds (0-59)
+        // value(8)   Milliseconds (0-999)
+
+        date_and_time(_, _, _, clockvalues);
+        calctime = clockvalues(5) * 3600.0 + clockvalues(6) * 60.0 + clockvalues(7) + clockvalues(8) / 1000.0;
+
+        return calctime;
+    }
+
 } // namespace UtilityRoutines
 
 int AbortEnergyPlus(EnergyPlusData &state)
@@ -636,7 +632,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataSystemVariables;
-    using namespace DataTimings;
     using namespace DataErrorTracking;
     using BranchInputManager::TestBranchIntegrity;
     using BranchNodeConnections::CheckNodeConnections;
@@ -718,12 +713,9 @@ int AbortEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
-    state.dataSysVars->Time_Finish = epElapsedTime();
+    state.dataSysVars->Time_Finish = UtilityRoutines::epElapsedTime();
     if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
     state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
-#ifdef EP_Detailed_Timings
-    epStopTime("EntireRun=");
-#endif
     if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
     Hours = state.dataSysVars->Elapsed_Time / 3600.0;
     state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
@@ -758,14 +750,8 @@ int AbortEnergyPlus(EnergyPlusData &state)
             tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
 
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles(state, state.files.json);
-
     state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
-#ifdef EP_Detailed_Timings
-    epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
-#endif
     std::cerr << "Program terminated: "
               << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
     // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
@@ -827,7 +813,6 @@ int EndEnergyPlus(EnergyPlusData &state)
     // Stops the program.
 
     using namespace DataSystemVariables;
-    using namespace DataTimings;
     using namespace DataErrorTracking;
     using ExternalInterface::CloseSocket;
 
@@ -864,15 +849,12 @@ int EndEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
     strip(NumSevereDuringSizing);
 
-    state.dataSysVars->Time_Finish = epElapsedTime();
+    state.dataSysVars->Time_Finish = UtilityRoutines::epElapsedTime();
     if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
     state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
     if (state.dataGlobal->createPerfLog) {
         UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
     }
-#ifdef EP_Detailed_Timings
-    epStopTime("EntireRun=");
-#endif
     Hours = state.dataSysVars->Elapsed_Time / 3600.0;
     state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
     Minutes = state.dataSysVars->Elapsed_Time / 60.0;
@@ -908,14 +890,8 @@ int EndEnergyPlus(EnergyPlusData &state)
         print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
 
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles(state, state.files.json);
-
     state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
-#ifdef EP_Detailed_Timings
-    epSummaryTimes(Time_Finish - Time_Start);
-#endif
     if (state.dataGlobal->printConsoleOutput) std::cerr << "EnergyPlus Completed Successfully." << std::endl;
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation

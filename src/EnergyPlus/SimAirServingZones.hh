@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -65,10 +66,6 @@ struct EnergyPlusData;
 
 namespace SimAirServingZones {
 
-    // coil operation
-    constexpr int CoilOn(1);  // normal coil operation
-    constexpr int CoilOff(0); // signal coil shouldn't run
-
     constexpr int BeforeBranchSim(1);
     constexpr int AfterBranchSim(2);
 
@@ -76,7 +73,7 @@ namespace SimAirServingZones {
     // component types addressed by this module
     enum class CompType
     {
-        Unassigned = -1,
+        Invalid = -1,
         OAMixer_Num,
         Fan_Simple_CV,
         Fan_Simple_VAV,
@@ -109,7 +106,8 @@ namespace SimAirServingZones {
         ZoneVRFasAirLoopEquip,
         PVT_AirBased,
         VRFTerminalUnit,
-        CoilSystemWater
+        CoilSystemWater,
+        Num
     };
 
     void ManageAirLoops(EnergyPlusData &state,
@@ -161,9 +159,9 @@ namespace SimAirServingZones {
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
                              HVACSystemData *CompPointer, // equipment actual pointer
-                             int const &airLoopNum,       // index to AirloopHVAC
-                             int const &branchNum,        // index to AirloopHVAC branch
-                             int const &compNum           // index to AirloopHVAC branch component
+                             int airLoopNum,              // index to AirloopHVAC
+                             int branchNum,               // index to AirloopHVAC branch
+                             int compNum                  // index to AirloopHVAC branch component
     );
 
     void UpdateBranchConnections(EnergyPlusData &state,
@@ -241,17 +239,6 @@ struct SimAirServingZonesData : BaseGlobalStruct
     Real64 Vou = 0.0;            // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
     Real64 Vot = 0.0;            // Required outdoor air intake at primary AHU per ASHRAE std 62.1
 
-    Array1D_int CtrlZoneNumsCool;
-    Array1D_int CtrlZoneNumsHeat;
-    Array1D_int ZoneInletNodesCool;
-    Array1D_int ZoneInletNodesHeat;
-    Array1D_int TermInletNodesCool;
-    Array1D_int TermInletNodesHeat;
-    Array1D_int TermUnitSizingNumsCool;
-    Array1D_int TermUnitSizingNumsHeat;
-    Array1D_int SupNode;
-    Array1D_int SupNodeType;
-
     int TUInNode = 0;            // inlet node number of a terminal unit
     Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
     Real64 OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
@@ -319,17 +306,6 @@ struct SimAirServingZonesData : BaseGlobalStruct
         this->ZoneEz = 1.0;
         this->Vou = 0.0;
         this->Vot = 0.0;
-
-        this->CtrlZoneNumsCool.clear();
-        this->CtrlZoneNumsHeat.clear();
-        this->ZoneInletNodesCool.clear();
-        this->ZoneInletNodesHeat.clear();
-        this->TermInletNodesCool.clear();
-        this->TermInletNodesHeat.clear();
-        this->TermUnitSizingNumsCool.clear();
-        this->TermUnitSizingNumsHeat.clear();
-        this->SupNode.clear();
-        this->SupNodeType.clear();
 
         this->TUInNode = 0;         // inlet node number of a terminal unit
         this->SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system

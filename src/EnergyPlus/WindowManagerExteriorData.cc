@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -85,10 +85,10 @@ namespace WindowManager {
         Real64 Gamma = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Tilt;
         Real64 Alpha = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Azimuth;
 
-        int RadType = state.dataWindowComplexManager->Front_Incident;
+        RayIdentificationType RadType = RayIdentificationType::Front_Incident;
 
         if (t_Direction == BSDFDirection::Outgoing) {
-            RadType = state.dataWindowComplexManager->Back_Incident;
+            RadType = RayIdentificationType::Back_Incident;
         }
 
         // get the corresponding local Theta, Phi for ray
@@ -123,7 +123,7 @@ namespace WindowManager {
         CSeries solarRadiation;
 
         for (auto i = 1; i <= state.dataWindowManager->nume; ++i) {
-            solarRadiation.addProperty(state.dataWindowManager->wle(i), state.dataWindowManager->e(i));
+            solarRadiation.addProperty(state.dataWindowManager->wle[i - 1], state.dataWindowManager->e[i - 1]);
         }
 
         return solarRadiation;
@@ -144,7 +144,7 @@ namespace WindowManager {
         CSeries visibleResponse;
 
         for (auto i = 1; i <= state.dataWindowManager->numt3; ++i) {
-            visibleResponse.addProperty(state.dataWindowManager->wlt3(i), state.dataWindowManager->y30(i));
+            visibleResponse.addProperty(state.dataWindowManager->wlt3[i - 1], state.dataWindowManager->y30[i - 1]);
         }
 
         return visibleResponse;

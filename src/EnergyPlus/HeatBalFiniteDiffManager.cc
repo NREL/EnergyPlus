@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,7 +55,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -178,15 +178,10 @@ namespace HeatBalFiniteDiffManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
-
                 {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
-
-                    if (SELECT_CASE_var == "CRANKNICHOLSONSECONDORDER") {
-                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = CrankNicholsonSecondOrder;
-                    } else if (SELECT_CASE_var == "FULLYIMPLICITFIRSTORDER") {
-                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = FullyImplicitFirstOrder;
-                    } else {
+                    state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = static_cast<CondFDScheme>(
+                        getEnumerationValue(CondFDSchemeTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Invalid) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                             " entered=" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -439,7 +434,7 @@ namespace HeatBalFiniteDiffManager {
         // now do begin environment inits.
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
                 if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
@@ -490,7 +485,7 @@ namespace HeatBalFiniteDiffManager {
         // now do every timestep inits
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
             if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
@@ -524,7 +519,6 @@ namespace HeatBalFiniteDiffManager {
         using DataHeatBalance::ThinMaterialLayerThreshold;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Lay;
         int SurfNum;
 
         Real64 dxn; // Intermediate calculation of nodal spacing. This is the full dx. There is
@@ -803,9 +797,10 @@ namespace HeatBalFiniteDiffManager {
         for (Surf = 1; Surf <= state.dataSurface->TotSurfaces; ++Surf) {
             if (!state.dataSurface->Surface(Surf).HeatTransSurf) continue;
             if (state.dataSurface->Surface(Surf).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+            if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
             ConstrNum = state.dataSurface->Surface(Surf).Construction;
             TotNodes = ConstructFD(ConstrNum).TotNodes;
+            int TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
 
             // Allocate the Surface Arrays
             SurfaceFD(Surf).T.allocate(TotNodes + 1);
@@ -832,10 +827,15 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeStateOldOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeTemperatureReverse.allocate(TotNodes + 1);
-            SurfaceFD(Surf).condMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
-            SurfaceFD(Surf).specHeatMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
+            SurfaceFD(Surf).condMaterialActuators.allocate(TotLayers);
+            SurfaceFD(Surf).specHeatMaterialActuators.allocate(TotLayers);
             SurfaceFD(Surf).condNodeReport.allocate(TotNodes + 1);
             SurfaceFD(Surf).specHeatNodeReport.allocate(TotNodes + 1);
+            SurfaceFD(Surf).heatSourceFluxMaterialActuators.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceInternalFluxLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceInternalFluxEnergyLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceEMSFluxLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceEMSFluxEnergyLayerReport.allocate(TotLayers - 1);
 
             // Initialize the allocated arrays.
             SurfaceFD(Surf).T = TempInitValue;
@@ -864,22 +864,31 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
             SurfaceFD(Surf).condNodeReport = 0.0;
             SurfaceFD(Surf).specHeatNodeReport = 0.0;
+            SurfaceFD(Surf).heatSourceInternalFluxLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceInternalFluxEnergyLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceEMSFluxLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceEMSFluxEnergyLayerReport = 0.0;
 
             // Setup EMS data
-            for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+            for (int lay = 1; lay <= TotLayers; ++lay) {
                 // Setup material layer names actuators
                 int matLay = state.dataConstruction->Construct(ConstrNum).LayerPoint(lay);
                 // Actuator name format: "{SurfName}:{MaterialLayerName}"
                 std::string actName = fmt::format("{}:{}", state.dataSurface->Surface(Surf).Name, state.dataMaterial->Material(matLay).Name);
                 SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = actName;
                 SurfaceFD(Surf).specHeatMaterialActuators(lay).actuatorName = actName;
+
+                // only setup for heat source actuator for layers 1 to N-1
+                if (lay != TotLayers) {
+                    SurfaceFD(Surf).heatSourceFluxMaterialActuators(lay).actuatorName = actName;
+                }
             }
         }
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
             if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
 
             SetupOutputVariable(state,
                                 "CondFD Inner Solver Loop Iteration Count",
@@ -889,88 +898,141 @@ namespace HeatBalFiniteDiffManager {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataSurface->Surface(SurfNum).Name);
 
-            // Setup EMS Material Actuators
+            // Setup EMS Material Actuators for Conductivity and Specific Heat
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-            for (int mat = 1; mat <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++mat) {
-                EnergyPlus::SetupEMSActuator(state,
-                                             "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatorName,
-                                             "Thermal Conductivity",
-                                             "[W/m-K]",
-                                             SurfaceFD(SurfNum).condMaterialActuators(mat).isActuated,
-                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatedValue);
-                EnergyPlus::SetupEMSActuator(state,
-                                             "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatorName,
-                                             "Specific Heat",
-                                             "[J/kg-C]",
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).isActuated,
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatedValue);
+
+            // Setup internal heat source output variables
+            // Only setup for layers 1 to N-1
+            for (int lay = 1; lay < state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                SetupOutputVariable(state,
+                                    format("CondFD Internal Heat Source Power After Layer {}", lay),
+                                    OutputProcessor::Unit::W,
+                                    SurfaceFD(SurfNum).heatSourceInternalFluxLayerReport(lay),
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
+                                    state.dataSurface->Surface(SurfNum).Name);
+                SetupOutputVariable(state,
+                                    format("CondFD Internal Heat Source Energy After Layer {}", lay),
+                                    OutputProcessor::Unit::J,
+                                    SurfaceFD(SurfNum).heatSourceInternalFluxEnergyLayerReport(lay),
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataSurface->Surface(SurfNum).Name);
+            }
+
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                    EnergyPlus::SetupEMSActuator(state,
+                                                 "CondFD Surface Material Layer",
+                                                 SurfaceFD(SurfNum).condMaterialActuators(lay).actuatorName,
+                                                 "Thermal Conductivity",
+                                                 "[W/m-K]",
+                                                 SurfaceFD(SurfNum).condMaterialActuators(lay).isActuated,
+                                                 SurfaceFD(SurfNum).condMaterialActuators(lay).actuatedValue);
+                    EnergyPlus::SetupEMSActuator(state,
+                                                 "CondFD Surface Material Layer",
+                                                 SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatorName,
+                                                 "Specific Heat",
+                                                 "[J/kg-C]",
+                                                 SurfaceFD(SurfNum).specHeatMaterialActuators(lay).isActuated,
+                                                 SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatedValue);
+                }
+
+                // Setup EMS Actuator and Output Variables for Heat Flux
+                // Only setup for layers 1 to N-1
+                for (int lay = 1; lay < state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                    EnergyPlus::SetupEMSActuator(state,
+                                                 "CondFD Surface Material Layer",
+                                                 SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatorName,
+                                                 "Heat Flux",
+                                                 "[W/m2]",
+                                                 SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).isActuated,
+                                                 SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatedValue);
+                    SetupOutputVariable(state,
+                                        format("CondFD EMS Heat Source Power After Layer {}", lay),
+                                        OutputProcessor::Unit::W,
+                                        SurfaceFD(SurfNum).heatSourceEMSFluxLayerReport(lay),
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::State,
+                                        state.dataSurface->Surface(SurfNum).Name);
+                    SetupOutputVariable(state,
+                                        format("CondFD EMS Heat Source Energy After Layer {}", lay),
+                                        OutputProcessor::Unit::J,
+                                        SurfaceFD(SurfNum).heatSourceEMSFluxEnergyLayerReport(lay),
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataSurface->Surface(SurfNum).Name,
+                                        _,
+                                        "Electricity",
+                                        "Heating",
+                                        _,
+                                        "Building");
+                }
             }
 
             TotNodes = ConstructFD(state.dataSurface->Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
-            for (Lay = 1; Lay <= TotNodes + 1; ++Lay) {                                        // include inside face node
+            for (int node = 1; node <= TotNodes + 1; ++node) {                                 // include inside face node
                 SetupOutputVariable(state,
-                                    format("CondFD Surface Temperature Node {}", Lay),
+                                    format("CondFD Surface Temperature Node {}", node),
                                     OutputProcessor::Unit::C,
-                                    SurfaceFD(SurfNum).TDreport(Lay),
+                                    SurfaceFD(SurfNum).TDreport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Surface Heat Flux Node {}", Lay),
+                                    format("CondFD Surface Heat Flux Node {}", node),
                                     OutputProcessor::Unit::W_m2,
-                                    SurfaceFD(SurfNum).QDreport(Lay),
+                                    SurfaceFD(SurfNum).QDreport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change State {}", Lay),
+                                    format("CondFD Phase Change State {}", node),
                                     OutputProcessor::Unit::None,
-                                    SurfaceFD(SurfNum).PhaseChangeState(Lay),
+                                    SurfaceFD(SurfNum).PhaseChangeState(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Previous State {}", Lay),
+                                    format("CondFD Phase Change Previous State {}", node),
                                     OutputProcessor::Unit::None,
-                                    SurfaceFD(SurfNum).PhaseChangeStateOld(Lay),
+                                    SurfaceFD(SurfNum).PhaseChangeStateOld(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Node Temperature {}", Lay),
+                                    format("CondFD Phase Change Node Temperature {}", node),
                                     OutputProcessor::Unit::C,
-                                    SurfaceFD(SurfNum).TDT(Lay),
+                                    SurfaceFD(SurfNum).TDT(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Node Conductivity {}", Lay),
+                                    format("CondFD Phase Change Node Conductivity {}", node),
                                     OutputProcessor::Unit::W_mK,
-                                    SurfaceFD(SurfNum).condNodeReport(Lay),
+                                    SurfaceFD(SurfNum).condNodeReport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Phase Change Node Specific Heat {}", Lay),
+                                    format("CondFD Phase Change Node Specific Heat {}", node),
                                     OutputProcessor::Unit::J_kgK,
-                                    SurfaceFD(SurfNum).specHeatNodeReport(Lay),
+                                    SurfaceFD(SurfNum).specHeatNodeReport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
-                                        format("CondFD Surface Heat Capacitance Outer Half Node {}", Lay),
+                                        format("CondFD Surface Heat Capacitance Outer Half Node {}", node),
                                         OutputProcessor::Unit::W_m2K,
-                                        SurfaceFD(SurfNum).CpDelXRhoS1(Lay),
+                                        SurfaceFD(SurfNum).CpDelXRhoS1(node),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
-                                        format("CondFD Surface Heat Capacitance Inner Half Node {}", Lay),
+                                        format("CondFD Surface Heat Capacitance Inner Half Node {}", node),
                                         OutputProcessor::Unit::W_m2K,
-                                        SurfaceFD(SurfNum).CpDelXRhoS2(Lay),
+                                        SurfaceFD(SurfNum).CpDelXRhoS2(node),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
@@ -1222,7 +1284,7 @@ namespace HeatBalFiniteDiffManager {
               "Temperature Convergence Criteria\n");
         print(state.files.eio,
               " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
-              state.dataHeatBalFiniteDiffMgr->cCondFDSchemeType(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType),
+              CondFDSchemeTypeNamesCC[static_cast<int>(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType)],
               state.dataHeatBalFiniteDiffMgr->SpaceDescritConstant,
               state.dataHeatBal->CondFDRelaxFactorInput,
               state.dataHeatBal->MaxAllowedDelTempCondFD);
@@ -1511,6 +1573,13 @@ namespace HeatBalFiniteDiffManager {
             auto TDT_i(TDT(i));
             auto const TDT_p(TDT(i + 1));
 
+            Real64 Tgndsurface = 0.0;
+            if (state.dataSurface->Surface(Surf).UseSurfPropertyGndSurfTemp) {
+                Tgndsurface = state.dataSurface->GroundSurfsProperty(Surf).SurfsTempAvg;
+            } else {
+                Tgndsurface = state.dataMstBal->TempOutsideAirFD(Surf);
+            }
+
             // Boundary Conditions from Simulation for Exterior
             Real64 const hconvo(state.dataMstBal->HConvExtFD(Surf));
 
@@ -1518,9 +1587,9 @@ namespace HeatBalFiniteDiffManager {
             Real64 const hsky(state.dataMstBal->HSkyFD(Surf));
             Real64 const hgnd(state.dataMstBal->HGrndFD(Surf));
             Real64 const Toa(state.dataMstBal->TempOutsideAirFD(Surf));
-            Real64 const Tgnd(state.dataMstBal->TempOutsideAirFD(Surf));
+            Real64 const Tgnd(Tgndsurface);
 
-            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+            if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
 
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
@@ -1599,14 +1668,14 @@ namespace HeatBalFiniteDiffManager {
 
                     if (HMovInsul <= 0.0) { // Regular  case
 
-                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) { // Second Order equation
+                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Second Order equation
                             Real64 const Cp_DelX_RhoS_2Delt(Cp * DelX * RhoS / (2.0 * Delt));
                             Real64 const kt_2DelX(kt / (2.0 * DelX));
                             Real64 const hsum(0.5 * (hconvo + hgnd + hrad + hsky));
                             TDT_i = (QRadSWOutFD + Cp_DelX_RhoS_2Delt * TD_i + kt_2DelX * (TDT_p - TD_i + TD(i + 1)) + hgnd * Tgnd +
                                      (hconvo + hrad) * Toa + hsky * Tsky - hsum * TD_i) /
                                     (hsum + kt_2DelX + Cp_DelX_RhoS_2Delt);
-                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // First Order
+                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) { // First Order
                             Real64 const Two_Delt_DelX(2.0 * Delt_DelX);
                             Real64 const Cp_DelX2_RhoS(Cp * pow_2(DelX) * RhoS);
                             Real64 const Two_Delt_kt(2.0 * Delt * kt);
@@ -1627,10 +1696,10 @@ namespace HeatBalFiniteDiffManager {
                         Real64 const Two_Delt_kt(2.0 * Delt * kt);
 
                         // Wall first node temperature behind Movable insulation
-                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                             TDT_i = (Two_Delt_DelX * (QRadSWOutFD + HMovInsul * TInsulOut) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_p) /
                                     (Two_Delt_DelX * HMovInsul + Two_Delt_kt + Cp_DelX2_RhoS);
-                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                             // Currently same as Crank Nicholson, need fully implicit formulation
                             TDT_i = (Two_Delt_DelX * (QRadSWOutFD + HMovInsul * TInsulOut) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_p) /
                                     (Two_Delt_DelX * HMovInsul + Two_Delt_kt + Cp_DelX2_RhoS);
@@ -1663,9 +1732,9 @@ namespace HeatBalFiniteDiffManager {
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
 
             // Report all outside BC heat fluxes
-            state.dataHeatBalSurf->QdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
-            state.dataHeatBalSurf->QdotRadOutRep(Surf) = surface.Area * state.dataHeatBalSurf->QdotRadOutRepPerArea(Surf);
-            state.dataHeatBalSurf->QRadOutReport(Surf) = state.dataHeatBalSurf->QdotRadOutRep(Surf) * state.dataGlobal->TimeStepZoneSec;
+            state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
+            state.dataHeatBalSurf->SurfQdotRadOutRep(Surf) = surface.Area * state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(Surf);
+            state.dataHeatBalSurf->SurfQRadOutReport(Surf) = state.dataHeatBalSurf->SurfQdotRadOutRep(Surf) * state.dataGlobal->TimeStepZoneSec;
 
         } // regular BC part of the ground and Rain check
     }
@@ -1749,6 +1818,8 @@ namespace HeatBalFiniteDiffManager {
         // EMS Conductivity Override
         if (condActuator.isActuated) {
             kt = condActuator.actuatedValue;
+            ktA1 = kt;
+            ktA2 = kt;
         }
 
         // EMS Specific Heat Override
@@ -1762,14 +1833,18 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const DelX(state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum).DelX(Lay));
         Real64 const Cp_DelX_RhoS_Delt(Cp * DelX * RhoS / Delt);
-        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) { // Adams-Moulton second order
+
+        switch (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType) {
+        case CondFDScheme::CrankNicholsonSecondOrder: { // Adams-Moulton second order
             Real64 const inv2DelX(1.0 / (2.0 * DelX));
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA1 * (TD(i + 1) - TD_i + TDT_p) + ktA2 * (TD(i - 1) - TD_i + TDT_m)) * inv2DelX)) /
                     (((ktA1 + ktA2) * inv2DelX) + Cp_DelX_RhoS_Delt);
-        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // Adams-Moulton First order
+        } break;
+        case CondFDScheme::FullyImplicitFirstOrder: { // Adams-Moulton First order
             Real64 const invDelX(1.0 / DelX);
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA2 * TDT_m) + (ktA1 * TDT_p)) * invDelX) / (((ktA1 + ktA2) * invDelX) + Cp_DelX_RhoS_Delt);
-        } else {
+        } break;
+        default:
             assert(false); // Illegal CondFDSchemeType
         }
 
@@ -1814,7 +1889,7 @@ namespace HeatBalFiniteDiffManager {
 
         auto const &surface(state.dataSurface->Surface(Surf));
 
-        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) { // HT Algo issue
+        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) { // HT Algo issue
 
             int const ConstrNum(surface.Construction);
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -1830,6 +1905,8 @@ namespace HeatBalFiniteDiffManager {
 
             auto const &specHeatActuator1(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
             auto const &specHeatActuator2(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay + 1));
+
+            auto const &heatFluxActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).heatSourceFluxMaterialActuators(Lay));
 
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
@@ -1894,9 +1971,36 @@ namespace HeatBalFiniteDiffManager {
 
                 // Source/Sink Flux Capability ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-                Real64 const QSSFlux((surface.Area > 0.0) && (construct.SourceSinkPresent && Lay == construct.SourceAfterLayer)
-                                         ? (state.dataHeatBalFanSys->QRadSysSource(Surf) + state.dataHeatBalFanSys->QPVSysSource(Surf)) / surface.Area
-                                         : 0.0); // Source/Sink flux value at a layer interface // Includes QPV Source
+                Real64 QSSFlux = 0.0;
+                if ((surface.Area > 0.0) && (construct.SourceSinkPresent && Lay == construct.SourceAfterLayer)) {
+                    // Source/Sink flux value at a layer interface // Includes QPV Source
+                    QSSFlux = (state.dataHeatBalFanSys->QRadSysSource(Surf) + state.dataHeatBalFanSys->QPVSysSource(Surf)) / surface.Area;
+                }
+
+                // update report variables
+                auto &surfFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
+
+                // only includes internal heat source
+                surfFD.heatSourceInternalFluxLayerReport(Lay) = QSSFlux * surface.Area;
+                surfFD.heatSourceInternalFluxEnergyLayerReport(Lay) = QSSFlux * surface.Area * state.dataGlobal->TimeStepZoneSec;
+
+                // Add EMS actuated value
+                if (heatFluxActuator.isActuated) {
+                    Real64 actuatedVal = heatFluxActuator.actuatedValue;
+                    if (actuatedVal >= 0) {
+                        QSSFlux += heatFluxActuator.actuatedValue;
+                    } else {
+                        ShowSevereError(state, fmt::format("Surface: {}, Material: {}", surface.Name, mat.Name));
+                        ShowContinueError(state, "EMS Actuator does not support negative values");
+                        ShowFatalError(state, "Program terminates due to preceding conditions.");
+                    }
+
+                    // Update report variables
+                    // Only includes the EMS values
+                    surfFD.heatSourceEMSFluxLayerReport(Lay) = heatFluxActuator.actuatedValue * surface.Area;
+                    surfFD.heatSourceEMSFluxEnergyLayerReport(Lay) =
+                        heatFluxActuator.actuatedValue * surface.Area * state.dataGlobal->TimeStepZoneSec;
+                }
 
                 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1926,15 +2030,31 @@ namespace HeatBalFiniteDiffManager {
                         }
                     }
 
+                    // EMS Conductivity 2 Override
+                    if (condActuator2.isActuated) {
+                        kt2 = condActuator1.actuatedValue;
+                    }
+
+                    // EMS Specific Heat 2 Override
+                    if (specHeatActuator2.isActuated) {
+                        Cp2 = specHeatActuator1.actuatedValue;
+                    }
+
+                    // Update EMS internal variables
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
+
                     // R layer first, then PCM or regular layer
                     Real64 const Delt_Delx2(Delt * Delx2);
                     Real64 const Cp2_fac(Cp2 * pow_2(Delx2) * RhoS2 * Rlayer);
                     Real64 const Delt_kt2_Rlayer(Delt * kt2 * Rlayer);
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                         TDT_i = (2.0 * Delt_Delx2 * QSSFlux * Rlayer + (Cp2_fac - Delt_Delx2 - Delt_kt2_Rlayer) * TD_i +
                                  Delt_Delx2 * (TD(i - 1) + TDT_m) + Delt_kt2_Rlayer * (TD(i + 1) + TDT_p)) /
                                 (Delt_Delx2 + Delt_kt2_Rlayer + Cp2_fac);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                         Real64 const Two_Delt_Delx2(2.0 * Delt_Delx2);
                         Real64 const Two_Delt_kt2_Rlayer(2.0 * Delt_kt2_Rlayer);
                         TDT_i = (Two_Delt_Delx2 * (QSSFlux * Rlayer + TDT_m) + Cp2_fac * TD_i + Two_Delt_kt2_Rlayer * TDT_p) /
@@ -1970,35 +2090,25 @@ namespace HeatBalFiniteDiffManager {
                         kt1 = condActuator1.actuatedValue;
                     }
 
-                    // EMS Conductivity 2 Override
-                    if (condActuator2.isActuated) {
-                        kt2 = condActuator2.actuatedValue;
-                    }
-
                     // EMS Specific Heat 1 Override
                     if (specHeatActuator1.isActuated) {
                         Cp1 = specHeatActuator1.actuatedValue;
                     }
 
-                    // EMS Specific Heat 2 Override
-                    if (specHeatActuator2.isActuated) {
-                        Cp2 = specHeatActuator2.actuatedValue;
-                    }
-
                     // Update EMS internal variables
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
 
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Cp1_fac(Cp1 * pow_2(Delx1) * RhoS1 * Rlayer2);
                     Real64 const Delt_kt1_Rlayer2(Delt * kt1 * Rlayer2);
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                         TDT_i = (2.0 * Delt_Delx1 * QSSFlux * Rlayer2 + (Cp1_fac - Delt_Delx1 - Delt_kt1_Rlayer2) * TD_i +
                                  Delt_Delx1 * (TD(i + 1) + TDT_p) + Delt_kt1_Rlayer2 * (TD(i - 1) + TDT_m)) /
                                 (Delt_Delx1 + Delt_kt1_Rlayer2 + Cp1_fac);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                         Real64 const Two_Delt_Delx1(2.0 * Delt_Delx1);
                         Real64 const Two_Delt_kt1_Rlayer2(2.0 * Delt_kt1_Rlayer2);
                         TDT_i = (Two_Delt_Delx1 * (QSSFlux * Rlayer2 + TDT_p) + Cp1_fac * TD_i + Two_Delt_kt1_Rlayer2 * TDT_m) /
@@ -2087,10 +2197,10 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Update EMS internal variables
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
 
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Delt_Delx2(Delt * Delx2);
@@ -2101,11 +2211,13 @@ namespace HeatBalFiniteDiffManager {
                     Real64 const Cp2_fac(Cp2 * Delx1 * pow_2(Delx2) * RhoS2);
                     Real64 const Cp_fac(Cp1_fac + Cp2_fac);
                     if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
-                        CrankNicholsonSecondOrder) { // Regular Internal Interface Node with Source/sink using Adams Moulton second order
+                        CondFDScheme::CrankNicholsonSecondOrder) { // Regular Internal Interface Node with Source/sink using Adams Moulton second
+                                                                   // order
                         TDT_i = (2.0 * Delt_Delx1 * Delx2 * QSSFlux + (Cp_fac - Delt_sum) * TD_i + Delt_Delx1_kt2 * (TD(i + 1) + TDT_p) +
                                  Delt_Delx2_kt1 * (TD(i - 1) + TDT_m)) /
                                 (Delt_sum + Cp_fac);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // First order adams moulton
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
+                               CondFDScheme::FullyImplicitFirstOrder) { // First order adams moulton
                         TDT_i = (2.0 * (Delt_Delx1 * Delx2 * QSSFlux + Delt_Delx2_kt1 * TDT_m + Delt_Delx1_kt2 * TDT_p) + Cp_fac * TD_i) /
                                 (2.0 * (Delt_Delx2_kt1 + Delt_Delx1_kt2) + Cp_fac);
                     }
@@ -2189,7 +2301,7 @@ namespace HeatBalFiniteDiffManager {
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
         auto TDT_i(TDT(i));
         Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
-        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(state.dataMaterial->Material(MatLay));
             auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
@@ -2200,7 +2312,7 @@ namespace HeatBalFiniteDiffManager {
 
             if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
-                Real64 const IterDampConst(
+                Real64 constexpr IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
                 Real64 const Rlayer(mat.Resistance);
                 if ((i == 1) && (surface.ExtBoundCond > 0)) { // this is for an adiabatic partition
@@ -2267,21 +2379,22 @@ namespace HeatBalFiniteDiffManager {
                 Real64 const Delt_kt(Delt * kt);
                 Real64 const Cp_DelX2_RhoS(Cp * pow_2(DelX) * RhoS);
                 if ((surface.ExtBoundCond > 0) && (i == 1)) { // this is for an adiabatic or interzone partition
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) { // Adams-Moulton second order
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
                                  Delt_kt * (TD(i + 1) + TDT(i + 1))) /
                                 (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) { // Adams-Moulton First order
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
+                               CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
                         Real64 const Two_Delt_kt(2.0 * Delt_kt);
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT(i + 1)) /
                                 (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
                     }
                 } else { // for regular or interzone walls
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CrankNicholsonSecondOrder) {
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) {
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + (Cp_DelX2_RhoS - Delt_DelX * hconvi - Delt_kt) * TD_i +
                                  Delt_kt * (TD(i - 1) + TDT_m)) /
                                 (Delt_DelX * hconvi + Delt_kt + Cp_DelX2_RhoS);
-                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == FullyImplicitFirstOrder) {
+                    } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) {
                         Real64 const Two_Delt_kt(2.0 * Delt_kt);
                         TDT_i = (Two_Delt_DelX * (QFac + hconvi * Tia) + Cp_DelX2_RhoS * TD_i + Two_Delt_kt * TDT_m) /
                                 (Two_Delt_DelX * hconvi + Two_Delt_kt + Cp_DelX2_RhoS);
@@ -2355,7 +2468,7 @@ namespace HeatBalFiniteDiffManager {
                             ShowContinueError(
                                 state, format("...Internal Heat Gain (no floor) [{:.3R}] W", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains));
                         }
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                             ShowContinueError(state,
                                               format("...Infiltration/Ventilation [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalInfilVent));
                             ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalMixing));
@@ -2408,7 +2521,7 @@ namespace HeatBalFiniteDiffManager {
                             ShowContinueError(
                                 state, format("...Internal Heat Gain (no floor) [{:.3R}] W", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains));
                         }
-                        if (state.dataAirflowNetwork->SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
+                        if (state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                             ShowContinueError(state,
                                               format("...Infiltration/Ventilation [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalInfilVent));
                             ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalMixing));

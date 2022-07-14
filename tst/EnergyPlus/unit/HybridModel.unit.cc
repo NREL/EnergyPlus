@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->NonAirSystemResponse(1) = 0.0;
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.allocate(1);
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged(1) = 0.0;
-    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
+    state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
@@ -165,10 +165,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
-    state->dataHeatBal->SNLoadHeatRate.allocate(1);
-    state->dataHeatBal->SNLoadCoolRate.allocate(1);
-    state->dataHeatBal->SNLoadHeatEnergy.allocate(1);
-    state->dataHeatBal->SNLoadCoolEnergy.allocate(1);
+    state->dataHeatBal->ZoneSNLoadHeatRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadCoolRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadHeatEnergy.allocate(1);
+    state->dataHeatBal->ZoneSNLoadCoolEnergy.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
     state->dataRoomAirMod->IsZoneDV.dimension(1, false);
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);
@@ -239,7 +239,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
@@ -560,7 +559,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.deallocate();
-    state->dataAirflowNetworkBalanceManager->exchangeData.deallocate();
+    state->afn->exchangeData.deallocate();
     state->dataLoopNodes->Node.deallocate();
     state->dataHeatBalFanSys->TempTstatAir.deallocate();
     state->dataHeatBalFanSys->LoadCorrectionFactor.deallocate();
@@ -628,7 +627,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->NonAirSystemResponse(1) = 0.0;
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.allocate(1);
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged(1) = 0.0;
-    state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
+    state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
@@ -730,7 +729,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
@@ -888,7 +886,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
     state->dataHeatBalFanSys->SysDepZoneLoadsLagged.deallocate();
-    state->dataAirflowNetworkBalanceManager->exchangeData.deallocate();
+    state->afn->exchangeData.deallocate();
     state->dataLoopNodes->Node.deallocate();
     state->dataHeatBalFanSys->TempTstatAir.deallocate();
     state->dataHeatBalFanSys->LoadCorrectionFactor.deallocate();

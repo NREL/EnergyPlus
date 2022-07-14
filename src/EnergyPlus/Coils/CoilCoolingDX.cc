@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -144,50 +144,40 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                    input_data.evaporator_inlet_node_name,
                                                                    errorsFound,
-                                                                   state.dataCoilCooingDX->coilCoolingDXObjectName,
+                                                                   DataLoopNode::ConnectionObjectType::CoilCoolingDX,
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                   DataLoopNode::ConnectionType::Inlet,
+                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsNotParent);
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                     input_data.evaporator_outlet_node_name,
                                                                     errorsFound,
-                                                                    state.dataCoilCooingDX->coilCoolingDXObjectName,
+                                                                    DataLoopNode::ConnectionObjectType::CoilCoolingDX,
                                                                     input_data.name,
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                    DataLoopNode::ConnectionType::Outlet,
+                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
     this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                    input_data.condenser_inlet_node_name,
                                                                    errorsFound,
-                                                                   state.dataCoilCooingDX->coilCoolingDXObjectName,
+                                                                   DataLoopNode::ConnectionObjectType::CoilCoolingDX,
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                   DataLoopNode::ConnectionType::Inlet,
+                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                    DataLoopNode::ObjectIsNotParent);
-
-    // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
-    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
-        ShowWarningError(state,
-                         std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
-        ShowContinueError(state,
-                          "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
-                              "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-        ShowContinueError(state, "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
-    }
 
     this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                     input_data.condenser_outlet_node_name,
                                                                     errorsFound,
-                                                                    state.dataCoilCooingDX->coilCoolingDXObjectName,
+                                                                    DataLoopNode::ConnectionObjectType::CoilCoolingDX,
                                                                     input_data.name,
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                    DataLoopNode::ConnectionType::Outlet,
+                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
@@ -848,7 +838,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
                                                                                              this->name,
                                                                                              state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                                              state.dataHVACFan->fanObjs[this->supplyFanIndex]->name,
-                                                                                             DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                             DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                              this->supplyFanIndex);
                 }
             } else {
@@ -857,7 +847,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
                                                                                              this->name,
                                                                                              state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                                              state.dataFans->Fan(this->supplyFanIndex).FanName,
-                                                                                             DataAirSystems::structArrayLegacyFanModels,
+                                                                                             DataAirSystems::StructArrayLegacyFanModels,
                                                                                              this->supplyFanIndex);
                 }
             }
@@ -873,10 +863,10 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
             int dummyFanOpMode = 1.0;
             bool dummySingleMode = false;
 
-            Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
-            Real64 const RatedInletWetBulbTemp(19.44); // 19.44 or 67F
-            Real64 const RatedOutdoorAirTemp(35.0);    // 35 C or 95F
-            Real64 ratedOutdoorAirWetBulb = 23.9;      // from I/O ref. more precise value?
+            Real64 constexpr RatedInletAirTemp(26.6667);   // 26.6667C or 80F
+            Real64 constexpr RatedInletWetBulbTemp(19.44); // 19.44 or 67F
+            Real64 constexpr RatedOutdoorAirTemp(35.0);    // 35 C or 95F
+            Real64 ratedOutdoorAirWetBulb = 23.9;          // from I/O ref. more precise value?
 
             Real64 ratedInletEvapMassFlowRate = this->performance.normalMode.ratedEvapAirMassFlowRate;
             dummyEvapInlet.MassFlowRate = ratedInletEvapMassFlowRate;
@@ -993,7 +983,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
 {
 
     if (!state.dataCoilCooingDX->coilCoolingDXs.empty()) {
-        Real64 const ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
+        Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr std::string_view Format_990(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
             "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");

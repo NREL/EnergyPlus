@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef FOUNDATION_FIXTURE_HPP_
@@ -13,9 +13,7 @@ Foundation typical_fnd();
 
 class FoundationFixture : public testing::Test {
 public:
-  void SetUp() {
-      fnd = typical_fnd();
-  }
+  void SetUp() { fnd = typical_fnd(); }
 
   Foundation fnd;
 };

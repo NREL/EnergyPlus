@@ -550,7 +550,7 @@ The object also allows input to disable self-shading effect from exterior surfac
 
 \subsubsection{Inputs}\label{inputs-10-019}
 
-\paragraph{Field: Shading Calculation Method}
+\paragraph{Field: Shading Calculation Method}\label{field-shading-calculation-method}
 
 Select between CPU-based polygon clipping method, the GPU-based pixel counting method, or importing from external shading data.
 
@@ -615,7 +615,7 @@ In general (and you should also read the previous field description), if shadowi
 This field applies to the shading calculation update frequency method called ``Periodic.'' When the method called ``Timestep'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
 
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
-This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported back using \textbf{ImportedShading} in \textbf{Field: External Shading Calculation Method}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
+This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported back using \textbf{Imported} in \textbf{\hyperref[field-shading-calculation-method]{Field: Shading Calculation Method}}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
 
 \paragraph{Field: Disable Self-Shading Within Shading Zone Groups}\label{fieldself--disable-shading-within-a-zone-group}
 This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the self-shading effect by exterior surfaces of all zones within the target Zone Group is disabled. If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to surfaces within the same Shading Zone Group. If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, then all self-shading from exterior surfaces will be disabled.If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored. Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
@@ -1089,7 +1089,7 @@ Although, defined view factors cannot be used with CarrollMRT, the algorithm app
 
 \paragraph{Field: Override Mode}\label{override-mode}
 
-The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used.
+The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the MaxZoneTempDiff and MaxAllowedDelTemp fields of the PerformancePrecisionTradeoffs to be used.
 
 % table 2
 \begin{longtable}[c]{p{1.5in}p{5.0in}}
@@ -1100,7 +1100,9 @@ The Override Mode field provides a single field that will override other inputs 
     \endfirsthead
 
     Normal & No overrides\tabularnewline
-    Mode01 & Zone time step (TimeStep object) will be set to one timestep per hour\tabularnewline
+    Mode01 & Zone time step (TimeStep object) and the number of timesteps in averaging windows
+    will be set to one timestep per hour. The averaging windows are used in data smoothing
+    during sizing periods.\tabularnewline
     Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
     Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
     Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
@@ -1134,6 +1136,7 @@ Surface are grouped based on the following criteria for similarity:
     \item orientation
     \item surface height
     \item zone
+    \item enclosure
     \item solar/wind exposure
     \item other side boundary condition
     \item conduction and convection heat transfer algorithms
@@ -1148,11 +1151,15 @@ Surfaces with the following objects defined are currently never grouped because 
 \begin{itemize}
     \item ConstructionProperty:InternalHeatSource
     \item ZoneProperty:UserViewFactors:BySurfaceName
-    \item WindowShadingControl (windows only)
-    \item WindowProperty:AirflowControl (windows only)
+    \item WindowShadingControl
+    \item WindowProperty:AirflowControl
+    \item WindowMaterial:GlazingGroup:Thermochromic
+    \item DaylightingDevice:Tubular
+    \item WindowsCalculationEngine
+    \item SurfaceProperty:SolarIncidentInside
 \end{itemize}
 
-Currently, the only calculations performed across all surfaces with a group is the interior radiation exchange, where surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Additional calculations may be performed for a group of surfaces in future releases.
+Surface heat balance and interior radiation exchange calculations are performed across all surfaces within a group. Surface heat balance calculations are skipped for all but one surface within a group, and subsequently updated using the results from the representative surface. For interior radiation exchange, surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Solar shading and interior solar distribution are still calculated for each individual surface. The absorbed solar radiation used for the surface heat balance equations within a group is the area weighted average of all surfaces within the group.
 
 An IDF example:
 

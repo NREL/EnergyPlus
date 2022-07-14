@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,6 +63,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -208,12 +209,20 @@ void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
 
+    static constexpr std::array<std::string_view, 12> MonthNamesCC{
+        "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
+    static constexpr std::array<std::string_view, 12> MonthNamesUC{
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
+
     template <class T> struct is_shared_ptr : std::false_type
     {
     };
     template <class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
     {
     };
+
+    Real64 epElapsedTime();
 
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
@@ -354,7 +363,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const &str)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view str)
     {
         return FindItem(first, last, str, is_shared_ptr<typename std::iterator_traits<InputIterator>::value_type>{});
     }
@@ -426,7 +435,35 @@ namespace UtilityRoutines {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    std::string MakeUPPERCase(std::string_view const InputString); // Input String
+    inline std::string MakeUPPERCase(std::string_view const InputString) // Input String
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This function returns the Upper Case representation of the InputString.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the Intrinsic SCAN function to scan the lowercase representation of
+        // characters (DataStringGlobals) for each character in the given string.
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+        std::string ResultString(InputString);
+
+        for (std::string::size_type i = 0, e = len(InputString); i < e; ++i) {
+            int const curCharVal = int(InputString[i]);
+            if ((97 <= curCharVal && curCharVal <= 122) || (224 <= curCharVal && curCharVal <= 255)) { // lowercase ASCII and accented characters
+                ResultString[i] = char(curCharVal - 32);
+            }
+        }
+
+        return ResultString;
+    }
 
     constexpr bool SameString(std::string_view const s, std::string_view const t)
     {
@@ -568,12 +605,12 @@ namespace UtilityRoutines {
     // For map, you'd only need the comparator
     struct case_insensitive_hasher
     {
-        size_t operator()(const std::string_view key) const noexcept;
+        size_t operator()(std::string_view key) const noexcept;
     };
 
     struct case_insensitive_comparator
     {
-        bool operator()(const std::string_view a, const std::string_view b) const noexcept;
+        bool operator()(std::string_view a, std::string_view b) const noexcept;
     };
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
@@ -582,7 +619,7 @@ namespace UtilityRoutines {
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
-                          bool const &AllowSteamAndDistrict = false);
+                          bool AllowSteamAndDistrict = false);
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
@@ -594,9 +631,15 @@ namespace UtilityRoutines {
 constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
-        if (UtilityRoutines::SameString(sList[i], s)) return i;
+        if (sList[i] == s) return i;
     }
     return -1;
+}
+
+constexpr BooleanSwitch getYesNoValue(const std::string_view s)
+{
+    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
+    return static_cast<BooleanSwitch>(getEnumerationValue(yesNo, s));
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct

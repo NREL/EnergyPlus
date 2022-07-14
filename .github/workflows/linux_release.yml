@@ -8,6 +8,7 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BUILD_TYPE: Release
+  Python_REQUIRED_VERSION: 3.8
 
 jobs:
   linux_release:
@@ -19,10 +20,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.7
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
+      id: setup-python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
 
     - name: Setup QtIFW 4.x
       uses: jmarrec/setup-qtifw@v1
@@ -49,9 +51,11 @@ jobs:
       working-directory: ./build
       shell: bash
       run: |
-        cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-              -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
-              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DENABLE_PCH=OFF \
+        cmake -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/ \
+              -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" -DENABLE_PCH:BOOL=OFF \
               ../
 
     - name: Build Package

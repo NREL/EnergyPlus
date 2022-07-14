@@ -193,6 +193,8 @@ This alpha field specifies the method used to control the number of cells used t
 
 \textbf{MaximalCell}: As many cells as possible will be turned on. In no case, however, will the flow per cell be allowed to drop below its minimum value specified by the \emph{Minimum Water Flow Rate Fraction}.
 
+If this field is left blank, the default value is \textit{MaximalCell}.
+
 \paragraph{Field: Cell Minimum Water Flow Rate Fraction}\label{field-cell-minimum-water-flow-rate-fraction}
 
 This numeric field specifies the allowable smallest fraction of the design water flow rate. Flows less than this value will commonly result in fluid distribution problems; the pressure at each nozzle will be too weak for the fluid to be sprayed out in the correct pattern, not all the fill would be wet. If this field is left blank, the default value is 0.33.
@@ -655,7 +657,7 @@ This alpha field contains the name of the basin heater operating schedule. The b
 
 \paragraph{Field: Evaporation Loss Mode}\label{field-evaporation-loss-mode-1}
 
-This field is used to choose which method is used to model the amount of water evaporated by the cooling tower. There are two options: `LossFactor' or `SaturatedExit'. The default is SaturatedExit. The user-defined loss factor is entered in the following field. By assuming that the air leaving the tower is saturated, the evaporation can be directly calculated using moist air engineering calculations with data available within the cooling tower model (and does not require additional user input).
+This field is used to choose which method is used to model the amount of water evaporated by the cooling tower. There are two options: \textbf{LossFactor} or \textbf{SaturatedExit}. The default is SaturatedExit. The user-defined loss factor is entered in the following field. By assuming that the air leaving the tower is saturated, the evaporation can be directly calculated using moist air engineering calculations with data available within the cooling tower model (and does not require additional user input).
 
 \paragraph{Field: Evaporation Loss Factor}\label{field-evaporation-loss-factor-1}
 
@@ -696,6 +698,8 @@ This alpha field specifies the method used to control the number of cells used t
 \textbf{MinimalCell}: the program will use minimal number of cells needed, all other cells will be shut down with no water flow. It will attempt to use as few cells as possible to cool the fluid. In no case, however, will the flow per cell be allowed to exceed its maximum value defined by the \emph{Maximum Water Flow Rate Fraction.}
 
 \textbf{MaximalCell}: As many cells as possible will be turned on. In no case, however, will the flow per cell be allowed to drop below its minimum value specified by the \emph{Minimum Water Flow Rate Fraction}.
+
+If this field is left blank, the default value is \textit{MaximalCell}.
 
 \paragraph{Field: Cell Minimum Water Flow Rate Fraction}\label{field-cell-minimum-water-flow-rate-fraction-1}
 
@@ -1026,7 +1030,7 @@ This represents the fan speed operating at each time step: 2 for High Speed, 1 f
 
 \subsection{CoolingTower:VariableSpeed:Merkel}\label{coolingtowervariablespeedmerkel}
 
-This variable speed tower model is based on Merkel's theory and is similar to the single-speed and two-speed tower models.~ The open wet cooling tower is modeled as a counter flow heat exchanger with a variable-speed fan drawing air through the tower (induced-draft configuration). The model also includes a ``free convection'' regime where cooling tower performance modeled with the fan off.
+This variable speed tower model is based on Merkel's theory and is similar to the single-speed and two-speed tower models.~ The open wet cooling tower is modeled as a counter flow heat exchanger with a variable-speed fan drawing air through the tower (induced-draft configuration). The model also includes a ``free convection'' regime where cooling tower performance is modeled with the fan off.
 
 For this model, Merkel's theory is modified to include adjustments developed by Scheier to alter the heat transfer effectiveness based on current wetbulb, air flow rates, and water flow rates. The input requires performance curves or lookup tables to describe these three adjustment factors.
 
@@ -1208,6 +1212,8 @@ This alpha field specifies the method used to control the number of cells used t
 \textbf{MinimalCell} : the program will use minimal number of cells needed, all other cells will be shut down with no water flow. It will attempt to use as few cells as possible to cool the fluid. In no case, however, will the flow per cell be allowed to exceed its maximum value defined by the \emph{Maximum Water Flow Rate Fraction.}
 
 \textbf{MaximalCell}: As many cells as possible will be turned on. In no case, however, will the flow per cell be allowed to drop below its minimum value specified by the \emph{Minimum Water Flow Rate Fraction}.
+
+If this field is left blank, the default value is \textit{MaximalCell}.
 
 \paragraph{Field: Cell Minimum~ Water Flow Rate Fraction}\label{field-cell-minimum-water-flow-rate-fraction-2}
 
@@ -1573,7 +1579,7 @@ This alpha field contains the name of the basin heater operating schedule. The b
 
 \paragraph{Field: Evaporation Loss Mode}\label{field-evaporation-loss-mode-3}
 
-This field is used to choose which method is used to model the amount of water evaporated by the cooling tower. There are two options: `LossFactor' or `SaturatedExit'. The default is SaturatedExit. The user-defined loss factor is entered in the following field. By assuming that the air leaving the tower is saturated, the evaporation can be directly calculated using moist air engineering calculations with data available within the cooling tower model (and does not require additional user input).
+This field is used to choose which method is used to model the amount of water evaporated by the cooling tower. There are two options: \textbf{LossFactor} or \textbf{SaturatedExit}. The default is SaturatedExit. The user-defined loss factor is entered in the following field. By assuming that the air leaving the tower is saturated, the evaporation can be directly calculated using moist air engineering calculations with data available within the cooling tower model (and does not require additional user input).
 
 \paragraph{Field: Evaporation Loss Factor}\label{field-evaporation-loss-factor-3}
 
@@ -1581,7 +1587,7 @@ This field is used to specify the rate of water evaporated from the cooling towe
 
 \paragraph{Field: Drift Loss Percent}\label{field-drift-loss-percent-3}
 
-This numeric field contains the percent (\%) of design water flow rate lost to the atmosphere at the design air flow rate due to drift, which is water droplets that are entrained in the airstream as it passes through the tower. Drift is assumed to vary directly with tower air flow rate ratio, and is in addition to the amount of water lost to the atmosphere due to evaporation and/or blowdown. Typical values for water usage due to drift are from 0.05 to 0.2\% of the total water circulation rate with currently-available drift eliminators from tower manufacturers. The value entered in this field must be greater than or equal to zero, and the default is zero if the field is left blank.
+This numeric field contains the percent (\%) of design water flow rate lost to the atmosphere at the design air flow rate due to drift, which is water droplets that are entrained in the airstream as it passes through the tower. Drift is assumed to vary directly with tower air flow rate ratio, and is in addition to the amount of water lost to the atmosphere due to evaporation and/or blowdown. Typical values for water usage due to drift are from 0.05 to 0.2\% of the total water circulation rate with currently-available drift eliminators from tower manufacturers. The value entered in this field must be greater than or equal to zero, and the default value is 0.008\%.
 
 \paragraph{Field: Blowdown Calculation Mode}\label{field-blowdown-calculation-mode-3}
 
@@ -1614,6 +1620,8 @@ This alpha field specifies the method used to control the number of cells used t
 \textbf{MinimalCell}: the program will use minimal number of cells needed, all other cells will be shut down with no water flow. It will attempt to use as few cells as possible to cool the fluid. In no case, however, will the flow per cell be allowed to exceed its maximum value defined by the \emph{Maximum Water Flow Rate Fraction.}
 
 \textbf{MaximalCel} : As many cells as possible will be turned on. In no case, however, will the flow per cell be allowed to drop below its minimum value specified by the \emph{Minimum Water Flow Rate Fraction}.
+
+If this field is left blank, the default value is \textit{MaximalCell}.
 
 \paragraph{Field: Cell Minimum Water Flow Rate Fraction}\label{field-cell-minimum-water-flow-rate-fraction-3}
 

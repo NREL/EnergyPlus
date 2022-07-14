@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,6 +89,8 @@ namespace CoolTower {
     // Using/Aliasing
     using namespace DataHeatBalance;
 
+    constexpr std::array<std::string_view, static_cast<int>(FlowCtrl::Num)> FlowCtrlNamesUC{"WATERFLOWSCHEDULE", "WINDDRIVENFLOW"};
+
     void ManageCoolTower(EnergyPlusData &state)
     {
 
@@ -110,7 +112,7 @@ namespace CoolTower {
             state.dataCoolTower->GetInputFlag = false;
         }
 
-        if (state.dataCoolTower->NumCoolTowers == 0) return;
+        if ((int)state.dataCoolTower->CoolTowerSys.size() == 0) return;
 
         CalcCoolTower(state);
 
@@ -139,14 +141,14 @@ namespace CoolTower {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("ZoneCoolTower:Shower");
-        Real64 const MaximumWaterFlowRate(0.016667); // Maximum limit of water flow rate in m3/s (1000 l/min)
-        Real64 const MinimumWaterFlowRate(0.0);      // Minimum limit of water flow rate
-        Real64 const MaxHeight(30.0);                // Maximum effective tower height in m
-        Real64 const MinHeight(1.0);                 // Minimum effective tower height in m
-        Real64 const MaxValue(100.0);                // Maximum limit of outlet area, airflow, and temperature
-        Real64 const MinValue(0.0);                  // Minimum limit of outlet area, airflow, and temperature
-        Real64 const MaxFrac(1.0);                   // Maximum fraction
-        Real64 const MinFrac(0.0);                   // Minimum fraction
+        Real64 constexpr MaximumWaterFlowRate(0.016667); // Maximum limit of water flow rate in m3/s (1000 l/min)
+        Real64 constexpr MinimumWaterFlowRate(0.0);      // Minimum limit of water flow rate
+        Real64 constexpr MaxHeight(30.0);                // Maximum effective tower height in m
+        Real64 constexpr MinHeight(1.0);                 // Minimum effective tower height in m
+        Real64 constexpr MaxValue(100.0);                // Maximum limit of outlet area, airflow, and temperature
+        Real64 constexpr MinValue(0.0);                  // Minimum limit of outlet area, airflow, and temperature
+        Real64 constexpr MaxFrac(1.0);                   // Maximum fraction
+        Real64 constexpr MinFrac(0.0);                   // Minimum fraction
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -173,12 +175,12 @@ namespace CoolTower {
 
         auto &Zone(state.dataHeatBal->Zone);
 
-        state.dataCoolTower->NumCoolTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumCoolTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        state.dataCoolTower->CoolTowerSys.allocate(state.dataCoolTower->NumCoolTowers);
+        state.dataCoolTower->CoolTowerSys.allocate(NumCoolTowers);
 
         // Obtain inputs
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -235,12 +237,9 @@ namespace CoolTower {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(5)); // Type of flow control
-                if (SELECT_CASE_var == "WATERFLOWSCHEDULE") {
-                    state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType = FlowCtrlEnum::FlowSchedule;
-                } else if ((SELECT_CASE_var == "WINDDRIVENFLOW") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var.empty())) {
-                    state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType = FlowCtrlEnum::WindDriven;
-                } else {
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType =
+                    static_cast<FlowCtrl>(getEnumerationValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
+                if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::Invalid) {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(5) + "=\"" +
                                         state.dataIPShortCut->cAlphaArgs(5) + "\".");
@@ -430,7 +429,7 @@ namespace CoolTower {
 
         if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
             SetupOutputVariable(state,
                                 "Zone Cooltower Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
@@ -614,9 +613,9 @@ namespace CoolTower {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinWindSpeed(0.1);  // Minimum limit of outdoor air wind speed in m/s
-        Real64 const MaxWindSpeed(30.0); // Maximum limit of outdoor air wind speed in m/s
-        Real64 const UCFactor(60000.0);  // Unit conversion factor m3/s to l/min
+        Real64 constexpr MinWindSpeed(0.1);  // Minimum limit of outdoor air wind speed in m/s
+        Real64 constexpr MaxWindSpeed(30.0); // Maximum limit of outdoor air wind speed in m/s
+        Real64 constexpr UCFactor(60000.0);  // Unit conversion factor m3/s to l/min
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;            // Number of zone being served
@@ -640,7 +639,7 @@ namespace CoolTower {
 
         auto &Zone(state.dataHeatBal->Zone);
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
             ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
 
             if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
@@ -650,7 +649,7 @@ namespace CoolTower {
 
                 // Unit is on and simulate this component
                 // Determine the temperature and air flow rate at the cooltower outlet
-                if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrlEnum::WindDriven) {
+                if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::WindDriven) {
                     Real64 const height_sqrt(std::sqrt(state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight));
                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletVelocity = 0.7 * height_sqrt + 0.47 * (state.dataEnvrn->WindSpeed - 1.0);
                     AirVolFlowRate =
@@ -667,7 +666,7 @@ namespace CoolTower {
                         state.dataEnvrn->OutDryBulbTemp - (state.dataEnvrn->OutDryBulbTemp - state.dataEnvrn->OutWetBulbTemp) *
                                                               (1.0 - std::exp(-0.8 * state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight)) *
                                                               (1.0 - std::exp(-0.15 * WaterFlowRate));
-                } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrlEnum::FlowSchedule) {
+                } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::FlowSchedule) {
                     WaterFlowRate = state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate * UCFactor;
                     AirVolFlowRate = 0.0125 * WaterFlowRate * std::sqrt(state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight);
                     AirVolFlowRate = min(AirVolFlowRate, state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate);
@@ -774,7 +773,7 @@ namespace CoolTower {
         int CoolTowerNum;
         Real64 AvailWaterRate;
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 
             // Set the demand request for supply water from water storage tank (if needed)
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
@@ -811,7 +810,7 @@ namespace CoolTower {
 
         TSMult = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirVol = state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate * TSMult;
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirMass = state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate * TSMult;

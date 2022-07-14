@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -140,6 +140,7 @@ std::ostream::pos_type InputFile::position() const noexcept
 void InputFile::open(bool, bool)
 {
     file_size = fs::file_size(filePath);
+    // basic_fstream is a template, it has no problem with wchar_t (which filePath.c_str() returns on Windows)
     is = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
     // is->imbue(std::locale("C"));
 }
@@ -344,6 +345,8 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
 
+            state.dataInputProcessing->inputProcessor->markObjectAsUsed("OutputControl:Files", instance.key());
+
             { // "output_csv"
                 csv = boolean_choice(find_input(fields, "output_csv"));
             }
@@ -464,87 +467,52 @@ void IOFiles::flushAll()
     if (err_stream) {
         err_stream->flush();
     }
-    if (json.json_stream) {
-        json.json_stream->flush();
-    }
-    if (json.json_TSstream_Zone) {
-        json.json_TSstream_Zone->flush();
-    }
-    if (json.json_TSstream_HVAC) {
-        json.json_TSstream_HVAC->flush();
-    }
-    if (json.json_TSstream) {
-        json.json_TSstream->flush();
-    }
-    if (json.json_HRstream) {
-        json.json_HRstream->flush();
-    }
-    if (json.json_MNstream) {
-        json.json_MNstream->flush();
-    }
-    if (json.json_DYstream) {
-        json.json_DYstream->flush();
-    }
-    if (json.json_SMstream) {
-        json.json_SMstream->flush();
-    }
-    if (json.json_YRstream) {
-        json.json_YRstream->flush();
-    }
-    if (json.cbor_stream) {
-        json.cbor_stream->flush();
-    }
-    if (json.cbor_TSstream_Zone) {
-        json.cbor_TSstream_Zone->flush();
-    }
-    if (json.cbor_TSstream_HVAC) {
-        json.cbor_TSstream_HVAC->flush();
-    }
-    if (json.cbor_TSstream) {
-        json.cbor_TSstream->flush();
-    }
-    if (json.cbor_HRstream) {
-        json.cbor_HRstream->flush();
-    }
-    if (json.cbor_MNstream) {
-        json.cbor_MNstream->flush();
-    }
-    if (json.cbor_DYstream) {
-        json.cbor_DYstream->flush();
-    }
-    if (json.cbor_SMstream) {
-        json.cbor_SMstream->flush();
-    }
-    if (json.cbor_YRstream) {
-        json.cbor_YRstream->flush();
-    }
-    if (json.msgpack_stream) {
-        json.msgpack_stream->flush();
-    }
-    if (json.msgpack_TSstream_Zone) {
-        json.msgpack_TSstream_Zone->flush();
-    }
-    if (json.msgpack_TSstream_HVAC) {
-        json.msgpack_TSstream_HVAC->flush();
-    }
-    if (json.msgpack_TSstream) {
-        json.msgpack_TSstream->flush();
-    }
-    if (json.msgpack_HRstream) {
-        json.msgpack_HRstream->flush();
-    }
-    if (json.msgpack_MNstream) {
-        json.msgpack_MNstream->flush();
-    }
-    if (json.msgpack_DYstream) {
-        json.msgpack_DYstream->flush();
-    }
-    if (json.msgpack_SMstream) {
-        json.msgpack_SMstream->flush();
-    }
-    if (json.msgpack_YRstream) {
-        json.msgpack_YRstream->flush();
-    }
 }
 
 } // namespace EnergyPlus
+
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int>(std::string_view, int &&);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, const char *const &>(std::string_view, const char *const &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int &, std::string &>(std::string_view, int &, std::string &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &, std::string &, std::string &, double &>(
+    std::string_view, std::string &, std::string &, std::string &, double &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, const std::string_view &>(std::string_view, const std::string_view &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, const std::string_view &, std::string &>(std::string_view,
+                                                                                                                    const std::string_view &,
+                                                                                                                    std::string &);
+template std::string
+EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &, double &, double &>(std::string_view, std::string &, double &, double &);
+template std::string
+EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &, std::string &, int &>(std::string_view, std::string &, std::string &, int &);
+template std::string
+EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, double &, double &, double &>(std::string_view, double &, double &, double &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, double &, std::string &>(std::string_view, double &, std::string &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &>(std::string_view, std::string &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, const int &, int &>(std::string_view, const int &, int &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, double>(std::string_view, double &&);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int &, int &>(std::string_view, int &, int &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, const double &>(std::string_view, const double &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &, int &>(std::string_view, std::string &, int &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &, std::string &, double &>(std::string_view,
+                                                                                                                   std::string &,
+                                                                                                                   std::string &,
+                                                                                                                   double &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &, double &, std::string &, double &>(
+    std::string_view, std::string &, double &, std::string &, double &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, const int &>(std::string_view, const int &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int &, const std::string &, std::string &>(std::string_view,
+                                                                                                                      int &,
+                                                                                                                      const std::string &,
+                                                                                                                      std::string &);
+template std::string
+EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int &, int &, const std::string &>(std::string_view, int &, int &, const std::string &);
+template std::string
+EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int &, int &, std::string_view &>(std::string_view, int &, int &, std::string_view &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int &, std::string_view &, std::string &>(std::string_view,
+                                                                                                                     int &,
+                                                                                                                     std::string_view &,
+                                                                                                                     std::string &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, double &, double &>(std::string_view, double &, double &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, int &>(std::string_view, int &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, std::string &, double &>(std::string_view, std::string &, double &);
+template std::string EnergyPlus::format<EnergyPlus::FormatSyntax::Fortran, double &>(std::string_view, double &);

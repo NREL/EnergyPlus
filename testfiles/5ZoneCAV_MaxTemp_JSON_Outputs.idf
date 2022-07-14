@@ -123,7 +123,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     Building,                !- Name
@@ -3628,3 +3628,5 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
+  Output:SQLite,
+    SimpleAndTabular;        !- Option Type

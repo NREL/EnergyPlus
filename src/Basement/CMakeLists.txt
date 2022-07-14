@@ -21,7 +21,7 @@ set(SRC
 
 add_library(BasementOptions INTERFACE)
 if(NOT CMAKE_Fortran_COMPILER MATCHES "ifort")
-  target_compile_options(BasementOptions INTERFACE -ffloat-store)
+  target_compile_options(BasementOptions INTERFACE -ffloat-store -finit-local-zero)
 endif()
 
 if(NOT APPLE AND NOT UNIX) # Windows
