@@ -1694,26 +1694,6 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
     state.dataSysRpts->SysAnyZoneOccupied.allocate(NumPrimaryAirSys);
     state.dataSysRpts->SysPreDefRep.allocate(NumPrimaryAirSys);
 
-    state.dataSysRpts->SetBackCounter.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->HeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->LastHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->FirstHeatCoolFlag.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->LastHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->FirstHeatCoolHour.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->NoLoadFlag.allocate(state.dataGlobal->NumOfZones);
-    state.dataSysRpts->UnmetLoadFlag.allocate(state.dataGlobal->NumOfZones);
-
-    for (int ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
-        state.dataSysRpts->UnmetLoadFlag(ZoneIndex) = false;
-        state.dataSysRpts->SetBackCounter(ZoneIndex) = 0;
-        state.dataSysRpts->HeatCoolFlag(ZoneIndex) = 0;
-        state.dataSysRpts->LastHeatCoolFlag(ZoneIndex) = 0;
-        state.dataSysRpts->FirstHeatCoolFlag(ZoneIndex) = 0;
-        state.dataSysRpts->LastHeatCoolHour(ZoneIndex) = 0;
-        state.dataSysRpts->FirstHeatCoolHour(ZoneIndex) = 0;
-        state.dataSysRpts->NoLoadFlag(ZoneIndex) = false;
-    }
-
     for (int SysIndex = 1; SysIndex <= NumPrimaryAirSys; ++SysIndex) {
         state.dataSysRpts->SysMechVentFlow(SysIndex) = 0.0;
         state.dataSysRpts->SysNatVentFlow(SysIndex) = 0.0;

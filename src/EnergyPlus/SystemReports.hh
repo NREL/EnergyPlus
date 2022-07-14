@@ -375,15 +375,6 @@ struct SystemReportsData : BaseGlobalStruct
     int MaxLoopArraySize = 100;
     int MaxCompArraySize = 500;
 
-    Array1D_int SetBackCounter;
-    Array1D_int HeatCoolFlag;
-    Array1D_int FirstHeatCoolFlag;
-    Array1D_int FirstHeatCoolHour;
-    Array1D_int LastHeatCoolFlag;
-    Array1D_int LastHeatCoolHour;
-    Array1D_bool NoLoadFlag;
-    Array1D_bool UnmetLoadFlag;
-
     EPVector<SystemReports::SummarizeLoads> Vent;
     EPVector<SystemReports::ZoneVentReportVariables> ZoneVentRepVars;
     EPVector<SystemReports::SysLoadReportVariables> SysLoadRepVars;
@@ -437,14 +428,6 @@ struct SystemReportsData : BaseGlobalStruct
         this->TotalLoopConnects = 0;
         this->MaxLoopArraySize = 100;
         this->MaxCompArraySize = 500;
-        this->SetBackCounter.deallocate();
-        this->HeatCoolFlag.deallocate();
-        this->FirstHeatCoolFlag.deallocate();
-        this->FirstHeatCoolHour.deallocate();
-        this->LastHeatCoolFlag.deallocate();
-        this->LastHeatCoolHour.deallocate();
-        this->NoLoadFlag.deallocate();
-        this->UnmetLoadFlag.deallocate();
         this->Vent.deallocate();
         this->ZoneVentRepVars.deallocate();
         this->SysLoadRepVars.deallocate();
