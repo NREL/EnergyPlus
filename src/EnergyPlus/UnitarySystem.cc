@@ -15979,14 +15979,30 @@ namespace UnitarySystems {
         } break;
         default: {
             if (OutletNode > 0 && this->NodeNumOfControlledZone > 0) {
-                CalcZoneSensibleLatentOutput(AirMassFlow,
-                                             state.dataLoopNodes->Node(OutletNode).Temp,
-                                             state.dataLoopNodes->Node(OutletNode).HumRat,
-                                             state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp,
-                                             state.dataLoopNodes->Node(this->NodeNumOfControlledZone).HumRat,
-                                             SensibleOutput,
-                                             LatentOutput,
-                                             TotalOutput);
+                // PTUnit uses old style method of calculating delivered capacity.
+                // Also PTUnit always uses inlet node data, which is good when inlet is connected to zone return node
+                if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+                    Real64 SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+                    Real64 SpecHumIn = state.dataLoopNodes->Node(this->AirInNode).HumRat;
+                    LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
+                    SensibleOutput =
+                        AirMassFlow *
+                        (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(this->AirInNode).HumRat) -
+                                                    Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(this->AirInNode).Temp,
+                                                                               state.dataLoopNodes->Node(this->AirInNode).HumRat));
+                    QTotUnitOut =
+                        AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(this->AirInNode).Enthalpy);
+                } else {
+                    // air loop systems don't use the Sensible capacity, zone equipment uses this to adjust RemainingOutputRequired
+                    CalcZoneSensibleLatentOutput(AirMassFlow,
+                                                 state.dataLoopNodes->Node(OutletNode).Temp,
+                                                 state.dataLoopNodes->Node(OutletNode).HumRat,
+                                                 state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp,
+                                                 state.dataLoopNodes->Node(this->NodeNumOfControlledZone).HumRat,
+                                                 SensibleOutput,
+                                                 LatentOutput,
+                                                 TotalOutput);
+                }
                 QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
                 QTotUnitOut = TotalOutput;
             }
@@ -15998,47 +16014,51 @@ namespace UnitarySystems {
         // set the compressor part-load ratio report variable
         this->m_CompPartLoadRatio = max(this->m_CoolCompPartLoadRatio, this->m_HeatCompPartLoadRatio);
 
-        if (state.dataUnitarySystems->HeatingLoad) {
-            if (QTotUnitOut > 0.0) { // heating
-                this->m_TotCoolEnergyRate = 0.0;
-                this->m_SensCoolEnergyRate = 0.0;
-                this->m_LatCoolEnergyRate = 0.0;
-                this->m_TotHeatEnergyRate = QTotUnitOut;
-                this->m_SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
-                this->m_LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
-            } else {
-                this->m_TotCoolEnergyRate = std::abs(QTotUnitOut);
-                this->m_SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
-                this->m_LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
-                this->m_TotHeatEnergyRate = 0.0;
-                this->m_SensHeatEnergyRate = 0.0;
-                this->m_LatHeatEnergyRate = 0.0;
-            }
+        // logic difference in PTUnit *Rate reporting vs UnitarySystem. Use PTUnit more compact method for 9093.
+        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+            // Issue 9093.
+            // PTHP reports these differently, seems this is correct. Can't change this now, need an issue to resolve
+            this->m_TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
+            this->m_TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
+            this->m_SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
+            this->m_SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
+            this->m_LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
+            this->m_LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
         } else {
-            if (QTotUnitOut <= 0.0) { // cooling
-                this->m_TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
-                this->m_SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
-                this->m_LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
-                this->m_TotHeatEnergyRate = 0.0;
-                this->m_SensHeatEnergyRate = 0.0;
-                this->m_LatHeatEnergyRate = 0.0;
+            if (state.dataUnitarySystems->HeatingLoad) {
+                if (QTotUnitOut > 0.0) { // heating
+                    this->m_TotCoolEnergyRate = 0.0;
+                    this->m_SensCoolEnergyRate = 0.0;
+                    this->m_LatCoolEnergyRate = 0.0;
+                    this->m_TotHeatEnergyRate = QTotUnitOut;
+                    this->m_SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
+                    this->m_LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
+                } else {
+                    this->m_TotCoolEnergyRate = std::abs(QTotUnitOut);
+                    this->m_SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
+                    this->m_LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
+                    this->m_TotHeatEnergyRate = 0.0;
+                    this->m_SensHeatEnergyRate = 0.0;
+                    this->m_LatHeatEnergyRate = 0.0;
+                }
             } else {
-                this->m_TotCoolEnergyRate = 0.0;
-                this->m_SensCoolEnergyRate = 0.0;
-                this->m_LatCoolEnergyRate = 0.0;
-                this->m_TotHeatEnergyRate = QTotUnitOut;
-                this->m_SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
-                this->m_LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
+                if (QTotUnitOut <= 0.0) { // cooling
+                    this->m_TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
+                    this->m_SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
+                    this->m_LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
+                    this->m_TotHeatEnergyRate = 0.0;
+                    this->m_SensHeatEnergyRate = 0.0;
+                    this->m_LatHeatEnergyRate = 0.0;
+                } else {
+                    this->m_TotCoolEnergyRate = 0.0;
+                    this->m_SensCoolEnergyRate = 0.0;
+                    this->m_LatCoolEnergyRate = 0.0;
+                    this->m_TotHeatEnergyRate = QTotUnitOut;
+                    this->m_SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
+                    this->m_LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
+                }
             }
         }
-        // Issue 9093.
-        // PTHP reports these differently, seems this is correct. Can't change this now, need an issue to resolve
-        // state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
-        // state.dataPTHP->PTUnit(PTUnitNum).TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
-        // state.dataPTHP->PTUnit(PTUnitNum).SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOutNoATM));
-        // state.dataPTHP->PTUnit(PTUnitNum).SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOutNoATM));
-        // state.dataPTHP->PTUnit(PTUnitNum).LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
-        // state.dataPTHP->PTUnit(PTUnitNum).LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOutNoATM)));
 
         this->m_TotHeatEnergy = m_TotHeatEnergyRate * ReportingConstant;
         this->m_TotCoolEnergy = m_TotCoolEnergyRate * ReportingConstant;
