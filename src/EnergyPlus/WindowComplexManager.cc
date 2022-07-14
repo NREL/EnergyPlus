@@ -1538,14 +1538,22 @@ namespace WindowComplexManager {
             Geom.SolSkyWt(I) = SkyWeight(Geom.sInc(J));
         }
         WtSum = sum(Geom.SolSkyWt({1, NSky}));
-        Geom.SolSkyWt({1, NSky}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyWt({1, NSky}) /= WtSum;
+        } else {
+            Geom.SolSkyWt({1, NSky}) = 0.0;
+        }
         // SkyGround Weights
         Geom.SolSkyGndWt.allocate(NGnd);
         for (I = 1; I <= NGnd; ++I) {
             Geom.SolSkyGndWt(I) = SkyGndWeight(Geom.GndPt(I));
         }
         WtSum = sum(Geom.SolSkyGndWt({1, NGnd}));
-        Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        } else {
+            Geom.SolSkyGndWt({1, NGnd}) = 0.0;
+        }
         //  Weights for beam reflected from ground are calculated after shading
         //  interval is determined
         // Transmitted Basis:
@@ -2718,8 +2726,6 @@ namespace WindowComplexManager {
         Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
         Real64 edgeGlCorrFac;
 
-        int SrdSurfsNum;       // Surrounding surfaces list number
-        int SrdSurfNum;        // Surrounding surface number DO loop counter
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
@@ -2784,10 +2790,10 @@ namespace WindowComplexManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                        for (SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
                                              DataGlobalConstants::KelvinConv;

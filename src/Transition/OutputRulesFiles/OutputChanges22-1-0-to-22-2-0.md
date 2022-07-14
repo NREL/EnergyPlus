@@ -29,3 +29,12 @@ For the period-specific reports, when users choose ThermalResilienceSummary, CO2
 A "Reporting Period Time and Consumption" table is created to summarize the type, time range, and total electricity consumption for all reporting periods.
 
 Please see PR [#9156](https://github.com/NREL/EnergyPlus/pull/9156).
+
+### SurfaceProperty:GroundSurfaces New Object Output Variables
+
+Two new output variables related to the `SurfaceProperty:GroundSurfaces` have been added along with the new feature development. These new variables are:
+
+- Surfaces Property Ground Surfaces Average Temperature [C]
+- Surfaces Property Ground Surfaces Average Reflectance []
+
+See pull request [#9409](https://github.com/NREL/EnergyPlus/pull/9409) for more details.
