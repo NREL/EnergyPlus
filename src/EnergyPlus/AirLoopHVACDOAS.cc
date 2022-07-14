@@ -522,14 +522,6 @@ namespace AirLoopHVACDOAS {
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;
                         }
-                        if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
-                            ShowSevereError(state,
-                                            format("The fan placement is either first as blow through or last as draw through in{} = {}",
-                                                   CurrentModuleObject,
-                                                   CompName));
-                            ShowContinueError(state, format("The current position is number {}", CompNum));
-                            errorsFound = true;
-                        }
                         break;
 
                     case ValidEquipListType::FanComponentModel:
@@ -543,14 +535,6 @@ namespace AirLoopHVACDOAS {
                         thisOutletNodeNum = Fans::GetFanOutletNode(state, typeNameUC, CompName, OutletNodeErrFlag);
                         thisDOAS.m_FanInletNodeNum = thisInletNodeNum;
                         thisDOAS.m_FanOutletNodeNum = thisOutletNodeNum;
-                        if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
-                            ShowSevereError(state,
-                                            format("The fan placement is either first as blow through or last as draw through in{} = {}",
-                                                   CurrentModuleObject,
-                                                   CompName));
-                            ShowContinueError(state, format("The current position is number {}", CompNum));
-                            errorsFound = true;
-                        }
                         break;
 
                     case ValidEquipListType::CoilCoolingWater:
