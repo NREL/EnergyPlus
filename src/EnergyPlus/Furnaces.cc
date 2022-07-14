@@ -12636,7 +12636,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
                 DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
         } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating =
+            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
                 VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
         } else {
             state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling = -1000.0;
