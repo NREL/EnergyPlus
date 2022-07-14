@@ -119,6 +119,7 @@ TEST_F(EnergyPlusFixture, FluidProperties_GetSpecificHeatGlycol)
 
 TEST_F(EnergyPlusFixture, FluidProperties_InterpValuesForGlycolConc)
 {
+    // Test fluid property interpolations with only one concentration
     int const NumCon = 1;
     int const NumTemp = 5;
     Array1D<Real64> ConData = {1.0};
@@ -126,7 +127,7 @@ TEST_F(EnergyPlusFixture, FluidProperties_InterpValuesForGlycolConc)
     Array2D<Real64> PropData;
     PropData.allocate(NumCon, NumTemp);
 
-    // This array contains the actual data
+    // This array contains the temperature dependent fluid property data
     // e.g. one of the types of density, specific heat, viscosity, or conductivity
     for (int i = 1; i <= NumCon; ++i) {
         for (int j = 1; j <= NumTemp; ++j) {
@@ -140,6 +141,7 @@ TEST_F(EnergyPlusFixture, FluidProperties_InterpValuesForGlycolConc)
 
     Result.allocate(NumTemp);
 
+    // Test interpolation for the single-concentration scenario
     InterpValuesForGlycolConc(*state,
                               NumCon,   // number of concentrations (dimension of raw data)
                               NumTemp,  // number of temperatures (dimension of raw data)
