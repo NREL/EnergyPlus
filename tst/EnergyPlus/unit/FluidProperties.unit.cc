@@ -116,3 +116,41 @@ TEST_F(EnergyPlusFixture, FluidProperties_GetSpecificHeatGlycol)
     EXPECT_NEAR(4082, GetSpecificHeatGlycol(*state, "GLHXFLUID", 105.0, FluidIndex, "UnitTest"), 0.01);
     EXPECT_NEAR(4137, GetSpecificHeatGlycol(*state, "GLHXFLUID", 125.0, FluidIndex, "UnitTest"), 0.01);
 }
+
+TEST_F(EnergyPlusFixture, FluidProperties_InterpValuesForGlycolConc)
+{
+    int const NumCon = 1;
+    int const NumTemp = 5;
+    Array1D<Real64> ConData = {1.0};
+
+    Array2D<Real64> PropData;
+    PropData.allocate(NumCon, NumTemp);
+
+    // This array contains the actual data
+    // e.g. one of the types of density, specific heat, viscosity, or conductivity
+    for (int i = 1; i <= NumCon; ++i) {
+        for (int j = 1; j <= NumTemp; ++j) {
+            // assume some varying density close to water
+            PropData(i, j) = 1030.0 - 10.0 * j;
+        }
+    }
+
+    Real64 ActCon = 1.0;
+    Array1D<Real64> Result;
+
+    Result.allocate(NumTemp);
+
+    InterpValuesForGlycolConc(*state,
+                              NumCon,   // number of concentrations (dimension of raw data)
+                              NumTemp,  // number of temperatures (dimension of raw data)
+                              ConData,  // concentrations for raw data
+                              PropData, // raw property data (temperature,concentration)
+                              ActCon,   // concentration of actual fluid mix
+                              Result);  // interpolated output data at proper concentration
+
+    EXPECT_NEAR(1020.0, Result(1), 1e-6);
+    EXPECT_NEAR(1010.0, Result(2), 1e-6);
+    EXPECT_NEAR(1000.0, Result(3), 1e-6);
+    EXPECT_NEAR(990.0, Result(4), 1e-6);
+    EXPECT_NEAR(980.0, Result(5), 1e-6);
+}
