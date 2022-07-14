@@ -234,6 +234,8 @@ namespace SurfaceGeometry {
 
     void GetSurfaceHeatTransferAlgorithmOverrides(EnergyPlusData &state, bool &ErrorsFound);
 
+    void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound); // Error flag indicator (true if errors found)
+
     class ExposedFoundationPerimeter
     {
     public:
