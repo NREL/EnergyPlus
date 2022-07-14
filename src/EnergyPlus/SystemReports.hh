@@ -128,27 +128,29 @@ namespace SystemReports {
         }
     };
 
-    struct SysPreDefRepType
+    struct ZoneVentReportVariables
     {
-        Real64 SysMechVentTotal = 0.0;           // air loop mechanical vent total volume OA at standard density {m3}
-        Real64 SysNatVentTotal = 0.0;            // air loop natural vent total volume OA at standard density {m3}
-        Real64 SysTargetVentTotalVoz = 0.0;      // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3}
-        Real64 SysTimeBelowVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
-        Real64 SysTimeAtVozDynTotal = 0.0;       // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
-        Real64 SysTimeAboveVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
-        Real64 SysMechVentTotalOcc = 0.0;        // air loop mechanical vent total volume OA at standard density {m3} during occupied
-        Real64 SysNatVentTotalOcc = 0.0;         // air loop natural vent total volume OA at standard density {m3} during occupied
-        Real64 SysTargetVentTotalVozOcc = 0.0;   // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3} during occupied
-        Real64 SysTimeBelowVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
-        Real64 SysTimeAtVozDynTotalOcc = 0.0;    // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occ
-        Real64 SysTimeAboveVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
-        Real64 SysTimeVentUnoccTotal = 0.0;      // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
-        Real64 SysTimeOccupiedTotal = 0.0;       // time [hrs] that any zone is occupied
+        Real64 CoolingLoadMetByVent = 0.0;
+        Real64 CoolingLoadAddedByVent = 0.0;
+        Real64 OvercoolingByVent = 0.0;
+        Real64 HeatingLoadMetByVent = 0.0;
+        Real64 HeatingLoadAddedByVent = 0.0;
+        Real64 OverheatingByVent = 0.0;
+        Real64 NoLoadHeatingByVent = 0.0;
+        Real64 NoLoadCoolingByVent = 0.0;
 
-        std::vector<Real64> SysTimeAtOALimit = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};    // time [hrs] at limit [n]
-        std::vector<Real64> SysTimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
-        std::vector<Real64> SysMechVentTotAtLimitOcc = {
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
+        Real64 ZoneOAMassFlow = 0.0;               // zone mech vent mass flow rate {kg/s}
+        Real64 ZoneOAMass = 0.0;                   // zone mech vent total mass for time {kg}
+        Real64 ZoneOAVolFlowStdRho = 0.0;          // zone mech vent volume flow rate at standard density {m3/s}
+        Real64 ZoneOAVolStdRho = 0.0;              // zone mech vent total volume OA at standard density {m3}
+        Real64 ZoneOAVolFlowCrntRho = 0.0;         // zone mech vent volume flow rate at current density {m3/s}
+        Real64 ZoneOAVolCrntRho = 0.0;             // zone mech vent total volume OA at current density {m3}
+        Real64 ZoneMechACH = 0.0;                  // zone mech vent air changes per hour {ACH}
+        Real64 ZoneTargetVentilationFlowVoz = 0.0; // zone target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+        Real64 ZoneTimeBelowVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 ZoneTimeAtVozDyn = 0.0;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 ZoneTimeAboveVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 ZoneTimeVentUnocc = 0.0;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
     };
 
     struct SysLoadReportVariables
@@ -195,6 +197,29 @@ namespace SystemReports {
         Real64 SysHCCompPropane = 0.0;
         Real64 SysHCCompSteam = 0.0;
         Real64 SysDomesticH2O = 0.0;
+    };
+
+    struct SysPreDefRepType
+    {
+        Real64 SysMechVentTotal = 0.0;           // air loop mechanical vent total volume OA at standard density {m3}
+        Real64 SysNatVentTotal = 0.0;            // air loop natural vent total volume OA at standard density {m3}
+        Real64 SysTargetVentTotalVoz = 0.0;      // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3}
+        Real64 SysTimeBelowVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 SysTimeAtVozDynTotal = 0.0;       // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 SysTimeAboveVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 SysMechVentTotalOcc = 0.0;        // air loop mechanical vent total volume OA at standard density {m3} during occupied
+        Real64 SysNatVentTotalOcc = 0.0;         // air loop natural vent total volume OA at standard density {m3} during occupied
+        Real64 SysTargetVentTotalVozOcc = 0.0;   // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3} during occupied
+        Real64 SysTimeBelowVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
+        Real64 SysTimeAtVozDynTotalOcc = 0.0;    // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occ
+        Real64 SysTimeAboveVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
+        Real64 SysTimeVentUnoccTotal = 0.0;      // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+        Real64 SysTimeOccupiedTotal = 0.0;       // time [hrs] that any zone is occupied
+
+        std::vector<Real64> SysTimeAtOALimit = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};    // time [hrs] at limit [n]
+        std::vector<Real64> SysTimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
+        std::vector<Real64> SysMechVentTotAtLimitOcc = {
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
     };
 
     // Functions
@@ -286,7 +311,7 @@ namespace SystemReports {
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
-    void ReportMaxVentilationLoads(EnergyPlusData &state);
+    void ReportVentilationLoads(EnergyPlusData &state);
 
     void MatchPlantSys(EnergyPlusData &state,
                        int const AirLoopNum, // counter for zone air distribution inlets
@@ -325,34 +350,13 @@ namespace SystemReports {
 struct SystemReportsData : BaseGlobalStruct
 {
 
-    Array1D<Real64> MaxCoolingLoadMetByVent;
-    Array1D<Real64> MaxCoolingLoadAddedByVent;
-    Array1D<Real64> MaxOvercoolingByVent;
-    Array1D<Real64> MaxHeatingLoadMetByVent;
-    Array1D<Real64> MaxHeatingLoadAddedByVent;
-    Array1D<Real64> MaxOverheatingByVent;
-    Array1D<Real64> MaxNoLoadHeatingByVent;
-    Array1D<Real64> MaxNoLoadCoolingByVent;
-
-    Array1D<Real64> ZoneOAMassFlow;               // zone mech vent mass flow rate {kg/s}
-    Array1D<Real64> ZoneOAMass;                   // zone mech vent total mass for time {kg}
-    Array1D<Real64> ZoneOAVolFlowStdRho;          // zone mech vent volume flow rate at standard density {m3/s}
-    Array1D<Real64> ZoneOAVolStdRho;              // zone mech vent total volume OA at standard density {m3}
-    Array1D<Real64> ZoneOAVolFlowCrntRho;         // zone mech vent volume flow rate at current density {m3/s}
-    Array1D<Real64> ZoneOAVolCrntRho;             // zone mech vent total volume OA at current density {m3}
-    Array1D<Real64> ZoneMechACH;                  // zone mech vent air changes per hour {ACH}
-    Array1D<Real64> ZoneTargetVentilationFlowVoz; // zone target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
-    Array1D<Real64> ZoneTimeBelowVozDyn;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
-    Array1D<Real64> ZoneTimeAtVozDyn;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
-    Array1D<Real64> ZoneTimeAboveVozDyn;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
-    Array1D<Real64> ZoneTimeVentUnocc;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
-    Real64 AnyZoneTimeBelowVozDyn = 0.0;          // time [hrs] that any zone mechanical+natural ventilation is < VozTarget - 1%
-    Real64 AllZonesTimeAtVozDyn = 0.0;            // time [hrs] that all zones mechanical+natural ventilation is = VozTarget within 1% and > zero
-    Real64 AnyZoneTimeAboveVozDyn = 0.0;          // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1%
-    Real64 AnyZoneTimeVentUnocc = 0.0;            // time [hrs] that any zone mechanical+natural ventilation is > zero during unoccupied
-    Real64 AnyZoneTimeBelowVozDynOcc = 0.0;       // time [hrs] that any zone mechanical+natural ventilation is < VozTarget - 1% during occupied
-    Real64 AllZonesTimeAtVozDynOcc = 0.0;         // time [hrs] that all zones mech+nat vent is = VozTarget within 1% and > zero during occupied
-    Real64 AnyZoneTimeAboveVozDynOcc = 0.0;       // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1% during occupied
+    Real64 AnyZoneTimeBelowVozDyn = 0.0;    // time [hrs] that any zone mechanical+natural ventilation is < VozTarget - 1%
+    Real64 AllZonesTimeAtVozDyn = 0.0;      // time [hrs] that all zones mechanical+natural ventilation is = VozTarget within 1% and > zero
+    Real64 AnyZoneTimeAboveVozDyn = 0.0;    // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1%
+    Real64 AnyZoneTimeVentUnocc = 0.0;      // time [hrs] that any zone mechanical+natural ventilation is > zero during unoccupied
+    Real64 AnyZoneTimeBelowVozDynOcc = 0.0; // time [hrs] that any zone mechanical+natural ventilation is < VozTarget - 1% during occupied
+    Real64 AllZonesTimeAtVozDynOcc = 0.0;   // time [hrs] that all zones mech+nat vent is = VozTarget within 1% and > zero during occupied
+    Real64 AnyZoneTimeAboveVozDynOcc = 0.0; // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1% during occupied
 
     Array1D<Real64> SysMechVentFlow;             // air loop mechanical vent total volume OA at standard density {m3/s}
     Array1D<Real64> SysNatVentFlow;              // air loop natural vent total volume OA at standard density {m3/s}
@@ -381,8 +385,9 @@ struct SystemReportsData : BaseGlobalStruct
     Array1D_bool UnmetLoadFlag;
 
     EPVector<SystemReports::SummarizeLoads> Vent;
-    EPVector<SystemReports::SysPreDefRepType> SysPreDefRep;
+    EPVector<SystemReports::ZoneVentReportVariables> ZoneVentRepVars;
     EPVector<SystemReports::SysLoadReportVariables> SysLoadRepVars;
+    EPVector<SystemReports::SysPreDefRepType> SysPreDefRep;
 
     bool OneTimeFlag_FindFirstLastPtr = true;
     bool OneTimeFlag_InitEnergyReports = true;
@@ -410,27 +415,6 @@ struct SystemReportsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->MaxCoolingLoadMetByVent.deallocate();
-        this->MaxCoolingLoadAddedByVent.deallocate();
-        this->MaxOvercoolingByVent.deallocate();
-        this->MaxHeatingLoadMetByVent.deallocate();
-        this->MaxHeatingLoadAddedByVent.deallocate();
-        this->MaxOverheatingByVent.deallocate();
-        this->MaxNoLoadHeatingByVent.deallocate();
-        this->MaxNoLoadCoolingByVent.deallocate();
-        this->SysLoadRepVars.deallocate();
-        this->ZoneOAMassFlow.deallocate();
-        this->ZoneOAMass.deallocate();
-        this->ZoneOAVolFlowStdRho.deallocate();
-        this->ZoneOAVolStdRho.deallocate();
-        this->ZoneOAVolFlowCrntRho.deallocate();
-        this->ZoneOAVolCrntRho.deallocate();
-        this->ZoneMechACH.deallocate();
-        this->ZoneTargetVentilationFlowVoz.deallocate();
-        this->ZoneTimeBelowVozDyn.deallocate();
-        this->ZoneTimeAtVozDyn.deallocate();
-        this->ZoneTimeAboveVozDyn.deallocate();
-        this->ZoneTimeVentUnocc.deallocate();
         this->AnyZoneTimeBelowVozDyn = 0.0;
         this->AllZonesTimeAtVozDyn = 0.0;
         this->AnyZoneTimeAboveVozDyn = 0.0;
@@ -462,6 +446,8 @@ struct SystemReportsData : BaseGlobalStruct
         this->NoLoadFlag.deallocate();
         this->UnmetLoadFlag.deallocate();
         this->Vent.deallocate();
+        this->ZoneVentRepVars.deallocate();
+        this->SysLoadRepVars.deallocate();
         this->SysPreDefRep.deallocate();
         this->OneTimeFlag_FindFirstLastPtr = true;
         this->OneTimeFlag_InitEnergyReports = true;
