@@ -7897,7 +7897,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
         {"Source Energy End Use Components Summary", eleckWh},
-        {"Source Energy End Use Component Per Conditioned Floor Area", 10000.0 / expectedBuildingConditionedFloorArea},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / expectedBuildingConditionedFloorArea},
         {"Source Energy End Use Components Per Total Floor Area", 10000.0 / expectedBuildingGrossFloorArea},
     });
 
@@ -9049,7 +9049,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
         {"Source Energy End Use Components Summary", eleckWh / largeConv},
-        {"Source Energy End Use Component Per Conditioned Floor Area", 10000.0 / largeConv / (expectedBuildingConditionedFloorArea / areaConv)},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / largeConv / (expectedBuildingConditionedFloorArea / areaConv)},
         {"Source Energy End Use Components Per Total Floor Area", 10000.0 / largeConv / (expectedBuildingGrossFloorArea / areaConv)},
     });
 
