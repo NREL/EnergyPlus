@@ -2600,3 +2600,363 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
     EXPECT_NEAR(calculatedResult3, expectedResult3, tol);
     EXPECT_NEAR(calculatedResult4, expectedResult4, tol);
 }
+
+TEST_F(EnergyPlusFixture, ITE_Env_Class_Fix_41C)
+{
+    // Test PR 9541 for Issue 9538
+    std::string const idf_objects = delimited_string({
+        " Zone,",
+        "  ZONE ONE,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+
+        " ElectricEquipment:ITE:AirCooled,",
+        "  Data Center Servers,     !- Name",
+        "  ZONE ONE,                !- Zone Name",
+        "  FlowFromSystem,          !- Air Flow Calculation Method",
+        "  Watts/Unit,              !- Design Power Input Calculation Method",
+        "  50,                      !- Watts per Unit {W}",
+        "  10,                      !- Number of Units",
+        "  ,                        !- Watts per Zone Floor Area {W/m2}",
+        "  ,                        !- Design Power Input Schedule Name",
+        "  ,                        !- CPU Loading  Schedule Name",
+        "  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+        "  0.4,                     !- Design Fan Power Input Fraction",
+        "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+        "  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+        "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+        "  15,                      !- Design Entering Air Temperature {C}",
+        "  A3,                      !- Environmental Class",
+        "  ZoneAirNode,             !- Air Inlet Connection Type",
+        "  ,                        !- Air Inlet Room Air Model Node Name",
+        "  ,                        !- Air Outlet Room Air Model Node Name",
+        "  ,                        !- Supply Air Node Name",
+        "  0.1,                     !- Design Recirculation Fraction",
+        "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
+        "  0.9,                     !- Design Electric Power Supply Efficiency",
+        "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+        "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+        "  ITE-CPU,                 !- CPU End-Use Subcategory",
+        "  ITE-Fans,                !- Fan End-Use Subcategory",
+        "  ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
+        "  2,                       !- Supply Temperature Difference {deltaC}",
+        "  ,                        !- Supply Temperature Difference Schedule",
+        "  -1,                      !- Return Temperature Difference {deltaC}",
+        "  ;                        !- Return Temperature Difference Schedule",
+
+        " Curve:Biquadratic,",
+        "  Data Center Servers Power fLoadTemp,  !- Name",
+        "  -1.0,                    !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.06667,                 !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "  Data Center Servers Airflow fLoadTemp,  !- Name",
+        "  -1.4,                    !- Coefficient1 Constant",
+        "  0.9,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.1,                     !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        " Curve:Quadratic,",
+        "  ECM FanPower fFlow,      !- Name",
+        "  0.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  99.0;                    !- Maximum Value of x",
+    });
+
+    static constexpr std::array<Real64, 7> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0};           // Minimum dry-bulb temperature [C]
+    static constexpr std::array<Real64, 7> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0};        // Maximum dry-bulb temperature [C]
+    static constexpr std::array<Real64, 7> DPMin = {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}; // Minimum dewpoint temperature [C]
+    static constexpr std::array<Real64, 7> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0};        // Maximum dewpoint temperature [C]
+    static constexpr std::array<Real64, 7> RHMin = {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0};             // Minimum relative humidity [%]
+    static constexpr std::array<Real64, 7> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0};        // Maximum relative humidity [%]
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+
+    state->dataGlobal->TimeStepZone = 1.0;
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+
+    // Test 1: 41C;
+    state->dataHeatBalFanSys->MAT(1) = 41.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.015;
+
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataEnvrn->StdBaroPress = 101400.0;
+
+    InternalHeatGains::CalcZoneITEq(*state);
+
+    int Loop = 1;
+    int NZ = 1;
+    int spaceNum = 1;
+    int EnvClass = 3;
+    Real64 TAirIn = state->dataHeatBalFanSys->MAT(1);
+    Real64 TDPAirIn = 20;
+    Real64 RHAirIn = 40;
+
+    TDPAirIn = 20.335339775634917;
+    RHAirIn = 30.667066060140435;
+
+    EXPECT_NEAR(state->dataGlobal->TimeStepZone, 1.0, 1e-6);
+
+    // Test 1: 41C
+    // if (TAirIn > DBMax[EnvClass]): A3 upper bounds hit
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NEAR(state->dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT, TAirIn - DBMax[EnvClass], 1e-6);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, 1.0);
+    EXPECT_NEAR(state->dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT, TAirIn - DBMax[EnvClass], 1e-6);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, 1.0);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, 1.0);
+}
+
+TEST_F(EnergyPlusFixture, ITE_Env_Class_Fix_39C)
+{
+    // Test PR 9541 for Issue 9538
+    std::string const idf_objects = delimited_string({
+        " Zone,",
+        "  ZONE ONE,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+
+        " ElectricEquipment:ITE:AirCooled,",
+        "  Data Center Servers,     !- Name",
+        "  ZONE ONE,                !- Zone Name",
+        "  FlowFromSystem,          !- Air Flow Calculation Method",
+        "  Watts/Unit,              !- Design Power Input Calculation Method",
+        "  50,                      !- Watts per Unit {W}",
+        "  10,                      !- Number of Units",
+        "  ,                        !- Watts per Zone Floor Area {W/m2}",
+        "  ,                        !- Design Power Input Schedule Name",
+        "  ,                        !- CPU Loading  Schedule Name",
+        "  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+        "  0.4,                     !- Design Fan Power Input Fraction",
+        "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+        "  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+        "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+        "  15,                      !- Design Entering Air Temperature {C}",
+        "  A3,                      !- Environmental Class",
+        "  ZoneAirNode,             !- Air Inlet Connection Type",
+        "  ,                        !- Air Inlet Room Air Model Node Name",
+        "  ,                        !- Air Outlet Room Air Model Node Name",
+        "  ,                        !- Supply Air Node Name",
+        "  0.1,                     !- Design Recirculation Fraction",
+        "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
+        "  0.9,                     !- Design Electric Power Supply Efficiency",
+        "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+        "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+        "  ITE-CPU,                 !- CPU End-Use Subcategory",
+        "  ITE-Fans,                !- Fan End-Use Subcategory",
+        "  ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
+        "  2,                       !- Supply Temperature Difference {deltaC}",
+        "  ,                        !- Supply Temperature Difference Schedule",
+        "  -1,                      !- Return Temperature Difference {deltaC}",
+        "  ;                        !- Return Temperature Difference Schedule",
+
+        " Curve:Biquadratic,",
+        "  Data Center Servers Power fLoadTemp,  !- Name",
+        "  -1.0,                    !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.06667,                 !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "  Data Center Servers Airflow fLoadTemp,  !- Name",
+        "  -1.4,                    !- Coefficient1 Constant",
+        "  0.9,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.1,                     !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        " Curve:Quadratic,",
+        "  ECM FanPower fFlow,      !- Name",
+        "  0.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  99.0;                    !- Maximum Value of x",
+    });
+
+    static constexpr std::array<Real64, 7> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0};           // Minimum dry-bulb temperature [C]
+    static constexpr std::array<Real64, 7> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0};        // Maximum dry-bulb temperature [C]
+    static constexpr std::array<Real64, 7> DPMin = {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}; // Minimum dewpoint temperature [C]
+    static constexpr std::array<Real64, 7> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0};        // Maximum dewpoint temperature [C]
+    static constexpr std::array<Real64, 7> RHMin = {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0};             // Minimum relative humidity [%]
+    static constexpr std::array<Real64, 7> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0};        // Maximum relative humidity [%]
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+
+    state->dataGlobal->TimeStepZone = 1.0;
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+
+    // Test 2: 39C;
+    state->dataHeatBalFanSys->MAT(1) = 39.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.015;
+
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataEnvrn->StdBaroPress = 101400.0;
+
+    InternalHeatGains::CalcZoneITEq(*state);
+
+    int Loop = 1;
+    int NZ = 1;
+    int spaceNum = 1;
+    int EnvClass = 3;
+    Real64 TAirIn = state->dataHeatBalFanSys->MAT(1);
+    Real64 TDPAirIn = 20;
+    Real64 RHAirIn = 40;
+
+    TDPAirIn = 20.335339775634917;
+    RHAirIn = 34.117980814511832;
+
+    EXPECT_NEAR(state->dataGlobal->TimeStepZone, 1.0, 1e-6);
+
+    // Test 2: The following test should pass in with the fix (PR9541);
+    // Witout the fix, some of the following items would fail if tested in the original develop branch
+    // if (TAirIn > DBMax[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT, TAirIn - DBMax[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT, 0.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT, 0.0, 1e-6);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT, 0.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, 0.0);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT, 0.0);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, 0.0);
+
+    // if (TAirIn < DBMin[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT, TAirIn - DBMin[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (TDPAirIn > DPMax[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (TDPAirIn < DPMin[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT, TDPAirIn - DPMin[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn > RHMax[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH, RHAirIn - RHMax[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn < RHMin[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH, RHAirIn - RHMin[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+}
