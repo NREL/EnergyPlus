@@ -2956,17 +2956,16 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
 
 //******************************************************************************
 
-Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal) const
+Real64 GLHEBase::interpGFunc(Real64 const x_val) const
 {
     // Purpose: interpolate between g-function values, with linear extrapolation above and below range
 
-    auto &x = this->myRespFactors->LNTTS;
-    auto &y = this->myRespFactors->GFNC;
+    auto const &x = this->myRespFactors->LNTTS;
+    auto const &y = this->myRespFactors->GFNC;
 
-    auto x_begin = x.begin();
-    auto x_end = x.end();
-    double x_val = LnTTsVal;
-    auto upper_it = std::upper_bound(x_begin, x_end, x_val);
+    auto const &x_begin = x.begin();
+    auto const &x_end = x.end();
+    auto const &upper_it = std::upper_bound(x_begin, x_end, x_val);
 
     int l_idx = 0;
     int u_idx = 0;
@@ -2985,10 +2984,11 @@ Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal) const
         l_idx = u_idx - 1;
     }
 
-    double x_low = x[l_idx];
-    double x_high = x[u_idx];
-    double y_low = y[l_idx];
-    double y_high = y[u_idx];
+    Real64 const x_low = x[l_idx];
+    Real64 const x_high = x[u_idx];
+    Real64 const y_low = y[l_idx];
+    Real64 const y_high = y[u_idx];
+
     return (x_val - x_low) / (x_high - x_low) * (y_high - y_low) + y_low;
 }
 
