@@ -571,6 +571,7 @@ add_simulation_test(IDF_FILE Supermarket_SharedAirCondenser.idf EPW_FILE USA_FL_
 add_simulation_test(IDF_FILE SupplyPlenumVAV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SurfaceGroundHeatExchanger.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SurfaceHeatSourceTerm_RefBldgSmallOfficeNew2004.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE SurfacePropGroundSurfaces_LWR.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 add_simulation_test(IDF_FILE SurfacePropTest_SurfLWR.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 add_simulation_test(IDF_FILE SurfaceTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SurfaceZonePropTest_LocalEnv.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
@@ -1017,4 +1018,10 @@ if (BUILD_FORTRAN)
             -x
             COST
             2)
+
+    add_test(NAME integration.5ZoneCAV_MaxTemp_JSON_Outputs.CompareOutputReports
+             COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/compare_output_reports.py" "${PROJECT_BINARY_DIR}/testfiles/5ZoneCAV_MaxTemp_JSON_Outputs/")
+
+    set_tests_properties("integration.5ZoneCAV_MaxTemp_JSON_Outputs.CompareOutputReports" PROPERTIES DEPENDS "integration.5ZoneCAV_MaxTemp_JSON_Outputs")
+
 endif ()

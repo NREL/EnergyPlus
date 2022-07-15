@@ -586,13 +586,13 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         state.dataSysVars->ReportExtShadingSunlitFrac = false;
     }
-    int ExtShadingSchedNum;
     if (state.dataSysVars->shadingMethod == ShadingMethod::Imported) {
+        int ExtShadingSchedNum;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
-            if (ExtShadingSchedNum) {
-                state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = true;
-                state.dataSurface->SurfExternalShadingSchInd(SurfNum) = ExtShadingSchedNum;
+            if (ExtShadingSchedNum != 0) {
+                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
+                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
             } else {
                 ShowWarningError(state,
                                  cCurrentModuleObject + ": sunlit fraction schedule not found for " + state.dataSurface->Surface(SurfNum).Name +
@@ -4972,9 +4972,9 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
     if ((state.dataSysVars->shadingMethod == ShadingMethod::Scheduled || state.dataSysVars->shadingMethod == ShadingMethod::Imported) &&
         !state.dataGlobal->DoingSizing && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->SurfSchedExternalShadingFrac(SurfNum)) {
+            if (state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac) {
                 state.dataHeatBal->SurfSunlitFrac(iHour, iTimeStep, SurfNum) =
-                    LookUpScheduleValue(state, state.dataSurface->SurfExternalShadingSchInd(SurfNum), iHour, iTimeStep);
+                    LookUpScheduleValue(state, state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd, iHour, iTimeStep);
             } else {
                 state.dataHeatBal->SurfSunlitFrac(iHour, iTimeStep, SurfNum) = 1.0;
             }
@@ -10418,10 +10418,9 @@ void SkyDifSolarShading(EnergyPlusData &state)
         }
         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
 
-        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-            int SrdSurfsNum;
+        if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
             Real64 SrdSurfsViewFactor = 0.0;
-            SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+            int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
             auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
             for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                 SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
