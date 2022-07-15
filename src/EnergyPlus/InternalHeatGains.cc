@@ -135,6 +135,8 @@ namespace InternalHeatGains {
     int constexpr ITEClassA4(4);
     int constexpr ITEClassB(5);
     int constexpr ITEClassC(6);
+    int constexpr ITEClassH1(7);
+
     int constexpr ITEInletAdjustedSupply(0);
     int constexpr ITEInletZoneAirNode(1);
     int constexpr ITEInletRoomAirModel(2);
@@ -2886,10 +2888,12 @@ namespace InternalHeatGains {
                             thisZoneITEq.Class = ITEClassB;
                         } else if (UtilityRoutines::SameString(AlphaName(10), "C")) {
                             thisZoneITEq.Class = ITEClassC;
+                        } else if (UtilityRoutines::SameString(AlphaName(10), "H1")) {
+                            thisZoneITEq.Class = ITEClassH1;
                         } else {
                             ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
                             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphaName(10));
-                            ShowContinueError(state, "Valid entries are None, A1, A2, A3, A4, B or C.");
+                            ShowContinueError(state, "Valid entries are None, A1, A2, A3, A4, B, C, or H1.");
                             ErrorsFound = true;
                         }
 
