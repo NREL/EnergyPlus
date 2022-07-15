@@ -688,6 +688,16 @@ namespace OutputReportTabular {
                                   Array1D<std::vector<Real64>> const &ZoneBins,
                                   Real64 const unitConvMultiplier = 1.0);
 
+    void WriteResilienceBinsTableNoPreDef(EnergyPlusData &state,
+                                          int const columnNum,
+                                          const std::string tableName,
+                                          Array1D_string const &columnHead,
+                                          Array1D_int columnWidth,
+                                          Array1D<std::vector<Real64>> const &ZoneBins,
+                                          Array1D_string &rowHead,
+                                          Array2D_string &tableBody,
+                                          Real64 const unitConvMultiplier = 1.0);
+
     void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
                                                  const std::string tableType,
                                                  int const columnNum,
@@ -706,6 +716,16 @@ namespace OutputReportTabular {
                             std::vector<int> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins,
                             Real64 const unitConvMultiplier = 1.0);
+
+    void WriteSETHoursTableNonPreDef(EnergyPlusData &state,
+                                     int const columnNum,
+                                     const std::string tableName,
+                                     Array1D_string const &columnHead,
+                                     Array1D_int columnWidth,
+                                     Array1D<std::vector<Real64>> const &ZoneBins,
+                                     Array1D_string &rowHead,
+                                     Array2D_string &tableBody,
+                                     Real64 const unitConvMultiplier = 1.0);
 
     void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                            int const columnNum,
@@ -727,6 +747,16 @@ namespace OutputReportTabular {
                                 std::vector<int> const &columnHead,
                                 Array1D<std::vector<Real64>> const &ZoneBins,
                                 int const dateColIdx);
+
+    void WriteHourOfSafetyTableNonPreDef(EnergyPlusData &state,
+                                         int const columnNum,
+                                         const std::string tableName,
+                                         Array1D_string const &columnHead,
+                                         Array1D_int columnWidth,
+                                         Array1D<std::vector<Real64>> const &ZoneBins,
+                                         Array1D_string &rowHead,
+                                         Array2D_string &tableBody,
+                                         int const dateColIdx);
 
     void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
                                                int const columnNum,
