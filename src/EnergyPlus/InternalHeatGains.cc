@@ -7597,14 +7597,14 @@ namespace InternalHeatGains {
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallTempDiff;
 
-        // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
+        // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C, H1
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
-        static constexpr std::array<Real64, 7> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0};           // Minimum dry-bulb temperature [C]
-        static constexpr std::array<Real64, 7> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0};        // Maximum dry-bulb temperature [C]
-        static constexpr std::array<Real64, 7> DPMin = {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}; // Minimum dewpoint temperature [C]
-        static constexpr std::array<Real64, 7> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0};        // Maximum dewpoint temperature [C]
-        static constexpr std::array<Real64, 7> RHMin = {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0};             // Minimum relative humidity [%]
-        static constexpr std::array<Real64, 7> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0};        // Maximum relative humidity [%]
+        static constexpr std::array<Real64, 8> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0, 5.0};           // Minimum dry-bulb temperature [C]
+        static constexpr std::array<Real64, 8> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0, 25.0};        // Maximum dry-bulb temperature [C]
+        static constexpr std::array<Real64, 8> DPMin = {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0, -12.0}; // Minimum dewpoint temperature [C]
+        static constexpr std::array<Real64, 8> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0, 17.0};        // Maximum dewpoint temperature [C]
+        static constexpr std::array<Real64, 8> RHMin = {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0, 8.0};             // Minimum relative humidity [%]
+        static constexpr std::array<Real64, 8> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0, 80.0};        // Maximum relative humidity [%]
 
         static constexpr std::string_view RoutineName("CalcZoneITEq");
         int Loop;
