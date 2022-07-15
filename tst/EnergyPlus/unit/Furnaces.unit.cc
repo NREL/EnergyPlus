@@ -1210,7 +1210,7 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
                         ErrFound);   // GetInput logical that errors were found
 
     EXPECT_FALSE(ErrFound);
-    // Would expect the following checks to be messed up if without the fix 
+    // Would expect the following checks to be messed up if without the fix
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
 }
