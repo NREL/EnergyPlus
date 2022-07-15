@@ -3368,48 +3368,49 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     if (!state.dataSysRpts->AirLoopLoadsReportEnabled) return;
 
     for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
+        auto &thisSysLoadRepVars = state.dataSysRpts->SysLoadRepVars(airLoopNum);
         // SYSTEM LOADS REPORT
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotHTNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotCLNG = 0.0;
+        thisSysLoadRepVars.SysTotHTNG = 0.0;
+        thisSysLoadRepVars.SysTotCLNG = 0.0;
 
         // SYSTEM ENERGY USE REPORT
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotElec = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotNaturalGas = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotPropane = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotSteam = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotH2OCOLD = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotH2OHOT = 0.0;
+        thisSysLoadRepVars.SysTotElec = 0.0;
+        thisSysLoadRepVars.SysTotNaturalGas = 0.0;
+        thisSysLoadRepVars.SysTotPropane = 0.0;
+        thisSysLoadRepVars.SysTotSteam = 0.0;
+        thisSysLoadRepVars.SysTotH2OCOLD = 0.0;
+        thisSysLoadRepVars.SysTotH2OHOT = 0.0;
 
         // SYSTEM COMPONENT LOADS REPORT
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysFANCompHTNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysCCCompCLNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompHTNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHeatExHTNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHeatExCLNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysSolarCollectHeating = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysSolarCollectCooling = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysUserDefinedTerminalHeating = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysUserDefinedTerminalCooling = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidHTNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysEvapCLNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).DesDehumidCLNG = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysDomesticH2O = 0.0;
+        thisSysLoadRepVars.SysFANCompHTNG = 0.0;
+        thisSysLoadRepVars.SysCCCompCLNG = 0.0;
+        thisSysLoadRepVars.SysHCCompHTNG = 0.0;
+        thisSysLoadRepVars.SysHeatExHTNG = 0.0;
+        thisSysLoadRepVars.SysHeatExCLNG = 0.0;
+        thisSysLoadRepVars.SysSolarCollectHeating = 0.0;
+        thisSysLoadRepVars.SysSolarCollectCooling = 0.0;
+        thisSysLoadRepVars.SysUserDefinedTerminalHeating = 0.0;
+        thisSysLoadRepVars.SysUserDefinedTerminalCooling = 0.0;
+        thisSysLoadRepVars.SysHumidHTNG = 0.0;
+        thisSysLoadRepVars.SysEvapCLNG = 0.0;
+        thisSysLoadRepVars.DesDehumidCLNG = 0.0;
+        thisSysLoadRepVars.SysDomesticH2O = 0.0;
 
         // SYSTEM COMPONENT ENERGY REPORT
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysFANCompElec = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompH2OHOT = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysCCCompH2OCOLD = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompElec = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysCCCompElec = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompElecRes = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompNaturalGas = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompPropane = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompSteam = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidElec = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidNaturalGas = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidPropane = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).DesDehumidElec = 0.0;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysEvapElec = 0.0;
+        thisSysLoadRepVars.SysFANCompElec = 0.0;
+        thisSysLoadRepVars.SysHCCompH2OHOT = 0.0;
+        thisSysLoadRepVars.SysCCCompH2OCOLD = 0.0;
+        thisSysLoadRepVars.SysHCCompElec = 0.0;
+        thisSysLoadRepVars.SysCCCompElec = 0.0;
+        thisSysLoadRepVars.SysHCCompElecRes = 0.0;
+        thisSysLoadRepVars.SysHCCompNaturalGas = 0.0;
+        thisSysLoadRepVars.SysHCCompPropane = 0.0;
+        thisSysLoadRepVars.SysHCCompSteam = 0.0;
+        thisSysLoadRepVars.SysHumidElec = 0.0;
+        thisSysLoadRepVars.SysHumidNaturalGas = 0.0;
+        thisSysLoadRepVars.SysHumidPropane = 0.0;
+        thisSysLoadRepVars.DesDehumidElec = 0.0;
+        thisSysLoadRepVars.SysEvapElec = 0.0;
     }
 
     auto &Node(state.dataLoopNodes->Node);
@@ -3603,28 +3604,21 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     }                 // Controlled Zone Loop
 
     for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotHTNG =
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysFANCompHTNG + state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompHTNG +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHeatExHTNG + state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidHTNG +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysSolarCollectHeating +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysUserDefinedTerminalHeating;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotCLNG =
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysCCCompCLNG + state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHeatExCLNG +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysEvapCLNG + state.dataSysRpts->SysLoadRepVars(airLoopNum).DesDehumidCLNG +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysSolarCollectCooling +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysUserDefinedTerminalCooling;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotElec =
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysFANCompElec + state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompElec +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysCCCompElec + state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompElecRes +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidElec + state.dataSysRpts->SysLoadRepVars(airLoopNum).DesDehumidElec +
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysEvapElec;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotNaturalGas =
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompNaturalGas + state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidNaturalGas;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotPropane =
-            state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompPropane + state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHumidPropane;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotSteam = state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompSteam;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotH2OCOLD = state.dataSysRpts->SysLoadRepVars(airLoopNum).SysCCCompH2OCOLD;
-        state.dataSysRpts->SysLoadRepVars(airLoopNum).SysTotH2OHOT = state.dataSysRpts->SysLoadRepVars(airLoopNum).SysHCCompH2OHOT;
+        auto &thisSysLoadRepVars = state.dataSysRpts->SysLoadRepVars(airLoopNum);
+        thisSysLoadRepVars.SysTotHTNG = thisSysLoadRepVars.SysFANCompHTNG + thisSysLoadRepVars.SysHCCompHTNG + thisSysLoadRepVars.SysHeatExHTNG +
+                                        thisSysLoadRepVars.SysHumidHTNG + thisSysLoadRepVars.SysSolarCollectHeating +
+                                        thisSysLoadRepVars.SysUserDefinedTerminalHeating;
+        thisSysLoadRepVars.SysTotCLNG = thisSysLoadRepVars.SysCCCompCLNG + thisSysLoadRepVars.SysHeatExCLNG + thisSysLoadRepVars.SysEvapCLNG +
+                                        thisSysLoadRepVars.DesDehumidCLNG + thisSysLoadRepVars.SysSolarCollectCooling +
+                                        thisSysLoadRepVars.SysUserDefinedTerminalCooling;
+        thisSysLoadRepVars.SysTotElec = thisSysLoadRepVars.SysFANCompElec + thisSysLoadRepVars.SysHCCompElec + thisSysLoadRepVars.SysCCCompElec +
+                                        thisSysLoadRepVars.SysHCCompElecRes + thisSysLoadRepVars.SysHumidElec + thisSysLoadRepVars.DesDehumidElec +
+                                        thisSysLoadRepVars.SysEvapElec;
+        thisSysLoadRepVars.SysTotNaturalGas = thisSysLoadRepVars.SysHCCompNaturalGas + thisSysLoadRepVars.SysHumidNaturalGas;
+        thisSysLoadRepVars.SysTotPropane = thisSysLoadRepVars.SysHCCompPropane + thisSysLoadRepVars.SysHumidPropane;
+        thisSysLoadRepVars.SysTotSteam = thisSysLoadRepVars.SysHCCompSteam;
+        thisSysLoadRepVars.SysTotH2OCOLD = thisSysLoadRepVars.SysCCCompH2OCOLD;
+        thisSysLoadRepVars.SysTotH2OHOT = thisSysLoadRepVars.SysHCCompH2OHOT;
     }
 }
 
@@ -3842,6 +3836,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     int found;
 
     if (!state.dataSysRpts->AirLoopLoadsReportEnabled) return;
+    auto &thisSysLoadRepVars = state.dataSysRpts->SysLoadRepVars(AirLoopNum);
 
     // Find enum for the component type string
     ComponentTypes comp_type;
@@ -3868,8 +3863,8 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case FAN_SYSTEMMODEL:
     case FAN_COMPONENTMODEL:
 
-        if (CompLoadFlag) state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysFANCompHTNG += std::abs(CompLoad);
-        state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysFANCompElec += CompEnergy;
+        if (CompLoadFlag) thisSysLoadRepVars.SysFANCompHTNG += std::abs(CompLoad);
+        thisSysLoadRepVars.SysFANCompElec += CompEnergy;
 
         // Cooling Coil Types for the air sys simulation
         break;
@@ -3892,12 +3887,12 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case COIL_COOLING_VRF_FTC:
     case COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED:
 
-        if (CompLoadFlag) state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompCLNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.SysCCCompCLNG += std::abs(CompLoad);
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompH2OCOLD += CompEnergy;
+            thisSysLoadRepVars.SysCCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompElec += CompEnergy;
+            thisSysLoadRepVars.SysCCCompElec += CompEnergy;
         }
 
         // Heating Coil Types for the air sys simulation
@@ -3914,27 +3909,27 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case COIL_HEATING_GAS_MULTISTAGE:
     case COIL_HEATING_DESUPERHEATER:
 
-        if (CompLoadFlag) state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompHTNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.SysHCCompHTNG += std::abs(CompLoad);
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompH2OHOT += CompEnergy;
+            thisSysLoadRepVars.SysHCCompH2OHOT += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompSteam += CompEnergy;
+            thisSysLoadRepVars.SysHCCompSteam += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompElec += CompEnergy;
+            thisSysLoadRepVars.SysHCCompElec += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompNaturalGas += CompEnergy;
+            thisSysLoadRepVars.SysHCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompPropane += CompEnergy;
+            thisSysLoadRepVars.SysHCCompPropane += CompEnergy;
         }
 
         break;
     case COIL_HEATING_ELECTRIC:
     case COIL_HEATING_ELECTRIC_MULTISTAGE:
 
-        if (CompLoadFlag) state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompHTNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.SysHCCompHTNG += std::abs(CompLoad);
         if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompElecRes += CompEnergy;
+            thisSysLoadRepVars.SysHCCompElecRes += CompEnergy;
         }
 
         break;
@@ -3942,29 +3937,29 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
 
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompCLNG += std::abs(CompLoad);
+                thisSysLoadRepVars.SysCCCompCLNG += std::abs(CompLoad);
             } else {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompHTNG += std::abs(CompLoad);
+                thisSysLoadRepVars.SysHCCompHTNG += std::abs(CompLoad);
             }
         }
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompH2OHOT += CompEnergy;
+            thisSysLoadRepVars.SysHCCompH2OHOT += CompEnergy;
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompH2OCOLD += CompEnergy;
+            thisSysLoadRepVars.SysCCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompSteam += CompEnergy;
+            thisSysLoadRepVars.SysHCCompSteam += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompElec += CompEnergy;
+                thisSysLoadRepVars.SysCCCompElec += CompEnergy;
             } else {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompElec += CompEnergy;
+                thisSysLoadRepVars.SysHCCompElec += CompEnergy;
             }
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompNaturalGas += CompEnergy;
+            thisSysLoadRepVars.SysHCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompPropane += CompEnergy;
+            thisSysLoadRepVars.SysHCCompPropane += CompEnergy;
         }
 
         // DX Systems
@@ -4010,15 +4005,15 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         // Humidifier Types for the air system simulation
     case HUMIDIFIER_STEAM_GAS:
     case HUMIDIFIER_STEAM_ELECTRIC:
-        if (CompLoadFlag) state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHumidHTNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.SysHumidHTNG += std::abs(CompLoad);
         if (EnergyType == DataGlobalConstants::ResourceType::Water) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysDomesticH2O += std::abs(CompEnergy);
+            thisSysLoadRepVars.SysDomesticH2O += std::abs(CompEnergy);
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHumidElec += CompEnergy;
+            thisSysLoadRepVars.SysHumidElec += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHumidNaturalGas += CompEnergy;
+            thisSysLoadRepVars.SysHumidNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHumidPropane += CompEnergy;
+            thisSysLoadRepVars.SysHumidPropane += CompEnergy;
         }
 
         // Evap Cooler Types for the air system simulation
@@ -4028,20 +4023,20 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case EVAPORATIVECOOLER_INDIRECT_WETCOIL:
     case EVAPORATIVECOOLER_DIRECT_RESEARCHSPECIAL:
     case EVAPORATIVECOOLER_INDIRECT_RESEARCHSPECIAL:
-        if (CompLoadFlag) state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysEvapCLNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.SysEvapCLNG += std::abs(CompLoad);
         if (EnergyType == DataGlobalConstants::ResourceType::Water) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysDomesticH2O += std::abs(CompEnergy);
+            thisSysLoadRepVars.SysDomesticH2O += std::abs(CompEnergy);
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysEvapElec += CompEnergy;
+            thisSysLoadRepVars.SysEvapElec += CompEnergy;
         }
 
         // Desiccant Dehumidifier Types for the air system simulation
         break;
     case DEHUMIDIFIER_DESICCANT_NOFANS:
     case DEHUMIDIFIER_DESICCANT_SYSTEM:
-        if (CompLoadFlag) state.dataSysRpts->SysLoadRepVars(AirLoopNum).DesDehumidCLNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.DesDehumidCLNG += std::abs(CompLoad);
         if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).DesDehumidElec += CompEnergy;
+            thisSysLoadRepVars.DesDehumidElec += CompEnergy;
         }
 
         // Heat Exchanger Types
@@ -4051,9 +4046,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case HEATEXCHANGER_DESICCANT_BALANCEDFLOW:
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHeatExCLNG += std::abs(CompLoad);
+                thisSysLoadRepVars.SysHeatExCLNG += std::abs(CompLoad);
             } else {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHeatExHTNG += std::abs(CompLoad);
+                thisSysLoadRepVars.SysHeatExHTNG += std::abs(CompLoad);
             }
         }
 
@@ -4098,9 +4093,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case SOLARCOLLECTOR_UNGLAZEDTRANSPIRED:
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysSolarCollectCooling += std::abs(CompLoad);
+                thisSysLoadRepVars.SysSolarCollectCooling += std::abs(CompLoad);
             } else {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysSolarCollectHeating += std::abs(CompLoad);
+                thisSysLoadRepVars.SysSolarCollectHeating += std::abs(CompLoad);
             }
         }
 
@@ -4109,29 +4104,29 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         // User component model energy use should be accounted for here
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysUserDefinedTerminalCooling += std::abs(CompLoad);
+                thisSysLoadRepVars.SysUserDefinedTerminalCooling += std::abs(CompLoad);
             } else {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysUserDefinedTerminalHeating += std::abs(CompLoad);
+                thisSysLoadRepVars.SysUserDefinedTerminalHeating += std::abs(CompLoad);
             }
         }
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompH2OHOT += CompEnergy;
+            thisSysLoadRepVars.SysHCCompH2OHOT += CompEnergy;
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompH2OCOLD += CompEnergy;
+            thisSysLoadRepVars.SysCCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompSteam += CompEnergy;
+            thisSysLoadRepVars.SysHCCompSteam += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysCCCompElec += CompEnergy;
+                thisSysLoadRepVars.SysCCCompElec += CompEnergy;
             } else {
-                state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompElec += CompEnergy;
+                thisSysLoadRepVars.SysHCCompElec += CompEnergy;
             }
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompNaturalGas += CompEnergy;
+            thisSysLoadRepVars.SysHCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            state.dataSysRpts->SysLoadRepVars(AirLoopNum).SysHCCompPropane += CompEnergy;
+            thisSysLoadRepVars.SysHCCompPropane += CompEnergy;
         }
         // Recurring warning for unaccounted equipment types
         // (should never happen, when this does happen enter appropriate equipment CASE statement above)
@@ -4170,66 +4165,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
     // calculate energy contribution of outside air through mixing box and pro-rate to
     // zones according to zone mass flow rates.
 
-    // Using/Aliasing
-    using Psychrometrics::PsyHFnTdbW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using namespace DataZoneEnergyDemands;
-    using namespace DataGlobalConstants;
-    using FanCoilUnits::GetFanCoilMixedAirNode;
-    using FanCoilUnits::GetFanCoilOutAirNode;
-    using FanCoilUnits::GetFanCoilReturnAirNode;
-    using FanCoilUnits::GetFanCoilZoneInletAirNode;
-    using HVACStandAloneERV::GetStandAloneERVOutAirNode;
-    using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
-    using HVACStandAloneERV::GetStandAloneERVZoneInletAirNode;
-    using HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode;
-    using HVACVariableRefrigerantFlow::GetVRFTUOutAirNode;
-    using HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode;
-    using HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode;
-    using HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode;
-    using HybridUnitaryAirConditioners::GetHybridUnitaryACReturnAirNode;
-    using HybridUnitaryAirConditioners::GetHybridUnitaryACZoneInletNode;
-    using PackagedTerminalHeatPump::GetPTUnitMixedAirNode;
-    using PackagedTerminalHeatPump::GetPTUnitOutAirNode;
-    using PackagedTerminalHeatPump::GetPTUnitReturnAirNode;
-    using PackagedTerminalHeatPump::GetPTUnitZoneInletAirNode;
-    using PurchasedAirManager::GetPurchasedAirMixedAirHumRat;
-    using PurchasedAirManager::GetPurchasedAirMixedAirTemp;
-    using PurchasedAirManager::GetPurchasedAirOutAirMassFlow;
-    using PurchasedAirManager::GetPurchasedAirReturnAirNode;
-    using PurchasedAirManager::GetPurchasedAirZoneInletAirNode;
-    using UnitVentilator::GetUnitVentilatorMixedAirNode;
-    using UnitVentilator::GetUnitVentilatorOutAirNode;
-    using UnitVentilator::GetUnitVentilatorReturnAirNode;
-    using UnitVentilator::GetUnitVentilatorZoneInletAirNode;
-    using WindowAC::GetWindowACMixedAirNode;
-    using WindowAC::GetWindowACOutAirNode;
-    using WindowAC::GetWindowACReturnAirNode;
-    using WindowAC::GetWindowACZoneInletAirNode;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr SmallLoad(0.1); // (W)
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CtrlZoneNum;             // ZONE counter
-    int ZoneInNum;               // counter for zone air distribution inlets
-    int ReturnAirNode;           // node number for return node on primary air loop
-    int MixedAirNode;            // mixed air node number (right after the mixing box) on primary air loop
-    int AirDistCoolInletNodeNum; // Air distribution unit inlet node number
-    int AirDistHeatInletNodeNum; // Air distribution unit outlet node number
-
-    Real64 ZFAUEnthReturnAir;  // Zone forced Air unit enthalpy of the return air [kJ/kgK]
-    Real64 ZFAUTempMixedAir;   // Zone forced Air unit dry-bulb temperature of the mixed air [C]
-    Real64 ZFAUHumRatMixedAir; // Zone forced Air unit humidity ratio of the mixed air [kg/kg]
-    Real64 ZFAUEnthMixedAir;   // Zone forced Air unit enthalpy of the mixed air [kJ/kgK]
-    Real64 ZFAUEnthOutdoorAir; // Zone forced Air unit enthalpy of the outdoor air [kJ/kgK]
-    int ZoneInletAirNode;      // Zone forced Air unit zone inlet node number
-
-    Real64 ZoneVentLoad;          // ventilation load attributed to a particular zone
-    Real64 currentZoneAirDensity; // current zone air density (outside barometric pressure) [kg/m3]
-
-    int OutAirNode;       // Zone forced Air unit outdoor air node number
-    int thisZoneEquipNum; // loop counter
 
     auto &Node(state.dataLoopNodes->Node);
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
@@ -4282,17 +4218,22 @@ void ReportVentilationLoads(EnergyPlusData &state)
         thisSysVentRepVars.SysAnyZoneOccupied = false;
     }
 
-    for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
+    for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
         if (!thisZoneEquipConfig.IsControlled) continue;
+
         Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
         Real64 ZAirSysOutAirFlow = 0.0;   // outside air flow rate for zone from all primary air systems serving thezone [kg/s]
-        // first clear out working variables from previous zone.
-        Real64 ZFAUFlowRate = 0.0;     // Zone forced Air unit air mass flow rate [kg/s]
-        Real64 ZFAUZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from zone forced air units [J]
-        Real64 ZFAUOutAirFlow = 0.0;   // outside air flow rate for zone from zone forced air units. [kg/s]
-        Real64 OutAirFlow = 0.0;       // Total outside air mass flow from zone equipment and air loop equipment [kg/s]
-        Real64 ZoneFlowFrac = 0.0;     // fraction of mixed air flowing to a zone
+        Real64 ZFAUFlowRate = 0.0;        // Zone forced Air unit air mass flow rate [kg/s]
+        Real64 ZFAUZoneVentLoad = 0.0;    // ventilation load attributed to a particular zone from zone forced air units [J]
+        Real64 ZFAUOutAirFlow = 0.0;      // outside air flow rate for zone from zone forced air units. [kg/s]
+        Real64 OutAirFlow = 0.0;          // Total outside air mass flow from zone equipment and air loop equipment [kg/s]
+        Real64 ZoneFlowFrac = 0.0;        // fraction of mixed air flowing to a zone
+        Real64 ZFAUEnthReturnAir = 0.0;   // Zone forced Air unit enthalpy of the return air [kJ/kgK]
+        Real64 ZFAUTempMixedAir = 0.0;    // Zone forced Air unit dry-bulb temperature of the mixed air [C]
+        Real64 ZFAUHumRatMixedAir = 0.0;  // Zone forced Air unit humidity ratio of the mixed air [kg/kg]
+        Real64 ZFAUEnthMixedAir = 0.0;    // Zone forced Air unit enthalpy of the mixed air [kJ/kgK]
+        Real64 ZFAUEnthOutdoorAir = 0.0;  // Zone forced Air unit enthalpy of the outdoor air [kJ/kgK]
 
         // retrieve the zone load for each zone
         int ActualZoneNum = thisZoneEquipConfig.ActualZoneNum;
@@ -4302,6 +4243,8 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
         bool constexpr UseOccSchFlag = true;
         bool constexpr UseMinOASchFlag = true;
+
+        auto &thisZonePredefRep = state.dataHeatBal->ZonePreDefRep(ActualZoneNum);
         auto &thisZoneVentRepVars = state.dataSysRpts->ZoneVentRepVars(CtrlZoneNum);
         thisZoneVentRepVars.ZoneTargetVentilationFlowVoz = DataSizing::calcDesignSpecificationOutdoorAir(
             state, thisZoneEquipConfig.ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
@@ -4316,22 +4259,23 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
         // first deal with any (and all) Zone Forced Air Units that might have outside air.
         auto &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(thisZoneEquipConfig.EquipListIndex);
-        for (thisZoneEquipNum = 1; thisZoneEquipNum <= thisZoneEquipList.NumOfEquipTypes; ++thisZoneEquipNum) {
+        for (int thisZoneEquipNum = 1; thisZoneEquipNum <= thisZoneEquipList.NumOfEquipTypes; ++thisZoneEquipNum) {
+            auto &thisEquipIndex = thisZoneEquipList.EquipIndex(thisZoneEquipNum);
 
             switch (thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum)) {
                 // case statement to cover all possible zone forced air units that could have outside air
 
             case DataZoneEquipment::ZoneEquip::WindowAC: { // Window Air Conditioner
-                OutAirNode = GetWindowACOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int OutAirNode = WindowAC::GetWindowACOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
-                ZoneInletAirNode = GetWindowACZoneInletAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ZoneInletAirNode = WindowAC::GetWindowACZoneInletAirNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                MixedAirNode = GetWindowACMixedAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
-                ReturnAirNode = GetWindowACReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int MixedAirNode = WindowAC::GetWindowACMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNode = WindowAC::GetWindowACReturnAirNode(state, thisEquipIndex);
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4342,15 +4286,15 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 break;
             }
             case DataZoneEquipment::ZoneEquip::VRFTerminalUnit: {
-                OutAirNode = GetVRFTUOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int OutAirNode = HVACVariableRefrigerantFlow::GetVRFTUOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-                ZoneInletAirNode = GetVRFTUZoneInletAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ZoneInletAirNode = HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                MixedAirNode = GetVRFTUMixedAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
-                ReturnAirNode = GetVRFTUReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int MixedAirNode = HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNode = HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode(state, thisEquipIndex);
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4363,20 +4307,20 @@ void ReportVentilationLoads(EnergyPlusData &state)
             case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir:
             case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir:
             case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
-                OutAirNode =
-                    GetPTUnitOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum), thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
+                int OutAirNode =
+                    PackagedTerminalHeatPump::GetPTUnitOutAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
-                ZoneInletAirNode = GetPTUnitZoneInletAirNode(
-                    state, thisZoneEquipList.EquipIndex(thisZoneEquipNum), thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
+                int ZoneInletAirNode =
+                    PackagedTerminalHeatPump::GetPTUnitZoneInletAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                MixedAirNode =
-                    GetPTUnitMixedAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum), thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
-                ReturnAirNode =
-                    GetPTUnitReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum), thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
+                int MixedAirNode =
+                    PackagedTerminalHeatPump::GetPTUnitMixedAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
+                int ReturnAirNode =
+                    PackagedTerminalHeatPump::GetPTUnitReturnAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4387,16 +4331,16 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 break;
             }
             case DataZoneEquipment::ZoneEquip::FanCoil4Pipe: {
-                OutAirNode = GetFanCoilOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int OutAirNode = FanCoilUnits::GetFanCoilOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
-                ZoneInletAirNode = GetFanCoilZoneInletAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ZoneInletAirNode = FanCoilUnits::GetFanCoilZoneInletAirNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                MixedAirNode = GetFanCoilMixedAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
-                ReturnAirNode = GetFanCoilReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int MixedAirNode = FanCoilUnits::GetFanCoilMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNode = FanCoilUnits::GetFanCoilReturnAirNode(state, thisEquipIndex);
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4407,16 +4351,16 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 break;
             }
             case DataZoneEquipment::ZoneEquip::UnitVentilator: {
-                OutAirNode = GetUnitVentilatorOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int OutAirNode = UnitVentilator::GetUnitVentilatorOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
-                ZoneInletAirNode = GetUnitVentilatorZoneInletAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ZoneInletAirNode = UnitVentilator::GetUnitVentilatorZoneInletAirNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                MixedAirNode = GetUnitVentilatorMixedAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
-                ReturnAirNode = GetUnitVentilatorReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int MixedAirNode = UnitVentilator::GetUnitVentilatorMixedAirNode(state, thisEquipIndex);
+                int ReturnAirNode = UnitVentilator::GetUnitVentilatorReturnAirNode(state, thisEquipIndex);
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4427,15 +4371,15 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 break;
             }
             case DataZoneEquipment::ZoneEquip::PurchasedAir: {
-                ZFAUOutAirFlow += GetPurchasedAirOutAirMassFlow(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
-                ZoneInletAirNode = GetPurchasedAirZoneInletAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                ZFAUOutAirFlow += PurchasedAirManager::GetPurchasedAirOutAirMassFlow(state, thisEquipIndex);
+                int ZoneInletAirNode = PurchasedAirManager::GetPurchasedAirZoneInletAirNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                ZFAUTempMixedAir = GetPurchasedAirMixedAirTemp(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
-                ZFAUHumRatMixedAir = GetPurchasedAirMixedAirHumRat(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
-                ReturnAirNode = GetPurchasedAirReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                ZFAUTempMixedAir = PurchasedAirManager::GetPurchasedAirMixedAirTemp(state, thisEquipIndex);
+                ZFAUHumRatMixedAir = PurchasedAirManager::GetPurchasedAirMixedAirHumRat(state, thisEquipIndex);
+                int ReturnAirNode = PurchasedAirManager::GetPurchasedAirReturnAirNode(state, thisEquipIndex);
                 if ((ZFAUFlowRate > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = PsyHFnTdbW(ZFAUTempMixedAir, ZFAUHumRatMixedAir);
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(ZFAUTempMixedAir, ZFAUHumRatMixedAir);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4446,16 +4390,16 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 break;
             }
             case DataZoneEquipment::ZoneEquip::ERVStandAlone: {
-                OutAirNode = GetStandAloneERVOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int OutAirNode = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
-                ZoneInletAirNode = GetStandAloneERVZoneInletAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ZoneInletAirNode = HVACStandAloneERV::GetStandAloneERVZoneInletAirNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                MixedAirNode = ZoneInletAirNode;
-                ReturnAirNode = GetStandAloneERVReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int MixedAirNode = ZoneInletAirNode;
+                int ReturnAirNode = HVACStandAloneERV::GetStandAloneERVReturnAirNode(state, thisEquipIndex);
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4471,15 +4415,15 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 break;
             }
             case DataZoneEquipment::ZoneEquip::OutdoorAirUnit: {
-                OutAirNode = OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int OutAirNode = OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
-                ZoneInletAirNode = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ZoneInletAirNode = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                ReturnAirNode = OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ReturnAirNode = OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, thisEquipIndex);
                 if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                    ZFAUEnthOutdoorAir = PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
@@ -4490,16 +4434,16 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 break;
             }
             case DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler: {
-                OutAirNode = GetHybridUnitaryACOutAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int OutAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
-                ZoneInletAirNode = GetHybridUnitaryACZoneInletNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ZoneInletAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACZoneInletNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
 
-                ReturnAirNode = GetHybridUnitaryACReturnAirNode(state, thisZoneEquipList.EquipIndex(thisZoneEquipNum));
+                int ReturnAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACReturnAirNode(state, thisEquipIndex);
                 if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
-                    ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                    ZFAUEnthOutdoorAir = PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
+                    ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                    ZFAUEnthOutdoorAir = Psychrometrics::PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
 
                     ZFAUZoneVentLoad +=
@@ -4547,7 +4491,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
 
         // loop over the zone supply air path inlet nodes
-        for (ZoneInNum = 1; ZoneInNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInNum) {
+        for (int ZoneInNum = 1; ZoneInNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInNum) {
             Real64 AirSysEnthReturnAir = 0.0;    // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
             Real64 AirSysEnthMixedAir = 0.0;     // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
             Real64 AirSysZoneVentLoad = 0.0;     // ventilation load attributed to a particular zone from primary air system [J]
@@ -4557,10 +4501,10 @@ void ReportVentilationLoads(EnergyPlusData &state)
             Real64 AirSysOutAirFlow = 0.0;       // outside air flow rate for zone from primary air system [kg/s]
             // retrieve air loop index
             int AirLoopNum = thisZoneEquipConfig.InletNodeAirLoopNum(ZoneInNum);
-            MixedAirNode = 0;
-            ReturnAirNode = 0;
-            AirDistCoolInletNodeNum = 0;
-            AirDistHeatInletNodeNum = 0;
+            int MixedAirNode = 0;
+            int ReturnAirNode = 0;
+            int AirDistCoolInletNodeNum = 0;
+            int AirDistHeatInletNodeNum = 0;
             if (AirLoopNum != 0) { // deal with primary air system
                 AirDistCoolInletNodeNum = max(thisZoneEquipConfig.AirDistUnitCool(ZoneInNum).InNode, 0);
                 AirDistHeatInletNodeNum = max(thisZoneEquipConfig.AirDistUnitHeat(ZoneInNum).InNode, 0);
@@ -4599,12 +4543,11 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 }
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).SysTargetVentilationFlowVoz +=
                     termUnitOAFrac * thisZoneVentRepVars.ZoneTargetVentilationFlowVoz;
-                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
-                                          state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen) /
+                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) /
                                          (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).SysNatVentFlow += termUnitOAFrac * naturalVentFlow;
 
-                if (state.dataHeatBal->ZonePreDefRep(ActualZoneNum).isOccupied) {
+                if (thisZonePredefRep.isOccupied) {
                     state.dataSysRpts->SysVentRepVars(AirLoopNum).SysAnyZoneOccupied = true;
                 }
             }
@@ -4614,11 +4557,11 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 AirSysOutAirFlow = 0.0;
             } else {
                 // Calculate return and mixed air ethalpies
-                AirSysEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                AirSysEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                AirSysEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                AirSysEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
 
                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysExists) {
-                    OutAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum;
+                    int OutAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum;
                     AirSysOutAirFlow = Node(OutAirNode).MassFlowRate;
                 } else {
                     AirSysOutAirFlow = 0.0;
@@ -4653,7 +4596,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
         Real64 totMechNatVentVolStdRho = thisZoneVentRepVars.ZoneOAVolStdRho + state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
-                                         state.dataHeatBal->ZonePreDefRep(ActualZoneNum).AFNVentVolStdDen;
+                                         thisZonePredefRep.AFNVentVolStdDen;
         Real64 targetVoz = thisZoneVentRepVars.ZoneTargetVentilationFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
         // Allow 1% tolerance
         if (totMechNatVentVolStdRho < (0.99 * targetVoz)) {
@@ -4668,64 +4611,62 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
 
         // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-        currentZoneAirDensity = PsyRhoAirFnPbTdbW(state,
-                                                  state.dataEnvrn->OutBaroPress,
-                                                  state.dataHeatBalFanSys->MAT(ActualZoneNum),
-                                                  state.dataHeatBalFanSys->ZoneAirHumRatAvg(ActualZoneNum));
+        Real64 currentZoneAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                                         state.dataEnvrn->OutBaroPress,
+                                                                         state.dataHeatBalFanSys->MAT(ActualZoneNum),
+                                                                         state.dataHeatBalFanSys->ZoneAirHumRatAvg(ActualZoneNum));
         if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.ZoneOAVolFlowCrntRho = thisZoneVentRepVars.ZoneOAMassFlow / currentZoneAirDensity;
         thisZoneVentRepVars.ZoneOAVolCrntRho = thisZoneVentRepVars.ZoneOAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
         if (ZoneVolume > 0.0) thisZoneVentRepVars.ZoneMechACH = (thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys) / ZoneVolume;
 
         // store data for predefined tabular report on outside air
-        if (state.dataHeatBal->ZonePreDefRep(ActualZoneNum).isOccupied) {
+        if (thisZonePredefRep.isOccupied) {
             // accumulate the occupied time
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).TotTimeOcc += TimeStepSys;
+            thisZonePredefRep.TotTimeOcc += TimeStepSys;
             // mechanical ventilation
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).MechVentVolTotalOcc += thisZoneVentRepVars.ZoneOAVolCrntRho;
-            if ((thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys) < state.dataHeatBal->ZonePreDefRep(ActualZoneNum).MechVentVolMin) {
-                state.dataHeatBal->ZonePreDefRep(ActualZoneNum).MechVentVolMin = thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys;
+            thisZonePredefRep.MechVentVolTotalOcc += thisZoneVentRepVars.ZoneOAVolCrntRho;
+            if ((thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys) < thisZonePredefRep.MechVentVolMin) {
+                thisZonePredefRep.MechVentVolMin = thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys;
             }
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).MechVentVolTotalOccStdDen += thisZoneVentRepVars.ZoneOAVolStdRho;
+            thisZonePredefRep.MechVentVolTotalOccStdDen += thisZoneVentRepVars.ZoneOAVolStdRho;
             // infiltration
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolTotalOcc += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
-            if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolMin) {
-                state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+            thisZonePredefRep.InfilVolTotalOcc += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+            if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < thisZonePredefRep.InfilVolMin) {
+                thisZonePredefRep.InfilVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
             }
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolTotalOccStdDen +=
-                state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
+            thisZonePredefRep.InfilVolTotalOccStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
             // 'simple' natural ventilation
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOcc += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
-            if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity < state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolMin) {
-                state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+            thisZonePredefRep.SimpVentVolTotalOcc += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+            if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity < thisZonePredefRep.SimpVentVolMin) {
+                thisZonePredefRep.SimpVentVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
             }
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOccStdDen +=
-                state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
+            thisZonePredefRep.SimpVentVolTotalOccStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
             // target ventilation Voz-dyn
             state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = state.dataSysRpts->AnyZoneTimeBelowVozDyn;
             state.dataSysRpts->AllZonesTimeAtVozDynOcc = state.dataSysRpts->AllZonesTimeAtVozDyn;
             state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = state.dataSysRpts->AnyZoneTimeAboveVozDyn;
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTotalOcc += targetVoz;
+            thisZonePredefRep.VozTargetTotalOcc += targetVoz;
 
             // time mechanical+natural ventilation is below, at, or above target Voz-dyn
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeBelowOcc += thisZoneVentRepVars.ZoneTimeBelowVozDyn;
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeAtOcc += thisZoneVentRepVars.ZoneTimeAtVozDyn;
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeAboveOcc += thisZoneVentRepVars.ZoneTimeAboveVozDyn;
+            thisZonePredefRep.VozTargetTimeBelowOcc += thisZoneVentRepVars.ZoneTimeBelowVozDyn;
+            thisZonePredefRep.VozTargetTimeAtOcc += thisZoneVentRepVars.ZoneTimeAtVozDyn;
+            thisZonePredefRep.VozTargetTimeAboveOcc += thisZoneVentRepVars.ZoneTimeAboveVozDyn;
         } else if (totMechNatVentVolStdRho > SmallAirVolFlow) {
             thisZoneVentRepVars.ZoneTimeVentUnocc = TimeStepSys;
             state.dataSysRpts->AnyZoneTimeVentUnocc = TimeStepSys;
-            state.dataHeatBal->ZonePreDefRep(ActualZoneNum).TotVentTimeNonZeroUnocc += thisZoneVentRepVars.ZoneTimeVentUnocc;
+            thisZonePredefRep.TotVentTimeNonZeroUnocc += thisZoneVentRepVars.ZoneTimeVentUnocc;
         }
         // accumulate during occupancy or not
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).MechVentVolTotalStdDen += thisZoneVentRepVars.ZoneOAVolStdRho;
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTotal += targetVoz;
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeBelow += thisZoneVentRepVars.ZoneTimeBelowVozDyn;
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeAt += thisZoneVentRepVars.ZoneTimeAtVozDyn;
-        state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeAbove += thisZoneVentRepVars.ZoneTimeAboveVozDyn;
+        thisZonePredefRep.MechVentVolTotalStdDen += thisZoneVentRepVars.ZoneOAVolStdRho;
+        thisZonePredefRep.InfilVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
+        thisZonePredefRep.SimpVentVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
+        thisZonePredefRep.VozTargetTotal += targetVoz;
+        thisZonePredefRep.VozTargetTimeBelow += thisZoneVentRepVars.ZoneTimeBelowVozDyn;
+        thisZonePredefRep.VozTargetTimeAt += thisZoneVentRepVars.ZoneTimeAtVozDyn;
+        thisZonePredefRep.VozTargetTimeAbove += thisZoneVentRepVars.ZoneTimeAboveVozDyn;
 
         // now combine Vent load from zone forced air units with primary air system
-        ZoneVentLoad = ZAirSysZoneVentLoad + ZFAUZoneVentLoad;
+        Real64 ZoneVentLoad = ZAirSysZoneVentLoad + ZFAUZoneVentLoad;
         // cycle if ZoneVentLoad is small
         if (std::abs(ZoneVentLoad) < SmallLoad) continue; // orig. had RETURN here, BG changed to CYCLE for next controlled zone in do loop.
 
