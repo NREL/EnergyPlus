@@ -12672,11 +12672,19 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         columnWidth.allocate(columnNum);
         columnWidth = 10;
         Array1D_string columnHead(5);
-        columnHead(1) = "Safe (≤ 26.7°C) [hr]";
-        columnHead(2) = "Caution (> 26.7, ≤ 32.2°C) [hr]";
-        columnHead(3) = "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]";
-        columnHead(4) = "Danger (> 39.4, ≤ 51.7°C) [hr]";
-        columnHead(5) = "Extreme Danger (> 51.7°C) [hr]";
+        if (unitsStyle_cur == UnitsStyle::InchPound) {
+            columnHead(1) = "Safe (≤ 80.1°F) [hr]";
+            columnHead(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
+            columnHead(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
+            columnHead(4) = "Danger (> 102.9, ≤ 125.1°F) [hr]";
+            columnHead(5) = "Extreme Danger (> 125.1°F) [hr]";
+        } else {
+            columnHead(1) = "Safe (≤ 26.7°C) [hr]";
+            columnHead(2) = "Caution (> 26.7°C, ≤ 32.2°C) [hr]";
+            columnHead(3) = "Extreme Caution (> 32.2°C, ≤ 39.4°C) [hr]";
+            columnHead(4) = "Danger (> 39.4°C, ≤ 51.7°C) [hr]";
+            columnHead(5) = "Extreme Danger (> 51.7°C) [hr]";
+        }
 
         Array1D_string rowHead;
         Array2D_string tableBody;
@@ -12722,6 +12730,11 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 rowHead,
                                                 tableBody);
 
+        columnHead(1) = "Little to no Discomfort (≤ 29) [hr]";
+        columnHead(2) = "Some Discomfort (> 29, ≤ 40) [hr]";
+        columnHead(3) = "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]";
+        columnHead(4) = "Dangerous (> 45, ≤ 50) [hr]";
+        columnHead(5) = "Heat Stroke Quite Possible (> 50) [hr]";
         tableName = "Humidex Hours";
         WriteResilienceBinsTableReportingPeriod(state,
                                                 tableType,
@@ -12792,12 +12805,17 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
 
             if (unitsStyle_cur == UnitsStyle::InchPound) {
-                int indexUnitConv;
-                std::string curUnits;
-                for (int i = 1; i < columnNum; i++) {
-                    LookupSItoIP(state, columnHead(i), indexUnitConv, curUnits);
-                    columnHead(i) = curUnits;
-                }
+                columnHead(1) = "SET ≤ 54.0°F Degree-Hours [°F·hr]";
+                columnHead(2) = "SET ≤ 54.0°F Occupant-Weighted Degree-Hours [°F·hr]";
+                columnHead(3) = "SET ≤ 54.0°F Occupied Degree-Hours [°F·hr]";
+                columnHead(4) = "Longest SET ≤ 54.0°F Duration for Occupied Period [hr]";
+                columnHead(5) = "Start Time of the Longest SET ≤ 54.0°F Duration for Occupied Period ";
+            } else {
+                columnHead(1) = "SET ≤ 12.2°C Degree-Hours [°C·hr]";
+                columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]";
+                columnHead(3) = "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]";
+                columnHead(4) = "Longest SET ≤ 12.2°C Duration for Occupied Period [hr]";
+                columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
             }
 
             tableName = "Heating SET Degree-Hours";
@@ -12817,19 +12835,18 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                               tableBodySET,
                                               degreeHourConversion);
 
-            columnHead(1) = "SET > 30°C Degree-Hours [°C·hr]";
-            columnHead(2) = "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]";
-            columnHead(3) = "SET > 30°C Occupied Degree-Hours [°C·hr]";
-            columnHead(4) = "Longest SET > 30°C Duration for Occupied Period [hr]";
-            columnHead(5) = "Start Time of the Longest SET > 30°C Duration for Occupied Period";
-
             if (unitsStyle_cur == UnitsStyle::InchPound) {
-                int indexUnitConv;
-                std::string curUnits;
-                for (int i = 1; i < columnNum; i++) {
-                    LookupSItoIP(state, columnHead(i), indexUnitConv, curUnits);
-                    columnHead(i) = curUnits;
-                }
+                columnHead(1) = "SET > 86°F Degree-Hours [°F·hr]";
+                columnHead(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
+                columnHead(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
+                columnHead(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
+                columnHead(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
+            } else {
+                columnHead(1) = "SET > 30°C Degree-Hours [°C·hr]";
+                columnHead(2) = "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]";
+                columnHead(3) = "SET > 30°C Occupied Degree-Hours [°C·hr]";
+                columnHead(4) = "Longest SET > 30°C Duration for Occupied Period [hr]";
+                columnHead(5) = "Start Time of the Longest SET > 30°C Duration for Occupied Period";
             }
 
             tableName = "Cooling SET Degree-Hours";
