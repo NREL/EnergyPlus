@@ -401,7 +401,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             ThisCP.CoolingCapMethod = DataSizing::CapacityPerFloorArea;
             if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
                 ThisCP.ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(5);
-                if (ThisCP.CoolingCapMethod <= 0.0) {
+                if (ThisCP.ScaledCoolingCapacity <= 0.0) {
                     ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
                     ShowContinueError(state, "Input for " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
                     ShowContinueError(
