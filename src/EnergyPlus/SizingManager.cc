@@ -3461,11 +3461,11 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 }
                 zoneSizingIndex.ZnLatCoolDgnSAMethod =
                     (state.dataIPShortCut->cAlphaArgs(11) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
-                zoneSizingIndex.CoolDesDehumHumRat = state.dataIPShortCut->rNumericArgs(19);
+                zoneSizingIndex.LatentCoolDesHumRat = state.dataIPShortCut->rNumericArgs(19);
                 zoneSizingIndex.CoolDesHumRatDiff = state.dataIPShortCut->rNumericArgs(20);
                 zoneSizingIndex.ZnLatHeatDgnSAMethod =
                     (state.dataIPShortCut->cAlphaArgs(12) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
-                zoneSizingIndex.HeatDesHumidifyHumRat = state.dataIPShortCut->rNumericArgs(21);
+                zoneSizingIndex.LatentHeatDesHumRat = state.dataIPShortCut->rNumericArgs(21);
                 zoneSizingIndex.HeatDesHumRatDiff = state.dataIPShortCut->rNumericArgs(22);
                 if (NumAlphas > 12 && !state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     zoneSizingIndex.zoneRHDehumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));

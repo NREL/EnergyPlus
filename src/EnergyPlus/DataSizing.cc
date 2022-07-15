@@ -172,11 +172,11 @@ void ZoneSizingData::zeroMemberData()
     std::fill(this->HeatLoadNoDOASSeq.begin(), this->HeatLoadNoDOASSeq.end(), 0.0);
     std::fill(this->CoolLoadNoDOASSeq.begin(), this->CoolLoadNoDOASSeq.end(), 0.0);
     std::fill(this->HeatLatentLoadSeq.begin(), this->HeatLatentLoadSeq.end(), 0.0);
-    std::fill(this->CoolLatentLoadSeq.begin(), this->CoolLatentLoadSeq.end(), 0.0);
+    std::fill(this->LatentCoolLoadSeq.begin(), this->LatentCoolLoadSeq.end(), 0.0);
     std::fill(this->HeatLatentLoadNoDOASSeq.begin(), this->HeatLatentLoadNoDOASSeq.end(), 0.0);
     std::fill(this->CoolLatentLoadNoDOASSeq.begin(), this->CoolLatentLoadNoDOASSeq.end(), 0.0);
-    std::fill(this->ZoneCoolLatentMassFlowSeq.begin(), this->ZoneCoolLatentMassFlowSeq.end(), 0.0);
-    std::fill(this->ZoneHeatLatentMassFlowSeq.begin(), this->ZoneHeatLatentMassFlowSeq.end(), 0.0);
+    std::fill(this->LatentCoolFlowSeq.begin(), this->LatentCoolFlowSeq.end(), 0.0);
+    std::fill(this->LatentHeatFlowSeq.begin(), this->LatentHeatFlowSeq.end(), 0.0);
 
     this->CoolDesDay = "";          // name of a sensible cooling design day
     this->HeatDesDay = "";          // name of a sensible heating design day
@@ -261,14 +261,14 @@ void ZoneSizingData::zeroMemberData()
     this->ZoneCoolLatentVolFlow = 0.0;          // current volume flow rate required to meet dehumidification load [m3/s]
     this->DesHeatLoadNoDOAS = 0.0;              // zone design heating load without DOAS [W]
     this->DesCoolLoadNoDOAS = 0.0;              // zone design cooling load without DOAS [W]
-    this->DesHeatLatentLoad = 0.0;              // current zone humidification load (HVAC time step)
-    this->DesCoolLatentLoad = 0.0;              // current zone dehumidification load (HVAC time step)
-    this->DesHeatLatentLoadNoDOAS = 0.0;        // current zone humidification load no DOAS (HVAC time step)
-    this->DesCoolLatentLoadNoDOAS = 0.0;        // current zone dehumidification load no DOAS (HVAC time step)
-    this->DesHeatLatentMassFlow = 0.0;          // current mass flow rate required to meet humidification load [kg/s]
-    this->DesCoolLatentMassFlow = 0.0;          // current mass flow rate required to meet dehumidification load [kg/s]
-    this->DesHeatLatentVolFlow = 0.0;           // current volume flow rate required to meet humidification load [m3/s]
-    this->DesCoolLatentVolFlow = 0.0;           // current volume flow rate required to meet dehumidification load [m3/s]
+    this->DesLatentHeatLoad = 0.0;              // current zone humidification load (HVAC time step)
+    this->DesLatentCoolLoad = 0.0;              // current zone dehumidification load (HVAC time step)
+    this->DesLatentHeatLoadNoDOAS = 0.0;        // current zone humidification load no DOAS (HVAC time step)
+    this->DesLatentCoolLoadNoDOAS = 0.0;        // current zone dehumidification load no DOAS (HVAC time step)
+    this->DesLatentHeatMassFlow = 0.0;          // current mass flow rate required to meet humidification load [kg/s]
+    this->DesLatentCoolMassFlow = 0.0;          // current mass flow rate required to meet dehumidification load [kg/s]
+    this->DesLatentHeatVolFlow = 0.0;           // current volume flow rate required to meet humidification load [m3/s]
+    this->DesLatentCoolVolFlow = 0.0;           // current volume flow rate required to meet dehumidification load [m3/s]
     this->DesLatentHeatCoilInTemp = 0.0;        // zone heating coil design air inlet temperature [C]
     this->DesLatentCoolCoilInTemp = 0.0;        // zone cooling coil design air inlet temperature [C]
     this->DesLatentHeatCoilInHumRat = 0.0;      // zone heating coil design air inlet humidity ratio [kg/kg]
@@ -318,11 +318,11 @@ void ZoneSizingData::allocateMemberArrays(int const numOfTimeStepInDay)
     this->HeatLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
     this->CoolLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
     this->HeatLatentLoadSeq.dimension(numOfTimeStepInDay, 0.0);
-    this->CoolLatentLoadSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->LatentCoolLoadSeq.dimension(numOfTimeStepInDay, 0.0);
     this->HeatLatentLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
     this->CoolLatentLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
-    this->ZoneCoolLatentMassFlowSeq.dimension(numOfTimeStepInDay, 0.0);
-    this->ZoneHeatLatentMassFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->LatentCoolFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->LatentHeatFlowSeq.dimension(numOfTimeStepInDay, 0.0);
 }
 
 void resetHVACSizingGlobals(EnergyPlusData &state,
