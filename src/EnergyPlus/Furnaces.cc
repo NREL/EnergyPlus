@@ -1594,7 +1594,6 @@ namespace Furnaces {
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state,
                                 FurnaceNum,
-                                Alphas(1),
                                 cCurrentModuleObject,
                                 state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
                                 state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
@@ -2967,7 +2966,6 @@ namespace Furnaces {
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state,
                                 FurnaceNum,
-                                Alphas(1),
                                 cCurrentModuleObject,
                                 state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
                                 state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
@@ -3973,7 +3971,6 @@ namespace Furnaces {
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state,
                                 FurnaceNum,
-                                Alphas(1),
                                 cCurrentModuleObject,
                                 state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
                                 state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
@@ -4856,7 +4853,6 @@ namespace Furnaces {
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state,
                                 FurnaceNum,
-                                Alphas(1),
                                 cCurrentModuleObject,
                                 state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
                                 state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
@@ -12617,48 +12613,41 @@ namespace Furnaces {
 
     void SetMinOATCompressor(EnergyPlusData &state,
                              int const FurnaceNum,                    // index to furnace
-                             std::string const &FurnaceName,          // name of furnace
                              std::string const &cCurrentModuleObject, // type of furnace
                              int const CoolingCoilIndex,              // index of cooling coil
                              int const HeatingCoilIndex,              // index of heating coil
                              bool &ErrorsFound                        // GetInput logical that errors were found
     )
     {
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool errFlag;
+        bool errFlag = false;
+        auto &furnace = state.dataFurnaces->Furnace(FurnaceNum);
 
         // Set minimum OAT for heat pump compressor operation in heating mode
-        errFlag = false;
-        if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
-                DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
-                DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
-                VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+        if (furnace.CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+        } else if (furnace.CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
+            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+        } else if (furnace.CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
+            furnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
         } else {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling = -1000.0;
+            furnace.MinOATCompressorCooling = -1000.0;
         }
         if (errFlag) {
-            ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + FurnaceName);
+            ShowContinueError(state, format("...occurs in {} = {}", cCurrentModuleObject, furnace.Name));
             ErrorsFound = true;
         }
 
         // Set minimum OAT for heat pump compressor operation in heating mode
         errFlag = false;
-        if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating =
-                VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == CoilDX_HeatingEmpirical) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating =
-                DXCoils::GetMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
+        if (furnace.HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
+            furnace.MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
+        } else if (furnace.HeatingCoilType_Num == CoilDX_HeatingEmpirical) {
+            furnace.MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
         } else {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating = -1000.0;
+            furnace.MinOATCompressorHeating = -1000.0;
         }
         if (errFlag) {
-            ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + FurnaceName);
+            ShowContinueError(state, format("...occurs in {} = {}", cCurrentModuleObject, furnace.Name));
             ErrorsFound = true;
         }
     }

@@ -1203,7 +1203,7 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     state->dataFurnaces->Furnace(1).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
     state->dataFurnaces->Furnace(1).HeatingCoilType_Num = Coil_HeatingElectric;
     // Each test should return 30 for cooling coil (limited) and -1000 for heating coil (no limit)
-    SetMinOATCompressor(*state, FurnaceNum, FurnaceName, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
@@ -1212,13 +1212,13 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     state->dataFurnaces->Furnace(1).MinOATCompressorHeating = -999.0;
 
     state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
-    SetMinOATCompressor(*state, FurnaceNum, FurnaceName, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
 
     state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
-    SetMinOATCompressor(*state, FurnaceNum, FurnaceName, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
@@ -1226,13 +1226,13 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     // check heating coil types
     // should return 30 in each case since cooling and heating coil now have limit
     state->dataFurnaces->Furnace(1).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
-    SetMinOATCompressor(*state, FurnaceNum, FurnaceName, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6); // same as above
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, 30.0, 1e-6); // now returns 30
 
     state->dataFurnaces->Furnace(1).HeatingCoilType_Num = CoilDX_HeatingEmpirical;
-    SetMinOATCompressor(*state, FurnaceNum, FurnaceName, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, coolCoilIdx, heatCoilIdx, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, 30.0, 1e-6);
