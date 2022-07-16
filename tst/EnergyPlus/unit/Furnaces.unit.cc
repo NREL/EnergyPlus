@@ -1195,7 +1195,6 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     int coolCoilIdx = 1;
     int heatCoilIdx = 2;
     int FurnaceNum = 1;
-    std::string FurnaceName = "Furnace_1";
     std::string cCurModObj = "Furnace_Test";
     bool ErrFound = false;
 
