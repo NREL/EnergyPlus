@@ -318,8 +318,8 @@ void InitEnergyReports(EnergyPlusData &state)
                         if (thisZoneEquipList.EquipData(AirDistUnitNum).MeteredVar(VarNum).ResourceType ==
                             DataGlobalConstants::ResourceType::EnergyTransfer) {
                             thisZoneEquipList.EquipData(AirDistUnitNum).EnergyTransComp = EnergyTransfer;
-                            std::string CompType = thisZoneEquipList.EquipData(AirDistUnitNum).TypeOf;
-                            std::string CompName = thisZoneEquipList.EquipData(AirDistUnitNum).Name;
+                            const std::string &CompType = thisZoneEquipList.EquipData(AirDistUnitNum).TypeOf;
+                            const std::string &CompName = thisZoneEquipList.EquipData(AirDistUnitNum).Name;
                             int Idx = 0;
                             int MatchLoop = 0;
                             int MatchLoopType = 0;
@@ -339,8 +339,8 @@ void InitEnergyReports(EnergyPlusData &state)
                             if (thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).MeteredVar(VarNum).ResourceType ==
                                 DataGlobalConstants::ResourceType::EnergyTransfer) {
                                 thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).EnergyTransComp = EnergyTransfer;
-                                std::string CompType = thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).TypeOf;
-                                std::string CompName = thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).Name;
+                                const std::string &CompType = thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).TypeOf;
+                                const std::string &CompName = thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).Name;
                                 int Idx = 0;
                                 int MatchLoop = 0;
                                 int MatchLoopType = 0;
@@ -371,9 +371,9 @@ void InitEnergyReports(EnergyPlusData &state)
                                         .SubEquipData(SubEquipNum)
                                         .SubSubEquipData(SubSubEquipNum)
                                         .EnergyTransComp = EnergyTransfer;
-                                    std::string CompType =
+                                    const std::string &CompType =
                                         thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).SubSubEquipData(SubSubEquipNum).TypeOf;
-                                    std::string CompName =
+                                    const std::string &CompName =
                                         thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).SubSubEquipData(SubSubEquipNum).Name;
                                     int Idx = 0;
                                     int MatchLoop = 0;
@@ -711,8 +711,8 @@ void InitEnergyReports(EnergyPlusData &state)
                                 auto &thisVentRepComp(state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum)
                                                           .Branch(BranchNum)
                                                           .Comp(CompNum));
-                                std::string CompType = thisVentRepComp.TypeOf;
-                                std::string CompName = thisVentRepComp.Name;
+                                const std::string &CompType = thisVentRepComp.TypeOf;
+                                const std::string &CompName = thisVentRepComp.Name;
                                 int MatchLoop = 0;
                                 int MatchLoopType = 0;
                                 int MatchBranch = 0;
@@ -740,8 +740,8 @@ void InitEnergyReports(EnergyPlusData &state)
                                 auto &thisVentRepComp(state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum)
                                                           .Branch(BranchNum)
                                                           .Comp(CompNum));
-                                std::string CompType = thisVentRepComp.TypeOf;
-                                std::string CompName = thisVentRepComp.Name;
+                                const std::string &CompType = thisVentRepComp.TypeOf;
+                                const std::string &CompName = thisVentRepComp.Name;
                                 int MatchLoop = 0;
                                 int MatchLoopType = 0;
                                 int MatchBranch = 0;
@@ -1595,14 +1595,14 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
 
     for (int sysIndex = 1; sysIndex <= NumPrimaryAirSys; ++sysIndex) {
         auto &thisSysVentRepVars = state.dataSysRpts->SysVentRepVars(sysIndex);
-        thisSysVentRepVars.SysMechVentFlow = 0.0;
-        thisSysVentRepVars.SysNatVentFlow = 0.0;
-        thisSysVentRepVars.SysTargetVentilationFlowVoz = 0.0;
-        thisSysVentRepVars.SysTimeBelowVozDyn = 0.0;
-        thisSysVentRepVars.SysTimeAtVozDyn = 0.0;
-        thisSysVentRepVars.SysTimeAboveVozDyn = 0.0;
-        thisSysVentRepVars.SysTimeVentUnocc = 0.0;
-        thisSysVentRepVars.SysAnyZoneOccupied = false;
+        thisSysVentRepVars.MechVentFlow = 0.0;
+        thisSysVentRepVars.NatVentFlow = 0.0;
+        thisSysVentRepVars.TargetVentilationFlowVoz = 0.0;
+        thisSysVentRepVars.TimeBelowVozDyn = 0.0;
+        thisSysVentRepVars.TimeAtVozDyn = 0.0;
+        thisSysVentRepVars.TimeAboveVozDyn = 0.0;
+        thisSysVentRepVars.TimeVentUnocc = 0.0;
+        thisSysVentRepVars.AnyZoneOccupied = false;
     }
 
     if (state.dataSysRpts->AirLoopLoadsReportEnabled) {
@@ -1616,7 +1616,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotHTNG,
+                                thisSysLoadRepVars.TotHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1624,7 +1624,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotCLNG,
+                                thisSysLoadRepVars.TotCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1633,7 +1633,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Hot Water Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotH2OHOT,
+                                thisSysLoadRepVars.TotH2OHOT,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1641,7 +1641,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Steam Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotSteam,
+                                thisSysLoadRepVars.TotSteam,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1649,7 +1649,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Chilled Water Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotH2OCOLD,
+                                thisSysLoadRepVars.TotH2OCOLD,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1657,7 +1657,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotElec,
+                                thisSysLoadRepVars.TotElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1665,7 +1665,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotNaturalGas,
+                                thisSysLoadRepVars.TotNaturalGas,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1673,7 +1673,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Propane Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysTotPropane,
+                                thisSysLoadRepVars.TotPropane,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1681,7 +1681,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Water Volume",
                                 OutputProcessor::Unit::m3,
-                                thisSysLoadRepVars.SysDomesticH2O,
+                                thisSysLoadRepVars.DomesticH2O,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1690,7 +1690,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Fan Air Heating Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysFANCompHTNG,
+                                thisSysLoadRepVars.FANCompHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1698,7 +1698,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysCCCompCLNG,
+                                thisSysLoadRepVars.CCCompCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1706,7 +1706,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heating Coil Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHCCompHTNG,
+                                thisSysLoadRepVars.HCCompHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1714,7 +1714,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHeatExHTNG,
+                                thisSysLoadRepVars.HeatExHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1722,7 +1722,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHeatExCLNG,
+                                thisSysLoadRepVars.HeatExCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1730,7 +1730,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysSolarCollectHeating,
+                                thisSysLoadRepVars.SolarCollectHeating,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1738,7 +1738,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysSolarCollectCooling,
+                                thisSysLoadRepVars.SolarCollectCooling,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1746,7 +1746,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysUserDefinedTerminalHeating,
+                                thisSysLoadRepVars.UserDefinedTerminalHeating,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1754,7 +1754,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysUserDefinedTerminalCooling,
+                                thisSysLoadRepVars.UserDefinedTerminalCooling,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1762,7 +1762,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Humidifier Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHumidHTNG,
+                                thisSysLoadRepVars.HumidHTNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1770,7 +1770,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysEvapCLNG,
+                                thisSysLoadRepVars.EvapCLNG,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1787,7 +1787,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysFANCompElec,
+                                thisSysLoadRepVars.FANCompElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1795,7 +1795,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heating Coil Hot Water Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHCCompH2OHOT,
+                                thisSysLoadRepVars.HCCompH2OHOT,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1803,7 +1803,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Chilled Water Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysCCCompH2OCOLD,
+                                thisSysLoadRepVars.CCCompH2OCOLD,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1811,7 +1811,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System DX Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHCCompElec,
+                                thisSysLoadRepVars.HCCompElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1819,7 +1819,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System DX Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysCCCompElec,
+                                thisSysLoadRepVars.CCCompElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1827,7 +1827,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHCCompElecRes,
+                                thisSysLoadRepVars.HCCompElecRes,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1835,7 +1835,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heating Coil NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHCCompNaturalGas,
+                                thisSysLoadRepVars.HCCompNaturalGas,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1843,7 +1843,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heating Coil Propane Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHCCompPropane,
+                                thisSysLoadRepVars.HCCompPropane,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1851,7 +1851,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Heating Coil Steam Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHCCompSteam,
+                                thisSysLoadRepVars.HCCompSteam,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1859,7 +1859,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Humidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHumidElec,
+                                thisSysLoadRepVars.HumidElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1867,7 +1867,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Humidifier NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHumidNaturalGas,
+                                thisSysLoadRepVars.HumidNaturalGas,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1875,7 +1875,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Humidifier Propane Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysHumidPropane,
+                                thisSysLoadRepVars.HumidPropane,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1883,7 +1883,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                thisSysLoadRepVars.SysEvapElec,
+                                thisSysLoadRepVars.EvapElec,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1899,7 +1899,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Mechanical Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                thisSysVentRepVars.SysMechVentFlow,
+                                thisSysVentRepVars.MechVentFlow,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
                                 primaryAirSysName);
@@ -1907,7 +1907,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Natural Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                thisSysVentRepVars.SysNatVentFlow,
+                                thisSysVentRepVars.NatVentFlow,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
                                 primaryAirSysName);
@@ -1915,7 +1915,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Target Voz Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                thisSysVentRepVars.SysTargetVentilationFlowVoz,
+                                thisSysVentRepVars.TargetVentilationFlowVoz,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
                                 primaryAirSysName);
@@ -1923,7 +1923,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Ventilation Below Target Voz Time",
                                 OutputProcessor::Unit::hr,
-                                thisSysVentRepVars.SysTimeBelowVozDyn,
+                                thisSysVentRepVars.TimeBelowVozDyn,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1931,7 +1931,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Ventilation At Target Voz Time",
                                 OutputProcessor::Unit::hr,
-                                thisSysVentRepVars.SysTimeAtVozDyn,
+                                thisSysVentRepVars.TimeAtVozDyn,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1939,7 +1939,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Ventilation Above Target Voz Time",
                                 OutputProcessor::Unit::hr,
-                                thisSysVentRepVars.SysTimeAboveVozDyn,
+                                thisSysVentRepVars.TimeAboveVozDyn,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -1947,7 +1947,7 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Air System Ventilation When Unoccupied Time",
                                 OutputProcessor::Unit::hr,
-                                thisSysVentRepVars.SysTimeVentUnocc,
+                                thisSysVentRepVars.TimeVentUnocc,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 primaryAirSysName);
@@ -3272,47 +3272,47 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
         auto &thisSysLoadRepVars = state.dataSysRpts->SysLoadRepVars(airLoopNum);
         // SYSTEM LOADS REPORT
-        thisSysLoadRepVars.SysTotHTNG = 0.0;
-        thisSysLoadRepVars.SysTotCLNG = 0.0;
+        thisSysLoadRepVars.TotHTNG = 0.0;
+        thisSysLoadRepVars.TotCLNG = 0.0;
 
         // SYSTEM ENERGY USE REPORT
-        thisSysLoadRepVars.SysTotElec = 0.0;
-        thisSysLoadRepVars.SysTotNaturalGas = 0.0;
-        thisSysLoadRepVars.SysTotPropane = 0.0;
-        thisSysLoadRepVars.SysTotSteam = 0.0;
-        thisSysLoadRepVars.SysTotH2OCOLD = 0.0;
-        thisSysLoadRepVars.SysTotH2OHOT = 0.0;
+        thisSysLoadRepVars.TotElec = 0.0;
+        thisSysLoadRepVars.TotNaturalGas = 0.0;
+        thisSysLoadRepVars.TotPropane = 0.0;
+        thisSysLoadRepVars.TotSteam = 0.0;
+        thisSysLoadRepVars.TotH2OCOLD = 0.0;
+        thisSysLoadRepVars.TotH2OHOT = 0.0;
 
         // SYSTEM COMPONENT LOADS REPORT
-        thisSysLoadRepVars.SysFANCompHTNG = 0.0;
-        thisSysLoadRepVars.SysCCCompCLNG = 0.0;
-        thisSysLoadRepVars.SysHCCompHTNG = 0.0;
-        thisSysLoadRepVars.SysHeatExHTNG = 0.0;
-        thisSysLoadRepVars.SysHeatExCLNG = 0.0;
-        thisSysLoadRepVars.SysSolarCollectHeating = 0.0;
-        thisSysLoadRepVars.SysSolarCollectCooling = 0.0;
-        thisSysLoadRepVars.SysUserDefinedTerminalHeating = 0.0;
-        thisSysLoadRepVars.SysUserDefinedTerminalCooling = 0.0;
-        thisSysLoadRepVars.SysHumidHTNG = 0.0;
-        thisSysLoadRepVars.SysEvapCLNG = 0.0;
+        thisSysLoadRepVars.FANCompHTNG = 0.0;
+        thisSysLoadRepVars.CCCompCLNG = 0.0;
+        thisSysLoadRepVars.HCCompHTNG = 0.0;
+        thisSysLoadRepVars.HeatExHTNG = 0.0;
+        thisSysLoadRepVars.HeatExCLNG = 0.0;
+        thisSysLoadRepVars.SolarCollectHeating = 0.0;
+        thisSysLoadRepVars.SolarCollectCooling = 0.0;
+        thisSysLoadRepVars.UserDefinedTerminalHeating = 0.0;
+        thisSysLoadRepVars.UserDefinedTerminalCooling = 0.0;
+        thisSysLoadRepVars.HumidHTNG = 0.0;
+        thisSysLoadRepVars.EvapCLNG = 0.0;
         thisSysLoadRepVars.DesDehumidCLNG = 0.0;
-        thisSysLoadRepVars.SysDomesticH2O = 0.0;
+        thisSysLoadRepVars.DomesticH2O = 0.0;
 
         // SYSTEM COMPONENT ENERGY REPORT
-        thisSysLoadRepVars.SysFANCompElec = 0.0;
-        thisSysLoadRepVars.SysHCCompH2OHOT = 0.0;
-        thisSysLoadRepVars.SysCCCompH2OCOLD = 0.0;
-        thisSysLoadRepVars.SysHCCompElec = 0.0;
-        thisSysLoadRepVars.SysCCCompElec = 0.0;
-        thisSysLoadRepVars.SysHCCompElecRes = 0.0;
-        thisSysLoadRepVars.SysHCCompNaturalGas = 0.0;
-        thisSysLoadRepVars.SysHCCompPropane = 0.0;
-        thisSysLoadRepVars.SysHCCompSteam = 0.0;
-        thisSysLoadRepVars.SysHumidElec = 0.0;
-        thisSysLoadRepVars.SysHumidNaturalGas = 0.0;
-        thisSysLoadRepVars.SysHumidPropane = 0.0;
+        thisSysLoadRepVars.FANCompElec = 0.0;
+        thisSysLoadRepVars.HCCompH2OHOT = 0.0;
+        thisSysLoadRepVars.CCCompH2OCOLD = 0.0;
+        thisSysLoadRepVars.HCCompElec = 0.0;
+        thisSysLoadRepVars.CCCompElec = 0.0;
+        thisSysLoadRepVars.HCCompElecRes = 0.0;
+        thisSysLoadRepVars.HCCompNaturalGas = 0.0;
+        thisSysLoadRepVars.HCCompPropane = 0.0;
+        thisSysLoadRepVars.HCCompSteam = 0.0;
+        thisSysLoadRepVars.HumidElec = 0.0;
+        thisSysLoadRepVars.HumidNaturalGas = 0.0;
+        thisSysLoadRepVars.HumidPropane = 0.0;
         thisSysLoadRepVars.DesDehumidElec = 0.0;
-        thisSysLoadRepVars.SysEvapElec = 0.0;
+        thisSysLoadRepVars.EvapElec = 0.0;
     }
 
     auto &Node(state.dataLoopNodes->Node);
@@ -3511,20 +3511,20 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
 
     for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
         auto &thisSysLoadRepVars = state.dataSysRpts->SysLoadRepVars(airLoopNum);
-        thisSysLoadRepVars.SysTotHTNG = thisSysLoadRepVars.SysFANCompHTNG + thisSysLoadRepVars.SysHCCompHTNG + thisSysLoadRepVars.SysHeatExHTNG +
-                                        thisSysLoadRepVars.SysHumidHTNG + thisSysLoadRepVars.SysSolarCollectHeating +
-                                        thisSysLoadRepVars.SysUserDefinedTerminalHeating;
-        thisSysLoadRepVars.SysTotCLNG = thisSysLoadRepVars.SysCCCompCLNG + thisSysLoadRepVars.SysHeatExCLNG + thisSysLoadRepVars.SysEvapCLNG +
-                                        thisSysLoadRepVars.DesDehumidCLNG + thisSysLoadRepVars.SysSolarCollectCooling +
-                                        thisSysLoadRepVars.SysUserDefinedTerminalCooling;
-        thisSysLoadRepVars.SysTotElec = thisSysLoadRepVars.SysFANCompElec + thisSysLoadRepVars.SysHCCompElec + thisSysLoadRepVars.SysCCCompElec +
-                                        thisSysLoadRepVars.SysHCCompElecRes + thisSysLoadRepVars.SysHumidElec + thisSysLoadRepVars.DesDehumidElec +
-                                        thisSysLoadRepVars.SysEvapElec;
-        thisSysLoadRepVars.SysTotNaturalGas = thisSysLoadRepVars.SysHCCompNaturalGas + thisSysLoadRepVars.SysHumidNaturalGas;
-        thisSysLoadRepVars.SysTotPropane = thisSysLoadRepVars.SysHCCompPropane + thisSysLoadRepVars.SysHumidPropane;
-        thisSysLoadRepVars.SysTotSteam = thisSysLoadRepVars.SysHCCompSteam;
-        thisSysLoadRepVars.SysTotH2OCOLD = thisSysLoadRepVars.SysCCCompH2OCOLD;
-        thisSysLoadRepVars.SysTotH2OHOT = thisSysLoadRepVars.SysHCCompH2OHOT;
+        thisSysLoadRepVars.TotHTNG = thisSysLoadRepVars.FANCompHTNG + thisSysLoadRepVars.HCCompHTNG + thisSysLoadRepVars.HeatExHTNG +
+                                     thisSysLoadRepVars.HumidHTNG + thisSysLoadRepVars.SolarCollectHeating +
+                                     thisSysLoadRepVars.UserDefinedTerminalHeating;
+        thisSysLoadRepVars.TotCLNG = thisSysLoadRepVars.CCCompCLNG + thisSysLoadRepVars.HeatExCLNG + thisSysLoadRepVars.EvapCLNG +
+                                     thisSysLoadRepVars.DesDehumidCLNG + thisSysLoadRepVars.SolarCollectCooling +
+                                     thisSysLoadRepVars.UserDefinedTerminalCooling;
+        thisSysLoadRepVars.TotElec = thisSysLoadRepVars.FANCompElec + thisSysLoadRepVars.HCCompElec + thisSysLoadRepVars.CCCompElec +
+                                     thisSysLoadRepVars.HCCompElecRes + thisSysLoadRepVars.HumidElec + thisSysLoadRepVars.DesDehumidElec +
+                                     thisSysLoadRepVars.EvapElec;
+        thisSysLoadRepVars.TotNaturalGas = thisSysLoadRepVars.HCCompNaturalGas + thisSysLoadRepVars.HumidNaturalGas;
+        thisSysLoadRepVars.TotPropane = thisSysLoadRepVars.HCCompPropane + thisSysLoadRepVars.HumidPropane;
+        thisSysLoadRepVars.TotSteam = thisSysLoadRepVars.HCCompSteam;
+        thisSysLoadRepVars.TotH2OCOLD = thisSysLoadRepVars.CCCompH2OCOLD;
+        thisSysLoadRepVars.TotH2OHOT = thisSysLoadRepVars.HCCompH2OHOT;
     }
 }
 
@@ -3762,8 +3762,8 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case FAN_SYSTEMMODEL:
     case FAN_COMPONENTMODEL:
 
-        if (CompLoadFlag) thisSysLoadRepVars.SysFANCompHTNG += std::abs(CompLoad);
-        thisSysLoadRepVars.SysFANCompElec += CompEnergy;
+        if (CompLoadFlag) thisSysLoadRepVars.FANCompHTNG += std::abs(CompLoad);
+        thisSysLoadRepVars.FANCompElec += CompEnergy;
 
         // Cooling Coil Types for the air sys simulation
         break;
@@ -3786,12 +3786,12 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case COIL_COOLING_VRF_FTC:
     case COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED:
 
-        if (CompLoadFlag) thisSysLoadRepVars.SysCCCompCLNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.CCCompCLNG += std::abs(CompLoad);
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
-            thisSysLoadRepVars.SysCCCompH2OCOLD += CompEnergy;
+            thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            thisSysLoadRepVars.SysCCCompElec += CompEnergy;
+            thisSysLoadRepVars.CCCompElec += CompEnergy;
         }
 
         // Heating Coil Types for the air sys simulation
@@ -3808,27 +3808,27 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case COIL_HEATING_GAS_MULTISTAGE:
     case COIL_HEATING_DESUPERHEATER:
 
-        if (CompLoadFlag) thisSysLoadRepVars.SysHCCompHTNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.HCCompHTNG += std::abs(CompLoad);
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
-            thisSysLoadRepVars.SysHCCompH2OHOT += CompEnergy;
+            thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
-            thisSysLoadRepVars.SysHCCompSteam += CompEnergy;
+            thisSysLoadRepVars.HCCompSteam += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            thisSysLoadRepVars.SysHCCompElec += CompEnergy;
+            thisSysLoadRepVars.HCCompElec += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            thisSysLoadRepVars.SysHCCompNaturalGas += CompEnergy;
+            thisSysLoadRepVars.HCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            thisSysLoadRepVars.SysHCCompPropane += CompEnergy;
+            thisSysLoadRepVars.HCCompPropane += CompEnergy;
         }
 
         break;
     case COIL_HEATING_ELECTRIC:
     case COIL_HEATING_ELECTRIC_MULTISTAGE:
 
-        if (CompLoadFlag) thisSysLoadRepVars.SysHCCompHTNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.HCCompHTNG += std::abs(CompLoad);
         if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            thisSysLoadRepVars.SysHCCompElecRes += CompEnergy;
+            thisSysLoadRepVars.HCCompElecRes += CompEnergy;
         }
 
         break;
@@ -3836,29 +3836,29 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
 
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                thisSysLoadRepVars.SysCCCompCLNG += std::abs(CompLoad);
+                thisSysLoadRepVars.CCCompCLNG += std::abs(CompLoad);
             } else {
-                thisSysLoadRepVars.SysHCCompHTNG += std::abs(CompLoad);
+                thisSysLoadRepVars.HCCompHTNG += std::abs(CompLoad);
             }
         }
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
-            thisSysLoadRepVars.SysHCCompH2OHOT += CompEnergy;
+            thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
-            thisSysLoadRepVars.SysCCCompH2OCOLD += CompEnergy;
+            thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
-            thisSysLoadRepVars.SysHCCompSteam += CompEnergy;
+            thisSysLoadRepVars.HCCompSteam += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {
-                thisSysLoadRepVars.SysCCCompElec += CompEnergy;
+                thisSysLoadRepVars.CCCompElec += CompEnergy;
             } else {
-                thisSysLoadRepVars.SysHCCompElec += CompEnergy;
+                thisSysLoadRepVars.HCCompElec += CompEnergy;
             }
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            thisSysLoadRepVars.SysHCCompNaturalGas += CompEnergy;
+            thisSysLoadRepVars.HCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            thisSysLoadRepVars.SysHCCompPropane += CompEnergy;
+            thisSysLoadRepVars.HCCompPropane += CompEnergy;
         }
 
         // DX Systems
@@ -3904,15 +3904,15 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         // Humidifier Types for the air system simulation
     case HUMIDIFIER_STEAM_GAS:
     case HUMIDIFIER_STEAM_ELECTRIC:
-        if (CompLoadFlag) thisSysLoadRepVars.SysHumidHTNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.HumidHTNG += std::abs(CompLoad);
         if (EnergyType == DataGlobalConstants::ResourceType::Water) {
-            thisSysLoadRepVars.SysDomesticH2O += std::abs(CompEnergy);
+            thisSysLoadRepVars.DomesticH2O += std::abs(CompEnergy);
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            thisSysLoadRepVars.SysHumidElec += CompEnergy;
+            thisSysLoadRepVars.HumidElec += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            thisSysLoadRepVars.SysHumidNaturalGas += CompEnergy;
+            thisSysLoadRepVars.HumidNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            thisSysLoadRepVars.SysHumidPropane += CompEnergy;
+            thisSysLoadRepVars.HumidPropane += CompEnergy;
         }
 
         // Evap Cooler Types for the air system simulation
@@ -3922,11 +3922,11 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case EVAPORATIVECOOLER_INDIRECT_WETCOIL:
     case EVAPORATIVECOOLER_DIRECT_RESEARCHSPECIAL:
     case EVAPORATIVECOOLER_INDIRECT_RESEARCHSPECIAL:
-        if (CompLoadFlag) thisSysLoadRepVars.SysEvapCLNG += std::abs(CompLoad);
+        if (CompLoadFlag) thisSysLoadRepVars.EvapCLNG += std::abs(CompLoad);
         if (EnergyType == DataGlobalConstants::ResourceType::Water) {
-            thisSysLoadRepVars.SysDomesticH2O += std::abs(CompEnergy);
+            thisSysLoadRepVars.DomesticH2O += std::abs(CompEnergy);
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
-            thisSysLoadRepVars.SysEvapElec += CompEnergy;
+            thisSysLoadRepVars.EvapElec += CompEnergy;
         }
 
         // Desiccant Dehumidifier Types for the air system simulation
@@ -3945,9 +3945,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case HEATEXCHANGER_DESICCANT_BALANCEDFLOW:
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                thisSysLoadRepVars.SysHeatExCLNG += std::abs(CompLoad);
+                thisSysLoadRepVars.HeatExCLNG += std::abs(CompLoad);
             } else {
-                thisSysLoadRepVars.SysHeatExHTNG += std::abs(CompLoad);
+                thisSysLoadRepVars.HeatExHTNG += std::abs(CompLoad);
             }
         }
 
@@ -3992,9 +3992,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case SOLARCOLLECTOR_UNGLAZEDTRANSPIRED:
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                thisSysLoadRepVars.SysSolarCollectCooling += std::abs(CompLoad);
+                thisSysLoadRepVars.SolarCollectCooling += std::abs(CompLoad);
             } else {
-                thisSysLoadRepVars.SysSolarCollectHeating += std::abs(CompLoad);
+                thisSysLoadRepVars.SolarCollectHeating += std::abs(CompLoad);
             }
         }
 
@@ -4003,29 +4003,29 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         // User component model energy use should be accounted for here
         if (CompLoadFlag) {
             if (CompLoad > 0.0) {
-                thisSysLoadRepVars.SysUserDefinedTerminalCooling += std::abs(CompLoad);
+                thisSysLoadRepVars.UserDefinedTerminalCooling += std::abs(CompLoad);
             } else {
-                thisSysLoadRepVars.SysUserDefinedTerminalHeating += std::abs(CompLoad);
+                thisSysLoadRepVars.UserDefinedTerminalHeating += std::abs(CompLoad);
             }
         }
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
-            thisSysLoadRepVars.SysHCCompH2OHOT += CompEnergy;
+            thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
-            thisSysLoadRepVars.SysCCCompH2OCOLD += CompEnergy;
+            thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
-            thisSysLoadRepVars.SysHCCompSteam += CompEnergy;
+            thisSysLoadRepVars.HCCompSteam += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {
-                thisSysLoadRepVars.SysCCCompElec += CompEnergy;
+                thisSysLoadRepVars.CCCompElec += CompEnergy;
             } else {
-                thisSysLoadRepVars.SysHCCompElec += CompEnergy;
+                thisSysLoadRepVars.HCCompElec += CompEnergy;
             }
         } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
-            thisSysLoadRepVars.SysHCCompNaturalGas += CompEnergy;
+            thisSysLoadRepVars.HCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
-            thisSysLoadRepVars.SysHCCompPropane += CompEnergy;
+            thisSysLoadRepVars.HCCompPropane += CompEnergy;
         }
         // Recurring warning for unaccounted equipment types
         // (should never happen, when this does happen enter appropriate equipment CASE statement above)
@@ -4107,14 +4107,14 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
     for (int sysNum = 1; sysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++sysNum) {
         auto &thisSysVentRepVars = state.dataSysRpts->SysVentRepVars(sysNum);
-        thisSysVentRepVars.SysMechVentFlow = 0.0;
-        thisSysVentRepVars.SysNatVentFlow = 0.0;
-        thisSysVentRepVars.SysTargetVentilationFlowVoz = 0.0;
-        thisSysVentRepVars.SysTimeBelowVozDyn = 0.0;
-        thisSysVentRepVars.SysTimeAtVozDyn = 0.0;
-        thisSysVentRepVars.SysTimeAboveVozDyn = 0.0;
-        thisSysVentRepVars.SysTimeVentUnocc = 0.0;
-        thisSysVentRepVars.SysAnyZoneOccupied = false;
+        thisSysVentRepVars.MechVentFlow = 0.0;
+        thisSysVentRepVars.NatVentFlow = 0.0;
+        thisSysVentRepVars.TargetVentilationFlowVoz = 0.0;
+        thisSysVentRepVars.TimeBelowVozDyn = 0.0;
+        thisSysVentRepVars.TimeAtVozDyn = 0.0;
+        thisSysVentRepVars.TimeAboveVozDyn = 0.0;
+        thisSysVentRepVars.TimeVentUnocc = 0.0;
+        thisSysVentRepVars.AnyZoneOccupied = false;
     }
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
@@ -4440,14 +4440,14 @@ void ReportVentilationLoads(EnergyPlusData &state)
                         termUnitOAFrac = state.dataSize->TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
                     }
                 }
-                state.dataSysRpts->SysVentRepVars(AirLoopNum).SysTargetVentilationFlowVoz +=
+                state.dataSysRpts->SysVentRepVars(AirLoopNum).TargetVentilationFlowVoz +=
                     termUnitOAFrac * thisZoneVentRepVars.TargetVentilationFlowVoz;
                 Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) /
                                          (TimeStepSys * DataGlobalConstants::SecInHour);
-                state.dataSysRpts->SysVentRepVars(AirLoopNum).SysNatVentFlow += termUnitOAFrac * naturalVentFlow;
+                state.dataSysRpts->SysVentRepVars(AirLoopNum).NatVentFlow += termUnitOAFrac * naturalVentFlow;
 
                 if (thisZonePredefRep.isOccupied) {
-                    state.dataSysRpts->SysVentRepVars(AirLoopNum).SysAnyZoneOccupied = true;
+                    state.dataSysRpts->SysVentRepVars(AirLoopNum).AnyZoneOccupied = true;
                 }
             }
 
@@ -4615,38 +4615,38 @@ void ReportVentilationLoads(EnergyPlusData &state)
         auto &thisSysVentRepVars = state.dataSysRpts->SysVentRepVars(sysNum);
         auto &thisSysPreDefRep = state.dataSysRpts->SysPreDefRep(sysNum);
         Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow / state.dataEnvrn->StdRhoAir;
-        thisSysVentRepVars.SysMechVentFlow = mechVentFlow;
-        thisSysPreDefRep.SysMechVentTotal += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-        thisSysPreDefRep.SysNatVentTotal += thisSysVentRepVars.SysNatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisSysVentRepVars.MechVentFlow = mechVentFlow;
+        thisSysPreDefRep.MechVentTotal += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisSysPreDefRep.NatVentTotal += thisSysVentRepVars.NatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
-        Real64 totMechNatVentVolFlowStdRho = mechVentFlow + thisSysVentRepVars.SysNatVentFlow;
+        Real64 totMechNatVentVolFlowStdRho = mechVentFlow + thisSysVentRepVars.NatVentFlow;
 
-        Real64 targetFlowVoz = thisSysVentRepVars.SysTargetVentilationFlowVoz;
-        thisSysPreDefRep.SysTargetVentTotalVoz += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 targetFlowVoz = thisSysVentRepVars.TargetVentilationFlowVoz;
+        thisSysPreDefRep.TargetVentTotalVoz += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
         // Allow 1% tolerance
         if (totMechNatVentVolFlowStdRho < (0.99 * targetFlowVoz)) {
-            thisSysVentRepVars.SysTimeBelowVozDyn = TimeStepSys;
-            thisSysPreDefRep.SysTimeBelowVozDynTotal += TimeStepSys;
+            thisSysVentRepVars.TimeBelowVozDyn = TimeStepSys;
+            thisSysPreDefRep.TimeBelowVozDynTotal += TimeStepSys;
         } else if (totMechNatVentVolFlowStdRho > (1.01 * targetFlowVoz)) {
-            thisSysVentRepVars.SysTimeAboveVozDyn = TimeStepSys;
-            thisSysPreDefRep.SysTimeAboveVozDynTotal += TimeStepSys;
+            thisSysVentRepVars.TimeAboveVozDyn = TimeStepSys;
+            thisSysPreDefRep.TimeAboveVozDynTotal += TimeStepSys;
         } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
-            thisSysVentRepVars.SysTimeAtVozDyn = TimeStepSys;
-            thisSysPreDefRep.SysTimeAtVozDynTotal += TimeStepSys;
+            thisSysVentRepVars.TimeAtVozDyn = TimeStepSys;
+            thisSysPreDefRep.TimeAtVozDynTotal += TimeStepSys;
         }
 
-        if (thisSysVentRepVars.SysAnyZoneOccupied) {
-            thisSysPreDefRep.SysTimeOccupiedTotal += TimeStepSys;
-            thisSysPreDefRep.SysMechVentTotalOcc += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-            thisSysPreDefRep.SysNatVentTotalOcc += thisSysVentRepVars.SysNatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
-            thisSysPreDefRep.SysTargetVentTotalVozOcc += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
-            thisSysPreDefRep.SysTimeBelowVozDynTotalOcc += thisSysVentRepVars.SysTimeBelowVozDyn;
-            thisSysPreDefRep.SysTimeAboveVozDynTotalOcc += thisSysVentRepVars.SysTimeAboveVozDyn;
-            thisSysPreDefRep.SysTimeAtVozDynTotalOcc += thisSysVentRepVars.SysTimeAtVozDyn;
+        if (thisSysVentRepVars.AnyZoneOccupied) {
+            thisSysPreDefRep.TimeOccupiedTotal += TimeStepSys;
+            thisSysPreDefRep.MechVentTotalOcc += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSysPreDefRep.NatVentTotalOcc += thisSysVentRepVars.NatVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSysPreDefRep.TargetVentTotalVozOcc += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+            thisSysPreDefRep.TimeBelowVozDynTotalOcc += thisSysVentRepVars.TimeBelowVozDyn;
+            thisSysPreDefRep.TimeAboveVozDynTotalOcc += thisSysVentRepVars.TimeAboveVozDyn;
+            thisSysPreDefRep.TimeAtVozDynTotalOcc += thisSysVentRepVars.TimeAtVozDyn;
         } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
-            thisSysVentRepVars.SysTimeVentUnocc = TimeStepSys;
-            thisSysPreDefRep.SysTimeVentUnoccTotal += TimeStepSys;
+            thisSysVentRepVars.TimeVentUnocc = TimeStepSys;
+            thisSysPreDefRep.TimeVentUnoccTotal += TimeStepSys;
         }
 
         // set time at OA limiting factors
@@ -4654,10 +4654,10 @@ void ReportVentilationLoads(EnergyPlusData &state)
             int thisOAControlNum = state.dataAirLoop->AirLoopControlInfo(sysNum).OACtrlNum;
             if (thisOAControlNum > 0) {
                 int limitFactorIndex = state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor;
-                thisSysPreDefRep.SysTimeAtOALimit[limitFactorIndex] += TimeStepSys;
-                if (thisSysVentRepVars.SysAnyZoneOccupied) {
-                    thisSysPreDefRep.SysTimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;
-                    thisSysPreDefRep.SysMechVentTotAtLimitOcc[limitFactorIndex] += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+                thisSysPreDefRep.TimeAtOALimit[limitFactorIndex] += TimeStepSys;
+                if (thisSysVentRepVars.AnyZoneOccupied) {
+                    thisSysPreDefRep.TimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;
+                    thisSysPreDefRep.MechVentTotAtLimitOcc[limitFactorIndex] += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
                 }
             }
         }
@@ -4696,8 +4696,8 @@ void MatchPlantSys(EnergyPlusData &state,
             for (int VarNum = 1; VarNum <= thisComp.NumMeteredVars; ++VarNum) {
                 if (thisComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
                     thisComp.EnergyTransComp = EnergyTrans;
-                    std::string CompType = thisComp.TypeOf;
-                    std::string CompName = thisComp.Name;
+                    const std::string &CompType = thisComp.TypeOf;
+                    const std::string &CompName = thisComp.Name;
                     bool MatchFound = false; // Set to .TRUE. when a match is found
                     int MatchLoop = 0;       // Loop number of the match
                     int MatchBranch = 0;     // Branch number of the match
@@ -4718,8 +4718,8 @@ void MatchPlantSys(EnergyPlusData &state,
                     for (int VarNum = 1; VarNum <= thisSubComp.NumMeteredVars; ++VarNum) {
                         if (thisSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
                             thisSubComp.EnergyTransComp = EnergyTrans;
-                            std::string CompType = thisComp.TypeOf;
-                            std::string CompName = thisComp.Name;
+                            const std::string &CompType = thisComp.TypeOf;
+                            const std::string &CompName = thisComp.Name;
                             bool MatchFound = false; // Set to .TRUE. when a match is found
                             int MatchLoop = 0;       // Loop number of the match
                             int MatchBranch = 0;     // Branch number of the match
@@ -4741,8 +4741,8 @@ void MatchPlantSys(EnergyPlusData &state,
                             for (int VarNum = 1; VarNum <= thisSubSubComp.NumMeteredVars; ++VarNum) {
                                 if (thisSubSubComp.MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
                                     thisSubSubComp.EnergyTransComp = EnergyTrans;
-                                    std::string CompType = thisComp.TypeOf;
-                                    std::string CompName = thisComp.Name;
+                                    const std::string &CompType = thisComp.TypeOf;
+                                    const std::string &CompName = thisComp.Name;
                                     bool MatchFound = false; // Set to .TRUE. when a match is found
                                     int MatchLoop = 0;       // Loop number of the match
                                     int MatchBranch = 0;     // Branch number of the match

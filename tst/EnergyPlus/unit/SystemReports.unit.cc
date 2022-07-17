@@ -145,17 +145,17 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
                         CompLoad,
                         CompEnergyUse);
 
-    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHumidNaturalGas, 100);
-    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHCCompNaturalGas, 100);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).HumidNaturalGas, 100);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).HCCompNaturalGas, 100);
 
     // Calculate SysTotNaturalGas ("Air System NaturalGas Energy")
     ReportSystemEnergyUse(*state);
-    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysTotNaturalGas, 200);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).TotNaturalGas, 200);
 
     // Initialization for propane cases
-    state->dataSysRpts->SysLoadRepVars(1).SysHumidNaturalGas = 0;
-    state->dataSysRpts->SysLoadRepVars(1).SysHCCompNaturalGas = 0;
-    state->dataSysRpts->SysLoadRepVars(1).SysTotNaturalGas = 0;
+    state->dataSysRpts->SysLoadRepVars(1).HumidNaturalGas = 0;
+    state->dataSysRpts->SysLoadRepVars(1).HCCompNaturalGas = 0;
+    state->dataSysRpts->SysLoadRepVars(1).TotNaturalGas = 0;
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
@@ -178,12 +178,12 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
                         CompLoad,
                         CompEnergyUse);
 
-    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHumidPropane, 100);
-    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysHCCompPropane, 100);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).HumidPropane, 100);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).HCCompPropane, 100);
 
     // Calculate SysTotPropane ("Air System Propane Energy")
     ReportSystemEnergyUse(*state);
-    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).SysTotPropane, 200);
+    EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).TotPropane, 200);
 }
 TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
 {

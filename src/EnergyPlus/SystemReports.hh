@@ -155,81 +155,81 @@ namespace SystemReports {
 
     struct SysVentReportVariables
     {
-        Real64 SysMechVentFlow = 0.0;             // air loop mechanical vent total volume OA at standard density {m3/s}
-        Real64 SysNatVentFlow = 0.0;              // air loop natural vent total volume OA at standard density {m3/s}
-        Real64 SysTargetVentilationFlowVoz = 0.0; // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
-        Real64 SysTimeBelowVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
-        Real64 SysTimeAtVozDyn = 0.0;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
-        Real64 SysTimeAboveVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
-        Real64 SysTimeVentUnocc = 0.0;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
-        bool SysAnyZoneOccupied = false;          // true if any zone on system is occupied
+        Real64 MechVentFlow = 0.0;             // air loop mechanical vent total volume OA at standard density {m3/s}
+        Real64 NatVentFlow = 0.0;              // air loop natural vent total volume OA at standard density {m3/s}
+        Real64 TargetVentilationFlowVoz = 0.0; // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+        Real64 TimeBelowVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 TimeAtVozDyn = 0.0;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 TimeAboveVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 TimeVentUnocc = 0.0;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+        bool AnyZoneOccupied = false;          // true if any zone on system is occupied
     };
     struct SysLoadReportVariables
     {
         // SYSTEM LOADS REPORT
-        Real64 SysTotHTNG = 0.0;
-        Real64 SysTotCLNG = 0.0;
+        Real64 TotHTNG = 0.0;
+        Real64 TotCLNG = 0.0;
 
         // SYSTEM ENERGY USE REPORT
-        Real64 SysTotH2OHOT = 0.0;
-        Real64 SysTotH2OCOLD = 0.0;
-        Real64 SysTotElec = 0.0;
-        Real64 SysTotNaturalGas = 0.0;
-        Real64 SysTotPropane = 0.0;
-        Real64 SysTotSteam = 0.0;
+        Real64 TotH2OHOT = 0.0;
+        Real64 TotH2OCOLD = 0.0;
+        Real64 TotElec = 0.0;
+        Real64 TotNaturalGas = 0.0;
+        Real64 TotPropane = 0.0;
+        Real64 TotSteam = 0.0;
 
         // SYSTEM COMPONENT LOADS REPORT
-        Real64 SysHumidHTNG = 0.0;
-        Real64 SysHumidElec = 0.0;
-        Real64 SysHumidNaturalGas = 0.0;
-        Real64 SysHumidPropane = 0.0;
-        Real64 SysEvapCLNG = 0.0;
-        Real64 SysEvapElec = 0.0;
-        Real64 SysHeatExHTNG = 0.0;
-        Real64 SysHeatExCLNG = 0.0;
+        Real64 HumidHTNG = 0.0;
+        Real64 HumidElec = 0.0;
+        Real64 HumidNaturalGas = 0.0;
+        Real64 HumidPropane = 0.0;
+        Real64 EvapCLNG = 0.0;
+        Real64 EvapElec = 0.0;
+        Real64 HeatExHTNG = 0.0;
+        Real64 HeatExCLNG = 0.0;
         Real64 DesDehumidCLNG = 0.0;
         Real64 DesDehumidElec = 0.0;
-        Real64 SysSolarCollectHeating = 0.0;
-        Real64 SysSolarCollectCooling = 0.0;
-        Real64 SysUserDefinedTerminalHeating = 0.0;
-        Real64 SysUserDefinedTerminalCooling = 0.0;
+        Real64 SolarCollectHeating = 0.0;
+        Real64 SolarCollectCooling = 0.0;
+        Real64 UserDefinedTerminalHeating = 0.0;
+        Real64 UserDefinedTerminalCooling = 0.0;
 
         // SYSTEM COMPONENT ENERGY REPORT
-        Real64 SysFANCompHTNG = 0.0;
-        Real64 SysFANCompElec = 0.0;
-        Real64 SysCCCompCLNG = 0.0;
-        Real64 SysCCCompH2OCOLD = 0.0;
-        Real64 SysCCCompElec = 0.0;
-        Real64 SysHCCompH2OHOT = 0.0;
-        Real64 SysHCCompElec = 0.0;
-        Real64 SysHCCompElecRes = 0.0;
-        Real64 SysHCCompHTNG = 0.0;
-        Real64 SysHCCompNaturalGas = 0.0;
-        Real64 SysHCCompPropane = 0.0;
-        Real64 SysHCCompSteam = 0.0;
-        Real64 SysDomesticH2O = 0.0;
+        Real64 FANCompHTNG = 0.0;
+        Real64 FANCompElec = 0.0;
+        Real64 CCCompCLNG = 0.0;
+        Real64 CCCompH2OCOLD = 0.0;
+        Real64 CCCompElec = 0.0;
+        Real64 HCCompH2OHOT = 0.0;
+        Real64 HCCompElec = 0.0;
+        Real64 HCCompElecRes = 0.0;
+        Real64 HCCompHTNG = 0.0;
+        Real64 HCCompNaturalGas = 0.0;
+        Real64 HCCompPropane = 0.0;
+        Real64 HCCompSteam = 0.0;
+        Real64 DomesticH2O = 0.0;
     };
 
     struct SysPreDefRepType
     {
-        Real64 SysMechVentTotal = 0.0;           // air loop mechanical vent total volume OA at standard density {m3}
-        Real64 SysNatVentTotal = 0.0;            // air loop natural vent total volume OA at standard density {m3}
-        Real64 SysTargetVentTotalVoz = 0.0;      // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3}
-        Real64 SysTimeBelowVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
-        Real64 SysTimeAtVozDynTotal = 0.0;       // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
-        Real64 SysTimeAboveVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
-        Real64 SysMechVentTotalOcc = 0.0;        // air loop mechanical vent total volume OA at standard density {m3} during occupied
-        Real64 SysNatVentTotalOcc = 0.0;         // air loop natural vent total volume OA at standard density {m3} during occupied
-        Real64 SysTargetVentTotalVozOcc = 0.0;   // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3} during occupied
-        Real64 SysTimeBelowVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
-        Real64 SysTimeAtVozDynTotalOcc = 0.0;    // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occ
-        Real64 SysTimeAboveVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
-        Real64 SysTimeVentUnoccTotal = 0.0;      // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
-        Real64 SysTimeOccupiedTotal = 0.0;       // time [hrs] that any zone is occupied
+        Real64 MechVentTotal = 0.0;           // air loop mechanical vent total volume OA at standard density {m3}
+        Real64 NatVentTotal = 0.0;            // air loop natural vent total volume OA at standard density {m3}
+        Real64 TargetVentTotalVoz = 0.0;      // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3}
+        Real64 TimeBelowVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 TimeAtVozDynTotal = 0.0;       // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 TimeAboveVozDynTotal = 0.0;    // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 MechVentTotalOcc = 0.0;        // air loop mechanical vent total volume OA at standard density {m3} during occupied
+        Real64 NatVentTotalOcc = 0.0;         // air loop natural vent total volume OA at standard density {m3} during occupied
+        Real64 TargetVentTotalVozOcc = 0.0;   // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3} during occupied
+        Real64 TimeBelowVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
+        Real64 TimeAtVozDynTotalOcc = 0.0;    // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occ
+        Real64 TimeAboveVozDynTotalOcc = 0.0; // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
+        Real64 TimeVentUnoccTotal = 0.0;      // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+        Real64 TimeOccupiedTotal = 0.0;       // time [hrs] that any zone is occupied
 
-        std::vector<Real64> SysTimeAtOALimit = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};    // time [hrs] at limit [n]
-        std::vector<Real64> SysTimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
-        std::vector<Real64> SysMechVentTotAtLimitOcc = {
+        std::vector<Real64> TimeAtOALimit = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};    // time [hrs] at limit [n]
+        std::vector<Real64> TimeAtOALimitOcc = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // time [hrs] at limit [n] during occupied
+        std::vector<Real64> MechVentTotAtLimitOcc = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // air loop mech vent total vol OA at limit [n] {m3} during occupied
     };
 
