@@ -139,18 +139,18 @@ namespace SystemReports {
         Real64 NoLoadHeatingByVent = 0.0;
         Real64 NoLoadCoolingByVent = 0.0;
 
-        Real64 ZoneOAMassFlow = 0.0;               // zone mech vent mass flow rate {kg/s}
-        Real64 ZoneOAMass = 0.0;                   // zone mech vent total mass for time {kg}
-        Real64 ZoneOAVolFlowStdRho = 0.0;          // zone mech vent volume flow rate at standard density {m3/s}
-        Real64 ZoneOAVolStdRho = 0.0;              // zone mech vent total volume OA at standard density {m3}
-        Real64 ZoneOAVolFlowCrntRho = 0.0;         // zone mech vent volume flow rate at current density {m3/s}
-        Real64 ZoneOAVolCrntRho = 0.0;             // zone mech vent total volume OA at current density {m3}
-        Real64 ZoneMechACH = 0.0;                  // zone mech vent air changes per hour {ACH}
-        Real64 ZoneTargetVentilationFlowVoz = 0.0; // zone target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
-        Real64 ZoneTimeBelowVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
-        Real64 ZoneTimeAtVozDyn = 0.0;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
-        Real64 ZoneTimeAboveVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
-        Real64 ZoneTimeVentUnocc = 0.0;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+        Real64 OAMassFlow = 0.0;               // zone mech vent mass flow rate {kg/s}
+        Real64 OAMass = 0.0;                   // zone mech vent total mass for time {kg}
+        Real64 OAVolFlowStdRho = 0.0;          // zone mech vent volume flow rate at standard density {m3/s}
+        Real64 OAVolStdRho = 0.0;              // zone mech vent total volume OA at standard density {m3}
+        Real64 OAVolFlowCrntRho = 0.0;         // zone mech vent volume flow rate at current density {m3/s}
+        Real64 OAVolCrntRho = 0.0;             // zone mech vent total volume OA at current density {m3}
+        Real64 MechACH = 0.0;                  // zone mech vent air changes per hour {ACH}
+        Real64 TargetVentilationFlowVoz = 0.0; // zone target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+        Real64 TimeBelowVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 TimeAtVozDyn = 0.0;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 TimeAboveVozDyn = 0.0;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 TimeVentUnocc = 0.0;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
     };
 
     struct SysVentReportVariables

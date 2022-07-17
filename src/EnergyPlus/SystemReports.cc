@@ -1955,169 +1955,171 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
     }
     for (int ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
         if (!state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).IsControlled) continue;
+        auto &thisZoneVentRepVars = state.dataSysRpts->ZoneVentRepVars(ZoneIndex);
+        auto &thisZoneName = state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName;
         // CurrentModuleObject='Zones(Controlled)'
         if (state.dataSysRpts->VentLoadsReportEnabled) {
             // Cooling Loads
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation No Load Heat Removal Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).NoLoadCoolingByVent,
+                                thisZoneVentRepVars.NoLoadCoolingByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Increase Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).CoolingLoadAddedByVent,
+                                thisZoneVentRepVars.CoolingLoadAddedByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).OverheatingByVent,
+                                thisZoneVentRepVars.OverheatingByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Decrease Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).CoolingLoadMetByVent,
+                                thisZoneVentRepVars.CoolingLoadMetByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
             // Heating Loads
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation No Load Heat Addition Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).NoLoadHeatingByVent,
+                                thisZoneVentRepVars.NoLoadHeatingByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Increase Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).HeatingLoadAddedByVent,
+                                thisZoneVentRepVars.HeatingLoadAddedByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).OvercoolingByVent,
+                                thisZoneVentRepVars.OvercoolingByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Decrease Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataSysRpts->ZoneVentRepVars(ZoneIndex).HeatingLoadMetByVent,
+                                thisZoneVentRepVars.HeatingLoadMetByVent,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                                thisZoneName);
         }
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneOAMassFlow,
+                            thisZoneVentRepVars.OAMassFlow,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Mass",
                             OutputProcessor::Unit::kg,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneOAMass,
+                            thisZoneVentRepVars.OAMass,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Standard Density Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneOAVolFlowStdRho,
+                            thisZoneVentRepVars.OAVolFlowStdRho,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Standard Density Volume",
                             OutputProcessor::Unit::m3,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneOAVolStdRho,
+                            thisZoneVentRepVars.OAVolStdRho,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Current Density Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneOAVolFlowCrntRho,
+                            thisZoneVentRepVars.OAVolFlowCrntRho,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Current Density Volume",
                             OutputProcessor::Unit::m3,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneOAVolCrntRho,
+                            thisZoneVentRepVars.OAVolCrntRho,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Air Changes per Hour",
                             OutputProcessor::Unit::ach,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneMechACH,
+                            thisZoneVentRepVars.MechACH,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Target Voz Ventilation Flow Rate",
                             OutputProcessor::Unit::m3_s,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneTargetVentilationFlowVoz,
+                            thisZoneVentRepVars.TargetVentilationFlowVoz,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation Below Target Voz Time",
                             OutputProcessor::Unit::hr,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneTimeBelowVozDyn,
+                            thisZoneVentRepVars.TimeBelowVozDyn,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation At Target Voz Time",
                             OutputProcessor::Unit::hr,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneTimeAtVozDyn,
+                            thisZoneVentRepVars.TimeAtVozDyn,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation Above Target Voz Time",
                             OutputProcessor::Unit::hr,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneTimeAboveVozDyn,
+                            thisZoneVentRepVars.TimeAboveVozDyn,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation When Unoccupied Time",
                             OutputProcessor::Unit::hr,
-                            state.dataSysRpts->ZoneVentRepVars(ZoneIndex).ZoneTimeVentUnocc,
+                            thisZoneVentRepVars.TimeVentUnocc,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
+                            thisZoneName);
     }
 
     // Facility outputs
@@ -4073,18 +4075,18 @@ void ReportVentilationLoads(EnergyPlusData &state)
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         auto &thisZoneVentRepVars = state.dataSysRpts->ZoneVentRepVars(zoneNum);
         if (!state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
-        thisZoneVentRepVars.ZoneOAMassFlow = 0.0;
-        thisZoneVentRepVars.ZoneOAMass = 0.0;
-        thisZoneVentRepVars.ZoneOAVolFlowStdRho = 0.0;
-        thisZoneVentRepVars.ZoneOAVolStdRho = 0.0;
-        thisZoneVentRepVars.ZoneOAVolFlowCrntRho = 0.0;
-        thisZoneVentRepVars.ZoneOAVolCrntRho = 0.0;
-        thisZoneVentRepVars.ZoneMechACH = 0.0;
-        thisZoneVentRepVars.ZoneTargetVentilationFlowVoz = 0.0;
-        thisZoneVentRepVars.ZoneTimeBelowVozDyn = 0.0;
-        thisZoneVentRepVars.ZoneTimeAtVozDyn = 0.0;
-        thisZoneVentRepVars.ZoneTimeAboveVozDyn = 0.0;
-        thisZoneVentRepVars.ZoneTimeVentUnocc = 0.0;
+        thisZoneVentRepVars.OAMassFlow = 0.0;
+        thisZoneVentRepVars.OAMass = 0.0;
+        thisZoneVentRepVars.OAVolFlowStdRho = 0.0;
+        thisZoneVentRepVars.OAVolStdRho = 0.0;
+        thisZoneVentRepVars.OAVolFlowCrntRho = 0.0;
+        thisZoneVentRepVars.OAVolCrntRho = 0.0;
+        thisZoneVentRepVars.MechACH = 0.0;
+        thisZoneVentRepVars.TargetVentilationFlowVoz = 0.0;
+        thisZoneVentRepVars.TimeBelowVozDyn = 0.0;
+        thisZoneVentRepVars.TimeAtVozDyn = 0.0;
+        thisZoneVentRepVars.TimeAboveVozDyn = 0.0;
+        thisZoneVentRepVars.TimeVentUnocc = 0.0;
         thisZoneVentRepVars.CoolingLoadMetByVent = 0.0;
         thisZoneVentRepVars.CoolingLoadAddedByVent = 0.0;
         thisZoneVentRepVars.OvercoolingByVent = 0.0;
@@ -4143,11 +4145,11 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
         auto &thisZonePredefRep = state.dataHeatBal->ZonePreDefRep(ActualZoneNum);
         auto &thisZoneVentRepVars = state.dataSysRpts->ZoneVentRepVars(CtrlZoneNum);
-        thisZoneVentRepVars.ZoneTargetVentilationFlowVoz = DataSizing::calcDesignSpecificationOutdoorAir(
+        thisZoneVentRepVars.TargetVentilationFlowVoz = DataSizing::calcDesignSpecificationOutdoorAir(
             state, thisZoneEquipConfig.ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
         if (thisZoneEquipConfig.ZoneAirDistributionIndex > 0) {
-            thisZoneVentRepVars.ZoneTargetVentilationFlowVoz =
-                thisZoneVentRepVars.ZoneTargetVentilationFlowVoz /
+            thisZoneVentRepVars.TargetVentilationFlowVoz =
+                thisZoneVentRepVars.TargetVentilationFlowVoz /
                 state.dataSize->ZoneAirDistribution(thisZoneEquipConfig.ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
         }
 
@@ -4439,7 +4441,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     }
                 }
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).SysTargetVentilationFlowVoz +=
-                    termUnitOAFrac * thisZoneVentRepVars.ZoneTargetVentilationFlowVoz;
+                    termUnitOAFrac * thisZoneVentRepVars.TargetVentilationFlowVoz;
                 Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) /
                                          (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).SysNatVentFlow += termUnitOAFrac * naturalVentFlow;
@@ -4484,26 +4486,26 @@ void ReportVentilationLoads(EnergyPlusData &state)
         // now combine OA flow from zone forced air units with primary air system
         OutAirFlow = ZAirSysOutAirFlow + ZFAUOutAirFlow;
         // assign report variables
-        thisZoneVentRepVars.ZoneOAMassFlow = OutAirFlow;
-        thisZoneVentRepVars.ZoneOAMass = thisZoneVentRepVars.ZoneOAMassFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisZoneVentRepVars.OAMassFlow = OutAirFlow;
+        thisZoneVentRepVars.OAMass = thisZoneVentRepVars.OAMassFlow * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // determine volumetric values from mass flow using standard density (adjusted for elevation)
-        thisZoneVentRepVars.ZoneOAVolFlowStdRho = thisZoneVentRepVars.ZoneOAMassFlow / state.dataEnvrn->StdRhoAir;
-        thisZoneVentRepVars.ZoneOAVolStdRho = thisZoneVentRepVars.ZoneOAVolFlowStdRho * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisZoneVentRepVars.OAVolFlowStdRho = thisZoneVentRepVars.OAMassFlow / state.dataEnvrn->StdRhoAir;
+        thisZoneVentRepVars.OAVolStdRho = thisZoneVentRepVars.OAVolFlowStdRho * TimeStepSys * DataGlobalConstants::SecInHour;
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
-        Real64 totMechNatVentVolStdRho = thisZoneVentRepVars.ZoneOAVolStdRho + state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
-                                         thisZonePredefRep.AFNVentVolStdDen;
-        Real64 targetVoz = thisZoneVentRepVars.ZoneTargetVentilationFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 totMechNatVentVolStdRho =
+            thisZoneVentRepVars.OAVolStdRho + state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen;
+        Real64 targetVoz = thisZoneVentRepVars.TargetVentilationFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
         // Allow 1% tolerance
         if (totMechNatVentVolStdRho < (0.99 * targetVoz)) {
-            thisZoneVentRepVars.ZoneTimeBelowVozDyn = TimeStepSys;
+            thisZoneVentRepVars.TimeBelowVozDyn = TimeStepSys;
             state.dataSysRpts->AnyZoneTimeBelowVozDyn = TimeStepSys;
         } else if (totMechNatVentVolStdRho > (1.01 * targetVoz)) {
-            thisZoneVentRepVars.ZoneTimeAboveVozDyn = TimeStepSys;
+            thisZoneVentRepVars.TimeAboveVozDyn = TimeStepSys;
             state.dataSysRpts->AnyZoneTimeAboveVozDyn = TimeStepSys;
         } else if (totMechNatVentVolStdRho > SmallAirVolFlow) {
-            thisZoneVentRepVars.ZoneTimeAtVozDyn = TimeStepSys;
+            thisZoneVentRepVars.TimeAtVozDyn = TimeStepSys;
             state.dataSysRpts->AllZonesTimeAtVozDyn = TimeStepSys;
         }
 
@@ -4512,20 +4514,20 @@ void ReportVentilationLoads(EnergyPlusData &state)
                                                                          state.dataEnvrn->OutBaroPress,
                                                                          state.dataHeatBalFanSys->MAT(ActualZoneNum),
                                                                          state.dataHeatBalFanSys->ZoneAirHumRatAvg(ActualZoneNum));
-        if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.ZoneOAVolFlowCrntRho = thisZoneVentRepVars.ZoneOAMassFlow / currentZoneAirDensity;
-        thisZoneVentRepVars.ZoneOAVolCrntRho = thisZoneVentRepVars.ZoneOAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
-        if (ZoneVolume > 0.0) thisZoneVentRepVars.ZoneMechACH = (thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys) / ZoneVolume;
+        if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.OAVolFlowCrntRho = thisZoneVentRepVars.OAMassFlow / currentZoneAirDensity;
+        thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
+        if (ZoneVolume > 0.0) thisZoneVentRepVars.MechACH = (thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) / ZoneVolume;
 
         // store data for predefined tabular report on outside air
         if (thisZonePredefRep.isOccupied) {
             // accumulate the occupied time
             thisZonePredefRep.TotTimeOcc += TimeStepSys;
             // mechanical ventilation
-            thisZonePredefRep.MechVentVolTotalOcc += thisZoneVentRepVars.ZoneOAVolCrntRho;
-            if ((thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys) < thisZonePredefRep.MechVentVolMin) {
-                thisZonePredefRep.MechVentVolMin = thisZoneVentRepVars.ZoneOAVolCrntRho / TimeStepSys;
+            thisZonePredefRep.MechVentVolTotalOcc += thisZoneVentRepVars.OAVolCrntRho;
+            if ((thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) < thisZonePredefRep.MechVentVolMin) {
+                thisZonePredefRep.MechVentVolMin = thisZoneVentRepVars.OAVolCrntRho / TimeStepSys;
             }
-            thisZonePredefRep.MechVentVolTotalOccStdDen += thisZoneVentRepVars.ZoneOAVolStdRho;
+            thisZonePredefRep.MechVentVolTotalOccStdDen += thisZoneVentRepVars.OAVolStdRho;
             // infiltration
             thisZonePredefRep.InfilVolTotalOcc += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
             if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < thisZonePredefRep.InfilVolMin) {
@@ -4545,22 +4547,22 @@ void ReportVentilationLoads(EnergyPlusData &state)
             thisZonePredefRep.VozTargetTotalOcc += targetVoz;
 
             // time mechanical+natural ventilation is below, at, or above target Voz-dyn
-            thisZonePredefRep.VozTargetTimeBelowOcc += thisZoneVentRepVars.ZoneTimeBelowVozDyn;
-            thisZonePredefRep.VozTargetTimeAtOcc += thisZoneVentRepVars.ZoneTimeAtVozDyn;
-            thisZonePredefRep.VozTargetTimeAboveOcc += thisZoneVentRepVars.ZoneTimeAboveVozDyn;
+            thisZonePredefRep.VozTargetTimeBelowOcc += thisZoneVentRepVars.TimeBelowVozDyn;
+            thisZonePredefRep.VozTargetTimeAtOcc += thisZoneVentRepVars.TimeAtVozDyn;
+            thisZonePredefRep.VozTargetTimeAboveOcc += thisZoneVentRepVars.TimeAboveVozDyn;
         } else if (totMechNatVentVolStdRho > SmallAirVolFlow) {
-            thisZoneVentRepVars.ZoneTimeVentUnocc = TimeStepSys;
+            thisZoneVentRepVars.TimeVentUnocc = TimeStepSys;
             state.dataSysRpts->AnyZoneTimeVentUnocc = TimeStepSys;
-            thisZonePredefRep.TotVentTimeNonZeroUnocc += thisZoneVentRepVars.ZoneTimeVentUnocc;
+            thisZonePredefRep.TotVentTimeNonZeroUnocc += thisZoneVentRepVars.TimeVentUnocc;
         }
         // accumulate during occupancy or not
-        thisZonePredefRep.MechVentVolTotalStdDen += thisZoneVentRepVars.ZoneOAVolStdRho;
+        thisZonePredefRep.MechVentVolTotalStdDen += thisZoneVentRepVars.OAVolStdRho;
         thisZonePredefRep.InfilVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
         thisZonePredefRep.SimpVentVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
         thisZonePredefRep.VozTargetTotal += targetVoz;
-        thisZonePredefRep.VozTargetTimeBelow += thisZoneVentRepVars.ZoneTimeBelowVozDyn;
-        thisZonePredefRep.VozTargetTimeAt += thisZoneVentRepVars.ZoneTimeAtVozDyn;
-        thisZonePredefRep.VozTargetTimeAbove += thisZoneVentRepVars.ZoneTimeAboveVozDyn;
+        thisZonePredefRep.VozTargetTimeBelow += thisZoneVentRepVars.TimeBelowVozDyn;
+        thisZonePredefRep.VozTargetTimeAt += thisZoneVentRepVars.TimeAtVozDyn;
+        thisZonePredefRep.VozTargetTimeAbove += thisZoneVentRepVars.TimeAboveVozDyn;
 
         // now combine Vent load from zone forced air units with primary air system
         Real64 ZoneVentLoad = ZAirSysZoneVentLoad + ZFAUZoneVentLoad;

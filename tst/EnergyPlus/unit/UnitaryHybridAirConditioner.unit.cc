@@ -444,7 +444,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     SystemReports::ReportVentilationLoads(*state);
     // output results
-    Real64 zone_oa_mass_flow = state->dataSysRpts->ZoneVentRepVars(1).ZoneOAMassFlow; // OA flow reported to the zone from the unitary hybrid system
+    Real64 zone_oa_mass_flow = state->dataSysRpts->ZoneVentRepVars(1).OAMassFlow; // OA flow reported to the zone from the unitary hybrid system
 
     // checks
     EXPECT_EQ(zone_oa_mass_flow, DesignMinVR); // reported zone OA flow matches unitary hybrid OA flow

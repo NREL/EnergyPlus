@@ -333,7 +333,7 @@ TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
     state->dataSysRpts->VentLoadsReportEnabled = true;
     SystemReports::ReportVentilationLoads(*state);
 
-    EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).ZoneTargetVentilationFlowVoz, expectedVoz, 0.001);
-    EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).ZoneOAMassFlow, 98765432.1, 0.001);
+    EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).TargetVentilationFlowVoz, expectedVoz, 0.001);
+    EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).OAMassFlow, 98765432.1, 0.001);
 }
 } // namespace EnergyPlus
