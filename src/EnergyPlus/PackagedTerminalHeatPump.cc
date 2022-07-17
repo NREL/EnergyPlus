@@ -941,12 +941,7 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         // set minimum outdoor temperature for compressor operation
-        SetMinOATCompressor(state,
-                            PTUnitNum,
-                            CurrentModuleObject,
-                            state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
-                            state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                            ErrorsFound);
+        SetMinOATCompressor(state, PTUnitNum, CurrentModuleObject, ErrorsFound);
 
         SuppHeatCoilType = Alphas(13);
         SuppHeatCoilName = Alphas(14);
@@ -2011,12 +2006,7 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         // set minimum outdoor temperature for compressor operation
-        SetMinOATCompressor(state,
-                            PTUnitNum,
-                            CurrentModuleObject,
-                            state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
-                            state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                            ErrorsFound);
+        SetMinOATCompressor(state, PTUnitNum, CurrentModuleObject, ErrorsFound);
 
         // Get AirTerminal mixer data
         GetATMixer(state,
@@ -2845,12 +2835,7 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         // set minimum outdoor temperature for compressor operation
-        SetMinOATCompressor(state,
-                            PTUnitNum,
-                            CurrentModuleObject,
-                            state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
-                            state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                            ErrorsFound);
+        SetMinOATCompressor(state, PTUnitNum, CurrentModuleObject, ErrorsFound);
 
         // Get supplemental heating coil information
 
@@ -9149,21 +9134,19 @@ void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
 void SetMinOATCompressor(EnergyPlusData &state,
                          int const PTUnitNum,                     // index to PTUnit
                          std::string const &cCurrentModuleObject, // type of PTUnit
-                         int const CoolingCoilIndex,              // index of cooling coil
-                         int const HeatingCoilIndex,              // index of heating coil
                          bool &ErrorsFound                        // GetInput logical that errors were found
 )
 {
     bool errFlag = false;
-    auto thisPTUnit = state.dataPTHP->PTUnit(PTUnitNum);
+    auto &thisPTUnit = state.dataPTHP->PTUnit(PTUnitNum);
 
     // Set minimum OAT for heat pump compressor operation in cooling mode
     if (thisPTUnit.DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed) {
-        thisPTUnit.MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+        thisPTUnit.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, thisPTUnit.DXCoolCoilIndexNum, errFlag);
     } else if (thisPTUnit.DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-        thisPTUnit.MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, thisPTUnit.DXCoolCoilIndexNum, errFlag);
+        thisPTUnit.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, thisPTUnit.DXCoolCoilIndexNum, errFlag);
     } else if (thisPTUnit.DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-        thisPTUnit.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+        thisPTUnit.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, thisPTUnit.DXCoolCoilIndexNum, errFlag);
     } else {
         thisPTUnit.MinOATCompressorCooling = -1000.0;
     }
@@ -9175,9 +9158,9 @@ void SetMinOATCompressor(EnergyPlusData &state,
     // Set minimum OAT for heat pump compressor operation in heating mode
     errFlag = false;
     if (thisPTUnit.DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-        thisPTUnit.MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
+        thisPTUnit.MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, thisPTUnit.DXHeatCoilIndexNum, errFlag);
     } else if (thisPTUnit.DXHeatCoilType_Num == CoilDX_HeatingEmpirical) {
-        thisPTUnit.MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
+        thisPTUnit.MinOATCompressorHeating = DXCoils::GetMinOATCompressor(state, thisPTUnit.DXHeatCoilIndexNum, errFlag);
     } else {
         thisPTUnit.MinOATCompressorHeating = -1000.0;
     }
