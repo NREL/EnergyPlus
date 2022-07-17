@@ -516,8 +516,7 @@ namespace PackagedTerminalHeatPump {
     );
 
     void SetMinOATCompressor(EnergyPlusData &state,
-                             int FurnaceNum,                          // index to furnace
-                             std::string const &FurnaceName,          // name of furnace
+                             int PTUnitNum,                           // index to furnace
                              std::string const &cCurrentModuleObject, // type of furnace
                              int CoolingCoilIndex,                    // index of cooling coil
                              int HeatingCoilIndex,                    // index of heating coil
