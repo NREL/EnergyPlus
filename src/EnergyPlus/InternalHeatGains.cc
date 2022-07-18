@@ -7601,7 +7601,6 @@ namespace InternalHeatGains {
         Real64 UPSPower;                  // UPS new power input (losses) [W]
         Real64 UPSPartLoadRatio;          // UPS part load ratio (current total power input / design total power input)
         Real64 UPSHeatGain;               // UPS convective heat gain to zone [W]
-        int EnvClass;                     // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
@@ -7932,7 +7931,8 @@ namespace InternalHeatGains {
             state.dataHeatBal->spaceRpt(spaceNum).SumToutMinusTSup += (TAirOut - TSupply) * AirVolFlowRate;
 
             // Check environmental class operating range limits (defined as parameters in this subroutine)
-            EnvClass = static_cast<int>(state.dataHeatBal->ZoneITEq(Loop).Class);
+            // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
+            int EnvClass = static_cast<int>(state.dataHeatBal->ZoneITEq(Loop).Class);
             if (EnvClass > 0) {
                 if (TAirIn > DBMax[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
