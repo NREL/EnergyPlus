@@ -904,6 +904,23 @@ namespace DataHeatBalance {
             ExteriorEnergyUse::ExteriorFuelUsage::Invalid; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
     };
 
+    // ITE Equipment Environmental Class Data
+    // MODULE PARAMETER DEFINITIONS:
+    enum class ITEClass
+    {
+        Invalid = -1,
+        None, // (0)
+        A1,   // (1)
+        A2,   // (2)
+        A3,   // (3)
+        A4,   // (4)
+        B,    // (5)
+        C,    // (6)
+        H1,   // (7)
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(ITEClass::Num)> ITEClassNamesUC = {"NONE", "A1", "A2", "A3", "A4", "B", "C", "H1"};
+
     struct ITEquipData // IT Equipment
     {
         // Members
@@ -922,7 +939,7 @@ namespace DataHeatBalance {
         Real64 DesignFanPower = 0.0;               // Design fan power input [W]
         Real64 DesignCPUPower = 0.0;               // Design CPU power input [W]
         Real64 DesignAirVolFlowRate = 0.0;         // Design air volume flow rate [m3/s]
-        int Class = 0;                             // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
+        ITEClass Class = ITEClass::None;           // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
         int AirFlowFLTCurve = 0;                   // Index for airflow function of CPULoadFrac (x) and TAirIn (y) curve
         int CPUPowerFLTCurve = 0;                  // Index for CPU power function of CPULoadFrac (x) and TAirIn (y) curve
         int FanPowerFFCurve = 0;                   // Index for fan power function of flow fraction curve

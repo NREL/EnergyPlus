@@ -126,23 +126,6 @@ namespace InternalHeatGains {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    enum class ITEClass
-    {
-        Invalid = -1,
-        None, // (0)
-        A1,   // (1)
-        A2,   // (2)
-        A3,   // (3)
-        A4,   // (4)
-        B,    // (5)
-        C,    // (6)
-        H1,   // (7)
-        Num
-    };
-    static constexpr std::array<std::string_view, static_cast<int>(ITEClass::Num)> ITEClassNamesUC = {"NONE", "A1", "A2", "A3", "A4", "B", "C", "H1"};
-
     int constexpr ITEInletAdjustedSupply(0);
     int constexpr ITEInletZoneAirNode(1);
     int constexpr ITEInletRoomAirModel(2);
@@ -2880,8 +2863,9 @@ namespace InternalHeatGains {
                         }
 
                         // Environmental class
-                        thisZoneITEq.Class = getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(10)));
-                        ErrorsFound |= (thisZoneITEq.Class == static_cast<int>(ITEClass::Invalid));
+                        thisZoneITEq.Class =
+                            static_cast<ITEClass>(getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(10))));
+                        ErrorsFound |= (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
                         if (UtilityRoutines::SameString(AlphaName(11), "AdjustedSupply")) {
@@ -7957,7 +7941,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->spaceRpt(spaceNum).SumToutMinusTSup += (TAirOut - TSupply) * AirVolFlowRate;
 
             // Check environmental class operating range limits (defined as parameters in this subroutine)
-            EnvClass = state.dataHeatBal->ZoneITEq(Loop).Class;
+            EnvClass = static_cast<int>(state.dataHeatBal->ZoneITEq(Loop).Class);
             if (EnvClass > 0) {
                 if (TAirIn > DBMax[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
