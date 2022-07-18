@@ -7634,7 +7634,7 @@ namespace InternalHeatGains {
         Real64 UPSPower;              // UPS new power input (losses) [W]
         Real64 UPSPartLoadRatio;      // UPS part load ratio (current total power input / design total power input)
         Real64 UPSHeatGain;           // UPS convective heat gain to zone [W]
-        int EnvClass;                 // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6)
+        int EnvClass;                 // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
