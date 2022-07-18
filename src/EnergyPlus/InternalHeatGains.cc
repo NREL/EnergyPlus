@@ -2861,7 +2861,7 @@ namespace InternalHeatGains {
                         // Environmental class
                         thisZoneITEq.Class =
                             static_cast<ITEClass>(getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(10))));
-                        ErrorsFound |= (thisZoneITEq.Class == ITEClass::Invalid);
+                        ErrorsFound = ErrorsFound || (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
                         thisZoneITEq.AirConnectionType = static_cast<ITEInletConnection>(
@@ -2873,7 +2873,7 @@ namespace InternalHeatGains {
                                                  "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode");
                             thisZoneITEq.AirConnectionType = ITEInletConnection::ZoneAirNode;
                         }
-                        ErrorsFound |= (thisZoneITEq.AirConnectionType == ITEInletConnection::Invalid);
+                        ErrorsFound = ErrorsFound || (thisZoneITEq.AirConnectionType == ITEInletConnection::Invalid);
 
                         if (state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                             if (thisZoneITEq.AirConnectionType == ITEInletConnection::AdjustedSupply) {
