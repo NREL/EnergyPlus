@@ -3401,6 +3401,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
         state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
         state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(1).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
@@ -3424,6 +3426,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(2).Vertex(2) = Vector(10.0, 10.0, 3.0);
         state->dataSurface->Surface(2).Vertex(3) = Vector(10.0, -10.0, 3.0);
         state->dataSurface->Surface(2).Vertex(4) = Vector(30.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(2).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(800.0, RoofGeo.Area);
@@ -3447,6 +3451,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(3).Vertex(2) = Vector(30.0, 10.0, 6.0);
         state->dataSurface->Surface(3).Vertex(3) = Vector(30.0, -10.0, 6.0);
         state->dataSurface->Surface(3).Vertex(4) = Vector(50.0, -10.0, 6.0);
+        state->dataSurface->Surface(3).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(3).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(1200.0, RoofGeo.Area);
@@ -3474,6 +3480,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(1).Vertex(2) = Vector(0.0, 10.0, 0.0);
         state->dataSurface->Surface(1).Vertex(3) = Vector(0.0, 0.0, 0.0);
         state->dataSurface->Surface(1).Vertex(4) = Vector(12.0, 0.0, 5.0);
+        state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(1).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(130.0, RoofGeo.Area);
@@ -3498,6 +3506,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(2).Vertex(2) = Vector(12.0, 10.0, 5.0);
         state->dataSurface->Surface(2).Vertex(3) = Vector(12.0, 0.0, 5.0);
         state->dataSurface->Surface(2).Vertex(4) = Vector(24.0, 0.0, 0.0);
+        state->dataSurface->Surface(2).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(2).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(260.0, RoofGeo.Area);
@@ -3522,6 +3532,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(3).Vertex(2) = Vector(24.0, 10.0, 0.0);
         state->dataSurface->Surface(3).Vertex(3) = Vector(24.0, 0.0, 0.0);
         state->dataSurface->Surface(3).Vertex(4) = Vector(50.0, 0.0, 0.0);
+        state->dataSurface->Surface(3).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(3).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(520.0, RoofGeo.Area);
@@ -3549,6 +3561,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
         state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
         state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(1).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
@@ -3572,6 +3586,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         state->dataSurface->Surface(2).Vertex(2) = Vector(20.0, 10.0, 3.0);
         state->dataSurface->Surface(2).Vertex(3) = Vector(20.0, -10.0, 3.0);
         state->dataSurface->Surface(2).Vertex(4) = Vector(40.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(2).HeatTransSurf = true;
 
         ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
         EXPECT_DOUBLE_EQ(800.0, RoofGeo.Area);
