@@ -128,14 +128,20 @@ namespace InternalHeatGains {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int constexpr ITEClassNone(0);
-    int constexpr ITEClassA1(1);
-    int constexpr ITEClassA2(2);
-    int constexpr ITEClassA3(3);
-    int constexpr ITEClassA4(4);
-    int constexpr ITEClassB(5);
-    int constexpr ITEClassC(6);
-    int constexpr ITEClassH1(7);
+    enum class ITEClass
+    {
+        Invalid = -1,
+        None, // (0)
+        A1,   // (1)
+        A2,   // (2)
+        A3,   // (3)
+        A4,   // (4)
+        B,    // (5)
+        C,    // (6)
+        H1,   // (7)
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(ITEClass::Num)> ITEClassNamesUC = {"NONE", "A1", "A2", "A3", "A4", "B", "C", "H1"};
 
     int constexpr ITEInletAdjustedSupply(0);
     int constexpr ITEInletZoneAirNode(1);
@@ -2874,28 +2880,8 @@ namespace InternalHeatGains {
                         }
 
                         // Environmental class
-                        if (UtilityRoutines::SameString(AlphaName(10), "None")) {
-                            thisZoneITEq.Class = ITEClassNone;
-                        } else if (UtilityRoutines::SameString(AlphaName(10), "A1")) {
-                            thisZoneITEq.Class = ITEClassA1;
-                        } else if (UtilityRoutines::SameString(AlphaName(10), "A2")) {
-                            thisZoneITEq.Class = ITEClassA2;
-                        } else if (UtilityRoutines::SameString(AlphaName(10), "A3")) {
-                            thisZoneITEq.Class = ITEClassA3;
-                        } else if (UtilityRoutines::SameString(AlphaName(10), "A4")) {
-                            thisZoneITEq.Class = ITEClassA4;
-                        } else if (UtilityRoutines::SameString(AlphaName(10), "B")) {
-                            thisZoneITEq.Class = ITEClassB;
-                        } else if (UtilityRoutines::SameString(AlphaName(10), "C")) {
-                            thisZoneITEq.Class = ITEClassC;
-                        } else if (UtilityRoutines::SameString(AlphaName(10), "H1")) {
-                            thisZoneITEq.Class = ITEClassH1;
-                        } else {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphaName(10));
-                            ShowContinueError(state, "Valid entries are None, A1, A2, A3, A4, B, C, or H1.");
-                            ErrorsFound = true;
-                        }
+                        thisZoneITEq.Class = getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(10)));
+                        ErrorsFound |= (thisZoneITEq.Class == static_cast<int>(ITEClass::Invalid));
 
                         // Air and supply inlet connections
                         if (UtilityRoutines::SameString(AlphaName(11), "AdjustedSupply")) {
@@ -7599,12 +7585,18 @@ namespace InternalHeatGains {
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C, H1
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
-        static constexpr std::array<Real64, 8> DBMin = {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0, 5.0};             // Minimum dry-bulb temperature [C]
-        static constexpr std::array<Real64, 8> DBMax = {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0, 25.0};         // Maximum dry-bulb temperature [C]
-        static constexpr std::array<Real64, 8> DPMin = {-99.0, -12.0, -12.0, -12.0, -12.0, -99.0, -99.0, -12.0}; // Minimum dewpoint temperature [C]
-        static constexpr std::array<Real64, 8> DPMax = {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0, 17.0};         // Maximum dewpoint temperature [C]
-        static constexpr std::array<Real64, 8> RHMin = {0.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0};                 // Minimum relative humidity [%]
-        static constexpr std::array<Real64, 8> RHMax = {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0, 80.0};         // Maximum relative humidity [%]
+        static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> DBMin = {
+            -99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0, 5.0}; // Minimum dry-bulb temperature [C]
+        static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> DBMax = {
+            99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0, 25.0}; // Maximum dry-bulb temperature [C]
+        static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> DPMin = {
+            -99.0, -12.0, -12.0, -12.0, -12.0, -99.0, -99.0, -12.0}; // Minimum dewpoint temperature [C]
+        static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> DPMax = {
+            99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0, 17.0}; // Maximum dewpoint temperature [C]
+        static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> RHMin = {
+            0.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0}; // Minimum relative humidity [%]
+        static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> RHMax = {
+            99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0, 80.0}; // Maximum relative humidity [%]
 
         static constexpr std::string_view RoutineName("CalcZoneITEq");
         int Loop;
