@@ -126,10 +126,6 @@ namespace InternalHeatGains {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
 
-    int constexpr ITEInletAdjustedSupply(0);
-    int constexpr ITEInletZoneAirNode(1);
-    int constexpr ITEInletRoomAirModel(2);
-
     void ManageInternalHeatGains(EnergyPlusData &state,
                                  Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
@@ -2868,24 +2864,19 @@ namespace InternalHeatGains {
                         ErrorsFound |= (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
-                        if (UtilityRoutines::SameString(AlphaName(11), "AdjustedSupply")) {
-                            thisZoneITEq.AirConnectionType = ITEInletAdjustedSupply;
-                        } else if (UtilityRoutines::SameString(AlphaName(11), "ZoneAirNode")) {
-                            thisZoneITEq.AirConnectionType = ITEInletZoneAirNode;
-                        } else if (UtilityRoutines::SameString(AlphaName(11), "RoomAirModel")) {
-                            // ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
+                        thisZoneITEq.AirConnectionType = static_cast<ITEInletConnection>(
+                            getEnumerationValue(ITEInletConnectionNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(11))));
+                        if (thisZoneITEq.AirConnectionType == ITEInletConnection::RoomAirModel) {
+                            // ZoneITEq(Loop).AirConnectionType = ITEInletConnection::RoomAirModel;
                             ShowWarningError(state,
                                              std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) +
                                                  "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode");
-                            thisZoneITEq.AirConnectionType = ITEInletZoneAirNode;
-                        } else {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphaName(11));
-                            ShowContinueError(state, "Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel.");
-                            ErrorsFound = true;
+                            thisZoneITEq.AirConnectionType = ITEInletConnection::ZoneAirNode;
                         }
+                        ErrorsFound |= (thisZoneITEq.AirConnectionType == ITEInletConnection::Invalid);
+
                         if (state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                            if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply) {
+                            if (thisZoneITEq.AirConnectionType == ITEInletConnection::AdjustedSupply) {
                                 ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
                                 ShowContinueError(state,
                                                   "For " + state.dataIPShortCut->cAlphaFieldNames(11) + "= AdjustedSupply, " +
@@ -2922,7 +2913,7 @@ namespace InternalHeatGains {
                                 supplyNodeFound = true;
                             }
 
-                            if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
+                            if (thisZoneITEq.AirConnectionType == ITEInletConnection::AdjustedSupply && !supplyNodeFound) {
                                 // supply air node must match zone equipment supply air node for these conditions
                                 ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
                                 ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
@@ -7585,32 +7576,32 @@ namespace InternalHeatGains {
         static constexpr std::string_view RoutineName("CalcZoneITEq");
         int Loop;
         int NZ;
-        int SupplyNodeNum;            // Supply air node number (if zero, then not specified)
-        Real64 OperSchedFrac;         // Operating schedule fraction
-        Real64 CPULoadSchedFrac;      // CPU loading schedule fraction
-        Real64 AirConnection;         // Air connection type
-        Real64 TSupply(0.0);          // Supply air temperature [C]
-        Real64 WSupply;               // Supply air humidity ratio [kgWater/kgDryAir]
-        Real64 RecircFrac;            // Recirulation fraction - current
-        Real64 TRecirc;               // Recirulation air temperature [C]
-        Real64 WRecirc;               // Recirulation air humidity ratio [kgWater/kgDryAir]
-        Real64 TAirIn;                // Entering air dry-bulb temperature [C]
-        Real64 TAirInDesign;          // Design entering air dry-bulb temperature [C]
-        Real64 WAirIn;                // Entering air humidity ratio [kgWater/kgDryAir]
-        Real64 TDPAirIn;              // Entering air dewpoint temperature [C]
-        Real64 RHAirIn;               // Entering air relative humidity [%]
-        Real64 SupplyHeatIndex;       // Supply heat index
-        Real64 TAirOut;               // Leaving air temperature [C]
-        Real64 AirVolFlowFrac;        // Air volume flow fraction
-        Real64 AirVolFlowFracDesignT; // Air volume flow fraction at design entering air temperature
-        Real64 AirVolFlowRate;        // Air volume flow rate at current density [m3/s]
-        Real64 AirMassFlowRate;       // Air mass flow rate [kg/s]
-        Real64 CPUPower;              // CPU power input [W]
-        Real64 FanPower;              // Fan power input [W]
-        Real64 UPSPower;              // UPS new power input (losses) [W]
-        Real64 UPSPartLoadRatio;      // UPS part load ratio (current total power input / design total power input)
-        Real64 UPSHeatGain;           // UPS convective heat gain to zone [W]
-        int EnvClass;                 // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
+        int SupplyNodeNum;                // Supply air node number (if zero, then not specified)
+        Real64 OperSchedFrac;             // Operating schedule fraction
+        Real64 CPULoadSchedFrac;          // CPU loading schedule fraction
+        ITEInletConnection AirConnection; // Air connection type
+        Real64 TSupply(0.0);              // Supply air temperature [C]
+        Real64 WSupply;                   // Supply air humidity ratio [kgWater/kgDryAir]
+        Real64 RecircFrac;                // Recirulation fraction - current
+        Real64 TRecirc;                   // Recirulation air temperature [C]
+        Real64 WRecirc;                   // Recirulation air humidity ratio [kgWater/kgDryAir]
+        Real64 TAirIn;                    // Entering air dry-bulb temperature [C]
+        Real64 TAirInDesign;              // Design entering air dry-bulb temperature [C]
+        Real64 WAirIn;                    // Entering air humidity ratio [kgWater/kgDryAir]
+        Real64 TDPAirIn;                  // Entering air dewpoint temperature [C]
+        Real64 RHAirIn;                   // Entering air relative humidity [%]
+        Real64 SupplyHeatIndex;           // Supply heat index
+        Real64 TAirOut;                   // Leaving air temperature [C]
+        Real64 AirVolFlowFrac;            // Air volume flow fraction
+        Real64 AirVolFlowFracDesignT;     // Air volume flow fraction at design entering air temperature
+        Real64 AirVolFlowRate;            // Air volume flow rate at current density [m3/s]
+        Real64 AirMassFlowRate;           // Air mass flow rate [kg/s]
+        Real64 CPUPower;                  // CPU power input [W]
+        Real64 FanPower;                  // Fan power input [W]
+        Real64 UPSPower;                  // UPS new power input (losses) [W]
+        Real64 UPSPartLoadRatio;          // UPS part load ratio (current total power input / design total power input)
+        Real64 UPSHeatGain;               // UPS convective heat gain to zone [W]
+        int EnvClass;                     // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
@@ -7745,7 +7736,7 @@ namespace InternalHeatGains {
                 }
                 WAirIn = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
             } else {
-                if (AirConnection == ITEInletAdjustedSupply) {
+                if (AirConnection == ITEInletConnection::AdjustedSupply) {
                     TSupply = state.dataLoopNodes->Node(SupplyNodeNum).Temp;
                     WSupply = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
                     if (state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve != 0) {
@@ -7758,7 +7749,7 @@ namespace InternalHeatGains {
                     WRecirc = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
-                } else if (AirConnection == ITEInletRoomAirModel) {
+                } else if (AirConnection == ITEInletConnection::RoomAirModel) {
                     // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
                     TAirIn = state.dataHeatBalFanSys->MAT(NZ);
                     TSupply = TAirIn;
@@ -7851,10 +7842,10 @@ namespace InternalHeatGains {
                 SupplyHeatIndex = 0.0;
             }
 
-            if (AirConnection == ITEInletAdjustedSupply || AirConnection == ITEInletZoneAirNode) {
+            if (AirConnection == ITEInletConnection::AdjustedSupply || AirConnection == ITEInletConnection::ZoneAirNode) {
                 // If not a room air model, then all ITEquip power input is a convective heat gain to the zone heat balance, plus UPS heat gain
                 state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone = CPUPower + FanPower + UPSHeatGain;
-            } else if (AirConnection == ITEInletRoomAirModel) {
+            } else if (AirConnection == ITEInletConnection::RoomAirModel) {
                 // Room air model option not implemented yet - set room air model outlet node conditions here
                 // If a room air model, then the only convective heat gain to the zone heat balance is the UPS heat gain
                 state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone = UPSHeatGain;
