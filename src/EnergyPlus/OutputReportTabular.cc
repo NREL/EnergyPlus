@@ -13622,6 +13622,8 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         columnNum = 4;
         columnHeadStr.allocate(columnNum);
         columnWidth.allocate(columnNum);
+        columnWidth = 10;
+        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
         columnHeadStr(1) = "Very-cold Exceedance OccupantHours [hr]";
         columnHeadStr(2) = "Cool Exceedance OccupantHours [hr]";
         columnHeadStr(3) = "Warm Exceedance OccupantHours [hr]";
@@ -13639,6 +13641,12 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                                          state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins,
                                          rowHead,
                                          tableBody);
+        rowHead.deallocate();
+        columnHeadStr.deallocate();
+        tableBody.deallocate();
+        columnWidth.deallocate();
+        columnHeadUnmetDegHr.deallocate();
+        columnWidthUnmetDegHr.deallocate();
     }
 }
 
