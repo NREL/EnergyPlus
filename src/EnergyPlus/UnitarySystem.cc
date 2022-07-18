@@ -1273,6 +1273,13 @@ namespace UnitarySystems {
         state.dataUnitarySystems->m_massFlow2 = 0.0;
         state.dataUnitarySystems->m_runTimeFraction1 = 0.0;
         state.dataUnitarySystems->m_runTimeFraction2 = 0.0;
+        if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
+            // this should be done in the child. DXElecHeatingPower not reset to 0 if coil is off, ZoneSysAvailManager
+            // zero the fan and DX coils electricity consumption
+            state.dataHVACGlobal->DXElecCoolingPower = 0.0;
+            state.dataHVACGlobal->DXElecHeatingPower = 0.0;
+            state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
+        }
     }
 
     void UnitarySys::checkNodeSetPoint(EnergyPlusData &state,
@@ -8589,7 +8596,17 @@ namespace UnitarySystems {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
             } else {
-                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                if (this->m_IsZoneEquipment) {
+                    Fans::SimulateFanComponents(state,
+                                                blankString,
+                                                FirstHVACIteration,
+                                                this->m_FanIndex,
+                                                state.dataUnitarySystems->FanSpeedRatio,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
+                } else {
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                }
             }
         }
 
@@ -8682,7 +8699,17 @@ namespace UnitarySystems {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
             } else {
-                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                if (this->m_IsZoneEquipment) {
+                    Fans::SimulateFanComponents(state,
+                                                blankString,
+                                                FirstHVACIteration,
+                                                this->m_FanIndex,
+                                                state.dataUnitarySystems->FanSpeedRatio,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
+                } else {
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                }
             }
         }
 
@@ -8789,6 +8816,19 @@ namespace UnitarySystems {
                         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToHeatSP;
                     state.dataUnitarySystems->MoistureLoad =
                         state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
+                    if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
+                        this->m_sysType == SysType::PackagedWSHP) {
+                        // ZoneSysAvailManager is turning on sooner than PTUnit in UnitarySystem. Mimic PTUnit logic.
+                        if (state.dataUnitarySystems->QToCoolSetPt < 0.0 &&
+                            state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
+                            ZoneLoad = state.dataUnitarySystems->QToCoolSetPt;
+                        } else if (state.dataUnitarySystems->QToHeatSetPt > 0.0 &&
+                                   state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling) {
+                            ZoneLoad = state.dataUnitarySystems->QToHeatSetPt;
+                        } else {
+                            ZoneLoad = 0.0;
+                        }
+                    }
                 }
 
                 if (ZoneLoad < 0.0 && state.dataUnitarySystems->MoistureLoad <= 0.0 &&
@@ -11863,7 +11903,17 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                if (this->m_IsZoneEquipment) {
+                    Fans::SimulateFanComponents(state,
+                                                blankString,
+                                                FirstHVACIteration,
+                                                this->m_FanIndex,
+                                                state.dataUnitarySystems->FanSpeedRatio,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
+                } else {
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                }
             }
         }
 
@@ -11901,7 +11951,18 @@ namespace UnitarySystems {
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
                                                                            _);
                 } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                    if (this->m_IsZoneEquipment) {
+                        Fans::SimulateFanComponents(state,
+                                                    blankString,
+                                                    FirstHVACIteration,
+                                                    this->m_FanIndex,
+                                                    state.dataUnitarySystems->FanSpeedRatio,
+                                                    state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                    state.dataHVACGlobal->ZoneCompTurnFansOff);
+                    } else {
+                        Fans::SimulateFanComponents(
+                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                    }
                 }
                 if (this->m_CoolCoilExists) {
                     this->calcUnitaryCoolingSystem(
@@ -11953,7 +12014,18 @@ namespace UnitarySystems {
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
                                                                            _);
                 } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                    if (this->m_IsZoneEquipment) {
+                        Fans::SimulateFanComponents(state,
+                                                    blankString,
+                                                    FirstHVACIteration,
+                                                    this->m_FanIndex,
+                                                    state.dataUnitarySystems->FanSpeedRatio,
+                                                    state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                    state.dataHVACGlobal->ZoneCompTurnFansOff);
+                    } else {
+                        Fans::SimulateFanComponents(
+                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                    }
                 }
                 if (this->m_HeatCoilExists) {
                     this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
@@ -11987,7 +12059,17 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                if (this->m_IsZoneEquipment) {
+                    Fans::SimulateFanComponents(state,
+                                                blankString,
+                                                FirstHVACIteration,
+                                                this->m_FanIndex,
+                                                state.dataUnitarySystems->FanSpeedRatio,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
+                } else {
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                }
             }
         }
         if (this->m_SuppCoilExists) {
@@ -12390,7 +12472,9 @@ namespace UnitarySystems {
                 }
             } break;
             case DataHVACGlobals::Coil_CoolingWaterToAirHPSimple: {
-                if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+                // WSHP coils do not have a PLF curve and do not adjust fan performance
+                if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil &&
+                    this->m_sysType != SysType::PackagedWSHP) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
                 }
 
@@ -12617,7 +12701,9 @@ namespace UnitarySystems {
             }
         } break;
         case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple: {
-            if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+            // WSHP coils do not have a PLF curve and do not adjust fan performance
+            if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil &&
+                this->m_sysType != SysType::PackagedWSHP) { // used to match up to PTUnit results
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
             }
 
@@ -15861,7 +15947,17 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                if (this->m_IsZoneEquipment) {
+                    Fans::SimulateFanComponents(state,
+                                                blankString,
+                                                FirstHVACIteration,
+                                                this->m_FanIndex,
+                                                state.dataUnitarySystems->FanSpeedRatio,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
+                } else {
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                }
             }
         }
 
@@ -15913,7 +16009,17 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                if (this->m_IsZoneEquipment) {
+                    Fans::SimulateFanComponents(state,
+                                                blankString,
+                                                FirstHVACIteration,
+                                                this->m_FanIndex,
+                                                state.dataUnitarySystems->FanSpeedRatio,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
+                } else {
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
+                }
             }
         }
 
@@ -15985,12 +16091,11 @@ namespace UnitarySystems {
                     Real64 SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
                     Real64 SpecHumIn = state.dataLoopNodes->Node(this->AirInNode).HumRat;
                     LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
-                    SensibleOutput =
-                        AirMassFlow *
-                        (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(this->AirInNode).HumRat) -
+                    SensibleOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp,
+                                                                               state.dataLoopNodes->Node(this->AirInNode).HumRat) -
                                                     Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(this->AirInNode).Temp,
                                                                                state.dataLoopNodes->Node(this->AirInNode).HumRat));
-                    QTotUnitOut =
+                    TotalOutput =
                         AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(this->AirInNode).Enthalpy);
                 } else {
                     // air loop systems don't use the Sensible capacity, zone equipment uses this to adjust RemainingOutputRequired
@@ -18288,7 +18393,9 @@ namespace UnitarySystems {
             } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
                        this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP) {
                 this->heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
-                if (RuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) { // was DataHVACGlobals::ContFanCycCoil
+                // WSHP coils do not have a PLF curve and do not adjust fan performance
+                if (RuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil &&
+                    this->m_sysType != SysType::PackagedWSHP) { // was DataHVACGlobals::ContFanCycCoil
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
                 } else {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1;
@@ -18317,9 +18424,9 @@ namespace UnitarySystems {
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple ||
                        this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
                 this->heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
-                if (RuntimeFrac > 0.0 &&
-                    this->m_FanOpMode ==
-                        DataHVACGlobals::CycFanCycCoil) { // was DataHVACGlobals::ContFanCycCoil, maybe file an issue or see if it fixes some
+                // WSHP coils do not have a PLF curve and do not adjust fan performance
+                if (RuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil &&
+                    this->m_sysType != SysType::PackagedWSHP) { // was DataHVACGlobals::ContFanCycCoil, maybe file an issue or see if it fixes some
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
                 } else {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;

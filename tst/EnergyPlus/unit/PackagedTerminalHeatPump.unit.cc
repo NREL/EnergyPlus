@@ -1309,9 +1309,9 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     ASSERT_NEAR(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp);
 
-    // loads above the lower bounday load should operate above the minimum air flow rate
+    // loads above the lower boundary load should operate above the minimum air flow rate
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2010.0; // set heating load to just above lower boundary load
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2010.0;
     //    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired; // initialize zone heating load
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0, true, QUnitOut, latOut);
     EXPECT_NEAR(QUnitOut, 2010.0, 0.01);
@@ -1333,7 +1333,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // system should operate at maximum air flow rate for loads greater than 2995.2 W
     // outlet air temperture is allowed to be above the design maximum supply air temperature in heating mode
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 3000.0; // set heating load to just above upper boundary load
-    //    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired; // initialize zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 3000.0;
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0, true, QUnitOut, latOut);
     EXPECT_NEAR(QUnitOut, 3000.0, 0.01);
     ASSERT_GT(state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp, thisSys.DesignMaxOutletTemp);
