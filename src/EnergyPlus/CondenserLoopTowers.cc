@@ -237,6 +237,8 @@ namespace CondenserLoopTowers {
 
         constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> EvapLossNamesUC{"LOSSFACTOR", "SATURATEDEXIT"};
         constexpr std::array<std::string_view, static_cast<int>(PIM::Num)> PIMNamesUC{"NOMINALCAPACITY", "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"};
+        constexpr std::array<std::string_view, static_cast<int>(Blowdown::Num)> BlowDownNamesUC = {"CONCENTRATIONRATIO", "SCHEDULEDRATE"};
+        constexpr std::array<std::string_view, static_cast<int>(CellCtrl::Num)> CellCtrlNamesUC = {"MINIMALCELL", "MAXIMALCELL"};
 
         // Get number of all cooling towers specified in the input data file (idf)
         NumSingleSpeedTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoolingTower_SingleSpeed);
@@ -416,41 +418,18 @@ namespace CondenserLoopTowers {
 
             // begin water use and systems get input
             tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
-            if (AlphArray(6).empty()) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            }
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
-
-            if ((NumNums < 20) && (tower.DriftLossFraction == 0.0)) {
-                // assume Drift loss not entered and should be defaulted
-                tower.DriftLossFraction = 0.008 / 100.0;
-            }
-
-            tower.ConcentrationRatio = NumArray(21); //  N13, \field Blowdown Concentration Ratio
-            tower.SizFac = NumArray(25);             //  N17  \field Sizing Factor
+            tower.ConcentrationRatio = NumArray(21);        //  N13, \field Blowdown Concentration Ratio
+            tower.SizFac = NumArray(25);                    //  N17  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(7), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else if (AlphArray(7).empty()) {
-                tower.BlowdownMode = Blowdown::Concentration;
-                if ((NumNums < 21) && (tower.ConcentrationRatio == 0.0)) {
-                    // assume Concetratino ratio was omitted and should be defaulted
-                    tower.ConcentrationRatio = 3.0;
-                }
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_SingleSpeed, tower.Name));
                 ErrorsFound = true;
             }
 
@@ -516,27 +495,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
 
-            if (NumAlphas >= 12) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(12) || AlphArray(12).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(12), "MinimalCell") || UtilityRoutines::SameString(AlphArray(12), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(12), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(12), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for single speed tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(12))));
             }
 
             //   High speed air flow rate must be greater than free convection air flow rate.
@@ -793,40 +754,18 @@ namespace CondenserLoopTowers {
 
             // begin water use and systems get input
             tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
-            if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            }
 
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
-            if ((NumNums < 28) && (tower.DriftLossFraction == 0.0)) {
-                // assume Drift loss not entered and should be defaulted
-                tower.DriftLossFraction = 0.008 / 100.0;
-            }
-
-            tower.ConcentrationRatio = NumArray(29); //  N17, \field Blowdown Concentration Ratio
-            tower.SizFac = NumArray(33);             //  N21  \field Sizing Factor
+            tower.ConcentrationRatio = NumArray(29);        //  N17, \field Blowdown Concentration Ratio
+            tower.SizFac = NumArray(33);                    //  N21  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(7), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                tower.BlowdownMode = Blowdown::Concentration;
-                if ((NumNums < 29) && (tower.ConcentrationRatio == 0.0)) {
-                    // assume concentration ratio was omitted and should be defaulted
-                    tower.ConcentrationRatio = 3.0;
-                }
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_TwoSpeed, tower.Name));
                 ErrorsFound = true;
             }
 
@@ -847,27 +786,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
 
-            if (NumAlphas >= 11) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(11), "MinimalCell") || UtilityRoutines::SameString(AlphArray(11), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(11), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(11), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for two speed tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
@@ -1456,17 +1377,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            if (UtilityRoutines::SameString(AlphArray(8), "LossFactor")) {
-                tower.EvapLossMode = EvapLoss::UserFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(8), "SaturatedExit")) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                ErrorsFound = true;
-            }
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(8))));
 
             tower.UserEvapLossFactor = NumArray(11);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(12) / 100.0; //  N12, \field Drift Loss Percent
@@ -1474,21 +1385,11 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(17);                    //  N14  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(9), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(9), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(9))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(10));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_VariableSpeed, tower.Name));
                 ErrorsFound = true;
             }
 
@@ -1509,27 +1410,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
 
-            if (NumAlphas >= 13) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(13) || AlphArray(13).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(13), "MinimalCell") || UtilityRoutines::SameString(AlphArray(13), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(13), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(13), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + AlphArray(13));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for variable speed tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(13))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
@@ -1747,48 +1630,19 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            if (UtilityRoutines::SameString(AlphArray(10), "LossFactor")) {
-                tower.EvapLossMode = EvapLoss::UserFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(10), "SaturatedExit")) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                tower.EvapLossMode = EvapLoss::MoistTheory;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
-                ErrorsFound = true;
-            }
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
 
             tower.UserEvapLossFactor = NumArray(23);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(24) / 100.0; //  N24, \field Drift Loss Percent
-            if ((NumNums < 24) && (tower.DriftLossFraction == 0.0)) {
-                // assume Drift loss not entered and should be defaulted
-                tower.DriftLossFraction = 0.008 / 100.0;
-            }
-
-            tower.ConcentrationRatio = NumArray(25); //  N25, \field Blowdown Concentration Ratio
-            tower.SizFac = NumArray(29);             //  N29  \field Sizing Factor
+            tower.ConcentrationRatio = NumArray(25);        //  N25, \field Blowdown Concentration Ratio
+            tower.SizFac = NumArray(29);                    //  N29  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            if (UtilityRoutines::SameString(AlphArray(11), "ScheduledRate")) {
-                tower.BlowdownMode = Blowdown::Schedule;
-            } else if (UtilityRoutines::SameString(AlphArray(11), "ConcentrationRatio")) {
-                tower.BlowdownMode = Blowdown::Concentration;
-            } else if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                tower.BlowdownMode = Blowdown::Concentration;
-                if ((NumNums < 25) && (tower.ConcentrationRatio == 0.0)) {
-                    // assume concentration ratio was omitted and should be defaulted
-                    tower.ConcentrationRatio = 3.0;
-                }
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
-                ErrorsFound = true;
-            }
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(12));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
-                ShowSevereError(state, cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + AlphArray(12));
+                ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(12), AlphArray(12)));
+                ShowContinueError(state, format("Entered in {} = \"{}\"", cCoolingTower_VariableSpeedMerkel, tower.Name));
                 ErrorsFound = true;
             }
 
@@ -1809,27 +1663,9 @@ namespace CondenserLoopTowers {
                 tower.MaxFracFlowRate = 2.5;
             }
             tower.TowerMassFlowRateMultiplier = tower.MaxFracFlowRate;
-            if (NumAlphas >= 15) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(15) || AlphArray(15).empty()) {
-                    tower.CellCtrl_Num = CellCtrl::MaxCell;
-                } else {
-                    if (UtilityRoutines::SameString(AlphArray(15), "MinimalCell") || UtilityRoutines::SameString(AlphArray(15), "MaximalCell")) {
-                        if (UtilityRoutines::SameString(AlphArray(15), "MinimalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MinCell;
-                        }
-                        if (UtilityRoutines::SameString(AlphArray(15), "MaximalCell")) {
-                            tower.CellCtrl_Num = CellCtrl::MaxCell;
-                        }
-                    } else {
-                        ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(15) + " = " + AlphArray(15));
-                        ShowContinueError(state,
-                                          format("Occurs in {}={}", DataPlant::PlantEquipTypeNames[static_cast<int>(tower.TowerType)], tower.Name));
-                        ErrorsFound = true;
-                    }
-                }
-            } else {
-                // assume Cell Control not entered and should be defaulted
-                tower.CellCtrl_Num = CellCtrl::MaxCell;
+            //   cell control for variable speed Merkel tower
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(15))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
@@ -4765,7 +4601,7 @@ namespace CondenserLoopTowers {
         // cap min at 1
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
@@ -5081,7 +4917,7 @@ namespace CondenserLoopTowers {
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
 
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
@@ -5252,7 +5088,7 @@ namespace CondenserLoopTowers {
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
 
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
@@ -5608,7 +5444,7 @@ namespace CondenserLoopTowers {
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
 
-        if (this->CellCtrl_Num == CellCtrl::MinCell) {
+        if (this->cellCtrl == CellCtrl::MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
