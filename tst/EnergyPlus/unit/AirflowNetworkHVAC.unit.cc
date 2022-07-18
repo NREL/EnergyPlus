@@ -16301,4 +16301,143 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     EXPECT_NEAR(state->afn->DisSysCompDuctData(3).hydraulicDiameter, 0.653543, 0.0001);
     EXPECT_NEAR(state->afn->DisSysCompDuctData(3).A, 0.335458, 0.0001);
 }
+TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingOAReportWithMultipliers)
+{
+
+    // Unit test for #8528
+
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
+
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SOFF";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SOFF";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
+
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
+
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant,OnSch,,1.0;",
+        "Schedule:Constant,FreeRunningSeason,,0.0;",
+        "Schedule:Constant,Sempre 21,,21.0;",
+        "AirflowNetwork:SimulationControl,",
+        "  NaturalVentilation, !- Name",
+        "  MultizoneWithoutDistribution, !- AirflowNetwork Control",
+        "  SurfaceAverageCalculation, !- Wind Pressure Coefficient Type",
+        "  , !- Height Selection for Local Wind Pressure Calculation",
+        "  LOWRISE, !- Building Type",
+        "  1000, !- Maximum Number of Iterations{ dimensionless }",
+        "  ZeroNodePressures, !- Initialization Type",
+        "  0.0001, !- Relative Airflow Convergence Tolerance{ dimensionless }",
+        "  0.0001, !- Absolute Airflow Convergence Tolerance{ kg / s }",
+        "  -0.5, !- Convergence Acceleration Limit{ dimensionless }",
+        "  90, !- Azimuth Angle of Long Axis of Building{ deg }",
+        "  0.36;                    !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+        "AirflowNetwork:MultiZone:Zone,",
+        "  Soff, !- Zone Name",
+        "  CEN15251Adaptive, !- Ventilation Control Mode",
+        "  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  , !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  FreeRunningSeason; !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window 1, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel; !- Ventilation Control Mode",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window 2, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel; !- Ventilation Control Mode",
+        "AirflowNetwork:MultiZone:Component:SimpleOpening,",
+        "  Simple Window, !- Name",
+        "  0.0010, !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+        "  0.65, !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+        "  0.01, !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+        "  0.78;                    !- Discharge Coefficient{ dimensionless }",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->afn->get_input();
+
+    // The original value before fix is zero. After the fix, the correct schedule number is assigned.
+
+    // changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
+    // has index 1 which is the .VentSchNum
+    auto GetIndex = UtilityRoutines::FindItemInList(state->afn->MultizoneZoneData(1).VentingSchName,
+                                                    state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
+    EXPECT_EQ(GetIndex, state->afn->MultizoneZoneData(1).VentingSchNum);
+
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 23.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.001;
+    state->dataHeatBal->ZonePreDefRep.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->afn->initialize();
+    Real64 currentCpAir = Psychrometrics::PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRatAvg(1));
+    state->afn->exchangeData(1).SumMCp = 1.2 * currentCpAir;  // infiltration mass flow rate
+    state->afn->exchangeData(1).SumMVCp = 2.4 * currentCpAir; // ventilation mass flow rate
+
+    state->dataEnvrn->OutBaroPress = 100000.0;
+    Real64 currentAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+        *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRatAvg(1));
+    state->dataHVACGlobal->TimeStepSys = 1.0 / DataGlobalConstants::SecInHour;
+
+    state->dataHeatBal->ZonePreDefRep(1).isOccupied = false;
+    state->afn->report();
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolMin, 9.9e+09);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOcc, 0.00);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOccStdDen, 0.00);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalStdDen, 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolMin, 9.9e+09);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOcc, 0.00);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOccStdDen, 0.00);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalStdDen, 2.0);
+
+    state->dataHeatBal->ZonePreDefRep(1).isOccupied = true;
+    state->afn->report();
+    // Note that Total values accumulate over the entire simulation period, so AFNInfilVolTotalStdDen and AFNVentVolTotalStdDen will be 2x
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolMin, 1.2 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOcc, 1.2 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOccStdDen, 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalStdDen, 2.0 * 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolMin, 2.4 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOcc, 2.4 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOccStdDen, 2.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalStdDen, 2.0 * 2.0);
+}
 } // namespace EnergyPlus
