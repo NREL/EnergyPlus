@@ -4060,4 +4060,61 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     EXPECT_NEAR(state->dataLoopNodes->Node(zone5InletNode1).MassFlowRate, state->dataLoopNodes->Node(zone5ReturnNode).MassFlowRate, 0.001);
 }
 
+TEST_F(EnergyPlusFixture, PTUnit_SetMinOATCompressor)
+{
+    state->dataPTHP->PTUnit.allocate(1);
+    state->dataPTHP->PTUnit(1).DXCoolCoilIndexNum = 1;
+    state->dataPTHP->PTUnit(1).DXHeatCoilIndexNum = 2;
+    state->dataVariableSpeedCoils->VarSpeedCoil.allocate(2);
+    state->dataVariableSpeedCoils->GetCoilsInputFlag = false;
+    state->dataVariableSpeedCoils->VarSpeedCoil(1).MinOATCompressor = 30.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(2).MinOATCompressor = 30.0;
+    state->dataDXCoils->DXCoil.allocate(2);
+    state->dataDXCoils->GetCoilsInputFlag = false;
+    state->dataDXCoils->DXCoil(1).MinOATCompressor = 30.0;
+    state->dataDXCoils->DXCoil(2).MinOATCompressor = 30.0;
+
+    int PTUnitNum = 1;
+    std::string cCurModObj = "PTUnit_Test";
+    bool ErrFound = false;
+
+    // Check that each coil type returns correctly
+    state->dataPTHP->PTUnit(1).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
+    state->dataPTHP->PTUnit(1).DXHeatCoilType_Num = Coil_HeatingElectric;
+    // Each test should return 30 for cooling coil (limited) and -1000 for heating coil (no limit)
+    SetMinOATCompressor(*state, PTUnitNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorHeating, -1000.0, 1e-6);
+    // reset once as test
+    state->dataPTHP->PTUnit(1).MinOATCompressorCooling = -999.0;
+    state->dataPTHP->PTUnit(1).MinOATCompressorHeating = -999.0;
+
+    state->dataPTHP->PTUnit(1).DXCoolCoilType_Num = CoilDX_CoolingSingleSpeed;
+    SetMinOATCompressor(*state, PTUnitNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorHeating, -1000.0, 1e-6);
+
+    state->dataPTHP->PTUnit(1).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
+    SetMinOATCompressor(*state, PTUnitNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorHeating, -1000.0, 1e-6);
+
+    // check heating coil types
+    // should return 30 in each case since cooling and heating coil now have limit
+    state->dataPTHP->PTUnit(1).DXHeatCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
+    SetMinOATCompressor(*state, PTUnitNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorCooling, 30.0, 1e-6); // same as above
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorHeating, 30.0, 1e-6); // now returns 30
+
+    state->dataPTHP->PTUnit(1).DXHeatCoilType_Num = CoilDX_HeatingEmpirical;
+    SetMinOATCompressor(*state, PTUnitNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataPTHP->PTUnit(1).MinOATCompressorHeating, 30.0, 1e-6);
+}
+
 } // namespace EnergyPlus
