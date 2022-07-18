@@ -7584,7 +7584,7 @@ namespace InternalHeatGains {
         using DataHVACGlobals::SmallTempDiff;
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C, H1
-        // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
+        // From ASHRAE 2021 Thermal Guidelines environmental classes for Air-Cooled ITE
         static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> DBMin = {
             -99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0, 5.0}; // Minimum dry-bulb temperature [C]
         static constexpr std::array<Real64, static_cast<int>(ITEClass::Num)> DBMax = {
