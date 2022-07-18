@@ -3424,15 +3424,17 @@ void WriteTableOfContents(EnergyPlusData &state)
                 }
             }
 
-            std::string ReportPeriodSummary = "Reporting Period Summary";
-            tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriodSummary, Entire_Facility) << "\">"
-                       << "Reporting Period Summary"
-                       << "</a>\n";
-            AddTOCReportPeriod(
-                state.dataWeatherManager->TotThermalReportPers, "Thermal", state.dataWeatherManager->ThermalReportPeriodInput, tbl_stream);
-            AddTOCReportPeriod(state.dataWeatherManager->TotCO2ReportPers, "CO2", state.dataWeatherManager->CO2ReportPeriodInput, tbl_stream);
-            AddTOCReportPeriod(
-                state.dataWeatherManager->TotVisualReportPers, "Visual", state.dataWeatherManager->VisualReportPeriodInput, tbl_stream);
+            if (state.dataWeatherManager->TotReportPers > 0) {
+                std::string ReportPeriodSummary = "Reporting Period Summary";
+                tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriodSummary, Entire_Facility) << "\">"
+                           << "Reporting Period Summary"
+                           << "</a>\n";
+                AddTOCReportPeriod(
+                    state.dataWeatherManager->TotThermalReportPers, "Thermal", state.dataWeatherManager->ThermalReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(state.dataWeatherManager->TotCO2ReportPers, "CO2", state.dataWeatherManager->CO2ReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(
+                    state.dataWeatherManager->TotVisualReportPers, "Visual", state.dataWeatherManager->VisualReportPeriodInput, tbl_stream);
+            }
         }
     }
 }
@@ -5339,7 +5341,9 @@ void WriteTabularReports(EnergyPlusData &state)
         if (ort->displayThermalResilienceSummary) {
             WriteThermalResilienceTables(state);
         }
-        WriteReportPeriodTimeConsumption(state);
+        if (state.dataWeatherManager->TotReportPers > 0) {
+            WriteReportPeriodTimeConsumption(state);
+        }
         for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
             WriteThermalResilienceTablesRepPeriod(state, i);
         }

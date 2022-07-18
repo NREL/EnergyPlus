@@ -5485,7 +5485,8 @@ void ReportThermalResilience(EnergyPlusData &state)
 
     Array1D_bool reportPeriodFlags;
     reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
-    General::findReportPeriodIdx(state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
+    General::findReportPeriodIdx(
+        state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
 
     auto &ort(state.dataOutRptTab);
     for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
@@ -6103,7 +6104,8 @@ void ReportCO2Resilience(EnergyPlusData &state)
 
         Array1D_bool reportPeriodFlags;
         reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
-        General::findReportPeriodIdx(state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+        General::findReportPeriodIdx(
+            state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
 
         auto &ort(state.dataOutRptTab);
         for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
