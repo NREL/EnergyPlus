@@ -16430,14 +16430,31 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingOAReportWithMultipliers)
 
     state->dataHeatBal->ZonePreDefRep(1).isOccupied = true;
     state->afn->report();
+    Real64 n = 2.0;
     // Note that Total values accumulate over the entire simulation period, so AFNInfilVolTotalStdDen and AFNVentVolTotalStdDen will be 2x
     EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolMin, 1.2 / currentAirDensity);
     EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOcc, 1.2 / currentAirDensity);
     EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOccStdDen, 1.0);
-    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalStdDen, 2.0 * 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalStdDen, n * 1.0);
     EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolMin, 2.4 / currentAirDensity);
     EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOcc, 2.4 / currentAirDensity);
     EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOccStdDen, 2.0);
-    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalStdDen, 2.0 * 2.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalStdDen, n * 2.0);
+
+    state->dataHeatBal->ZonePreDefRep(1).isOccupied = false;
+    // Zone multipliers should have no effect because ZonePreDefRep values are for unmultiplied zone
+    state->dataHeatBal->Zone(1).Multiplier = 2.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 5.0;
+    state->afn->report();
+    n = 3.0;
+    // Note that Total values accumulate over the entire simulation period, so AFNInfilVolTotalStdDen and AFNVentVolTotalStdDen will be 3x
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolMin, 1.2 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOcc, 1.2 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalOccStdDen, 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNInfilVolTotalStdDen, n * 1.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolMin, 2.4 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOcc, 2.4 / currentAirDensity);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalOccStdDen, 2.0);
+    EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).AFNVentVolTotalStdDen, n * 2.0);
 }
 } // namespace EnergyPlus
