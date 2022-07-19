@@ -66,3 +66,20 @@ The Adaptive Comfort Summary/Report was renamed to match the HTML:
 ```
 
 See pull request [#9461](https://github.com/NREL/EnergyPlus/pull/9461) for more details.
+
+### Tabular Report Outdoor Air Summary - New Column
+In both subtables of the Outdoor Air Summary report, these is a new column at the far right for *AFN Ventilation [ach]*. AirflowNetwork infiltraion (cracks) and ventilation (openings) flow rates are now reported separately. Previously, they were combined in the AFN Infiltration column. 
+
+Also, the AFN Infiltration values were corrected to ignore zone multipliers since this report is per zone without multipliers. See issue [#8528](https://github.com/NREL/EnergyPlus/issues/8528) for more details.
+
+See pull request [#9519](https://github.com/NREL/EnergyPlus/pull/9519) for more details.
+
+### Tabular Report Outdoor Air Details - New Footnotes
+The Outdoor Air Details report, the subtables "by Zone" have a new footnote:
+
+*Values shown for a single zone without multipliers. Total Facility includes multipliers*
+
+In the Outdoor Air Details, Total Outdoor Air by AirLoop subtable, Mechanical Ventilation and Total Ventilation values were corrected to properly apply density. See issue [#9398](https://github.com/NREL/EnergyPlus/issues/9398) for more details.
+
+See pull request [#9519](https://github.com/NREL/EnergyPlus/pull/9519) for more details.
+
