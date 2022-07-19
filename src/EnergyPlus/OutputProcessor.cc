@@ -376,6 +376,9 @@ namespace OutputProcessor {
 
         bool found = false;
 
+        std::vector<int> scanAgainIndices;
+        scanAgainIndices.reserve(MaxIndx - MinIndx);
+
         // First pass, avoid using a regex if not needed
         for (int Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
             auto &reqRepVar = op->ReqRepVars(Loop);
@@ -392,6 +395,7 @@ namespace OutputProcessor {
                 continue;
             }
             if (!UtilityRoutines::SameString(reqRepVar.Key, KeyedValue)) {
+                scanAgainIndices.push_back(Loop);
                 continue;
             }
 
@@ -426,7 +430,7 @@ namespace OutputProcessor {
         }
 
         // Second pass: for the remaining, try a Regex
-        for (int Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
+        for (int Loop : scanAgainIndices) {
             auto &reqRepVar = op->ReqRepVars(Loop);
 
             // Skip the ones already found
@@ -434,12 +438,6 @@ namespace OutputProcessor {
             //    continue;
             //}
 
-            if (reqRepVar.Key.empty()) {
-                continue;
-            }
-            if (!UtilityRoutines::SameString(reqRepVar.VarName, VariableName)) {
-                continue;
-            }
             if (!RE2::FullMatch(KeyedValue, "(?i)" + reqRepVar.Key)) {
                 continue;
             }
