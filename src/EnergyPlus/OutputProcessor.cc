@@ -387,21 +387,10 @@ namespace OutputProcessor {
             }
 
             //   A match.  Make sure doesn't duplicate
-
             reqRepVar.Used = true;
-            bool Dup = false;
-            for (int Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
-                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == reqRepVar.frequency) {
-                    Dup = true;
-                } else {
-                    continue;
-                }
-                //  So Same Report Frequency
-                if (op->ReqRepVars(op->ReportList(Loop1)).SchedPtr != reqRepVar.SchedPtr) {
-                    Dup = false;
-                }
-            }
-
+            bool Dup = std::find_if(std::cbegin(op->ReportList), std::cend(op->ReportList), [&reqRepVar, &op](int idx) {
+                           return (op->ReqRepVars(idx).frequency == reqRepVar.frequency) && (op->ReqRepVars(idx).SchedPtr == reqRepVar.SchedPtr);
+                       }) == std::cend(op->ReportList);
             if (!Dup) {
                 ++op->NumExtraVars;
                 if (op->NumExtraVars == op->NumReportList) {
