@@ -2447,7 +2447,31 @@ Specifies the entering air temperature in deg. C at design conditions. The defau
 
 \paragraph{Field: Environmental Class}\label{field-environmental-class}
 
-Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, H1, or None. This is used to report the ``ITE Air Inlet Operating Range Exceeded Time'' If None is specified (the default), then no reporting of time outside allowable conditions will be done.
+Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, H1, or None. This is used to report the ``ITE Air Inlet Operating Range Exceeded Time.'' If None is specified (the default), then no reporting of time outside allowable conditions will be done.
+
+The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}: 
+
+\begin{longtable}[c]{@{}lrrrrrrr@{}}
+	\caption{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \label{table:ite-aircooled-air-inlet-code-specification-limits} \tabularnewline
+	\toprule
+	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \tabularnewline
+	\toprule
+	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
+	\midrule
+	\endhead
+	
+	Dry-Bulb$_{min}$ [$^{\circ}$C]    &  15 &  10 &   5 &   5 &  5 &  5 &   5 \tabularnewline
+	Dry-Bulb$_{max}$ [$^{\circ}$C]    &  32 &  35 &  40 &  45 & 35 & 40 &  25 \tabularnewline
+	Dew-Point$_{min}$ [$^{\circ}$C]   & -12 & -12 & -12 & -12 & -- & -- & -12 \tabularnewline
+	Dew-Point$_{max}$ [$^{\circ}$C]   &  17 &  21 &  24 &  24 & 28 & 28 &  17 \tabularnewline
+	Relative Humidity$_{min}$ [$\%$]  &   8 &   8 &   8 &   8 &  8 &  8 &   8 \tabularnewline
+	Relative Humidity$_{max}$ [$\%$]  &  80 &  80 &  85 &  90 & 80 & 80 &  80 \tabularnewline
+	\bottomrule
+\end{longtable}
 
 \paragraph{Field: Air Inlet Connection Type}\label{field-air-inlet-connection-type}
 
