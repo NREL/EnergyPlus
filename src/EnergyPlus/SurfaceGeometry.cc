@@ -15357,14 +15357,14 @@ namespace SurfaceGeometry {
                 // At least two points are coincident. Should this happen? GetVertices is supposed to pop these vertices
                 continue;
             }
-            Real64 DotProd = V1.dot(V2);
-            Real64 cosarg = DotProd / (V1len * V2len);
-            if (cosarg < -1.0) {
-                cosarg = -1.0;
-            } else if (cosarg > 1.0) {
-                cosarg = 1.0;
+            Real64 CrossProd = V1.cross(V2);
+            Real64 sinarg = CrossProd / (V1len * V2len);
+            if (sinarg < -1.0) {
+                sinarg = -1.0;
+            } else if (sinarg > 1.0) {
+                sinarg = 1.0;
             }
-            Real64 Theta = std::acos(cosarg);
+            Real64 Theta = std::asin(sinarg);
             if (Theta > TurnThreshold) {
                 SignFlag = true;
             } else if (Theta < -TurnThreshold) {
