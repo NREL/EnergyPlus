@@ -4099,40 +4099,33 @@ RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state)
             continue;
         }
 
-        auto const &vertices = surface.Vertex;
-
-        auto const &thisArea = surface.Area;
-        Real64 const z_min(minval(vertices, &Vector::z));
-        Real64 const z_max(maxval(vertices, &Vector::z));
+        Real64 const z_min(minval(surface.Vertex, &Vector::z));
+        Real64 const z_max(maxval(surface.Vertex, &Vector::z));
         Real64 const verticalHeight = z_max - z_min;
-        RoofGeo.Height += verticalHeight * thisArea;
-        RoofGeo.Tilt += surface.Tilt * thisArea;
-        RoofGeo.Azimuth += surface.Azimuth * thisArea;
-        RoofGeo.Area += thisArea;
+        RoofGeo.Height += verticalHeight * surface.Area;
+        RoofGeo.Tilt += surface.Tilt * surface.Area;
+        RoofGeo.Azimuth += surface.Azimuth * surface.Area;
+        RoofGeo.Area += surface.Area;
 
-        for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+        for (auto it = surface.Vertex.begin(); it != surface.Vertex.end(); ++it) {
 
             auto itnext = std::next(it);
-            if (itnext == std::end(vertices)) {
-                itnext = std::begin(vertices);
+            if (itnext == std::end(surface.Vertex)) {
+                itnext = std::begin(surface.Vertex);
             }
 
             auto curVertex = *it;
             auto nextVertex = *itnext;
-            if (uniqueRoofVertices.size() == 0) {
+            auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
+                return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
+            });
+            if (it2 == std::end(uniqueRoofVertices)) {
                 uniqueRoofVertices.emplace_back(curVertex);
-            } else {
-                auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
-                    return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
-                });
-                if (it2 == std::end(uniqueRoofVertices)) {
-                    uniqueRoofVertices.emplace_back(curVertex);
-                }
             }
 
             SurfaceGeometry::EdgeOfSurf thisEdge;
-            thisEdge.start = curVertex;
-            thisEdge.end = nextVertex;
+            thisEdge.start = std::move(curVertex);
+            thisEdge.end = std::move(nextVertex);
             thisEdge.count = 1;
 
             // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
