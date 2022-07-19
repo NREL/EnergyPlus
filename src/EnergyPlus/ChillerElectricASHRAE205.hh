@@ -64,23 +64,7 @@ namespace EnergyPlus {
 
     namespace ChillerElectricASHRAE205 {
         struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs {
-            std::unique_ptr<tk205::rs_instance_base> RS;      // ASHRAE205 representation instance
-            int oil_cooler_inlet_nodeNum{0};
-            int oil_cooler_outlet_nodeNum{0};
-            int aux_inlet_nodeNum{0};
-            int aux_outlet_nodeNum{0};
-            int heat_recovery_inlet_nodeNum{0};
-            int heat_recovery_outlet_nodeNum{0};
-            // Lookup variables
-            Real64 input_power;
-            Real64 net_evaporator_capacity; //RefCap?
-            Real64 net_condenser_capacity;
-            Real64 evaporator_liquid_entering_temperature;  //EvapInletTemp?
-            Real64 condenser_liquid_leaving_temperature;    //CondOutletTemp?
-            Real64 evaporator_liquid_differential_pressure;
-            Real64 condenser_liquid_differential_pressure;
-            Real64 oil_cooler_heat;
-            Real64 auxiliary_heat;
+            std::shared_ptr<tk205::rs_instance_base> RS;      // ASHRAE205 representation instance
 
             std::string EndUseSubcategory{""};                // identifier use for the end use subcategory
 
@@ -97,9 +81,15 @@ namespace EnergyPlus {
                           Real64 &CurLoad,
                           bool RunFlag) override;
 
-            void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
+            void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
             void size(EnergyPlusData &state);
+
+            void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
+
+            Real64 findCapacityResidual(EnergyPlusData &state, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
+
+            //void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
             void calculate(EnergyPlusData &state,
                            Real64 &MyLoad,                                   // operating load
@@ -109,7 +99,7 @@ namespace EnergyPlus {
             void update(EnergyPlusData &state,
                         Real64 MyLoad, // current load
                         bool RunFlag   // TRUE if chiller operating
-            );
+            ) override;
 
             void oneTimeInit(EnergyPlusData &state) override;
         };

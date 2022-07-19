@@ -3669,6 +3669,16 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                         }
                     } break;
+                        case DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205: { //        = 10
+                            this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                            if (LoopSideCtr == LoopSideLocation::Demand) {
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                            } else {
+                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
+                            }
+                        } break;
                     case DataPlant::PlantEquipmentType::Chiller_EngineDriven: { //             = 11
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
