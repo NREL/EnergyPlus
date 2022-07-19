@@ -2,11 +2,11 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! SingleFamilyHouse_TwoSpeed_MultiStageElectricSuppCoilEMS.idf
+! PythonPlugin_SingleFamilyHouse_TwoSpeed_MultiStageElectricSuppCoil.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
 ! Highlights:             This file does the basic test of an air distribution system in a residential home.
-!                         A two speed heat pump with a supplmental multistage electric heater provides space heating and cooling, whose stages actuated by EMS program.
+!                         A two speed heat pump with a supplmental multistage electric heater provides space heating and cooling, whose stages actuated by Python plugin.
 !                         It provides thermostat temperature difference between cutout and setpoint.
 !
 !
@@ -2008,83 +2008,67 @@
     1.0,                     !- Motor In Airstream Fraction
     Air Loop Inlet Node,     !- Air Inlet Node Name
     Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+
+  PythonPlugin:Instance,
+    MultiSpeed Supp Coil Speed Level Management,      !- Name
+    Yes,                                              !- Run During Warmup Days
+    PythonPlugin_SingleFamilyHouse_TwoSpeed_MultiStageElectricSuppCoil,    !- Python Module Name
+    SuppCoilSpeedControl;                             !- Plugin Class Name
+
+  PythonPlugin:Variables,
+    PythonGlobalVarsReport,              !- Name
+    CoilSpeedLevelOverrideReport;  !- Variable Name 1
     
-  EnergyManagementSystem:Sensor,
-    HeatingSetpoint,                               !- Name
-    LIVING ZONE,                                   !- Output:Variable or Output:Meter Index Key Name
-    Zone Thermostat Heating Setpoint Temperature;  !- Output:Variable or Output:Meter Name
+  PythonPlugin:OutputVariable,
+    PythonPlugin Coil Speed Level Override On,  !- Name
+    CoilSpeedLevelOverrideReport,               !- Python Plugin Variable Name
+    Averaged,                                   !- Type of Data in Variable
+    SystemTimestep,                             !- Update Frequency
+    On/Off;                                     !- Units
 
-  EnergyManagementSystem:Sensor,
-    ZoneAirTemperature,      !- Name
-    LIVING ZONE,             !- Output:Variable or Output:Meter Index Key Name
-    Zone Air Temperature;    !- Output:Variable or Output:Meter Name
+  PythonPlugin:Variables,
+    PythonGlobalVarsValue,              !- Name
+    CoilSpeedLevelOverrideValue;  !- Variable Name 1
 
-  EnergyManagementSystem:GlobalVariable,
-    SuppCoilSpeedLevelOverrideReport;      !- Erl Variable 1 Name
+  PythonPlugin:OutputVariable,
+    PythonPlugin Coil Speed Level Override Value,  !- Name
+    CoilSpeedLevelOverrideValue,               !- Python Plugin Variable Name
+    Averaged,                                   !- Type of Data in Variable
+    SystemTimestep,                             !- Update Frequency
+    ;                                     !- Units
+    
+  Output:Variable,
+    PythonPlugin Coil Speed Level Override On,  !- Name
+    PythonPlugin:OutputVariable,      !- EMS Variable Name
+    detailed;                          !- Type of Data in Variable
 
-  EnergyManagementSystem:OutputVariable,
-    EMS Coil Speed Level Override On,  !- Name
-    SuppCoilSpeedLevelOverrideReport,      !- EMS Variable Name
-    Averaged,                          !- Type of Data in Variable
-    SystemTimeStep,                    !- Update Frequency
-    ,                                  !- EMS Program or Subroutine Name
-    On/Off;                            !- Units
-
-  EnergyManagementSystem:OutputVariable,
-    EMS Coil Speed Level Override Value,  !- Name
-    SuppCoilSpeedOverride,      !- EMS Variable Name
-    Averaged,                          !- Type of Data in Variable
-    SystemTimeStep,                    !- Update Frequency
-    ,                                  !- EMS Program or Subroutine Name
-    ;                            !- Units
-
-  EnergyManagementSystem:Actuator,
-    SuppCoilSpeedOverride,                           !- Name
-    TWOSPEED HEAT PUMP 1,                        !- Actuated Component Unique Name
-    Coil Speed Control,                          !- Actuated Component Type
-    Unitary System Supplemental Coil Stage Level;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:ProgramCallingManager,
-    Supp Coil Speed  Management,                      !- Name
-    InsideHVACSystemIterationLoop,               !- EnergyPlus Model Calling Point
-    SuppCoilSpeedControl;                            !- Program Name 1
-
-
-  EnergyManagementSystem:Program,
-    SuppCoilSpeedControl,                                                                            !- Name
-    IF (ZoneAirTemperature < HeatingSetpoint - 1.0),                                                   !- Program Line 1
-    SET SuppCoilSpeedOverride = 1.9,                                                                 !- Program Line 2
-    SET SuppCoilSpeedLevelOverrideReport = 1,    
-    ELSEIF (ZoneAirTemperature < HeatingSetpoint - 0.1),                                         !- Program Line 4
-    SET SuppCoilSpeedOverride = 1,                                                                   !- Program Line 5
-    SET SuppCoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 6
-    ELSE,                                                                                        !- Program Line 13
-    SET SuppCoilSpeedOverride = Null,                                                                !- Program Line 14
-    SET SuppCoilSpeedLevelOverrideReport = 0,                                                        !- Program Line 15
-    ENDIF;       
+  Output:Variable,
+    PythonPlugin Coil Speed Level Override Value,  !- Name
+    PythonPlugin:OutputVariable,      !- EMS Variable Name
+    detailed;                          !- Type of Data in Variable
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep;
 
   Output:Variable,*,Heating Coil Heating Rate,detailed;
 
-  Output:Variable,LIVING ZONE,Zone Air Temperature,TimeStep;
+  Output:Variable,LIVING ZONE,Zone Air Temperature,detailed;
 
-  Output:Variable,*,Zone Air System Sensible Heating Energy,TimeStep;
+  Output:Variable,*,Zone Air System Sensible Heating Energy,detailed;
 
-  Output:Variable,*,Zone Air System Sensible Cooling Energy,TimeStep;
-  Output:Variable,*,Unitary System DX Coil Cycling Ratio,TimeStep;
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,detailed;
+  Output:Variable,*,Unitary System DX Coil Cycling Ratio,detailed;
 
-  Output:Variable,*,Unitary System DX Coil Speed Ratio,TimeStep;
+  Output:Variable,*,Unitary System DX Coil Speed Ratio,detailed;
 
-  Output:Variable,*,Unitary System DX Coil Speed Level,TimeStep;
+  Output:Variable,*,Unitary System DX Coil Speed Level,detailed;
 
-  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,TimeStep;
+  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,detailed;
 
-  Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,TimeStep;
+  Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,detailed;
 
-  Output:Variable,SuppHeating Coil Air Inlet Node,System Node Temperature,TimeStep;
+  Output:Variable,SuppHeating Coil Air Inlet Node,System Node Temperature,detailed;
 
-  Output:Variable,Air Loop Outlet Node,System Node Temperature,TimeStep;
+  Output:Variable,Air Loop Outlet Node,System Node Temperature,detailed;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -2119,12 +2103,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
-
-  Output:EnergyManagementSystem,
-    Verbose,                 !- Actuator Availability Dictionary Reporting
-    Verbose,                 !- Internal Variable Availability Dictionary Reporting
-    Verbose;                 !- EMS Runtime Language Debug Output Level
-
-  Output:Variable,*,EMS Coil Speed Level Override On,detailed;
-  Output:Variable,*,EMS Coil Speed Level Override Value,detailed;
