@@ -3219,6 +3219,60 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_9118)
     }
 }
 
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_ASHRAE901_Hospital_STD2019_Denver)
+{
+
+    // Test for #9118. This is ASHRAE901_Hospital_STD2019_Denver.idf
+    //  y
+    //    ▲
+    //    │
+    //    │            6 ┌──────┐ 5
+    //    │    8         │      │
+    //    │    ┌─────────┘7     │
+    //    │    │                │
+    //    │    │   ┌────────────┘
+    //    │    │   │3             4
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    └────┴───┴────────────────────►
+    //         1   2                     x
+
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->MaxVerticesPerSurface = 8;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+    auto &surface = state->dataSurfaceGeometry->SurfaceTmp(1);
+
+    surface.Azimuth = 0.0;
+    surface.Tilt = 0.0;
+    surface.Sides = 8;
+    surface.GrossArea = 100.0;
+    surface.Name = "CORRIDOR_FLR_5_CEILING";
+    surface.Vertex.allocate(8);
+    std::vector<Vector> vertices = {
+        {9.1440, 0.0000, 21.3415},
+        {15.2400, 0.0000, 21.3415},
+        {15.2400, 42.6720, 21.3415},
+        {39.6240, 42.6720, 21.3415},
+        {39.6240, 53.3400, 21.3415},
+        {27.4320, 53.3400, 21.3415},
+        {27.4320, 48.7680, 21.3415},
+        {9.1440, 48.7680, 21.3415},
+    };
+    surface.Vertex = vertices;
+
+    CheckConvexity(*state, 1, surface.Sides);
+
+    EXPECT_EQ(8, surface.Sides);
+    EXPECT_FALSE(surface.IsConvex);
+}
+
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
 {
     state->dataSurface->TotWinShadingControl = 3;
