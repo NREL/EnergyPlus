@@ -799,7 +799,6 @@ namespace Furnaces {
         using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
         using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
         using VariableSpeedCoils::GetVSCoilCondenserInletNode;
-        using VariableSpeedCoils::GetVSCoilMinOATCompressor;
         using VariableSpeedCoils::SetVarSpeedCoilData;
         auto &GetWtoAHPCoilCapacity(WaterToAirHeatPump::GetCoilCapacity);
         auto &GetWtoAHPCoilInletNode(WaterToAirHeatPump::GetCoilInletNode);
@@ -1592,12 +1591,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).HeatingConvergenceTolerance = 0.001;
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the HeatOnly Furnace Loop
 
@@ -2964,12 +2958,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).CoolingConvergenceTolerance = 0.001;
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the HeatCool Furnace Loop
 
@@ -3969,12 +3958,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).MaxOATSuppHeat = Numbers(5);
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the Unitary System HeatPump Loop
 
@@ -4851,12 +4835,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).MaxOATSuppHeat = Numbers(9);
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the Unitary System WaterToAirHeatPump Loop
 
@@ -12614,8 +12593,6 @@ namespace Furnaces {
     void SetMinOATCompressor(EnergyPlusData &state,
                              int const FurnaceNum,                    // index to furnace
                              std::string const &cCurrentModuleObject, // type of furnace
-                             int const CoolingCoilIndex,              // index of cooling coil
-                             int const HeatingCoilIndex,              // index of heating coil
                              bool &ErrorsFound                        // GetInput logical that errors were found
     )
     {
@@ -12624,11 +12601,11 @@ namespace Furnaces {
 
         // Set minimum OAT for heat pump compressor operation in heating mode
         if (furnace.CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
         } else if (furnace.CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
         } else if (furnace.CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-            furnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+            furnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
         } else {
             furnace.MinOATCompressorCooling = -1000.0;
         }
@@ -12640,9 +12617,9 @@ namespace Furnaces {
         // Set minimum OAT for heat pump compressor operation in heating mode
         errFlag = false;
         if (furnace.HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-            furnace.MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
+            furnace.MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, furnace.HeatingCoilIndex, errFlag);
         } else if (furnace.HeatingCoilType_Num == CoilDX_HeatingEmpirical) {
-            furnace.MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
+            furnace.MinOATCompressorHeating = DXCoils::GetMinOATCompressor(state, furnace.HeatingCoilIndex, errFlag);
         } else {
             furnace.MinOATCompressorHeating = -1000.0;
         }
