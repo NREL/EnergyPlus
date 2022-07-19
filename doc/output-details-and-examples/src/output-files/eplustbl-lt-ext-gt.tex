@@ -1854,12 +1854,9 @@ CW CIRC PUMP & 0.002061 & 526.69 \tabularnewline
 
 \subsection{Outdoor Air Summary}\label{outdoor-air-summary}
 
-The Outdoor Air Summary provides information for each zone on the average and minimum ventilation provided.
+The Outdoor Air Summary provides information for each zone on the average and minimum ventilation provided. Directly following is an example of the report. The key used to obtain this report is OutdoorAirSummary.
 
-The reports described so far in this section are displayed when specified in the Output:Table:SummaryReports object. They are either on or off and are not customizable. The next few types of tabular reports are customizable. You can specify the report variables being used in each one.
-
-Directly following is an example of the report. The key used to obtain this report is OutdoorAirSummary.
-
+\bigskip
 Report: Outdoor Air Summary
 
 For: Entire Facility
@@ -1867,46 +1864,72 @@ For: Entire Facility
 Timestamp: 2007-10-17 08:54:27
 
 Average Outside Air During Occupied Hours
+\footnotesize
 
-\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\begin{longtable}[c]{>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}}
 \toprule 
-~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume [m3] & Mechanical Ventilation [ach] & Infiltration [ach] & AFN Infiltration [ach] & Simple Ventilation [ach] & AFN Ventilation [ach] \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume [m3] & Mechanical Ventilation [ach] & Infiltration [ach] & AFN Infiltration [ach] & Simple Ventilation [ach] & AFN Ventilation [ach] \tabularnewline
 \midrule
 \endhead
 
-SPACE1-1 & 9.50 & 11.00 & 239.25 & 0.365 & 0.050 & 0.000 \tabularnewline
-SPACE2-1 & 4.32 & 5.00 & 103.31 & 0.630 & 0.051 & 0.000 \tabularnewline
-SPACE3-1 & 9.50 & 11.00 & 239.25 & 0.338 & 0.050 & 0.000 \tabularnewline
-SPACE4-1 & 4.32 & 5.00 & 103.31 & 0.708 & 0.051 & 0.000 \tabularnewline
-SPACE5-1 & 17.27 & 20.00 & 447.68 & 0.214 & 0.052 & 0.000 \tabularnewline
+SPACE1-1 & 9.50 & 11.00 & 239.25 & 0.365 & 0.050 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE2-1 & 4.32 & 5.00 & 103.31 & 0.630 & 0.051 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE3-1 & 9.50 & 11.00 & 239.25 & 0.338 & 0.050 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE4-1 & 4.32 & 5.00 & 103.31 & 0.708 & 0.051 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE5-1 & 17.27 & 20.00 & 447.68 & 0.214 & 0.052 & 0.000 & 0.000 & 0.000 \tabularnewline
 \bottomrule
 \end{longtable}
+\textit{Values shown for a single zone without multipliers}
 
+\normalsize
+\bigskip
 Minimum Outside Air During Occupied Hours
 
-\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\footnotesize
+\begin{longtable}[c]{>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}>{\raggedright}p{0.64in}}
 \toprule 
-~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume [m3] & Mechanical Ventilation [ach] & Infiltration [ach] & AFN Infiltration [ach] & Simple Ventilation [ach] & AFN Ventilation [ach] \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
-~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation (ach) & Infiltration (ach) & Simple Ventilation (ach) \tabularnewline
+~ & Average Number of Occupants & Nominal Number of Occupants & Zone Volume (m3) & Mechanical Ventilation [ach] & Infiltration [ach] & AFN Infiltration [ach] & Simple Ventilation [ach] & AFN Ventilation [ach] \tabularnewline
 \midrule
 \endhead
 
-SPACE1-1 & 9.50 & 11.00 & 239.25 & 0.000 & 0.000 & 0.000 \tabularnewline
-SPACE2-1 & 4.32 & 5.00 & 103.31 & 0.000 & 0.000 & 0.000 \tabularnewline
-SPACE3-1 & 9.50 & 11.00 & 239.25 & 0.000 & 0.000 & 0.000 \tabularnewline
-SPACE4-1 & 4.32 & 5.00 & 103.31 & 0.000 & 0.000 & 0.000 \tabularnewline
-SPACE5-1 & 17.27 & 20.00 & 447.68 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE1-1 & 9.50 & 11.00 & 239.25 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE2-1 & 4.32 & 5.00 & 103.31 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE3-1 & 9.50 & 11.00 & 239.25 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE4-1 & 4.32 & 5.00 & 103.31 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \tabularnewline
+SPACE5-1 & 17.27 & 20.00 & 447.68 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \tabularnewline
 \bottomrule
 \end{longtable}
+\textit{Values shown for a single zone without multipliers}
+\normalsize
+
+\begin{description}
+  \item[Average Number of Occupants] The average number of occupants in the zone during occupied hours.
+
+  \item[Nominal Number of Occupants] The number of occupants when the people schedule is 1.0.
+  
+  \item[Zone Volume] The volume of the zone in \si{\volume}.
+
+  \item[Mechanical Ventilation] The total outdoor air delivered to this zone by mechanical ventilation (HVAC systems) in ach (Output:Variable Zone Mechanical Ventilation Air Changes per Hour).
+
+  \item[Infiltration] The total outdoor air delivered to this zone by infiltration (ZoneInfiltration:*) in ach (Output:Variable Zone Infiltration Air Change Rate).
+
+  \item[AFN Infiltration] The total outdoor air delivered to this zone by AirflowNetwork infiltration through cracks in ach (Output:Variable AFN Zone Infiltration Air Change Rate).
+
+  \item[Simple Ventilation] The total outdoor air delivered to this zone by natural ventilation (ZoneVentilation:*) in ach (Output:Variable Zone Ventilation Air Change Rate).
+
+  \item[AFN Ventilation] The total outdoor air delivered to this zone by AirflowNetwork natural ventilation through openings in ach (Output:Variable AFN Zone Ventilation Air Change Rate).
+
+\end{description}
 
 \subsection{Outdoor Air Details}\label{outdoor-air-details}
 
@@ -3202,6 +3225,8 @@ Number of People & 11.0 \tabularnewline
 \bottomrule
 \end{longtable}}
 
+
+The reports described so far in this section are displayed when specified in the Output:Table:SummaryReports object. They are either on or off and are not customizable. The next few types of tabular reports are customizable. You can specify the report variables being used in each one.
 
 \subsection{Output:Table:TimeBins}\label{outputtabletimebins}
 
