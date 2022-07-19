@@ -2256,7 +2256,7 @@ namespace AirflowNetwork {
                        "single object."));
             ShowContinueError(m_state, format("..Duct sizing is not performed"));
             simulation_control.autosize_ducts = false;
-        } else if (NumDuctSizing == 1) {
+        } else if (simulation_control.autosize_ducts && NumDuctSizing == 0) {
             ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
             ShowContinueError(
                 m_state,
@@ -2295,7 +2295,7 @@ namespace AirflowNetwork {
                                          Alphas(1)));
                 ErrorsFound = true;
             }
-            if (simulation_control.type == ControlType::MultizoneWithDistribution) {
+            if (simulation_control.type != ControlType::MultizoneWithDistribution) {
                 ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
                 ShowContinueError(m_state,
                                   format("Although {} = \"{}\" is entered, but {} is not MultizoneWithoutDistribution.",
