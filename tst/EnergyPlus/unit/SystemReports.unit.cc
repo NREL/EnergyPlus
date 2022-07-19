@@ -53,7 +53,10 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -185,7 +188,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     ReportSystemEnergyUse(*state);
     EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).TotPropane, 200);
 }
-TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
+TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
 {
     state->dataHVACGlobal->NumPrimaryAirSys = 0;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
@@ -335,5 +338,133 @@ TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
 
     EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).TargetVentilationFlowVoz, expectedVoz, 0.001);
     EXPECT_NEAR(state->dataSysRpts->ZoneVentRepVars(1).OAMassFlow, 98765432.1, 0.001);
+}
+TEST_F(EnergyPlusFixture, ReportVentilationLoads_AirLoop)
+{
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataAirLoop->AirLoopControlInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZonePreDefRep.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    SystemReports::AllocateAndSetUpVentReports(*state);
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
+    state->dataLoopNodes->Node.allocate(20);
+    state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
+
+    auto &thisZoneEquipConfig = state->dataZoneEquip->ZoneEquipConfig(1);
+    auto &thisZoneEquipList = state->dataZoneEquip->ZoneEquipList(1);
+    auto &zone1 = state->dataHeatBal->Zone(1);
+    auto &zone1IntGain = state->dataHeatBal->ZoneIntGain(1);
+
+    // Set up OA requirements for one zone
+    state->dataSize->NumOARequirements = 1;
+    state->dataSize->OARequirements.allocate(state->dataSize->NumOARequirements);
+    auto &thisOARequirements = state->dataSize->OARequirements(1);
+    thisOARequirements.OAFlowMethod = DataSizing::OAFlowSum;
+    Real64 expectedVoz = 0.0;
+    thisOARequirements.OAFlowPerZone = 20;
+    expectedVoz += thisOARequirements.OAFlowPerZone;
+    thisOARequirements.OAFlowPerArea = 0.5;
+    zone1.FloorArea = 1000.0;
+    expectedVoz += thisOARequirements.OAFlowPerArea * zone1.FloorArea;
+    thisOARequirements.OAFlowPerPerson = 0.1;
+    zone1IntGain.NOFOCC = 100.0;
+    expectedVoz += thisOARequirements.OAFlowPerPerson * zone1IntGain.NOFOCC;
+    zone1.Multiplier = 2.0;
+    zone1.ListMultiplier = 10.0;
+    expectedVoz *= zone1.Multiplier;
+    expectedVoz *= zone1.ListMultiplier;
+
+    // Set up controlled zone equipment with just enough info for the ventilation report test
+    thisZoneEquipConfig.IsControlled = true;
+    thisZoneEquipConfig.ActualZoneNum = 1;
+    thisZoneEquipConfig.ZoneDesignSpecOAIndex = 1;
+    zone1.Volume = 10.0;
+    thisZoneEquipConfig.EquipListIndex = 1;
+
+    int NumEquip = 1;
+    thisZoneEquipList.NumOfEquipTypes = NumEquip;
+    thisZoneEquipList.EquipTypeEnum.allocate(NumEquip);
+    thisZoneEquipList.EquipIndex.allocate(NumEquip);
+    thisZoneEquipConfig.InletNodeAirLoopNum.allocate(NumEquip);
+    thisZoneEquipConfig.AirDistUnitCool.allocate(NumEquip);
+    thisZoneEquipConfig.AirDistUnitHeat.allocate(NumEquip);
+    thisZoneEquipConfig.NumInletNodes = NumEquip;
+    thisZoneEquipConfig.InletNodeAirLoopNum.allocate(NumEquip);
+    thisZoneEquipConfig.InletNodeADUNum.allocate(NumEquip);
+    state->dataDefineEquipment->AirDistUnit.allocate(NumEquip);
+
+    // 1: AirDistribution Unit
+    int equipNum = 1;
+    int nodeNum = 0;
+    int sysNum = 1;
+    thisZoneEquipList.EquipTypeEnum(equipNum) = DataZoneEquipment::ZoneEquip::AirDistUnit;
+    thisZoneEquipList.EquipIndex(equipNum) = 1;
+    thisZoneEquipConfig.InletNodeAirLoopNum(equipNum) = sysNum;
+    thisZoneEquipConfig.AirDistUnitCool(equipNum).InNode = ++nodeNum;
+    thisZoneEquipConfig.AirDistUnitHeat(equipNum).InNode = ++nodeNum;
+    thisZoneEquipConfig.InletNodeADUNum(equipNum) = 1;
+    state->dataLoopNodes->Node(thisZoneEquipConfig.AirDistUnitCool(equipNum).InNode).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(thisZoneEquipConfig.AirDistUnitHeat(equipNum).InNode).MassFlowRate = 0.2;
+
+    // Setup Airloop
+    state->dataHVACGlobal->TimeStepSys = 1.0 / DataGlobalConstants::SecInHour;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    auto &thisPrimaryAirLoop = state->dataAirSystemsData->PrimaryAirSystems(1);
+    state->dataAirLoop->AirLoopFlow(sysNum).OAFlow = 1.0;
+    int mixedAirNode = ++nodeNum;
+    thisPrimaryAirLoop.OASysExists = true;
+    thisPrimaryAirLoop.OASysOutletNodeNum = mixedAirNode;
+    state->dataLoopNodes->Node(mixedAirNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(mixedAirNode).Temp = 20.0;
+    state->dataLoopNodes->Node(mixedAirNode).HumRat = 0.002;
+
+    int returnAirNode = ++nodeNum;
+    thisPrimaryAirLoop.OASysInletNodeNum = returnAirNode;
+    state->dataLoopNodes->Node(returnAirNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(returnAirNode).Temp = 25.0;
+    state->dataLoopNodes->Node(returnAirNode).HumRat = 0.008;
+
+    int oaInletNode = ++nodeNum;
+    thisPrimaryAirLoop.OAMixOAInNodeNum = ++oaInletNode;
+    state->dataLoopNodes->Node(oaInletNode).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(mixedAirNode).Temp = 20.0;
+    state->dataLoopNodes->Node(oaInletNode).HumRat = 0.002;
+
+    // Call reporting function
+    state->dataSysRpts->VentReportStructureCreated = true;
+    state->dataSysRpts->VentLoadsReportEnabled = true;
+    SystemReports::ReportVentilationLoads(*state);
+
+    auto &thisZoneVentRepVars = state->dataSysRpts->ZoneVentRepVars(1);
+    EXPECT_NEAR(thisZoneVentRepVars.TargetVentilationFlowVoz, expectedVoz, 0.001);
+    EXPECT_NEAR(thisZoneVentRepVars.OAMassFlow, 0.3, 0.001);
+    EXPECT_NEAR(thisZoneVentRepVars.OAVolFlowStdRho, 0.3 / state->dataEnvrn->StdRhoAir, 0.001);
+    EXPECT_NEAR(thisZoneVentRepVars.OAVolStdRho, 0.3 / state->dataEnvrn->StdRhoAir, 0.001);
+    EXPECT_NEAR(thisZoneVentRepVars.TimeBelowVozDyn, state->dataHVACGlobal->TimeStepSys, 0.001);
+    EXPECT_NEAR(state->dataSysRpts->AnyZoneTimeBelowVozDyn, state->dataHVACGlobal->TimeStepSys, 0.001);
+    EXPECT_NEAR(thisZoneVentRepVars.TimeAboveVozDyn, 0.0, 0.001);
+    EXPECT_NEAR(state->dataSysRpts->AnyZoneTimeAboveVozDyn, 0.0, 0.001);
+    EXPECT_NEAR(thisZoneVentRepVars.TimeAtVozDyn, 0.0, 0.001);
+    EXPECT_NEAR(state->dataSysRpts->AllZonesTimeAtVozDyn, 0.0, 0.001);
+
+    auto &thisSysVentRepVars = state->dataSysRpts->SysVentRepVars(sysNum);
+    auto &thisSysPreDefRep = state->dataSysRpts->SysPreDefRep(sysNum);
+    EXPECT_NEAR(thisSysVentRepVars.MechVentFlow, 1.0 / state->dataEnvrn->StdRhoAir, 0.001);
+    EXPECT_NEAR(thisSysPreDefRep.MechVentTotal, 1.0 / state->dataEnvrn->StdRhoAir, 0.001);
+    EXPECT_NEAR(thisSysVentRepVars.TargetVentilationFlowVoz, expectedVoz, 0.001);
+    EXPECT_NEAR(thisSysVentRepVars.TimeBelowVozDyn, state->dataHVACGlobal->TimeStepSys, 0.001);
+    EXPECT_NEAR(thisSysVentRepVars.TimeAboveVozDyn, 0.0, 0.001);
+    EXPECT_NEAR(thisSysVentRepVars.TimeAtVozDyn, 0.0, 0.001);
+    EXPECT_NEAR(thisSysPreDefRep.TargetVentTotalVoz, expectedVoz, 0.001);
+    EXPECT_NEAR(thisSysPreDefRep.TimeBelowVozDynTotal, state->dataHVACGlobal->TimeStepSys, 0.001);
+    EXPECT_NEAR(thisSysPreDefRep.TimeAboveVozDynTotal, 0.0, 0.001);
+    EXPECT_NEAR(thisSysPreDefRep.TimeAtVozDynTotal, 0.0, 0.001);
 }
 } // namespace EnergyPlus
