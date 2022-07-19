@@ -2383,7 +2383,7 @@ This field specifies the method used to calculate the IT inlet temperature and z
 
 If \textbf{FlowFromSystem} is chosen, the zone is assumed to be well-mixed.
 
-If \textbf{FlowControlWithApproachTemperatures} is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution.The inputs of \textit{Air Inlet Connection Type}, \textit{Design Recirculation Fraction} and \textit{Recirculation Function of Loading and Supply Temperature Curve Name} are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The \textbf{FlowControlWithApproachTemperatures} only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when \textbf{FlowControlWithApproachTemperatures} is chosen.
+If \textbf{FlowControlWithApproachTemperatures} is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution. The inputs of \textit{Air Inlet Connection Type}, \textit{Design Recirculation Fraction} and \textit{Recirculation Function of Loading and Supply Temperature Curve Name} are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The \textbf{FlowControlWithApproachTemperatures} only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when \textbf{FlowControlWithApproachTemperatures} is chosen.
 
 The default method is FlowFromSystem.
 
@@ -2391,13 +2391,11 @@ The default method is FlowFromSystem.
 
 This field is a key/choice field that tells which of the next two fields are filled and is descriptive of the method for calculating the nominal electric power input to the ITE. The key/choices are:
 
-Watts/Unit
-
-With this choice, the design power input will be the product of Design Level per Unit and Number of Units. (Both of these fields should be filled.) This is the default.
-
-Watts/Area
-
-With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+\begin{description}
+	\item[Watts/Unit:] With this choice, the design power input will be the product of Design Level per Unit and Number of Units. (Both of these fields should be filled.) This is the default.
+	
+	\item[Watts/Area:] With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+\end{description}
 
 \paragraph{Field: Watts per Unit}\label{field-watts-per-unit}
 
@@ -2421,7 +2419,7 @@ This field is the name of the schedule that specifies the CPU loading for this e
 
 \paragraph{Field: CPU Power Input Function of Loading and Air Temperature Curve Name}\label{field-cpu-power-input-function-of-loading-and-air-temperature-curve-name}
 
-The name of a two-variable curve or table lookup object which modifies the CPU power input as a function of CPU loading (x) and air inlet node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
+The name of a two-variable curve or table lookup object which modifies the CPU power input as a function of CPU loading ($x$) and air inlet node temperature ($y$). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
 
 \paragraph{Field: Design Fan Power Input Fraction}\label{field-design-fan-power-input-fraction}
 
@@ -2443,7 +2441,7 @@ The name of a single-variable curve or table lookup object which modifies the fa
 
 \paragraph{Field: Design Entering Air Temperature}\label{field-design-entering-air-temperature}
 
-Specifies the entering air temperature in deg. C at design conditions. The default is 15C.
+Specifies the entering air temperature in $^\circ$C at design conditions. The default is 15$^\circ$C.
 
 \paragraph{Field: Environmental Class}\label{field-environmental-class}
 
@@ -2477,11 +2475,14 @@ The related reporting variables (such as ``ITE Air Inlet Operating Range Exceede
 
 Specifies the type of connection between the zone and the ITE air inlet node. The choices are:
 
-AdjustedSupply = This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
+\begin{description}
+	\item[AdjustedSupply:] This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
+	
+	\item[ZoneAirNode:] This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
+	
+	\item[RoomAirModel:] This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).  Currently in EnergyPlus, this option has not been fully implemented.  If the user chooses this option, the program will issue a warning message and this field will be adjusted to ZoneAirNode.
+\end{description}
 
-ZoneAirNode = This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
-
-RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).  Currently in EnergyPlus, this option has not been fully implemented.  If the user chooses this option, the program will issue a warning message and this field will be adjusted to ZoneAirNode.
 
 This field is only used when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
@@ -2523,7 +2524,7 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 \paragraph{Field: Fan End-Use Subcategory}\label{field-fan-end-use-subcategory}
 
-This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the fan power consumption. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-Fans
+This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the fan power consumption. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-Fans.
 
 \paragraph{Field: Electric Power Supply End-Use Subcategory}\label{field-electric-power-supply-end-use-subcategory}
 
@@ -2531,19 +2532,19 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 \paragraph{Field: Supply Temperature Difference}\label{field-supply-temperature-difference}
 
-The difference of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the IT inlet temperature from the AHU supply air temperature ($\Delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Supply Temperature Difference Schedule}\label{field-supply-temperature-difference-schedule}
 
-The difference schedule of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the IT inlet temperature from the AHU supply air temperature ($\Delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference}\label{field-return-temperature-difference}
 
-The difference of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the actual AHU return air temperature to the IT equipment outlet temperature ($\Delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference Schedule}\label{field-return-temperature-difference-schedule}
 
-The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature ($\Delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 An IDF example:
 
@@ -2942,7 +2943,7 @@ Hours when the dry-bulb temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range {[}deltaC{]}}\label{ite-air-inlet-dry-bulb-temperature-difference-below-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dry-bulb temperature and the minimum allowable dry-bulb temperature specified by the ITE Environmental Class. Only negative values are reported. When the dry-bulb temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}C$) between the air inlet dry-bulb temperature and the minimum allowable dry-bulb temperature specified by the ITE Environmental Class. Only negative values are reported. When the dry-bulb temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-above-operating-range-time-hr}
 
@@ -2952,7 +2953,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Above Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-above-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}C$) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-below-operating-range-time-hr}
 
@@ -2962,7 +2963,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Below Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-below-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}C$) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-above-operating-range-time-hr}
 
@@ -2972,7 +2973,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Above Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-above-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}C$) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-below-operating-range-time-hr}
 
@@ -2982,7 +2983,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Below Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-below-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The relative humidity (RH) difference (in $\Delta\%$) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Adjusted Return Air Temperature [C]}
 
