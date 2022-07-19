@@ -374,6 +374,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
 
+        // First pass, avoid using a regex if not needed
         for (int Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
             auto &reqRepVar = op->ReqRepVars(Loop);
             if (reqRepVar.Key.empty()) {
@@ -382,7 +383,40 @@ namespace OutputProcessor {
             if (!UtilityRoutines::SameString(reqRepVar.VarName, VariableName)) {
                 continue;
             }
-            if (!(UtilityRoutines::SameString(reqRepVar.Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + reqRepVar.Key))) {
+            if (!UtilityRoutines::SameString(reqRepVar.Key, KeyedValue)) {
+                continue;
+            }
+
+            //   A match.  Make sure doesn't duplicate
+            reqRepVar.Used = true;
+            bool Dup = std::find_if(std::cbegin(op->ReportList), std::cend(op->ReportList), [&reqRepVar, &op](int idx) {
+                           return (op->ReqRepVars(idx).frequency == reqRepVar.frequency) && (op->ReqRepVars(idx).SchedPtr == reqRepVar.SchedPtr);
+                       }) == std::cend(op->ReportList);
+            if (!Dup) {
+                ++op->NumExtraVars;
+                if (op->NumExtraVars == op->NumReportList) {
+                    op->ReportList.redimension(op->NumReportList += 100, 0);
+                }
+                op->ReportList(op->NumExtraVars) = Loop;
+            }
+        }
+
+        // Second pass: for the remaining, try a Regex
+        for (int Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
+            auto &reqRepVar = op->ReqRepVars(Loop);
+
+            // Skip the ones already found
+            if (reqRepVar.Used) {
+                continue;
+            }
+
+            if (reqRepVar.Key.empty()) {
+                continue;
+            }
+            if (!UtilityRoutines::SameString(reqRepVar.VarName, VariableName)) {
+                continue;
+            }
+            if (!RE2::FullMatch(KeyedValue, "(?i)" + reqRepVar.Key)) {
                 continue;
             }
 
