@@ -3037,7 +3037,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
         }
         if (SizingDesRunThisAirSys) {
-            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) { // 62.1 simplified procedure
                 if (this->MaxAirVolFlowRate > 0.0) {
                     MinAirFlowFracDes = 1.5 *
                                         max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
@@ -3073,7 +3073,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                          "Design Size Constant Minimum Air Flow Fraction",
                                          MinAirFlowFracDes * this->ZoneTurndownMinAirFrac);
             if (SizingDesRunThisAirSys) {
-                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) {
                     state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
                 }
             }
@@ -3137,7 +3137,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
         }
         if (SizingDesRunThisAirSys) {
-            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) { // 62.1 simplified procedure
                 if (this->MaxAirVolFlowRate > 0.0) {
                     FixedMinAirDes = 1.5 * max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
                                                state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone);
@@ -3166,7 +3166,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(
                 state, this->sysType, this->SysName, "Design Size Fixed Minimum Air Flow Rate [m3/s]", FixedMinAirDes * this->ZoneTurndownMinAirFrac);
             if (SizingDesRunThisAirSys) {
-                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) {
                     state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
                 }
             }

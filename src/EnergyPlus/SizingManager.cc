@@ -1324,7 +1324,8 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         if (FinalSysSizing(AirLoopNum).OAAutoSized &&
-            (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP || state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) &&
+            (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::VRP ||
+             state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) &&
             state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
 
             // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
@@ -1428,7 +1429,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                     auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
                     Real64 Er = thisTermUnitFinalZoneSizing.ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
 
-                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) { // 62.1 simplified procedure
                         if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                             state.dataSize->EvzByZoneHeat(termUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                         } else {
@@ -1495,7 +1496,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                 FinalSysSizing(AirLoopNum).DesOutAirVolFlow = max(state.dataSize->VotClgBySys(AirLoopNum), state.dataSize->VotHtgBySys(AirLoopNum));
             }
         } // system OA is autosized and VRP
-        else if ((FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
+        else if ((FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::VRP &&
                   state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones == 1)) { // single zone VRP
             int termUnitSizingIndex = 0;
             termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(1);
@@ -1603,12 +1604,12 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  state.dataSize->EvzMinBySysCool(AirLoopNum),
                                                  4); // Ev
         // Ev Calculation Methodology
-        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) {
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::VRP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrClEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
                                                      "Standard 62.1 Ventilation Rate Procedure");
-        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrClEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -1685,12 +1686,12 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  state.dataSize->EvzMinBySysHeat(AirLoopNum),
                                                  4); // Ev
         // Ev Calculation Methodology
-        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) {
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::VRP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrHtEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
                                                      "Standard 62.1 Ventilation Rate Procedure");
-        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrHtEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -2130,7 +2131,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
     bool anyVRPinModel(false);
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) {
+        if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM::VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM::SP) {
             anyVRPinModel = true;
             break;
         }
@@ -3974,9 +3975,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
         {
             auto const systemOAMethod(state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum));
             if (systemOAMethod == "ZONESUM") {
-                SysSizInput(SysSizIndex).SystemOAMethod = SOAM_ZoneSum;
+                SysSizInput(SysSizIndex).SystemOAMethod = SOAM::ZoneSum;
             } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
-                SysSizInput(SysSizIndex).SystemOAMethod = SOAM_VRP;
+                SysSizInput(SysSizIndex).SystemOAMethod = SOAM::VRP;
                 if (SysSizInput(SysSizIndex).LoadSizeType == Ventilation) {
                     ShowWarningError(
                         state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid combination of inputs.");
@@ -3986,7 +3987,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                                           state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum) + " = " +
                                           state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum) + ".");
                     ShowContinueError(state, "Resetting System Outdoor Air Method to ZoneSum.");
-                    SysSizInput(SysSizIndex).SystemOAMethod = SOAM_ZoneSum;
+                    SysSizInput(SysSizIndex).SystemOAMethod = SOAM::ZoneSum;
                 } else {
                     if (SysSizInput(SysSizIndex).DesOutAirVolFlow > 0) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
@@ -3996,7 +3997,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                     }
                 }
             } else if (systemOAMethod == "STANDARD62.1SIMPLIFIEDPROCEDURE") {
-                SysSizInput(SysSizIndex).SystemOAMethod = SOAM_SP;
+                SysSizInput(SysSizIndex).SystemOAMethod = SOAM::SP;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
                 ShowContinueError(state,

@@ -150,6 +150,17 @@ Array1D_string const CurrentModuleObjects(8,
                                            "Controller:MechanicalVentilation",
                                            "OutdoorAir:Mixer"});
 
+constexpr std::array<std::string_view, static_cast<int>(DataSizing::SOAM::Num)> SOAMNamesUC{"ZONESUM",
+                                                                                            "STANDARD62.1VENTILATIONRATEPROCEDURE",
+                                                                                            "INDOORAIRQUALITYPROCEDURE",
+                                                                                            "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE",
+                                                                                            "INDOORAIRQUALITYPROCEDUREGENERICCONTAMINANT",
+                                                                                            "INDOORAIRQUALITYPROCEDURECOMBINED",
+                                                                                            "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY",
+                                                                                            "PROPORTIONALCONTROLBASEDONDESIGNOARATE",
+                                                                                            "STANDARD62.1SIMPLIFIEDPROCEDURE",
+                                                                                            "STANDARD62.1VENTILATIONRATEPROCEDUREWITHLIMIT"};
+
 Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr)
 {
     Real64 FlowRate(0);
@@ -1401,92 +1412,42 @@ void GetOAControllerInputs(EnergyPlusData &state)
             }
 
             // System outdoor air method
-            {
-                auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(4)));
-                if (SELECT_CASE_var == "ZONESUM") { // Simplify sum the zone OA flow rates
-                    thisVentilationMechanical.SystemOAMethod = SOAM_ZoneSum;
-                } else if ((SELECT_CASE_var ==
-                            "STANDARD62.1VENTILATIONRATEPROCEDURE")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
-                    thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
-                } else if ((SELECT_CASE_var ==
-                            "STANDARD62.1VENTILATIONRATEPROCEDUREWITHLIMIT")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
-                                                                                // capped at the design outdoor air flow rate
-                    thisVentilationMechanical.SystemOAMethod = SOAM_VRPL;
-                } else if ((SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
-                    thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
-                    if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                            "\" requires CO2 simulation.");
-                        ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var ==
-                           "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE") { // Proportional Control based on ASHRAE Standard 62.1-2004
-                    thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlSchOcc;
-                    if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                            "\" requires CO2 simulation.");
-                        ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var ==
-                           "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY") { // Proportional Control based on ASHRAE Standard 62.1-2004
-                    thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOcc;
-                    if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                            "\" requires CO2 simulation.");
-                        ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOARATE") { // Proportional Control based on design OA rate
-                    thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOARate;
-                    if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                            "\" requires CO2 simulation.");
-                        ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var ==
-                           "INDOORAIRQUALITYPROCEDUREGENERICCONTAMINANT") { // Indoor Air Quality Procedure based on generic contaminant setpoint
-                    thisVentilationMechanical.SystemOAMethod = SOAM_IAQPGC;
-                    if (!state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                            "\" requires generic contaminant simulation.");
-                        ShowContinueError(state,
-                                          "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURECOMBINED") { // Indoor Air Quality Procedure based on both generic
-                                                                                     // contaminant and CO2 setpoint
-                    thisVentilationMechanical.SystemOAMethod = SOAM_IAQPCOM;
-                    if (!state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                            "\" requires generic contaminant simulation.");
-                        ShowContinueError(state,
-                                          "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance");
-                        ErrorsFound = true;
-                    }
-                    if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        ShowSevereError(state,
-                                        CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
-                                            "\" requires CO2 simulation.");
-                        ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                        ErrorsFound = true;
-                    }
-                } else { // If specified incorrectly, show errors
-                    thisVentilationMechanical.SystemOAMethod = SOAM_ZoneSum;
-                    ShowWarningError(state,
-                                     CurrentModuleObject + "=\"" + AlphArray(1) + "\" incorrect specification for " + cAlphaFields(4) +
-                                         ", the ZoneSum method will be used.");
-                    // ErrorsFound=.TRUE.
+            thisVentilationMechanical.SystemOAMethod =
+                static_cast<DataSizing::SOAM>(getEnumerationValue(SOAMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+
+            if (thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::IAQP ||
+                thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc ||
+                thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc ||
+                thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate ||
+                thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::IAQPCOM) {
+                if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
+                                        "\" requires CO2 simulation.");
+                    ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
+                    ErrorsFound = true;
                 }
             }
+
+            if (thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::IAQPGC ||
+                thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::IAQPCOM) {
+                if (!state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    ShowSevereError(state,
+                                    CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
+                                        "\" requires generic contaminant simulation.");
+                    ShowContinueError(state, "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance");
+                    ErrorsFound = true;
+                }
+            }
+
+            if (thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::Invalid) { // If specified incorrectly, show errors
+                thisVentilationMechanical.SystemOAMethod = DataSizing::SOAM::ZoneSum;
+                ShowWarningError(state,
+                                 CurrentModuleObject + "=\"" + AlphArray(1) + "\" incorrect specification for " + cAlphaFields(4) +
+                                     ", the ZoneSum method will be used.");
+                // ErrorsFound=.TRUE.
+                }
+            
 
             // Zone maximum outdoor air fraction
             thisVentilationMechanical.ZoneMaxOAFraction = NumArray(1);
@@ -1717,7 +1678,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                     thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = curOARequirements.OAFlowMethod;
                     thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = curOARequirements.OAFlowFracSchPtr;
                     thisVentilationMechanical.OAPropCtlMinRateSchPtr(ventMechZoneNum) = curOARequirements.OAPropCtlMinRateSchPtr;
-                    if (thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+                    if (thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate) {
                         if (thisVentilationMechanical.ZoneOAPeopleRate(ventMechZoneNum) == 0.0 &&
                             thisVentilationMechanical.ZoneOAAreaRate(ventMechZoneNum) == 0.0) {
                             ShowSevereError(state,
@@ -1772,7 +1733,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
         for (VentMechNum = 1; VentMechNum <= state.dataMixedAir->NumVentMechControllers; ++VentMechNum) {
             auto &thisVentilationMechanical(state.dataMixedAir->VentilationMechanical(VentMechNum));
             for (jZone = 1; jZone <= thisVentilationMechanical.NumofVentMechZones; ++jZone) {
-                if (thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlSchOcc) {
+                if (thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc) {
                     if (thisVentilationMechanical.ZoneOAACHRate(jZone) > 0.0 || thisVentilationMechanical.ZoneOAFlowRate(jZone) > 0.0) {
                         ShowWarningError(state,
                                          CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", inappropriate outdoor air method");
@@ -1785,7 +1746,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                           "Flow/Zone outdoor air methods are not valid. Simulation continues.... ");
                     }
                 }
-                if (thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOcc) {
+                if (thisVentilationMechanical.SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc) {
                     if (thisVentilationMechanical.ZoneOAACHRate(jZone) > 0.0 || thisVentilationMechanical.ZoneOAFlowRate(jZone) > 0.0) {
                         ShowWarningError(state,
                                          CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", inappropriate outdoor air method");
@@ -1929,23 +1890,23 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 print(state.files.eio, "No,");
             }
 
-            if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
+            if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::ZoneSum) {
                 print(state.files.eio, "ZoneSum,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::VRP) {
                 print(state.files.eio, "Standard62.1VentilationRateProcedure,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRPL) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::VRPL) {
                 print(state.files.eio, "Standard62.1VentilationRateProcedureWithLimit,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::IAQP) {
                 print(state.files.eio, "IndoorAirQualityProcedure,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc) {
                 print(state.files.eio, "ProportionalControlBasedOnOccupancySchedule,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc) {
                 print(state.files.eio, "ProportionalControlBasedOnDesignOccupancy,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate) {
                 print(state.files.eio, "ProportionalControlBasedOnDesignOARate,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::IAQPGC) {
                 print(state.files.eio, "IndoorAirQualityGenericContaminant,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SOAM::IAQPCOM) {
                 print(state.files.eio, "IndoorAirQualityProcedureCombined,");
             } else {
                 print(state.files.eio, "Invalid/Unknown,");
@@ -3993,7 +3954,7 @@ void VentilationMechanicalProps::CalcMechVentController(
 
     // Apply mechanical ventilation only when it is available/allowed
     if (GetCurrentScheduleValue(state, this->SchPtr) > 0) {
-        if (this->SystemOAMethod == SOAM_IAQP) {
+        if (this->SystemOAMethod == DataSizing::SOAM::IAQP) {
             // IAQP for CO2 control
             SysOAMassFlow = 0.0;
             for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
@@ -4002,7 +3963,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                  GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
             }
             MechVentOAMassFlow = SysOAMassFlow;
-        } else if (this->SystemOAMethod == SOAM_IAQPGC) {
+        } else if (this->SystemOAMethod == DataSizing::SOAM::IAQPGC) {
             // IAQP for generic contaminant control
             SysOAMassFlow = 0.0;
             for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
@@ -4011,7 +3972,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                  GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
             }
             MechVentOAMassFlow = SysOAMassFlow;
-        } else if (this->SystemOAMethod == SOAM_IAQPCOM) {
+        } else if (this->SystemOAMethod == DataSizing::SOAM::IAQPCOM) {
             // IAQP for both CO2 and generic contaminant control
             SysOAMassFlow = 0.0;
             for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
@@ -4042,7 +4003,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                 // Calc the zone OA flow rate based on the people component
                 // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
                 //  Checking DCV flag before calculating zone OA per person
-                if (this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc) {
+                if (this->DCVFlag && this->SystemOAMethod != DataSizing::SOAM::ProportionalControlDesOcc) {
                     ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier *
                                    this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
                 } else {
@@ -4081,7 +4042,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     ZoneOABZ = ZoneOAPeople;
                 }
 
-                if (this->SystemOAMethod == SOAM_ZoneSum) {
+                if (this->SystemOAMethod == DataSizing::SOAM::ZoneSum) {
                     // Sum the zone OA flow rates and done
                     SysOA += ZoneOABZ;
                 } else {
@@ -4091,9 +4052,9 @@ void VentilationMechanicalProps::CalcMechVentController(
             }
 
             // get system supply air flow rate
-            if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_ProportionalControlSchOcc ||
-                this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ||
-                this->SystemOAMethod == SOAM_VRPL) {
+            if (this->SystemOAMethod == DataSizing::SOAM::VRP || this->SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc ||
+                this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc ||
+                this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate || this->SystemOAMethod == DataSizing::SOAM::VRPL) {
 
                 // System supply air flow rate is always greater than or equal the system outdoor air flow rate
                 if ((SysSA > 0.0) && (SysSA < (SysOAuc * state.dataEnvrn->StdRhoAir))) SysSA = SysOAuc * state.dataEnvrn->StdRhoAir;
@@ -4122,14 +4083,14 @@ void VentilationMechanicalProps::CalcMechVentController(
                     // Calc the zone OA flow rate based on the people component
                     // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
                     //  Checking DCV flag before calculating zone OA per person
-                    if (this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc) {
+                    if (this->DCVFlag && this->SystemOAMethod != DataSizing::SOAM::ProportionalControlDesOcc) {
                         ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier *
                                        this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
                     } else {
                         ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate(ZoneIndex) *
                                        curZoneOASchValue;
                         CO2PeopleGeneration = 0.0;
-                        if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
+                        if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc) {
                             // Accumulate CO2 generation from people at design occupancy and current activity level
                             for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                                 if (state.dataHeatBal->People(PeopleNum).ZonePtr != ZoneNum) continue;
@@ -4193,12 +4154,13 @@ void VentilationMechanicalProps::CalcMechVentController(
                     }
 
                     // Calc zone supply OA flow rate
-                    if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_VRPL) {
+                    if (this->SystemOAMethod == DataSizing::SOAM::VRP || this->SystemOAMethod == DataSizing::SOAM::VRPL) {
                         // the VRP case
                         ZoneOA = ZoneOABZ / ZoneEz;
 
-                    } else if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ||
-                               this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+                    } else if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc ||
+                               this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc ||
+                               this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate) {
                         // Check whether "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController is specified
                         if (curZone.ZoneContamControllerSchedIndex > 0.0) {
                             // Check the availability schedule value for ZoneControl:ContaminantController
@@ -4206,7 +4168,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                             if (ZoneContamControllerSched > 0.0) {
                                 ZoneOAMin = ZoneOAArea / ZoneEz;
                                 ZoneOAMax = (ZoneOAArea + ZoneOAPeople) / ZoneEz;
-                                if (this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+                                if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate) {
                                     ZoneOAMax = ZoneOABZ / ZoneEz;
                                     if (this->OAPropCtlMinRateSchPtr(ZoneIndex) > 0) {
                                         ZoneOAMin = ZoneOAMax * GetCurrentScheduleValue(state, this->OAPropCtlMinRateSchPtr(ZoneIndex));
@@ -4250,7 +4212,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                         }
 
                                         // Calculate zone maximum target CO2 concentration in PPM
-                                        if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
+                                        if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc) {
                                             ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
                                                          (CO2PeopleGeneration * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) / ZoneOAMax;
                                         } else if (curZone.ZoneMaxCO2SchedIndex > 0.0) {
@@ -4264,7 +4226,7 @@ void VentilationMechanicalProps::CalcMechVentController(
 
                                         if (ZoneMaxCO2 <= ZoneMinCO2) {
                                             ++this->CO2MaxMinLimitErrorCount;
-                                            if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc) {
+                                            if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
                                                     ShowSevereError(state,
                                                                     std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
@@ -4290,7 +4252,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                                    this->CO2MaxMinLimitErrorIndex);
                                                 }
                                             }
-                                            if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
+                                            if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
                                                     ShowSevereError(state,
                                                                     std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
@@ -4316,7 +4278,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                                    this->CO2MaxMinLimitErrorIndex);
                                                 }
                                             }
-                                            if (this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+                                            if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
                                                     ShowSevereError(state,
                                                                     std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
@@ -4365,7 +4327,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                     } else {
                                         if (state.dataGlobal->DisplayExtraWarnings) {
                                             ++this->CO2GainErrorCount;
-                                            if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc) {
+                                            if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
                                                     ShowSevereError(state,
                                                                     std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
@@ -4388,7 +4350,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                         this->CO2GainErrorIndex);
                                                 }
                                             }
-                                            if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
+                                            if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
                                                     ShowSevereError(state,
                                                                     std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
@@ -4480,7 +4442,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     // only for VRP system OA method
                     curZoneSysEnergyDemand.SupplyAirAdjustFactor = 1.0;
 
-                    if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_VRPL) {
+                    if (this->SystemOAMethod == DataSizing::SOAM::VRP || this->SystemOAMethod == DataSizing::SOAM::VRPL) {
                         if (ZoneOAFrac > this->ZoneMaxOAFraction) {
                             if (this->ZoneMaxOAFraction > 0.0) {
                                 curZoneSysEnergyDemand.SupplyAirAdjustFactor = ZoneOAFrac / this->ZoneMaxOAFraction;
@@ -4522,10 +4484,11 @@ void VentilationMechanicalProps::CalcMechVentController(
                 if (SysEv <= 0.0) SysEv = 1.0;
 
                 // Calc system outdoor air requirement
-                if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ||
-                    this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+                if (this->SystemOAMethod == DataSizing::SOAM::ProportionalControlSchOcc ||
+                    this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOcc ||
+                    this->SystemOAMethod == DataSizing::SOAM::ProportionalControlDesOARate) {
                     SysOA = SysOA / SysEv;
-                } else if (this->SystemOAMethod == SOAM_VRPL && this->SysDesOA > 0.0) {
+                } else if (this->SystemOAMethod == DataSizing::SOAM::VRPL && this->SysDesOA > 0.0) {
                     // Limit system OA to design OA minimum flow rate, as per ASHRAE Guideline 36-2018 Section 5.16.3.1
                     // If no system sizing run is done (i.e. no Sizing:System) the design outdoor air flow rate is not known
                     SysOA = min(SysOAuc / SysEv, this->SysDesOA);

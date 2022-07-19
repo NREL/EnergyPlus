@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -299,7 +300,7 @@ namespace MixedAir {
         Real64 TotPeopleOAFlow;                 // Total outdoor air flow rate for all PEOPLE objects in zones (m3/s)
         Real64 TotZoneOAFlow;                   // Total outdoor air flow rate for all zones (m3/s)
         Real64 TotZoneOAACH;                    // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
-        int SystemOAMethod;                     // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP, SOAM_VRPL
+        DataSizing::SOAM SystemOAMethod;        // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP, SOAM_VRPL
         Real64 ZoneMaxOAFraction;               // Zone maximum outdoor air fraction
         Array1D<Real64> ZoneOAAreaRate;         // Mechanical ventilation rate (m3/s/m2) for each zone
         Array1D<Real64> ZoneOAPeopleRate;       // Mechanical ventilation rate (m3/s/person) for each zone
@@ -337,8 +338,8 @@ namespace MixedAir {
         // Default Constructor
         VentilationMechanicalProps()
             : SchPtr(0), DCVFlag(false), NumofVentMechZones(0), TotAreaOAFlow(0.0), TotPeopleOAFlow(0.0), TotZoneOAFlow(0.0), TotZoneOAACH(0.0),
-              SystemOAMethod(0), ZoneMaxOAFraction(1.0), CO2MaxMinLimitErrorCount(0), CO2MaxMinLimitErrorIndex(0), CO2GainErrorCount(0),
-              CO2GainErrorIndex(0), OAMaxMinLimitErrorCount(0), OAMaxMinLimitErrorIndex(0)
+              SystemOAMethod(DataSizing::SOAM::Invalid), ZoneMaxOAFraction(1.0), CO2MaxMinLimitErrorCount(0), CO2MaxMinLimitErrorIndex(0),
+              CO2GainErrorCount(0), CO2GainErrorIndex(0), OAMaxMinLimitErrorCount(0), OAMaxMinLimitErrorIndex(0)
         {
         }
 
