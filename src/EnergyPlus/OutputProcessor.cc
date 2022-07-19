@@ -374,9 +374,17 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
 
+        bool found = false;
+
         // First pass, avoid using a regex if not needed
         for (int Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
             auto &reqRepVar = op->ReqRepVars(Loop);
+
+            // Skip the ones already found
+            // if (reqRepVar.Used) {
+            //    continue;
+            // }
+
             if (reqRepVar.Key.empty()) {
                 continue;
             }
@@ -387,11 +395,23 @@ namespace OutputProcessor {
                 continue;
             }
 
+            found = true;
+
             //   A match.  Make sure doesn't duplicate
             reqRepVar.Used = true;
-            bool Dup = std::find_if(std::cbegin(op->ReportList), std::cend(op->ReportList), [&reqRepVar, &op](int idx) {
-                           return (op->ReqRepVars(idx).frequency == reqRepVar.frequency) && (op->ReqRepVars(idx).SchedPtr == reqRepVar.SchedPtr);
-                       }) == std::cend(op->ReportList);
+            bool Dup = false;
+            // op->ReportList is allocated to a large value, so we can't use a std::find_if on it
+            for (int Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
+                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == reqRepVar.frequency &&
+                    op->ReqRepVars(op->ReportList(Loop1)).SchedPtr == reqRepVar.SchedPtr) {
+                    Dup = true;
+                    break;
+                }
+            }
+
+            // bool Dup = std::find_if(std::cbegin(op->ReportList), std::cend(op->ReportList), [&reqRepVar, &op](int idx) {
+            //                return (op->ReqRepVars(idx).frequency == reqRepVar.frequency) && (op->ReqRepVars(idx).SchedPtr == reqRepVar.SchedPtr);
+            //            }) == std::cend(op->ReportList);
             if (!Dup) {
                 ++op->NumExtraVars;
                 if (op->NumExtraVars == op->NumReportList) {
@@ -401,14 +421,18 @@ namespace OutputProcessor {
             }
         }
 
+        if (found) {
+            return;
+        }
+
         // Second pass: for the remaining, try a Regex
         for (int Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
             auto &reqRepVar = op->ReqRepVars(Loop);
 
             // Skip the ones already found
-            if (reqRepVar.Used) {
-                continue;
-            }
+            // if (reqRepVar.Used) {
+            //    continue;
+            //}
 
             if (reqRepVar.Key.empty()) {
                 continue;
@@ -422,9 +446,16 @@ namespace OutputProcessor {
 
             //   A match.  Make sure doesn't duplicate
             reqRepVar.Used = true;
-            bool Dup = std::find_if(std::cbegin(op->ReportList), std::cend(op->ReportList), [&reqRepVar, &op](int idx) {
-                           return (op->ReqRepVars(idx).frequency == reqRepVar.frequency) && (op->ReqRepVars(idx).SchedPtr == reqRepVar.SchedPtr);
-                       }) == std::cend(op->ReportList);
+            bool Dup = false;
+            // op->ReportList is allocated to a large value, so we can't use a std::find_if on it
+            for (int Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
+                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == reqRepVar.frequency &&
+                    op->ReqRepVars(op->ReportList(Loop1)).SchedPtr == reqRepVar.SchedPtr) {
+                    Dup = true;
+                    break;
+                }
+            }
+
             if (!Dup) {
                 ++op->NumExtraVars;
                 if (op->NumExtraVars == op->NumReportList) {
