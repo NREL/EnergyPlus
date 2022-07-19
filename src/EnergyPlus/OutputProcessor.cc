@@ -372,29 +372,34 @@ namespace OutputProcessor {
         // that match (and dont duplicate ones already in the list).
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        bool Dup;
         auto &op(state.dataOutputProcessor);
 
-        for (Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
-            if (op->ReqRepVars(Loop).Key.empty()) continue;
-            if (!UtilityRoutines::SameString(op->ReqRepVars(Loop).VarName, VariableName)) continue;
-            if (!(UtilityRoutines::SameString(op->ReqRepVars(Loop).Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + op->ReqRepVars(Loop).Key)))
+        for (int Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
+            auto &reqRepVar = op->ReqRepVars(Loop);
+            if (reqRepVar.Key.empty()) {
                 continue;
+            }
+            if (!UtilityRoutines::SameString(reqRepVar.VarName, VariableName)) {
+                continue;
+            }
+            if (!(UtilityRoutines::SameString(reqRepVar.Key, KeyedValue) || RE2::FullMatch(KeyedValue, "(?i)" + reqRepVar.Key))) {
+                continue;
+            }
 
             //   A match.  Make sure doesn't duplicate
 
-            op->ReqRepVars(Loop).Used = true;
-            Dup = false;
-            for (Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
-                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == op->ReqRepVars(Loop).frequency) {
+            reqRepVar.Used = true;
+            bool Dup = false;
+            for (int Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
+                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == reqRepVar.frequency) {
                     Dup = true;
                 } else {
                     continue;
                 }
                 //  So Same Report Frequency
-                if (op->ReqRepVars(op->ReportList(Loop1)).SchedPtr != op->ReqRepVars(Loop).SchedPtr) Dup = false;
+                if (op->ReqRepVars(op->ReportList(Loop1)).SchedPtr != reqRepVar.SchedPtr) {
+                    Dup = false;
+                }
             }
 
             if (!Dup) {
