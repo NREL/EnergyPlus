@@ -13596,6 +13596,8 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         columnWidthUnmetDegHr = 10;
         Array1D_string columnHeadUnmetDegHr;
         columnHeadUnmetDegHr.allocate(columnNumUnmetDegHr);
+        Array2D_string tableBodyUnmetDegHr;
+        tableBodyUnmetDegHr.allocate(columnNumUnmetDegHr, state.dataGlobal->NumOfZones + 4);
         tableName = "Unmet Degree-Hours";
         columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
         columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
@@ -13614,13 +13616,13 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         }
 
         WriteResilienceBinsTableNoPreDef(state,
-                                         columnNum,
+                                         columnNumUnmetDegHr,
                                          tableName,
                                          columnHeadUnmetDegHr,
                                          columnWidthUnmetDegHr,
                                          state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins,
                                          rowHead,
-                                         tableBody,
+                                         tableBodyUnmetDegHr,
                                          degreeHourConversion);
 
         columnNum = 4;
@@ -13648,6 +13650,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         rowHead.deallocate();
         columnHeadStr.deallocate();
         tableBody.deallocate();
+        tableBodyUnmetDegHr.deallocate();
         columnWidth.deallocate();
         columnHeadUnmetDegHr.deallocate();
         columnWidthUnmetDegHr.deallocate();
