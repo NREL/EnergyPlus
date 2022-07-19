@@ -79,7 +79,7 @@ The Outdoor Air Details report, the subtables "by Zone" have a new footnote:
 
 *Values shown for a single zone without multipliers. Total Facility includes multipliers*
 
-In the Outdoor Air Details, Total Outdoor Air by AirLoop subtable, Mechanical Ventilation and Total Ventilation values were corrected to properly apply density. See issue [#9398](https://github.com/NREL/EnergyPlus/issues/9398) for more details.
+In the Outdoor Air Details, Total Outdoor Air by AirLoop subtable, Mechanical Ventilation and Total Ventilation values were corrected to properly apply density. This results in changes to the values in the three Time Below/At/Above Voz-sum-dyn columns as well. See issue [#9398](https://github.com/NREL/EnergyPlus/issues/9398) for more details.
 
 See pull request [#9519](https://github.com/NREL/EnergyPlus/pull/9519) for more details.
 
