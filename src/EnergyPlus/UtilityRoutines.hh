@@ -626,6 +626,8 @@ namespace UtilityRoutines {
                                                    DataGlobalConstants::ResourceType &FuelTypeNum,
                                                    bool &FuelTypeErrorsFound);
 
+    bool isKeyRegexLike(std::string_view key);
+
 } // namespace UtilityRoutines
 
 constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)

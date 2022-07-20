@@ -139,6 +139,8 @@ OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::s
     : key(KeyValue), variableName(VariableName)
 {
     if (KeyValue == "*") return;
+
+    // TODO: use the new UtilityRoutines::isKeyRegexLike
     for (auto const &c : KeyValue) {
         if (c == ' ' || c == '_' || std::isalnum(c)) continue;
         is_simple_string = false;
