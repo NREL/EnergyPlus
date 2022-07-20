@@ -596,6 +596,7 @@ namespace AirLoopHVACDOAS {
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
+                        CoolingCoilOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilHeatingElectric:
