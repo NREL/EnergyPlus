@@ -8070,7 +8070,7 @@ namespace InternalHeatGains {
 
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
-            auto EnvClass = static_cast<int>(state.dataHeatBal->ZoneITEq(Loop).Class);
+            int EnvClass = static_cast<int>(state.dataHeatBal->ZoneITEq(Loop).Class);
             if (EnvClass > 0) {
                 if (TAirIn > DBMax[EnvClass - 1]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
