@@ -1885,8 +1885,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             // Store cooling zone numbers in AirLoopZoneInfo data structure
             for (int NumAirLoopCooledZonesTemp = 1; NumAirLoopCooledZonesTemp <= NumAirLoopCooledZones; ++NumAirLoopCooledZonesTemp) {
                 thisAirLoopZoneInfo.Zone(NumAirLoopCooledZonesTemp) = thisAirToZoneNodeInfo.CoolCtrlZoneNums(NumAirLoopCooledZonesTemp);
-                thisAirLoopZoneInfo.ActualZoneNumber(NumAirLoopCooledZonesTemp) =
-                    state.dataZoneEquip->ZoneEquipConfig(thisAirToZoneNodeInfo.CoolCtrlZoneNums(NumAirLoopCooledZonesTemp)).ActualZoneNum;
+                thisAirLoopZoneInfo.ActualZoneNumber(NumAirLoopCooledZonesTemp) = thisAirToZoneNodeInfo.CoolCtrlZoneNums(NumAirLoopCooledZonesTemp);
             }
             // Store heating zone numbers in AirLoopZoneInfo data structure
             // Only store zone numbers that aren't already defined as cooling zones above
@@ -1900,7 +1899,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 if (!CommonZone) {
                     ++AirLoopZones;
                     thisAirLoopZoneInfo.Zone(AirLoopZones) = ZoneNum;
-                    thisAirLoopZoneInfo.ActualZoneNumber(AirLoopZones) = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum;
+                    thisAirLoopZoneInfo.ActualZoneNumber(AirLoopZones) = ZoneNum;
                 }
             }
             thisAirLoopZoneInfo.NumZones = AirLoopZones;
