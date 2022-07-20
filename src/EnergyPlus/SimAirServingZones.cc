@@ -685,7 +685,8 @@ void GetAirPathData(EnergyPlusData &state)
         PrimaryAirSystems(AirSysNum).Branch.allocate(PrimaryAirSystems(AirSysNum).NumBranches);
         // Cycle through all of the branches and set up the branch data
         for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name = BranchNames(BranchNum);
+            auto &thisBranch = PrimaryAirSystems(AirSysNum).Branch(BranchNum);
+            thisBranch.Name = BranchNames(BranchNum);
             NumCompsOnBranch = NumCompsInBranch(state, BranchNames(BranchNum));
             if (NumCompsOnBranch <= 0) {
                 ShowSevereError(state,
@@ -715,13 +716,13 @@ void GetAirPathData(EnergyPlusData &state)
                           OutletNodeNames,
                           OutletNodeNumbers,
                           ErrorsFound); // Placeholders for plant branch pressure data (not used in air loops)
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp.allocate(NumCompsOnBranch);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents = NumCompsOnBranch;
+            thisBranch.Comp.allocate(NumCompsOnBranch);
+            thisBranch.TotalComponents = NumCompsOnBranch;
 
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalNodes = NumCompsOnBranch + 1;
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum.allocate(NumCompsOnBranch + 1);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum(1) = InletNodeNumbers(1);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).DuctType = DataHVACGlobals::AirDuctType::Main;
+            thisBranch.TotalNodes = NumCompsOnBranch + 1;
+            thisBranch.NodeNum.allocate(NumCompsOnBranch + 1);
+            thisBranch.NodeNum(1) = InletNodeNumbers(1);
+            thisBranch.DuctType = DataHVACGlobals::AirDuctType::Main;
 
             // If first node is an outdoor air node, then consider this to have a simple OA system (many places check for this)
             if (OutAirNodeManager::CheckOutAirNodeNumber(state, InletNodeNumbers(1))) {
@@ -734,16 +735,16 @@ void GetAirPathData(EnergyPlusData &state)
                 state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysInletNodeNum = InletNodeNumbers(1);
                 state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysOutletNodeNum = InletNodeNumbers(1);
             }
-            for (CompNum = 1; CompNum <= PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+            for (CompNum = 1; CompNum <= thisBranch.TotalComponents; ++CompNum) {
 
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf = CompTypes(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name = CompNames(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex = 0;
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNameIn = InletNodeNames(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNumIn = InletNodeNumbers(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNameOut = OutletNodeNames(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNumOut = OutletNodeNumbers(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum(CompNum + 1) = OutletNodeNumbers(CompNum);
+                thisBranch.Comp(CompNum).TypeOf = CompTypes(CompNum);
+                thisBranch.Comp(CompNum).Name = CompNames(CompNum);
+                thisBranch.Comp(CompNum).CompIndex = 0;
+                thisBranch.Comp(CompNum).NodeNameIn = InletNodeNames(CompNum);
+                thisBranch.Comp(CompNum).NodeNumIn = InletNodeNumbers(CompNum);
+                thisBranch.Comp(CompNum).NodeNameOut = OutletNodeNames(CompNum);
+                thisBranch.Comp(CompNum).NodeNumOut = OutletNodeNumbers(CompNum);
+                thisBranch.NodeNum(CompNum + 1) = OutletNodeNumbers(CompNum);
 
                 // Check for Outside Air system; if there, store its connection node numbers to primary air system
                 if (UtilityRoutines::SameString(CompTypes(CompNum), "AirLoopHVAC:OutdoorAirSystem")) {
@@ -783,7 +784,7 @@ void GetAirPathData(EnergyPlusData &state)
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
                                             "\", item not found.");
                         ShowContinueError(state, "AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
-                        ShowContinueError(state, "  referenced in Branch=\"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name + "\".");
+                        ShowContinueError(state, "  referenced in Branch=\"" + thisBranch.Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -818,9 +819,9 @@ void GetAirPathData(EnergyPlusData &state)
 
             } // end of component loop
 
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).ControlType = "";
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumIn = InletNodeNumbers(1);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumOut = OutletNodeNumbers(NumCompsOnBranch);
+            thisBranch.ControlType = "";
+            thisBranch.NodeNumIn = InletNodeNumbers(1);
+            thisBranch.NodeNumOut = OutletNodeNumbers(NumCompsOnBranch);
 
             CompTypes.deallocate();
             CompNames.deallocate();
@@ -4996,7 +4997,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                         if (SysSizNum > 0) {
                             ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
                                         TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // should not have diversity at this point
-                            if (SysSizInput(SysSizNum).SystemOAMethod == SOAM::ZoneSum) {              // ZoneSum Method
+                            if (SysSizInput(SysSizNum).SystemOAMethod == SOAM::ZoneSum) {             // ZoneSum Method
                                 SysOAUnc += ZoneOAUnc;
                             } else if (SysSizInput(SysSizNum).SystemOAMethod == SOAM::VRP ||
                                        SysSizInput(SysSizNum).SystemOAMethod == SOAM::SP) { // Ventilation Rate and Simplified Procedure
