@@ -277,7 +277,6 @@ namespace FanCoilUnits {
     void SimFanCoilUnit(EnergyPlusData &state,
                         std::string_view CompName,     // name of the fan coil unit
                         int const ZoneNum,             // number of zone being served
-                        int const ControlledZoneNum,   // index into ZoneEquipConfig array; may not be equal to ZoneNum
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                         Real64 &PowerMet,              // Sensible power supplied (W)
                         Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
@@ -286,18 +285,14 @@ namespace FanCoilUnits {
     void GetFanCoilUnits(EnergyPlusData &state);
 
     void InitFanCoilUnits(EnergyPlusData &state,
-                          int const FanCoilNum,         // number of the current fan coil unit being simulated
-                          int const ZoneNum,            // number of zone being served
-                          int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
+                          int const FanCoilNum, // number of the current fan coil unit being simulated
+                          int const ZoneNum);   // number of zone being served
 
-    void SizeFanCoilUnit(EnergyPlusData &state,
-                         int const FanCoilNum,
-                         int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
+    void SizeFanCoilUnit(EnergyPlusData &state, int const FanCoilNum, int const ZoneNum);
 
     void Sim4PipeFanCoil(EnergyPlusData &state,
                          int &FanCoilNum,               // number of the current fan coil unit being simulated
                          int const ZoneNum,             // number of zone being served
-                         int const ControlledZoneNum,   // index into ZoneEqupConfig
                          bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                          Real64 &PowerMet,              // Sensible power supplied (W)
                          Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
@@ -329,7 +324,7 @@ namespace FanCoilUnits {
 
     void Calc4PipeFanCoil(EnergyPlusData &state,
                           int const FanCoilNum,          // Unit index in fan coil array
-                          int const ControlledZoneNum,   // ZoneEquipConfig index
+                          int const ZoneNum,             // Zone index
                           bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                           Real64 &LoadMet,               // load met by unit (watts)
                           Optional<Real64> PLR = _,      // Part Load Ratio, fraction of time step fancoil is on
@@ -338,7 +333,7 @@ namespace FanCoilUnits {
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state,
                                    int &FanCoilNum,               // number of the current fan coil unit being simulated
-                                   int const ControlledZoneNum,   // index into ZoneEqupConfig
+                                   int const ZoneNum,             // Zone index
                                    bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    Real64 &PowerMet               // Sensible power supplied (W)
     );

@@ -104,7 +104,6 @@ namespace BaseboardRadiator {
 
     void SimBaseboard(EnergyPlusData &state,
                       std::string const &EquipName,
-                      int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,
                       Real64 &PowerMet,
@@ -167,7 +166,7 @@ namespace BaseboardRadiator {
 
         InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
         if ((QZnReq < SmallLoad) || (baseboard->baseboards(BaseboardNum).WaterInletTemp <= baseboard->baseboards(BaseboardNum).AirInletTemp)) {
             //  IF (Baseboard(BaseboardNum)%WaterInletTemp <= Baseboard(BaseboardNum)%AirInletTemp) THEN

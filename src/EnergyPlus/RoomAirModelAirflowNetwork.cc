@@ -1267,7 +1267,6 @@ namespace RoomAirModelAirflowNetwork {
                 SimHWBaseboard(state,
                                ThisRAFNNode.HVAC(I).Name,
                                ZoneNum,
-                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                false,
                                SysOutputProvided,
                                ThisRAFNNode.HVAC(I).CompIndex);
@@ -1280,7 +1279,6 @@ namespace RoomAirModelAirflowNetwork {
                 SimSteamBaseboard(state,
                                   ThisRAFNNode.HVAC(I).Name,
                                   ZoneNum,
-                                  state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                   false,
                                   SysOutputProvided,
                                   ThisRAFNNode.HVAC(I).CompIndex);
@@ -1294,7 +1292,6 @@ namespace RoomAirModelAirflowNetwork {
                 SimBaseboard(state,
                              ThisRAFNNode.HVAC(I).Name,
                              ZoneNum,
-                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                              false,
                              SysOutputProvided,
                              ThisRAFNNode.HVAC(I).CompIndex);
@@ -1307,7 +1304,6 @@ namespace RoomAirModelAirflowNetwork {
                 SimElectricBaseboard(state,
                                      ThisRAFNNode.HVAC(I).Name,
                                      ZoneNum,
-                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                      SysOutputProvided,
                                      ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;

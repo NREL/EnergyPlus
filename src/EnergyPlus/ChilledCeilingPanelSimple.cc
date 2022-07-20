@@ -101,13 +101,8 @@ namespace EnergyPlus::CoolingPanelSimple {
 // MODULE PARAMETER DEFINITIONS
 std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
 
-void SimCoolingPanel(EnergyPlusData &state,
-                     std::string const &EquipName,
-                     int const ActualZoneNum,
-                     int const ControlledZoneNum,
-                     bool const FirstHVACIteration,
-                     Real64 &PowerMet,
-                     int &CompIndex)
+void SimCoolingPanel(
+    EnergyPlusData &state, std::string const &EquipName, int const ControlledZoneNum, bool const FirstHVACIteration, Real64 &PowerMet, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -169,7 +164,7 @@ void SimCoolingPanel(EnergyPlusData &state,
 
         InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP;
 
         // On the first HVAC iteration the system values are given to the controller, but after that
         // the demand limits are in place and there needs to be feedback to the Zone Equipment

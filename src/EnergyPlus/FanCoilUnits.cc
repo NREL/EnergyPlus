@@ -143,7 +143,6 @@ namespace FanCoilUnits {
     void SimFanCoilUnit(EnergyPlusData &state,
                         std::string_view CompName,     // name of the fan coil unit
                         int const ZoneNum,             // number of zone being served
-                        int const ControlledZoneNum,   // index into ZoneEquipConfig array; may not be equal to ZoneNum
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                         Real64 &PowerMet,              // Sensible power supplied (W)
                         Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
@@ -201,11 +200,11 @@ namespace FanCoilUnits {
         state.dataSize->ZoneEqFanCoil = true;
 
         // Initialize the fan coil unit
-        InitFanCoilUnits(state, FanCoilNum, ZoneNum, ControlledZoneNum);
+        InitFanCoilUnits(state, FanCoilNum, ZoneNum);
 
         // Select the correct unit type
         if (state.dataFanCoilUnits->FanCoil(FanCoilNum).UnitType_Num == FanCoilUnit_4Pipe) {
-            Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
+            Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
         }
 
         // Report the result of the simulation

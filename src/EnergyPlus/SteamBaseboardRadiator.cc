@@ -112,7 +112,6 @@ namespace SteamBaseboardRadiator {
 
     void SimSteamBaseboard(EnergyPlusData &state,
                            std::string const &EquipName,
-                           int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
                            Real64 &PowerMet,
@@ -175,13 +174,13 @@ namespace SteamBaseboardRadiator {
 
             InitSteamBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
             SteamBaseboardDesignData SteamBaseboardDesignDataObject{state.dataSteamBaseboardRadiator->SteamBaseboardDesign(
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum)
                     .DesignObjectPtr)}; // Array that contains the design data for steam baseboard objects
 
-            if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ActualZoneNum) &&
+            if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ControlledZoneNum) &&
                 (GetCurrentScheduleValue(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr) > 0.0)) {
 
                 // On the first HVAC iteration the system values are given to the controller, but after that

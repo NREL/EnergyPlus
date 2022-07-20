@@ -108,7 +108,6 @@ namespace BaseboardRadiator {
 
     void SimBaseboard(EnergyPlusData &state,
                       std::string const &EquipName,
-                      int ActualZoneNum,
                       int ControlledZoneNum,
                       bool FirstHVACIteration,
                       Real64 &PowerMet,

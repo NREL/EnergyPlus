@@ -128,7 +128,6 @@ namespace HWBaseboardRadiator {
 
     void SimHWBaseboard(EnergyPlusData &state,
                         std::string const &EquipName,
-                        int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
                         Real64 &PowerMet,
@@ -138,8 +137,6 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Baseboard Radiators.
@@ -198,7 +195,7 @@ namespace HWBaseboardRadiator {
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment

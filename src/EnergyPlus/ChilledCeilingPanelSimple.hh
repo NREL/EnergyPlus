@@ -165,13 +165,8 @@ namespace CoolingPanelSimple {
         void ReportCoolingPanel(EnergyPlusData &state);
     };
 
-    void SimCoolingPanel(EnergyPlusData &state,
-                         std::string const &EquipName,
-                         int ActualZoneNum,
-                         int ControlledZoneNum,
-                         bool FirstHVACIteration,
-                         Real64 &PowerMet,
-                         int &CompIndex);
+    void SimCoolingPanel(
+        EnergyPlusData &state, std::string const &EquipName, int ControlledZoneNum, bool FirstHVACIteration, Real64 &PowerMet, int &CompIndex);
 
     void GetCoolingPanelInput(EnergyPlusData &state);
 

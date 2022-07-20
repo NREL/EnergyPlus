@@ -2380,7 +2380,7 @@ void GetSysInput(EnergyPlusData &state)
              ++state.dataSingleDuct->SysIndexGSI) {
             for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex) {
                 if (state.dataGlobal->DoZoneSizing) {
-                    if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ActualZoneNum ==
+                    if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneNum ==
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysIndexGSI).CtrlZoneNum) {
                         if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
                             ShowWarningError(state,
