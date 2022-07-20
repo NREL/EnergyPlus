@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -1057,21 +1058,21 @@ namespace DataSizing {
 
 struct SizingData : BaseGlobalStruct
 {
-    int NumOARequirements = 0;                       // Number of OA Requirements objects
-    int NumZoneAirDistribution = 0;                  // Number of zone air distribution objects
-    int NumZoneSizingInput = 0;                      // Number of Zone Sizing objects
-    int NumSysSizInput = 0;                          // Number of System Sizing objects
-    int NumPltSizInput = 0;                          // Number of Plant Sizing objects
-    int CurSysNum = 0;                               // Current Air System index (0 if not in air loop)
-    int CurOASysNum = 0;                             // Current outside air system index (0 if not in OA Sys)
-    int CurZoneEqNum = 0;                            // Current Zone Equipment index (0 if not simulating ZoneEq)
-    int CurTermUnitSizingNum = 0;                    // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
-    int CurBranchNum = 0;                            // Index of branch being simulated (or 0 if not air loop)
-    int CurDuctType = 0;                             // Duct type of current branch
-    int CurLoopNum = 0;                              // the current plant loop index
-    int CurCondLoopNum = 0;                          // the current condenser loop number
-    int CurEnvirNumSimDay = 0;                       // current environment number for day simulated
-    int CurOverallSimDay = 0;                        // current day of simulation
+    int NumOARequirements = 0;      // Number of OA Requirements objects
+    int NumZoneAirDistribution = 0; // Number of zone air distribution objects
+    int NumZoneSizingInput = 0;     // Number of Zone Sizing objects
+    int NumSysSizInput = 0;         // Number of System Sizing objects
+    int NumPltSizInput = 0;         // Number of Plant Sizing objects
+    int CurSysNum = 0;              // Current Air System index (0 if not in air loop)
+    int CurOASysNum = 0;            // Current outside air system index (0 if not in OA Sys)
+    int CurZoneEqNum = 0;           // Current Zone Equipment index (0 if not simulating ZoneEq)
+    int CurTermUnitSizingNum = 0;   // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
+    int CurBranchNum = 0;           // Index of branch being simulated (or 0 if not air loop)
+    DataHVACGlobals::AirDuctType CurDuctType = DataHVACGlobals::AirDuctType::Invalid; // Duct type of current branch
+    int CurLoopNum = 0;                                                               // the current plant loop index
+    int CurCondLoopNum = 0;                                                           // the current condenser loop number
+    int CurEnvirNumSimDay = 0;                                                        // current environment number for day simulated
+    int CurOverallSimDay = 0;                                                         // current day of simulation
     int NumTimeStepsInAvg = 0;                       // number of time steps in the averaging window for the design flow and load sequences
     int SaveNumPlantComps = 0;                       // Number of components using water as an energy source or sink (e.g. water coils)
     int DataTotCapCurveIndex = 0;                    // index to total capacity as a function of temperature curve
@@ -1247,7 +1248,7 @@ struct SizingData : BaseGlobalStruct
         this->CurZoneEqNum = 0;
         this->CurTermUnitSizingNum = 0;
         this->CurBranchNum = 0;
-        this->CurDuctType = 0;
+        this->CurDuctType = DataHVACGlobals::AirDuctType::Invalid;
         this->CurLoopNum = 0;
         this->CurCondLoopNum = 0;
         this->CurEnvirNumSimDay = 0;

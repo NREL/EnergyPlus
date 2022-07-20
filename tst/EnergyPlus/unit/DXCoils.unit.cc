@@ -2220,7 +2220,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     // Fake having a parent coil setting the size
     // UnitarySysEqSizing(DXCoilNum).CoolingCapacity = true;
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
@@ -2445,7 +2445,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     state->dataSize->OASysEqSizing.allocate(1);
 
     // Get into a block so that it sets the RatedTotCap
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table

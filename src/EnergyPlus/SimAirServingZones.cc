@@ -634,7 +634,7 @@ void GetAirPathData(EnergyPlusData &state)
         // Fill the supply node arrays with node numbers
         for (I = 1; I <= AirToZoneNodeInfo(AirSysNum).NumSupplyNodes; ++I) {
             AirToZoneNodeInfo(AirSysNum).ZoneEquipSupplyNodeNum(I) = NodeNums(I);
-            AirToZoneNodeInfo(AirSysNum).SupplyDuctType(I) = 0;
+            AirToZoneNodeInfo(AirSysNum).SupplyDuctType(I) = DataHVACGlobals::AirDuctType::Invalid;
         }
         ErrInList = false;
         GetNodeNums(state,
@@ -721,7 +721,7 @@ void GetAirPathData(EnergyPlusData &state)
             PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalNodes = NumCompsOnBranch + 1;
             PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum.allocate(NumCompsOnBranch + 1);
             PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum(1) = InletNodeNumbers(1);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).DuctType = Main;
+            PrimaryAirSystems(AirSysNum).Branch(BranchNum).DuctType = DataHVACGlobals::AirDuctType::Main;
 
             // If first node is an outdoor air node, then consider this to have a simple OA system (many places check for this)
             if (OutAirNodeManager::CheckOutAirNodeNumber(state, InletNodeNumbers(1))) {
@@ -1664,10 +1664,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 ++NumZonesCool;
                                 // Set Duct Type for branch for dual duct
                                 if (NumZonesCool == 1 && OutBranchNum > 1) {
-                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = Cooling;
+                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = DataHVACGlobals::AirDuctType::Cooling;
                                 }
                                 if (NumZonesCool == 1) {
-                                    thisAirToZoneNodeInfo.SupplyDuctType(OutNum) = Cooling;
+                                    thisAirToZoneNodeInfo.SupplyDuctType(OutNum) = DataHVACGlobals::AirDuctType::Cooling;
                                 }
                                 cooledZone(NumZonesCool).ctrlZoneNum = CtrlZoneNum;
                                 cooledZone(NumZonesCool).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
@@ -1701,10 +1701,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 ++NumZonesHeat;
                                 // Set Duct Type for branch for dual duct
                                 if (NumZonesHeat == 1 && OutBranchNum > 1) {
-                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = Heating;
+                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = DataHVACGlobals::AirDuctType::Heating;
                                 }
                                 if (NumZonesHeat == 1) {
-                                    thisAirToZoneNodeInfo.SupplyDuctType(OutNum) = Heating;
+                                    thisAirToZoneNodeInfo.SupplyDuctType(OutNum) = DataHVACGlobals::AirDuctType::Heating;
                                 }
                                 heatedZone(NumZonesHeat).ctrlZoneNum = CtrlZoneNum;
                                 heatedZone(NumZonesHeat).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
@@ -1762,7 +1762,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 ++NumZonesCool;
                                 // Set Duct Type for branch for dual duct
                                 if (NumZonesCool == 1 && OutBranchNum > 1) {
-                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = Cooling;
+                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = DataHVACGlobals::AirDuctType::Cooling;
                                 }
                                 cooledZone(NumZonesCool).ctrlZoneNum = CtrlZoneNum;
                                 cooledZone(NumZonesCool).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
@@ -1779,7 +1779,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 ++NumZonesHeat;
                                 // Set Duct Type for branch for dual duct
                                 if (NumZonesHeat == 1 && OutBranchNum > 1) {
-                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = Heating;
+                                    thisPrimaryAirSys.Branch(OutBranchNum).DuctType = DataHVACGlobals::AirDuctType::Heating;
                                 }
                                 heatedZone(NumZonesHeat).ctrlZoneNum = CtrlZoneNum;
                                 heatedZone(NumZonesHeat).zoneInletNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
@@ -1858,7 +1858,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                             thisPrimaryAirSys.SupMixInNode = thisPrimaryAirSys.Mixer.NodeNumIn(1);
                         }
                         // set the duct type
-                        thisPrimaryAirSys.Branch(BranchNum).DuctType = RAB;
+                        thisPrimaryAirSys.Branch(BranchNum).DuctType = DataHVACGlobals::AirDuctType::RAB;
                     }
                 }
                 thisPrimaryAirSys.MixOutNode = thisPrimaryAirSys.Mixer.NodeNumOut;
@@ -1955,7 +1955,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         CompTypeNum == CompType::Fan_ComponentModel) {
                         if (thisPrimaryAirSys.OASysExists && !thisPrimaryAirSys.isAllOA) {
                             if (FoundOASys) {
-                                if (thisPrimaryAirSys.Branch(BranchNum).DuctType != 3) {
+                                if (thisPrimaryAirSys.Branch(BranchNum).DuctType != DataHVACGlobals::AirDuctType::Heating) {
                                     Fans::GetFanIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                                     supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
@@ -1973,7 +1973,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     if (CompTypeNum == CompType::Fan_System_Object) {
                         if (thisPrimaryAirSys.OASysExists && !thisPrimaryAirSys.isAllOA) {
                             if (FoundOASys) {
-                                if (thisPrimaryAirSys.Branch(BranchNum).DuctType != 3) {
+                                if (thisPrimaryAirSys.Branch(BranchNum).DuctType != DataHVACGlobals::AirDuctType::Heating) {
                                     SupFanIndex = HVACFan::getFanObjectVectorIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
                                     supFanModelType = ObjectVectorOOFanSystemModel;
                                     goto EndOfAirLoop;
@@ -2204,7 +2204,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         auto &thisAirLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
         // zero all MassFlowRateSetPoints
         for (int BranchNum = 1; BranchNum <= thisPrimaryAirSys.NumBranches; ++BranchNum) { // loop over all branches in system
-            if (thisPrimaryAirSys.Branch(BranchNum).DuctType == RAB) continue;
+            if (thisPrimaryAirSys.Branch(BranchNum).DuctType == DataHVACGlobals::AirDuctType::RAB) continue;
             for (int NodeIndex = 1; NodeIndex <= thisPrimaryAirSys.Branch(BranchNum).TotalNodes; ++NodeIndex) { // loop over alll nodes on branch
                 int NodeNum = thisPrimaryAirSys.Branch(BranchNum).NodeNum(NodeIndex);
                 state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = 0.0;
@@ -3423,7 +3423,7 @@ void SimAirLoopComponents(EnergyPlusData &state,
     } // End of branch loop
 
     state.dataSize->CurBranchNum = 0;
-    state.dataSize->CurDuctType = 0;
+    state.dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Invalid;
 }
 
 void SimAirLoopComponent(EnergyPlusData &state,

@@ -696,8 +696,8 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 42 - Airloop Equipment - CurDuctType = Main
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    // Test 42 - Airloop Equipment - CurDuctType = DataHVACGlobals::AirDuctType::Main
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     state->dataSize->FinalSysSizing(1).DesMainVolFlow = 5.0;
     state->dataSize->FinalSysSizing(1).DesCoolVolFlow = 5.0;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.0;
@@ -797,7 +797,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     sizer.autoSizedValue = 0.0;         // reset for next test
 
     // Test 48 - Air Loop HX Equipment, CurDuctType = Cooling
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -810,8 +810,8 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(5.0, sizedValue, 0.01); // uses cooling flow rate
     sizer.autoSizedValue = 0.0;         // reset for next test
 
-    // Test 49 - Air Loop HX Equipment, CurDuctType = Heating
-    state->dataSize->CurDuctType = DataHVACGlobals::Heating;
+    // Test 49 - Air Loop HX Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Heating
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
     state->dataSize->FinalSysSizing(1).DesHeatVolFlow = 8.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -825,8 +825,8 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(8.0, sizedValue, 0.01); // uses heating flow rate
     sizer.autoSizedValue = 0.0;         // reset for next test
 
-    // Test 50 - Air Loop HX Equipment, CurDuctType = Other
-    state->dataSize->CurDuctType = DataHVACGlobals::Other;
+    // Test 50 - Air Loop HX Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Other
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Other;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -839,9 +839,9 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(5.0, sizedValue, 0.01); // uses a main flow rate
     sizer.autoSizedValue = 0.0;         // reset for next test
 
-    // Test 51 - Air Loop HX Equipment, CurDuctType = Main
+    // Test 51 - Air Loop HX Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Main
     state->dataSize->CurOASysNum = 0;
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -856,7 +856,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     sizer.autoSizedValue = 0.0;         // reset for next test
 
     // Test 52 - Air Loop HX Equipment, CurDuctType = Cooling
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -869,8 +869,8 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(5.0, sizedValue, 0.01); // uses cooling flow rate
     sizer.autoSizedValue = 0.0;         // reset for next test
 
-    // Test 53 - Air Loop HX Equipment, CurDuctType = Heating
-    state->dataSize->CurDuctType = DataHVACGlobals::Heating;
+    // Test 53 - Air Loop HX Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Heating
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
     state->dataSize->FinalSysSizing(1).DesHeatVolFlow = 8.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -884,8 +884,8 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(8.0, sizedValue, 0.01); // uses heating flow rate
     sizer.autoSizedValue = 0.0;         // reset for next test
 
-    // Test 54 - Air Loop HX Equipment, CurDuctType = Other
-    state->dataSize->CurDuctType = DataHVACGlobals::Other;
+    // Test 54 - Air Loop HX Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Other
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Other;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -898,8 +898,8 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EXPECT_NEAR(5.0, sizedValue, 0.01); // uses a main flow rate
     sizer.autoSizedValue = 0.0;         // reset for next test
 
-    // Test 55 - Air Loop HX Equipment, CurDuctType = RAB
-    state->dataSize->CurDuctType = DataHVACGlobals::RAB;
+    // Test 55 - Air Loop HX Equipment, CurDuctType = DataHVACGlobals::AirDuctType::RAB
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::RAB;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 

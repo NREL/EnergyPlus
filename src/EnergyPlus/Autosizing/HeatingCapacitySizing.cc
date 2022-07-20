@@ -227,21 +227,21 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     } else if (this->unitarySysEqSizing(this->curSysNum).HeatingAirFlow) {
                         DesVolFlow = this->unitarySysEqSizing(this->curSysNum).HeatingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::Main) {
+                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Cooling) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Heating) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                         } else {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;

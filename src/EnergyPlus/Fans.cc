@@ -96,17 +96,13 @@ namespace EnergyPlus::Fans {
 // Using/Aliasing
 using namespace DataLoopNode;
 using DataHVACGlobals::cFanTypes;
-using DataHVACGlobals::Cooling;
 using DataHVACGlobals::FanType_ComponentModel;
 using DataHVACGlobals::FanType_SimpleConstVolume;
 using DataHVACGlobals::FanType_SimpleOnOff;
 using DataHVACGlobals::FanType_SimpleVAV;
 using DataHVACGlobals::FanType_ZoneExhaust;
 using DataHVACGlobals::FixedMin;
-using DataHVACGlobals::Heating;
-using DataHVACGlobals::Main;
 using DataHVACGlobals::MinFrac;
-using DataHVACGlobals::Other;
 using DataHVACGlobals::SmallAirVolFlow;
 using EMSManager::ManageEMS;
 using Psychrometrics::PsyCpAirFnW;

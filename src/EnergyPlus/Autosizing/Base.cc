@@ -744,7 +744,7 @@ void BaseSizer::clearState()
     curSysNum = 0;
     curOASysNum = 0;
     curZoneEqNum = 0;
-    curDuctType = 0;
+    curDuctType = DataHVACGlobals::AirDuctType::Invalid;
     curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
     numPrimaryAirSys = 0;
     numSysSizInput = 0;

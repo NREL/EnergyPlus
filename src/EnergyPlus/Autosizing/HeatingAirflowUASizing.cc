@@ -112,7 +112,7 @@ void HeatingAirflowUASizer::initializeForSystemMainDuct(EnergyPlusData &state,
 {
     this->initializeFromAPI(state, elevation);
     this->curSysNum = 1;
-    this->curDuctType = DataHVACGlobals::Main;
+    this->curDuctType = DataHVACGlobals::AirDuctType::Main;
     this->finalSysSizing.allocate(1);
     this->finalSysSizing(1).SysAirMinFlowRat = minFlowRateRatio;
     this->finalSysSizing(1).DesMainVolFlow = overallSystemVolFlow;
@@ -177,21 +177,21 @@ Real64 HeatingAirflowUASizer::size(EnergyPlusData &state, Real64 _originalValue,
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                 }
             } else {
-                if (this->curDuctType == DataHVACGlobals::Main) {
+                if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
                     if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
                         this->autoSizedValue =
                             this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                     }
-                } else if (this->curDuctType == DataHVACGlobals::Cooling) {
+                } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
                     if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0) {
                         this->autoSizedValue =
                             this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                     }
-                } else if (this->curDuctType == DataHVACGlobals::Heating) {
+                } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;

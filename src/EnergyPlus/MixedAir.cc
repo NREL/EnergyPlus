@@ -5027,19 +5027,22 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
             switch (this->ControllerType_Num) {
             case MixedAirControllerType::ControllerOutsideAir: {
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
-                {
-                    auto const SELECT_CASE_var1(state.dataSize->CurDuctType);
-                    if (SELECT_CASE_var1 == Main) {
+                switch (state.dataSize->CurDuctType) {
+                case DataHVACGlobals::AirDuctType::Main: {
                         this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                    } else if (SELECT_CASE_var1 == Cooling) {
+                    } break;
+                case DataHVACGlobals::AirDuctType::Cooling: {
                         this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
-                    } else if (SELECT_CASE_var1 == Heating) {
+                    } break;
+                case DataHVACGlobals::AirDuctType::Heating: {
                         this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
-                    } else if (SELECT_CASE_var1 == Other) {
-                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                    } else {
-                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                    }
+                } break;
+                case DataHVACGlobals::AirDuctType::Other: {
+                    this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                } break;
+                default: {
+                    this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                } break;
                 }
             } break;
             case MixedAirControllerType::ControllerStandAloneERV: {

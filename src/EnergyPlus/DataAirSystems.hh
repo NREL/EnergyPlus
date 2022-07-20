@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -136,7 +137,7 @@ namespace DataAirSystems {
         Array1D_int LastCompIndex;     // Gives comp index in AllComp that corresponds to last subcomponent
         int NodeNumIn = 0;             // Branch inlet node number
         int NodeNumOut = 0;            // Branch outlet node number
-        int DuctType = 0;              // 1=main, 2=cooling, 3=heating, 4=other
+        DataHVACGlobals::AirDuctType DuctType = DataHVACGlobals::AirDuctType::Invalid; // 1=main, 2=cooling, 3=heating, 4=other
         Array1D<AirLoopCompData> Comp; // Component list--high level components
         //  This list would include children, grandchildren, etc.
         int TotalNodes = 0;  // total number of nodes on branch

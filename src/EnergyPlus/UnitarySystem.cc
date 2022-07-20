@@ -62,6 +62,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -1476,7 +1477,7 @@ namespace UnitarySystems {
         std::string SystemType;    // type of air loop equipment
         std::string HXCoilName;    // cooling coil name in HXAssisted parent
         int ActualCoolCoilType;    // cooling coil type in HXAssisted parent
-        int SaveCurDuctType;       // used during sizing to save the current duct type
+        DataHVACGlobals::AirDuctType SaveCurDuctType; // used during sizing to save the current duct type
         Real64 QActual;            // water coil output [W]
         Real64 capacityMultiplier; // used for ASHRAE model sizing
 
@@ -1614,7 +1615,7 @@ namespace UnitarySystems {
             // might want to rethink this method. Tries to find the larger of cooling or heating capcity
             // however, if there is no heating coil the cooling air flow rate is used, not the main flow rate
             // this is fine if there are no other systems on the branch. CoilSystem does not do this (#8761).
-            if (this->UnitType == "AirLoopHVAC:UnitarySystem") state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
+            if (this->UnitType == "AirLoopHVAC:UnitarySystem") state.dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
             bool errorsFound = false;
             if ((CoolingSAFlowMethod == SupplyAirFlowRate) || (CoolingSAFlowMethod == None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1762,7 +1763,7 @@ namespace UnitarySystems {
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxHeatAirVolFlow;
             SaveCurDuctType = state.dataSize->CurDuctType;
-            state.dataSize->CurDuctType = DataHVACGlobals::Heating;
+            state.dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
             if ((HeatingSAFlowMethod == SupplyAirFlowRate) || (HeatingSAFlowMethod == None)) {
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;

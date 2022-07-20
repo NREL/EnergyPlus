@@ -732,10 +732,6 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataHVACGlobals::Cooling;
-        using DataHVACGlobals::Heating;
-        using DataHVACGlobals::Main;
-        using DataHVACGlobals::Other;
         using DataSizing::AutoSize;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
@@ -840,16 +836,16 @@ namespace Humidifiers {
                                                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
                         } else { // ELSE size to supply air duct flow rate
                             switch (state.dataSize->CurDuctType) {
-                            case Main: {
+                            case DataHVACGlobals::AirDuctType::Main: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } break;
-                            case Cooling: {
+                            case DataHVACGlobals::AirDuctType::Cooling: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } break;
-                            case Heating: {
+                            case DataHVACGlobals::AirDuctType::Heating: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } break;
-                            case Other: {
+                            case DataHVACGlobals::AirDuctType::Other: {
                                 AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } break;
                             default: {
@@ -870,16 +866,16 @@ namespace Humidifiers {
                         }
                     } else {
                         switch (state.dataSize->CurDuctType) {
-                        case Main: {
+                        case DataHVACGlobals::AirDuctType::Main: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         } break;
-                        case Cooling: {
+                        case DataHVACGlobals::AirDuctType::Cooling: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                         } break;
-                        case Heating: {
+                        case DataHVACGlobals::AirDuctType::Heating: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                         } break;
-                        case Other: {
+                        case DataHVACGlobals::AirDuctType::Other: {
                             AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         } break;
                         default: {

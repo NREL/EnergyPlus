@@ -306,7 +306,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->NumPltSizInput = 2;
     state->dataSize->PlantSizData(1).PlantLoopName = "ColdWaterLoop";
     state->dataSize->PlantSizData(2).PlantLoopName = "HotWaterLoop";
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
@@ -19124,7 +19124,7 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     state->dataSize->NumPltSizInput = 2;
     state->dataSize->PlantSizData(1).PlantLoopName = "ColdWaterLoop";
     state->dataSize->PlantSizData(2).PlantLoopName = "HotWaterLoop";
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {

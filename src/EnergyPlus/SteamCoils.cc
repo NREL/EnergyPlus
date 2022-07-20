@@ -775,16 +775,16 @@ namespace SteamCoils {
 
                     // Set the duct flow rate
                     switch (state.dataSize->CurDuctType) {
-                    case Main:
+                    case DataHVACGlobals::AirDuctType::Main:
                         DesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesMainVolFlow;
                         break;
-                    case Cooling:
+                    case DataHVACGlobals::AirDuctType::Cooling:
                         DesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesCoolVolFlow;
                         break;
-                    case Heating:
+                    case DataHVACGlobals::AirDuctType::Heating:
                         DesVolFlow = finalSysSizing.DesHeatVolFlow;
                         break;
-                    case Other:
+                    case DataHVACGlobals::AirDuctType::Other:
                         DesVolFlow = finalSysSizing.DesMainVolFlow;
                         break;
                     default:

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -67,24 +68,24 @@ namespace DataAirLoop {
     struct AirLoopZoneEquipConnectData
     {
         // Members
-        std::string AirLoopName;             // Name of Primary Air System
-        int NumReturnNodes = 0;              // Number of return nodes entering primary air system (currently limited to 1 node)
-        int NumSupplyNodes = 0;              // number of supply nodes exiting primary air system
-        int NumZonesCooled = 0;              // number of zones cooled by this primary air system
-        int NumZonesHeated = 0;              // number of zones heated by this primary air system
-        Array1D_int ZoneEquipReturnNodeNum;  // Zone Equip side return air node numbers (currently limited to 1 node)
-        Array1D_int ZoneEquipSupplyNodeNum;  // Zone equip side supply air node numbers
-        Array1D_int AirLoopReturnNodeNum;    // Air loop side return air node numbers
-        Array1D_int AirLoopSupplyNodeNum;    // Air loop side supply air node numbers
-        Array1D_int CoolCtrlZoneNums;        // Controlled zone numbers of zones cooled by this air loop
-        Array1D_int HeatCtrlZoneNums;        // Controlled zone numbers of zones heated by this air loop
-        Array1D_int CoolZoneInletNodes;      // Zone inlet node numbers of zones cooled by this air loop
-        Array1D_int HeatZoneInletNodes;      // Zone inlet node numbers of zones heated by this air loop
-        Array1D_int TermUnitCoolInletNodes;  // Air terminal unit cooling inlet node numbers for this air loop
-        Array1D_int TermUnitHeatInletNodes;  // Air terminal unit heating inlet node numbers for this air loop
-        Array1D_int TermUnitCoolSizingIndex; // Air terminal sizing numbers for zones cooled by this air loop
-        Array1D_int TermUnitHeatSizingIndex; // Air terminal sizing numbers for zones heated by this air loop
-        Array1D_int SupplyDuctType;          // 1=main, 2=cooling, 3=heating, 4=other
+        std::string AirLoopName;                              // Name of Primary Air System
+        int NumReturnNodes = 0;                               // Number of return nodes entering primary air system (currently limited to 1 node)
+        int NumSupplyNodes = 0;                               // number of supply nodes exiting primary air system
+        int NumZonesCooled = 0;                               // number of zones cooled by this primary air system
+        int NumZonesHeated = 0;                               // number of zones heated by this primary air system
+        Array1D_int ZoneEquipReturnNodeNum;                   // Zone Equip side return air node numbers (currently limited to 1 node)
+        Array1D_int ZoneEquipSupplyNodeNum;                   // Zone equip side supply air node numbers
+        Array1D_int AirLoopReturnNodeNum;                     // Air loop side return air node numbers
+        Array1D_int AirLoopSupplyNodeNum;                     // Air loop side supply air node numbers
+        Array1D_int CoolCtrlZoneNums;                         // Controlled zone numbers of zones cooled by this air loop
+        Array1D_int HeatCtrlZoneNums;                         // Controlled zone numbers of zones heated by this air loop
+        Array1D_int CoolZoneInletNodes;                       // Zone inlet node numbers of zones cooled by this air loop
+        Array1D_int HeatZoneInletNodes;                       // Zone inlet node numbers of zones heated by this air loop
+        Array1D_int TermUnitCoolInletNodes;                   // Air terminal unit cooling inlet node numbers for this air loop
+        Array1D_int TermUnitHeatInletNodes;                   // Air terminal unit heating inlet node numbers for this air loop
+        Array1D_int TermUnitCoolSizingIndex;                  // Air terminal sizing numbers for zones cooled by this air loop
+        Array1D_int TermUnitHeatSizingIndex;                  // Air terminal sizing numbers for zones heated by this air loop
+        Array1D<DataHVACGlobals::AirDuctType> SupplyDuctType; // 1=main, 2=cooling, 3=heating, 4=other
     };
 
     struct AirLoopOutsideAirConnectData

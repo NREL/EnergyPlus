@@ -323,8 +323,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 12 - Airloop Equipment - CurDuctType = Main, SysAirMinFlowRat = 0
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    // Test 12 - Airloop Equipment - CurDuctType = DataHVACGlobals::AirDuctType::Main, SysAirMinFlowRat = 0
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     state->dataSize->FinalSysSizing(1).DesMainVolFlow = 5.0;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.0;
     // start with an auto-sized value as the user input
@@ -355,7 +355,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 14 - Airloop Equipment - CurDuctType = Cooling, SysAirMinFlowRat = 0
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     state->dataSize->FinalSysSizing(1).DesMainVolFlow = 0.0;
     state->dataSize->FinalSysSizing(1).DesCoolVolFlow = 5.0;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.0;
@@ -385,8 +385,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     EXPECT_NEAR(3.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 16 - Airloop Equipment - CurDuctType = Heating, SysAirMinFlowRat doesn't matter
-    state->dataSize->CurDuctType = DataHVACGlobals::Heating;
+    // Test 16 - Airloop Equipment - CurDuctType = DataHVACGlobals::AirDuctType::Heating, SysAirMinFlowRat doesn't matter
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
     state->dataSize->FinalSysSizing(1).DesCoolVolFlow = 0.0;
     state->dataSize->FinalSysSizing(1).DesHeatVolFlow = 5.0;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.5;

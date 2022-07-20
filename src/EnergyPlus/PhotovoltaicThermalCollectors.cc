@@ -775,15 +775,15 @@ namespace PhotovoltaicThermalCollectors {
                         DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                     } else {
                         switch (state.dataSize->CurDuctType) {
-                        case DataHVACGlobals::Main: {
+                        case DataHVACGlobals::AirDuctType::Main: {
                             DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
                                                    state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         } break;
-                        case DataHVACGlobals::Cooling: {
+                        case DataHVACGlobals::AirDuctType::Cooling: {
                             DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
                                                    state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                         } break;
-                        case DataHVACGlobals::Heating: {
+                        case DataHVACGlobals::AirDuctType::Heating: {
                             DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                         } break;
                         default: {

@@ -273,8 +273,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    // Test 11 - Airloop Equipment - CurDuctType = Main
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    // Test 11 - Airloop Equipment - CurDuctType = DataHVACGlobals::AirDuctType::Main
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -302,7 +302,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 13 - Airloop Equipment - CurDuctType = Cooling
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -328,8 +328,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     EXPECT_NEAR(10.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 15 - Airloop Equipment - CurDuctType = Heating
-    state->dataSize->CurDuctType = DataHVACGlobals::Heating;
+    // Test 15 - Airloop Equipment - CurDuctType = DataHVACGlobals::AirDuctType::Heating
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
