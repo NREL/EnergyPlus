@@ -3013,13 +3013,13 @@ namespace InternalHeatGains {
                         // Level", ZoneITEq( Loop ).Name, "[W]", ZoneITEq( Loop ).DesignTotalPower ); } // EMS
 
                         if (!ErrorsFound)
-                            SetupSpaceInternalGain(state,
-                                                   thisZoneITEq.spaceIndex,
-                                                   1.0,
-                                                   thisZoneITEq.Name,
-                                                   DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                   &thisZoneITEq.PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                                                        .power /*ConGainRateToZone*/);
+                            SetupSpaceInternalGain(
+                                state,
+                                thisZoneITEq.spaceIndex,
+                                1.0,
+                                thisZoneITEq.Name,
+                                DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                &thisZoneITEq.PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].power /*ConGainRateToZone*/);
                     }
                 } // for itEqInputNum.NumOfSpaces
             }     // for itEqInputNum
@@ -6085,164 +6085,150 @@ namespace InternalHeatGains {
             // Set flags for zone and space total report variables
             addZoneOutputs(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex) = true;
+            SetupOutputVariable(state,
+                                "ITE CPU Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPU)].power, // CPUPower,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Fan Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].power, // FanPower,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE UPS Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPS)].power, // UPSPower,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
             SetupOutputVariable(
                 state,
-                "ITE CPU Electricity Rate",
+                "ITE CPU Electricity Rate at Design Inlet Conditions",
                 OutputProcessor::Unit::W,
-                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPU)].power, // CPUPower,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].power, // CPUPowerAtDesign,
                 OutputProcessor::SOVTimeStepType::Zone,
                 OutputProcessor::SOVStoreType::Average,
                 state.dataHeatBal->ZoneITEq(itEqNum).Name);
             SetupOutputVariable(
                 state,
-                "ITE Fan Electricity Rate",
+                "ITE Fan Electricity Rate at Design Inlet Conditions",
                 OutputProcessor::Unit::W,
-                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)].power, // FanPower,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].power, // FanPowerAtDesign,
                 OutputProcessor::SOVTimeStepType::Zone,
                 OutputProcessor::SOVStoreType::Average,
                 state.dataHeatBal->ZoneITEq(itEqNum).Name);
             SetupOutputVariable(
                 state,
-                "ITE UPS Electricity Rate",
+                "ITE UPS Heat Gain to Zone Rate",
                 OutputProcessor::Unit::W,
-                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPS)].power, // UPSPower,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPSGainToZone)].power, // UPSGainRateToZone,
                 OutputProcessor::SOVTimeStepType::Zone,
                 OutputProcessor::SOVStoreType::Average,
                 state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            SetupOutputVariable(state,
-                                "ITE CPU Electricity Rate at Design Inlet Conditions",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                                    .power, // CPUPowerAtDesign,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            SetupOutputVariable(state,
-                                "ITE Fan Electricity Rate at Design Inlet Conditions",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                                    .power, // FanPowerAtDesign,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            SetupOutputVariable(state,
-                                "ITE UPS Heat Gain to Zone Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPSGainToZone)]
-                                    .power, // UPSGainRateToZone,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            SetupOutputVariable(state,
-                                "ITE Total Heat Gain to Zone Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                                    .power, // ConGainRateToZone,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(
+                state,
+                "ITE Total Heat Gain to Zone Rate",
+                OutputProcessor::Unit::W,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].power, // ConGainRateToZone,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Average,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name);
 
-            SetupOutputVariable(state,
-                                "ITE CPU Electricity Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPU)]
-                                    .energy, // CPUConsumption,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                _,
-                                "Electricity",
-                                "InteriorEquipment",
-                                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryCPU,
-                                "Building",
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
-                                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
+            SetupOutputVariable(
+                state,
+                "ITE CPU Electricity Energy",
+                OutputProcessor::Unit::J,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPU)].energy, // CPUConsumption,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Summed,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name,
+                _,
+                "Electricity",
+                "InteriorEquipment",
+                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryCPU,
+                "Building",
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
+                _,
+                _,
+                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
 
-            SetupOutputVariable(state,
-                                "ITE Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)]
-                                    .energy, // FanConsumption,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                _,
-                                "Electricity",
-                                "InteriorEquipment",
-                                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryFan,
-                                "Building",
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
-                                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
-            SetupOutputVariable(state,
-                                "ITE UPS Electricity Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPS)]
-                                    .energy, // UPSConsumption,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                _,
-                                "Electricity",
-                                "InteriorEquipment",
-                                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryUPS,
-                                "Building",
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
-                                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
-            SetupOutputVariable(state,
-                                "ITE CPU Electricity Energy at Design Inlet Conditions",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                                    .energy, // CPUEnergyAtDesign,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            SetupOutputVariable(state,
-                                "ITE Fan Electricity Energy at Design Inlet Conditions",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                                    .energy, // FanEnergyAtDesign,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            SetupOutputVariable(state,
-                                "ITE UPS Heat Gain to Zone Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPSGainToZone)]
-                                    .energy, // UPSGainEnergyToZone,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
-            SetupOutputVariable(state,
-                                "ITE Total Heat Gain to Zone Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneITEq(itEqNum)
-                                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                                    .energy, // ConGainEnergyToZone,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(
+                state,
+                "ITE Fan Electricity Energy",
+                OutputProcessor::Unit::J,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].energy, // FanConsumption,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Summed,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name,
+                _,
+                "Electricity",
+                "InteriorEquipment",
+                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryFan,
+                "Building",
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
+                _,
+                _,
+                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
+            SetupOutputVariable(
+                state,
+                "ITE UPS Electricity Energy",
+                OutputProcessor::Unit::J,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPS)].energy, // UPSConsumption,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Summed,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name,
+                _,
+                "Electricity",
+                "InteriorEquipment",
+                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryUPS,
+                "Building",
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
+                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
+                _,
+                _,
+                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
+            SetupOutputVariable(
+                state,
+                "ITE CPU Electricity Energy at Design Inlet Conditions",
+                OutputProcessor::Unit::J,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].energy, // CPUEnergyAtDesign,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Summed,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(
+                state,
+                "ITE Fan Electricity Energy at Design Inlet Conditions",
+                OutputProcessor::Unit::J,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].energy, // FanEnergyAtDesign,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Summed,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(
+                state,
+                "ITE UPS Heat Gain to Zone Energy",
+                OutputProcessor::Unit::J,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPSGainToZone)].energy, // UPSGainEnergyToZone,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Summed,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(
+                state,
+                "ITE Total Heat Gain to Zone Energy",
+                OutputProcessor::Unit::J,
+                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].energy, // ConGainEnergyToZone,
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Summed,
+                state.dataHeatBal->ZoneITEq(itEqNum).Name);
 
             SetupOutputVariable(state,
                                 "ITE Standard Density Air Volume Flow Rate",
@@ -7802,9 +7788,7 @@ namespace InternalHeatGains {
             CPUPower = max(state.dataHeatBal->ZoneITEq(Loop).DesignCPUPower * OperSchedFrac *
                                CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn),
                            0.0);
-            state.dataHeatBal->ZoneITEq(Loop)
-                .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                .power /*CPUPowerAtDesign*/
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].power /*CPUPowerAtDesign*/
                 = max(state.dataHeatBal->ZoneITEq(Loop).DesignCPUPower * OperSchedFrac *
                           CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign),
                       0.0);
@@ -7819,7 +7803,7 @@ namespace InternalHeatGains {
             FanPower = max(state.dataHeatBal->ZoneITEq(Loop).DesignFanPower * OperSchedFrac *
                                CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac),
                            0.0);
-            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)].power /*FanPowerAtDesign*/
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].power /*FanPowerAtDesign*/
                 = max(state.dataHeatBal->ZoneITEq(Loop).DesignFanPower * OperSchedFrac *
                           CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT),
                       0.0);
@@ -7861,97 +7845,68 @@ namespace InternalHeatGains {
 
             if (AirConnection == ITEInletConnection::AdjustedSupply || AirConnection == ITEInletConnection::ZoneAirNode) {
                 // If not a room air model, then all ITEquip power input is a convective heat gain to the zone heat balance, plus UPS heat gain
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                    .power /*ConGainRateToZone*/
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].power /*ConGainRateToZone*/
                     = CPUPower + FanPower + UPSHeatGain;
             } else if (AirConnection == ITEInletConnection::RoomAirModel) {
                 // Room air model option not implemented yet - set room air model outlet node conditions here
                 // If a room air model, then the only convective heat gain to the zone heat balance is the UPS heat gain
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                    .power /*ConGainRateToZone*/
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].power /*ConGainRateToZone*/
                     = UPSHeatGain;
             }
             if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE) {
                 ZoneITEMap[state.dataHeatBal->ZoneITEq(Loop).ZonePtr].push_back(Loop);
             }
             if (state.dataGlobal->DoingSizing && state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                if (state.dataHeatBal->ZoneITEq(Loop)
-                            .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                            .power /*FanPowerAtDesign*/
-                        + state.dataHeatBal->ZoneITEq(Loop)
-                              .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                              .power /*CPUPowerAtDesign*/
+                if (state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].power       /*FanPowerAtDesign*/
+                        + state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].power /*CPUPowerAtDesign*/
                     > state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower) {
-                    state.dataHeatBal->ZoneITEq(Loop)
-                        .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                        .power /*ConGainRateToZone*/
-                        = state.dataHeatBal->ZoneITEq(Loop)
-                              .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                              .power /*FanPowerAtDesign*/
+                    state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].power /*ConGainRateToZone*/
+                        = state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].power /*FanPowerAtDesign*/
                           + state.dataHeatBal->ZoneITEq(Loop)
-                                .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
+                                .PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)]
                                 .power /*CPUPowerAtDesign*/;
                 }
             }
             // Object report variables
-            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPU)].power =
-                CPUPower; // CPUPower = CPUPower;
-            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)].power =
-                FanPower; // FanPower = FanPower;
-            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPS)].power =
-                UPSPower; // UPSPower = UPSPower;
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPU)].power = CPUPower; // CPUPower = CPUPower;
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].power = FanPower; // FanPower = FanPower;
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPS)].power = UPSPower; // UPSPower = UPSPower;
             // ZoneITEq( Loop ).CPUPowerAtDesign = set above
             // ZoneITEq( Loop ).FanPowerAtDesign = set above
-            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPSGainToZone)].power =
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPSGainToZone)].power =
                 UPSHeatGain; // UPSGainRateToZone = UPSHeatGain;
             // ZoneITEq( Loop ).ConGainRateToZone = set above
 
             // 2022-07-20: These below could also be potential candiates for block assigning; but wait for the next batch
             state.dataHeatBal->ZnRpt(NZ).ITEqCPUPower +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPU)].power; // CPUPower;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPU)].power; // CPUPower;
             state.dataHeatBal->ZnRpt(NZ).ITEqFanPower +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)].power; // FanPower;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].power; // FanPower;
             state.dataHeatBal->ZnRpt(NZ).ITEqUPSPower +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPS)].power; // UPSPower;
-            state.dataHeatBal->ZnRpt(NZ).ITEqCPUPowerAtDesign += state.dataHeatBal->ZoneITEq(Loop)
-                                                                     .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                                                                     .power; // CPUPowerAtDesign;
-            state.dataHeatBal->ZnRpt(NZ).ITEqFanPowerAtDesign += state.dataHeatBal->ZoneITEq(Loop)
-                                                                     .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                                                                     .power; // FanPowerAtDesign;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPS)].power; // UPSPower;
+            state.dataHeatBal->ZnRpt(NZ).ITEqCPUPowerAtDesign +=
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].power; // CPUPowerAtDesign;
+            state.dataHeatBal->ZnRpt(NZ).ITEqFanPowerAtDesign +=
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].power; // FanPowerAtDesign;
             state.dataHeatBal->ZnRpt(NZ).ITEqUPSGainRateToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPSGainToZone)]
-                    .power; // UPSGainRateToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPSGainToZone)].power; // UPSGainRateToZone;
             state.dataHeatBal->ZnRpt(NZ).ITEqConGainRateToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                    .power; // ConGainRateToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].power; // ConGainRateToZone;
 
             state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPower +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPU)].power; // CPUPower;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPU)].power; // CPUPower;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPower +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)].power; // FanPower;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].power; // FanPower;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSPower +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPS)].power; // UPSPower;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPS)].power; // UPSPower;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPowerAtDesign +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                    .power; // CPUPowerAtDesign;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].power; // CPUPowerAtDesign;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPowerAtDesign +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                    .power; // FanPowerAtDesign;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].power; // FanPowerAtDesign;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainRateToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPSGainToZone)]
-                    .power; // UPSGainRateToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPSGainToZone)].power; // UPSGainRateToZone;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainRateToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                    .power; // ConGainRateToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].power; // ConGainRateToZone;
 
             for (auto &pe : state.dataHeatBal->ZoneITEq(Loop).PERptVars) {
                 pe.energy = pe.power * state.dataGlobal->TimeStepZoneSec;
@@ -7959,50 +7914,34 @@ namespace InternalHeatGains {
 
             // 2022-07-20 next batch candidates chaing to block assignments; but just do manual change for now
             state.dataHeatBal->ZnRpt(NZ).ITEqCPUConsumption +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPU)].energy; // CPUConsumption;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPU)].energy; // CPUConsumption;
             state.dataHeatBal->ZnRpt(NZ).ITEqFanConsumption +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)].energy; // FanConsumption;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].energy; // FanConsumption;
             state.dataHeatBal->ZnRpt(NZ).ITEqUPSConsumption +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPS)].energy; // UPSConsumption;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPS)].energy; // UPSConsumption;
             state.dataHeatBal->ZnRpt(NZ).ITEqCPUEnergyAtDesign +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                    .energy; // CPUEnergyAtDesign;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].energy; // CPUEnergyAtDesign;
             state.dataHeatBal->ZnRpt(NZ).ITEqFanEnergyAtDesign +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                    .energy; // FanEnergyAtDesign;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].energy; // FanEnergyAtDesign;
             state.dataHeatBal->ZnRpt(NZ).ITEqUPSGainEnergyToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPSGainToZone)]
-                    .energy; // UPSGainEnergyToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPSGainToZone)].energy; // UPSGainEnergyToZone;
             state.dataHeatBal->ZnRpt(NZ).ITEqConGainEnergyToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                    .energy; // ConGainEnergyToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].energy; // ConGainEnergyToZone;
 
             state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUConsumption +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPU)].energy; // CPUConsumption;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPU)].energy; // CPUConsumption;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqFanConsumption +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Fan)].energy; // FanConsumption;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::Fan)].energy; // FanConsumption;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSConsumption +=
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPS)].energy; // UPSConsumption;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPS)].energy; // UPSConsumption;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUEnergyAtDesign +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::CPUAtDesign)]
-                    .energy; // CPUEnergyAtDesign;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::CPUAtDesign)].energy; // CPUEnergyAtDesign;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqFanEnergyAtDesign +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::FanAtDesign)]
-                    .energy; // FanEnergyAtDesign;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::FanAtDesign)].energy; // FanEnergyAtDesign;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainEnergyToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::UPSGainToZone)]
-                    .energy; // UPSGainEnergyToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::UPSGainToZone)].energy; // UPSGainEnergyToZone;
             state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainEnergyToZone +=
-                state.dataHeatBal->ZoneITEq(Loop)
-                    .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
-                    .energy; // ConGainEnergyToZone;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[static_cast<int>(ITEquipData::PERptVar::ConGainToZone)].energy; // ConGainEnergyToZone;
 
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = AirMassFlowRate * state.dataEnvrn->StdRhoAir;
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowCurDensity = AirVolFlowRate;
