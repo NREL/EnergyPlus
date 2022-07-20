@@ -681,7 +681,7 @@ namespace DataSurfaces {
         Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
 
         // Boundary conditions and interconnections
-        bool HeatTransSurf;                      // True if surface is a heat transfer surface,
+        bool HeatTransSurf;                      // True if surface is a heat transfer surface (light shelf can also be IsShadowing)
         int OutsideHeatSourceTermSchedule;       // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
         int InsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
                                                  // False if a (detached) shadowing (sub)surface
@@ -713,7 +713,7 @@ namespace DataSurfaces {
         int OSCPtr;             // Pointer to OSC data structure
         int OSCMPtr;            // "Pointer" to OSCM data structure (other side conditions from a model)
         bool MirroredSurf;      // True if it is a mirrored surface
-        bool IsShadowing;       // True if a surface is a shadowing surface
+        bool IsShadowing;       // True if a surface is a shadowing surface (light shelf can also be HeatTransSurf)
         bool IsShadowPossibleObstruction; // True if a surface can be an exterior obstruction
 
         // Optional parameters specific to shadowing surfaces and subsurfaces (detached shading, overhangs, wings, etc.)
@@ -742,7 +742,18 @@ namespace DataSurfaces {
 
         ConvectionConstants::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
 
-        SurfaceCalcHashKey calcHashKey; // Hash key used for determining if this surface requires unique calculations.
+        SurfaceCalcHashKey calcHashKey;        // Hash key used for determining if this surface requires unique calculations.
+        bool IsSurfPropertyGndSurfacesDefined; // true if ground surfaces properties are listed for an external surface
+        int SurfPropertyGndSurfIndex;          // index to a ground surfaces list (defined in SurfaceProperties::GroundSurfaces)
+        bool UseSurfPropertyGndSurfTemp;       // true if at least one ground surface temperature schedules is specified
+        bool UseSurfPropertyGndSurfRefl;       // true if at least one ground surfaces reflectance schedule is specified
+        Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
+        bool SurfHasSurroundingSurfProperty;   // true if surrounding surfaces properties are listed for an external surface
+        bool SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
+        bool SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
+        int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+        int SurfExternalShadingSchInd;         // Schedule for a the external shading
+        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
 
         // Default Constructor
         SurfaceData()
@@ -757,7 +768,10 @@ namespace DataSurfaces {
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
-              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
+              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid), IsSurfPropertyGndSurfacesDefined(false),
+              SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
+              SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false), SurfHasLinkedOutAirNode(false),
+              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
         {
         }
 
@@ -1284,48 +1298,58 @@ namespace DataSurfaces {
         }
     };
 
+    struct GroundSurfacesData
+    {
+        // Members
+        std::string Name;        // name of a ground surface
+        Real64 ViewFactor = 0.0; // view factor to a ground surface
+        int TempSchPtr = 0;      // pointer to a ground surface temperature schedule object
+        int ReflSchPtr = 0;      // pointer to a ground Surface reflectance schedule object
+    };
+
+    struct GroundSurfacesProperty
+    {
+        // Members
+        std::string Name;                     // name of multiple ground surfaces object
+        int NumGndSurfs = 0;                  // number of groundSurfaces
+        Array1D<GroundSurfacesData> GndSurfs; // ground surfaces data
+        Real64 SurfsTempAvg = 0.0;            // ground Surfaces average temperature at each time step
+        Real64 SurfsReflAvg = 0.0;            // ground Surfaces average reflectance at each time step
+        Real64 SurfsViewFactorSum = 0.0;      // sum of view factors of ground surfaces seen by an exterior surface
+        bool IsGroundViewFactorSet = false;   // true if the ground view factor field is not blank
+    };
+
     struct SurfaceLocalEnvironment
     {
         // Members
         std::string Name;
-        int SurfPtr;             // surface pointer
-        int ExtShadingSchedPtr;  // schedule pointer
-        int SurroundingSurfsPtr; // schedule pointer
-        int OutdoorAirNodePtr;   // schedule pointer
-
-        // Default Constructor
-        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0)
-        {
-        }
+        int SurfPtr = 0;             // surface pointer
+        int ExtShadingSchedPtr = 0;  // schedule pointer
+        int SurroundingSurfsPtr = 0; // schedule pointer
+        int OutdoorAirNodePtr = 0;   // outdoor air node pointer
+        int GroundSurfsPtr = 0;      // pointer to multiple ground surfaces object
     };
 
     struct SurroundingSurfProperty
     {
         // Members
         std::string Name;
-        Real64 ViewFactor;
-        int TempSchNum; // schedule pointer
-                        // Default Constructor
-        SurroundingSurfProperty() : ViewFactor(0.0), TempSchNum(0)
-        {
-        }
+        Real64 ViewFactor = 0.0; // view factor to surrounding surface
+        int TempSchNum = 0;      // schedule pointer
     };
 
     struct SurroundingSurfacesProperty
     {
         // Members
         std::string Name;
-        Real64 SkyViewFactor;
-        int SkyTempSchNum; // schedule pointer
-        Real64 GroundViewFactor;
-        int GroundTempSchNum;      // schedule pointer
-        int TotSurroundingSurface; // Total number of surrounding surfaces defined for an exterior surface
+        Real64 SkyViewFactor = 0.0;         // sky view factor
+        Real64 GroundViewFactor = 0.0;      // ground view factor
+        int SkyTempSchNum = 0;              // schedule pointer
+        int GroundTempSchNum = 0;           // schedule pointer
+        int TotSurroundingSurface = 0;      // Total number of surrounding surfaces defined for an exterior surface
+        bool IsSkyViewFactorSet = false;    // false if the sky view factor field is blank
+        bool IsGroundViewFactorSet = false; // false if the ground view factor field is blank
         Array1D<SurroundingSurfProperty> SurroundingSurfs;
-
-        // Default Constructor
-        SurroundingSurfacesProperty() : SkyViewFactor(-1.0), SkyTempSchNum(0), GroundViewFactor(-1.0), GroundTempSchNum(0), TotSurroundingSurface(0)
-        {
-        }
     };
 
     struct IntMassObject
@@ -1377,14 +1401,15 @@ struct SurfacesData : BaseGlobalStruct
     int TotWindows = 0;            // Total number of windows
     int TotStormWin = 0;           // Total number of storm window blocks
     int TotWinShadingControl = 0;  // Total number of window shading control blocks
-    int TotIntConvCoeff = 0;       // Total number of interior convection coefficient (overrides)
-    int TotExtConvCoeff = 0;       // Total number of exterior convection coefficient (overrides)
+    int TotIntConvCoeff = 0;       // Total number of interior convection coefficient (overrides) // TODO: Should just be a local variable I think
+    int TotExtConvCoeff = 0;       // Total number of exterior convection coefficient (overrides) // TODO: Should just be a local variable I think
     int TotOSC = 0;                // Total number of Other Side Coefficient Blocks
     int TotOSCM = 0;               // Total number of Other Side Conditions Model Blocks.
     int TotExtVentCav = 0;         // Total number of ExteriorNaturalVentedCavity
     int TotSurfIncSolSSG = 0;      // Total number of scheduled surface gains for incident solar radiation on surface
     int TotFenLayAbsSSG = 0;       // Total number of scheduled surface gains for absorbed solar radiation in window layers
     int TotSurfLocalEnv = 0;       // Total number of surface level outdoor air node.
+    int TotSurfPropGndSurfs = 0;   // Total number of surface property ground surfaces object
     int Corner = 0;                // Which corner is specified as the first vertex
     int MaxVerticesPerSurface = 4; // Maximum number of vertices allowed for a single surface (default -- can go higher)
     int BuildingShadingCount = 0;  // Total number of Building External Shades
@@ -1417,12 +1442,17 @@ struct SurfacesData : BaseGlobalStruct
         RepresentativeSurfaceMap; // A map that categorizes similar surfaces with
                                   // a single representative surface index
 
-    std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
-    std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
-    std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
-    std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
-    std::vector<int> AllHTKivaSurfaceList;      // List of all window surfaces
-    std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
+    std::vector<int> AllHTSurfaceList;                 // List of all heat transfer surfaces
+    std::vector<int> AllExtSolarSurfaceList;           // List of all exterior solar surfaces, all are heat transfer surfaces
+    std::vector<int> AllExtSolAndShadingSurfaceList;   // List of all exterior solar surfaces plus all shading surfaces
+    std::vector<int> AllShadowPossObstrSurfaceList;    // List of all IsShadoPossibleObstuction surfaces
+    std::vector<int> AllIZSurfaceList;                 // List of all interzone heat transfer surfaces
+    std::vector<int> AllHTNonWindowSurfaceList;        // List of all non-window heat transfer surfaces
+    std::vector<int> AllHTWindowSurfaceList;           // List of all window surfaces
+    std::vector<int> AllExtSolWindowSurfaceList;       // List of all exterior solar window surfaces
+    std::vector<int> AllExtSolWinWithFrameSurfaceList; // List of all exterior solar window surfaces with a frame and divider
+    std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva foundation surfaces
+    std::vector<int> AllSurfaceListReportOrder;        // List of all surfaces - output reporting order
 
     // Surface HB arrays
     Array1D<Real64> SurfOutDryBulbTemp; // Surface outside dry bulb air temperature, for surface heat balance (C)
@@ -1494,21 +1524,15 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWindDirEMSOverrideValue;          // value to use for EMS override of outside wind direction (deg)
 
     // Surface Properties
-    Array1D<int> SurfDaylightingShelfInd;           // Pointer to daylighting shelf
-    Array1D<bool> SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
-    Array1D<int> SurfExternalShadingSchInd;         // Schedule for a the external shading
-    Array1D<bool> SurfHasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
-    Array1D<int> SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
-    Array1D<bool> SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
-    Array1D<int> SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
-    Array1D<bool> SurfExtEcoRoof;                   // True if the top outside construction material is of type Eco Roof
-    Array1D<bool> SurfExtCavityPresent;             // true if there is an exterior vented cavity on surface
-    Array1D<int> SurfExtCavNum;                     // index for this surface in ExtVentedCavity structure (if any)
-    Array1D<bool> SurfIsPV;                         // true if this is a photovoltaic surface (dxf output)
-    Array1D<bool> SurfIsICS;                        // true if this is an ICS collector
-    Array1D<bool> SurfIsPool;                       // true if this is a pool
-    Array1D<int> SurfICSPtr;                        // Index to ICS collector
-    Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
+    Array1D<int> SurfDaylightingShelfInd;        // Pointer to daylighting shelf
+    Array1D<bool> SurfExtEcoRoof;                // True if the top outside construction material is of type Eco Roof
+    Array1D<bool> SurfExtCavityPresent;          // true if there is an exterior vented cavity on surface
+    Array1D<int> SurfExtCavNum;                  // index for this surface in ExtVentedCavity structure (if any)
+    Array1D<bool> SurfIsPV;                      // true if this is a photovoltaic surface (dxf output)
+    Array1D<bool> SurfIsICS;                     // true if this is an ICS collector
+    Array1D<bool> SurfIsPool;                    // true if this is a pool
+    Array1D<int> SurfICSPtr;                     // Index to ICS collector
+    Array1D<bool> SurfIsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;           // Flag for reference air temperature
@@ -1771,6 +1795,7 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
     EPVector<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
     EPVector<DataSurfaces::IntMassObject> IntMassObjects;
+    EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
 
     int actualMaxSlatAngs = DataSurfaces::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
 
@@ -1788,6 +1813,7 @@ struct SurfacesData : BaseGlobalStruct
         this->TotSurfIncSolSSG = 0;
         this->TotFenLayAbsSSG = 0;
         this->TotSurfLocalEnv = 0;
+        this->TotSurfPropGndSurfs = 0;
         this->Corner = 0;
         this->MaxVerticesPerSurface = 4;
         this->BuildingShadingCount = 0;
@@ -1817,9 +1843,14 @@ struct SurfacesData : BaseGlobalStruct
         this->Z0.deallocate();
         this->RepresentativeSurfaceMap.clear();
         this->AllHTSurfaceList.clear();
+        this->AllExtSolarSurfaceList.clear();
+        this->AllExtSolAndShadingSurfaceList.clear();
+        this->AllShadowPossObstrSurfaceList.clear();
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
         this->AllHTWindowSurfaceList.clear();
+        this->AllExtSolWindowSurfaceList.clear();
+        this->AllExtSolWinWithFrameSurfaceList.clear();
         this->AllHTKivaSurfaceList.clear();
         this->AllSurfaceListReportOrder.clear();
 
@@ -1876,12 +1907,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWindDirEMSOverrideOn.deallocate();
         this->SurfWindDirEMSOverrideValue.deallocate();
         this->SurfDaylightingShelfInd.deallocate();
-        this->SurfSchedExternalShadingFrac.deallocate();
-        this->SurfExternalShadingSchInd.deallocate();
-        this->SurfHasSurroundingSurfProperties.deallocate();
-        this->SurfSurroundingSurfacesNum.deallocate();
-        this->SurfHasLinkedOutAirNode.deallocate();
-        this->SurfLinkedOutAirNode.deallocate();
         this->SurfExtEcoRoof.deallocate();
         this->SurfExtCavityPresent.deallocate();
         this->SurfExtCavNum.deallocate();
@@ -2114,6 +2139,7 @@ struct SurfacesData : BaseGlobalStruct
         this->SurroundingSurfsProperty.deallocate();
         this->IntMassObjects.deallocate();
         this->actualMaxSlatAngs = DataSurfaces::MaxSlatAngs;
+        this->GroundSurfsProperty.deallocate();
     }
 };
 

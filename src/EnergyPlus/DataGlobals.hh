@@ -64,20 +64,26 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
+enum class BooleanSwitch
+{
+    Invalid = -1,
+    No,
+    Yes,
+    Num
+};
+
 struct DataGlobal : BaseGlobalStruct
 {
-    bool BeginDayFlag = false;            // True at the start of each day, False after first time step in day
-    bool BeginEnvrnFlag = false;          // True at the start of each environment, False after first time step in environ
-    bool beginEnvrnWarmStartFlag = false; // Sizing Speed Up
-    bool BeginHourFlag = false;           // True at the start of each hour, False after first time step in hour
-    bool BeginSimFlag = false;            // True until any actual simulation (full or sizing) has begun, False after first time step
-    bool BeginFullSimFlag = false;        // True until full simulation has begun, False after first time step
-    bool BeginTimeStepFlag = false;       // True at the start of each time step, False after first subtime step of time step
-    int DayOfSim = 0;                     // Counter for days (during the simulation)
-    int CalendarYear = 0;                 // Calendar year of the current day of simulation
-    std::string CalendarYearChr;          // Calendar year of the current day of simulation (character -- for reporting)
-    bool EndEnvrnFlag = false;            // True at the end of each environment (last time step of last hour of last day of environ)
-    bool EndDesignDayEnvrnsFlag = false;  // True at the end of the last design day environment
+    bool BeginDayFlag = false;           // True at the start of each day, False after first time step in day
+    bool BeginEnvrnFlag = false;         // True at the start of each environment, False after first time step in environ
+    bool BeginHourFlag = false;          // True at the start of each hour, False after first time step in hour
+    bool BeginSimFlag = false;           // True until any actual simulation (full or sizing) has begun, False after first time step
+    bool BeginTimeStepFlag = false;      // True at the start of each time step, False after first subtime step of time step
+    int DayOfSim = 0;                    // Counter for days (during the simulation)
+    int CalendarYear = 0;                // Calendar year of the current day of simulation
+    std::string CalendarYearChr;         // Calendar year of the current day of simulation (character -- for reporting)
+    bool EndEnvrnFlag = false;           // True at the end of each environment (last time step of last hour of last day of environ)
+    bool EndDesignDayEnvrnsFlag = false; // True at the end of the last design day environment
     bool AnnualSimulation = false;
     std::string DayOfSimChr = "0"; // Counter for days (during the simulation) (character -- for reporting)
     bool runReadVars = false;
@@ -85,10 +91,6 @@ struct DataGlobal : BaseGlobalStruct
     bool outputEpJSONConversion = false;
     bool outputEpJSONConversionOnly = false;
     bool isEpJSON = false;
-    bool isCBOR = false;
-    bool isMsgPack = false;
-    bool isUBJSON = false;
-    bool isBSON = false;
     bool preserveIDFOrder = true;
     bool stopSimulation = false;
     std::function<void(void *)> externalHVACManager;
@@ -140,25 +142,25 @@ struct DataGlobal : BaseGlobalStruct
     int MinutesPerTimeStep = 0;   // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
     Real64 TimeStepZoneSec = 0.0; // Seconds per time step
     bool MetersHaveBeenInitialized = false;
-    bool KickOffSimulation = false;                 // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
-    bool KickOffSizing = false;                     // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
-    bool RedoSizesHVACSimulation = false;           // doing kick off simulation for redoing sizes as part of sizing
-    bool FinalSizingHVACSizingSimIteration = false; // when doing HVAC sizing Simulation
-    bool AnyEnergyManagementSystemInModel = false;  // true if there is any EMS or Erl in model.  otherwise false
-    bool AnySurfPropOverridesInModel = false;       // true if there is any EMS or Erl overriding the surface properties for any surface.
-    bool AnyConstrOverridesInModel = false;         // true if there is any EMS or Erl overriding the constructions for any surface.
-    bool AndShadingControlInModel = false;          // true if there is any window shading control for any fenestration surface
-    bool AnyLocalEnvironmentsInModel = false;       // true if there is any local environmental data objected defined in model, otherwise false
-    bool AnyPlantInModel = false;                   // true if there are any plant or condenser loops in model, otherwise false
-    bool AnyIdealCondEntSetPointInModel = false;    // true if there is any ideal condenser entering set point manager in model.
-    bool RunOptCondEntTemp = false;                 // true if the ideal condenser entering set point optimization is running
-    bool CompLoadReportIsReq = false;               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
-    bool isPulseZoneSizing = false;                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    bool doLoadComponentPulseNow = false;           // true for the time step that is the "pulse" for the load component report
-    bool ShowDecayCurvesInEIO = false;              // true if the Radiant to Convective Decay Curves should appear in the EIO file
-    bool AnySlabsInModel = false;                   // true if there are any zone-coupled ground domains in the input file
-    bool AnyBasementsInModel = false;               // true if there are any basements in the input file
-    bool DoCoilDirectSolutions = false;             // true if use coil direction solutions
+    bool KickOffSimulation = false;                // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
+    bool KickOffSizing = false;                    // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
+    bool RedoSizesHVACSimulation = false;          // doing kick off simulation for redoing sizes as part of sizing
+                                                   //    bool FinalSizingHVACSizingSimIteration = false; // when doing HVAC sizing Simulation
+    bool AnyEnergyManagementSystemInModel = false; // true if there is any EMS or Erl in model.  otherwise false
+    bool AnySurfPropOverridesInModel = false;      // true if there is any EMS or Erl overriding the surface properties for any surface.
+    bool AnyConstrOverridesInModel = false;        // true if there is any EMS or Erl overriding the constructions for any surface.
+    bool AndShadingControlInModel = false;         // true if there is any window shading control for any fenestration surface
+    bool AnyLocalEnvironmentsInModel = false;      // true if there is any local environmental data objected defined in model, otherwise false
+    bool AnyPlantInModel = false;                  // true if there are any plant or condenser loops in model, otherwise false
+    bool AnyIdealCondEntSetPointInModel = false;   // true if there is any ideal condenser entering set point manager in model.
+    bool RunOptCondEntTemp = false;                // true if the ideal condenser entering set point optimization is running
+    bool CompLoadReportIsReq = false;              // true if the extra sizing calcs are performed to create a "pulse" for the load component report
+    bool isPulseZoneSizing = false;                // true during the set of zone sizing calcs that include the "pulse" for the load component report
+    bool doLoadComponentPulseNow = false;          // true for the time step that is the "pulse" for the load component report
+    bool ShowDecayCurvesInEIO = false;             // true if the Radiant to Convective Decay Curves should appear in the EIO file
+    bool AnySlabsInModel = false;                  // true if there are any zone-coupled ground domains in the input file
+    bool AnyBasementsInModel = false;              // true if there are any basements in the input file
+    bool DoCoilDirectSolutions = false;            // true if use coil direction solutions
     bool createPerfLog = false; // true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
     void (*fProgressPtr)(int const) = nullptr;
     void (*fMessagePtr)(std::string const &) = nullptr;
@@ -166,7 +168,7 @@ struct DataGlobal : BaseGlobalStruct
     std::function<void(const std::string &)> messageCallback = nullptr;
     std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback = nullptr;
     bool eplusRunningViaAPI = false;
-    int NumOfWaterHeater;
+    int NumOfWaterHeater = 0;
     bool CountNonZoneEquip = true;
     int FDsimDay = 0;
     int FDnumIterYears = 0;

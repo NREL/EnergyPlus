@@ -101,7 +101,8 @@ namespace EvaporativeFluidCoolers {
     constexpr std::array<std::string_view, static_cast<int>(EvapLoss::Num)> evapLossNamesUC = {"LOSSFACTOR", "SATURATEDEXIT"};
     constexpr std::array<std::string_view, static_cast<int>(Blowdown::Num)> blowDownNamesUC = {"CONCENTRATIONRATIO", "SCHEDULEDRATE"};
 
-    PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
+    EvapFluidCoolerSpecs *
+    EvapFluidCoolerSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
         if (state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag) {

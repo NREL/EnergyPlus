@@ -1148,7 +1148,6 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                     state->dataGlobal->BeginDayFlag = false;
                     state->dataGlobal->BeginEnvrnFlag = false;
                     state->dataGlobal->BeginSimFlag = false;
-                    state->dataGlobal->BeginFullSimFlag = false;
 
                 } // TimeStep loop
 
@@ -2241,7 +2240,6 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                     state->dataGlobal->BeginDayFlag = false;
                     state->dataGlobal->BeginEnvrnFlag = false;
                     state->dataGlobal->BeginSimFlag = false;
-                    state->dataGlobal->BeginFullSimFlag = false;
 
                 } // TimeStep loop
 

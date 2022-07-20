@@ -115,11 +115,6 @@ namespace FileSystem {
         Num
     };
 
-    static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
-        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
-    static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
-    static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
-
     inline constexpr bool is_all_json_type(FileTypes t)
     {
         return t > FileTypes::Invalid && t <= FileTypes::last_binary_json_type;

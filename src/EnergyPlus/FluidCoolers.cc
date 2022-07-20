@@ -97,7 +97,7 @@ namespace EnergyPlus::FluidCoolers {
 std::string const cFluidCooler_SingleSpeed("FluidCooler:SingleSpeed");
 std::string const cFluidCooler_TwoSpeed("FluidCooler:TwoSpeed");
 
-PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
+FluidCoolerspecs *FluidCoolerspecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataFluidCoolers->GetFluidCoolerInputFlag) {
         GetFluidCoolerInput(state);

@@ -238,7 +238,7 @@ struct BaseSizer
     // CoolingAirFlowSizing
     Real64 dataBypassFrac = 0.0;
 
-    Real64 dataIsDXCoil = false;
+    bool dataIsDXCoil = false;
 
     Real64 dataNonZoneNonAirloopValue = 0.0;
 

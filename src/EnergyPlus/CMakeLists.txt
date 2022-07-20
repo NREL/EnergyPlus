@@ -214,7 +214,6 @@ set(SRC
     DataSurfaces.hh
     DataSystemVariables.cc
     DataSystemVariables.hh
-    DataTimings.cc
     DataTimings.hh
     DataUCSDSharedData.hh
     DataVectorTypes.hh
@@ -241,6 +240,7 @@ set(SRC
     DualDuct.hh
     EMSManager.cc
     EMSManager.hh
+    EPVector.hh
     EarthTube.cc
     EarthTube.hh
     EcoRoofManager.cc
@@ -613,7 +613,6 @@ set(SRC
     ThermalEN673Calc.hh
     ThermalISO15099Calc.cc
     ThermalISO15099Calc.hh
-    Timer.h
     TranspiredCollector.cc
     TranspiredCollector.hh
     UFADManager.cc
@@ -696,7 +695,8 @@ set(INPUTPARSING_SRC
     InputProcessing/IdfParser.cc
     InputProcessing/IdfParser.hh
     InputProcessing/InputValidation.cc
-    InputProcessing/InputValidation.hh)
+    InputProcessing/InputValidation.hh
+    UtilityRoutines.hh)
 
 create_src_groups("${INPUTPARSING_SRC}")
 
