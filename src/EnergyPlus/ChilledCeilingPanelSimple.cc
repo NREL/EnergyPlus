@@ -734,7 +734,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     }
 }
 
-void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ZoneNum, bool const FirstHVACIteration)
 {
 
     // SUBROUTINE INFORMATION:
@@ -761,8 +761,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     static constexpr std::string_view RoutineName("ChilledCeilingPanelSimple:InitCoolingPanel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNode;
-    int ZoneNum;
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
     bool errFlag;
@@ -770,7 +768,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
     auto &ThisInNode(state.dataLoopNodes->Node(ThisCP.WaterInletNode));
 
-    if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+    if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneNum;
 
     // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
     if (!ThisCP.ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -854,7 +852,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-        ZoneNum = ThisCP.ZonePtr;
+        int ZoneNum = ThisCP.ZonePtr;
         state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf = SumHATsurf(state, ZoneNum);
         ThisCP.CoolingPanelSrcAvg = 0.0;
         ThisCP.LastCoolingPanelSrc = 0.0;
@@ -863,7 +861,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     // Do the every time step initializations
-    ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+    int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
     ThisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
     ThisCP.WaterInletTemp = ThisInNode.Temp;
     ThisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;

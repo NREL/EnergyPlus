@@ -2566,13 +2566,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
 
         // Check to see if this is a controlled zone
-        ControlledZoneAirFlag = false;
-        for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-            if (!state.dataHeatBal->Zone(ZoneEquipConfigNum).IsControlled) continue;
-            if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
-            ControlledZoneAirFlag = true;
-            break;
-        } // ZoneEquipConfigNum
+        ControlledZoneAirFlag = state.dataHeatBal->Zone(ZoneNum).IsControlled;
 
         // Check to see if this is a plenum zone
         ZoneRetPlenumAirFlag = false;

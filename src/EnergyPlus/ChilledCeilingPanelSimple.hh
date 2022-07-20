@@ -175,7 +175,7 @@ namespace CoolingPanelSimple {
 
     void GetCoolingPanelInput(EnergyPlusData &state);
 
-    void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
+    void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ZoneNum, bool FirstHVACIteration);
 
     void SizeCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 

@@ -116,7 +116,7 @@ namespace BaseboardRadiator {
 
     void GetBaseboardInput(EnergyPlusData &state);
 
-    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub);
+    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ZoneNum);
 
     void SizeBaseboard(EnergyPlusData &state, int BaseboardNum);
 

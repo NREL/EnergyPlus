@@ -1024,7 +1024,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                             designOAductFlow =
                                 DataSizing::calcDesignSpecificationOutdoorAir(state,
                                                                               state.dataDualDuct->dd_airterminal(dualDuctATUNum).OARequirementsPtr,
-                                                                              state.dataDualDuct->dd_airterminal(dualDuctATUNum).ActualZoneNum,
+                                                                              state.dataDualDuct->dd_airterminal(dualDuctATUNum).CtrlZoneNum,
                                                                               UseOccSchFlag,
                                                                               UseMinOASchFlag);
                             airLoopHeatingMinimumFlowRateSum += designOAductFlow;

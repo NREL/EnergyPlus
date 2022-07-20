@@ -199,8 +199,7 @@ namespace HVACUnitaryBypassVAV {
         int AirLoopNumber;              // Air loop served by the CBVAV system
         int NumControlledZones;
         Array1D_int ControlledZoneNum;           // Index to controlled zones
-        Array1D_int ActualZoneNum;               // Actual zone number of controlled zone
-        Array1D_int ActualZoneNodeNum;           // Actual zone node num of controlled zone
+        Array1D_int ZoneNodeNum;                 // Zone node num of controlled zone
         Array1D_int CBVAVBoxOutletNode;          // Outlet node of CBVAV Box in controlled zone
         Array1D_int ZoneSequenceCoolingNum;      // Index to cooling sequence/priority for this zone
         Array1D_int ZoneSequenceHeatingNum;      // Index to heating sequence/priority for this zone

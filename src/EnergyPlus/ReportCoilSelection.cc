@@ -542,7 +542,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     auto &c(coilSelectionDataObjs[coilVecIndex]);
     c->coilLocation = "Zone";
     c->zoneNum.resize(1);
-    c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
+    c->zoneNum[0] = c->zoneEqNum;
     c->zoneName.resize(1);
     c->zoneName[0] = state.dataHeatBal->Zone(c->zoneNum[0]).Name;
     c->typeHVACname = "Zone Equipment"; // init
@@ -1386,8 +1386,8 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
+        c->zoneNum[0] = curZoneEqNum;
+        c->zoneName[0] = state.dataHeatBal->Zone(curZoneEqNum).Name;
         c->desDayNameAtSensPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDesDay;
         c->oaPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtCoolPeak;
         c->oaPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtCoolPeak;
@@ -1616,8 +1616,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
+        c->zoneNum[0] = curZoneEqNum;
+        c->zoneName[0] = state.dataHeatBal->Zone(curZoneEqNum).Name;
         c->desDayNameAtSensPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDesDay;
         c->oaPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak;
         c->oaPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak;

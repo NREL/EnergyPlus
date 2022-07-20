@@ -3508,8 +3508,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             case ZoneEquip::BBElectric: { // 'ZoneHVAC:Baseboard:RadiantConvective:Electric'
                 SimElecBaseboard(state,
                                  state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                                 ActualZoneNum,
-                                 ControlledZoneNum,
+                                 ZoneNum,
                                  FirstHVACIteration,
                                  SysOutputProvided,
                                  state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
