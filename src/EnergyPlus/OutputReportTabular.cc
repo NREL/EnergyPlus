@@ -13001,7 +13001,7 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
     }
 }
 
-void WriteResilienceBinsTableNoPreDef(EnergyPlusData &state,
+void WriteResilienceBinsTableNonPreDef(EnergyPlusData &state,
                                       int const columnNum,
                                       const std::string tableName,
                                       Array1D_string const &columnHead,
@@ -13491,13 +13491,13 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         }
 
         std::string tableName = "Heat Index Hours";
-        WriteResilienceBinsTableNoPreDef(
+        WriteResilienceBinsTableNonPreDef(
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneHeatIndexHourBins, rowHead, tableBody);
         tableName = "Heat Index OccupantHours";
-        WriteResilienceBinsTableNoPreDef(
+        WriteResilienceBinsTableNonPreDef(
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins, rowHead, tableBody);
         tableName = "Heat Index OccupiedHours";
-        WriteResilienceBinsTableNoPreDef(
+        WriteResilienceBinsTableNonPreDef(
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBins, rowHead, tableBody);
 
         columnHeadStr(1) = "Little to no Discomfort (≤ 29) [hr]";
@@ -13507,13 +13507,13 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         columnHeadStr(5) = "Heat Stroke Quite Possible (> 50) [hr]";
 
         tableName = "Humidex Hours";
-        WriteResilienceBinsTableNoPreDef(
+        WriteResilienceBinsTableNonPreDef(
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneHumidexHourBins, rowHead, tableBody);
         tableName = "Humidex OccupantHours";
-        WriteResilienceBinsTableNoPreDef(
+        WriteResilienceBinsTableNonPreDef(
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneHumidexOccuHourBins, rowHead, tableBody);
         tableName = "Humidex OccupiedHours";
-        WriteResilienceBinsTableNoPreDef(
+        WriteResilienceBinsTableNonPreDef(
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBins, rowHead, tableBody);
 
         bool hasPierceSET = true;
@@ -13615,7 +13615,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
             }
         }
 
-        WriteResilienceBinsTableNoPreDef(state,
+        WriteResilienceBinsTableNonPreDef(state,
                                          columnNumUnmetDegHr,
                                          tableName,
                                          columnHeadUnmetDegHr,
@@ -13636,10 +13636,10 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         columnHeadStr(4) = "Very-hot Exceedance OccupantHours [hr]";
 
         tableName = "Discomfort-weighted Exceedance OccupantHours";
-        WriteResilienceBinsTableNoPreDef(
+        WriteResilienceBinsTableNonPreDef(
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins, rowHead, tableBody);
         tableName = "Discomfort-weighted Exceedance OccupiedHours";
-        WriteResilienceBinsTableNoPreDef(state,
+        WriteResilienceBinsTableNonPreDef(state,
                                          columnNum,
                                          tableName,
                                          columnHeadStr,

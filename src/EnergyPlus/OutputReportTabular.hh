@@ -688,7 +688,7 @@ namespace OutputReportTabular {
                                   Array1D<std::vector<Real64>> const &ZoneBins,
                                   Real64 const unitConvMultiplier = 1.0);
 
-    void WriteResilienceBinsTableNoPreDef(EnergyPlusData &state,
+    void WriteResilienceBinsTableNonPreDef(EnergyPlusData &state,
                                           int const columnNum,
                                           const std::string tableName,
                                           Array1D_string const &columnHead,
