@@ -3389,9 +3389,13 @@ namespace OutputProcessor {
         EXPECT_EQ(2, op->NumOfReqVariables);
         auto &varLatentRegex = op->ReqRepVars(1);
         EXPECT_EQ("Liv.*", varLatentRegex.Key);
+        EXPECT_FALSE(varLatentRegex.is_simple_string);
+        EXPECT_NE(nullptr, varLatentRegex.case_insensitive_pattern);
 
         auto &varSensibleNormal = op->ReqRepVars(2);
         EXPECT_EQ("Living", varSensibleNormal.Key);
+        EXPECT_TRUE(varSensibleNormal.is_simple_string);
+        EXPECT_EQ(nullptr, varSensibleNormal.case_insensitive_pattern);
 
         auto resetReqRepVarsUsed = [this]() {
             auto &op(state->dataOutputProcessor);
@@ -5571,10 +5575,14 @@ namespace OutputProcessor {
         auto &varSetpTempRegex = op->ReqRepVars(1);
         EXPECT_EQ("(Air Loop 1|Air Supply) InletNode", varSetpTempRegex.Key);
         EXPECT_EQ("SYSTEM NODE SETPOINT TEMPERATURE", varSetpTempRegex.VarName);
+        EXPECT_FALSE(varSetpTempRegex.is_simple_string);
+        EXPECT_NE(nullptr, varSetpTempRegex.case_insensitive_pattern);
 
         auto &varTempRegex = op->ReqRepVars(2);
         EXPECT_EQ("(Air Loop 1|Air Supply) InletNode", varTempRegex.Key);
         EXPECT_EQ("SYSTEM NODE TEMPERATURE", varTempRegex.VarName);
+        EXPECT_FALSE(varTempRegex.is_simple_string);
+        EXPECT_NE(nullptr, varTempRegex.case_insensitive_pattern);
 
         SetupOutputVariable(*state,
                             "Site Outdoor Air Drybulb Temperature",
