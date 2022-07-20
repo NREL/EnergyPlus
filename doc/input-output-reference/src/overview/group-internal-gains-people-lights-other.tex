@@ -2447,7 +2447,7 @@ Specifies the entering air temperature in $^\circ$C at design conditions. The de
 
 Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, H1, or None. This is used to report the ``ITE Air Inlet Operating Range Exceeded Time.'' If None is specified (the default), then no reporting of time outside allowable conditions will be done.
 
-The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}: 
+The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits\footnote{Sources: [1]. ASHRAE, 2021. ``Thermal Guidelines for Data Processing Environments (5$^{\textrm{th}}$ Edition),'' Peachtree Corners: ASHRAE; [2]. Quirk, Davidson, and Schmidt, 2022. ``ASHRAE's Data Center Thermal Guidelines---Air-Cooled Evolution,'' ASHRAE Journal, May 2022.} on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}: 
 
 \begin{longtable}[c]{@{}lrrrrrrr@{}}
 	\caption{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \label{table:ite-aircooled-air-inlet-code-specification-limits} \tabularnewline
@@ -2469,6 +2469,7 @@ The related reporting variables (such as ``ITE Air Inlet Operating Range Exceede
 	Relative Humidity$_{min}$ [$\%$]  &   8 &   8 &   8 &   8 &  8 &  8 &   8 \tabularnewline
 	Relative Humidity$_{max}$ [$\%$]  &  80 &  80 &  85 &  90 & 80 & 80 &  80 \tabularnewline
 	\bottomrule
+
 \end{longtable}
 
 \paragraph{Field: Air Inlet Connection Type}\label{field-air-inlet-connection-type}
