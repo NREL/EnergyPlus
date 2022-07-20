@@ -998,7 +998,7 @@ namespace DataHeatBalance {
         int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
 
         // Report variables
-        std::vector<PEVar> PwEjRptVars;
+        std::vector<PEVar> PERptVars;
 
         Real64 AirVolFlowStdDensity = 0.0; // Air volume flow rate at standard density [m3/s]
         Real64 AirVolFlowCurDensity = 0.0; // Air volume flow rate at current density [m3/s]
