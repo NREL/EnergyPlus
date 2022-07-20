@@ -155,6 +155,8 @@ namespace AirLoopHVACDOAS {
         int CWCtrlNodeNum = 0;
         bool MyEnvrnFlag = true;
 
+        bool FanHeatAdded = false;
+
         static void getAirLoopDOASInput(EnergyPlusData &state);
 
         void SimAirLoopHVACDOAS(EnergyPlusData &state, bool firstHVACIteration, int &CompIndex);

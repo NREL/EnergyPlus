@@ -467,6 +467,8 @@ namespace AirLoopHVACDOAS {
 
                 // get inlet and outlet node number from equipment list
                 CurrentModuleObject = "AirLoopHVAC:OutdoorAirSystem:EquipmentList";
+                int CoolingCoilOrder = 0;
+                int FanOrder = 0;
                 for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents; ++CompNum) {
                     auto &CompType = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum);
                     auto &CompName = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum);
@@ -522,6 +524,7 @@ namespace AirLoopHVACDOAS {
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;
                         }
+                        FanOrder = CompNum; 
                         break;
 
                     case ValidEquipListType::FanComponentModel:
@@ -535,6 +538,7 @@ namespace AirLoopHVACDOAS {
                         thisOutletNodeNum = Fans::GetFanOutletNode(state, typeNameUC, CompName, OutletNodeErrFlag);
                         thisDOAS.m_FanInletNodeNum = thisInletNodeNum;
                         thisDOAS.m_FanOutletNodeNum = thisOutletNodeNum;
+                        FanOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilCoolingWater:
@@ -549,6 +553,7 @@ namespace AirLoopHVACDOAS {
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
+                        CoolingCoilOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilHeatingWater:
@@ -617,6 +622,7 @@ namespace AirLoopHVACDOAS {
                         thisOutletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
                                                 .compPointer[CompNum]
                                                 ->getAirOutNode(state, CompName, 0, OutletNodeErrFlag);
+                        CoolingCoilOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilSystemHeatingDX:
@@ -682,6 +688,9 @@ namespace AirLoopHVACDOAS {
                                                CompName,
                                                state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum)));
                         errorsFound = true;
+                    }
+                    if (CoolingCoilOrder > FanOrder) {
+                        thisDOAS.FanHeatAdded = true;
                     }
                     if (InletNodeErrFlag) {
                         ShowSevereError(state, "Inlet node number is not found in " + CurrentModuleObject + " = " + std::string{CompName});
@@ -945,6 +954,31 @@ namespace AirLoopHVACDOAS {
         }
         state.dataSize->CurSysNum = state.dataHVACGlobal->NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
         state.dataSize->CurOASysNum = this->m_OASystemNum;
+
+        // Add fan heat to cooling coil capacity
+        if (this->FanHeatAdded) {
+            Real64 deltaP;
+            Real64 motEff;
+            Real64 totEff;
+            Real64 motInAirFrac;
+            Real64 fanShaftPow;
+            Real64 motInPower;
+            bool fanCompModel;
+            Real64 designHeatGain = 0.0;
+            Real64 airVolFlow = sizingMassFlow / state.dataEnvrn->StdRhoAir;
+            if (this->m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
+                state.dataHVACFan->fanObjs[this->m_FanIndex]->FanInputsForDesignHeatGain(state, deltaP, motEff, totEff, motInAirFrac);
+                Real64 fanPowerTot = (airVolFlow * deltaP) / totEff;
+                designHeatGain = motEff * fanPowerTot + (fanPowerTot - motEff * fanPowerTot) * motInAirFrac;
+            } else if (this->m_FanTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) {
+                Fans::FanInputsForDesHeatGain(state, this->m_FanIndex, deltaP, motEff, totEff, motInAirFrac, fanShaftPow, motInPower, fanCompModel);
+                designHeatGain = fanShaftPow + (motInPower - fanShaftPow) * motInAirFrac;
+            }
+            // Calculate temperature diff
+            Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->m_FanInletNodeNum).HumRat);
+            Real64 fanDeltaT = designHeatGain / (sizingMassFlow * CpAir);
+            this->PrecoolTemp -= fanDeltaT;
+        }
     }
 
     void getAirLoopHVACDOASInput(EnergyPlusData &state)
