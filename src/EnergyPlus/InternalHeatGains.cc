@@ -7653,7 +7653,7 @@ namespace InternalHeatGains {
             // state.dataHeatBal->ZoneITEq(Loop).FanEnergyAtDesign = 0.0;
             // state.dataHeatBal->ZoneITEq(Loop).UPSGainEnergyToZone = 0.0;
             // state.dataHeatBal->ZoneITEq(Loop).ConGainEnergyToZone = 0.0;
-            for (std::vector<DataHeatBalance::ITEquipData::PwEjRptElement>::iterator iter = state.dataHeatBal->ZoneITEq(Loop).PwEjRptVars.begin();
+            for (std::vector<DataHeatBalance::ITEquipData::PEVar>::iterator iter = state.dataHeatBal->ZoneITEq(Loop).PwEjRptVars.begin();
                  iter != state.dataHeatBal->ZoneITEq(Loop).PwEjRptVars.end();
                  ++iter) {
                 iter->power = 0.0;
@@ -7987,7 +7987,7 @@ namespace InternalHeatGains {
             // state.dataHeatBal->ZoneITEq(Loop).UPSGainEnergyToZone = UPSHeatGain * state.dataGlobal->TimeStepZoneSec;
             // state.dataHeatBal->ZoneITEq(Loop).ConGainEnergyToZone =
             //    state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone * state.dataGlobal->TimeStepZoneSec;
-            for (std::vector<DataHeatBalance::ITEquipData::PwEjRptElement>::iterator iter = state.dataHeatBal->ZoneITEq(Loop).PwEjRptVars.begin();
+            for (std::vector<DataHeatBalance::ITEquipData::PEVar>::iterator iter = state.dataHeatBal->ZoneITEq(Loop).PwEjRptVars.begin();
                  iter != state.dataHeatBal->ZoneITEq(Loop).PwEjRptVars.end();
                  ++iter) {
                 iter->energy = iter->power * state.dataGlobal->TimeStepZoneSec;

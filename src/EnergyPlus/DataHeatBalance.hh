@@ -934,7 +934,7 @@ namespace DataHeatBalance {
 
     struct ITEquipData // IT Equipment
     {
-        struct PwEjRptElement
+        struct PEVar
         {
             Real64 power = 0.0;
             Real64 energy = 0.0;
@@ -1018,7 +1018,7 @@ namespace DataHeatBalance {
         //                                  // if room air model not used
 
         // 2022-07-20 Reporting variabel vector instead
-        std::vector<PwEjRptElement> PwEjRptVars;
+        std::vector<PEVar> PwEjRptVars;
 
         Real64 AirVolFlowStdDensity = 0.0; // Air volume flow rate at standard density [m3/s]
         Real64 AirVolFlowCurDensity = 0.0; // Air volume flow rate at current density [m3/s]
