@@ -3057,8 +3057,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
 
-        state->dataOutputProcessor->NumOfReqVariables = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Variable");
-
+        EXPECT_EQ(5, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Variable"));
         EXPECT_EQ(5, state->dataOutputProcessor->NumOfReqVariables);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
@@ -3112,12 +3111,17 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
 
-        auto const keyed_value = "ENVIRONMENT";
-        auto const var_name = "SITE OUTDOOR AIR DRYBULB TEMPERATURE";
+        Real64 faketmp = 0;
 
-        BuildKeyVarList(*state, keyed_value, var_name, 1, 6);
+        SetupOutputVariable(*state,
+                            "Site Outdoor Air Drybulb Temperature",
+                            OutputProcessor::Unit::C,
+                            faketmp,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            "Environment");
 
-        EXPECT_EQ(0, state->dataOutputProcessor->NumExtraVars);
+        EXPECT_EQ(5, state->dataOutputProcessor->NumExtraVars);
         EXPECT_EQ(6, state->dataOutputProcessor->NumOfReqVariables);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
@@ -3125,35 +3129,42 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_enums(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(1).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(1).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(2).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(2).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(2).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(2).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(3).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(3).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(3).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(3).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(4).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(4).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(4).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(4).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(5).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(5).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(5).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(5).Used);
+
+        EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).Key);
+        EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(5).VarName);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency));
+        EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(5).SchedPtr);
+        EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).SchedName);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(5).Used);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_buildKeyVarListWithKey)
@@ -3176,9 +3187,9 @@ namespace OutputProcessor {
         state->dataInputProcessing->inputProcessor->preScanReportingVariables(*state);
         InitializeOutput(*state);
 
-        Real64 ilgrGarage;
-        Real64 ilgrLiving;
-        Real64 ilgrAttic;
+        Real64 ilgrGarage = 0.0;
+        Real64 ilgrLiving = 0.0;
+        Real64 ilgrAttic = 0.0;
 
         SetupOutputVariable(*state,
                             "Zone Total Internal Latent Gain Rate",
@@ -3202,9 +3213,9 @@ namespace OutputProcessor {
                             OutputProcessor::SOVStoreType::Summed,
                             "Attic");
 
-        Real64 isgrGarage;
-        Real64 isgrLiving;
-        Real64 isgrAttic;
+        Real64 isgrGarage = 0.0;
+        Real64 isgrLiving = 0.0;
+        Real64 isgrAttic = 0.0;
 
         SetupOutputVariable(*state,
                             "Zone Total Internal Sensible Gain Rate",
@@ -3237,17 +3248,58 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
 
-        state->dataOutputProcessor->NumExtraVars = 0;
-        BuildKeyVarList(*state, "LIVING", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 3);
+        Real64 fakeVar = 0.0;
+        auto resetReqRepVarsUsed = [this]() {
+            auto &op(state->dataOutputProcessor);
+            for (int i = 1; i <= op->NumOfReqVariables; ++i) {
+                op->ReqRepVars(i).Used = false;
+            }
+        };
+        auto countReqRepVarsUsed = [this]() {
+            auto &op(state->dataOutputProcessor);
+            int count = 0;
+            for (int i = 1; i <= op->NumOfReqVariables; ++i) {
+                if (op->ReqRepVars(i).Used) {
+                    ++count;
+                }
+            }
+            return count;
+        };
+
+        resetReqRepVarsUsed();
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::W,
+                            fakeVar,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            "LIVING");
+
+        EXPECT_EQ(1, countReqRepVarsUsed());
         EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
 
-        state->dataOutputProcessor->NumExtraVars = 0;
-        BuildKeyVarList(*state, "GARAGE", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 3);
-        EXPECT_EQ(0, state->dataOutputProcessor->NumExtraVars);
+        resetReqRepVarsUsed();
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::W,
+                            fakeVar,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            "GARAGE");
+        EXPECT_EQ(0, countReqRepVarsUsed()); // Garage not part of the list
+        EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
 
-        state->dataOutputProcessor->NumExtraVars = 0;
-        BuildKeyVarList(*state, "ATTIC", "ZONE TOTAL INTERNAL SENSIBLE GAIN RATE", 1, 3);
-        EXPECT_EQ(0, state->dataOutputProcessor->NumExtraVars);
+        resetReqRepVarsUsed();
+
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::W,
+                            fakeVar,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            "ATTIC");
+        EXPECT_EQ(1, countReqRepVarsUsed());
+        EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_buildKeyVarListWithRegexKey)
@@ -3328,15 +3380,81 @@ namespace OutputProcessor {
         EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly(*state);
 
-        GetReportVariableInput(*state);
+        auto &op(state->dataOutputProcessor);
 
-        state->dataOutputProcessor->NumExtraVars = 0;
-        BuildKeyVarList(*state, "LIVING1", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 2);
+        // This has already been called by SetupOutputVariable so it'll do nothing
+        // GetReportVariableInput(*state);
+
+        EXPECT_EQ(2, op->ReqRepVars.size());
+        EXPECT_EQ(2, op->NumOfReqVariables);
+        auto &varLatentRegex = op->ReqRepVars(1);
+        EXPECT_EQ("Liv.*", varLatentRegex.Key);
+
+        auto &varSensibleNormal = op->ReqRepVars(2);
+        EXPECT_EQ("Living", varSensibleNormal.Key);
+
+        auto resetReqRepVarsUsed = [this]() {
+            auto &op(state->dataOutputProcessor);
+            for (int i = 1; i <= op->NumOfReqVariables; ++i) {
+                op->ReqRepVars(i).Used = false;
+            }
+            op->NumExtraVars = 0;
+        };
+        auto countReqRepVarsUsed = [this]() {
+            auto &op(state->dataOutputProcessor);
+            int count = 0;
+            for (int i = 1; i <= op->NumOfReqVariables; ++i) {
+                if (op->ReqRepVars(i).Used) {
+                    ++count;
+                }
+            }
+            return count;
+        };
+
+        EXPECT_EQ(1, countReqRepVarsUsed());
         EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
 
-        state->dataOutputProcessor->NumExtraVars = 0;
-        BuildKeyVarList(*state, "GARAGE", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 2);
-        EXPECT_EQ(0, state->dataOutputProcessor->NumExtraVars);
+        resetReqRepVarsUsed();
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrGarage,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "LIVING1");
+        EXPECT_EQ(1, countReqRepVarsUsed());
+        EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
+        EXPECT_TRUE(varLatentRegex.Used);
+        EXPECT_FALSE(varSensibleNormal.Used);
+
+        resetReqRepVarsUsed();
+
+        resetReqRepVarsUsed();
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrGarage,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "LIVING");
+        EXPECT_EQ(1, countReqRepVarsUsed());
+        EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
+        EXPECT_TRUE(varLatentRegex.Used);
+        EXPECT_FALSE(varSensibleNormal.Used);
+
+        resetReqRepVarsUsed();
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrGarage,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "GARAGE");
+        EXPECT_EQ(0, countReqRepVarsUsed());
+        // When NumExtraVars is 0 after CheckReportVariable, it resets to 1...
+        EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
+        EXPECT_FALSE(varLatentRegex.Used);
+        EXPECT_FALSE(varSensibleNormal.Used);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_addBlankKeys)
@@ -3355,9 +3473,14 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
 
-        auto const var_name = "Site Outdoor Air Drybulb Temperature";
-
-        AddBlankKeys(*state, var_name, 1, 5);
+        Real64 fakeVar = 0.0;
+        SetupOutputVariable(*state,
+                            "Site Outdoor Air Drybulb Temperature",
+                            OutputProcessor::Unit::C,
+                            fakeVar,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            "Environment");
 
         EXPECT_EQ(5, state->dataOutputProcessor->NumExtraVars);
         EXPECT_EQ(1, state->dataOutputProcessor->ReportList(1));
@@ -3372,35 +3495,35 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_enums(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(1).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(1).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(2).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(2).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(2).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(2).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(3).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(3).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(3).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(3).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(4).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(4).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(4).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(4).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(5).VarName);
         EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(5).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).SchedName);
-        EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(5).Used);
+        EXPECT_TRUE(state->dataOutputProcessor->ReqRepVars(5).Used);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_determineFrequency)
@@ -5396,8 +5519,8 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_fullOutputVariableKeyComparisonWithRegex)
     {
         std::string const idf_objects = delimited_string({
-            "Output:Variable,Air Loop 1|AirSupply InletNode,System Node Setpoint Temperature,Hourly;",
-            "Output:Variable,Air Loop 1|AirSupply InletNode,System Node Temperature,Hourly;",
+            "Output:Variable,(Air Loop 1|Air Supply) InletNode,System Node Setpoint Temperature,Hourly;",
+            "Output:Variable,(Air Loop 1|Air Supply) InletNode,System Node Temperature,Hourly;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
@@ -5441,6 +5564,18 @@ namespace OutputProcessor {
         OutputReportTabular::InitializeTabularMonthly(*state);
 
         GetReportVariableInput(*state);
+
+        auto &op(state->dataOutputProcessor);
+        EXPECT_EQ(2, op->ReqRepVars.size());
+        EXPECT_EQ(2, op->NumOfReqVariables);
+        auto &varSetpTempRegex = op->ReqRepVars(1);
+        EXPECT_EQ("(Air Loop 1|Air Supply) InletNode", varSetpTempRegex.Key);
+        EXPECT_EQ("SYSTEM NODE SETPOINT TEMPERATURE", varSetpTempRegex.VarName);
+
+        auto &varTempRegex = op->ReqRepVars(2);
+        EXPECT_EQ("(Air Loop 1|Air Supply) InletNode", varTempRegex.Key);
+        EXPECT_EQ("SYSTEM NODE TEMPERATURE", varTempRegex.VarName);
+
         SetupOutputVariable(*state,
                             "Site Outdoor Air Drybulb Temperature",
                             OutputProcessor::Unit::C,
@@ -5468,12 +5603,35 @@ namespace OutputProcessor {
         UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         state->dataOutputProcessor->NumExtraVars = 0;
-        BuildKeyVarList(*state, "Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2);
+        Real64 fakeVar = 0.0;
+        SetupOutputVariable(*state,
+                            "System Node Setpoint Temperature",
+                            OutputProcessor::Unit::C,
+                            fakeVar,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            // TODO: is that supposed to look like a regex?!
+                            // SetupOutputVariable is the only one that used to call BuildKeyVarList
+                            // So it should pass actual NodeID(NodeNum)
+                            "Air Loop 1 InletNode");
+        // BuildKeyVarList(*state, "Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2); // TODO: WHAT?
         EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
+        EXPECT_TRUE(varSetpTempRegex.Used);
+        EXPECT_FALSE(varTempRegex.Used);
 
         state->dataOutputProcessor->NumExtraVars = 0;
-        BuildKeyVarList(*state, "Air Loop 1|AirSupply InletNode", "SYSTEM NODE TEMPERATURE", 1, 2);
+        SetupOutputVariable(*state,
+                            "System Node Temperature",
+                            OutputProcessor::Unit::C,
+                            fakeVar,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            // TODO: is that supposed to look like a regex?!
+                            "Air Loop 1 InletNode");
+        // BuildKeyVarList(*state, "Air Loop 1|AirSupply InletNode", "SYSTEM NODE TEMPERATURE", 1, 2);
         EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
+        EXPECT_TRUE(varSetpTempRegex.Used);
+        EXPECT_TRUE(varTempRegex.Used);
 
         GenOutputVariablesAuditReport(*state);
 
