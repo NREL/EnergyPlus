@@ -940,10 +940,9 @@ namespace DataHeatBalance {
             Real64 energy = 0.0;
         };
 
-        enum class PwEjRptIdx
+        enum class PERptVar
         {
-            Invalid = -1,
-            CPU,
+            CPU = 0,
             Fan,
             UPS,
             CPUAtDesign,
