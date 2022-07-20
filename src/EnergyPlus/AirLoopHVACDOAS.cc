@@ -524,7 +524,7 @@ namespace AirLoopHVACDOAS {
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;
                         }
-                        FanOrder = CompNum; 
+                        FanOrder = CompNum;
                         break;
 
                     case ValidEquipListType::FanComponentModel:
