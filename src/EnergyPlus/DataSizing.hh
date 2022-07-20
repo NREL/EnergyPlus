@@ -65,17 +65,34 @@ struct EnergyPlusData;
 
 namespace DataSizing {
 
+    enum class OAFlowCalcMethod
     // parameters for outside air flow method
-    constexpr int NumOAFlowMethods(9);
-    constexpr int OAFlowNone(0);
-    constexpr int OAFlowPPer(1);
-    constexpr int OAFlow(2);
-    constexpr int OAFlowPerArea(3);
-    constexpr int OAFlowACH(4);
-    constexpr int OAFlowSum(5);
-    constexpr int OAFlowMax(6);
+    {
+        Invalid = -1,
+        PerPerson,    // set the outdoor air flow rate based on number of people in the zone
+        PerZone,      // sum the outdoor air flow rate per zone based on user input
+        PerArea,      // sum the outdoor air flow rate based on zone area
+        ACH,          // sum the outdoor air flow rate based on number of air changes for the zone
+        Sum,          // sum the outdoor air flow rate of the people component and the space floor area component
+        Max,          // use the maximum of the outdoor air flow rate of the people component and the space floor area component
+        IAQProcedure, // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
+        PCOccSch,     // ProportionalControlBasedOnOccupancySchedule, Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5) to
+                      // calculate the zone level outdoor air flow rates based on scheduled occupancy
+        PCDesOcc,     // ProportionalControlBasedOnDesignOccupancy, Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5) to
+                      // calculate the zone level outdoor air flow rates based on design occupancy
+        Num
+    };
 
-    extern Array1D_string const cOAFlowMethodTypes;
+    constexpr std::array<std::string_view, static_cast<int>(OAFlowCalcMethod::Num)> OAFlowCalcMethodNames{
+        "Flow/Person",
+        "Flow/Zone",
+        "Flow/Area",
+        "AirChanges/Hour",
+        "Sum",
+        "Maximum",
+        "IndoorAirQualityProcedure",
+        "ProportionalControlBasedOnOccupancySchedule",
+        "ProportionalControlBasedOnDesignOccupancy"};
 
     // parameters for outside air
     constexpr int AllOA(1);
@@ -127,15 +144,6 @@ namespace DataSizing {
     static constexpr std::string_view PeakHrMinFmt("{:02}:{:02}:00");
 
     // Zone Outdoor Air Method
-    constexpr int ZOAM_FlowPerPerson(1); // set the outdoor air flow rate based on number of people in the zone
-    constexpr int ZOAM_FlowPerZone(2);   // sum the outdoor air flow rate per zone based on user input
-    constexpr int ZOAM_FlowPerArea(3);   // sum the outdoor air flow rate based on zone area
-    constexpr int ZOAM_FlowPerACH(4);    // sum the outdoor air flow rate based on number of air changes for the zone
-    constexpr int ZOAM_Sum(5);           // sum the outdoor air flow rate of the people component and the space floor area component
-    constexpr int ZOAM_Max(6);           // use the maximum of the outdoor air flow rate of the people component and the space floor area component
-    constexpr int ZOAM_IAQP(7);          // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
-    constexpr int ZOAM_ProportionalControlSchOcc(8); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-    // to calculate the zone level outdoor air flow rates based on scheduled occupancy
     constexpr int ZOAM_ProportionalControlDesOcc(9); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
     // to calculate the zone level outdoor air flow rates based on design occupancy
 
@@ -968,7 +976,7 @@ namespace DataSizing {
         EPVector<int> dsoaIndexes;            // Indexes to DesignSpecification:OutdoorAir objects (if this is a DSOA:SpaceList object)
         EPVector<std::string> dsoaSpaceNames; // Names of spaces if this is a (if this is a DSOA:SpaceList object)
         EPVector<int> dsoaSpaceIndexes;       // Indexes to Spaces (if this is a DSOA:SpaceList object)
-        int OAFlowMethod = 0;                 // - Method for OA flow calculation (Flow/Person, Flow/Zone, Flow/Area, FlowACH, Sum, Maximum)
+        OAFlowCalcMethod OAFlowMethod;        // - Method for OA flow calculation (Flow/Person, Flow/Zone, Flow/Area, FlowACH, Sum, Maximum)
         Real64 OAFlowPerPerson = 0.0;         // - OA requirement per person
         Real64 OAFlowPerArea = 0.0;           // - OA requirement per zone area
         Real64 OAFlowPerZone = 0.0;           // - OA requirement per zone

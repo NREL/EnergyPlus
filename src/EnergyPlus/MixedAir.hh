@@ -317,13 +317,13 @@ namespace MixedAir {
         int CO2GainErrorIndex;       // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int OAMaxMinLimitErrorCount; // Counter when max OA < min OA for SOAM_ProportionalControlDesOARate
         int OAMaxMinLimitErrorIndex; // Index for max OA < min OA recurring error message for SOAM_ProportionalControlDesOARate
-        Array1D<Real64> ZoneADEffCooling;           // Zone air distribution effectiveness in cooling mode for each zone
-        Array1D<Real64> ZoneADEffHeating;           // Zone air distribution effectiveness in heating mode for each zone
-        Array1D_int ZoneADEffSchPtr;                // Pointer to the zone air distribution effectiveness schedule for each zone
-        Array1D_int ZoneDesignSpecADObjIndex;       // index of the design specification zone air distribution object for each zone
-        Array1D_string ZoneDesignSpecADObjName;     // name of the design specification zone air distribution object for each zone
-        Array1D<Real64> ZoneSecondaryRecirculation; // zone air secondary recirculation ratio for each zone
-        Array1D_int ZoneOAFlowMethod;               // OA flow method for each zone
+        Array1D<Real64> ZoneADEffCooling;                       // Zone air distribution effectiveness in cooling mode for each zone
+        Array1D<Real64> ZoneADEffHeating;                       // Zone air distribution effectiveness in heating mode for each zone
+        Array1D_int ZoneADEffSchPtr;                            // Pointer to the zone air distribution effectiveness schedule for each zone
+        Array1D_int ZoneDesignSpecADObjIndex;                   // index of the design specification zone air distribution object for each zone
+        Array1D_string ZoneDesignSpecADObjName;                 // name of the design specification zone air distribution object for each zone
+        Array1D<Real64> ZoneSecondaryRecirculation;             // zone air secondary recirculation ratio for each zone
+        Array1D<DataSizing::OAFlowCalcMethod> ZoneOAFlowMethod; // OA flow method for each zone
         Array1D_int ZoneOASchPtr;               // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
         Array1D<Real64> OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
         Real64 Ep = 1.0;                        // zone primary air fraction

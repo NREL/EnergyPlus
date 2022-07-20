@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
     state->dataSize->OARequirements.allocate(1);
     state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
-    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowCalcMethod::Sum;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
     state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
 
@@ -838,7 +838,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     EXPECT_NEAR(0.0194359, state->dataMixedAir->OAController(1).OAMassFlow, 0.00001);
     EXPECT_NEAR(0.009527, state->dataMixedAir->OAController(1).MinOAFracLimit, 0.00001);
 
-    state->dataSize->OARequirements(1).OAFlowMethod = 9;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowCalcMethod::PCDesOcc;
     state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1) = state->dataSize->OARequirements(1).OAFlowMethod;
     state->dataAirLoop->NumOASystems = 1;
 
@@ -872,7 +872,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     InitOAController(*state, 1, true, 1);
     EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy",
-              DataSizing::cOAFlowMethodTypes(state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1)));
+              DataSizing::OAFlowCalcMethodNames[static_cast<int>(state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1))]);
 
     state->dataAirLoop->OutsideAirSys.deallocate();
     state->dataMixedAir->OAMixer.deallocate();
@@ -5889,7 +5889,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
     state->dataSize->OARequirements.allocate(1);
     state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
-    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowCalcMethod::Sum;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
     state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataSize->OARequirements(1).OAPropCtlMinRateSchPtr = 8;

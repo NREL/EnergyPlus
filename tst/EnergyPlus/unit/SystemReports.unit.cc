@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
     // Set up OA requirements for one zone
     state->dataSize->NumOARequirements = 1;
     state->dataSize->OARequirements.allocate(state->dataSize->NumOARequirements);
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowCalcMethod::Sum;
     Real64 expectedVoz = 0.0;
     state->dataSize->OARequirements(1).OAFlowPerZone = 20;
     expectedVoz += state->dataSize->OARequirements(1).OAFlowPerZone;

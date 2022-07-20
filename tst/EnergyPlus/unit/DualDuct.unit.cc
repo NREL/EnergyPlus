@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
     state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowCalcMethod::Sum;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
     state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;

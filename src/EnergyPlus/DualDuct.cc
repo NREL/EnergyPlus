@@ -839,9 +839,10 @@ namespace DualDuct {
                 PeopleFlow = 0.0;
                 for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
                     if (state.dataHeatBal->People(Loop).ZonePtr != this->ActualZoneNum) continue;
-                    int damperOAFlowMethod = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowMethod;
-                    if (damperOAFlowMethod == DataSizing::OAFlowPPer || damperOAFlowMethod == DataSizing::OAFlowSum ||
-                        damperOAFlowMethod == DataSizing::OAFlowMax) {
+                    DataSizing::OAFlowCalcMethod damperOAFlowMethod = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowMethod;
+                    if (damperOAFlowMethod == DataSizing::OAFlowCalcMethod::PerPerson ||
+                        damperOAFlowMethod == DataSizing::OAFlowCalcMethod::Sum ||
+                        damperOAFlowMethod == DataSizing::OAFlowCalcMethod::Max) {
                         PeopleFlow +=
                             state.dataHeatBal->People(Loop).NumberOfPeople * state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
                     }

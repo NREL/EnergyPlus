@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPerArea, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(OAFlowCalcMethod::PerArea, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
     EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPPer, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(OAFlowCalcMethod::PerPerson, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
     EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
@@ -148,7 +148,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlow, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(OAFlowCalcMethod::PerZone, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
     EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowACH, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(OAFlowCalcMethod::ACH, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
     EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowSum, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(OAFlowCalcMethod::Sum, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
     EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
     EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
     EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowMax, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(OAFlowCalcMethod::Max, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
     EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
     EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
     EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);

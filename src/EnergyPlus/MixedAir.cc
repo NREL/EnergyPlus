@@ -1446,8 +1446,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                  CurrentModuleObject + "=\"" + AlphArray(1) + "\" incorrect specification for " + cAlphaFields(4) +
                                      ", the ZoneSum method will be used.");
                 // ErrorsFound=.TRUE.
-                }
-            
+            }
 
             // Zone maximum outdoor air fraction
             thisVentilationMechanical.ZoneMaxOAFraction = NumArray(1);
@@ -1697,7 +1696,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                     thisVentilationMechanical.ZoneOAPeopleRate(ventMechZoneNum) = 0.00944;
                     thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = 0.0;
                     thisVentilationMechanical.ZoneOAACHRate = 0.0;
-                    thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = OAFlowPPer;
+                    thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = OAFlowCalcMethod::PerPerson;
                     thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = DataGlobalConstants::ScheduleAlwaysOn;
                     ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
                     ShowContinueError(state,
@@ -2976,7 +2975,10 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate(jZone), 6);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchDCVMethod,
+                                 zoneName,
+                                 OAFlowCalcMethodNames[static_cast<int>(vent_mech.ZoneOAFlowMethod(jZone))]);
                 if (vent_mech.ZoneOASchPtr(jZone) > 0) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
@@ -3298,8 +3300,9 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                     int ZoneNum = vent_mech.VentMechZone(ZoneIndex);
 
                     // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
-                    int OAFlowMethod = vent_mech.ZoneOAFlowMethod(ZoneIndex);
-                    if (OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax) {
+                    OAFlowCalcMethod OAFlowMethod = vent_mech.ZoneOAFlowMethod(ZoneIndex);
+                    if (OAFlowMethod == OAFlowCalcMethod::PerPerson || OAFlowMethod == OAFlowCalcMethod::Sum ||
+                        OAFlowMethod == OAFlowCalcMethod::Max) {
                         TotalPeopleOAFlow += state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * state.dataHeatBal->Zone(ZoneNum).Multiplier *
                                              state.dataHeatBal->Zone(ZoneNum).ListMultiplier * vent_mech.ZoneOAPeopleRate(ZoneIndex) *
                                              GetCurrentScheduleValue(state, vent_mech.ZoneOASchPtr(ZoneIndex));
@@ -4020,23 +4023,28 @@ void VentilationMechanicalProps::CalcMechVentController(
                 // Calc the breathing-zone OA flow rate
                 OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                 if (OAIndex > 0) {
-                    {
-                        auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
-                        if (SELECT_CASE_var == OAFlowPPer) {
-                            ZoneOABZ = ZoneOAPeople;
-                        } else if (SELECT_CASE_var == OAFlow) {
-                            ZoneOABZ = ZoneOAFlow;
-                        } else if (SELECT_CASE_var == OAFlowPerArea) {
-                            ZoneOABZ = ZoneOAArea;
-                        } else if (SELECT_CASE_var == OAFlowACH) {
-                            ZoneOABZ = ZoneOAACH;
-                        } else if (SELECT_CASE_var == OAFlowSum) {
-                            ZoneOABZ = ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH;
-                        } else if (SELECT_CASE_var == OAFlowMax) {
-                            ZoneOABZ = max(ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH);
-                        } else {
-                            ZoneOABZ = 0.0;
-                        }
+                    switch (state.dataSize->OARequirements(OAIndex).OAFlowMethod) {
+                    case OAFlowCalcMethod::PerPerson: {
+                        ZoneOABZ = ZoneOAPeople;
+                    } break;
+                    case OAFlowCalcMethod::PerZone: {
+                        ZoneOABZ = ZoneOAFlow;
+                    } break;
+                    case OAFlowCalcMethod::PerArea: {
+                        ZoneOABZ = ZoneOAArea;
+                    } break;
+                    case OAFlowCalcMethod::ACH: {
+                        ZoneOABZ = ZoneOAACH;
+                    } break;
+                    case OAFlowCalcMethod::Sum: {
+                        ZoneOABZ = ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH;
+                    } break;
+                    case OAFlowCalcMethod::Max: {
+                        ZoneOABZ = max(ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH);
+                    } break;
+                    default: {
+                        ZoneOABZ = 0.0;
+                    } break;
                     }
                 } else {
                     ZoneOABZ = ZoneOAPeople;
@@ -4111,23 +4119,28 @@ void VentilationMechanicalProps::CalcMechVentController(
                     // Calc the breathing-zone OA flow rate
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                     if (OAIndex > 0) {
-                        {
-                            auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
-                            if (SELECT_CASE_var == OAFlowPPer) {
-                                ZoneOABZ = ZoneOAPeople;
-                            } else if (SELECT_CASE_var == OAFlow) {
-                                ZoneOABZ = ZoneOAFlow;
-                            } else if (SELECT_CASE_var == OAFlowPerArea) {
-                                ZoneOABZ = ZoneOAArea;
-                            } else if (SELECT_CASE_var == OAFlowACH) {
-                                ZoneOABZ = ZoneOAACH;
-                            } else if (SELECT_CASE_var == OAFlowSum) {
-                                ZoneOABZ = ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH;
-                            } else if (SELECT_CASE_var == OAFlowMax) {
-                                ZoneOABZ = max(ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH);
-                            } else {
-                                ZoneOABZ = 0.0;
-                            }
+                        switch (state.dataSize->OARequirements(OAIndex).OAFlowMethod) {
+                        case OAFlowCalcMethod::PerPerson: {
+                            ZoneOABZ = ZoneOAPeople;
+                        } break;
+                        case OAFlowCalcMethod::PerZone: {
+                            ZoneOABZ = ZoneOAFlow;
+                        } break;
+                        case OAFlowCalcMethod::PerArea: {
+                            ZoneOABZ = ZoneOAArea;
+                        } break;
+                        case OAFlowCalcMethod::ACH: {
+                            ZoneOABZ = ZoneOAACH;
+                        } break;
+                        case OAFlowCalcMethod::Sum: {
+                            ZoneOABZ = ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH;
+                        } break;
+                        case OAFlowCalcMethod::Max: {
+                            ZoneOABZ = max(ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH);
+                        } break;
+                        default: {
+                            ZoneOABZ = 0.0;
+                        } break;
                         }
                     }
 

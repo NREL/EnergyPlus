@@ -68,17 +68,6 @@ namespace EnergyPlus::DataSizing {
 // capacities. This data is available to the HVAC component modules
 // for their self sizing calculations.
 
-Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
-                                        {"Flow/Person",
-                                         "Flow/Zone",
-                                         "Flow/Area",
-                                         "AirChanges/Hour",
-                                         "Sum",
-                                         "Maximum",
-                                         "IndoorAirQualityProcedure",
-                                         "ProportionalControlBasedOnOccupancySchedule",
-                                         "ProportionalControlBasedOnDesignOccupancy"});
-
 //  days; includes effects of user multiplier
 //  and user set flows)
 //  of user input multiplier and flows
@@ -545,7 +534,8 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
     Real64 desFlowPA = 0.0;
     if (this->numDSOA == 0) {
         // This is a simple DesignSpecification:OutdoorAir
-        if (this->OAFlowMethod != DataSizing::OAFlowPPer && this->OAFlowMethod != DataSizing::OAFlow && this->OAFlowMethod != DataSizing::OAFlowACH) {
+        if (this->OAFlowMethod != OAFlowCalcMethod::PerPerson && this->OAFlowMethod != OAFlowCalcMethod::PerZone &&
+            this->OAFlowMethod != OAFlowCalcMethod::ACH) {
             desFlowPA = this->OAFlowPerArea;
         }
     } else {
@@ -553,8 +543,8 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
         Real64 sumAreaOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
-            if (thisDSOA.OAFlowMethod != DataSizing::OAFlowPPer && thisDSOA.OAFlowMethod != DataSizing::OAFlow &&
-                thisDSOA.OAFlowMethod != DataSizing::OAFlowACH) {
+            if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerPerson && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
+                thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
                 Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).floorArea;
                 sumAreaOA += thisDSOA.OAFlowPerArea * spaceArea;
             }
@@ -573,8 +563,8 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
     Real64 desFlowPP = 0.0;
     if (this->numDSOA == 0) {
         // This is a simple DesignSpecification:OutdoorAir
-        if (this->OAFlowMethod != DataSizing::OAFlowPerArea && this->OAFlowMethod != DataSizing::OAFlow &&
-            this->OAFlowMethod != DataSizing::OAFlowACH) {
+        if (this->OAFlowMethod != OAFlowCalcMethod::PerArea && this->OAFlowMethod != OAFlowCalcMethod::PerZone &&
+            this->OAFlowMethod != OAFlowCalcMethod::ACH) {
             desFlowPP = this->OAFlowPerPerson;
         }
     } else {
@@ -582,8 +572,8 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
         Real64 sumPeopleOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
             auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
-            if (thisDSOA.OAFlowMethod != DataSizing::OAFlowPerArea && thisDSOA.OAFlowMethod != DataSizing::OAFlow &&
-                thisDSOA.OAFlowMethod != DataSizing::OAFlowACH) {
+            if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerArea && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
+                thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
                 Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
                 sumPeopleOA += thisDSOA.OAFlowPerPerson * spacePeople;
             }
@@ -663,7 +653,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
         maxOccupants = thisZone.maxOccupants;
     }
 
-    if (this->OAFlowMethod == DataSizing::ZOAM_IAQP && this->myEnvrnFlag) {
+    if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::IAQProcedure && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
                             "DesignSpecification:OutdoorAir=\"" + this->Name +
@@ -673,7 +663,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
         }
         this->myEnvrnFlag = false;
     }
-    if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlSchOcc && this->myEnvrnFlag) {
+    if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCOccSch && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
                             "DesignSpecification:OutdoorAir=\"" + this->Name +
@@ -683,7 +673,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
         }
         this->myEnvrnFlag = false;
     }
-    if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlDesOcc && this->myEnvrnFlag) {
+    if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
                             "DesignSpecification:OutdoorAir=\"" + this->Name +
@@ -696,9 +686,9 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
 
     // Calculate people outdoor air flow rate as needed
     switch (this->OAFlowMethod) {
-    case DataSizing::OAFlowPPer:
-    case DataSizing::OAFlowSum:
-    case DataSizing::OAFlowMax: {
+    case OAFlowCalcMethod::PerPerson:
+    case OAFlowCalcMethod::Sum:
+    case OAFlowCalcMethod::Max: {
         if (UseOccSchFlag) {
             if (MaxOAVolFlowFlag) {
                 // OAPerPersonMode == PerPersonDCVByCurrentLevel (UseOccSchFlag = TRUE)
@@ -725,41 +715,35 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
 
     // Calculate minimum outdoor air flow rate
     switch (this->OAFlowMethod) {
-    case DataSizing::OAFlowNone: {
-        // Special case for no DesignSpecification:OutdoorAir object in Sizing:Zone object
-        // probably won't get to this CASE statement since it will RETURN above (Ptr=0)
-        // See SizingManager GetZoneSizingInput for Sizing:Zone input field Design Specification Outdoor Air Object Name
-        OAVolumeFlowRate = 0.0;
-    } break;
-    case DataSizing::OAFlowPPer: {
+    case OAFlowCalcMethod::PerPerson: {
         // Multiplied by occupancy
         OAVolumeFlowRate = DSOAFlowPeople;
     } break;
-    case DataSizing::OAFlow: {
+    case OAFlowCalcMethod::PerZone: {
         // User input
         OAVolumeFlowRate = this->OAFlowPerZone;
     } break;
-    case DataSizing::OAFlowPerArea: {
+    case OAFlowCalcMethod::PerArea: {
         // Multiplied by zone floor area
         OAVolumeFlowRate = this->OAFlowPerArea * floorArea;
     } break;
-    case DataSizing::OAFlowACH: {
+    case OAFlowCalcMethod::ACH: {
         // Multiplied by zone volume
         OAVolumeFlowRate = this->OAFlowACH * volume / 3600.0;
     } break;
-    case DataSizing::OAFlowSum:
-    case DataSizing::OAFlowMax: {
+    case OAFlowCalcMethod::Sum:
+    case OAFlowCalcMethod::Max: {
         // Use sum or max of per person and the following
         DSOAFlowPerZone = this->OAFlowPerZone;
         DSOAFlowPerArea = this->OAFlowPerArea * floorArea;
         DSOAFlowACH = this->OAFlowACH * volume / 3600.0;
-        if (this->OAFlowMethod == DataSizing::OAFlowMax) {
+        if (this->OAFlowMethod == OAFlowCalcMethod::Max) {
             OAVolumeFlowRate = max(DSOAFlowPeople, DSOAFlowPerZone, DSOAFlowPerArea, DSOAFlowACH);
         } else {
             OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
         }
     } break;
-    case DataSizing::ZOAM_IAQP: {
+    case DataSizing::OAFlowCalcMethod::IAQProcedure: {
         if (state.dataGlobal->DoingSizing) {
             DSOAFlowPeople = nomTotOccupants * this->OAFlowPerPerson;
             DSOAFlowPerZone = this->OAFlowPerZone;
@@ -770,15 +754,15 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
             OAVolumeFlowRate = state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / state.dataEnvrn->StdRhoAir;
         }
     } break;
-    case DataSizing::ZOAM_ProportionalControlSchOcc:
-    case DataSizing::ZOAM_ProportionalControlDesOcc: {
+    case DataSizing::OAFlowCalcMethod::PCOccSch:
+    case DataSizing::OAFlowCalcMethod::PCDesOcc: {
         ZoneOAPeople = 0.0;
-        if (this->OAFlowMethod != DataSizing::ZOAM_ProportionalControlDesOcc) {
+        if (this->OAFlowMethod != DataSizing::OAFlowCalcMethod::PCDesOcc) {
             ZoneOAPeople = curNumOccupants * thisZone.Multiplier * thisZone.ListMultiplier * this->OAFlowPerPerson;
         } else {
             ZoneOAPeople = nomTotOccupants * thisZone.Multiplier * thisZone.ListMultiplier * this->OAFlowPerPerson;
             CO2PeopleGeneration = 0.0;
-            if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlDesOcc) {
+            if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc) {
                 // Accumulate CO2 generation from people at design occupancy and current activity level
                 for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                     if (spaceNum > 0) {
@@ -809,7 +793,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                         }
 
                         // Calculate zone maximum target CO2 concentration in PPM
-                        if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlDesOcc) {
+                        if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc) {
                             ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
                                          (CO2PeopleGeneration * thisZone.Multiplier * thisZone.ListMultiplier * 1.0e6) / ZoneOAMax;
                         } else {
@@ -821,7 +805,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
 
                         if (ZoneMaxCO2 <= ZoneMinCO2) {
                             ++this->CO2MaxMinLimitErrorCount;
-                            if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlSchOcc) {
+                            if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCOccSch) {
                                 if (this->CO2MaxMinLimitErrorCount < 2) {
                                     ShowSevereError(state,
                                                     "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
@@ -844,7 +828,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                         this->CO2MaxMinLimitErrorIndex);
                                 }
                             }
-                            if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlDesOcc) {
+                            if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc) {
                                 if (this->CO2MaxMinLimitErrorCount < 2) {
                                     ShowSevereError(state,
                                                     "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
@@ -890,7 +874,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                     } else {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ++this->CO2GainErrorCount;
-                            if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlSchOcc) {
+                            if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCOccSch) {
                                 if (this->CO2GainErrorCount < 2) {
                                     ShowSevereError(state,
                                                     "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
@@ -911,7 +895,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                                    this->CO2GainErrorIndex);
                                 }
                             }
-                            if (this->OAFlowMethod == DataSizing::ZOAM_ProportionalControlDesOcc) {
+                            if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc) {
                                 if (this->CO2GainErrorCount < 2) {
                                     ShowSevereError(state,
                                                     "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
