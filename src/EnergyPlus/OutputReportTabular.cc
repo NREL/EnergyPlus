@@ -13047,11 +13047,11 @@ void WriteResilienceBinsTableNonPreDef(EnergyPlusData &state,
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-            tableBody, rowHead, columnHead, "ThermalResilienceSummary", "Entire Facility", tableName);
+            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-            tableBody, rowHead, columnHead, "ThermalResilienceSummary", "Entire Facility", tableName);
+            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
     }
 }
 
@@ -13163,11 +13163,11 @@ void WriteSETHoursTableNonPreDef(EnergyPlusData &state,
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-            tableBody, rowHead, columnHead, "ThermalResilienceSummary", "Entire Facility", tableName);
+            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-            tableBody, rowHead, columnHead, "ThermalResilienceSummary", "Entire Facility", tableName);
+            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
     }
 }
 
@@ -13293,11 +13293,11 @@ void WriteHourOfSafetyTableNonPreDef(EnergyPlusData &state,
     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-            tableBody, rowHead, columnHead, "ThermalResilienceSummary", "Entire Facility", tableName);
+            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
     }
     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-            tableBody, rowHead, columnHead, "ThermalResilienceSummary", "Entire Facility", tableName);
+            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
     }
 }
 
