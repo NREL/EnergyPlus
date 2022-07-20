@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -426,5 +427,78 @@ TEST_F(EnergyPlusFixture, General_MovingAvg)
     for (int j = 2; j <= numItem; j++) {
         ASSERT_EQ(outputData(j), (inputData(j) + inputData(j - 1)) / 2);
     }
+}
+
+TEST_F(EnergyPlusFixture, General_BetweenDateHoursLeftInclusive) {
+    int currentYear = 2018;
+    int currentMonth = 5;
+    int currentDay = 13;
+    int currentHour = 8;
+    int currentDate = WeatherManager::computeJulianDate(currentYear, currentMonth, currentDay);
+
+    // neither end inclusive
+    int startYear = 2018;
+    int startMonth = 3;
+    int startDay = 13;
+    int startHour = 8;
+    int startDate = WeatherManager::computeJulianDate(startYear, startMonth, startDay);
+    int endYear = 2018;
+    int endMonth = 5;
+    int endDay = 13;
+    int endHour = 9;
+    int endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
+    EXPECT_TRUE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
+
+    // right inclusive
+    startYear = 2018;
+    startMonth = 3;
+    startDay = 13;
+    startHour = 8;
+    startDate = WeatherManager::computeJulianDate(startYear, startMonth, startDay);
+    endYear = 2018;
+    endMonth = 5;
+    endDay = 13;
+    endHour = 8;
+    endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
+    EXPECT_TRUE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
+
+    // left inclusive
+    startYear = 2018;
+    startMonth = 5;
+    startDay = 13;
+    startHour = 8;
+    startDate = WeatherManager::computeJulianDate(startYear, startMonth, startDay);
+    endYear = 2018;
+    endMonth = 7;
+    endDay = 15;
+    endHour = 2;
+    endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
+    EXPECT_TRUE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
+
+    // different year
+    startYear = 2017;
+    startMonth = 5;
+    startDay = 13;
+    startHour = 8;
+    startDate = WeatherManager::computeJulianDate(startYear, startMonth, startDay);
+    endYear = 2019;
+    endMonth = 2;
+    endDay = 15;
+    endHour = 2;
+    endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
+    EXPECT_TRUE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
+
+    // different year flipping the start and end
+    startYear = 2019;
+    startMonth = 2;
+    startDay = 15;
+    startHour = 2;
+    startDate = WeatherManager::computeJulianDate(startYear, startMonth, startDay);
+    endYear = 2017;
+    endMonth = 5;
+    endDay = 13;
+    endHour = 8;
+    endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
+    EXPECT_TRUE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
 }
 } // namespace EnergyPlus
