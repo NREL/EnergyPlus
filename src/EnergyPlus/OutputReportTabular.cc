@@ -6314,7 +6314,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         int const zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
         if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
-            // AFN infiltration and ventilation -- check that afn sim is being done.
+            // AFN infiltration -- check that afn sim is being done.
             if (!state.afn->multizone_always_simulated) {
                 ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNVentVolTotalStdDen = 0.0;
@@ -6322,8 +6322,6 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                 ZonePreDefRep(iZone).AFNVentVolTotalOccStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolTotalOcc = 0.0;
-                ZonePreDefRep(iZone).AFNVentVolMin = 0.0;
-                ZonePreDefRep(iZone).AFNVentVolTotalOcc = 0.0;
             }
 
             // air loop name
@@ -6443,22 +6441,6 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                                      state.dataOutRptPredefined->pdchOaoMinSimpVent,
                                      Zone(iZone).Name,
                                      ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume),
-                                     3);
-                }
-
-                // AFN Ventilation
-                if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchOaoAvgAFNVent,
-                                     Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).AFNVentVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
-                                     3);
-                }
-                if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchOaoMinAFNVent,
-                                     Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).AFNVentVolMin / (Zone(iZone).Volume),
                                      3);
                 }
 
