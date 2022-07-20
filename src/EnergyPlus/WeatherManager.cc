@@ -2048,23 +2048,17 @@ namespace WeatherManager {
             }
 
             // at the beginning of each day find the min/max weather used for DOAS sizing
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn ==
-                    DataGlobalConstants::KindOfSim::RunPeriodDesign ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
+            auto &thisEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn);
+            if (thisEnvrn.KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign ||
+                thisEnvrn.KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
                 for (size_t i = 0; i < state.dataWeatherManager->TodayOutDryBulbTemp.size(); ++i) {
-                    if (state.dataWeatherManager->TodayOutDryBulbTemp[i] >
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOATSizing) {
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOATSizing =
-                            state.dataWeatherManager->TodayOutDryBulbTemp[i];
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).maxCoolingOADPSizing =
-                            state.dataWeatherManager->TodayOutDewPointTemp[i];
+                    if (state.dataWeatherManager->TodayOutDryBulbTemp[i] > thisEnvrn.maxCoolingOATSizing) {
+                        thisEnvrn.maxCoolingOATSizing = state.dataWeatherManager->TodayOutDryBulbTemp[i];
+                        thisEnvrn.maxCoolingOADPSizing = state.dataWeatherManager->TodayOutDewPointTemp[i];
                     }
-                    if (state.dataWeatherManager->TodayOutDryBulbTemp[i] <
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).minHeatingOATSizing) {
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).minHeatingOATSizing =
-                            state.dataWeatherManager->TodayOutDryBulbTemp[i];
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).minHeatingOADPSizing =
-                            state.dataWeatherManager->TodayOutDewPointTemp[i];
+                    if (state.dataWeatherManager->TodayOutDryBulbTemp[i] < thisEnvrn.minHeatingOATSizing) {
+                        thisEnvrn.minHeatingOATSizing = state.dataWeatherManager->TodayOutDryBulbTemp[i];
+                        thisEnvrn.minHeatingOADPSizing = state.dataWeatherManager->TodayOutDewPointTemp[i];
                     }
                 }
             }
