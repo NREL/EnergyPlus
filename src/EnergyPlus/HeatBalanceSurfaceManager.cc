@@ -5484,9 +5484,11 @@ void ReportThermalResilience(EnergyPlusData &state)
     int DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
 
     Array1D_bool reportPeriodFlags;
-    reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
-    General::findReportPeriodIdx(
-        state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
+    if (state.dataWeatherManager->TotReportPers > 0) {
+        reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
+        General::findReportPeriodIdx(
+            state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
+    }
 
     auto &ort(state.dataOutRptTab);
     for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
@@ -6103,9 +6105,11 @@ void ReportCO2Resilience(EnergyPlusData &state)
         }
 
         Array1D_bool reportPeriodFlags;
-        reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
-        General::findReportPeriodIdx(
-            state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+        if (state.dataWeatherManager->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
+            General::findReportPeriodIdx(
+                state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+        }
 
         auto &ort(state.dataOutRptTab);
         for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
@@ -6213,9 +6217,11 @@ void ReportVisualResilience(EnergyPlusData &state)
         }
 
         Array1D_bool reportPeriodFlags;
-        reportPeriodFlags.dimension(state.dataWeatherManager->TotVisualReportPers, false);
-        General::findReportPeriodIdx(
-            state, state.dataWeatherManager->VisualReportPeriodInput, state.dataWeatherManager->TotVisualReportPers, reportPeriodFlags);
+        if (state.dataWeatherManager->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeatherManager->TotVisualReportPers, false);
+            General::findReportPeriodIdx(
+                state, state.dataWeatherManager->VisualReportPeriodInput, state.dataWeatherManager->TotVisualReportPers, reportPeriodFlags);
+        }
 
         auto &ort(state.dataOutRptTab);
         for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
