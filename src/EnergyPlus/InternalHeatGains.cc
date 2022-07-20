@@ -6082,9 +6082,6 @@ namespace InternalHeatGains {
         }
         // Object report variables
         for (int itEqNum = 1; itEqNum <= state.dataHeatBal->TotITEquip; ++itEqNum) {
-            if (state.dataHeatBal->ZoneITEq(itEqNum).PERptVars.empty()) {
-                state.dataHeatBal->ZoneITEq(itEqNum).PERptVars.resize(static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::Num));
-            }
             // Set flags for zone and space total report variables
             addZoneOutputs(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex) = true;
@@ -7637,26 +7634,9 @@ namespace InternalHeatGains {
         // Object report variables
         for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
 
-            // state.dataHeatBal->ZoneITEq(Loop).CPUPower = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).FanPower = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).UPSPower = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).CPUPowerAtDesign = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).FanPowerAtDesign = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).UPSGainRateToZone = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone = 0.0;
-
-            // state.dataHeatBal->ZoneITEq(Loop).CPUConsumption = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).FanConsumption = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).UPSConsumption = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).CPUEnergyAtDesign = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).FanEnergyAtDesign = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).UPSGainEnergyToZone = 0.0;
-            // state.dataHeatBal->ZoneITEq(Loop).ConGainEnergyToZone = 0.0;
-            for (std::vector<DataHeatBalance::ITEquipData::PEVar>::iterator iter = state.dataHeatBal->ZoneITEq(Loop).PERptVars.begin();
-                 iter != state.dataHeatBal->ZoneITEq(Loop).PERptVars.end();
-                 ++iter) {
-                iter->power = 0.0;
-                iter->energy = 0.0;
+            for (auto &pe : state.dataHeatBal->ZoneITEq(Loop).PERptVars) {
+                pe.power = 0.0;
+                pe.energy = 0.0;
             }
 
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = 0.0;
@@ -7973,21 +7953,8 @@ namespace InternalHeatGains {
                     .PERptVars[static_cast<int>(DataHeatBalance::ITEquipData::PERptVar::ConGainToZone)]
                     .power; // ConGainRateToZone;
 
-            // 2022-07-20: do block assigning using vector elements
-            // state.dataHeatBal->ZoneITEq(Loop).CPUConsumption = CPUPower * state.dataGlobal->TimeStepZoneSec;
-            // state.dataHeatBal->ZoneITEq(Loop).FanConsumption = FanPower * state.dataGlobal->TimeStepZoneSec;
-            // state.dataHeatBal->ZoneITEq(Loop).UPSConsumption = UPSPower * state.dataGlobal->TimeStepZoneSec;
-            // state.dataHeatBal->ZoneITEq(Loop).CPUEnergyAtDesign =
-            //    state.dataHeatBal->ZoneITEq(Loop).CPUPowerAtDesign * state.dataGlobal->TimeStepZoneSec;
-            // state.dataHeatBal->ZoneITEq(Loop).FanEnergyAtDesign =
-            //    state.dataHeatBal->ZoneITEq(Loop).FanPowerAtDesign * state.dataGlobal->TimeStepZoneSec;
-            // state.dataHeatBal->ZoneITEq(Loop).UPSGainEnergyToZone = UPSHeatGain * state.dataGlobal->TimeStepZoneSec;
-            // state.dataHeatBal->ZoneITEq(Loop).ConGainEnergyToZone =
-            //    state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone * state.dataGlobal->TimeStepZoneSec;
-            for (std::vector<DataHeatBalance::ITEquipData::PEVar>::iterator iter = state.dataHeatBal->ZoneITEq(Loop).PERptVars.begin();
-                 iter != state.dataHeatBal->ZoneITEq(Loop).PERptVars.end();
-                 ++iter) {
-                iter->energy = iter->power * state.dataGlobal->TimeStepZoneSec;
+            for (auto &pe : state.dataHeatBal->ZoneITEq(Loop).PERptVars) {
+                pe.energy = pe.power * state.dataGlobal->TimeStepZoneSec;
             }
 
             // 2022-07-20 next batch candidates chaing to block assignments; but just do manual change for now
