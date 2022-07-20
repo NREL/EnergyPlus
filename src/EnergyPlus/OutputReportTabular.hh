@@ -689,14 +689,14 @@ namespace OutputReportTabular {
                                   Real64 const unitConvMultiplier = 1.0);
 
     void WriteResilienceBinsTableNonPreDef(EnergyPlusData &state,
-                                          int const columnNum,
-                                          const std::string tableName,
-                                          Array1D_string const &columnHead,
-                                          Array1D_int columnWidth,
-                                          Array1D<std::vector<Real64>> const &ZoneBins,
-                                          Array1D_string &rowHead,
-                                          Array2D_string &tableBody,
-                                          Real64 const unitConvMultiplier = 1.0);
+                                           int const columnNum,
+                                           const std::string tableName,
+                                           Array1D_string const &columnHead,
+                                           Array1D_int columnWidth,
+                                           Array1D<std::vector<Real64>> const &ZoneBins,
+                                           Array1D_string &rowHead,
+                                           Array2D_string &tableBody,
+                                           Real64 const unitConvMultiplier = 1.0);
 
     void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
                                                  const std::string tableType,

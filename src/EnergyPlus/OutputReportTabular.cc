@@ -13002,14 +13002,14 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
 }
 
 void WriteResilienceBinsTableNonPreDef(EnergyPlusData &state,
-                                      int const columnNum,
-                                      const std::string tableName,
-                                      Array1D_string const &columnHead,
-                                      Array1D_int columnWidth,
-                                      Array1D<std::vector<Real64>> const &ZoneBins,
-                                      Array1D_string &rowHead,
-                                      Array2D_string &tableBody,
-                                      Real64 const unitConvMultiplier)
+                                       int const columnNum,
+                                       const std::string tableName,
+                                       Array1D_string const &columnHead,
+                                       Array1D_int columnWidth,
+                                       Array1D<std::vector<Real64>> const &ZoneBins,
+                                       Array1D_string &rowHead,
+                                       Array2D_string &tableBody,
+                                       Real64 const unitConvMultiplier)
 {
     WriteSubtitle(state, tableName);
 
@@ -13616,14 +13616,14 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         }
 
         WriteResilienceBinsTableNonPreDef(state,
-                                         columnNumUnmetDegHr,
-                                         tableName,
-                                         columnHeadUnmetDegHr,
-                                         columnWidthUnmetDegHr,
-                                         state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins,
-                                         rowHead,
-                                         tableBodyUnmetDegHr,
-                                         degreeHourConversion);
+                                          columnNumUnmetDegHr,
+                                          tableName,
+                                          columnHeadUnmetDegHr,
+                                          columnWidthUnmetDegHr,
+                                          state.dataHeatBalFanSys->ZoneUnmetDegreeHourBins,
+                                          rowHead,
+                                          tableBodyUnmetDegHr,
+                                          degreeHourConversion);
 
         columnNum = 4;
         columnHeadStr.allocate(columnNum);
@@ -13640,13 +13640,13 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
             state, columnNum, tableName, columnHeadStr, columnWidth, state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBins, rowHead, tableBody);
         tableName = "Discomfort-weighted Exceedance OccupiedHours";
         WriteResilienceBinsTableNonPreDef(state,
-                                         columnNum,
-                                         tableName,
-                                         columnHeadStr,
-                                         columnWidth,
-                                         state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins,
-                                         rowHead,
-                                         tableBody);
+                                          columnNum,
+                                          tableName,
+                                          columnHeadStr,
+                                          columnWidth,
+                                          state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBins,
+                                          rowHead,
+                                          tableBody);
         rowHead.deallocate();
         columnHeadStr.deallocate();
         tableBody.deallocate();
