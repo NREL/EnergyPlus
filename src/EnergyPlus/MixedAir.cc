@@ -1524,7 +1524,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
             thisVentilationMechanical.ZoneOAPeopleRate.dimension(MechVentZoneCount, 0.0);
             thisVentilationMechanical.ZoneOAFlowRate.dimension(MechVentZoneCount, 0.0);
             thisVentilationMechanical.ZoneOAACHRate.dimension(MechVentZoneCount, 0.0);
-            thisVentilationMechanical.ZoneOAFlowMethod.dimension(MechVentZoneCount, 0);
+            thisVentilationMechanical.ZoneOAFlowMethod.dimension(MechVentZoneCount);
             thisVentilationMechanical.ZoneOASchPtr.dimension(MechVentZoneCount, 0);
             thisVentilationMechanical.OAPropCtlMinRateSchPtr.dimension(MechVentZoneCount, 0);
 
