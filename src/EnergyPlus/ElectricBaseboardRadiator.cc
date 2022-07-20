@@ -99,7 +99,6 @@ namespace ElectricBaseboardRadiator {
 
     void SimElecBaseboard(EnergyPlusData &state,
                           std::string const &EquipName,
-                          [[maybe_unused]] int const ActualZoneNum,
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
                           Real64 &PowerMet,
@@ -609,8 +608,7 @@ namespace ElectricBaseboardRadiator {
             MyOneTimeFlag = false;
         }
 
-        if (ElecBaseboard(BaseboardNum).ZonePtr <= 0)
-            ElecBaseboard(BaseboardNum).ZonePtr = ZoneNum;
+        if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) ElecBaseboard(BaseboardNum).ZonePtr = ZoneNum;
 
         if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.

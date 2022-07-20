@@ -536,7 +536,7 @@ namespace ZoneAirLoopEquipmentManager {
         }
     }
 
-    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum)
+    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ZoneNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -555,8 +555,8 @@ namespace ZoneAirLoopEquipmentManager {
             {
                 auto &thisADU(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum));
                 {
-                    auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum));
-                    thisADU.ZoneNum = ActualZoneNum;
+                    auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(ZoneNum));
+                    thisADU.ZoneNum = ZoneNum;
                     for (int inletNum = 1; inletNum <= thisZoneEqConfig.NumInletNodes; ++inletNum) {
                         if (thisZoneEqConfig.InletNode(inletNum) == thisADU.OutletNodeNum)
                             thisZoneEqConfig.InletNodeADUNum(inletNum) = AirDistUnitNum;

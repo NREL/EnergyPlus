@@ -89,7 +89,7 @@ namespace BaseboardElectric {
         bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
     };
 
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
     void GetBaseboardInput(EnergyPlusData &state);
 

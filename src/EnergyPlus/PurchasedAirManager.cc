@@ -180,7 +180,7 @@ void SimPurchasedAir(EnergyPlusData &state,
         }
     }
 
-    InitPurchasedAir(state, PurchAirNum, FirstHVACIteration, ControlledZoneNum);
+    InitPurchasedAir(state, PurchAirNum, ControlledZoneNum);
 
     CalcPurchAirLoads(state, PurchAirNum, SysOutputProvided, MoistOutputProvided, ControlledZoneNum);
 
@@ -1158,18 +1158,12 @@ void GetPurchasedAir(EnergyPlusData &state)
     }
 }
 
-void InitPurchasedAir(EnergyPlusData &state,
-                      int const PurchAirNum,
-                      [[maybe_unused]] bool const FirstHVACIteration, // unused1208
-                      int const ControlledZoneNum,
-                      int const ActualZoneNum)
+void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const ControlledZoneNum)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Russ Taylor
     //       DATE WRITTEN   Nov 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Initialize the PurchAir data structure.
@@ -1333,8 +1327,8 @@ void InitPurchasedAir(EnergyPlusData &state,
 
     // These initializations are done every iteration
     // check that supply air temps can meet the zone thermostat setpoints
-    if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) &&
-        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) != 0 && PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) {
+    if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) &&
+        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) != 0 && PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
         //        IF (PurchAir(PurchAirNum)%AvailSchedPtr > 0) THEN
@@ -1353,12 +1347,12 @@ void InitPurchasedAir(EnergyPlusData &state,
             if (PurchAir(PurchAirNum).CoolErrIndex == 0) {
                 ShowSevereError(state,
                                 "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name + " serving Zone " +
-                                    state.dataHeatBal->Zone(ActualZoneNum).Name);
+                                    state.dataHeatBal->Zone(ControlledZoneNum).Name);
                 ShowContinueError(state,
                                   format("..the minimum supply air temperature for cooling [{:.2R}] is greater than the zone cooling mean air "
                                          "temperature (MAT) setpoint [{:.2R}].",
                                          PurchAir(PurchAirNum).MinCoolSuppAirTemp,
-                                         state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum)));
+                                         state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too warm.");
                 ShowContinueError(state, "Unit availability is nominally ON and Cooling availability is nominally ON.");
@@ -1368,7 +1362,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name +
+                                              " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name +
                                               ", the minimum supply air temperature for cooling error continues",
                                           PurchAir(PurchAirNum).CoolErrIndex,
                                           PurchAir(PurchAirNum).MinCoolSuppAirTemp,
@@ -1378,8 +1372,8 @@ void InitPurchasedAir(EnergyPlusData &state,
                                           "C");
         }
     }
-    if (PurchAir(PurchAirNum).MaxHeatSuppAirTemp < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) &&
-        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) != 0 && PurchAir(PurchAirNum).HeatingLimit == LimitType::NoLimit) {
+    if (PurchAir(PurchAirNum).MaxHeatSuppAirTemp < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) &&
+        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) != 0 && PurchAir(PurchAirNum).HeatingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
         //        IF (PurchAir(PurchAirNum)%AvailSchedPtr > 0) THEN
@@ -1398,12 +1392,12 @@ void InitPurchasedAir(EnergyPlusData &state,
             if (PurchAir(PurchAirNum).HeatErrIndex == 0) {
                 ShowSevereMessage(state,
                                   "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                      " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name);
+                                      " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name);
                 ShowContinueError(state,
                                   format("..the maximum supply air temperature for heating [{:.2R}] is less than the zone mean air temperature "
                                          "heating setpoint [{:.2R}].",
                                          PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
-                                         state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum)));
+                                         state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too cold.");
                 ShowContinueError(state, "Unit availability is nominally ON and Heating availability is nominally ON.");
@@ -1413,7 +1407,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name +
+                                              " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name +
                                               ", maximum supply air temperature for heating error continues",
                                           PurchAir(PurchAirNum).HeatErrIndex,
                                           PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
@@ -2942,9 +2936,9 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 }
 
 void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
-                               int const PurchAirNum,   // index to ideal loads unit
-                               int const ZoneNum, // index to zone
-                               Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
+                               int const PurchAirNum, // index to ideal loads unit
+                               int const ZoneNum,     // index to zone
+                               Real64 &OAMassFlowRate // outside air mass flow rate [kg/s] from volume flow using std density
 )
 {
 
@@ -2977,8 +2971,8 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
         } else {
             UseOccSchFlag = false;
         }
-        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
-            state, PurchAir(PurchAirNum).OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag);
+        OAVolumeFlowRate =
+            DataSizing::calcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag);
         OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
