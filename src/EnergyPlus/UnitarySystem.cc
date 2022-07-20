@@ -7678,7 +7678,7 @@ namespace UnitarySystems {
                                       HeatCoilLoad,
                                       SupHeaterLoad,
                                       CompressorOn);
-
+        // Why need this second run?
         // check supplemental heating coil outlet temp based on maximum allowed
         if (this->m_SuppCoilExists) {
             // only need to test for high supply air temp if supplemental coil is operating
@@ -7696,7 +7696,10 @@ namespace UnitarySystems {
                                               SupHeaterLoad,
                                               CompressorOn);
                 if (this->m_DesignSuppHeatingCapacity > 0.0) {
-                    this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
+                    // multistage coil part load fraction already set in the calcUnitarySystemToLoad
+                    if (this->m_NumOfSpeedSuppHeating <= 1) {
+                        this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
+                    }
                 } else {
                     this->m_SuppHeatPartLoadFrac = 0.0;
                 }
@@ -11710,7 +11713,13 @@ namespace UnitarySystems {
             } break;
             default: {
                 if (this->m_EMSOverrideSuppCoilSpeedNumOn) {
-                    this->setEMSSuppCoilStagePLR(state);
+                    if (SuppHeatCoilLoad > 0.0) {
+                        this->setEMSSuppCoilStagePLR(state);
+                    } else {
+                        this->m_SuppHeatingSpeedRatio = 0.0;
+                        this->m_SuppHeatingCycRatio = 0.0;
+                        this->m_SuppHeatPartLoadFrac = 0.0;
+                    }
                 } else {
                     if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
                         this->calcMultiStageSuppCoilStageByLoad(state, SuppHeatCoilLoad, FirstHVACIteration);
@@ -14301,11 +14310,11 @@ namespace UnitarySystems {
             if ((state.dataLoopNodes->Node(InletNode).Temp < DesOutTemp) &&
                 (std::abs(state.dataLoopNodes->Node(InletNode).Temp - DesOutTemp) > DataHVACGlobals::TempControlTol))
                 SensibleLoad = true;
-            if (this->m_EMSOverrideSuppCoilSpeedNumOn) {
-                this->setEMSSuppCoilStagePLR(state);
-            } else {
-                if (SensibleLoad) {
 
+            if (SensibleLoad) {
+                if (this->m_EMSOverrideSuppCoilSpeedNumOn) {
+                    this->setEMSSuppCoilStagePLR(state);
+                } else {
                     ReqOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DesOutTemp,
                                                                            state.dataLoopNodes->Node(InletNode).HumRat,
@@ -14572,62 +14581,65 @@ namespace UnitarySystems {
 
                         } // IF ((FullOutput - ReqOutput) < Acc) THEN
                     }     // IF ((NoOutput-ReqOutput) > Acc) THEN
-                }         // IF (SensibleLoad ) THEN
 
-                if (PartLoadFrac > 1.0) {
-                    PartLoadFrac = 1.0;
-                } else if (PartLoadFrac < 0.0) {
-                    PartLoadFrac = 0.0;
-                }
+                    if (PartLoadFrac > 1.0) {
+                        PartLoadFrac = 1.0;
+                    } else if (PartLoadFrac < 0.0) {
+                        PartLoadFrac = 0.0;
+                    }
 
-                if (SolFla == -1) {
-                    if (!state.dataGlobal->WarmupFlag) {
-                        if (this->warnIndex.m_SuppHeatCoilSensPLRIter < 1) {
-                            ++this->warnIndex.m_SuppHeatCoilSensPLRIter;
-                            ShowWarningError(
-                                state, this->UnitType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + this->Name);
-                            ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
-                            ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                            ShowContinueErrorTimeStamp(state,
-                                                       "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                        } else {
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           this->UnitType + " \"" + this->Name +
-                                                               "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
-                                                               "Sensible PLR statistics follow.",
-                                                           this->warnIndex.m_SuppHeatCoilSensPLRIterIndex,
-                                                           PartLoadFrac,
-                                                           PartLoadFrac);
-                        }
-                    } // IF(.NOT. WarmupFlag)THEN
-                } else if (SolFla == -2) {
-                    PartLoadFrac = ReqOutput / FullOutput;
-                    if (!state.dataGlobal->WarmupFlag) {
-                        if (this->warnIndex.m_SuppHeatCoilSensPLRFail < 1) {
-                            ++this->warnIndex.m_SuppHeatCoilSensPLRFail;
-                            ShowWarningError(
-                                state,
-                                this->UnitType +
-                                    " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + this->Name);
-                            ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                            ShowContinueErrorTimeStamp(state,
-                                                       "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                        } else {
-                            ShowRecurringWarningErrorAtEnd(
-                                state,
-                                this->UnitType + " \"" + this->Name +
-                                    "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
-                                this->warnIndex.m_SuppHeatCoilSensPLRFailIndex,
-                                PartLoadFrac,
-                                PartLoadFrac);
-                        }
-                    } // IF(.NOT. WarmupFlag)THEN
-                }     // IF (SolFla == -1) THEN
+                    if (SolFla == -1) {
+                        if (!state.dataGlobal->WarmupFlag) {
+                            if (this->warnIndex.m_SuppHeatCoilSensPLRIter < 1) {
+                                ++this->warnIndex.m_SuppHeatCoilSensPLRIter;
+                                ShowWarningError(state,
+                                                 this->UnitType +
+                                                     " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + this->Name);
+                                ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
+                                ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(
+                                    state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                            } else {
+                                ShowRecurringWarningErrorAtEnd(
+                                    state,
+                                    this->UnitType + " \"" + this->Name +
+                                        "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
+                                        "Sensible PLR statistics follow.",
+                                    this->warnIndex.m_SuppHeatCoilSensPLRIterIndex,
+                                    PartLoadFrac,
+                                    PartLoadFrac);
+                            }
+                        } // IF(.NOT. WarmupFlag)THEN
+                    } else if (SolFla == -2) {
+                        PartLoadFrac = ReqOutput / FullOutput;
+                        if (!state.dataGlobal->WarmupFlag) {
+                            if (this->warnIndex.m_SuppHeatCoilSensPLRFail < 1) {
+                                ++this->warnIndex.m_SuppHeatCoilSensPLRFail;
+                                ShowWarningError(
+                                    state,
+                                    this->UnitType +
+                                        " - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + this->Name);
+                                ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(
+                                    state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                            } else {
+                                ShowRecurringWarningErrorAtEnd(
+                                    state,
+                                    this->UnitType + " \"" + this->Name +
+                                        "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
+                                    this->warnIndex.m_SuppHeatCoilSensPLRFailIndex,
+                                    PartLoadFrac,
+                                    PartLoadFrac);
+                            }
+                        } // IF(.NOT. WarmupFlag)THEN
+                    }     // IF (SolFla == -1) THEN
 
-                this->m_SuppHeatPartLoadFrac = PartLoadFrac;
-                this->m_SuppHeatingCycRatio = CycRatio;
-                this->m_SuppHeatingSpeedRatio = SpeedRatio;
-            } // IF NOT EMS override
+                    this->m_SuppHeatPartLoadFrac = PartLoadFrac;
+                    this->m_SuppHeatingCycRatio = CycRatio;
+                    this->m_SuppHeatingSpeedRatio = SpeedRatio;
+                } // IF (NOT EMS OVERRIDE) THEN
+
+            } // IF SENSIBLE LOAD
         }     // IF((GetCurrentScheduleValue(state, UnitarySystem(UnitarySysNum)%m_SysAvailSchedPtr) > 0.0d0) .AND. &
 
         // LoopHeatingCoilMaxRTF used for AirflowNetwork gets set in child components (gas and fuel)
