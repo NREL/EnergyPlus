@@ -942,13 +942,14 @@ namespace DataHeatBalance {
 
         enum class PERptVar
         {
-            CPU = 0,
-            Fan,
-            UPS,
-            CPUAtDesign,
-            FanAtDesign,
-            UPSGainToZone,
-            ConGainToZone,
+            CPU = 0,       // ITE CPU Electric Power/Energy
+            Fan,           // ITE Fan Electric Power/Energy
+            UPS,           // ITE UPS Electric Power/Energy
+            CPUAtDesign,   // ITE CPU Electric Power/Energy at Design Inlet Conditions
+            FanAtDesign,   // ITE Fan Electric Power/Energy at Design Inlet Conditions
+            UPSGainToZone, // ITE UPS Heat Gain to Zone Power(Rate)/Energy - convective gain
+            ConGainToZone, // ITE Total Heat Gain to Zone Power(Rate)/Energy - convective gain - includes heat gain from UPS, plus CPU and Fans if
+                           // room air model not used
             Num
         };
 
@@ -997,26 +998,6 @@ namespace DataHeatBalance {
         int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
 
         // Report variables
-        // Real64 CPUPower = 0.0;          // ITE CPU Electric Power [W]
-        // Real64 FanPower = 0.0;          // ITE Fan Electric Power [W]
-        // Real64 UPSPower = 0.0;          // ITE UPS Electric Power [W]
-        // Real64 CPUPowerAtDesign = 0.0;  // ITE CPU Electric Power at Design Inlet Conditions [W]
-        // Real64 FanPowerAtDesign = 0.0;  // ITE Fan Electric Power at Design Inlet Conditions [W]
-        // Real64 UPSGainRateToZone = 0.0; // ITE UPS Heat Gain to Zone Rate [W] - convective gain
-        // Real64 ConGainRateToZone = 0.0; // ITE Total Heat Gain to Zone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans
-        // if
-        //                                // room air model not used
-        // Real64 CPUConsumption = 0.0;    // ITE CPU Electric Energy [J]
-        // Real64 FanConsumption = 0.0;    // ITE Fan Electric Energy [J]
-        // Real64 UPSConsumption = 0.0;    // ITE UPS Electric Energy [J]
-        // Real64 CPUEnergyAtDesign = 0.0; // ITE CPU Electric Energy at Design Inlet Conditions [J]
-        // Real64 FanEnergyAtDesign = 0.0; // ITE Fan Electric Energy at Design Inlet Conditions [J]
-        // Real64 UPSGainEnergyToZone = 0.0; // ITE UPS Heat Gain to Zone Energy [J] - convective gain
-        // Real64 ConGainEnergyToZone = 0.0; // ITE Total Heat Gain to Zone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and
-        // Fans
-        //                                  // if room air model not used
-
-        // 2022-07-20 Reporting variabel vector instead
         std::vector<PEVar> PwEjRptVars;
 
         Real64 AirVolFlowStdDensity = 0.0; // Air volume flow rate at standard density [m3/s]
