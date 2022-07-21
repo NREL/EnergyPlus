@@ -10531,6 +10531,23 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     EXPECT_EQ("-90.0", RetrieveEntryFromTableBody(tableBody, 2, 6));
 }
 
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_RetrieveEntryFromTableBody) {
+
+    Array2D_string tableBody;
+    int columnCount = 4;
+    int rowCount = 3;
+    tableBody.allocate(columnCount, rowCount);
+    for (int col_i = 1; col_i <= columnCount; col_i++) {
+        for (int row_i = 1; row_i <= rowCount; row_i++) {
+            tableBody(col_i, row_i) = fmt::format("{}-{}", col_i, row_i);
+        }
+    }
+    EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 1, 1), "1-1");
+    EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 2, 1), "1-2");
+    EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 3, 4), "4-3");
+
+}
+
 TEST_F(SQLiteFixture, StatFile_TMYx)
 {
     // Test for #9400 and #9420
