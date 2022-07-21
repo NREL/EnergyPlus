@@ -932,27 +932,21 @@ namespace DataHeatBalance {
     static constexpr std::array<std::string_view, static_cast<int>(ITEInletConnection::Num)> ITEInletConnectionNamesUC = {
         "ADJUSTEDSUPPLY", "ZONEAIRNODE", "ROOMAIRMODEL"};
 
+    enum class PERptVars
+    {
+        CPU = 0,       // ITE CPU Electric Power/Energy
+        Fan,           // ITE Fan Electric Power/Energy
+        UPS,           // ITE UPS Electric Power/Energy
+        CPUAtDesign,   // ITE CPU Electric Power/Energy at Design Inlet Conditions
+        FanAtDesign,   // ITE Fan Electric Power/Energy at Design Inlet Conditions
+        UPSGainToZone, // ITE UPS Heat Gain to Zone Power(Rate)/Energy - convective gain
+        ConGainToZone, // ITE Total Heat Gain to Zone Power(Rate)/Energy - convective gain - includes heat gain from UPS, plus CPU and Fans if
+                       // room air model not used
+        Num
+    };
+
     struct ITEquipData // IT Equipment
     {
-        struct PEVal
-        {
-            Real64 power = 0.0;
-            Real64 energy = 0.0;
-        };
-
-        enum class PERptVars
-        {
-            CPU = 0,       // ITE CPU Electric Power/Energy
-            Fan,           // ITE Fan Electric Power/Energy
-            UPS,           // ITE UPS Electric Power/Energy
-            CPUAtDesign,   // ITE CPU Electric Power/Energy at Design Inlet Conditions
-            FanAtDesign,   // ITE Fan Electric Power/Energy at Design Inlet Conditions
-            UPSGainToZone, // ITE UPS Heat Gain to Zone Power(Rate)/Energy - convective gain
-            ConGainToZone, // ITE Total Heat Gain to Zone Power(Rate)/Energy - convective gain - includes heat gain from UPS, plus CPU and Fans if
-                           // room air model not used
-            Num
-        };
-
         // Members
         std::string Name;                          // EQUIPMENT object name
         int ZonePtr = 0;                           // Which zone internal gain is in
@@ -998,7 +992,8 @@ namespace DataHeatBalance {
         int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
 
         // Report variables
-        std::array<PEVal, (int)PERptVars::Num> PERptData;
+        std::array<Real64, (int)PERptVars::Num> PowerRpt;
+        std::array<Real64, (int)PERptVars::Num> EnergyRpt;
 
         Real64 AirVolFlowStdDensity = 0.0; // Air volume flow rate at standard density [m3/s]
         Real64 AirVolFlowCurDensity = 0.0; // Air volume flow rate at current density [m3/s]
@@ -1858,8 +1853,8 @@ namespace DataHeatBalance {
         Real64 OtherLostRate = 0.0;
         Real64 OtherTotGainRate = 0.0;
         // IT Equipment
-        std::array<ITEquipData::PEVal, (int)ITEquipData::PERptVars::Num> PERptData;
-
+        std::array<Real64, (int)PERptVars::Num> PowerRpt;
+        std::array<Real64, (int)PERptVars::Num> EnergyRpt;
         Real64 ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
         Real64 ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
         Real64 ITEqSHI = 0.0;                  // Zone Supply Heat Index []
