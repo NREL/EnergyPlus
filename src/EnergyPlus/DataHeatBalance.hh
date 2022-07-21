@@ -934,7 +934,7 @@ namespace DataHeatBalance {
 
     struct ITEquipData // IT Equipment
     {
-        struct PEVar
+        struct PEVal
         {
             Real64 power = 0.0;
             Real64 energy = 0.0;
@@ -998,7 +998,7 @@ namespace DataHeatBalance {
         int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
 
         // Report variables
-        std::array<PEVar, (int)PERptVars::Num> PERptData;
+        std::array<PEVal, (int)PERptVars::Num> PERptData;
 
         Real64 AirVolFlowStdDensity = 0.0; // Air volume flow rate at standard density [m3/s]
         Real64 AirVolFlowCurDensity = 0.0; // Air volume flow rate at current density [m3/s]
@@ -1858,7 +1858,7 @@ namespace DataHeatBalance {
         Real64 OtherLostRate = 0.0;
         Real64 OtherTotGainRate = 0.0;
         // IT Equipment
-        std::array<ITEquipData::PEVar, (int)ITEquipData::PERptVars::Num> PERptData;
+        std::array<ITEquipData::PEVal, (int)ITEquipData::PERptVars::Num> PERptData;
 
         Real64 ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
         Real64 ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
