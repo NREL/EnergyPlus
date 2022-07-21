@@ -1123,7 +1123,6 @@ namespace Furnaces {
                     }
                     if (AirLoopFound) break;
                 }
-                if (AirLoopFound) break;
                 if (!AirNodeFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowSevereError(state, "Did not find Air Node (Zone with Thermostat).");
@@ -1731,7 +1730,6 @@ namespace Furnaces {
                     }
                     if (AirLoopFound) break;
                 }
-                if (AirLoopFound) break;
                 if (!AirNodeFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "Did not find air node (zone with thermostat).");
@@ -3071,7 +3069,6 @@ namespace Furnaces {
                     }
                     if (AirLoopFound) break;
                 }
-                if (AirLoopFound) break;
                 if (!AirNodeFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "Did not find air node (zone with thermostat).");
@@ -4064,7 +4061,6 @@ namespace Furnaces {
                     }
                     if (AirLoopFound) break;
                 }
-                if (AirLoopFound) break;
                 if (!AirNodeFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "Did not find air node (zone with thermostat).");

@@ -3441,7 +3441,7 @@ namespace UnitarySystems {
             int compIndex;
             int branchIndex;
             AirLoopFound = searchTotalComponents(state, thisObjectName, compIndex, branchIndex, AirLoopNumber);
-            if (AirLoopFound) {
+            if (AirLoopFound && (this->ControlZoneNum > 0)) {
                 //             Find the controlled zone number for the specified thermostat location
                 this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
 
@@ -3482,36 +3482,41 @@ namespace UnitarySystems {
                                 cCurrentModuleObject)) {
                             AirLoopNumber = AirLoopNum;
                             AirLoopFound = true;
-                            //             Find the controlled zone number for the specified thermostat location
-                            this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
+                            if (this->ControlZoneNum > 0) {
+                                //             Find the controlled zone number for the specified thermostat location
+                                this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
 
-                            //             Determine if system is on air loop served by the thermostat location specified
-                            ZoneInletNodeFound = false;
-                            int ZoneInletNum = 0;
-                            ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, this->ControlZoneNum, ZoneInletNum);
-                            if (ZoneInletNodeFound) {
-                                this->m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).InletNode(ZoneInletNum);
-                                TotalFloorAreaOnAirLoop += state.dataHeatBal->Zone(this->ControlZoneNum).FloorArea;
-                            }
+                                //             Determine if system is on air loop served by the thermostat location specified
+                                ZoneInletNodeFound = false;
+                                int ZoneInletNum = 0;
+                                ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, this->ControlZoneNum, ZoneInletNum);
+                                if (ZoneInletNodeFound) {
+                                    this->m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).InletNode(ZoneInletNum);
+                                    TotalFloorAreaOnAirLoop += state.dataHeatBal->Zone(this->ControlZoneNum).FloorArea;
+                                }
 
-                            // if (this->m_ZoneInletNode == 0) AirLoopFound = false;
-                            for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
-                                AirNodeFound = true;
-                            }
-                            for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
-                                AirNodeFound = true;
-                            }
-                            if (!AirNodeFound && this->ControlZoneNum > 0) {
-                                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                ShowContinueError(state, "Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
-                                ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
-                                errorsFound = true;
+                                // if (this->m_ZoneInletNode == 0) AirLoopFound = false;
+                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                    if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
+                                    AirNodeFound = true;
+                                }
+                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                    if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
+                                    AirNodeFound = true;
+                                }
+                                if (!AirNodeFound && this->ControlZoneNum > 0) {
+                                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                                    ShowContinueError(state, "Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                                    ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
+                                    errorsFound = true;
+                                }
                             }
                         }
+                        if (AirLoopFound) break;
                     }
+                    if (AirLoopFound) break;
                 }
+                if (AirLoopFound) break;
             }
 
             if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
