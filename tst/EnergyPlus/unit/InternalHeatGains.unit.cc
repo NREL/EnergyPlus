@@ -482,22 +482,22 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 InitialPower = state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::CPU].power +
-                          state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::Fan].power +
-                          state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::UPS].power;
+    Real64 InitialPower = state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::CPU].power +
+                          state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::Fan].power +
+                          state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::UPS].power;
 
     state->dataLoopNodes->Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 NewPower = state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::CPU].power +
-                      state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::Fan].power +
-                      state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::UPS].power;
+    Real64 NewPower = state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::CPU].power +
+                      state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::Fan].power +
+                      state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::UPS].power;
     ASSERT_NE(InitialPower, NewPower);
     HVACManager::ResetNodeData(*state);
 
     InternalHeatGains::CalcZoneITEq(*state);
-    NewPower = state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::CPU].power +
-               state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::Fan].power +
-               state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::UPS].power;
+    NewPower = state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::CPU].power +
+               state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::Fan].power +
+               state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::UPS].power;
     ASSERT_EQ(InitialPower, NewPower);
 }
 
@@ -1058,11 +1058,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     InternalHeatGains::CalcZoneITEq(*state);
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
-    Real64 DefaultUPSPower = (state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::CPU].power +
-                              state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::Fan].power) *
+    Real64 DefaultUPSPower = (state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::CPU].power +
+                              state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::Fan].power) *
                              max((1.0 - state->dataHeatBal->ZoneITEq(1).DesignUPSEfficiency), 0.0);
 
-    ASSERT_EQ(DefaultUPSPower, state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::UPS].power);
+    ASSERT_EQ(DefaultUPSPower, state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::UPS].power);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
@@ -2596,10 +2596,10 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
     state->dataEnvrn->StdBaroPress = 101400.0;
 
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 calculatedResult1 = state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::CPU].power;
-    Real64 calculatedResult2 = state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::Fan].power;
-    Real64 calculatedResult3 = state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::UPS].power;
-    Real64 calculatedResult4 = state->dataHeatBal->ZoneITEq(1).PERptVars[(int)ITEquipData::PERptVar::UPSGainToZone].power;
+    Real64 calculatedResult1 = state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::CPU].power;
+    Real64 calculatedResult2 = state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::Fan].power;
+    Real64 calculatedResult3 = state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::UPS].power;
+    Real64 calculatedResult4 = state->dataHeatBal->ZoneITEq(1).PERptData[(int)ITEquipData::PERptVar::UPSGainToZone].power;
 
     Real64 expectedResult1 = 480.024;
     Real64 expectedResult2 = 380.0;
