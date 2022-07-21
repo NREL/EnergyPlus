@@ -6371,15 +6371,14 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaoAvgMechVent,
                                      Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).MechVentVolTotalOcc /
-                                         (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                                     ZonePreDefRep(iZone).MechVentVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume * zoneMult),
                                      3);
                 }
                 if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaoMinMechVent,
                                      Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).MechVentVolMin / (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                                     ZonePreDefRep(iZone).MechVentVolMin / (Zone(iZone).Volume * zoneMult),
                                      3);
                 }
                 PreDefTableEntry(
@@ -6511,122 +6510,122 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlMechVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).MechVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlNatVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).NatVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTotVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).MechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).NatVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlSumDynTrgVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz);
+                         state.dataSysRpts->SysPreDefRep(iSys).TargetVentTotalVoz);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmBelow,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeBelowVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAt,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAbove,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAboveVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeVentUnoccTotal);
 
         // Air loop times at OA limiting factors
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNoLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNone]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorNone]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorLimits]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorLimits]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEcono,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEconomizer]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorEconomizer]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctExhaust,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorExhaust]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorExhaust]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctMixedLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorMixedAir]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorMixedAir]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctHiHumid,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorHighHum]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorHighHum]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDCV,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDCV]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorDCV]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNiteVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNightVent]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorNightVent]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDemand,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDemandLimit]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorDemandLimit]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEMS,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEMS]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorEMS]);
 
-        if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+        if (state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal > 0.0) {
             // Average Outdoor Air During Occupancy by Airloop
-            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal * SecInHour;
+            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal * SecInHour;
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlMechVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).MechVentTotalOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlNatVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).NatVentTotalOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTotVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             (state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc) /
+                             (state.dataSysRpts->SysPreDefRep(iSys).MechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).NatVentTotalOcc) /
                                  totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).TargetVentTotalVozOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmBelow,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeBelowVozDynTotalOcc);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmAt,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeAtVozDynTotalOcc);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmAbove,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeAboveVozDynTotalOcc);
 
             // Average Outdoor Air at OA Limiting Factors During Occupancy by Airloop
             // lambda to set avgFlow during occupancy for a given airloop and limiting factor type
             auto avgFlowRate = [&state](int sysNum, int limitingFactorType) {
                 Real64 avgFlow = 0.0;
-                int time = state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimitOcc[limitingFactorType];
+                int time = state.dataSysRpts->SysPreDefRep(sysNum).TimeAtOALimitOcc[limitingFactorType];
                 if (time > 0) {
-                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
+                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).MechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
                 } else {
                     avgFlow = 0.0;
                 }
@@ -8378,12 +8377,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody,
-                            rowHead,
-                            columnHead,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "Site and Source Energy");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
                     }
                 }
             }
@@ -8545,7 +8539,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Site to Source Energy Conversion Factors");
                     }
@@ -8608,7 +8602,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
                     }
                 }
             }
@@ -9002,7 +8996,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                     }
                 }
             }
@@ -9217,7 +9211,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Utility Use Per Conditioned Floor Area");
                     }
@@ -9254,7 +9248,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Utility Use Per Total Floor Area");
                     }
@@ -9352,12 +9346,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody,
-                            rowHead,
-                            columnHead,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "Electric Loads Satisfied");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
                     }
                 }
             }
@@ -9455,12 +9444,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody,
-                            rowHead,
-                            columnHead,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "On-Site Thermal Sources");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
                     }
                 }
             }
@@ -9563,7 +9547,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                     }
                 }
             }
@@ -9618,7 +9602,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Setpoint Not Met Criteria");
                     }
@@ -9681,7 +9665,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Comfort and Setpoint Not Met Summary");
                     }
@@ -9933,7 +9917,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         if (produceTabular) {
             if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                 state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", subTableTitle);
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", subTableTitle);
             }
         }
         rowHeadTemp.deallocate();
@@ -10169,7 +10153,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                           rowHead,
                                                                                                           columnHead,
-                                                                                                          "Source Energy End Use Components Summary",
+                                                                                                          "SourceEnergyEndUseComponentsSummary",
                                                                                                           "Entire Facility",
                                                                                                           "Source Energy End Use Components Summary");
                 }
@@ -10253,7 +10237,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             columnHead,
                             "SourceEnergyEndUseComponentsSummary",
                             "Entire Facility",
-                            "Source Energy End Use Component Per Conditioned Floor Area");
+                            "Source Energy End Use Components Per Conditioned Floor Area");
                     }
                 }
                 if (produceTabular) {
@@ -10262,9 +10246,9 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Source Energy End Use Components Summary",
+                            "SourceEnergyEndUseComponentsSummary",
                             "Entire Facility",
-                            "Source Energy End Use Component Per Conditioned Floor Area");
+                            "Source Energy End Use Components Per Conditioned Floor Area");
                     }
                 }
             } // End of Normalized by Conditioned Area
@@ -10304,7 +10288,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Source Energy End Use Components Summary",
+                            "SourceEnergyEndUseComponentsSummary",
                             "Entire Facility",
                             "Source Energy End Use Components Per Total Floor Area");
                     }
@@ -10623,7 +10607,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
+                        tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
                 }
             }
 
@@ -10750,12 +10734,8 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
-                                                                                                          rowHeadTemp,
-                                                                                                          columnHeadTemp,
-                                                                                                          "Demand End Use Components Summary",
-                                                                                                          "Entire Facility",
-                                                                                                          "End Uses By Subcategory");
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
                 }
             }
             rowHeadTemp.deallocate();
@@ -11328,7 +11308,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
                 }
             }
 
@@ -11603,7 +11583,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
                 }
             }
 
@@ -11677,7 +11657,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
                 }
             }
 
@@ -11719,7 +11699,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
                 }
             }
 
@@ -12016,7 +11996,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
                 }
             }
 
@@ -12370,7 +12350,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     if (produceTabular) {
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                spaceTableBody, spaceRowHead, spaceColumnHead, "Input Verification and Results Summary", "Entire Facility", "Space Summary");
+                spaceTableBody, spaceRowHead, spaceColumnHead, "InputVerificationandResultsSummary", "Entire Facility", "Space Summary");
         }
     }
     if (produceTabular) {
@@ -12392,7 +12372,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(spaceTypeTableBody,
                                                                                                   spaceTypeRowHead,
                                                                                                   spaceTypeColumnHead,
-                                                                                                  "Input Verification and Results Summary",
+                                                                                                  "InputVerificationandResultsSummary",
                                                                                                   "Entire Facility",
                                                                                                   "Space Type Summary");
         }
@@ -12463,12 +12443,21 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
 
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                               rowHead,
+                                                                               columnHead,
+                                                                               "AdaptiveComfortSummary",
+                                                                               "Entire Facility",
+                                                                               "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
         }
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
+                tableBody,
+                rowHead,
+                columnHead,
+                "AdaptiveComfortSummary",
+                "Entire Facility",
+                "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
         }
     }
 }
@@ -12678,8 +12667,8 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             if (produceTabular) {
-                WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-                WriteSubtitle(state, "Heat Emission by Components");
+                WriteReportHeaders(state, "Annual Heat Emissions Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                WriteSubtitle(state, "Annual Heat Emissions Summary");
             }
 
             columnWidth.allocate(6);
@@ -12726,6 +12715,10 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
 
             if (produceTabular) {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
+                }
             }
             if (produceSQLite) {
                 if (state.dataSQLiteProcedures->sqlite) {
@@ -13233,7 +13226,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Component Sizing Summary",
+                            "ComponentSizingSummary",
                             "Entire Facility",
                             state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
                             "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
@@ -13366,7 +13359,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
                         tableBody,
                         rowHead,
                         columnHead,
-                        "Surface Shadowing Summary",
+                        "SurfaceShadowingSummary",
                         "Entire Facility",
                         "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                 }
@@ -13386,7 +13379,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
                         tableBody,
                         rowHead,
                         columnHead,
-                        "Surface Shadowing Summary",
+                        "SurfaceShadowingSummary",
                         "Entire Facility",
                         "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                 }
@@ -13512,11 +13505,15 @@ void WriteEioTables(EnergyPlusData &state)
                     if (produceTabular) {
                         WriteSubtitle(state, tableName);
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, "InitializationSummary", "Entire Facility", tableName);
+                        }
                     }
                     if (produceSQLite) {
                         if (state.dataSQLiteProcedures->sqlite) {
                             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                                tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                                tableBody, rowHead, columnHead, "InitializationSummary", "Entire Facility", tableName);
                         }
                     }
                 }

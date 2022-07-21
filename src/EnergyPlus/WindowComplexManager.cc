@@ -2726,8 +2726,6 @@ namespace WindowComplexManager {
         Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
         Real64 edgeGlCorrFac;
 
-        int SrdSurfsNum;       // Surrounding surfaces list number
-        int SrdSurfNum;        // Surrounding surface number DO loop counter
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
@@ -2792,10 +2790,10 @@ namespace WindowComplexManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                        for (SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
                                              DataGlobalConstants::KelvinConv;
