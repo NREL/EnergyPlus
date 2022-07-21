@@ -3268,11 +3268,11 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
 
     for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
         auto &thisSysLoadRepVars = state.dataSysRpts->SysLoadRepVars(airLoopNum);
-    // SYSTEM LOADS REPORT
+        // SYSTEM LOADS REPORT
         thisSysLoadRepVars.TotHTNG = 0.0;
         thisSysLoadRepVars.TotCLNG = 0.0;
 
-    // SYSTEM ENERGY USE REPORT
+        // SYSTEM ENERGY USE REPORT
         thisSysLoadRepVars.TotElec = 0.0;
         thisSysLoadRepVars.TotNaturalGas = 0.0;
         thisSysLoadRepVars.TotPropane = 0.0;
@@ -3280,7 +3280,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
         thisSysLoadRepVars.TotH2OCOLD = 0.0;
         thisSysLoadRepVars.TotH2OHOT = 0.0;
 
-    // SYSTEM COMPONENT LOADS REPORT
+        // SYSTEM COMPONENT LOADS REPORT
         thisSysLoadRepVars.FANCompHTNG = 0.0;
         thisSysLoadRepVars.CCCompCLNG = 0.0;
         thisSysLoadRepVars.HCCompHTNG = 0.0;
@@ -3295,7 +3295,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
         thisSysLoadRepVars.DesDehumidCLNG = 0.0;
         thisSysLoadRepVars.DomesticH2O = 0.0;
 
-    // SYSTEM COMPONENT ENERGY REPORT
+        // SYSTEM COMPONENT ENERGY REPORT
         thisSysLoadRepVars.FANCompElec = 0.0;
         thisSysLoadRepVars.HCCompH2OHOT = 0.0;
         thisSysLoadRepVars.CCCompH2OCOLD = 0.0;
@@ -4132,7 +4132,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         // retrieve the zone load for each zone
         Real64 ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
         Real64 ZoneVolume = state.dataHeatBal->Zone(CtrlZoneNum).Volume * state.dataHeatBal->Zone(CtrlZoneNum).Multiplier *
-                     state.dataHeatBal->Zone(CtrlZoneNum).ListMultiplier; // CR 7170
+                            state.dataHeatBal->Zone(CtrlZoneNum).ListMultiplier; // CR 7170
 
         bool constexpr UseOccSchFlag = true;
         bool constexpr UseMinOASchFlag = true;
@@ -4436,7 +4436,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 }
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).TargetVentilationFlowVoz +=
                     termUnitOAFrac * thisZoneVentRepVars.TargetVentilationFlowVoz;
-                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) /
+                Real64 naturalVentFlow = (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen) /
                                          (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataSysRpts->SysVentRepVars(AirLoopNum).NatVentFlow += termUnitOAFrac * naturalVentFlow;
 
@@ -4489,7 +4489,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
 
         // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
         Real64 totMechNatVentVolStdRho =
-            thisZoneVentRepVars.OAVolStdRho + state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen;
+            thisZoneVentRepVars.OAVolStdRho + state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity + thisZonePredefRep.AFNVentVolStdDen;
         Real64 targetVoz = thisZoneVentRepVars.TargetVentilationFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
         // Allow 1% tolerance
         if (totMechNatVentVolStdRho < (0.99 * targetVoz)) {
@@ -4504,10 +4504,8 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
 
         // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-        Real64 currentZoneAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                                                         state.dataEnvrn->OutBaroPress,
-                                                                         state.dataHeatBalFanSys->MAT(CtrlZoneNum),
-                                                                         state.dataHeatBalFanSys->ZoneAirHumRatAvg(CtrlZoneNum));
+        Real64 currentZoneAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+            state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(CtrlZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatAvg(CtrlZoneNum));
         if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.OAVolFlowCrntRho = thisZoneVentRepVars.OAMassFlow / currentZoneAirDensity;
         thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
         if (ZoneVolume > 0.0) thisZoneVentRepVars.MechACH = (thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) / ZoneVolume;
@@ -4523,15 +4521,15 @@ void ReportVentilationLoads(EnergyPlusData &state)
             }
             thisZonePredefRep.MechVentVolTotalOccStdDen += thisZoneVentRepVars.OAVolStdRho;
             // infiltration
-            thisZonePredefRep.InfilVolTotalOcc += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
-            if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < thisZonePredefRep.InfilVolMin) {
-                thisZonePredefRep.InfilVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+            thisZonePredefRep.InfilVolTotalOcc += state.dataHeatBal->ZnAirRpt(CtrlZoneNum).InfilVolumeCurDensity;
+            if (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).InfilVolumeCurDensity < thisZonePredefRep.InfilVolMin) {
+                thisZonePredefRep.InfilVolMin = state.dataHeatBal->ZnAirRpt(CtrlZoneNum).InfilVolumeCurDensity;
             }
-            thisZonePredefRep.InfilVolTotalOccStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
+            thisZonePredefRep.InfilVolTotalOccStdDen += state.dataHeatBal->ZnAirRpt(CtrlZoneNum).InfilVolumeStdDensity;
             // 'simple' natural ventilation
-            thisZonePredefRep.SimpVentVolTotalOcc += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
-            if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity < thisZonePredefRep.SimpVentVolMin) {
-                thisZonePredefRep.SimpVentVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+            thisZonePredefRep.SimpVentVolTotalOcc += state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeCurDensity;
+            if (state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeCurDensity < thisZonePredefRep.SimpVentVolMin) {
+                thisZonePredefRep.SimpVentVolMin = state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeCurDensity;
             }
             thisZonePredefRep.SimpVentVolTotalOccStdDen += state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity;
             // target ventilation Voz-dyn
@@ -4551,8 +4549,8 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
         // accumulate during occupancy or not
         thisZonePredefRep.MechVentVolTotalStdDen += thisZoneVentRepVars.OAVolStdRho;
-        thisZonePredefRep.InfilVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
-        thisZonePredefRep.SimpVentVolTotalStdDen += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
+        thisZonePredefRep.InfilVolTotalStdDen += state.dataHeatBal->ZnAirRpt(CtrlZoneNum).InfilVolumeStdDensity;
+        thisZonePredefRep.SimpVentVolTotalStdDen += state.dataHeatBal->ZnAirRpt(CtrlZoneNum).VentilVolumeStdDensity;
         thisZonePredefRep.VozTargetTotal += targetVoz;
         thisZonePredefRep.VozTargetTimeBelow += thisZoneVentRepVars.TimeBelowVozDyn;
         thisZonePredefRep.VozTargetTimeAt += thisZoneVentRepVars.TimeAtVozDyn;
