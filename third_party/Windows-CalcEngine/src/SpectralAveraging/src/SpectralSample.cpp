@@ -227,8 +227,7 @@ namespace SpectralAveraging
                                      const CSeries & t_SourceData,
                                      FenestrationCommon::IntegrationType integrationType,
                                      double NormalizationCoefficient) :
-        CSample(t_SourceData, integrationType, NormalizationCoefficient),
-        m_SampleData(t_SampleData)
+        CSample(t_SourceData, integrationType, NormalizationCoefficient), m_SampleData(t_SampleData)
     {
         if(t_SampleData == nullptr)
         {
@@ -245,8 +244,7 @@ namespace SpectralAveraging
     }
 
     CSpectralSample::CSpectralSample(std::shared_ptr<CSpectralSampleData> const & t_SampleData) :
-        CSample(),
-        m_SampleData(t_SampleData)
+        CSample(), m_SampleData(t_SampleData)
     {
         if(t_SampleData == nullptr)
         {
@@ -345,8 +343,7 @@ namespace SpectralAveraging
       double NormalizationCoefficient) :
         CSpectralSample(
           t_PhotovoltaicData, t_SourceData, integrationType, NormalizationCoefficient),
-        m_PCE{{Side::Front, CSeries()}, {Side::Back, CSeries()}},
-        m_W{{Side::Front, CSeries()}, {Side::Back, CSeries()}}
+        m_JcsPrime{{Side::Front, CSeries()}, {Side::Back, CSeries()}}
     {}
 
     void CPhotovoltaicSample::calculateState()
@@ -354,23 +351,15 @@ namespace SpectralAveraging
         CSpectralSample::calculateProperties();
         for(const auto & side : EnumSide())
         {
-            const CSeries eqe{getSample()->pvProperty(side, PVM::EQE)};
-            const CSeries voc{getSample()->pvProperty(side, PVM::VOC)};
-            const CSeries ff{getSample()->pvProperty(side, PVM::FF)};
-            const auto transmittance = m_SampleData->properties(Property::T, side);
-            const auto reflectance = m_SampleData->properties(Property::R, side);
+            const CSeries eqe{getSample()->eqe(side)};
             const auto wl = getWavelengthsFromSample();
-            CSeries pce;
-            CSeries w;
+            CSeries jscPrime;
             for(auto i = 0u; i < wl.size(); ++i)
             {
-                const double pceVal = pceCalc(wl[i], eqe[i].value(), voc[i].value(), ff[i].value());
-                pce.addProperty(wl[i], pceVal);
-                w.addProperty(wl[i],
-                              1 - pceVal / (1 - transmittance[i].value() - reflectance[i].value()));
+                const double pceVal = jscPrimeCalc(wl[i], eqe[i].value());
+                jscPrime.addProperty(wl[i], pceVal);
             }
-            m_PCE[side] = pce;
-            m_W[side] = w;
+            m_JcsPrime[side] = jscPrime;
         }
     }
 
@@ -379,22 +368,16 @@ namespace SpectralAveraging
         return dynamic_cast<PhotovoltaicSampleData *>(m_SampleData.get());
     }
 
-    double CPhotovoltaicSample::pceCalc(double wavelength, double eqe, double voc, double ff)
+    double CPhotovoltaicSample::jscPrimeCalc(double wavelength, double eqe)
     {
         double const microMeterToMeter{1e-6};
-        return eqe * voc * ff * wavelength * ConstantsData::ELECTRON_CHARGE * microMeterToMeter
+        return eqe * wavelength * ConstantsData::ELECTRON_CHARGE * microMeterToMeter
                / (ConstantsData::SPEEDOFLIGHT * ConstantsData::PLANKCONSTANT);
     }
 
-    FenestrationCommon::CSeries & CPhotovoltaicSample::pce(const FenestrationCommon::Side side)
+    FenestrationCommon::CSeries & CPhotovoltaicSample::jscPrime(const FenestrationCommon::Side side)
     {
         calculateState();
-        return m_PCE.at(side);
-    }
-
-    FenestrationCommon::CSeries & CPhotovoltaicSample::w(const FenestrationCommon::Side side)
-    {
-        calculateState();
-        return m_W.at(side);
+        return m_JcsPrime.at(side);
     }
 }   // namespace SpectralAveraging

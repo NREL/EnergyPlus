@@ -57,7 +57,6 @@
 #include <AirflowNetwork/Properties.hpp>
 #include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
@@ -144,6 +143,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -182,7 +182,6 @@
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
-#include <EnergyPlus/HeatBalanceKivaManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>

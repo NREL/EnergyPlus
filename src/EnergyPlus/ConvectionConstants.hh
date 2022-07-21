@@ -159,15 +159,6 @@ enum class OutConvClass
 // where used, that should be handled with a static_cast<int>(OutConvClass::Invalid)
 constexpr static std::array<int, static_cast<int>(OutConvClass::Num)> OutConvClassReportVals = {101, 102, 103, 104};
 
-enum class ConvSurfDeltaT
-{
-    Invalid = -1,
-    Positive,
-    Zero,
-    Negative,
-    Num
-};
-
 enum class SurfConvOrientation
 {
     Invalid = -1,
@@ -260,20 +251,6 @@ enum class ConvCoefOverrideType
     UserCurve,      // User specified "UserCurve" as the override type
     SpecifiedModel, // one of the direct named model equation keys
     Num             // count, always last element
-};
-
-// parameters, by zone, for flow regimes for adaptive convection on inside face
-enum class InConvFlowRegime
-{
-    Invalid = -1,
-    A1, // In-floor heating or in-ceiling cooling
-    A2, // In-wall heating
-    A3, // no HVAC system, all buoyancy
-    B,  // Convective heater in zone
-    C,  // central mechanical air
-    D,  // zone mechanical air
-    E,  // mixed. mechanical air and buoyancy
-    Num
 };
 
 // params for reference temperature type

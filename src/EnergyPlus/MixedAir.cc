@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1875,7 +1876,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                     for (EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
                                         if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipType(EquipNum),
                                                                         "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
-                                            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                                            for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                                                 if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipName(EquipNum),
                                                                                 state.dataDefineEquipment->AirDistUnit(ADUNum).Name)) {
                                                     if ((state.dataDefineEquipment->AirDistUnit(ADUNum).EquipTypeEnum(EquipNum) ==

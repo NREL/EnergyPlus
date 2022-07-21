@@ -194,7 +194,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
     state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue =
-        DataHVACGlobals::DualSetPointWithDeadBand;
+        static_cast<int>(DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 24C/20C
 
@@ -227,8 +227,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
-    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state->dataZoneCtrls->TempControlledZone(1).SchIndx_DualSetPointWDeadBandCool = 4;
+    state->dataZoneCtrls->TempControlledZone(1).SchIndx_DualSetPointWDeadBandHeat = 5;
 
     Real64 coolingSetpoint3 = 100.0;
     Real64 zoneAssumedTemperature3 = -9999;
@@ -245,8 +245,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
-    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state->dataZoneCtrls->TempControlledZone(1).SchIndx_DualSetPointWDeadBandCool = 4;
+    state->dataZoneCtrls->TempControlledZone(1).SchIndx_DualSetPointWDeadBandHeat = 5;
 
     Real64 zoneAssumedTemperature4 = 15.0;
     HeatBalanceKivaManager::KivaInstanceMap kv4(*state, fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
@@ -802,6 +802,33 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_GetAccDate)
 
     // Accelerated date should be greater than 0
     EXPECT_GT(accDate, 0);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceKiva_setMessageCallback)
+{
+    // Unit test for Issue #9309
+
+    int SurfNum;
+
+    SurfNum = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(SurfNum).ExtBoundCond = DataSurfaces::KivaFoundation;
+    state->dataSurface->Surface(SurfNum).Name = "Kiva Floor";
+    state->dataSurface->AllHTKivaSurfaceList = {1};
+    HeatBalanceKivaManager::KivaManager km;
+
+    EXPECT_THROW(km.calcKivaSurfaceResults(*state), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** Surface=\"Kiva Floor\": The weights of associated Kiva instances do not add to unity--check exposed perimeter values.",
+        "   **  Fatal  ** Kiva: Errors discovered, program terminates.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Surface=\"Kiva Floor\": The weights of associated Kiva instances do not add to "
+        "unity--check exposed perimeter values.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 } // namespace EnergyPlus

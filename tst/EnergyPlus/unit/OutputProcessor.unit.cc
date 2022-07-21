@@ -1083,6 +1083,9 @@ namespace OutputProcessor {
         WriteReportIntegerData(*state, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
+        WriteReportIntegerData(*state, 1, "1", 25.75, StoreType::Averaged, 720, ReportingFrequency::Monthly, 0, 4010115, 1, 4011560);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.3E-01,0, 1, 1,15,1, 1,15,60"}, "\n")));
+
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
@@ -1098,7 +1101,8 @@ namespace OutputProcessor {
                                                           {"10", "1", "1", "61677162.0987027"},
                                                           {"11", "1", "1", "61677162.0987027"},
                                                           {"12", "1", "1", "61677162.0987027"},
-                                                          {"13", "1", "1", "0.0"}});
+                                                          {"13", "1", "1", "0.0"},
+                                                          {"14", "1", "1", "0.0357638888888889"}});
 
         std::vector<std::vector<std::string>> reportExtendedData(
             {{"1", "4", "4283196.0", "12", "21", "24", "", "0", "4283136.0", "12", "21", "0", "", "10"},
@@ -1106,7 +1110,8 @@ namespace OutputProcessor {
              {"3", "6", "4283196.0", "12", "21", "24", "", "0", "4283136.0", "12", "21", "0", "", "10"},
              {"4", "10", "4283196.0", "12", "21", "24", "", "0", "4283136.0", "12", "21", "0", "", "10"},
              {"5", "11", "4283196.0", "12", "21", "24", "", "0", "4283136.0", "12", "21", "0", "", "10"},
-             {"6", "12", "4283196.0", "12", "21", "24", "", "0", "4283136.0", "12", "21", "0", "", "10"}});
+             {"6", "12", "4283196.0", "12", "21", "24", "", "0", "4283136.0", "12", "21", "0", "", "10"},
+             {"7", "14", "1.0", "4", "1", "15", "", "0", "0.0", "4", "1", "0", "", "15"}});
 
         EXPECT_EQ(reportData, reportDataResults);
         EXPECT_EQ(reportExtendedData, reportExtendedDataResults);
@@ -3985,6 +3990,43 @@ namespace OutputProcessor {
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(5).Used);
     }
 
+    TEST_F(SQLiteFixture, OutputProcessor_getMeters_WildCard)
+    {
+        // Test for #9150
+        std::string const idf_objects = delimited_string({"Output:Meter:MeterFileOnly,InteriorLights:Electricity:Zone:*,Monthly;"});
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        Real64 light_consumption = 0;
+        for (int i = 1; i <= 5; ++i) {
+            SetupOutputVariable(*state,
+                                "Lights Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                light_consumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "SPACE" + std::to_string(i) + "LIGHTS",
+                                _,
+                                "Electricity",
+                                "InteriorLights",
+                                "GeneralLights",
+                                "Building",
+                                "SPACE" + std::to_string(i),
+                                1,
+                                1);
+        }
+
+        UpdateMeterReporting(*state);
+
+        compare_mtr_stream(
+            delimited_string({"53,9,InteriorLights:Electricity:Zone:SPACE1 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "102,9,InteriorLights:Electricity:Zone:SPACE2 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "139,9,InteriorLights:Electricity:Zone:SPACE3 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "176,9,InteriorLights:Electricity:Zone:SPACE4 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
+                              "213,9,InteriorLights:Electricity:Zone:SPACE5 [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"},
+                             "\n"));
+    }
+
     TEST_F(SQLiteFixture, OutputProcessor_getCustomMeterInput)
     {
         std::string const idf_objects = delimited_string({
@@ -5651,7 +5693,6 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "*");
-        SystemReports::AllocateAndSetUpVentReports(*state);
         SystemReports::AllocateAndSetUpVentReports(*state);
         GetCustomMeterInput(*state, errors_found);
         EXPECT_FALSE(errors_found);

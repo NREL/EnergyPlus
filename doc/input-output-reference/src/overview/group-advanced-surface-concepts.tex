@@ -1060,10 +1060,10 @@ Williamson, 1989):
 
 \[d_{wt}=0.1022\cdot d_{elev}\]
 
-If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied, otherwise
+If \(d_{wt} \le\) 40 m., the GroundWater boundary is applied at this depth, otherwise
 a ZeroFlux boundary is applied at 40 m. If the calculated ground water depth is
-shallower than any element of the foundation construction, then the GroundWater
-is applied at 1 m below the lowest element.
+shallower than any element of a foundation construction, then the GroundWater
+is applied at 1 m below the lowest element for that foundation.
 
 Default: Autoselect.
 
@@ -1073,8 +1073,13 @@ The distance from the exterior grade to the deep ground boundary, in m.
 This distance represents either the distance to the ground water level,
 or a distance adequately far from the foundation such that it is
 isolated from the effects of the boundary (typically \textgreater{}= 40
-m). Default 40 m, or the distance determined by the ``Auto'' Deep-Ground
-Boundary Condition.
+m). Default 40 m, or the distance determined by the ``Autoselect'' Deep-Ground
+Boundary Condition. If the Deep-Ground Boundary Condition is set to ``Autoselect'', this field
+should be set to ``Autocalculate''. If the Deep-Ground Boundary Condition is not set
+to ``Autoselect'', but this field is set to ``Autocalculate'' (or allowed to default), an error
+will be issued.
+
+Default: Autocalculate.
 
 \paragraph{Field: Minimum Cell Dimension}\label{foundation-kiva-settings-minimum-cell-dimension}
 
@@ -2514,11 +2519,13 @@ This field specifies the aspect ratio of the building geometry described in the 
 
 This field specifies the aspect ratio that the building described in the rest of the input file will be changed to.
 
-\subsection{SurfaceProperty:SurroundingSurfaces}\label{surfacePropertysurroundingSurfaces}
+\subsection{SurfaceProperty:SurroundingSurfaces}\label{surfacePropertySurroundingSurfaces}
 
 The object is used to calculate long wave radiation to an external surface from its surrounding surfaces, defining the properties of the surrounding surfaces. The property object declares a list of single surrounding surfaces which has a name, a field of view factor, and another field Temperature Schedule Name referencing a schedule containing the temperature of the surrounding surface, which can be overwritten at each time step in EnergyPlus run time through co-simulation. View factors are assumed to be constant values. At least one surrounding surface should be defined in this object.
 
 The object also defines the sky and ground temperature and view factors to the external surface. The sum of all defined view factors should not exceed 1.0. If only sky view is defined in this object, the ground view factor to this surface will be 1.0 subtracted with the ground view factor and all other defined surface view factors. If only ground view is defined in this object, the sky view factor to this surface will be 1.0 subtracted with the sky view factor and all other defined surface view factors. If neither of the sky and ground view factors are explicitly declared here, the sum of the sky and ground view factor would be 1.0 subtracted with all other defined surface view factors and the proportion will be set as the same with the global setting.
+
+If ground surfaces view factors are defined in \textit{SurfaceProperty:GroundSurfaces} object, then this ground view factors overrides the gorund view factors specified in \textit{SurfaceProperty:SurroundingSurfaces} object. The sum of the sky view factors and the surrounding surfaces view factors defined in \textit{SurfaceProperty:SurroundingSurfaces} and the ground surfaces view factors defined in \textit{SurfaceProperty:GroundSurfaces} object should not exceed 1.0. The \textit{SurfaceProperty:GroundSurfaces} object allows specifying multiple ground surfaces viewed by an exterior surfaces.
 
 \subsubsection{Field: Name}\label{field-srd-surfs-name}
 
@@ -2534,11 +2541,11 @@ This field is used to supply a schedule name of the sky temperature. The sky tem
 
 \subsubsection{Field: Ground View Factor}\label{field-ground-view-factor}
 
-This field defines the constant ground view factor to an external surface. The ground view factor used in solar radiation calculation of the surface would be overwritten with the value of the fraction if defined here. If the field is left blank, the ground view factor of this surface will be calculated with the rules demonstrated above.
+This field defines the constant ground view factor to an external surface. The ground view factor used in solar radiation calculation of the surface would be overwritten with the value of the fraction if defined here. If the field is left blank, the ground view factor of this surface will be calculated with the rules demonstrated above. Ground surface view factor defined in \textit{SurfaceProperty:GroundSurfaces} object overrides the value specified in this field.
 
 \subsubsection{Field: Ground Temperature Schedule Name}\label{field-ground-temperature-schedule-name}
 
-This field is used to supply a schedule name of the ground temperature. The ground temperature used in solar radiation calculation of the surface would be overwritten with the value of the scheduled temperature if defined here. If the field is left blank, the global ground temperature would be used.
+This field is used to supply a schedule name of the ground temperature. The ground temperature used in long wave radiation exchange calculation of the surface would be overwritten with the value of the scheduled temperature if defined here. If the field is left blank, the global ground temperature would be used. Ground surface temperature defined in \textit{SurfaceProperty:GroundSurfaces} object overrides the value specified in this field.
 
 \subsubsection{Field: Surrounding Surface 1 Name}\label{field-surrounding-surface-1-name}
 
@@ -2575,9 +2582,112 @@ Schedule:Compact,
   Until: 24:00, 15.0;           !- Field 3
 \end{lstlisting}
 
+\subsection{SurfaceProperty:GroundSurfaces}\label{surfacePropertyGroundSurfaces}
+
+This object is used for calculating building exterior surfaces long-wave radation exchange with the ground and the calculation of solar radiation reflection from ground surfaces to a building exterior surface. A given exterior surface can view multiple ground surfaces with different surface properties and view factors. Thus, this object allows specifying multiple ground view factors, ground surfaces temperature, and ground surfaces refelectance properties viewed by a given exterior surface. View factors are assumed to be constant values. The ground surface temperature and ground surface reflectance are specified using schedule object. Ground surface view factors and ground surface temperature defined in this object overrides the ground surface view factor and ground temperature specified in \textit{SurfaceProperty:SurroundingSurfaces} object.
+
+The sum of all defined view factors that include the sky virew factor, the ground surfaces view factors and surrounding surfaces view factors seen by a given building exterior surface should be 1.0, or the sum of the ground view factors for a given exterior surface should not exceed 1 subtracted the sky view factor and the sum of view factors of all surrounding surfaces defined in \textit{SurfaceProperty:SurroundingSurfaces} object. If the ground view factor input field is blank in \textbf{SurfaceProperty:GroundSurfaces} object, the ground view factor to this surface will be 1.0 subtracted the sky view factor and all other defined surrounding surface view factors defined in \textit{SurfaceProperty:SurroundingSurfaces} object. If neither \textbf{SurfaceProperty:GroundSurfaces} object nor the \textbf{SurfaceProperty:SurroundingSurfaces} object is specified for an exterior surface, the default view factor specified in \textbf{BuildingSurface:Detailed} or \textbf{FenestrationSurface:Detailed} object is used.
+
+\subsubsection{Field: Name}\label{field-gnd-surfs-name}
+
+This is a unique name of the surface property ground surfaces object.
+
+\subsubsection{Field: Ground Surface 1 Name}\label{field-ground-surface-1-name}
+
+This is a unique name for ground surface 1. 
+
+\subsubsection{Field: Ground Surface 1 View Factor}\label{field-ground-surface-1-view-factor}
+
+This field defines the constant ground view factor of a building exterior surface to ground surface 1. The ground surface view factor is used in long-wave radiation exchange and ground surface solar reflectance calculations. If this field is left blank, the ground view factor of this surface will be calculated with the rules demonstrated above.
+
+\subsubsection{Field: Ground Surface 1 Temperature Schedule Name}\label{field-ground-surface-1-temp-schedule-name}
+
+This field is used to provide a schedule name of the ground surface 1 temperature. The ground surface temperature used in long-wave radiation exchange calculation of a building exterior surface with the ground surface. If the field is left blank, the default method will be used.
+
+\subsubsection{Field: Ground Surface 1 Reflectance Schedule Name}\label{field-ground-surface-1-reflectance-schedule-name}
+
+This field is used to provide a schedule name of a ground surface reflectance. The ground surface reflectance is used to calculate ground surface reflected solar radition to a building exterior surface. If the field is left blank, the global reflectance object defined else where or default values will be used.
+
+This object is extensible, so the last four fields can be repeated to define ground surface name, ground surface view factor, ground surface temperature, and ground surface reflectace sets.
+
+Ground surfaces solar reflectance values derived from satelite data for common ground surfaces obtained from Ground Albedo Measurements and Modeling (Bill Marion, 2018) are summerized in table below.
+
+\begin{longtable}[c]{p{1.0in}p{2.5in}p{2.5in}}
+\toprule
+Item & Ground Surface Type & Ground Surface Reflectance [] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule
+Item & Ground Surface Type & Ground Surface Reflectance [] \tabularnewline
+\midrule
+\endhead
+
+1 & Grass & 0.15  -  0.26 \tabularnewline
+2 & Black Earth & 0.08  -  0.13 \tabularnewline
+3 & White Sand, New Mexico & 0.60 \tabularnewline
+4 & Snow & 0.55  -  0.98 \tabularnewline
+5 & Asphalt Pavement & 0.09  -  0.18 \tabularnewline
+6 & Concrete Pavement & 0.20  -  0.40 \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+An example IDF objects.
+
+\begin{lstlisting}
+SurfaceProperty:GroundSurfaces,
+  GndSurfs:South,              !- Name
+  GndSurfSouth_Parking,        !- Ground Surface 1 Name
+  0.2,                         !- Ground Surface 1 View Factor
+  GndSurfsSouth_Parking_Sch,   !- Ground Surface 1 Temperature Schedule Name
+  GndSurfsSouth_Parking_Sch,   !- Ground Surface 1 Reflectance Schedule Name
+  GndSurfSouth_Grass,          !- Ground Surface 2 Name
+  0.2,                         !- Ground Surface 2 View Factor
+  GndSurfsSouth_Grass_Sch,     !- Ground Surface 2 Temperature Schedule Name
+  GndSurfsSouth_Grass_Sch,     !- Ground Surface 2 Reflectance Schedule Name
+  GndSurfSouth_Water,          !- Ground Surface 3 Name
+  0.1,                         !- Ground Surface 3 View Factor
+  GndSurfsSouth_Water_Sch,     !- Ground Surface 3 Temperature Schedule Name
+  GndSurfsSouth_Water_Sch;     !- Ground Surface 3 Reflectance Schedule Name
+\end{lstlisting}
+
+\begin{lstlisting}
+SurfaceProperty:LocalEnvironment,
+    LocEnv:Zn001:Wall001,      !- Name
+    Zn001:Wall001,             !- Exterior Surface Name
+    ,                          !- External Shading Fraction Schedule Name
+    ,                          !- Surrounding Surfaces Object Name
+    OutdoorAirNode:0001,       !- Outdoor Air Node Name
+    GndSurfs:South;            !- Ground Surfaces Object Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-gndSrfs}
+
+\begin{itemize}
+\item
+  Zone,Average,Surfaces Property Ground Surfaces Average Temperature {[}C{]}
+\item
+  Zone,Average,Surfaces Property Ground Surfaces Average Reflectance {[]}
+\end{itemize}
+
+\paragraph{Surfaces Property Ground Surfaces Average Temperature {[}C{]}}\label{surfaces-property-ground-surfaces-average-temperature}
+
+This is an average surface temperature of multiple ground surfaces in deg C viewed by an exterior surface for each time step. If there is only one ground surface specified in a given \textit{SurfaceProperty:GroundSurfaces} object, then the average surface temperature will be the same as the specified ground surface temperature. This output variable is not generated when all ground surface temperature schedule name fields are blank.
+
+\paragraph{Surfaces Property Ground Surfaces Average Reflectance {[]}}\label{surfaces-property-ground-surfaces-average-reflectance}
+
+This is an average surface reflectance of multiple ground surfaces viewed by an exterior surface for each time step. If there is only one ground surface specified in a given \textit{SurfaceProperty:GroundSurfaces} object, then the average surface reflectance will be the same as the specified ground surface reflectance. This output variable is not generated when all ground surface reflectance schedule name fields are blank.
+
+\subsection{References}\label{references-gnd-srfs}
+
+Bill Marion. 2018. Ground Albedo Measurements and Modeling. Bifacial PV Workshop Lakewood, Colorado. September 11, 2018.
+NREL/PR-5K00-72589. https://www.nrel.gov/docs/fy20osti/72589.pdf
+
 \subsection{SurfaceProperty:LocalEnvironment}\label{surfacePropertylocalEnvironment}
 
-The object links to a surface object \textbf{Surface:Detailed} and is used when there is a need to calculate surface level environmental data externally and import them into the simulation to override existing environmental data, including external solar shading fractions, local air velocity, temperature and humidity, and surrounding surface temperatures and view factors. The object links to three optional objects including a schedule object declared by \textbf{Field: External Shading Fraction Schedule Name}, a \textbf{\hyperref[surfacePropertysurroundingSurfaces]{SurfaceProperty:SurroundingSurfaces}} object declared by \textbf{Field: Surrounding Surfaces Object Name}, and an \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} object declared by \textbf{Field: Outdoor Air Node Name}. The object provides inputs to calculate shading, solar radiation, zone air balance and surface exterior heat balance.
+The object links to an exterior surface object \textbf{BuildingSurface:Detailed} or an exterior fenestration object \textbf{FenestrationSurface:Detailed} and is used when there is a need to calculate surface level environmental data externally and import them into the simulation to override existing environmental data, including external solar shading fractions, local air velocity, temperature and humidity, and surrounding surface temperatures, sky view factor, ground surfaces view factors, ground surfaces temperature and ground surfaces refelectance. The object links to four optional objects including a schedule object declared by \textbf{Field: External Shading Fraction Schedule Name}, a \textbf{\hyperref[surfacePropertySurroundingSurfaces]{SurfaceProperty:SurroundingSurfaces}} object declared by \textbf{Field: Surrounding Surfaces Object Name}, an \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} object declared by \textbf{Field: Outdoor Air Node Name}, and a \textbf{\hyperref[surfacePropertyGroundSurfaces]{SurfaceProperty:GroundSurfaces}} object declared by 
+\textbf{Field: Ground Surfaces Object Name}. The object provides inputs to calculate shading, solar radiation, zone air balance, and surface exterior heat balance.
 
 \subsubsection{Field: Name}\label{field-surf-localenv-name}
 
@@ -2593,11 +2703,15 @@ This field is used to import external shading fraction data from external calcul
 
 \subsubsection{Field: Surrounding Surfaces Object Name}\label{field-surrounding-surfaces-object-name}
 
-This field is used to import surrounding surfaces properties (temperature and view factors to the external surface) from external calculation. This should be a name of a \textbf{\hyperref[surfacePropertysurroundingSurfaces]{SurfaceProperty:SurroundingSurfaces}} object.
+This field is used to import surrounding surfaces properties (temperature and view factors to the external surface) from external calculation. This should be a name of a \textbf{\hyperref[surfacePropertySurroundingSurfaces]{SurfaceProperty:SurroundingSurfaces}} object.
 
 \subsubsection{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name}
 
 This field is used to import local environmental data from local outdoor air nodes, including dry and wet bulb temperature, wind speed and wind direction. This should be a name of a \textbf{\hyperref[outdoorairnode]{OutdoorAir:Node}} object.
+
+\subsubsection{Field: Ground Surfaces Object Name}\label{field-ground-surfaces-object-name}
+
+This field is used to specify ground surfaces properties (ground surface temperature, solar reflectance and view factors to the external surface) determined from external calculation. This should be a name of a \textbf{\hyperref[surfacePropertyGroundSurfaces]{SurfaceProperty:GroundSurfaces}} object.
 
 An example IDF object follows.
 
@@ -2607,7 +2721,8 @@ SurfaceProperty:LocalEnvironment,
     Zn001:Wall001,                !- Exterior Surface Name
     ExtShadingSch:Zn001:Wall001,  !- External Shading Fraction Schedule Name
     SrdSurf:Zn001:Wall001,        !- Surrounding Surfaces Object Name
-    OutdoorAirNode:0001;          !- Outdoor Air Node Name
+    OutdoorAirNode:0001,          !- Outdoor Air Node Name
+    GndSurfs:South;               !- Ground Surfaces Object Name	
 \end{lstlisting}
 
 \subsection{ZoneProperty:LocalEnvironment}\label{ZonePropertylocalEnvironment}
@@ -2620,7 +2735,7 @@ This is the unique name of the zone property.
 
 \subsubsection{Field: Zone Name}\label{ZonePropertylocalEnvironment-field-zone-name}
 
-This is the name of the zone that will be assigned to use the local environmental data defined in the next field. This should be a name of a surface defined elsewhere.
+This is the name of the zone that will be assigned to use the local environmental data defined in the next field. This should be a name of a zone defined elsewhere.
 
 \subsubsection{Field: Outdoor Air Node Name}\label{field-zone-outdoor-air-node-name}
 

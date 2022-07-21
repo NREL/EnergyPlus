@@ -386,6 +386,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     }
     state.dataSize->DataFlowUsedForSizing = 0.0;
     state.dataSize->DataCapacityUsedForSizing = 0.0;
+    state.dataSize->DataTotCapCurveIndex = 0;
     state.dataSize->DataSizingFraction = 1.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
@@ -571,6 +572,12 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
             outletNode.HumRat = inletNode.HumRat;
         }
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+    }
+    // Check for saturation error and modify temperature at constant enthalpy
+    Real64 tsat = Psychrometrics::PsyTsatFnHPb(state, outletNode.Enthalpy, inletNode.Press, RoutineName);
+    if (outletNode.Temp < tsat) {
+        outletNode.Temp = tsat;
+        outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, tsat, outletNode.Enthalpy);
     }
 }
 

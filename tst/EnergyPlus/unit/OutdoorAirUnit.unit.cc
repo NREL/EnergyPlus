@@ -641,7 +641,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
@@ -956,7 +956,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;

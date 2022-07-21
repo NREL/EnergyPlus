@@ -75,10 +75,6 @@ namespace DataSystemVariables {
     // This data-only module is a repository for system (such as environment) variables that are set
     // before a run or set of runs.
 
-    // Using/Aliasing
-    using DataStringGlobals::altpathChar;
-    using DataStringGlobals::pathChar;
-
     constexpr const char *DDOnlyEnvVar("DDONLY");       // Only run design days
     constexpr const char *ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
     constexpr const char *DisableGLHECachingEnvVar("DISABLEGLHECACHING");
@@ -156,8 +152,9 @@ namespace DataSystemVariables {
             state.files.audit.ensure_open(state, "CheckForActualFilePath", state.files.outputControl.audit);
             std::string tmp;
 
+            // epin is passed from Epl-run.bat as the path to the IDF file minus its extension, so take the parent directory
             get_environment_variable(cInputPath1, tmp);
-            state.dataSysVars->envinputpath1 = fs::path(tmp);
+            state.dataSysVars->envinputpath1 = FileSystem::getParentDirectoryPath(fs::path(tmp));
 
             get_environment_variable(cInputPath2, tmp);
             state.dataSysVars->envinputpath2 = fs::path(tmp);
@@ -175,23 +172,25 @@ namespace DataSystemVariables {
             {{InputFilePath, "Current Working Directory"},
              {state.dataStrGlobals->inputDirPath / InputFilePath, "IDF Directory"},
              {state.dataStrGlobals->exeDirectoryPath / InputFilePath, "EnergyPlus Executable Directory"},
-             {state.dataSysVars->envinputpath1 / InputFilePath, "\"epin\" Environment Variable"},
-             {state.dataSysVars->envinputpath2 / InputFilePath, "\"input_path\" Environment Variable"},
+             {state.dataSysVars->envinputpath1 / InputFilePath, R"("epin" Environment Variable)"},
+             {state.dataSysVars->envinputpath2 / InputFilePath, R"("input_path" Environment Variable)"},
+             // These two only tested if `TestAllPaths` is true
              {state.dataStrGlobals->CurrentWorkingFolder / InputFilePath, "INI File Directory"},
-             {state.dataStrGlobals->ProgramPath / InputFilePath, "\"program\", \"dir\" from INI File"}}};
+             {state.dataStrGlobals->ProgramPath / InputFilePath, R"("program", "dir" from INI File)"}}};
 
-        std::size_t numPathsToNotTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size() - 2 : pathsToCheck.size();
+        std::size_t numPathsToTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size() : pathsToCheck.size() - 2;
 
-        for (std::size_t i = 0; i < numPathsToNotTest; i++) {
+        for (std::size_t i = 0; i < numPathsToTest; ++i) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 foundFilePath = pathsToCheck[i].first;
-                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second + ")", FileSystem::getAbsolutePath(foundFilePath).string());
+                print(state.files.audit, "found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(foundFilePath).string());
+
                 return foundFilePath;
             } else {
                 std::pair<fs::path, std::string> currentPath(FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
                                                              pathsToCheck[i].second);
                 bool found = false;
-                for (auto path : pathsChecked) {
+                for (auto &path : pathsChecked) {
                     if (path.first == currentPath.first) {
                         found = true;
                     }
@@ -199,17 +198,14 @@ namespace DataSystemVariables {
                 if (!found) {
                     pathsChecked.push_back(currentPath);
                 }
-                print(state.files.audit,
-                      "{}={}\n",
-                      "not found (" + pathsToCheck[i].second + ")\"",
-                      FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
+                print(state.files.audit, "not found ({})={}\n", pathsToCheck[i].second, FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
             }
         }
 
         // If we get here, we didn't find the file
         ShowSevereError(state, contextString + "\"" + originalInputFilePath.string() + "\" not found.");
         ShowContinueError(state, "  Paths searched:");
-        for (auto path : pathsChecked) {
+        for (auto &path : pathsChecked) {
             ShowContinueError(state, "    " + path.second + ": \"" + path.first.string() + "\"");
         }
 

@@ -227,44 +227,45 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     Real64 RefAirTemp = 0;
 
     // determine reference air temperature for this surface
-    {
-        const auto SELECT_CASE_var(state.dataSurface->SurfTAirRef(t_SurfNum));
-        if (SELECT_CASE_var == ZoneMeanAirTemp) {
-            RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
-        } else if (SELECT_CASE_var == AdjacentAirTemp) {
-            RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
-        } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-            // determine ZoneEquipConfigNum for this zone
-            //            ControlledZoneAirFlag = .FALSE.
-            // ZoneEquipConfigNum = ZoneNum;
-            // check whether this zone is a controlled zone or not
-            if (!state.dataHeatBal->Zone(Zone).IsControlled) {
-                ShowFatalError(state,
-                               "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                   state.dataHeatBal->Zone(Zone).Name);
-                // return;
-            }
-            // determine supply air conditions
-            Real64 SumSysMCp = 0;
-            Real64 SumSysMCpT = 0;
-            for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
-                Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
-                Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-                Real64 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(Zone));
-                SumSysMCp += MassFlowRate * CpAir;
-                SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-            }
+    switch (state.dataSurface->SurfTAirRef(t_SurfNum)) {
+    case RefAirTemp::ZoneMeanAirTemp: {
+        RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+    } break;
+    case RefAirTemp::AdjacentAirTemp: {
+        RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
+    } break;
+    case RefAirTemp::ZoneSupplyAirTemp: {
+        // determine ZoneEquipConfigNum for this zone
+        //            ControlledZoneAirFlag = .FALSE.
+        // ZoneEquipConfigNum = ZoneNum;
+        // check whether this zone is a controlled zone or not
+        if (!state.dataHeatBal->Zone(Zone).IsControlled) {
+            ShowFatalError(
+                state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(Zone).Name);
+            // return;
+        }
+        // determine supply air conditions
+        Real64 SumSysMCp = 0;
+        Real64 SumSysMCpT = 0;
+        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
+            Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
+            Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
+            Real64 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(Zone));
+            SumSysMCp += MassFlowRate * CpAir;
+            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+        }
+        // a weighted average of the inlet temperatures.
+        if (SumSysMCp > 0.0) {
             // a weighted average of the inlet temperatures.
-            if (SumSysMCp > 0.0) {
-                // a weighted average of the inlet temperatures.
-                RefAirTemp = SumSysMCpT / SumSysMCp;
-            } else {
-                RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
-            }
+            RefAirTemp = SumSysMCpT / SumSysMCp;
         } else {
-            // currently set to mean air temp but should add error warning here
             RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
         }
+    } break;
+    default: {
+        // currently set to mean air temp but should add error warning here
+        RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+    } break;
     }
 
     return RefAirTemp;
@@ -559,9 +560,9 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.MaterialMovInsulInt = state.dataSurface->SurfMaterialMovInsulInt(SurfNum);
     calcHashKey.SchedMovInsulExt = state.dataSurface->SurfSchedMovInsulExt(SurfNum);
     calcHashKey.SchedMovInsulInt = state.dataSurface->SurfSchedMovInsulInt(SurfNum);
-    calcHashKey.ExternalShadingSchInd = state.dataSurface->SurfExternalShadingSchInd(SurfNum);
-    calcHashKey.SurroundingSurfacesNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-    calcHashKey.LinkedOutAirNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
+    calcHashKey.ExternalShadingSchInd = state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd;
+    calcHashKey.SurroundingSurfacesNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    calcHashKey.LinkedOutAirNode = state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode;
     calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
     calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
 }

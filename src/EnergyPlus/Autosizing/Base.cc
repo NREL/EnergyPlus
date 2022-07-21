@@ -413,6 +413,9 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                 }
             }
             if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
+        } else if (this->wasAutoSized && this->autoSizedValue != DataSizing::AutoSize) {
+            this->reportSizerOutput(
+                state, this->compType, this->compName, "Design Size " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             this->addErrorMessage(msg);
@@ -544,6 +547,9 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                 }
             }
             if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
+        } else if (this->wasAutoSized && this->autoSizedValue != DataSizing::AutoSize) {
+            this->reportSizerOutput(
+                state, this->compType, this->compName, "Design Size " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             this->addErrorMessage(msg);
@@ -617,7 +623,7 @@ bool BaseSizer::checkInitialized(EnergyPlusData &state, bool &errorsFound)
     return true;
 }
 
-void BaseSizer::overrideSizingString(std::string &string)
+void BaseSizer::overrideSizingString(std::string_view const string)
 {
     this->sizingString = string;
     this->overrideSizeString = false;

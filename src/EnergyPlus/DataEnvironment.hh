@@ -195,6 +195,8 @@ struct EnvironmentData : BaseGlobalStruct
     bool PrintEnvrnStampWarmup = false;
     bool PrintEnvrnStampWarmupPrinted = false;
     bool RunPeriodEnvironment = false; // True if Run Period, False if DesignDay
+    int StartYear = 0;                 // Start year for Environment
+    int EndYear = 0;                   // End year for Environment
     std::string EnvironmentStartEnd;   // Start/End dates for Environment
     bool CurrentYearIsLeapYear =
         false; // true when current year is leap year (convoluted logic dealing with whether weather file allows leap years, runperiod inputs.
@@ -206,123 +208,7 @@ struct EnvironmentData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->BeamSolarRad = 0.0;
-        this->EMSBeamSolarRadOverrideOn = false;
-        this->EMSBeamSolarRadOverrideValue = 0.0;
-        this->DayOfMonth = 0;
-        this->DayOfMonthTomorrow = 0;
-        this->DayOfWeek = 0;
-        this->DayOfWeekTomorrow = 0;
-        this->DayOfYear = 0;
-        this->DayOfYear_Schedule = 0;
-        this->DifSolarRad = 0.0;
-        this->EMSBeamSolarRadOverrideOn = false;
-        this->EMSBeamSolarRadOverrideValue = 0.0;
-        this->DSTIndicator = 0;
-        this->Elevation = 0.0;
-        this->EndMonthFlag = false;
-        this->EndYearFlag = false;
-        this->GndReflectanceForDayltg = 0.0;
-        this->GndReflectance = 0.0;
-        this->GndSolarRad = 0.0;
-        this->GroundTemp = 0.0;
-        this->GroundTempKelvin = 0.0;
-        this->GroundTempFC = 0.0;
-        this->GroundTemp_Surface = 0.0;
-        this->GroundTemp_Deep = 0.0;
-        this->HolidayIndex = 0;
-        this->HolidayIndexTomorrow = 0;
-        this->IsRain = false;
-        this->IsSnow = false;
-        this->Latitude = 0.0;
-        this->Longitude = 0.0;
-        this->Month = 0;
-        this->MonthTomorrow = 0;
-        this->OutBaroPress = 0.0;
-        this->OutDryBulbTemp = 0.0;
-        this->EMSOutDryBulbOverrideOn = false;
-        this->EMSOutDryBulbOverrideValue = 0.0;
-        this->OutHumRat = 0.0;
-        this->OutRelHum = 0.0;
-        this->OutRelHumValue = 0.0;
-        this->EMSOutRelHumOverrideOn = false;
-        this->EMSOutRelHumOverrideValue = 0.0;
-        this->OutEnthalpy = 0.0;
-        this->OutAirDensity = 0.0;
-        this->OutWetBulbTemp = 0.0;
-        this->OutDewPointTemp = 0.0;
-        this->EMSOutDewPointTempOverrideOn = false;
-        this->EMSOutDewPointTempOverrideValue = 0.0;
-        this->SkyTemp = 0.0;
-        this->SkyTempKelvin = 0.0;
-        this->LiquidPrecipitation = 0.0;
-        this->SunIsUp = false;
-        this->WindDir = 0.0;
-        this->EMSWindDirOverrideOn = false;
-        this->EMSWindDirOverrideValue = 0.0;
-        this->WindSpeed = 0.0;
-        this->EMSWindSpeedOverrideOn = false;
-        this->EMSWindSpeedOverrideValue = false;
-        this->WaterMainsTemp = 0.0;
-        this->Year = 0;
-        this->YearTomorrow = 0;
-        this->SOLCOS = Array1D<Real64>(3);
-        this->CloudFraction = 0.0;
-        this->HISKF = 0.0;
-        this->HISUNF = 0.0;
-        this->HISUNFnorm = 0.0;
-        this->PDIRLW = 0.0;
-        this->PDIFLW = 0.0;
-        this->SkyClearness = 0.0;
-        this->SkyBrightness = 0.0;
-        this->TotalCloudCover = 5.0;
-        this->OpaqueCloudCover = 5.0;
-        this->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
-        this->StdRhoAir = 0.0;
-        this->rhoAirSTP = 0.0;
-        this->TimeZoneNumber = 0.0;
-        this->TimeZoneMeridian = 0.0;
-        this->EnvironmentName.clear();
-        this->WeatherFileLocationTitle.clear();
-        this->CurMnDyHr.clear();
-        this->CurMnDy.clear();
-        this->CurMnDyYr.clear();
-        this->CurEnvirNum = 0;
-        this->TotDesDays = 0;
-        this->TotRunDesPersDays = 0;
-        this->CurrentOverallSimDay = 0;
-        this->TotalOverallSimDays = 0;
-        this->MaxNumberSimYears = 0;
-        this->RunPeriodStartDayOfWeek = 0;
-        this->CosSolarDeclinAngle = 0.0;
-        this->EquationOfTime = 0.0;
-        this->SinLatitude = 0.0;
-        this->CosLatitude = 0.0;
-        this->SinSolarDeclinAngle = 0.0;
-        this->TS1TimeOffset = -0.5;
-        this->WeatherFileWindModCoeff = 1.5863;
-        this->WeatherFileTempModCoeff = 0.0;
-        this->SiteWindExp = 0.22;
-        this->SiteWindBLHeight = 370.0;
-        this->SiteTempGradient = 0.0065;
-        this->GroundTempObjInput = false;
-        this->GroundTemp_SurfaceObjInput = false;
-        this->GroundTemp_DeepObjInput = false;
-        this->FCGroundTemps = false;
-        this->DisplayWeatherMissingDataWarnings = false;
-        this->IgnoreSolarRadiation = false;
-        this->IgnoreBeamRadiation = false;
-        this->IgnoreDiffuseRadiation = false;
-        this->PrintEnvrnStampWarmup = false;
-        this->PrintEnvrnStampWarmupPrinted = false;
-        this->RunPeriodEnvironment = false;
-        this->EnvironmentStartEnd.clear();
-        this->CurrentYearIsLeapYear = false;
-        this->varyingLocationSchedIndexLat = 0;
-        this->varyingLocationSchedIndexLong = 0;
-        this->varyingOrientationSchedIndex = 0;
-        this->forceBeginEnvResetSuppress = false;
-        this->oneTimeCompRptHeaderFlag = true;
+        *this = EnvironmentData();
     }
 };
 

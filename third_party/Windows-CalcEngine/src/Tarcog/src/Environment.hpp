@@ -29,6 +29,7 @@ namespace Tarcog
             double getDirectSolarRadiation() const;
             double getEnvironmentIR();
             double getHc();
+            virtual double getHr() = 0;
 
             double getAirTemperature();
             double getAmbientTemperature();
@@ -41,7 +42,6 @@ namespace Tarcog
             void initializeStateVariables() override;
             void calculateRadiationFlow() override;
             virtual double calculateIRFromVariables() = 0;
-            virtual double getHr() = 0;
             virtual void setIRFromEnvironment(double t_IR) = 0;
             virtual double getIRFromEnvironment() const = 0;
             virtual double getRadiationTemperature() const = 0;

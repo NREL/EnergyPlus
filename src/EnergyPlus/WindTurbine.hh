@@ -67,82 +67,65 @@ namespace WindTurbine {
     enum class RotorType
     {
         Invalid = -1,
-        HAWT = 1, // 'HorizontalAxisWindTurbine'
-        VAWT = 2, // 'VerticalAxisWindTurbine',
+        HorizontalAxis,
+        VerticalAxis,
         Num
     };
 
     enum class ControlType
     {
         Invalid = -1,
-        FSFP = 1, // 'FixedSpeedFixedPitch'
-        FSVP = 2, // 'FixedSpeedVariablePitch'
-        VSFP = 3, // 'VariableSpeedFixedPitch'
-        VSVP = 4, // 'VariableSpeedVariablePitch'
+        FixedSpeedFixedPitch,
+        FixedSpeedVariablePitch,
+        VariableSpeedFixedPitch,
+        VariableSpeedVariablePitch,
         Num
     };
 
     struct WindTurbineParams
     {
         // Members
-        std::string Name;        // The component name
-        std::string Schedule;    // Available schedule
-        RotorType rotorType;     // Rotor type (HAWT or VAWT)
-        ControlType controlType; // Control type
-        int SchedPtr;            // Schedule
-        int NumOfBlade;          // Blade number
-        Real64 RatedRotorSpeed;  // Rated rotor speed in m/s
-        Real64 RotorDiameter;    // Diameter of rotor in m
-        Real64 RotorHeight;      // Overall height of the rotor in m
-        Real64 RatedPower;       // Nominal average power output at the rated wind speed in Watts
-        Real64 RatedWindSpeed;   // Rated wind speed showing maximum power output in Watts
-        Real64 CutInSpeed;       // Minimum wind speed for system operation in m/s
-        Real64 CutOutSpeed;      // Maximum wind speed for system operation in m/s
-        Real64 SysEfficiency;    // Overall system efficiency including subsystems and losses
-        Real64 MaxTipSpeedRatio; // Maximum tip speed ratio
-        Real64 MaxPowerCoeff;    // Maximum power coefficient
-        Real64 LocalAnnualAvgWS; // Annual average wind speed locally measured in m/s
-        Real64 AnnualTMYWS;      // Annual average wind speed from stat file in m/s
-        Real64 HeightForLocalWS; // Height of the local station in m
-        Real64 ChordArea;        // Chord area of a single blade for VAWTs in m2
-        Real64 DragCoeff;        // Empirical blade drag coefficient for VAWTs
-        Real64 LiftCoeff;        // Empirical blade lift coefficient for VAWTs
-        Real64 PowerCoeffC1;     // Empirical power coefficient 1 for analytical calculation
-        Real64 PowerCoeffC2;     // Empirical power coefficient 2 for analytical calculation
-        Real64 PowerCoeffC3;     // Empirical power coefficient 3 for analytical calculation
-        Real64 PowerCoeffC4;     // Empirical power coefficient 4 for analytical calculation
-        Real64 PowerCoeffC5;     // Empirical power coefficient 5 for analytical calculation
-        Real64 PowerCoeffC6;     // Empirical power coefficient 6 for analytical calculation
-        Real64 TotPower;         // Maximum power produced from the wind in Watts
-        Real64 Power;            // Actual power wind turbine supplies to the building in Watts
-        Real64 TotEnergy;        // Maximum energy produced from the wind in Joules
-        Real64 Energy;           // Actual energy wind turbine supplies to the building in Joules
-        Real64 LocalWindSpeed;   // Local wind speed estimated at the particular height in m/s
-        Real64 LocalAirDensity;  // Local air density estimated at the particular height kg/m3
-        Real64 PowerCoeff;       // Power coefficient determined
-        Real64 ChordalVel;       // Chordal velocity for VAWTs in m/s
-        Real64 NormalVel;        // Normal velocity for VAWTs in m/s
-        Real64 RelFlowVel;       // Relative flow velocity for VAWTs in m/s
-        Real64 TipSpeedRatio;    // Relative flow velocity for VAWTs in m/s
-        Real64 WSFactor;         // Relative flow velocity for VAWTs in m/s
-        Real64 AngOfAttack;      // Angle of attack in degree
-        Real64 IntRelFlowVel;    // Integral of relative flow velocity
-        Real64 TanForce;         // Tangential force
-        Real64 NorForce;         // Normal force in N.m
-        Real64 TotTorque;        // Total torque in N.m
-        Real64 AzimuthAng;       // Azimuth angle between blades
-
-        // Default Constructor
-        WindTurbineParams()
-            : rotorType(RotorType::Invalid), controlType(ControlType::Invalid), SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0), RotorDiameter(0.0),
-              RotorHeight(0.0), RatedPower(0.0), RatedWindSpeed(0.0), CutInSpeed(0.0), CutOutSpeed(0.0), SysEfficiency(0.0), MaxTipSpeedRatio(0.0),
-              MaxPowerCoeff(0.0), LocalAnnualAvgWS(0.0), AnnualTMYWS(0.0), HeightForLocalWS(0.0), ChordArea(0.0), DragCoeff(0.0), LiftCoeff(0.0),
-              PowerCoeffC1(0.0), PowerCoeffC2(0.0), PowerCoeffC3(0.0), PowerCoeffC4(0.0), PowerCoeffC5(0.0), PowerCoeffC6(0.0), TotPower(0.0),
-              Power(0.0), TotEnergy(0.0), Energy(0.0), LocalWindSpeed(0.0), LocalAirDensity(0.0), PowerCoeff(0.0), ChordalVel(0.0), NormalVel(0.0),
-              RelFlowVel(0.0), TipSpeedRatio(0.0), WSFactor(0.0), AngOfAttack(0.0), IntRelFlowVel(0.0), TanForce(0.0), NorForce(0.0), TotTorque(0.0),
-              AzimuthAng(0.0)
-        {
-        }
+        std::string Name;                               // The component name
+        std::string Schedule;                           // Available schedule
+        RotorType rotorType = RotorType::Invalid;       // Rotor type (HAWT or VAWT)
+        ControlType controlType = ControlType::Invalid; // Control type
+        int SchedPtr = 0;                               // Schedule
+        int NumOfBlade = 0;                             // Blade number
+        Real64 RatedRotorSpeed = 0.0;                   // Rated rotor speed in m/s
+        Real64 RotorDiameter = 0.0;                     // Diameter of rotor in m
+        Real64 RotorHeight = 0.0;                       // Overall height of the rotor in m
+        Real64 RatedPower = 0.0;                        // Nominal average power output at the rated wind speed in Watts
+        Real64 RatedWindSpeed = 0.0;                    // Rated wind speed showing maximum power output in Watts
+        Real64 CutInSpeed = 0.0;                        // Minimum wind speed for system operation in m/s
+        Real64 CutOutSpeed = 0.0;                       // Maximum wind speed for system operation in m/s
+        Real64 SysEfficiency = 0.0;                     // Overall system efficiency including subsystems and losses
+        Real64 MaxTipSpeedRatio = 0.0;                  // Maximum tip speed ratio
+        Real64 MaxPowerCoeff = 0.0;                     // Maximum power coefficient
+        Real64 LocalAnnualAvgWS = 0.0;                  // Annual average wind speed locally measured in m/s
+        Real64 AnnualTMYWS = 0.0;                       // Annual average wind speed from stat file in m/s
+        Real64 HeightForLocalWS = 0.0;                  // Height of the local station in m
+        Real64 ChordArea = 0.0;                         // Chord area of a single blade for VAWTs in m2
+        Real64 DragCoeff = 0.0;                         // Empirical blade drag coefficient for VAWTs
+        Real64 LiftCoeff = 0.0;                         // Empirical blade lift coefficient for VAWTs
+        std::array<Real64, 6> PowerCoeffs = {0.0};      // Empirical power coefficients for analytical calculation
+        Real64 TotPower = 0.0;                          // Maximum power produced from the wind in Watts
+        Real64 Power = 0.0;                             // Actual power wind turbine supplies to the building in Watts
+        Real64 TotEnergy = 0.0;                         // Maximum energy produced from the wind in Joules
+        Real64 Energy = 0.0;                            // Actual energy wind turbine supplies to the building in Joules
+        Real64 LocalWindSpeed = 0.0;                    // Local wind speed estimated at the particular height in m/s
+        Real64 LocalAirDensity = 0.0;                   // Local air density estimated at the particular height kg/m3
+        Real64 PowerCoeff = 0.0;                        // Power coefficient determined
+        Real64 ChordalVel = 0.0;                        // Chordal velocity for VAWTs in m/s
+        Real64 NormalVel = 0.0;                         // Normal velocity for VAWTs in m/s
+        Real64 RelFlowVel = 0.0;                        // Relative flow velocity for VAWTs in m/s
+        Real64 TipSpeedRatio = 0.0;                     // Relative flow velocity for VAWTs in m/s
+        Real64 WSFactor = 0.0;                          // Relative flow velocity for VAWTs in m/s
+        Real64 AngOfAttack = 0.0;                       // Angle of attack in degree
+        Real64 IntRelFlowVel = 0.0;                     // Integral of relative flow velocity
+        Real64 TanForce = 0.0;                          // Tangential force
+        Real64 NorForce = 0.0;                          // Normal force in N.m
+        Real64 TotTorque = 0.0;                         // Total torque in N.m
+        Real64 AzimuthAng = 0.0;                        // Azimuth angle between blades
     };
 
     void SimWindTurbine(EnergyPlusData &state,
@@ -179,24 +162,13 @@ namespace WindTurbine {
 struct WindTurbineData : BaseGlobalStruct
 {
 
-    int NumWindTurbines; // Total wind turbine statements in inputs
-    bool GetInputFlag;
-    bool MyOneTimeFlag;
-    Real64 AnnualTMYWS = 0.0; // Annual average wind speed in stat file
+    bool GetInputFlag = true;
+    bool MyOneTimeFlag = true;
     EPVector<WindTurbine::WindTurbineParams> WindTurbineSys;
 
     void clear_state() override
     {
-        this->NumWindTurbines = 0;
-        this->GetInputFlag = true;
-        this->MyOneTimeFlag = true;
-        this->AnnualTMYWS = 0.0;
-        this->WindTurbineSys.deallocate();
-    }
-
-    // Default Constructor
-    WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true), AnnualTMYWS(0.0)
-    {
+        *this = WindTurbineData();
     }
 };
 

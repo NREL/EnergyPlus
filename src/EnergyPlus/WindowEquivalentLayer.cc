@@ -706,8 +706,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     Real64 ConvHeatGainWindow;  // net convection heat gain from inside surface of window to zone air (W)
     LayerType InSideLayerType;  // interior shade type
 
-    int SrdSurfsNum;       // Surrounding surfaces list number
-    int SrdSurfNum;        // Surrounding surface number DO loop counter
     Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
     Real64 SrdSurfViewFac; // View factor of a surrounding surface
     Real64 OutSrdIR;
@@ -747,21 +745,13 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                  // Calculate LWR from surrounding surfaces if defined for an exterior window
             OutSrdIR = 0;
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                    SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                    if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                        state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                    }
-                    if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR =
-                            state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                    }
-                    for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                        SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                        SrdSurfTempAbs =
-                            GetCurrentScheduleValue(
-                                state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                            DataGlobalConstants::KelvinConv;
+                if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                    int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+                    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                    for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                        SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                        SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                         DataGlobalConstants::KelvinConv;
                         OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                     }
                 }

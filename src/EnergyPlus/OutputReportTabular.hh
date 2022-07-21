@@ -233,6 +233,8 @@ namespace OutputReportTabular {
         MinDewPointLine,
         WithHDDLine,
         WithCDDLine,
+        MaxHourlyPrec,
+        MonthlyPrec,
         KoppenLine,
         KoppenDes1Line,
         KoppenDes2Line,
@@ -604,7 +606,8 @@ namespace OutputReportTabular {
                        bool &desConditionlinepassed,
                        bool &heatingDesignlinepassed,
                        bool &coolingDesignlinepassed,
-                       bool &isKoppen);
+                       bool &isKoppen,
+                       bool &insideLiquidPrecipitation);
 
     void FillWeatherPredefinedEntries(EnergyPlusData &state);
 

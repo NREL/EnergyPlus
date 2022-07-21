@@ -176,16 +176,6 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                    DataLoopNode::ObjectIsNotParent);
 
-    // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
-    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
-        ShowWarningError(state,
-                         std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
-        ShowContinueError(state,
-                          "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
-                              "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-        ShowContinueError(state, "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
-    }
-
     this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                     input_data.condenser_outlet_node_name,
                                                                     errorsFound,

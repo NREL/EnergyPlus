@@ -28,10 +28,11 @@
 #include <string>
 #include <utility>   // for move(), forward<>(), swap()
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
+#include <cstdlib>   // for abort()
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  38
-#define  gsl_lite_PATCH  1
+#define  gsl_lite_MINOR  40
+#define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -330,6 +331,21 @@
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_OFF) "; macro must be defined without value")
 # endif
 #endif
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF) "; macro must be defined without value")
+# endif
+#endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_THROWS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_THROWS) "; macro must be defined without value")
@@ -355,6 +371,21 @@
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER) "; macro must be defined without value")
 # endif
 #endif
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER) "; macro must be defined without value")
+# endif
+#endif
 #if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
 #  pragma message ("invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME) "; macro must be defined without value")
@@ -365,28 +396,82 @@
 #  pragma message ("invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE) "; macro must be defined without value")
 # endif
 #endif
+#if defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE) "; macro must be defined without value")
+# endif
+#endif
+
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_THROWS )
+# error cannot use gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_THROWS because exceptions are not supported in device code; use gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS or gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS
+#endif
+#if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TERMINATES )
+# error gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TERMINATES is not supported; use gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS or gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS
+#endif
 
 #if 1 < defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
 # error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined
 #endif
+#if 1 < defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF )
+# error only one of gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON, and gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF may be defined
+#endif
 #if 1 < defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 # error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS, gsl_CONFIG_CONTRACT_VIOLATION_TRAPS, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined
 #endif
+#if 1 < defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
+# error only one of gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS, gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS, and gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER may be defined
+#endif
 #if 1 < defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
 # error only one of gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE may be defined
+#endif
+#if 1 < defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE )
+# error only one of gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_DEVICE_CONTRACTS_ELIDE may be defined
 #endif
 
 #if 0 == defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
 // select default
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 #endif
+#if 0 == defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF )
+// select default
+# if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+#  define gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT
+# elif defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
+#  define gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF
+# else
+#  define gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON
+# endif
+#endif
 #if 0 == defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 // select default
 # define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
+#if 0 == defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
+// select default
+# if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+#  define gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER
+# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
+#  define gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS
+# else
+#  define gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS
+# endif
+#endif
 #if 0 == defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
 // select default
 # define gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE
+#endif
+#if 0 == defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE )
+// select default
+# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+#  define gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME
+# else
+#  define gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE
+# endif
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -465,7 +550,8 @@
 // AppleClang 11.0.0  __apple_build_version__ == 11000033  gsl_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3, 11.3.1) (LLVM  8.0.0)
 // AppleClang 11.0.3  __apple_build_version__ == 11030032  gsl_COMPILER_APPLECLANG_VERSION == 1103  (Xcode 11.4, 11.4.1, 11.5, 11.6) (LLVM  9.0.0)
 // AppleClang 12.0.0  __apple_build_version__ == 12000032  gsl_COMPILER_APPLECLANG_VERSION == 1200  (Xcode 12.0–12.4)                (LLVM 10.0.0)
-// AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 10.0.0)
+// AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 11.1.0)
+// AppleClang 13.0.0  __apple_build_version__ == 13000029  gsl_COMPILER_APPLECLANG_VERSION == 1300  (Xcode 13.0)                     (LLVM 12.0.0)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
@@ -478,7 +564,7 @@
 # define gsl_COMPILER_CLANG_VERSION       0
 #endif
 
-#if defined( __GNUC__ ) && ! defined( __clang__ )
+#if defined( __GNUC__ ) && ! defined( __clang__ ) && ! defined( __NVCOMPILER )
 # define gsl_COMPILER_GNUC_VERSION  gsl_COMPILER_VERSION( __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ )
 #else
 # define gsl_COMPILER_GNUC_VERSION  0
@@ -488,6 +574,13 @@
 # define gsl_COMPILER_NVCC_VERSION  ( __CUDACC_VER_MAJOR__ * 10 + __CUDACC_VER_MINOR__ )
 #else
 # define gsl_COMPILER_NVCC_VERSION  0
+#endif
+
+// NVHPC 21.2  gsl_COMPILER_NVHPC_VERSION == 2120
+#if defined( __NVCOMPILER )
+# define gsl_COMPILER_NVHPC_VERSION  gsl_COMPILER_VERSION( __NVCOMPILER_MAJOR__, __NVCOMPILER_MINOR__, __NVCOMPILER_PATCHLEVEL__ )
+#else
+# define gsl_COMPILER_NVHPC_VERSION  0
 #endif
 
 #if defined( __ARMCC_VERSION )
@@ -525,6 +618,15 @@
 #endif
 #define gsl_HAVE_WCHAR_()  gsl_HAVE_WCHAR
 
+// Compiling device code:
+
+#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+# define gsl_DEVICE_CODE  1
+#else
+# define gsl_DEVICE_CODE  0
+#endif
+
+
 // Presence of language & library features:
 
 #if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
@@ -550,8 +652,8 @@
 #   define gsl_HAVE_EXCEPTIONS  0
 #  endif
 # endif
-#elif gsl_COMPILER_GNUC_VERSION
-# if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500)
+#elif defined( __GNUC__ )
+# if __GNUC__ < 5
 #  ifdef __EXCEPTIONS
 #   define gsl_HAVE_EXCEPTIONS  1
 #  else
@@ -563,7 +665,7 @@
 #  else
 #   define gsl_HAVE_EXCEPTIONS  0
 #  endif // __cpp_exceptions
-# endif // gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500)
+# endif // __GNUC__ < 5
 #elif gsl_COMPILER_MSVC_VERSION
 # ifdef _CPPUNWIND
 #  define gsl_HAVE_EXCEPTIONS  1
@@ -839,7 +941,7 @@
 # define gsl_NORETURN  [[noreturn]]
 #elif defined(_MSC_VER)
 # define gsl_NORETURN  __declspec(noreturn)
-#elif gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_ARMCC_VERSION
+#elif defined( __GNUC__ ) || gsl_COMPILER_ARMCC_VERSION
 # define gsl_NORETURN  __attribute__((noreturn))
 #else
 # define gsl_NORETURN
@@ -936,20 +1038,20 @@
         return U( lhs ) >= U( rhs );                                  \
     }
 
-//
-// Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
-//
-//     enum class Vegetables { tomato = 0b001, onion = 0b010, eggplant = 0b100 };
-//     gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
-//
+    //
+    // Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
+    //
+    //     enum class Vegetables { tomato = 0b001, onion = 0b010, eggplant = 0b100 };
+    //     gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
+    //
 #define gsl_DEFINE_ENUM_BITMASK_OPERATORS( ENUM ) gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )
 
-//
-// Defines relational operators `<`, `>`, `<=`, `>=` for the given enum type.
-//
-//     enum class OperatorPrecedence { additive = 0, multiplicative = 1, power = 2 };
-//     gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
-//
+    //
+    // Defines relational operators `<`, `>`, `<=`, `>=` for the given enum type.
+    //
+    //     enum class OperatorPrecedence { additive = 0, multiplicative = 1, power = 2 };
+    //     gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
+    //
 #define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( ENUM ) gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )
 
 #endif // gsl_HAVE( TYPE_TRAITS )
@@ -1034,7 +1136,7 @@
 # include <initializer_list>
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) || gsl_DEVICE_CODE
 # include <cassert>
 #endif
 
@@ -1042,15 +1144,15 @@
 # include <intrin.h>
 #endif
 
-#if gsl_HAVE( ENUM_CLASS ) && gsl_COMPILER_ARMCC_VERSION
+#if gsl_HAVE( ENUM_CLASS ) && ( gsl_COMPILER_ARMCC_VERSION || gsl_COMPILER_NVHPC_VERSION ) && !defined( _WIN32 )
 # include <endian.h>
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
 # include <type_traits> // for enable_if<>,
-// add_const<>, add_pointer<>, common_type<>, make_signed<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
-// is_assignable<>, is_constructible<>, is_const<>, is_convertible<>, is_integral<>, is_pointer<>, is_signed<>,
-// integral_constant<>, declval()
+                        // add_const<>, add_pointer<>, common_type<>, make_signed<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
+                        // is_assignable<>, is_constructible<>, is_const<>, is_convertible<>, is_integral<>, is_pointer<>, is_signed<>,
+                        // integral_constant<>, declval()
 #elif gsl_HAVE( TR1_TYPE_TRAITS )
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
@@ -1062,7 +1164,7 @@
 # if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 #  if defined( _MSC_VER )                                           // MS-STL with either MSVC or clang-cl
 namespace gsl { namespace detail { extern "C" char * __cdecl _getptd(); } }
-#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 #   if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
 #    include  <cxxabi.h>
 #   elif ! defined( BOOST_CORE_UNCAUGHT_EXCEPTIONS_HPP_INCLUDED_ )  // libc++: prototype from Boost?
@@ -1122,32 +1224,32 @@ class span;
 
 // C++98 emulation:
 
-namespace std98 {
+namespace detail {
 
 // We implement `equal()` and `lexicographical_compare()` here to avoid having to pull in the <algorithm> header.
 template< class InputIt1, class InputIt2 >
 bool equal( InputIt1 first1, InputIt1 last1, InputIt2 first2 )
 {
-  // Implementation borrowed from https://en.cppreference.com/w/cpp/algorithm/equal.
-  for ( ; first1 != last1; ++first1, ++first2 )
-  {
-    if ( ! (*first1 == *first2 ) ) return false;
-  }
-  return true;
+    // Implementation borrowed from https://en.cppreference.com/w/cpp/algorithm/equal.
+    for ( ; first1 != last1; ++first1, ++first2 )
+    {
+        if ( ! (*first1 == *first2 ) ) return false;
+    }
+    return true;
 }
 template< class InputIt1, class InputIt2 >
 bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2 )
 {
-  // Implementation borrowed from https://en.cppreference.com/w/cpp/algorithm/lexicographical_compare.
-  for ( ; first1 != last1 && first2 != last2; ++first1, (void) ++first2 )
-  {
-    if ( *first1 < *first2 ) return true;
-    if ( *first2 < *first1 ) return false;
-  }
-  return first1 == last1 && first2 != last2;
+    // Implementation borrowed from https://en.cppreference.com/w/cpp/algorithm/lexicographical_compare.
+    for ( ; first1 != last1 && first2 != last2; ++first1, (void) ++first2 )
+    {
+        if ( *first1 < *first2 ) return true;
+        if ( *first2 < *first1 ) return false;
+    }
+    return first1 == last1 && first2 != last2;
 }
 
-} // namespace std98
+} // namespace detail
 
 // C++11 emulation:
 
@@ -1265,6 +1367,9 @@ template< class T, class... Args >
 gsl_NODISCARD std::unique_ptr<T>
 make_unique( Args &&... args )
 {
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "make_unique<T[]>() is not part of C++14" );
+#  endif
     return std::unique_ptr<T>( new T( std::forward<Args>( args )... ) );
 }
 
@@ -1326,42 +1431,42 @@ template< class T, size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr auto
 size( T const(&)[N] ) gsl_noexcept -> size_t
 {
-  return N;
+    return N;
 }
 
 template< class C >
 gsl_NODISCARD inline gsl_constexpr auto
 size( C const & cont ) -> decltype( cont.size() )
 {
-  return cont.size();
+    return cont.size();
 }
 
 template< class T, size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr auto
 data( T(&arr)[N] ) gsl_noexcept -> T*
 {
-  return &arr[0];
+    return &arr[0];
 }
 
 template< class C >
 gsl_NODISCARD inline gsl_constexpr auto
 data( C & cont ) -> decltype( cont.data() )
 {
-  return cont.data();
+    return cont.data();
 }
 
 template< class C >
 gsl_NODISCARD inline gsl_constexpr auto
 data( C const & cont ) -> decltype( cont.data() )
 {
-  return cont.data();
+    return cont.data();
 }
 
 template< class E >
 gsl_NODISCARD inline gsl_constexpr auto
 data( std::initializer_list<E> il ) gsl_noexcept -> E const *
 {
-  return il.begin();
+    return il.begin();
 }
 
 #endif // gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
@@ -1376,26 +1481,26 @@ namespace std20 {
 
 struct identity
 {
-  template < class T >
-  gsl_constexpr T && operator ()( T && arg ) const gsl_noexcept
-  {
-    return std::forward<T>( arg );
-  }
+    template < class T >
+    gsl_constexpr T && operator ()( T && arg ) const gsl_noexcept
+    {
+        return std::forward<T>( arg );
+    }
 };
 
 # if gsl_HAVE( ENUM_CLASS )
 enum class endian
 {
 #  if defined( _WIN32 )
-  little = 0,
+    little = 0,
     big    = 1,
     native = little
 #  elif gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
-  little = __ORDER_LITTLE_ENDIAN__,
-  big    = __ORDER_BIG_ENDIAN__,
-  native = __BYTE_ORDER__
-#  elif gsl_COMPILER_ARMCC_VERSION
-  // from <endian.h> header file
+    little = __ORDER_LITTLE_ENDIAN__,
+    big    = __ORDER_BIG_ENDIAN__,
+    native = __BYTE_ORDER__
+#  elif gsl_COMPILER_ARMCC_VERSION || gsl_COMPILER_NVHPC_VERSION
+    // from <endian.h> header file
     little = __LITTLE_ENDIAN,
     big    = __BIG_ENDIAN,
     native = __BYTE_ORDER
@@ -1410,7 +1515,7 @@ enum class endian
 template< class T >
 struct type_identity
 {
-  typedef T type;
+    typedef T type;
 };
 #if gsl_HAVE( ALIAS_TEMPLATE )
 template< class T >
@@ -1426,17 +1531,17 @@ using std::ssize;
 template < class C >
 gsl_NODISCARD gsl_constexpr auto
 ssize( C const & c )
--> typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type
+    -> typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type
 {
-  using R = typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type;
-  return static_cast<R>( c.size() );
+    using R = typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type;
+    return static_cast<R>( c.size() );
 }
 
 template <class T, std::size_t N>
 gsl_NODISCARD gsl_constexpr auto
 ssize( T const(&)[N] ) gsl_noexcept -> std::ptrdiff_t
 {
-  return std::ptrdiff_t( N );
+    return std::ptrdiff_t( N );
 }
 
 #endif // gsl_HAVE( STD_SSIZE )
@@ -1499,38 +1604,38 @@ struct has_size_and_data : std::false_type{};
 
 template< class C >
 struct has_size_and_data
-    <
-        C, std17::void_t<
+<
+    C, std17::void_t<
         decltype( std17::size(std::declval<C>()) ),
         decltype( std17::data(std::declval<C>()) ) >
-    > : std::true_type{};
+> : std::true_type{};
 
 template< class, class, class = void >
 struct is_compatible_element : std::false_type {};
 
 template< class C, class E >
 struct is_compatible_element
-    <
-        C, E, std17::void_t<
+<
+    C, E, std17::void_t<
         decltype( std17::data(std::declval<C>()) ),
         typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[] >
-    > : std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >{};
+> : std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >{};
 
 template< class C >
 struct is_container : std17::bool_constant
-                          <
-                              ! is_span< C >::value
-                              && ! is_array< C >::value
-                              && ! is_std_array< C >::value
-                              &&   has_size_and_data< C >::value
-                          >{};
+<
+    ! is_span< C >::value
+    && ! is_array< C >::value
+    && ! is_std_array< C >::value
+    &&   has_size_and_data< C >::value
+>{};
 
 template< class C, class E >
 struct is_compatible_container : std17::bool_constant
-                                     <
-                                         is_container<C>::value
-                                         && is_compatible_element<C,E>::value
-                                     >{};
+<
+    is_container<C>::value
+    && is_compatible_element<C,E>::value
+>{};
 
 # else // ^^^ gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 ) ^^^ / vvv ! gsl_CPP11_140 || gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 ) vvv
 
@@ -1586,23 +1691,19 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 // GSL.owner: ownership pointers
 //
 #if gsl_HAVE( SHARED_PTR )
-using std::unique_ptr;
-using std::shared_ptr;
-using std::make_shared;
-# if gsl_HAVE( MAKE_UNIQUE ) || gsl_HAVE( VARIADIC_TEMPLATE )
-using std14::make_unique;
-# endif
+  using std::unique_ptr;
+  using std::shared_ptr;
 #endif
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )
-template< class T
+  template< class T
 #if gsl_HAVE( TYPE_TRAITS )
-    , typename = typename std::enable_if< std::is_pointer<T>::value >::type
+          , typename = typename std::enable_if< std::is_pointer<T>::value >::type
 #endif
->
-using owner = T;
+  >
+  using owner = T;
 #elif gsl_CONFIG( DEFAULTS_VERSION ) == 0
-// TODO vNext: remove
+  // TODO vNext: remove
   template< class T > struct owner { typedef T type; };
 #endif
 
@@ -1629,135 +1730,197 @@ using owner = T;
 #endif
 #define gsl_NO_OP_()      ( static_cast<void>( 0 ) )
 
-#if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-# if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-#  if gsl_COMPILER_NVCC_VERSION >= 113
-#   define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
-#   define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
-#  else
-#   define gsl_ASSUME_( x )           gsl_ELIDE_( x ) /* there is no assume intrinsic in CUDA device code */
-#   define gsl_ASSUME_UNREACHABLE_()  gsl_NO_OP_() /* there is no assume intrinsic in CUDA device code */
-#  endif
-# elif gsl_COMPILER_MSVC_VERSION >= 140
-#  define  gsl_ASSUME_( x )           __assume( x )
-#  define  gsl_ASSUME_UNREACHABLE_()  __assume( 0 )
-# elif gsl_COMPILER_GNUC_VERSION
-#   define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
-#  define  gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
-# elif defined(__has_builtin)
-#  if __has_builtin(__builtin_unreachable)
-#   define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
-#   define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
-#  else
-#   error  gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints for this compiler; use gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE instead
-#  endif
-# else
-#  error   gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints for this compiler; use gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE instead
-# endif
-#endif // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-
-#if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-# define gsl_CONTRACT_UNENFORCED_( x )  gsl_ASSUME_( x )
-#else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
-# define gsl_CONTRACT_UNENFORCED_( x )  gsl_ELIDE_( x )
+#if gsl_COMPILER_NVHPC_VERSION
+// Suppress "controlling expression is constant" warning when using `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, etc.
+# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_  _Pragma("diag_suppress 236")
+# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_   _Pragma("diag_default 236")
+#else
+# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_
+# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
-# if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+#if gsl_DEVICE_CODE
+# if defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME )
+#  if gsl_COMPILER_NVCC_VERSION >= 113
+#   define gsl_ASSUME_( x )           ( __builtin_assume( !!( x ) ) )
+#   define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
+#  else  // unknown device compiler
+#   error  gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints in device code for this compiler; use gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE instead
+#  endif
+#  define  gsl_CONTRACT_UNENFORCED_( x )  gsl_ASSUME_( x )
+# else // defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE ) [default]
+#  define  gsl_CONTRACT_UNENFORCED_( x )  gsl_ELIDE_( x )
+# endif
+#else // host code
+# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+#  if gsl_COMPILER_MSVC_VERSION >= 140
+#   define  gsl_ASSUME_( x )           __assume( x )
+#   define  gsl_ASSUME_UNREACHABLE_()  __assume( 0 )
+#  elif gsl_COMPILER_GNUC_VERSION
+#   define  gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
+#   define  gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
+#  elif defined(__has_builtin)
+#   if __has_builtin(__builtin_unreachable)
+#    define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
+#    define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
+#   else
+#    error  gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints for this compiler; use gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE instead
+#   endif
+#  else
+#   error   gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints for this compiler; use gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE instead
+#  endif
+#  define  gsl_CONTRACT_UNENFORCED_( x )  gsl_ASSUME_( x )
+# else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
+#  define  gsl_CONTRACT_UNENFORCED_( x )  gsl_ELIDE_( x )
+# endif
+#endif // gsl_DEVICE_CODE
+
+#if gsl_DEVICE_CODE
+# if gsl_COMPILER_NVCC_VERSION
 #  define  gsl_TRAP_()  __trap()
-# elif gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
-#  define  gsl_TRAP_()  __fastfail( 0 ) /* legacy failure code for buffer-overrun errors, cf. winnt.h, "Fast fail failure codes" */
-# elif gsl_COMPILER_GNUC_VERSION
-#  define  gsl_TRAP_()  __builtin_trap()
 # elif defined(__has_builtin)
 #  if __has_builtin(__builtin_trap)
 #   define gsl_TRAP_()  __builtin_trap()
 #  else
-#   error  gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
+#   error  gsl-lite does not know how to generate a trap instruction for this device compiler
 #  endif
 # else
-#  error   gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
+#  error   gsl-lite does not know how to generate a trap instruction for this device compiler
 # endif
-#endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
-
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) )
-# if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+# if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( gsl_TRAP_() )
+# elif defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
 #  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
-# else
-#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
-# endif
-#elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) || ! defined( NDEBUG )
-#  define  gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
-# else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : __trap() )
-#endif
-# define  gsl_FAILFAST_()                 ( __trap() )
-#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
-# if ! defined( NDEBUG )
-#  define  gsl_FAILFAST_()                ( assert( ! "GSL: failure" ), ::gsl::detail::fail_fast_terminate() )
-# else
-#  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
-# endif
-#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() )
-# if gsl_COMPILER_MSVC_VERSION
-#  define  gsl_FAILFAST_()                ( gsl_TRAP_(), ::gsl::detail::fail_fast_terminate() )
-# else
+# else // defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS ) [default]
+#  if ! defined( NDEBUG )
+#   define gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
+#  else
+#   define gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() )
+#  endif
 #  define  gsl_FAILFAST_()                ( gsl_TRAP_() )
 # endif
-#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
-# define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
-#else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
-# define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
+#else // host code
+# if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
+#  if gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
+#   define  gsl_TRAP_()  __fastfail( 0 ) /* legacy failure code for buffer-overrun errors, cf. winnt.h, "Fast fail failure codes" */
+#  elif gsl_COMPILER_GNUC_VERSION
+#   define  gsl_TRAP_()  __builtin_trap()
+#  elif defined(__has_builtin)
+#   if __has_builtin(__builtin_trap)
+#    define gsl_TRAP_()  __builtin_trap()
+#   else
+#    error  gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
+#   endif
+#  else
+#   error   gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
+#  endif
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  if gsl_COMPILER_MSVC_VERSION
+#   define gsl_FAILFAST_()                ( gsl_TRAP_(), ::gsl::detail::fail_fast_terminate() )
+#  else
+#   define gsl_FAILFAST_()                ( gsl_TRAP_() )
+#  endif
+# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
+# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+#  if ! defined( NDEBUG )
+#   define gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#   define gsl_FAILFAST_()                ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( ! "GSL: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_, ::gsl::detail::fail_fast_abort() )
+#  else
+#   define gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_abort() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#   define gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_abort() )
+#  endif
+# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+# else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
+# endif
+#endif // gsl_DEVICE_CODE
+
+#if ( !gsl_DEVICE_CODE && defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) ) || ( gsl_DEVICE_CODE && defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF ) )
+# define  gsl_CHECK_CONTRACTS_        0
+# define  gsl_CHECK_DEBUG_CONTRACTS_  0
+# define  gsl_CHECK_AUDIT_CONTRACTS_  0
+#elif ( !gsl_DEVICE_CODE && defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) ) || ( gsl_DEVICE_CODE && defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT ) )
+# define  gsl_CHECK_CONTRACTS_        1
+# define  gsl_CHECK_DEBUG_CONTRACTS_  1
+# define  gsl_CHECK_AUDIT_CONTRACTS_  1
+#else // gsl_CONFIG_[DEVICE_]CONTRACT_CHECKING_ON [default]
+# define  gsl_CHECK_CONTRACTS_        1
+# if !defined( NDEBUG )
+#  define gsl_CHECK_DEBUG_CONTRACTS_  1
+# else // defined( NDEBUG )
+#  define gsl_CHECK_DEBUG_CONTRACTS_  0
+# endif
+# define  gsl_CHECK_AUDIT_CONTRACTS_  0
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
-#else
+#if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "GSL: Precondition failure", x )
+#else
+# define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #define   Expects( x )           gsl_Expects( x )
-#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
+#if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
+# define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (debug)", x )
 #else
+# define  gsl_ExpectsDebug( x )  gsl_ELIDE_( x )
+#endif
+#if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (audit)", x )
+#else
+# define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
-#else
+#if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "GSL: Postcondition failure", x )
+#else
+# define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #define   Ensures( x )           gsl_Ensures( x )
-#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
+#if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
+# define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (debug)", x )
 #else
+# define  gsl_EnsuresDebug( x )  gsl_ELIDE_( x )
+#endif
+#if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (audit)", x )
+#else
+# define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-#  define gsl_Assert( x )       gsl_CONTRACT_UNENFORCED_( x )
-#else
+#if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "GSL: Assertion failure", x )
-#endif
-#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAudit( x )  gsl_ELIDE_( x )
 #else
+# define  gsl_Assert( x )       gsl_CONTRACT_UNENFORCED_( x )
+#endif
+#if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+# define  gsl_AssertDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (debug)", x )
+#else
+# define  gsl_AssertDebug( x )  gsl_ELIDE_( x )
+#endif
+#if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (audit)", x )
+#else
+# define  gsl_AssertAudit( x )  gsl_ELIDE_( x )
 #endif
 
 #define   gsl_FailFast()        gsl_FAILFAST_()
 
+#undef gsl_CHECK_CONTRACTS_
+#undef gsl_CHECK_DEBUG_CONTRACTS_
+#undef gsl_CHECK_AUDIT_CONTRACTS_
+
 
 struct fail_fast : public std::logic_error
 {
-  explicit fail_fast( char const * message )
-      : std::logic_error( message ) {}
+    explicit fail_fast( char const * message )
+    : std::logic_error( message ) {}
 };
 
 namespace detail {
@@ -1766,12 +1929,16 @@ namespace detail {
 #if gsl_HAVE( EXCEPTIONS )
 gsl_NORETURN inline void fail_fast_throw( char const * message )
 {
-  throw fail_fast( message );
+    throw fail_fast( message );
 }
 #endif // gsl_HAVE( EXCEPTIONS )
 gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept
 {
-  std::terminate();
+    std::terminate();
+}
+gsl_NORETURN inline void fail_fast_abort() gsl_noexcept
+{
+    std::abort();
 }
 
 } // namespace detail
@@ -1807,8 +1974,8 @@ gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract ch
 gsl_constexpr14 inline
 void fail_fast_assert( bool cond ) gsl_noexcept
 {
-  if ( !cond )
-    std::terminate();
+    if ( !cond )
+        std::terminate();
 }
 
 #endif
@@ -1840,7 +2007,7 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
     return static_cast<unsigned char>( *reinterpret_cast<unsigned const*>( detail::_getptd() + (sizeof(void *) == 8 ? 0x100 : 0x90 ) ) );
 }
 
-#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
@@ -1862,53 +2029,53 @@ template< class F >
 class final_action
 {
 public:
-  explicit final_action( F action ) gsl_noexcept
-      : action_( std::move( action ) )
-      , invoke_( true )
-  {}
+    explicit final_action( F action ) gsl_noexcept
+        : action_( std::move( action ) )
+        , invoke_( true )
+    {}
 
-  final_action( final_action && other ) gsl_noexcept
-      : action_( std::move( other.action_ ) )
-      , invoke_( other.invoke_ )
-  {
-    other.invoke_ = false;
-  }
+    final_action( final_action && other ) gsl_noexcept
+        : action_( std::move( other.action_ ) )
+        , invoke_( other.invoke_ )
+    {
+        other.invoke_ = false;
+    }
 
-  gsl_SUPPRESS_MSGSL_WARNING(f.6)
-  virtual ~final_action() gsl_noexcept
-  {
-    if ( invoke_ )
-      action_();
-  }
+    gsl_SUPPRESS_MSGSL_WARNING(f.6)
+    virtual ~final_action() gsl_noexcept
+    {
+        if ( invoke_ )
+            action_();
+    }
 
 gsl_is_delete_access:
-  final_action( final_action const & ) gsl_is_delete;
-  final_action & operator=( final_action const & ) gsl_is_delete;
-  final_action & operator=( final_action && ) gsl_is_delete;
+    final_action( final_action const & ) gsl_is_delete;
+    final_action & operator=( final_action const & ) gsl_is_delete;
+    final_action & operator=( final_action && ) gsl_is_delete;
 
 protected:
-  void dismiss() gsl_noexcept
-  {
-    invoke_ = false;
-  }
+    void dismiss() gsl_noexcept
+    {
+        invoke_ = false;
+    }
 
 private:
-  F action_;
-  bool invoke_;
+    F action_;
+    bool invoke_;
 };
 
 template< class F >
 gsl_NODISCARD inline final_action<F>
 finally( F const & action ) gsl_noexcept
 {
-  return final_action<F>( action );
+    return final_action<F>( action );
 }
 
 template< class F >
 gsl_NODISCARD inline final_action<F>
 finally( F && action ) gsl_noexcept
 {
-  return final_action<F>( std::forward<F>( action ) );
+    return final_action<F>( std::forward<F>( action ) );
 }
 
 # if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
@@ -2112,7 +2279,7 @@ template< class T, class U >
 gsl_NODISCARD gsl_api inline gsl_constexpr T
 narrow_cast( U && u ) gsl_noexcept
 {
-  return static_cast<T>( std::forward<U>( u ) );
+    return static_cast<T>( std::forward<U>( u ) );
 }
 
 #else // ! gsl_STDLIB_CPP11_120
@@ -2128,24 +2295,24 @@ narrow_cast( U u ) gsl_noexcept
 
 struct narrowing_error : public std::exception
 {
-  char const * what() const gsl_noexcept
+    char const * what() const gsl_noexcept
 #if gsl_HAVE( OVERRIDE_FINAL )
-  override
+    override
 #endif
-  {
-    return "narrowing_error";
-  }
+    {
+        return "narrowing_error";
+    }
 };
 
 #if gsl_HAVE( TYPE_TRAITS )
 
 namespace detail {
 
-template< class T, class U >
-struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
+    template< class T, class U >
+    struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
 
-# if gsl_COMPILER_NVCC_VERSION
-// We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
+# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
+    // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
     gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
     {
@@ -2166,7 +2333,7 @@ struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T
     {
         return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
     }
-# endif // gsl_COMPILER_NVCC_VERSION
+# endif // gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
 
 } // namespace detail
 
@@ -2181,68 +2348,85 @@ inline T
 narrow( U u )
 {
 #if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && ! gsl_HAVE( EXCEPTIONS )
-  gsl_STATIC_ASSERT_( detail::dependent_false< T >::value,
+    gsl_STATIC_ASSERT_( detail::dependent_false< T >::value,
         "According to the GSL specification, narrow<>() throws an exception of type narrowing_error on truncation. Therefore "
         "it cannot be used if exceptions are disabled. Consider using narrow_failfast<>() instead which raises a precondition "
         "violation if the given value cannot be represented in the target type." );
 #endif
 
-  T t = static_cast<T>( u );
+    T t = static_cast<T>( u );
 
-  if ( static_cast<U>( t ) != u )
-  {
+    if ( static_cast<U>( t ) != u )
+    {
 #if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
-    throw narrowing_error();
+        throw narrowing_error();
 #else
-    std::terminate();
+        std::terminate();
 #endif
-  }
+    }
 
 #if gsl_HAVE( TYPE_TRAITS )
-# if gsl_COMPILER_NVCC_VERSION
+# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     if ( ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
 # else
-  gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-  if ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) )
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    if ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) )
 # endif
 #else
     // Don't assume T() works:
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+# if gsl_COMPILER_NVHPC_VERSION
+    // Suppress: pointless comparison of unsigned integer with zero.
+#  pragma diag_suppress 186
+# endif
     if ( ( t < 0 ) != ( u < 0 ) )
-#endif
-  {
-#if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
-    throw narrowing_error();
-#else
-    std::terminate();
-#endif
-  }
+# if gsl_COMPILER_NVHPC_VERSION
+    // Restore: pointless comparison of unsigned integer with zero.
+#  pragma diag_default 186
+# endif
 
-  return t;
+#endif
+    {
+#if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
+        throw narrowing_error();
+#else
+        std::terminate();
+#endif
+    }
+
+    return t;
 }
 
 template< class T, class U >
 gsl_NODISCARD gsl_api inline T
 narrow_failfast( U u )
 {
-  T t = static_cast<T>( u );
+    T t = static_cast<T>( u );
 
-  gsl_Expects( static_cast<U>( t ) == u );
+    gsl_Expects( static_cast<U>( t ) == u );
 
 #if gsl_HAVE( TYPE_TRAITS )
-# if gsl_COMPILER_NVCC_VERSION
-  gsl_Expects( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
+# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
+    gsl_Expects( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
 # else
-  gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-  gsl_Expects( ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    gsl_Expects( ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
 # endif
 #else
-  // Don't assume T() works:
+    // Don't assume T() works:
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+# if gsl_COMPILER_NVHPC_VERSION
+    // Suppress: pointless comparison of unsigned integer with zero.
+#  pragma diag_suppress 186
+# endif
     gsl_Expects( ( t < 0 ) == ( u < 0 ) );
+# if gsl_COMPILER_NVHPC_VERSION
+    // Restore: pointless comparison of unsigned integer with zero.
+#  pragma diag_default 186
+# endif
 #endif
 
-  return t;
+    return t;
 }
 
 
@@ -2254,24 +2438,24 @@ template< class T, size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 T &
 at( T(&arr)[N], size_t pos )
 {
-  gsl_Expects( pos < N );
-  return arr[pos];
+    gsl_Expects( pos < N );
+    return arr[pos];
 }
 
 template< class Container >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 typename Container::value_type &
 at( Container & cont, size_t pos )
 {
-  gsl_Expects( pos < cont.size() );
-  return cont[pos];
+    gsl_Expects( pos < cont.size() );
+    return cont[pos];
 }
 
 template< class Container >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 typename Container::value_type const &
 at( Container const & cont, size_t pos )
 {
-  gsl_Expects( pos < cont.size() );
-  return cont[pos];
+    gsl_Expects( pos < cont.size() );
+    return cont[pos];
 }
 
 #if gsl_HAVE( INITIALIZER_LIST )
@@ -2280,8 +2464,8 @@ template< class T >
 gsl_NODISCARD gsl_api inline const gsl_constexpr14 T
 at( std::initializer_list<T> cont, size_t pos )
 {
-  gsl_Expects( pos < cont.size() );
-  return *( cont.begin() + pos );
+    gsl_Expects( pos < cont.size() );
+    return *( cont.begin() + pos );
 }
 #endif
 
@@ -2289,7 +2473,7 @@ template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 T &
 at( span<T> s, size_t pos )
 {
-  return s[ pos ];
+    return s[ pos ];
 }
 
 //
@@ -2310,15 +2494,15 @@ namespace detail {
 template< class T, class E = void >
 struct element_type_helper
 {
-  // For types without a member element_type (this will handle raw pointers)
-  typedef typename std::remove_reference< decltype( *std::declval<T>() ) >::type type;
+    // For types without a member element_type (this will handle raw pointers)
+    typedef typename std::remove_reference< decltype( *std::declval<T>() ) >::type type;
 };
 
 template< class T >
 struct element_type_helper< T, std17::void_t< typename T::element_type > >
 {
-  // For types with a member element_type
-  typedef typename T::element_type type;
+    // For types with a member element_type
+    typedef typename T::element_type type;
 };
 #else // ! gsl_STDLIB_CPP11_OR_GREATER
 // Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
@@ -2349,26 +2533,26 @@ struct not_null_data;
 template< class T >
 struct not_null_data< T, false >
 {
-  T ptr_;
+    T ptr_;
 
-  gsl_api gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
-      : ptr_( std::move( _ptr ) )
-  {
-  }
+    gsl_api gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
+    : ptr_( std::move( _ptr ) )
+    {
+    }
 
-  gsl_api gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
-      : ptr_( std::move( other.ptr_ ) )
-  {
-  }
-  gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
-  {
-    ptr_ = std::move( other.ptr_ );
-    return *this;
-  }
+    gsl_api gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
+    : ptr_( std::move( other.ptr_ ) )
+    {
+    }
+    gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
+    {
+        ptr_ = std::move( other.ptr_ );
+        return *this;
+    }
 
 gsl_is_delete_access:
-  not_null_data( not_null_data const & ) gsl_is_delete;
-  not_null_data & operator=( not_null_data const & ) gsl_is_delete;
+    not_null_data( not_null_data const & ) gsl_is_delete;
+    not_null_data & operator=( not_null_data const & ) gsl_is_delete;
 };
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
 # endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
@@ -2376,41 +2560,41 @@ gsl_is_delete_access:
 template< class T >
 struct not_null_data< T, true >
 {
-  T ptr_;
+    T ptr_;
 
-  gsl_api gsl_constexpr14 not_null_data( T const & _ptr ) gsl_noexcept
-      : ptr_( _ptr )
-  {
-  }
+    gsl_api gsl_constexpr14 not_null_data( T const & _ptr ) gsl_noexcept
+    : ptr_( _ptr )
+    {
+    }
 
 #if gsl_HAVE( MOVE_FORWARD )
-  gsl_api gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
-      : ptr_( std::move( _ptr ) )
-  {
-  }
+    gsl_api gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
+    : ptr_( std::move( _ptr ) )
+    {
+    }
 
-  gsl_api gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
-      : ptr_( std::move( other.ptr_ ) )
-  {
-  }
-  gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
-  {
-    ptr_ = std::move( other.ptr_ );
-    return *this;
-  }
+    gsl_api gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
+    : ptr_( std::move( other.ptr_ ) )
+    {
+    }
+    gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
+    {
+        ptr_ = std::move( other.ptr_ );
+        return *this;
+    }
 #endif // gsl_HAVE( MOVE_FORWARD )
 
-  gsl_api gsl_constexpr14 not_null_data( not_null_data const & other )
-      : ptr_( other.ptr_ )
-  {
-    gsl_Expects( ptr_ != gsl_nullptr );
-  }
-  gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data const & other )
-  {
-    gsl_Expects( other.ptr_ != gsl_nullptr );
-    ptr_ = other.ptr_;
-    return *this;
-  }
+    gsl_api gsl_constexpr14 not_null_data( not_null_data const & other )
+    : ptr_( other.ptr_ )
+    {
+        gsl_Expects( ptr_ != gsl_nullptr );
+    }
+    gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data const & other )
+    {
+        gsl_Expects( other.ptr_ != gsl_nullptr );
+        ptr_ = other.ptr_;
+        return *this;
+    }
 };
 #if gsl_CONFIG_DEFAULTS_VERSION >= 1
 template< class T >
@@ -2427,9 +2611,9 @@ struct not_null_data< T *, true >
 template< class T >
 struct is_copyable
 #if gsl_HAVE( TYPE_TRAITS )
-    : std11::integral_constant< bool, std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value >
+: std11::integral_constant< bool, std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value >
 #else
-  : std11::true_type
+: std11::true_type
 #endif
 {
 };
@@ -2450,24 +2634,24 @@ template< class T >
 class not_null
 {
 private:
-  detail::not_null_data< T, detail::is_copyable< T >::value > data_;
+    detail::not_null_data< T, detail::is_copyable< T >::value > data_;
 
-  // need to access `not_null<U>::data_`
-  template< class U >
-  friend class not_null;
+    // need to access `not_null<U>::data_`
+    template< class U >
+    friend class not_null;
 
-  template< class U >
-  friend struct detail::not_null_accessor;
+    template< class U >
+    friend struct detail::not_null_accessor;
 
 public:
-  typedef typename detail::element_type_helper<T>::type element_type;
+    typedef typename detail::element_type_helper<T>::type element_type;
 
 #if gsl_HAVE( TYPE_TRAITS )
-  static_assert( std::is_assignable<typename std::remove_const<typename std::remove_reference<T>::type>::type&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
+    static_assert( std::is_assignable<typename std::remove_const<typename std::remove_reference<T>::type>::type&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
 
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-  # if gsl_HAVE( MOVE_FORWARD )
+# if gsl_HAVE( MOVE_FORWARD )
     template< class U
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
@@ -2491,30 +2675,30 @@ public:
 # endif // gsl_HAVE( MOVE_FORWARD )
 #else // a.k.a. !gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 # if gsl_HAVE( MOVE_FORWARD )
-  // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
-  // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
+    // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
+    // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
-  >
-  gsl_api gsl_constexpr14 explicit not_null( U other )
-      : data_( T( std::move( other ) ) )
-  {
-    gsl_Expects( data_.ptr_ != gsl_nullptr );
-  }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 explicit not_null( U other )
+    : data_( T( std::move( other ) ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
 
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
-  >
-  gsl_api gsl_constexpr14 not_null( U other )
-      : data_( std::move( other ) )
-  {
-    gsl_Expects( data_.ptr_ != gsl_nullptr );
-  }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 not_null( U other )
+    : data_( std::move( other ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
 #  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-  // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
+    // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
     gsl_api gsl_constexpr14 not_null( U other )
     : data_( T( std::move( other ) ) )
@@ -2523,7 +2707,7 @@ public:
     }
 #  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
-  template< class U >
+    template< class U >
     gsl_api gsl_constexpr14 not_null( U const& other )
     : data_( T( other ) )
     {
@@ -2534,30 +2718,30 @@ public:
 
 public:
 #if gsl_HAVE( MOVE_FORWARD )
-  // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
-  // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
+    // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
+    // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 # if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
-  >
-  gsl_api gsl_constexpr14 explicit not_null( not_null<U> other )
-      : data_( T( std::move( other.data_.ptr_ ) ) )
-  {
-    gsl_Expects( data_.ptr_ != gsl_nullptr );
-  }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 explicit not_null( not_null<U> other )
+    : data_( T( std::move( other.data_.ptr_ ) ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
 
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
-  >
-  gsl_api gsl_constexpr14 not_null( not_null<U> other )
-      : data_( T( std::move( other.data_.ptr_ ) ) )
-  {
-    gsl_Expects( data_.ptr_ != gsl_nullptr );
-  }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 not_null( not_null<U> other )
+    : data_( T( std::move( other.data_.ptr_ ) ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
 # else // a.k.a. ! ( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-  // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
+    // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
     gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
@@ -2573,7 +2757,7 @@ public:
     }
 # endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 #else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
-  template< class U >
+    template< class U >
     gsl_api gsl_constexpr14 not_null( not_null<U> const& other )
     : data_( T( other.data_.ptr_ ) )
     {
@@ -2589,200 +2773,191 @@ public:
 #endif // gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL )
-  gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
     get() const
     {
-        element_type * result = data_.ptr_.get();
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_.get();
     }
 #else
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-  gsl_NODISCARD gsl_api gsl_constexpr14 T const &
+    gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     get() const
     {
-        T const & result = data_.ptr_;
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
     }
 # else
-  gsl_NODISCARD gsl_api gsl_constexpr14 T
-  get() const
-  {
-    T result = data_.ptr_;
-    gsl_Ensures( result != gsl_nullptr );
-    return result;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 T
+    get() const
+    {
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
+    }
 # endif
 #endif
 
-  // We want an implicit conversion operator that can be used to convert from both lvalues (by
-  // const reference or by copy) and rvalues (by move). So it seems like we could define
-  //
-  //     template< class U >
-  //     operator U const &() const & { ... }
-  //     template< class U >
-  //     operator U &&() && { ... }
-  //
-  // However, having two conversion operators with different return types renders the assignment
-  // operator of the result type ambiguous:
-  //
-  //     not_null<std::unique_ptr<T>> p( ... );
-  //     std::unique_ptr<U> q;
-  //     q = std::move( p ); // ambiguous
-  //
-  // To avoid this ambiguity, we have both overloads of the conversion operator return `U`
-  // rather than `U const &` or `U &&`. This implies that converting an lvalue always induces
-  // a copy, which can cause unnecessary copies or even fail to compile in some situations:
-  //
-  //     not_null<std::shared_ptr<T>> sp( ... );
-  //     std::shared_ptr<U> const & rs = sp; // unnecessary copy
-  //     std::unique_ptr<U> const & ru = p; // error: cannot copy `unique_ptr<T>`
-  //
-  // However, these situations are rather unusual, and the following, more frequent situations
-  // remain unimpaired:
-  //
-  //     std::shared_ptr<U> vs = sp; // no extra copy
-  //     std::unique_ptr<U> vu = std::move( p );
+    // We want an implicit conversion operator that can be used to convert from both lvalues (by
+    // const reference or by copy) and rvalues (by move). So it seems like we could define
+    //
+    //     template< class U >
+    //     operator U const &() const & { ... }
+    //     template< class U >
+    //     operator U &&() && { ... }
+    //
+    // However, having two conversion operators with different return types renders the assignment
+    // operator of the result type ambiguous:
+    //
+    //     not_null<std::unique_ptr<T>> p( ... );
+    //     std::unique_ptr<U> q;
+    //     q = std::move( p ); // ambiguous
+    //
+    // To avoid this ambiguity, we have both overloads of the conversion operator return `U`
+    // rather than `U const &` or `U &&`. This implies that converting an lvalue always induces
+    // a copy, which can cause unnecessary copies or even fail to compile in some situations:
+    //
+    //     not_null<std::shared_ptr<T>> sp( ... );
+    //     std::shared_ptr<U> const & rs = sp; // unnecessary copy
+    //     std::unique_ptr<U> const & ru = p; // error: cannot copy `unique_ptr<T>`
+    //
+    // However, these situations are rather unusual, and the following, more frequent situations
+    // remain unimpaired:
+    //
+    //     std::shared_ptr<U> vs = sp; // no extra copy
+    //     std::unique_ptr<U> vu = std::move( p );
 
 #if gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
-  // explicit conversion operator
+    // explicit conversion operator
 
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
-  >
-  gsl_NODISCARD gsl_api gsl_constexpr14 explicit
-  operator U() const
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
+    operator U() const
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-  &
+    &
 # endif
-  {
-    U result( data_.ptr_ );
-    gsl_Ensures( result != gsl_nullptr );
-    return result;
-  }
+    {
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return U( data_.ptr_ );
+    }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
-  >
-  gsl_NODISCARD gsl_api gsl_constexpr14 explicit
-  operator U() &&
-  {
-    U result( std::move( data_.ptr_ ) );
-    gsl_Ensures( result != gsl_nullptr );
-    return result;
-  }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
+    operator U() &&
+    {
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return U( std::move( data_.ptr_ ) );
+    }
 # endif
 
-  // implicit conversion operator
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
-  >
-  gsl_NODISCARD gsl_api gsl_constexpr14
-  operator U() const
+    // implicit conversion operator
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator U() const
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-  &
+    &
 # endif
-  {
-    U result( data_.ptr_ );
-    gsl_Ensures( result != gsl_nullptr );
-    return result;
-  }
+    {
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
+    }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-  template< class U
-      // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-      , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
-  >
-  gsl_NODISCARD gsl_api gsl_constexpr14
-  operator U() &&
-  {
-    U result( std::move( data_.ptr_ ) );
-    gsl_Ensures( result != gsl_nullptr );
-    return result;
-  }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator U() &&
+    {
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return std::move( data_.ptr_ );
+    }
 # endif
 #else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
-  template< class U >
+    template< class U >
     gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const
     {
-        U result( data_.ptr_ );
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return U( data_.ptr_ );
     }
 #endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 T const &
-  operator->() const
-  {
-    T const & result( data_.ptr_ );
-    gsl_Ensures( result != gsl_nullptr );
-    return result;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 T const &
+    operator->() const
+    {
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
-  operator*() const
-  {
-    gsl_Expects( data_.ptr_ != gsl_nullptr );
-    return *data_.ptr_;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
+    operator*() const
+    {
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return *data_.ptr_;
+    }
 
 #if gsl_HAVE( MOVE_FORWARD )
-  // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
-  gsl_api gsl_constexpr14 not_null( not_null && other )
-  gsl_noexcept_not_testing  // we want to be nothrow-movable despite the precondition check
-      : data_( std::move( other.data_ ) )
-  {
-    gsl_Expects( data_.ptr_ != gsl_nullptr );
-  }
-  gsl_api gsl_constexpr14 not_null & operator=( not_null && other )
-  gsl_noexcept_not_testing // we want to be nothrow-movable despite the precondition check
-  {
-    gsl_Expects( other.data_.ptr_ != gsl_nullptr || &other == this );
-    data_ = std::move( other.data_ );
-    return *this;
-  }
+    // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
+    gsl_api gsl_constexpr14 not_null( not_null && other )
+    gsl_noexcept_not_testing  // we want to be nothrow-movable despite the precondition check
+    : data_( std::move( other.data_ ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+    gsl_api gsl_constexpr14 not_null & operator=( not_null && other )
+    gsl_noexcept_not_testing // we want to be nothrow-movable despite the precondition check
+    {
+        gsl_Expects( other.data_.ptr_ != gsl_nullptr || &other == this );
+        data_ = std::move( other.data_ );
+        return *this;
+    }
 #endif // gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_HAVE( IS_DEFAULT )
-  gsl_constexpr14 not_null( not_null const & ) = default;
-  gsl_constexpr14 not_null & operator=( not_null const & ) = default;
+    gsl_constexpr14 not_null( not_null const & ) = default;
+    gsl_constexpr14 not_null & operator=( not_null const & ) = default;
 #endif
 
-  gsl_api gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs )
-  gsl_noexcept_not_testing // we want to be nothrow-swappable despite the precondition check
-  {
-    gsl_Expects( lhs.data_.ptr_ != gsl_nullptr && rhs.data_.ptr_ != gsl_nullptr );
-    using std::swap;
-    swap( lhs.data_.ptr_, rhs.data_.ptr_ );
-  }
+    gsl_api gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs )
+    gsl_noexcept_not_testing // we want to be nothrow-swappable despite the precondition check
+    {
+        gsl_Expects( lhs.data_.ptr_ != gsl_nullptr && rhs.data_.ptr_ != gsl_nullptr );
+        using std::swap;
+        swap( lhs.data_.ptr_, rhs.data_.ptr_ );
+    }
 
 gsl_is_delete_access:
-  not_null() gsl_is_delete;
-  // prevent compilation when initialized with a nullptr or literal 0:
+    not_null() gsl_is_delete;
+    // prevent compilation when initialized with a nullptr or literal 0:
 #if gsl_HAVE( NULLPTR )
-  not_null(             std::nullptr_t ) gsl_is_delete;
-  not_null & operator=( std::nullptr_t ) gsl_is_delete;
+    not_null(             std::nullptr_t ) gsl_is_delete;
+    not_null & operator=( std::nullptr_t ) gsl_is_delete;
 #else
-  not_null(             int ) gsl_is_delete;
+    not_null(             int ) gsl_is_delete;
     not_null & operator=( int ) gsl_is_delete;
 #endif
 
-  // unwanted operators...pointers only point to single objects!
-  not_null & operator++() gsl_is_delete;
-  not_null & operator--() gsl_is_delete;
-  not_null   operator++( int ) gsl_is_delete;
-  not_null   operator--( int ) gsl_is_delete;
-  not_null & operator+ ( size_t ) gsl_is_delete;
-  not_null & operator+=( size_t ) gsl_is_delete;
-  not_null & operator- ( size_t ) gsl_is_delete;
-  not_null & operator-=( size_t ) gsl_is_delete;
-  not_null & operator+=( std::ptrdiff_t ) gsl_is_delete;
-  not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
-  void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
+    // unwanted operators...pointers only point to single objects!
+    not_null & operator++() gsl_is_delete;
+    not_null & operator--() gsl_is_delete;
+    not_null   operator++( int ) gsl_is_delete;
+    not_null   operator--( int ) gsl_is_delete;
+    not_null & operator+ ( size_t ) gsl_is_delete;
+    not_null & operator+=( size_t ) gsl_is_delete;
+    not_null & operator- ( size_t ) gsl_is_delete;
+    not_null & operator-=( size_t ) gsl_is_delete;
+    not_null & operator+=( std::ptrdiff_t ) gsl_is_delete;
+    not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
+    void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
 };
 #if gsl_CONFIG_DEFAULTS_VERSION >= 1
 template< class T >
@@ -2968,13 +3143,13 @@ template< class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 not_null<U>
 make_not_null( U u )
 {
-  return not_null<U>( std::move( u ) );
+    return not_null<U>( std::move( u ) );
 }
 template< class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 not_null<U>
 make_not_null( not_null<U> u )
 {
-  return std::move( u );
+    return std::move( u );
 }
 #else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
 template< class U >
@@ -2996,7 +3171,7 @@ namespace detail {
 template< class T >
 struct as_nullable_helper
 {
-  typedef T type;
+    typedef T type;
 };
 template< class T >
 struct as_nullable_helper< not_null<T> >
@@ -3007,15 +3182,15 @@ template< class T >
 struct not_null_accessor
 {
 #if gsl_HAVE( MOVE_FORWARD )
-  static gsl_api T get( not_null<T>&& p ) gsl_noexcept
-  {
-    return std::move( p.data_.ptr_ );
-  }
+    static gsl_api T get( not_null<T>&& p ) gsl_noexcept
+    {
+        return std::move( p.data_.ptr_ );
+    }
 #endif
-  static gsl_api T const & get( not_null<T> const & p ) gsl_noexcept
-  {
-    return p.data_.ptr_;
-  }
+    static gsl_api T const & get( not_null<T> const & p ) gsl_noexcept
+    {
+        return p.data_.ptr_;
+    }
 };
 
 namespace no_adl {
@@ -3026,14 +3201,14 @@ gsl_NODISCARD gsl_api gsl_constexpr auto as_nullable( T && p )
 gsl_noexcept_if( std::is_nothrow_move_constructible<T>::value )
 -> typename detail::as_nullable_helper<typename std20::remove_cvref<T>::type>::type
 {
-  return std::move( p );
+    return std::move( p );
 }
 template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr14 T as_nullable( not_null<T> && p )
 {
-  T result = detail::not_null_accessor<T>::get( std::move( p ) );
-  gsl_Expects( result != gsl_nullptr );
-  return result;
+    T result = detail::not_null_accessor<T>::get( std::move( p ) );
+    gsl_Expects( result != gsl_nullptr );
+    return result;
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
@@ -3043,16 +3218,31 @@ gsl_NODISCARD gsl_api gsl_constexpr T const & as_nullable( T const & p ) gsl_noe
 }
 #endif // gsl_HAVE( MOVE_FORWARD )
 template< class T >
-gsl_NODISCARD gsl_api gsl_constexpr14 T const & as_nullable( not_null<T> const & p )
+gsl_NODISCARD gsl_api gsl_constexpr14 T const &
+as_nullable( not_null<T> const & p )
 {
-  T const & result = detail::not_null_accessor<T>::get( p );
-  gsl_Expects( result != gsl_nullptr );
-  return result;
+    T const & result = detail::not_null_accessor<T>::get( p );
+    gsl_Expects( result != gsl_nullptr );
+    return result;
 }
 template< class T >
-gsl_NODISCARD gsl_api gsl_constexpr T* as_nullable( not_null<T*> p ) gsl_noexcept
+gsl_NODISCARD gsl_api gsl_constexpr T*
+as_nullable( not_null<T*> p ) gsl_noexcept
 {
-  return detail::not_null_accessor<T*>::get( p );
+    return detail::not_null_accessor<T*>::get( p );
+}
+
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr bool
+is_valid( not_null<T> const & p )
+{
+    return detail::not_null_accessor<T>::get( p ) != gsl_nullptr;
+}
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr bool
+is_valid( not_null<T*> const & )
+{
+    return true;
 }
 
 } // namespace no_adl
@@ -3066,18 +3256,18 @@ template< class T >
 class not_null_ic : public not_null<T>
 {
 public:
-  template< class U
-      gsl_ENABLE_IF_(( std::is_constructible<T, U>::value ))
-  >
-  gsl_api gsl_constexpr14
+    template< class U
+        gsl_ENABLE_IF_(( std::is_constructible<T, U>::value ))
+    >
+    gsl_api gsl_constexpr14
 #if gsl_HAVE( MOVE_FORWARD )
-  not_null_ic( U && u )
-      : not_null<T>( std::forward<U>( u ) )
+    not_null_ic( U && u )
+    : not_null<T>( std::forward<U>( u ) )
 #else // ! gsl_HAVE( MOVE_FORWARD )
-  not_null_ic( U const & u )
+    not_null_ic( U const & u )
     : not_null<T>( u )
 #endif // gsl_HAVE( MOVE_FORWARD )
-  {}
+    {}
 };
 
 // more not_null unwanted operators
@@ -3116,21 +3306,21 @@ gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l.operator->() == r.operator->() )
 {
-  return l.operator->() == r.operator->();
+    return l.operator->() == r.operator->();
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_(l.operator->() == r )
 {
-  return l.operator->() == r;
+    return l.operator->() == r;
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l == r.operator->() )
 {
-  return l == r.operator->();
+    return l == r.operator->();
 }
 
 template< class T, class U >
@@ -3138,21 +3328,21 @@ gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l.operator->() < r.operator->() )
 {
-  return l.operator->() < r.operator->();
+    return l.operator->() < r.operator->();
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( l.operator->() < r )
 {
-  return l.operator->() < r;
+    return l.operator->() < r;
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l < r.operator->() )
 {
-  return l < r.operator->();
+    return l < r.operator->();
 }
 
 template< class T, class U >
@@ -3160,21 +3350,21 @@ gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
-  return !( l == r );
+    return !( l == r );
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
-  return !( l == r );
+    return !( l == r );
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
-  return !( l == r );
+    return !( l == r );
 }
 
 template< class T, class U >
@@ -3182,21 +3372,21 @@ gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
-  return !( r < l );
+    return !( r < l );
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
-  return !( r < l );
+    return !( r < l );
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
-  return !( r < l );
+    return !( r < l );
 }
 
 template< class T, class U >
@@ -3204,21 +3394,21 @@ gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( r < l )
 {
-  return r < l;
+    return r < l;
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( r < l )
 {
-  return r < l;
+    return r < l;
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( r < l )
 {
-  return r < l;
+    return r < l;
 }
 
 template< class T, class U >
@@ -3226,21 +3416,21 @@ gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
-  return !( l < r );
+    return !( l < r );
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
-  return !( l < r );
+    return !( l < r );
 }
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
-  return !( l < r );
+    return !( l < r );
 }
 
 // print not_null
@@ -3248,17 +3438,45 @@ gsl_RETURN_DECLTYPE_( !( l < r ) )
 template< class CharType, class Traits, class T >
 std::basic_ostream< CharType, Traits > & operator<<( std::basic_ostream< CharType, Traits > & os, not_null<T> const & p )
 {
-  return os << p.operator->();
+    return os << p.operator->();
 }
+
+
+#if gsl_HAVE( VARIADIC_TEMPLATE )
+# if gsl_HAVE( UNIQUE_PTR )
+template< class T, class... Args >
+gsl_NODISCARD not_null<std::unique_ptr<T>>
+make_unique( Args &&... args )
+{
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "gsl::make_unique<T>() returns `gsl::not_null<std::unique_ptr<T>>`, which is not "
+        "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
+#  endif
+    return not_null<std::unique_ptr<T>>( new T( std::forward<Args>( args )... ) );
+}
+# endif // gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( SHARED_PTR )
+template< class T, class... Args >
+gsl_NODISCARD not_null<std::shared_ptr<T>>
+make_shared( Args &&... args )
+{
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "gsl::make_shared<T>() returns `gsl::not_null<std::shared_ptr<T>>`, which is not "
+        "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
+#  endif
+    return not_null<std::shared_ptr<T>>( std::make_shared<T>( std::forward<Args>( args )... ) );
+}
+# endif // gsl_HAVE( SHARED_PTR )
+#endif // gsl_HAVE( VARIADIC_TEMPLATE )
 
 
 //
 // Byte-specific type.
 //
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-enum class gsl_may_alias byte : unsigned char {};
+  enum class gsl_may_alias byte : unsigned char {};
 #else
-struct gsl_may_alias byte { typedef unsigned char type; type v; };
+  struct gsl_may_alias byte { typedef unsigned char type; type v; };
 #endif
 
 template< class T >
@@ -3266,9 +3484,9 @@ gsl_NODISCARD gsl_api inline gsl_constexpr byte
 to_byte( T v ) gsl_noexcept
 {
 #if    gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-  return static_cast<byte>( v );
+    return static_cast<byte>( v );
 #elif  gsl_HAVE( CONSTEXPR_11 )
-  return { static_cast<typename byte::type>( v ) };
+    return { static_cast<typename byte::type>( v ) };
 #else
     byte b = { static_cast<typename byte::type>( v ) }; return b;
 #endif
@@ -3279,22 +3497,22 @@ gsl_NODISCARD gsl_api inline gsl_constexpr IntegerType
 to_integer( byte b ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-  return static_cast<typename std::underlying_type<byte>::type>( b );
+    return static_cast<typename std::underlying_type<byte>::type>( b );
 #else
-  return b.v;
+    return b.v;
 #endif
 }
 
 gsl_NODISCARD gsl_api inline gsl_constexpr unsigned char
 to_uchar( byte b ) gsl_noexcept
 {
-  return to_integer<unsigned char>( b );
+    return to_integer<unsigned char>( b );
 }
 
 gsl_NODISCARD gsl_api inline gsl_constexpr unsigned char
 to_uchar( int i ) gsl_noexcept
 {
-  return static_cast<unsigned char>( i );
+    return static_cast<unsigned char>( i );
 }
 
 template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
@@ -3302,9 +3520,9 @@ gsl_api inline gsl_constexpr14 byte &
 operator<<=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-  return b = ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
+    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
 #else
-  b.v = ::gsl::to_uchar( b.v << shift ); return b;
+    b.v = ::gsl::to_uchar( b.v << shift ); return b;
 #endif
 }
 
@@ -3312,7 +3530,7 @@ template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::val
 gsl_NODISCARD gsl_api inline gsl_constexpr byte
 operator<<( byte b, IntegerType shift ) gsl_noexcept
 {
-  return ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
+    return ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
 }
 
 template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
@@ -3320,9 +3538,9 @@ gsl_NODISCARD gsl_api inline gsl_constexpr14 byte &
 operator>>=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-  return b = ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
+    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
 #else
-  b.v = ::gsl::to_uchar( b.v >> shift ); return b;
+    b.v = ::gsl::to_uchar( b.v >> shift ); return b;
 #endif
 }
 
@@ -3330,7 +3548,7 @@ template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::val
 gsl_NODISCARD gsl_api inline gsl_constexpr byte
 operator>>( byte b, IntegerType shift ) gsl_noexcept
 {
-  return ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
+    return ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
 }
 
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
@@ -3417,9 +3635,9 @@ namespace detail {
 template< class T >
 gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )
 {
-  // Be sure to run the check before doing pointer arithmetics, which would be UB for `nullptr` and non-0 integers.
-  gsl_Expects( size == 0 || data != gsl_nullptr );
-  return data + size;
+        // Be sure to run the check before doing pointer arithmetics, which would be UB for `nullptr` and non-0 integers.
+    gsl_Expects( size == 0 || data != gsl_nullptr );
+    return data + size;
 }
 
 } // namespace detail
@@ -3430,90 +3648,90 @@ gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )
 template< class T >
 class span
 {
-  template< class U > friend class span;
+    template< class U > friend class span;
 
 public:
-  typedef gsl_CONFIG_SPAN_INDEX_TYPE index_type;
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE index_type;
 
-  typedef T element_type;
-  typedef typename std11::remove_cv< T >::type value_type;
+    typedef T element_type;
+    typedef typename std11::remove_cv< T >::type value_type;
 
-  typedef T & reference;
-  typedef T * pointer;
-  typedef T const * const_pointer;
-  typedef T const & const_reference;
+    typedef T & reference;
+    typedef T * pointer;
+    typedef T const * const_pointer;
+    typedef T const & const_reference;
 
-  typedef pointer       iterator;
-  typedef const_pointer const_iterator;
+    typedef pointer       iterator;
+    typedef const_pointer const_iterator;
 
-  typedef std::reverse_iterator< iterator >       reverse_iterator;
-  typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
+    typedef std::reverse_iterator< iterator >       reverse_iterator;
+    typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
 
-  typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
-  typedef std::ptrdiff_t difference_type;
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
+    typedef std::ptrdiff_t difference_type;
 
-  // 26.7.3.2 Constructors, copy, and assignment [span.cons]
+    // 26.7.3.2 Constructors, copy, and assignment [span.cons]
 
-  gsl_api gsl_constexpr span() gsl_noexcept
-      : first_( gsl_nullptr )
-      , last_ ( gsl_nullptr )
-  {
-  }
+    gsl_api gsl_constexpr span() gsl_noexcept
+        : first_( gsl_nullptr )
+        , last_ ( gsl_nullptr )
+    {
+    }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
 #if gsl_HAVE( NULLPTR )
-  gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
-      : first_( nullptr )
-      , last_ ( nullptr )
-  {
-    gsl_Expects( size_in == 0 );
-  }
+    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
+        : first_( nullptr )
+        , last_ ( nullptr )
+    {
+        gsl_Expects( size_in == 0 );
+    }
 #endif
 
 #if gsl_HAVE( IS_DELETE )
-  gsl_DEPRECATED
-  gsl_api gsl_constexpr span( reference data_in )
-      : span( &data_in, 1 )
-  {}
+    gsl_DEPRECATED
+    gsl_api gsl_constexpr span( reference data_in )
+        : span( &data_in, 1 )
+    {}
 
-  gsl_api gsl_constexpr span( element_type && ) = delete;
+    gsl_api gsl_constexpr span( element_type && ) = delete;
 #endif
 
 #endif // deprecate
 
-  gsl_api gsl_constexpr14 span( pointer data_in, index_type size_in )
-      : first_( data_in )
-      , last_( detail::endptr( data_in, size_in ) )
-  {
-  }
+    gsl_api gsl_constexpr14 span( pointer data_in, index_type size_in )
+        : first_( data_in )
+        , last_( detail::endptr( data_in, size_in ) )
+    {
+    }
 
-  gsl_api gsl_constexpr14 span( pointer first_in, pointer last_in )
-      : first_( first_in )
-      , last_ ( last_in )
-  {
-    gsl_Expects( first_in <= last_in );
-  }
+    gsl_api gsl_constexpr14 span( pointer first_in, pointer last_in )
+        : first_( first_in )
+        , last_ ( last_in )
+    {
+        gsl_Expects( first_in <= last_in );
+    }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
-  template< class U >
-  gsl_api gsl_constexpr14 span( U * data_in, index_type size_in )
-      : first_( data_in )
-      , last_( detail::endptr( data_in, size_in ) )
-  {
-  }
+    template< class U >
+    gsl_api gsl_constexpr14 span( U * data_in, index_type size_in )
+        : first_( data_in )
+        , last_( detail::endptr( data_in, size_in ) )
+    {
+    }
 
 #endif // deprecate
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
-  template< class U, size_t N >
-  gsl_api gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
-      : first_( gsl_ADDRESSOF( arr[0] ) )
-      , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
-  {}
+    template< class U, size_t N >
+    gsl_api gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
+        : first_( gsl_ADDRESSOF( arr[0] ) )
+        , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
+    {}
 #else
-  template< size_t N
+    template< size_t N
         gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
     gsl_api gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
@@ -3525,21 +3743,21 @@ public:
 #if gsl_HAVE( ARRAY )
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
-  template< class U, size_t N >
-  gsl_api gsl_constexpr span( std::array< U, N > & arr )
-      : first_( arr.data() )
-      , last_ ( arr.data() + N )
-  {}
+    template< class U, size_t N >
+    gsl_api gsl_constexpr span( std::array< U, N > & arr )
+        : first_( arr.data() )
+        , last_ ( arr.data() + N )
+    {}
 
-  template< class U, size_t N >
-  gsl_api gsl_constexpr span( std::array< U, N > const & arr )
-      : first_( arr.data() )
-      , last_ ( arr.data() + N )
-  {}
+    template< class U, size_t N >
+    gsl_api gsl_constexpr span( std::array< U, N > const & arr )
+        : first_( arr.data() )
+        , last_ ( arr.data() + N )
+    {}
 
 #else
 
-  template< size_t N
+    template< size_t N
         gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
     gsl_constexpr span( std::array< value_type, N > & arr )
@@ -3559,28 +3777,28 @@ public:
 #endif // gsl_HAVE( ARRAY )
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
-  template< class Container
-      gsl_ENABLE_IF_(( detail::is_compatible_container< Container, element_type >::value ))
-  >
-  gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
-      : first_( std17::data( cont ) )
-      , last_ ( std17::data( cont ) + std17::size( cont ) )
-  {}
+    template< class Container
+        gsl_ENABLE_IF_(( detail::is_compatible_container< Container, element_type >::value ))
+    >
+    gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
+        : first_( std17::data( cont ) )
+        , last_ ( std17::data( cont ) + std17::size( cont ) )
+    {}
 
-  template< class Container
-      gsl_ENABLE_IF_((
-                         std::is_const< element_type >::value
-                         && detail::is_compatible_container< Container, element_type >::value
-                     ))
-  >
-  gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
-      : first_( std17::data( cont ) )
-      , last_ ( std17::data( cont ) + std17::size( cont ) )
-  {}
+    template< class Container
+        gsl_ENABLE_IF_((
+            std::is_const< element_type >::value
+            && detail::is_compatible_container< Container, element_type >::value
+        ))
+    >
+    gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
+        : first_( std17::data( cont ) )
+        , last_ ( std17::data( cont ) + std17::size( cont ) )
+    {}
 
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
-  template< class Container >
+    template< class Container >
     gsl_constexpr span( Container & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
@@ -3596,69 +3814,69 @@ public:
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
-  template< class Container >
-  gsl_constexpr span( with_container_t, Container & cont ) gsl_noexcept
-      : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
-      , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
-  {}
+    template< class Container >
+    gsl_constexpr span( with_container_t, Container & cont ) gsl_noexcept
+        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
+    {}
 
-  template< class Container >
-  gsl_constexpr span( with_container_t, Container const & cont ) gsl_noexcept
-      : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
-      , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
-  {}
+    template< class Container >
+    gsl_constexpr span( with_container_t, Container const & cont ) gsl_noexcept
+        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
+    {}
 
 #endif
 
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
-  // constructor taking shared_ptr deprecated since 0.29.0
+    // constructor taking shared_ptr deprecated since 0.29.0
 
 # if gsl_HAVE( SHARED_PTR )
-  gsl_DEPRECATED
-  gsl_constexpr span( shared_ptr<element_type> const & ptr )
-      : first_( ptr.get() )
-      , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
-  {}
+    gsl_DEPRECATED
+    gsl_constexpr span( shared_ptr<element_type> const & ptr )
+        : first_( ptr.get() )
+        , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
+    {}
 # endif
 
-  // constructors taking unique_ptr deprecated since 0.29.0
+    // constructors taking unique_ptr deprecated since 0.29.0
 
 # if gsl_HAVE( UNIQUE_PTR )
 #  if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-  template< class ArrayElementType = typename std::add_pointer<element_type>::type >
+    template< class ArrayElementType = typename std::add_pointer<element_type>::type >
 #  else
-  template< class ArrayElementType >
+    template< class ArrayElementType >
 #  endif
-  gsl_DEPRECATED
-  gsl_constexpr span( unique_ptr<ArrayElementType> const & ptr, index_type count )
-      : first_( ptr.get() )
-      , last_ ( ptr.get() + count )
-  {}
+    gsl_DEPRECATED
+    gsl_constexpr span( unique_ptr<ArrayElementType> const & ptr, index_type count )
+        : first_( ptr.get() )
+        , last_ ( ptr.get() + count )
+    {}
 
-  gsl_DEPRECATED
-  gsl_constexpr span( unique_ptr<element_type> const & ptr )
-      : first_( ptr.get() )
-      , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
-  {}
+    gsl_DEPRECATED
+    gsl_constexpr span( unique_ptr<element_type> const & ptr )
+        : first_( ptr.get() )
+        , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
+    {}
 # endif
 
 #endif // deprecate shared_ptr, unique_ptr
 
 #if gsl_HAVE( IS_DEFAULT ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
-  gsl_constexpr span( span && ) gsl_noexcept = default;
-  gsl_constexpr span( span const & ) = default;
+    gsl_constexpr span( span && ) gsl_noexcept = default;
+    gsl_constexpr span( span const & ) = default;
 #else
-  gsl_api gsl_constexpr span( span const & other )
+    gsl_api gsl_constexpr span( span const & other )
         : first_( other.begin() )
         , last_ ( other.end() )
     {}
 #endif
 
 #if gsl_HAVE( IS_DEFAULT )
-  gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
-  gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
+    gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
+    gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
 #else
-  gsl_constexpr14 span & operator=( span other ) gsl_noexcept
+    gsl_constexpr14 span & operator=( span other ) gsl_noexcept
     {
         first_ = other.first_;
         last_ = other.last_;
@@ -3666,232 +3884,232 @@ public:
     }
 #endif
 
-  template< class U
-      gsl_ENABLE_IF_(( std::is_convertible<U(*)[], element_type(*)[]>::value ))
-  >
-  gsl_api gsl_constexpr span( span<U> const & other )
-      : first_( other.begin() )
-      , last_ ( other.end() )
-  {}
+    template< class U
+        gsl_ENABLE_IF_(( std::is_convertible<U(*)[], element_type(*)[]>::value ))
+    >
+    gsl_api gsl_constexpr span( span<U> const & other )
+        : first_( other.begin() )
+        , last_ ( other.end() )
+    {}
 
 #if 0
-  // Converting from other span ?
+    // Converting from other span ?
     template< class U > operator=();
 #endif
 
-  // 26.7.3.3 Subviews [span.sub]
+    // 26.7.3.3 Subviews [span.sub]
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 span
-  first( index_type count ) const
-  {
-    gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
-    return span( this->data(), count );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 span
+    first( index_type count ) const
+    {
+        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
+        return span( this->data(), count );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 span
-  last( index_type count ) const
-  {
-    gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
-    return span( this->data() + this->size() - count, count );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 span
+    last( index_type count ) const
+    {
+        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
+        return span( this->data() + this->size() - count, count );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 span
-  subspan( index_type offset ) const
-  {
-    gsl_Expects( std::size_t( offset ) <= std::size_t( this->size() ) );
-    return span( this->data() + offset, this->size() - offset );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 span
+    subspan( index_type offset ) const
+    {
+        gsl_Expects( std::size_t( offset ) <= std::size_t( this->size() ) );
+        return span( this->data() + offset, this->size() - offset );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 span
-  subspan( index_type offset, index_type count ) const
-  {
-    gsl_Expects(
-        std::size_t( offset ) <= std::size_t( this->size() ) &&
-        std::size_t( count ) <= std::size_t( this->size() - offset ) );
-    return span( this->data() + offset, count );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 span
+    subspan( index_type offset, index_type count ) const
+    {
+        gsl_Expects(
+            std::size_t( offset ) <= std::size_t( this->size() ) &&
+            std::size_t( count ) <= std::size_t( this->size() - offset ) );
+        return span( this->data() + offset, count );
+    }
 
-  // 26.7.3.4 Observers [span.obs]
+    // 26.7.3.4 Observers [span.obs]
 
-  gsl_NODISCARD gsl_api gsl_constexpr index_type
-  size() const gsl_noexcept
-  {
-    return narrow_cast<index_type>( last_ - first_ );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    size() const gsl_noexcept
+    {
+        return narrow_cast<index_type>( last_ - first_ );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr std::ptrdiff_t
-  ssize() const gsl_noexcept
-  {
-    return narrow_cast<std::ptrdiff_t>( last_ - first_ );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr std::ptrdiff_t
+    ssize() const gsl_noexcept
+    {
+        return narrow_cast<std::ptrdiff_t>( last_ - first_ );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr index_type
-  size_bytes() const gsl_noexcept
-  {
-    return size() * narrow_cast<index_type>( sizeof( element_type ) );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    size_bytes() const gsl_noexcept
+    {
+        return size() * narrow_cast<index_type>( sizeof( element_type ) );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr bool
-  empty() const gsl_noexcept
-  {
-    return size() == 0;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr bool
+    empty() const gsl_noexcept
+    {
+        return size() == 0;
+    }
 
-  // 26.7.3.5 Element access [span.elem]
+    // 26.7.3.5 Element access [span.elem]
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 reference
-  operator[]( index_type pos ) const
-  {
-    gsl_Expects( pos < size() );
-    return first_[ pos ];
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 reference
+    operator[]( index_type pos ) const
+    {
+        gsl_Expects( pos < size() );
+        return first_[ pos ];
+    }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-  gsl_DEPRECATED_MSG("use subscript indexing instead")
-  gsl_api gsl_constexpr14 reference
-  operator()( index_type pos ) const
-  {
-    return (*this)[ pos ];
-  }
+    gsl_DEPRECATED_MSG("use subscript indexing instead")
+    gsl_api gsl_constexpr14 reference
+    operator()( index_type pos ) const
+    {
+        return (*this)[ pos ];
+    }
 
-  gsl_DEPRECATED_MSG("use subscript indexing instead")
-  gsl_api gsl_constexpr14 reference
-  at( index_type pos ) const
-  {
-    return (*this)[ pos ];
-  }
+    gsl_DEPRECATED_MSG("use subscript indexing instead")
+    gsl_api gsl_constexpr14 reference
+    at( index_type pos ) const
+    {
+        return (*this)[ pos ];
+    }
 #endif // deprecate
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 reference
-  front() const
-  {
-    gsl_Expects( first_ != last_ );
-    return *first_;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 reference
+    front() const
+    {
+        gsl_Expects( first_ != last_ );
+        return *first_;
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 reference
-  back() const
-  {
-    gsl_Expects( first_ != last_ );
-    return *(last_ - 1);
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 reference
+    back() const
+    {
+        gsl_Expects( first_ != last_ );
+        return *(last_ - 1);
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr pointer
-  data() const gsl_noexcept
-  {
-    return first_;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr pointer
+    data() const gsl_noexcept
+    {
+        return first_;
+    }
 
-  // 26.7.3.6 Iterator support [span.iterators]
+    // 26.7.3.6 Iterator support [span.iterators]
 
-  gsl_NODISCARD gsl_api gsl_constexpr iterator
-  begin() const gsl_noexcept
-  {
-    return iterator( first_ );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr iterator
+    begin() const gsl_noexcept
+    {
+        return iterator( first_ );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr iterator
-  end() const gsl_noexcept
-  {
-    return iterator( last_ );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr iterator
+    end() const gsl_noexcept
+    {
+        return iterator( last_ );
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr const_iterator
-  cbegin() const gsl_noexcept
-  {
+    gsl_NODISCARD gsl_api gsl_constexpr const_iterator
+    cbegin() const gsl_noexcept
+    {
 #if gsl_CPP11_OR_GREATER
-    return { begin() };
+        return { begin() };
 #else
-    return const_iterator( begin() );
+        return const_iterator( begin() );
 #endif
-  }
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr const_iterator
-  cend() const gsl_noexcept
-  {
+    gsl_NODISCARD gsl_api gsl_constexpr const_iterator
+    cend() const gsl_noexcept
+    {
 #if gsl_CPP11_OR_GREATER
-    return { end() };
+        return { end() };
 #else
-    return const_iterator( end() );
+        return const_iterator( end() );
 #endif
-  }
+    }
 
-  gsl_NODISCARD gsl_constexpr17 reverse_iterator
-  rbegin() const gsl_noexcept
-  {
-    return reverse_iterator( end() );
-  }
+    gsl_NODISCARD gsl_constexpr17 reverse_iterator
+    rbegin() const gsl_noexcept
+    {
+        return reverse_iterator( end() );
+    }
 
-  gsl_NODISCARD gsl_constexpr17 reverse_iterator
-  rend() const gsl_noexcept
-  {
-    return reverse_iterator( begin() );
-  }
+    gsl_NODISCARD gsl_constexpr17 reverse_iterator
+    rend() const gsl_noexcept
+    {
+        return reverse_iterator( begin() );
+    }
 
-  gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
-  crbegin() const gsl_noexcept
-  {
-    return const_reverse_iterator( cend() );
-  }
+    gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
+    crbegin() const gsl_noexcept
+    {
+        return const_reverse_iterator( cend() );
+    }
 
-  gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
-  crend() const gsl_noexcept
-  {
-    return const_reverse_iterator( cbegin() );
-  }
+    gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
+    crend() const gsl_noexcept
+    {
+        return const_reverse_iterator( cbegin() );
+    }
 
-  gsl_constexpr14 void swap( span & other ) gsl_noexcept
-  {
-    std::swap( first_, other.first_ );
-    std::swap( last_ , other.last_  );
-  }
+    gsl_constexpr14 void swap( span & other ) gsl_noexcept
+    {
+        std::swap( first_, other.first_ );
+        std::swap( last_ , other.last_  );
+    }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 3 )
-  // member length() deprecated since 0.29.0
+    // member length() deprecated since 0.29.0
 
-  gsl_DEPRECATED_MSG("use size() instead")
-  gsl_api gsl_constexpr index_type length() const gsl_noexcept
-  {
-    return size();
-  }
+    gsl_DEPRECATED_MSG("use size() instead")
+    gsl_api gsl_constexpr index_type length() const gsl_noexcept
+    {
+        return size();
+    }
 
-  // member length_bytes() deprecated since 0.29.0
+    // member length_bytes() deprecated since 0.29.0
 
-  gsl_DEPRECATED_MSG("use size_bytes() instead")
-  gsl_api gsl_constexpr index_type length_bytes() const gsl_noexcept
-  {
-    return size_bytes();
-  }
+    gsl_DEPRECATED_MSG("use size_bytes() instead")
+    gsl_api gsl_constexpr index_type length_bytes() const gsl_noexcept
+    {
+        return size_bytes();
+    }
 #endif
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 2 )
-  // member as_bytes(), as_writeable_bytes deprecated since 0.17.0
+    // member as_bytes(), as_writeable_bytes deprecated since 0.17.0
 
-  gsl_DEPRECATED_MSG("use free function gsl::as_bytes() instead")
-  gsl_api span< const byte > as_bytes() const gsl_noexcept
-  {
-    return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() ); // NOLINT
-  }
+    gsl_DEPRECATED_MSG("use free function gsl::as_bytes() instead")
+    gsl_api span< const byte > as_bytes() const gsl_noexcept
+    {
+        return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() ); // NOLINT
+    }
 
-  gsl_DEPRECATED_MSG("use free function gsl::as_writable_bytes() instead")
-  gsl_api span< byte > as_writeable_bytes() const gsl_noexcept
-  {
-    return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() ); // NOLINT
-  }
+    gsl_DEPRECATED_MSG("use free function gsl::as_writable_bytes() instead")
+    gsl_api span< byte > as_writeable_bytes() const gsl_noexcept
+    {
+        return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() ); // NOLINT
+    }
 
 #endif
 
-  template< class U >
-  gsl_NODISCARD gsl_api span< U >
-  as_span() const
-  {
-    gsl_Expects( ( this->size_bytes() % sizeof(U) ) == 0 );
-    return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) ); // NOLINT
-  }
+    template< class U >
+    gsl_NODISCARD gsl_api span< U >
+    as_span() const
+    {
+        gsl_Expects( ( this->size_bytes() % sizeof(U) ) == 0 );
+        return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) ); // NOLINT
+    }
 
 private:
-  pointer first_;
-  pointer last_;
+    pointer first_;
+    pointer last_;
 };
 
 // class template argument deduction guides:
@@ -3924,15 +4142,15 @@ template< class T, class U >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator==( span<T> const & l, span<U> const & r )
 {
-  return  l.size()  == r.size()
-          && (l.begin() == r.begin() || std98::equal( l.begin(), l.end(), r.begin() ) );
+    return  l.size()  == r.size()
+        && (l.begin() == r.begin() || detail::equal( l.begin(), l.end(), r.begin() ) );
 }
 
 template< class T, class U >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T> const & l, span<U> const & r )
 {
-  return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 # else // a.k.a. !gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
@@ -3942,39 +4160,39 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator==( span<T> const & l, span<T> const & r )
 {
     return  l.size()  == r.size()
-        && (l.begin() == r.begin() || std98::equal( l.begin(), l.end(), r.begin() ) );
+        && (l.begin() == r.begin() || detail::equal( l.begin(), l.end(), r.begin() ) );
 }
 
 template< class T >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T> const & l, span<T> const & r )
 {
-    return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 # endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr bool operator!=( span<T> const & l, span<U> const & r )
 {
-  return !( l == r );
+    return !( l == r );
 }
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr bool operator<=( span<T> const & l, span<U> const & r )
 {
-  return !( r < l );
+    return !( r < l );
 }
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr bool operator> ( span<T> const & l, span<U> const & r )
 {
-  return ( r < l );
+    return ( r < l );
 }
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr bool operator>=( span<T> const & l, span<U> const & r )
 {
-  return !( l < r );
+    return !( l < r );
 }
 #endif // gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
@@ -3984,14 +4202,14 @@ template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr std::size_t
 size( span<T> const & spn )
 {
-  return static_cast<std::size_t>( spn.size() );
+    return static_cast<std::size_t>( spn.size() );
 }
 
 template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr std::ptrdiff_t
 ssize( span<T> const & spn )
 {
-  return spn.ssize();
+    return spn.ssize();
 }
 
 namespace detail {
@@ -3999,15 +4217,15 @@ namespace detail {
 template< class II, class N, class OI >
 gsl_api gsl_constexpr14 inline OI copy_n( II first, N count, OI result )
 {
-  if ( count > 0 )
-  {
-    *result++ = *first;
-    for ( N i = 1; i < count; ++i )
+    if ( count > 0 )
     {
-      *result++ = *++first;
+        *result++ = *first;
+        for ( N i = 1; i < count; ++i )
+        {
+            *result++ = *++first;
+        }
     }
-  }
-  return result;
+    return result;
 }
 }
 
@@ -4015,10 +4233,10 @@ template< class T, class U >
 gsl_api gsl_constexpr14 inline void copy( span<T> src, span<U> dest )
 {
 #if gsl_CPP14_OR_GREATER // gsl_HAVE( TYPE_TRAITS ) (circumvent Travis clang 3.4)
-  static_assert( std::is_assignable<U &, T const &>::value, "Cannot assign elements of source span to elements of destination span" );
+    static_assert( std::is_assignable<U &, T const &>::value, "Cannot assign elements of source span to elements of destination span" );
 #endif
-  gsl_Expects( dest.size() >= src.size() );
-  detail::copy_n( src.data(), src.size(), dest.data() );
+    gsl_Expects( dest.size() >= src.size() );
+    detail::copy_n( src.data(), src.size(), dest.data() );
 }
 
 // span creator functions (see ctors)
@@ -4027,14 +4245,14 @@ template< class T >
 gsl_NODISCARD gsl_api inline span< const byte >
 as_bytes( span<T> spn ) gsl_noexcept
 {
-  return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
+    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
 template< class T>
 gsl_NODISCARD gsl_api inline span< byte >
 as_writable_bytes( span<T> spn ) gsl_noexcept
 {
-  return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
+    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 6 )
@@ -4042,7 +4260,7 @@ template< class T>
 gsl_DEPRECATED_MSG("use as_writable_bytes() (different spelling) instead")
 gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 {
-  return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
+    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 #endif // deprecate
 
@@ -4052,21 +4270,21 @@ template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr span<T>
 make_span( T * ptr, typename span<T>::index_type count )
 {
-  return span<T>( ptr, count );
+    return span<T>( ptr, count );
 }
 
 template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr span<T>
 make_span( T * first, T * last )
 {
-  return span<T>( first, last );
+    return span<T>( first, last );
 }
 
 template< class T, size_t N >
 gsl_NODISCARD inline gsl_constexpr span<T>
 make_span( T (&arr)[N] )
 {
-  return span<T>( gsl_ADDRESSOF( arr[0] ), N );
+    return span<T>( gsl_ADDRESSOF( arr[0] ), N );
 }
 
 #if gsl_HAVE( ARRAY )
@@ -4075,14 +4293,14 @@ template< class T, size_t N >
 gsl_NODISCARD inline gsl_constexpr span<T>
 make_span( std::array<T,N> & arr )
 {
-  return span<T>( arr );
+    return span<T>( arr );
 }
 
 template< class T, size_t N >
 gsl_NODISCARD inline gsl_constexpr span<const T>
 make_span( std::array<T,N> const & arr )
 {
-  return span<const T>( arr );
+    return span<const T>( arr );
 }
 #endif
 
@@ -4092,14 +4310,14 @@ template< class Container, class EP = decltype( std17::data(std::declval<Contain
 gsl_NODISCARD inline gsl_constexpr auto
 make_span( Container & cont ) -> span< typename std::remove_pointer<EP>::type >
 {
-  return span< typename std::remove_pointer<EP>::type >( cont );
+    return span< typename std::remove_pointer<EP>::type >( cont );
 }
 
 template< class Container, class EP = decltype( std17::data(std::declval<Container&>())) >
 gsl_NODISCARD inline gsl_constexpr auto
 make_span( Container const & cont ) -> span< const typename std::remove_pointer<EP>::type >
 {
-  return span< const typename std::remove_pointer<EP>::type >( cont );
+    return span< const typename std::remove_pointer<EP>::type >( cont );
 }
 
 #else
@@ -4125,14 +4343,14 @@ template< class Container >
 gsl_NODISCARD inline gsl_constexpr span<typename Container::value_type>
 make_span( with_container_t, Container & cont ) gsl_noexcept
 {
-  return span< typename Container::value_type >( with_container, cont );
+    return span< typename Container::value_type >( with_container, cont );
 }
 
 template< class Container >
 gsl_NODISCARD inline gsl_constexpr span<const typename Container::value_type>
 make_span( with_container_t, Container const & cont ) gsl_noexcept
 {
-  return span< const typename Container::value_type >( with_container, cont );
+    return span< const typename Container::value_type >( with_container, cont );
 }
 
 #endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
@@ -4143,7 +4361,7 @@ gsl_DEPRECATED
 inline span<typename Ptr::element_type>
 make_span( Ptr & ptr )
 {
-  return span<typename Ptr::element_type>( ptr );
+    return span<typename Ptr::element_type>( ptr );
 }
 #endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
 
@@ -4152,7 +4370,7 @@ gsl_DEPRECATED
 inline span<typename Ptr::element_type>
 make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
 {
-  return span<typename Ptr::element_type>( ptr, count );
+    return span<typename Ptr::element_type>( ptr, count );
 }
 
 #endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
@@ -4163,14 +4381,14 @@ template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr span<byte>
 byte_span( T & t ) gsl_noexcept
 {
-  return span<byte>( reinterpret_cast<byte *>( &t ), sizeof(T) );
+    return span<byte>( reinterpret_cast<byte *>( &t ), sizeof(T) );
 }
 
 template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr span<const byte>
 byte_span( T const & t ) gsl_noexcept
 {
-  return span<const byte>( reinterpret_cast<byte const *>( &t ), sizeof(T) );
+    return span<const byte>( reinterpret_cast<byte const *>( &t ), sizeof(T) );
 }
 
 #endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
@@ -4196,14 +4414,14 @@ struct is_basic_string_span : is_basic_string_span_oracle< typename std11::remov
 template< class T >
 gsl_api inline gsl_constexpr14 std::size_t string_length( T * ptr, std::size_t max )
 {
-  if ( ptr == gsl_nullptr || max <= 0 )
-    return 0;
+    if ( ptr == gsl_nullptr || max <= 0 )
+        return 0;
 
-  std::size_t len = 0;
-  while ( len < max && ptr[len] ) // NOLINT
-    ++len;
+    std::size_t len = 0;
+    while ( len < max && ptr[len] ) // NOLINT
+        ++len;
 
-  return len;
+    return len;
 }
 
 } // namespace detail
@@ -4215,102 +4433,102 @@ template< class T >
 class basic_string_span
 {
 public:
-  typedef T element_type;
-  typedef span<T> span_type;
+    typedef T element_type;
+    typedef span<T> span_type;
 
-  typedef typename span_type::size_type size_type;
-  typedef typename span_type::index_type index_type;
-  typedef typename span_type::difference_type difference_type;
+    typedef typename span_type::size_type size_type;
+    typedef typename span_type::index_type index_type;
+    typedef typename span_type::difference_type difference_type;
 
-  typedef typename span_type::pointer pointer ;
-  typedef typename span_type::reference reference ;
+    typedef typename span_type::pointer pointer ;
+    typedef typename span_type::reference reference ;
 
-  typedef typename span_type::iterator iterator ;
-  typedef typename span_type::const_iterator const_iterator ;
-  typedef typename span_type::reverse_iterator reverse_iterator;
-  typedef typename span_type::const_reverse_iterator const_reverse_iterator;
+    typedef typename span_type::iterator iterator ;
+    typedef typename span_type::const_iterator const_iterator ;
+    typedef typename span_type::reverse_iterator reverse_iterator;
+    typedef typename span_type::const_reverse_iterator const_reverse_iterator;
 
-  // construction:
+    // construction:
 
 #if gsl_HAVE( IS_DEFAULT )
-  gsl_constexpr basic_string_span() gsl_noexcept = default;
+    gsl_constexpr basic_string_span() gsl_noexcept = default;
 #else
-  gsl_api gsl_constexpr basic_string_span() gsl_noexcept {}
+    gsl_api gsl_constexpr basic_string_span() gsl_noexcept {}
 #endif
 
 #if gsl_HAVE( NULLPTR )
-  gsl_api gsl_constexpr basic_string_span( std::nullptr_t ) gsl_noexcept
-      : span_( nullptr, static_cast<index_type>( 0 ) )
-  {}
+    gsl_api gsl_constexpr basic_string_span( std::nullptr_t ) gsl_noexcept
+    : span_( nullptr, static_cast<index_type>( 0 ) )
+    {}
 #endif
 
 #ifdef __CUDACC_RELAXED_CONSTEXPR__
-  gsl_api
+    gsl_api
 #endif // __CUDACC_RELAXED_CONSTEXPR__
-  gsl_constexpr basic_string_span( pointer ptr )
-      : span_( remove_z( ptr, (std::numeric_limits<index_type>::max)() ) )
-  {}
+    gsl_constexpr basic_string_span( pointer ptr )
+    : span_( remove_z( ptr, (std::numeric_limits<index_type>::max)() ) )
+    {}
 
-  gsl_api gsl_constexpr basic_string_span( pointer ptr, index_type count )
-      : span_( ptr, count )
-  {}
+    gsl_api gsl_constexpr basic_string_span( pointer ptr, index_type count )
+    : span_( ptr, count )
+    {}
 
-  gsl_api gsl_constexpr basic_string_span( pointer firstElem, pointer lastElem )
-      : span_( firstElem, lastElem )
-  {}
+    gsl_api gsl_constexpr basic_string_span( pointer firstElem, pointer lastElem )
+    : span_( firstElem, lastElem )
+    {}
 
-  template< std::size_t N >
-  gsl_constexpr basic_string_span( element_type (&arr)[N] )
-      : span_( remove_z( gsl_ADDRESSOF( arr[0] ), N ) )
-  {}
+    template< std::size_t N >
+    gsl_constexpr basic_string_span( element_type (&arr)[N] )
+    : span_( remove_z( gsl_ADDRESSOF( arr[0] ), N ) )
+    {}
 
 #if gsl_HAVE( ARRAY )
 
-  template< std::size_t N >
-  gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> & arr )
-      : span_( remove_z( arr ) )
-  {}
+    template< std::size_t N >
+    gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> & arr )
+    : span_( remove_z( arr ) )
+    {}
 
-  template< std::size_t N >
-  gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> const & arr )
-      : span_( remove_z( arr ) )
-  {}
+    template< std::size_t N >
+    gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> const & arr )
+    : span_( remove_z( arr ) )
+    {}
 
 #endif
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
-  // Exclude: array, [basic_string,] basic_string_span
+    // Exclude: array, [basic_string,] basic_string_span
 
-  template< class Container
-      gsl_ENABLE_IF_((
-                         ! detail::is_std_array< Container >::value
-                         && ! detail::is_basic_string_span< Container >::value
-                         && std::is_convertible< typename Container::pointer, pointer >::value
-                         && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
-                     ))
-  >
-  gsl_constexpr basic_string_span( Container & cont )
-      : span_( ( cont ) )
-  {}
+    template< class Container
+        gsl_ENABLE_IF_((
+            ! detail::is_std_array< Container >::value
+            && ! detail::is_basic_string_span< Container >::value
+            && std::is_convertible< typename Container::pointer, pointer >::value
+            && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
+        ))
+    >
+    gsl_constexpr basic_string_span( Container & cont )
+    : span_( ( cont ) )
+    {}
 
-  // Exclude: array, [basic_string,] basic_string_span
+    // Exclude: array, [basic_string,] basic_string_span
 
-  template< class Container
-      gsl_ENABLE_IF_((
-                         ! detail::is_std_array< Container >::value
-                         && ! detail::is_basic_string_span< Container >::value
-                         && std::is_convertible< typename Container::pointer, pointer >::value
-                         && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
-                     ))
-  >
-  gsl_constexpr basic_string_span( Container const & cont )
-      : span_( ( cont ) )
-  {}
+    template< class Container
+        gsl_ENABLE_IF_((
+            ! detail::is_std_array< Container >::value
+            && ! detail::is_basic_string_span< Container >::value
+            && std::is_convertible< typename Container::pointer, pointer >::value
+            && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
+        ))
+    >
+    gsl_constexpr basic_string_span( Container const & cont )
+    : span_( ( cont ) )
+    {}
 
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
-  template< class Container >
+    template< class Container >
     gsl_constexpr basic_string_span( Container & cont )
     : span_( cont )
     {}
@@ -4331,228 +4549,228 @@ public:
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
-  template< class Container >
-  gsl_constexpr basic_string_span( with_container_t, Container & cont )
-      : span_( with_container, cont )
-  {}
+    template< class Container >
+    gsl_constexpr basic_string_span( with_container_t, Container & cont )
+    : span_( with_container, cont )
+    {}
 #endif
 
 #if gsl_HAVE( IS_DEFAULT )
 # if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
-  gsl_constexpr basic_string_span( basic_string_span const & ) = default;
+    gsl_constexpr basic_string_span( basic_string_span const & ) = default;
 
     gsl_constexpr basic_string_span( basic_string_span && ) = default;
 # else
-  gsl_constexpr basic_string_span( basic_string_span const & ) gsl_noexcept = default;
+    gsl_constexpr basic_string_span( basic_string_span const & ) gsl_noexcept = default;
 
-  gsl_constexpr basic_string_span( basic_string_span && ) gsl_noexcept = default;
+    gsl_constexpr basic_string_span( basic_string_span && ) gsl_noexcept = default;
 # endif
 #endif
 
-  template< class U
-      gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
-  >
-  gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
-      : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
-  {}
+    template< class U
+        gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
+    >
+    gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
+    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
+    {}
 
 #if gsl_STDLIB_CPP11_120
-  template< class U
-      gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
-  >
-  gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
-      : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
-  {}
+    template< class U
+        gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
+    >
+    gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
+    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
+    {}
 #endif // gsl_STDLIB_CPP11_120
 
-  template< class CharTraits, class Allocator >
-  gsl_constexpr basic_string_span(
-      std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > & str )
-      : span_( gsl_ADDRESSOF( str[0] ), str.length() )
-  {}
+    template< class CharTraits, class Allocator >
+    gsl_constexpr basic_string_span(
+        std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > & str )
+    : span_( gsl_ADDRESSOF( str[0] ), str.length() )
+    {}
 
-  template< class CharTraits, class Allocator >
-  gsl_constexpr basic_string_span(
-      std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > const & str )
-      : span_( gsl_ADDRESSOF( str[0] ), str.length() )
-  {}
+    template< class CharTraits, class Allocator >
+    gsl_constexpr basic_string_span(
+        std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > const & str )
+    : span_( gsl_ADDRESSOF( str[0] ), str.length() )
+    {}
 
-  // assignment:
+    // assignment:
 
 #if gsl_HAVE( IS_DEFAULT )
-  gsl_constexpr14 basic_string_span & operator=( basic_string_span const & ) gsl_noexcept = default;
+    gsl_constexpr14 basic_string_span & operator=( basic_string_span const & ) gsl_noexcept = default;
 
-  gsl_constexpr14 basic_string_span & operator=( basic_string_span && ) gsl_noexcept = default;
+    gsl_constexpr14 basic_string_span & operator=( basic_string_span && ) gsl_noexcept = default;
 #endif
 
-  // sub span:
+    // sub span:
 
-  /*gsl_api*/ // currently disabled due to an apparent NVCC bug
-  gsl_NODISCARD gsl_constexpr14 basic_string_span
-  first( index_type count ) const
-  {
-    return span_.first( count );
-  }
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_NODISCARD gsl_constexpr14 basic_string_span
+    first( index_type count ) const
+    {
+        return span_.first( count );
+    }
 
-  /*gsl_api*/ // currently disabled due to an apparent NVCC bug
-  gsl_NODISCARD gsl_constexpr14 basic_string_span
-  last( index_type count ) const
-  {
-    return span_.last( count );
-  }
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_NODISCARD gsl_constexpr14 basic_string_span
+    last( index_type count ) const
+    {
+        return span_.last( count );
+    }
 
-  /*gsl_api*/ // currently disabled due to an apparent NVCC bug
-  gsl_NODISCARD gsl_constexpr14 basic_string_span
-  subspan( index_type offset ) const
-  {
-    return span_.subspan( offset );
-  }
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_NODISCARD gsl_constexpr14 basic_string_span
+    subspan( index_type offset ) const
+    {
+        return span_.subspan( offset );
+    }
 
-  /*gsl_api*/ // currently disabled due to an apparent NVCC bug
-  gsl_NODISCARD gsl_constexpr14 basic_string_span
-  subspan( index_type offset, index_type count ) const
-  {
-    return span_.subspan( offset, count );
-  }
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_NODISCARD gsl_constexpr14 basic_string_span
+    subspan( index_type offset, index_type count ) const
+    {
+        return span_.subspan( offset, count );
+    }
 
-  // observers:
+    // observers:
 
-  gsl_NODISCARD gsl_api gsl_constexpr index_type
-  length() const gsl_noexcept
-  {
-    return span_.size();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    length() const gsl_noexcept
+    {
+        return span_.size();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr index_type
-  size() const gsl_noexcept
-  {
-    return span_.size();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    size() const gsl_noexcept
+    {
+        return span_.size();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr index_type
-  length_bytes() const gsl_noexcept
-  {
-    return span_.size_bytes();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    length_bytes() const gsl_noexcept
+    {
+        return span_.size_bytes();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr index_type
-  size_bytes() const gsl_noexcept
-  {
-    return span_.size_bytes();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    size_bytes() const gsl_noexcept
+    {
+        return span_.size_bytes();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr bool
-  empty() const gsl_noexcept
-  {
-    return size() == 0;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr bool
+    empty() const gsl_noexcept
+    {
+        return size() == 0;
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 reference
-  operator[]( index_type idx ) const
-  {
-    return span_[idx];
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 reference
+    operator[]( index_type idx ) const
+    {
+        return span_[idx];
+    }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-  gsl_DEPRECATED_MSG("use subscript indexing instead")
-  gsl_api gsl_constexpr14 reference operator()( index_type idx ) const
-  {
-    return span_[idx];
-  }
+    gsl_DEPRECATED_MSG("use subscript indexing instead")
+    gsl_api gsl_constexpr14 reference operator()( index_type idx ) const
+    {
+        return span_[idx];
+    }
 #endif // deprecate
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 reference
-  front() const
-  {
-    return span_.front();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 reference
+    front() const
+    {
+        return span_.front();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr14 reference
-  back() const
-  {
-    return span_.back();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr14 reference
+    back() const
+    {
+        return span_.back();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr pointer
-  data() const gsl_noexcept
-  {
-    return span_.data();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr pointer
+    data() const gsl_noexcept
+    {
+        return span_.data();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr iterator
-  begin() const gsl_noexcept
-  {
-    return span_.begin();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr iterator
+    begin() const gsl_noexcept
+    {
+        return span_.begin();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr iterator
-  end() const gsl_noexcept
-  {
-    return span_.end();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr iterator
+    end() const gsl_noexcept
+    {
+        return span_.end();
+    }
 
-  gsl_NODISCARD gsl_constexpr17 reverse_iterator
-  rbegin() const gsl_noexcept
-  {
-    return span_.rbegin();
-  }
+    gsl_NODISCARD gsl_constexpr17 reverse_iterator
+    rbegin() const gsl_noexcept
+    {
+        return span_.rbegin();
+    }
 
-  gsl_NODISCARD gsl_constexpr17 reverse_iterator
-  rend() const gsl_noexcept
-  {
-    return span_.rend();
-  }
+    gsl_NODISCARD gsl_constexpr17 reverse_iterator
+    rend() const gsl_noexcept
+    {
+        return span_.rend();
+    }
 
-  // const version not in p0123r2:
+    // const version not in p0123r2:
 
-  gsl_NODISCARD gsl_api gsl_constexpr const_iterator
-  cbegin() const gsl_noexcept
-  {
-    return span_.cbegin();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr const_iterator
+    cbegin() const gsl_noexcept
+    {
+        return span_.cbegin();
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr const_iterator
-  cend() const gsl_noexcept
-  {
-    return span_.cend();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr const_iterator
+    cend() const gsl_noexcept
+    {
+        return span_.cend();
+    }
 
-  gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
-  crbegin() const gsl_noexcept
-  {
-    return span_.crbegin();
-  }
+    gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
+    crbegin() const gsl_noexcept
+    {
+        return span_.crbegin();
+    }
 
-  gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
-  crend() const gsl_noexcept
-  {
-    return span_.crend();
-  }
+    gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
+    crend() const gsl_noexcept
+    {
+        return span_.crend();
+    }
 
 private:
-  gsl_api static gsl_constexpr14 span_type remove_z( pointer sz, std::size_t max )
-  {
-    return span_type( sz, detail::string_length( sz, max ) );
-  }
+    gsl_api static gsl_constexpr14 span_type remove_z( pointer sz, std::size_t max )
+    {
+        return span_type( sz, detail::string_length( sz, max ) );
+    }
 
 #if gsl_HAVE( ARRAY )
-  template< size_t N >
-  gsl_NODISCARD static gsl_constexpr14 span_type
-  remove_z( std::array<typename std11::remove_const<element_type>::type, N> & arr )
-  {
-    return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
-  }
+    template< size_t N >
+    gsl_NODISCARD static gsl_constexpr14 span_type
+    remove_z( std::array<typename std11::remove_const<element_type>::type, N> & arr )
+    {
+        return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
+    }
 
-  template< size_t N >
-  gsl_NODISCARD static gsl_constexpr14 span_type
-  remove_z( std::array<typename std11::remove_const<element_type>::type, N> const & arr )
-  {
-    return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
-  }
+    template< size_t N >
+    gsl_NODISCARD static gsl_constexpr14 span_type
+    remove_z( std::array<typename std11::remove_const<element_type>::type, N> const & arr )
+    {
+        return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
+    }
 #endif
 
 private:
-  span_type span_;
+    span_type span_;
 };
 
 // basic_string_span comparison functions:
@@ -4564,10 +4782,10 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator==( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
-  const basic_string_span< typename std11::add_const<T>::type > r( u );
+    const basic_string_span< typename std11::add_const<T>::type > r( u );
 
-  return l.size() == r.size()
-         && std98::equal( l.begin(), l.end(), r.begin() );
+    return l.size() == r.size()
+        && detail::equal( l.begin(), l.end(), r.begin() );
 }
 
 template< class T, class U >
@@ -4575,9 +4793,9 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator<( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
-  const basic_string_span< typename std11::add_const<T>::type > r( u );
+    const basic_string_span< typename std11::add_const<T>::type > r( u );
 
-  return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
@@ -4589,10 +4807,10 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
-  const basic_string_span< typename std11::add_const<T>::type > l( u );
+    const basic_string_span< typename std11::add_const<T>::type > l( u );
 
-  return l.size() == r.size()
-         && std98::equal( l.begin(), l.end(), r.begin() );
+    return l.size() == r.size()
+        && detail::equal( l.begin(), l.end(), r.begin() );
 }
 
 template< class T, class U
@@ -4602,9 +4820,9 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
-  const basic_string_span< typename std11::add_const<T>::type > l( u );
+    const basic_string_span< typename std11::add_const<T>::type > l( u );
 
-  return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 #endif
 
@@ -4616,7 +4834,7 @@ gsl_NODISCARD inline gsl_constexpr14 bool
 operator==( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
     return l.size() == r.size()
-        && std98::equal( l.begin(), l.end(), r.begin() );
+        && detail::equal( l.begin(), l.end(), r.begin() );
 }
 
 template< class T >
@@ -4624,7 +4842,7 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator<( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
-    return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 #endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
@@ -4633,7 +4851,7 @@ template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator!=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-  return !( l == r );
+    return !( l == r );
 }
 
 template< class T, class U >
@@ -4641,9 +4859,9 @@ gsl_NODISCARD inline gsl_constexpr14 bool
 operator<=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
-  return !( r < l );
+    return !( r < l );
 #else
-  basic_string_span< typename std11::add_const<T>::type > rr( r );
+    basic_string_span< typename std11::add_const<T>::type > rr( r );
     return !( rr < l );
 #endif
 }
@@ -4653,9 +4871,9 @@ gsl_NODISCARD inline gsl_constexpr14 bool
 operator>( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
-  return ( r < l );
+    return ( r < l );
 #else
-  basic_string_span< typename std11::add_const<T>::type > rr( r );
+    basic_string_span< typename std11::add_const<T>::type > rr( r );
     return ( rr < l );
 #endif
 }
@@ -4664,7 +4882,7 @@ template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator>=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-  return !( l < r );
+    return !( l < r );
 }
 
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
@@ -4675,7 +4893,7 @@ template< class T, class U
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator!=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
-  return !( l == r );
+    return !( l == r );
 }
 
 template< class T, class U
@@ -4684,7 +4902,7 @@ template< class T, class U
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator<=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
-  return !( r < l );
+    return !( r < l );
 }
 
 template< class T, class U
@@ -4693,7 +4911,7 @@ template< class T, class U
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator>( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
-  return ( r < l );
+    return ( r < l );
 }
 
 template< class T, class U
@@ -4702,7 +4920,7 @@ template< class T, class U
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator>=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
-  return !( l < r );
+    return !( l < r );
 }
 
 #endif // gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
@@ -4713,7 +4931,7 @@ template< class T >
 gsl_NODISCARD gsl_api inline span< const byte >
 as_bytes( basic_string_span<T> spn ) gsl_noexcept
 {
-  return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
+    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
 //
@@ -4751,13 +4969,13 @@ inline std::basic_string< typename std::remove_const<T>::type > to_string( basic
 gsl_NODISCARD inline std::string
 to_string( string_span const & spn )
 {
-  return std::string( spn.data(), static_cast<std::size_t>( spn.length() ) );
+    return std::string( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 gsl_NODISCARD inline std::string
 to_string( cstring_span const & spn )
 {
-  return std::string( spn.data(), static_cast<std::size_t>( spn.length() ) );
+    return std::string( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 #if gsl_HAVE( WCHAR )
@@ -4765,13 +4983,13 @@ to_string( cstring_span const & spn )
 gsl_NODISCARD inline std::wstring
 to_string( wstring_span const & spn )
 {
-  return std::wstring( spn.data(), static_cast<std::size_t>( spn.length() ) );
+    return std::wstring( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 gsl_NODISCARD inline std::wstring
 to_string( cwstring_span const & spn )
 {
-  return std::wstring( spn.data(), static_cast<std::size_t>( spn.length() ) );
+    return std::wstring( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 #endif // gsl_HAVE( WCHAR )
@@ -4786,37 +5004,37 @@ namespace detail {
 template< class Stream >
 void write_padding( Stream & os, std::streamsize n )
 {
-  for ( std::streamsize i = 0; i < n; ++i )
-    os.rdbuf()->sputc( os.fill() );
+    for ( std::streamsize i = 0; i < n; ++i )
+        os.rdbuf()->sputc( os.fill() );
 }
 
 template< class Stream, class Span >
 Stream & write_to_stream( Stream & os, Span const & spn )
 {
-  typename Stream::sentry sentry( os );
+    typename Stream::sentry sentry( os );
 
-  if ( !os )
+    if ( !os )
+        return os;
+
+    const std::streamsize length = gsl::narrow_failfast<std::streamsize>( spn.length() );
+
+    // Whether, and how, to pad
+    const bool pad = ( length < os.width() );
+    const bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::right;
+
+    if ( left_pad )
+        detail::write_padding( os, os.width() - length );
+
+    // Write span characters
+    os.rdbuf()->sputn( spn.begin(), length );
+
+    if ( pad && !left_pad )
+        detail::write_padding( os, os.width() - length );
+
+    // Reset output stream width
+    os.width(0);
+
     return os;
-
-  const std::streamsize length = gsl::narrow_failfast<std::streamsize>( spn.length() );
-
-  // Whether, and how, to pad
-  const bool pad = ( length < os.width() );
-  const bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::right;
-
-  if ( left_pad )
-    detail::write_padding( os, os.width() - length );
-
-  // Write span characters
-  os.rdbuf()->sputn( spn.begin(), length );
-
-  if ( pad && !left_pad )
-    detail::write_padding( os, os.width() - length );
-
-  // Reset output stream width
-  os.width(0);
-
-  return os;
 }
 
 } // namespace detail
@@ -4824,13 +5042,13 @@ Stream & write_to_stream( Stream & os, Span const & spn )
 template< typename Traits >
 std::basic_ostream< char, Traits > & operator<<( std::basic_ostream< char, Traits > & os, string_span const & spn )
 {
-  return detail::write_to_stream( os, spn );
+    return detail::write_to_stream( os, spn );
 }
 
 template< typename Traits >
 std::basic_ostream< char, Traits > & operator<<( std::basic_ostream< char, Traits > & os, cstring_span const & spn )
 {
-  return detail::write_to_stream( os, spn );
+    return detail::write_to_stream( os, spn );
 }
 
 #if gsl_HAVE( WCHAR )
@@ -4838,13 +5056,13 @@ std::basic_ostream< char, Traits > & operator<<( std::basic_ostream< char, Trait
 template< typename Traits >
 std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t, Traits > & os, wstring_span const & spn )
 {
-  return detail::write_to_stream( os, spn );
+    return detail::write_to_stream( os, spn );
 }
 
 template< typename Traits >
 std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t, Traits > & os, cwstring_span const & spn )
 {
-  return detail::write_to_stream( os, spn );
+    return detail::write_to_stream( os, spn );
 }
 
 #endif // gsl_HAVE( WCHAR )
@@ -4862,17 +5080,17 @@ namespace detail {
 template< class T, class SizeType, const T Sentinel >
 gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::numeric_limits<SizeType>::max)() )
 {
-  typedef T * pointer;
+    typedef T * pointer;
 
-  gsl_SUPPRESS_MSVC_WARNING( 26429, "f.23: symbol 'cur' is never tested for nullness, it can be marked as not_null" )
-  pointer cur = seq;
+    gsl_SUPPRESS_MSVC_WARNING( 26429, "f.23: symbol 'cur' is never tested for nullness, it can be marked as not_null" )
+    pointer cur = seq;
 
-  while ( static_cast<SizeType>( cur - seq ) < max && *cur != Sentinel )
-    ++cur;
+    while ( static_cast<SizeType>( cur - seq ) < max && *cur != Sentinel )
+        ++cur;
 
-  gsl_Expects( *cur == Sentinel );
+    gsl_Expects( *cur == Sentinel );
 
-  return span<T>( seq, gsl::narrow_cast< typename span<T>::index_type >( cur - seq ) );
+    return span<T>( seq, gsl::narrow_cast< typename span<T>::index_type >( cur - seq ) );
 }
 } // namespace detail
 
@@ -4886,14 +5104,14 @@ template< class T >
 gsl_NODISCARD inline gsl_constexpr14 span<T>
 ensure_z( T * const & sz, size_t max = (std::numeric_limits<size_t>::max)() )
 {
-  return detail::ensure_sentinel<T, size_t, 0>( sz, max );
+    return detail::ensure_sentinel<T, size_t, 0>( sz, max );
 }
 
 template< class T, size_t N >
 gsl_NODISCARD inline gsl_constexpr14 span<T>
 ensure_z( T (&sz)[N] )
 {
-  return ::gsl::ensure_z( gsl_ADDRESSOF( sz[0] ), N );
+    return ::gsl::ensure_z( gsl_ADDRESSOF( sz[0] ), N );
 }
 
 # if gsl_HAVE( TYPE_TRAITS )
@@ -4902,7 +5120,7 @@ template< class Container >
 gsl_NODISCARD inline gsl_constexpr14 span< typename std::remove_pointer<typename Container::pointer>::type >
 ensure_z( Container & cont )
 {
-  return ::gsl::ensure_z( cont.data(), cont.length() );
+    return ::gsl::ensure_z( cont.data(), cont.length() );
 }
 # endif
 
@@ -4914,59 +5132,59 @@ template <typename T>
 class basic_zstring_span
 {
 public:
-  typedef T element_type;
-  typedef span<T> span_type;
+    typedef T element_type;
+    typedef span<T> span_type;
 
-  typedef typename span_type::index_type index_type;
-  typedef typename span_type::difference_type difference_type;
+    typedef typename span_type::index_type index_type;
+    typedef typename span_type::difference_type difference_type;
 
-  typedef element_type * czstring_type;
-  typedef basic_string_span<element_type> string_span_type;
+    typedef element_type * czstring_type;
+    typedef basic_string_span<element_type> string_span_type;
 
-  gsl_api gsl_constexpr14 basic_zstring_span( span_type s )
-      : span_( s )
-  {
-    // expects a zero-terminated span
-    gsl_Expects( s.back() == '\0' );
-  }
+    gsl_api gsl_constexpr14 basic_zstring_span( span_type s )
+        : span_( s )
+    {
+        // expects a zero-terminated span
+        gsl_Expects( s.back() == '\0' );
+    }
 
 #if gsl_HAVE( IS_DEFAULT )
-  gsl_constexpr basic_zstring_span( basic_zstring_span const & ) = default;
-  gsl_constexpr basic_zstring_span( basic_zstring_span &&      ) = default;
-  gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & ) = default;
-  gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      ) = default;
+    gsl_constexpr basic_zstring_span( basic_zstring_span const & ) = default;
+    gsl_constexpr basic_zstring_span( basic_zstring_span &&      ) = default;
+    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & ) = default;
+    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      ) = default;
 #else
-  gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
+    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
     gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other ) { span_ = other.span_; return *this; }
 #endif
 
-  gsl_NODISCARD gsl_api gsl_constexpr bool
-  empty() const gsl_noexcept
-  {
-    return false;
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr bool
+    empty() const gsl_noexcept
+    {
+        return false;
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr string_span_type
-  as_string_span() const gsl_noexcept
-  {
-    return string_span_type( span_.data(), span_.size() - 1 );
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr string_span_type
+    as_string_span() const gsl_noexcept
+    {
+        return string_span_type( span_.data(), span_.size() - 1 );
+    }
 
-  /*gsl_api*/ // currently disabled due to an apparent NVCC bug
-  gsl_NODISCARD gsl_constexpr string_span_type
-  ensure_z() const
-  {
-    return ::gsl::ensure_z(span_.data(), span_.size());
-  }
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_NODISCARD gsl_constexpr string_span_type
+    ensure_z() const
+    {
+        return ::gsl::ensure_z(span_.data(), span_.size());
+    }
 
-  gsl_NODISCARD gsl_api gsl_constexpr czstring_type
-  assume_z() const gsl_noexcept
-  {
-    return span_.data();
-  }
+    gsl_NODISCARD gsl_api gsl_constexpr czstring_type
+    assume_z() const gsl_noexcept
+    {
+        return span_.data();
+    }
 
 private:
-  span_type span_;
+    span_type span_;
 };
 
 //
@@ -5008,11 +5226,11 @@ template<>
 struct conditionally_enabled_hash< false >
 {
 gsl_is_delete_access:
-  conditionally_enabled_hash() gsl_is_delete;
-  conditionally_enabled_hash( conditionally_enabled_hash const & ) gsl_is_delete;
-  conditionally_enabled_hash( conditionally_enabled_hash && ) gsl_is_delete;
-  conditionally_enabled_hash & operator=( conditionally_enabled_hash const & ) gsl_is_delete;
-  conditionally_enabled_hash & operator=( conditionally_enabled_hash && ) gsl_is_delete;
+    conditionally_enabled_hash() gsl_is_delete;
+    conditionally_enabled_hash( conditionally_enabled_hash const & ) gsl_is_delete;
+    conditionally_enabled_hash( conditionally_enabled_hash && ) gsl_is_delete;
+    conditionally_enabled_hash & operator=( conditionally_enabled_hash const & ) gsl_is_delete;
+    conditionally_enabled_hash & operator=( conditionally_enabled_hash && ) gsl_is_delete;
 };
 
 } // namespace detail
@@ -5025,32 +5243,32 @@ template< class T >
 struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash<is_default_constructible<hash<T>>::value>
 {
 public:
-  gsl_NODISCARD gsl_constexpr std::size_t
-  operator()( ::gsl::not_null<T> const & v ) const
-  // hash function is not `noexcept` because `as_nullable()` has preconditions
-  {
-    return hash<T>()( ::gsl::as_nullable( v ) );
-  }
+    gsl_NODISCARD gsl_constexpr std::size_t
+    operator()( ::gsl::not_null<T> const & v ) const
+    // hash function is not `noexcept` because `as_nullable()` has preconditions
+    {
+        return hash<T>()( ::gsl::as_nullable( v ) );
+    }
 };
 template< class T >
 struct hash< ::gsl::not_null< T* > >
 {
 public:
-  gsl_NODISCARD gsl_constexpr std::size_t
-  operator()( ::gsl::not_null< T* > const & v ) const gsl_noexcept
-  {
-    return hash<T*>()( ::gsl::as_nullable( v ) );
-  }
+    gsl_NODISCARD gsl_constexpr std::size_t
+    operator()( ::gsl::not_null< T* > const & v ) const gsl_noexcept
+    {
+        return hash<T*>()( ::gsl::as_nullable( v ) );
+    }
 };
 
 template<>
 struct hash< ::gsl::byte >
 {
 public:
-  gsl_NODISCARD gsl_constexpr std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
-  {
-    return ::gsl::to_integer<std::size_t>( v );
-  }
+    gsl_NODISCARD gsl_constexpr std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
+    {
+        return ::gsl::to_integer<std::size_t>( v );
+    }
 };
 
 } // namespace std
@@ -5090,16 +5308,19 @@ namespace std17 = ::gsl::std17;
 namespace std20 = ::gsl::std20;
 
 using namespace std11;
-using namespace std14;
+//using namespace std14;  // contains only make_unique<>(), which is superseded by `gsl::make_unique<>()`
 using namespace std17;
 using namespace std20;
 
 using namespace ::gsl::detail::no_adl;
 
-# if gsl_HAVE( SHARED_PTR )
+# if gsl_HAVE( UNIQUE_PTR ) && gsl_HAVE( SHARED_PTR )
 using std::unique_ptr;
 using std::shared_ptr;
-using std::make_shared;
+#  if gsl_HAVE( VARIADIC_TEMPLATE )
+using ::gsl::make_unique;
+using ::gsl::make_shared;
+#  endif
 # endif
 
 using ::gsl::index;

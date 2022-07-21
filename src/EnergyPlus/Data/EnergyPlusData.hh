@@ -63,9 +63,9 @@ namespace EnergyPlus {
 // forward declare all structs
 struct AirLoopHVACDOASData;
 struct AirSystemsData;
-struct AirflowNetworkBalanceManagerData;
-struct AirflowNetworkData;
-struct AirflowNetworkSolverData;
+namespace AirflowNetwork {
+    struct Solver;
+} // namespace AirflowNetwork
 struct BSDFWindowData;
 struct BaseSizerWithFanHeatInputsData;
 struct BaseSizerWithScalableInputsData;
@@ -95,7 +95,6 @@ struct CrossVentMgrData;
 struct CurveManagerData;
 struct DXCoilsData;
 struct DXFEarClippingData;
-struct DataAFNProps;
 struct DataAirLoopData;
 struct DataBranchAirLoopPlantData;
 struct DataDaylightingDevicesData;
@@ -172,7 +171,6 @@ struct HeatBalSurfMgr;
 struct HeatBalanceAirMgrData;
 struct HeatBalanceData;
 struct HeatBalanceIntRadExchgData;
-struct HeatBalanceKivaMgrData;
 struct HeatBalanceMgrData;
 struct HeatPumpWaterToWaterCOOLINGData;
 struct HeatPumpWaterToWaterHEATINGData;
@@ -242,6 +240,8 @@ struct ReportCoilSelectionData;
 struct ReportFlagData;
 struct ResultsFrameworkData;
 struct ReturnAirPathMgr;
+struct ExhaustAirSystemMgr;
+struct ExhaustControlSystemMgr;
 struct RoomAirModelAirflowNetworkData;
 struct RoomAirModelData;
 struct RoomAirModelManagerData;
@@ -323,9 +323,7 @@ struct EnergyPlusData : BaseGlobalStruct
     // module globals
     std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
     std::unique_ptr<AirSystemsData> dataAirSystemsData;
-    std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
-    std::unique_ptr<AirflowNetworkData> dataAirflowNetwork;
-    std::unique_ptr<AirflowNetworkSolverData> dataAFNSolver;
+    std::unique_ptr<AirflowNetwork::Solver> afn;
     std::unique_ptr<BSDFWindowData> dataBSDFWindow;
     std::unique_ptr<BaseSizerWithFanHeatInputsData> dataBaseSizerFanHeatInputs;
     std::unique_ptr<BaseSizerWithScalableInputsData> dataBaseSizerScalableInputs;
@@ -355,7 +353,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<CurveManagerData> dataCurveManager;
     std::unique_ptr<DXCoilsData> dataDXCoils;
     std::unique_ptr<DXFEarClippingData> dataDXFEarClipping;
-    std::unique_ptr<DataAFNProps> dataAFNProps;
     std::unique_ptr<DataAirLoopData> dataAirLoop;
     std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<DataDaylightingDevicesData> dataDaylightingDevicesData;
@@ -432,7 +429,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<HeatBalanceAirMgrData> dataHeatBalAirMgr;
     std::unique_ptr<HeatBalanceData> dataHeatBal;
     std::unique_ptr<HeatBalanceIntRadExchgData> dataHeatBalIntRadExchg;
-    std::unique_ptr<HeatBalanceKivaMgrData> dataHeatBalKivaMgr;
     std::unique_ptr<HeatBalanceMgrData> dataHeatBalMgr;
     std::unique_ptr<HeatPumpWaterToWaterCOOLINGData> dataHPWaterToWaterClg;
     std::unique_ptr<HeatPumpWaterToWaterHEATINGData> dataHPWaterToWaterHtg;
@@ -502,6 +498,8 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ReportFlagData> dataReportFlag;
     std::unique_ptr<ResultsFrameworkData> dataResultsFramework;
     std::unique_ptr<ReturnAirPathMgr> dataRetAirPathMrg;
+    std::unique_ptr<ExhaustAirSystemMgr> dataExhAirSystemMrg;
+    std::unique_ptr<ExhaustControlSystemMgr> dataExhCtrlSystemMrg;
     std::unique_ptr<RoomAirModelAirflowNetworkData> dataRoomAirflowNetModel;
     std::unique_ptr<RoomAirModelData> dataRoomAirMod;
     std::unique_ptr<RoomAirModelManagerData> dataRoomAirModelMgr;
@@ -575,6 +573,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ZoneTempPredictorCorrectorData> dataZoneTempPredictorCorrector;
 
     EnergyPlusData();
+    ~EnergyPlusData();
 
     // Cannot safely copy or delete this until we eradicate all remaining
     // calls to IOFiles::getSingleton and IOFiles::setSingleton

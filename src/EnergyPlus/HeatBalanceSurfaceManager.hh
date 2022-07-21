@@ -56,6 +56,8 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#include "WCETarcog.hpp"
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -196,6 +198,14 @@ namespace HeatBalanceSurfaceManager {
     void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
+
+    void InitSurfacePropertyViewFactors(EnergyPlusData &state);
+
+    void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state);
+
+    void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state);
+
+    void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum);
 
 } // namespace HeatBalanceSurfaceManager
 

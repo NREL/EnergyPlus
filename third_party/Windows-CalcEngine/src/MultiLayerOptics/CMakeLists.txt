@@ -7,6 +7,7 @@ set( target_name MultiLayerOptics )
 
 # make sure to connect to header files of common variables
 include_directories( ../Common/include )
+include_directories( ../Viewer/include )
 include_directories( ../SpectralAveraging/include )
 include_directories( ../SingleLayerOptics/include )
 
@@ -20,6 +21,7 @@ LIST(APPEND SOURCES ${SOURCES_HPP} ${SOURCES_CPP} )
 add_library( ${target_name} STATIC ${SOURCES} )
 
 target_link_libraries( ${target_name} ${LINK_TO_Common} )
+target_link_libraries( ${target_name} ${LINK_TO_Viewer} )
 target_link_libraries( ${target_name} ${LINK_TO_SpectralAveraging} )
 target_link_libraries( ${target_name} ${LINK_TO_SingleLayerOptics} )
 
