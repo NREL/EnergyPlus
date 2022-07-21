@@ -372,8 +372,6 @@ namespace General {
     bool BetweenDateHoursLeftInclusive(
         int const TestDate, int const TestHour, int const StartDate, int const StartHour, int const EndDate, int const EndHour);
 
-    bool BetweenDateHours(int const TestDate, int const TestHour, int const StartDate, int const StartHour, int const EndDate, int const EndHour);
-
     bool BetweenDates(int TestDate,  // Date to test
                       int StartDate, // Start date in sequence
                       int EndDate    // End date in sequence
