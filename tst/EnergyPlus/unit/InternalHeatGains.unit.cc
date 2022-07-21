@@ -2756,6 +2756,51 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Fix_41C)
     EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, 1.0);
     EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT, 1.0);
     EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, 1.0);
+
+    // if (TAirIn < DBMin[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT, TAirIn - DBMin[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (TDPAirIn > DPMax[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (TDPAirIn < DPMin[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT, TDPAirIn - DPMin[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn > RHMax[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH, RHAirIn - RHMax[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn < RHMin[EnvClass])
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH, RHAirIn - RHMin[EnvClass]);
+    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 }
 
 TEST_F(EnergyPlusFixture, ITE_Env_Class_Fix_39C)
