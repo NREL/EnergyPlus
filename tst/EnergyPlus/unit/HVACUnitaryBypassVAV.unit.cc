@@ -109,7 +109,6 @@ protected:
         state->dataZoneEquip->NumOfZoneEquipLists = 1;
         state->dataHeatBal->Zone(1).IsControlled = true;
         state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-        state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "EAST ZONE";
         state->dataZoneEquip->ZoneEquipConfig(1).EquipListName = "ZONEEQUIPMENT";
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 20;
@@ -117,8 +116,7 @@ protected:
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 21;
         state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
-        state->dataHeatBal->Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
-            state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
+        state->dataHeatBal->Zone(1).SystemZoneNodeNumber = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONEEQUIPMENT";
         int maxEquipCount = 1;
@@ -190,8 +188,8 @@ protected:
         cbvav.Name = "CBVAVAirLoop";
         cbvav.UnitType = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
         cbvav.SchedPtr = -1;
-        cbvav.ActualZoneNodeNum.allocate(1);
-        cbvav.ActualZoneNodeNum(1) = 1;
+        cbvav.ZoneNodeNum.allocate(1);
+        cbvav.ZoneNodeNum(1) = 1;
         cbvav.DXCoolCoilIndexNum = 1;
         state->dataDXCoils->DXCoil.allocate(1);
         state->dataDXCoils->DXCoilNumericFields.allocate(1);
@@ -681,7 +679,6 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     auto &cbvav(state->dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum));
     // should be the second zone in the zone list as well as actual zone number
     EXPECT_EQ(2, cbvav.ControlledZoneNum(CBVAVNum));
-    EXPECT_EQ(2, cbvav.ActualZoneNum(CBVAVNum));
     // reflects sequence number in ZoneHVAC:EquipmentList
     EXPECT_EQ(1, cbvav.ZoneSequenceCoolingNum(cbvav.ZoneSequenceCoolingNum(zoneIndex)));
     EXPECT_EQ(1, cbvav.ZoneSequenceHeatingNum(cbvav.ZoneSequenceHeatingNum(zoneIndex)));

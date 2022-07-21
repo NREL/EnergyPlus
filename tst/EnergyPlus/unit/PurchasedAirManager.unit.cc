@@ -834,11 +834,11 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     state->dataLoopNodes->Node(2).Temp = 25.0;
     state->dataLoopNodes->Node(2).HumRat = 0.001;
 
-    InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
+    InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
-    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
+    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1);
 
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueMassFlowRate, 0.0);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 0.0);
@@ -931,11 +931,11 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
         state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
     }
 
-    InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
+    InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
-    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
+    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1);
 
     EXPECT_EQ(SysOutputProvided, 0.0);
     // #8365 Supply air mass flow rate should be zero during heating mode when capacity is limited to zero
@@ -1094,7 +1094,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataLoopNodes->Node(2).Temp = 25.0;
     state->dataLoopNodes->Node(2).HumRat = 0.001;
 
-    InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
+    InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
@@ -1105,7 +1105,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataPurchasedAirMgr->PurchAir(1).OutdoorAirNodeNum = 2;
     state->dataPurchasedAirMgr->PurchAir(1).ZoneRecircAirNodeNum = 1;
 
-    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
+    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1);
 
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 18.0);
     EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyHumRat, 0.01);
@@ -1267,7 +1267,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     state->dataLoopNodes->Node(2).Temp = 25.0;
     state->dataLoopNodes->Node(2).HumRat = 0.001;
 
-    InitPurchasedAir(*state, 1, FirstHVACIteration, 1, 1);
+    InitPurchasedAir(*state, 1, 1);
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
@@ -1278,7 +1278,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     state->dataPurchasedAirMgr->PurchAir(1).OutdoorAirNodeNum = 2;
     state->dataPurchasedAirMgr->PurchAir(1).ZoneRecircAirNodeNum = 1;
 
-    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
+    CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1);
 
     EXPECT_EQ(SysOutputProvided, 0.0);
     EXPECT_EQ(MoistOutputProvided, 0.0);

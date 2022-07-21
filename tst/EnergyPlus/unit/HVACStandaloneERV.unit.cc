@@ -110,7 +110,6 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
@@ -222,7 +221,6 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
