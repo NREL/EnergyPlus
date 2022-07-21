@@ -462,6 +462,19 @@ TEST_F(EnergyPlusFixture, General_BetweenDateHoursLeftInclusive) {
     endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
     EXPECT_TRUE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
 
+    // not in the range
+    startYear = 2018;
+    startMonth = 6;
+    startDay = 13;
+    startHour = 8;
+    startDate = WeatherManager::computeJulianDate(startYear, startMonth, startDay);
+    endYear = 2018;
+    endMonth = 8;
+    endDay = 13;
+    endHour = 8;
+    endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
+    EXPECT_FALSE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
+
     // left inclusive
     startYear = 2018;
     startMonth = 5;
