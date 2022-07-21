@@ -3,8 +3,8 @@ Implement steam features
 
 **Dareum Nam, NREL**
 
- - Original Date: 12/3/2020
- - Revision Date: 1/28/2022
+ - Initial NFP Original Date: 12/3/2020
+ - Final NFP Revision Date: 7/21/2022
  
 
 ## Justification for New Feature ##
@@ -17,6 +17,17 @@ EnergyPlus Technicalities Call on 2/24/2021
 - We only have one phase steam plant fluid modeling. There is a lot of room for improvement and basic validation of current steam plant.
 - If we are going to add more complexity to remove assumptions, we need new ways to find those value; for example, how do we calculate the quality if we want to remove quality 0 & 1 assumption?
 - New systems could use current assumption for now. And if CoolProp is implemented, the steam systems can be renewed with enthalpy-based system.
+
+EnergyPlus Iteration Call on 2/2/2022
+- Instead of a separate object (PlantLoadProfile:Steam), a few optional input fields for a steam loop should be added to the current object (PlantLoadProfile).
+
+EnergyPlus Technicalities Call on 2/9/2022
+- Currently, there is "steam" as a resource type. This should be changed to DistrictHeatingSteam.
+- Current "DistrictHeating" should be "DistrictHeatingWater".
+- "DistrictHeatingWater" and "DistrictHeatingSteam" are better than "DistrictHeating:Water" and "DistrictHeating:Steam" because full meter names are a combination of resource type, end-use, etc. which are joined by colons so another colon would be confusing.
+- Keep these "DistrictHeatingWater" and "DistrictHeatingSteam" separate for output report since hot water and steam basically have difference source factors and emission factors.
+- SteamEquipment should go on the same meter as this (DistrictHeatingSteam)
+- As for Steam to Water Heat Exchanger, we stick with two explicit objects because it's better for user standpoint.
 
 ## Overview ##
 
