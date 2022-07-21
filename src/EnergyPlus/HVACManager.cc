@@ -160,7 +160,6 @@ void ManageHVAC(EnergyPlusData &state)
     using SizingManager::UpdateFacilitySizing;
     using SystemAvailabilityManager::ManageHybridVentilation;
     using SystemReports::InitEnergyReports;
-    using SystemReports::ReportMaxVentilationLoads;
     using SystemReports::ReportSystemEnergyUse;
     using WaterManager::ManageWater;
     using WaterManager::ManageWaterInits;
@@ -428,7 +427,7 @@ void ManageHVAC(EnergyPlusData &state)
                 if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
             }
             if (state.dataGlobal->DoOutputReporting) {
-                ReportMaxVentilationLoads(state);
+                SystemReports::ReportVentilationLoads(state);
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                     state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
