@@ -764,7 +764,7 @@ void SimOAComponent(EnergyPlusData &state,
             SimEvapCooler(state, CompName, CompIndex);
         }
 
-    } else if (CompTypeNum == SimAirServingZones::CompType::VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+    } else if (CompTypeNum == SimAirServingZones::CompType::ZoneVRFasAirLoopEquip) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
         if (Sim) {
             int ControlledZoneNum = 0;
             bool HeatingActive = false;
