@@ -744,7 +744,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int ControlledZoneNum(1);
     bool FirstHVACIteration(true);
     bool ErrorsFound(false);
     Real64 QZnReq(0.0);
@@ -1468,7 +1467,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int ControlledZoneNum(1);
     bool FirstHVACIteration(true);
     bool ErrorsFound(false);
     Real64 QZnReq(0.0);

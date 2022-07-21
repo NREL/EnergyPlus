@@ -856,7 +856,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     // Do the every time step initializations
-    int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
     ThisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
     ThisCP.WaterInletTemp = ThisInNode.Temp;
     ThisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;

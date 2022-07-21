@@ -253,7 +253,6 @@ namespace RoomAirModelAirflowNetwork {
         int NodeNum;
         int NodeIn;
         int Link;
-        int IdZone;
         int IdNode;
         int EquipLoop;
         int MaxNodeNum;

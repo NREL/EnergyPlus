@@ -4476,7 +4476,6 @@ namespace SystemAvailabilityManager {
                         for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) == hybridVentMgr.AirLoopNum) {
                                 zoneFound = true;
-                                break;
                             }
                         }
                         if (!zoneFound) {
@@ -4488,7 +4487,6 @@ namespace SystemAvailabilityManager {
                             ErrorsFound = true;
                         }
                     }
-                    break;
                 }
                 if (std::any_of(state.dataSystemAvailabilityManager->HybridVentData.begin(),
                                 state.dataSystemAvailabilityManager->HybridVentData.end(),

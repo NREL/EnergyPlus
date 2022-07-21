@@ -6743,8 +6743,6 @@ void DefineWarmestSetPointManager::calculate(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2002
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate the "warmest" supply air setpoint temperature that will satisfy the cooling
@@ -6764,7 +6762,6 @@ void DefineWarmestSetPointManager::calculate(EnergyPlusData &state)
     int AirLoopNum;          // the index of the air loop served by this setpoint manager
     Real64 TotCoolLoad;      // sum of the zone cooling loads for this air loop [W]
     int ZonesCooledIndex;    // DO loop index for zones cooled by the air loop
-    int ZoneInletNode;       // the zone inlet node number
     Real64 ZoneTemp;         // zone temperature [C]
     Real64 ZoneSetPointTemp; // zone supply air temperature [C]
     Real64 SetPointTemp;     // the system setpoint temperature [C]
@@ -6825,7 +6822,6 @@ void DefineColdestSetPointManager::calculate(EnergyPlusData &state)
     Real64 CpAir;            // inlet air specific heat [J/kg-C]
     int AirLoopNum;          // the index of the air loop served by this setpoint manager
     Real64 TotHeatLoad;      // sum of the zone heating loads for this air loop [W]
-    int ZoneInletNode;       // the zone inlet node number
     Real64 ZoneTemp;         // zone temperature [C]
     Real64 ZoneSetPointTemp; // zone supply air temperature [C]
     Real64 SetPointTemp;     // the system setpoint temperature [C]

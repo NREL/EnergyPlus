@@ -822,8 +822,6 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     EMSManager::GetEMSInput(*state);
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
-    bool FirstHVACIteration(true);
-
     if (state->dataPurchasedAirMgr->GetPurchAirInputFlag) {
         GetPurchasedAir(*state);
         state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
@@ -1080,8 +1078,6 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
 
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
-    bool FirstHVACIteration(true);
-
     if (state->dataPurchasedAirMgr->GetPurchAirInputFlag) {
         GetPurchasedAir(*state);
         state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
@@ -1252,8 +1248,6 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
 
     state->dataEMSMgr->FinishProcessingUserInput = true;
-
-    bool FirstHVACIteration(true);
 
     if (state->dataPurchasedAirMgr->GetPurchAirInputFlag) {
         GetPurchasedAir(*state);
