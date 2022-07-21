@@ -737,13 +737,15 @@ void GetAirPathData(EnergyPlusData &state)
             }
             for (CompNum = 1; CompNum <= thisBranch.TotalComponents; ++CompNum) {
 
-                thisBranch.Comp(CompNum).TypeOf = CompTypes(CompNum);
-                thisBranch.Comp(CompNum).Name = CompNames(CompNum);
-                thisBranch.Comp(CompNum).CompIndex = 0;
-                thisBranch.Comp(CompNum).NodeNameIn = InletNodeNames(CompNum);
-                thisBranch.Comp(CompNum).NodeNumIn = InletNodeNumbers(CompNum);
-                thisBranch.Comp(CompNum).NodeNameOut = OutletNodeNames(CompNum);
-                thisBranch.Comp(CompNum).NodeNumOut = OutletNodeNumbers(CompNum);
+                auto &thisBranchComp = thisBranch.Comp(CompNum);
+
+                thisBranchComp.TypeOf = CompTypes(CompNum);
+                thisBranchComp.Name = CompNames(CompNum);
+                thisBranchComp.CompIndex = 0;
+                thisBranchComp.NodeNameIn = InletNodeNames(CompNum);
+                thisBranchComp.NodeNumIn = InletNodeNumbers(CompNum);
+                thisBranchComp.NodeNameOut = OutletNodeNames(CompNum);
+                thisBranchComp.NodeNumOut = OutletNodeNumbers(CompNum);
                 thisBranch.NodeNum(CompNum + 1) = OutletNodeNumbers(CompNum);
 
                 // Check for Outside Air system; if there, store its connection node numbers to primary air system
