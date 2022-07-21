@@ -1440,7 +1440,7 @@ namespace InternalHeatGains {
                              state.dataOutRptPredefined->pdchInLtDens,
                              "Interior Lighting Total",
                              state.dataInternalHeatGains->sumPower / state.dataInternalHeatGains->sumArea,
-                             4); //** line 792
+                             4); // line 792
         } else {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
@@ -3018,7 +3018,7 @@ namespace InternalHeatGains {
                                                    1.0,
                                                    thisZoneITEq.Name,
                                                    DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                   &thisZoneITEq.PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power /*ConGainRateToZone*/);
+                                                   &thisZoneITEq.PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power);
                     }
                 } // for itEqInputNum.NumOfSpaces
             }     // for itEqInputNum
@@ -7681,10 +7681,10 @@ namespace InternalHeatGains {
             CPUPower = max(state.dataHeatBal->ZoneITEq(Loop).DesignCPUPower * OperSchedFrac *
                                CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn),
                            0.0);
-            state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::CPUAtDesign)].power /*CPUPowerAtDesign*/
-                = max(state.dataHeatBal->ZoneITEq(Loop).DesignCPUPower * OperSchedFrac *
-                          CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign),
-                      0.0);
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::CPUAtDesign)].power =
+                max(state.dataHeatBal->ZoneITEq(Loop).DesignCPUPower * OperSchedFrac *
+                        CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign),
+                    0.0);
 
             AirVolFlowFrac = max(CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
             AirVolFlowRate = state.dataHeatBal->ZoneITEq(Loop).DesignAirVolFlowRate * OperSchedFrac * AirVolFlowFrac;
@@ -7696,10 +7696,10 @@ namespace InternalHeatGains {
             FanPower = max(state.dataHeatBal->ZoneITEq(Loop).DesignFanPower * OperSchedFrac *
                                CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac),
                            0.0);
-            state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::Fan)].power /*FanPowerAtDesign*/
-                = max(state.dataHeatBal->ZoneITEq(Loop).DesignFanPower * OperSchedFrac *
-                          CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT),
-                      0.0);
+            state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::FanAtDesign)].power =
+                max(state.dataHeatBal->ZoneITEq(Loop).DesignFanPower * OperSchedFrac *
+                        CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT),
+                    0.0);
 
             // Calculate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
             if (state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower > 0.0) {
@@ -7738,24 +7738,22 @@ namespace InternalHeatGains {
 
             if (AirConnection == ITEInletConnection::AdjustedSupply || AirConnection == ITEInletConnection::ZoneAirNode) {
                 // If not a room air model, then all ITEquip power input is a convective heat gain to the zone heat balance, plus UPS heat gain
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power /*ConGainRateToZone*/
-                    = CPUPower + FanPower + UPSHeatGain;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power = CPUPower + FanPower + UPSHeatGain;
             } else if (AirConnection == ITEInletConnection::RoomAirModel) {
                 // Room air model option not implemented yet - set room air model outlet node conditions here
                 // If a room air model, then the only convective heat gain to the zone heat balance is the UPS heat gain
-                state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power /*ConGainRateToZone*/
-                    = UPSHeatGain;
+                state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power = UPSHeatGain;
             }
             if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE) {
                 ZoneITEMap[state.dataHeatBal->ZoneITEq(Loop).ZonePtr].push_back(Loop);
             }
             if (state.dataGlobal->DoingSizing && state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                if (state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::FanAtDesign)].power       /*FanPowerAtDesign*/
-                        + state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::CPUAtDesign)].power /*CPUPowerAtDesign*/
-                    > state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower) {
-                    state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power     /*ConGainRateToZone*/
-                        = state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::FanAtDesign)].power /*FanPowerAtDesign*/
-                          + state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::CPUAtDesign)].power /*CPUPowerAtDesign*/;
+                if (state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::FanAtDesign)].power +
+                        state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::CPUAtDesign)].power >
+                    state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower) {
+                    state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::ConGainToZone)].power =
+                        state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::FanAtDesign)].power +
+                        state.dataHeatBal->ZoneITEq(Loop).PERptVars[(int)(ITEquipData::PERptVar::CPUAtDesign)].power;
                 }
             }
             // Object report variables
