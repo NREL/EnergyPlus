@@ -5398,8 +5398,12 @@ namespace WeatherManager {
                                 const int sourceIdx,
                                 Array1D<WeatherManager::ReportPeriodData> &target,
                                 const int targetIdx)
+    // copy the content of one reporting period object to another.
+    // The aim is to transfer data of each reporting period object to its corresonding
+    // report time so the indexing works out
     {
         target(targetIdx).title = source(sourceIdx).title;
+        target(targetIdx).reportName = source(sourceIdx).reportName;
         target(targetIdx).startYear = source(sourceIdx).startYear;
         target(targetIdx).startMonth = source(sourceIdx).startMonth;
         target(targetIdx).startDay = source(sourceIdx).startDay;
