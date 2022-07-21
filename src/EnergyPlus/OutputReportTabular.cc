@@ -14651,33 +14651,24 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
             }
 
-            bool CoincidentFlag = false;
-            for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
-                if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
-                    CoincidentFlag = true;
-                }
-            }
-
-            if (CoincidentFlag) {
-                auto &facilityCoolTable = FacilityCoolCompLoadTables;
-                auto &facilityHeatTable = FacilityHeatCompLoadTables;
-                facilityCoolTable.peakDesSensLoad = 0.0;
-                facilityCoolTable.designPeakLoad = 0.0;
-                facilityHeatTable.peakDesSensLoad = 0.0;
-                facilityHeatTable.designPeakLoad = 0.0;
-                facilityCoolTable.diffPeakEst = 0.0;
-                facilityHeatTable.diffPeakEst = 0.0;
-                facilityCoolTable.diffDesignPeak = 0.0;
-                for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
-                    facilityCoolTable.peakDesSensLoad += AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad;
-                    facilityCoolTable.designPeakLoad += AirLoopCoolCompLoadTables(iAirLoop).designPeakLoad;
-                    facilityHeatTable.peakDesSensLoad += AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad;
-                    facilityHeatTable.designPeakLoad += AirLoopHeatCompLoadTables(iAirLoop).designPeakLoad;
-                    facilityCoolTable.diffPeakEst += AirLoopCoolCompLoadTables(iAirLoop).diffPeakEst;
-                    facilityCoolTable.diffDesignPeak += AirLoopCoolCompLoadTables(iAirLoop).diffDesignPeak;
-                    facilityHeatTable.diffPeakEst += AirLoopHeatCompLoadTables(iAirLoop).diffPeakEst;
-                    facilityCoolTable.diffDesignPeak += AirLoopHeatCompLoadTables(iAirLoop).diffDesignPeak;
-                }
+            auto &facilityCoolTable = FacilityCoolCompLoadTables;
+            auto &facilityHeatTable = FacilityHeatCompLoadTables;
+            facilityCoolTable.peakDesSensLoad = 0.0;
+            facilityCoolTable.designPeakLoad = 0.0;
+            facilityHeatTable.peakDesSensLoad = 0.0;
+            facilityHeatTable.designPeakLoad = 0.0;
+            facilityCoolTable.diffPeakEst = 0.0;
+            facilityHeatTable.diffPeakEst = 0.0;
+            facilityCoolTable.diffDesignPeak = 0.0;
+            for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
+                facilityCoolTable.peakDesSensLoad += AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityCoolTable.designPeakLoad += AirLoopCoolCompLoadTables(iAirLoop).designPeakLoad;
+                facilityHeatTable.peakDesSensLoad += AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityHeatTable.designPeakLoad += AirLoopHeatCompLoadTables(iAirLoop).designPeakLoad;
+                facilityCoolTable.diffPeakEst += AirLoopCoolCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopCoolCompLoadTables(iAirLoop).diffDesignPeak;
+                facilityHeatTable.diffPeakEst += AirLoopHeatCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopHeatCompLoadTables(iAirLoop).diffDesignPeak;
             }
 
             ComputeEngineeringChecks(FacilityCoolCompLoadTables);
