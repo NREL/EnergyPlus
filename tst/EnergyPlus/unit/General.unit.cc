@@ -514,4 +514,53 @@ TEST_F(EnergyPlusFixture, General_BetweenDateHoursLeftInclusive) {
     endDate = WeatherManager::computeJulianDate(endYear, endMonth, endDay);
     EXPECT_TRUE(BetweenDateHoursLeftInclusive(currentDate, currentHour, startDate, startHour, endDate, endHour));
 }
+
+TEST_F(EnergyPlusFixture, General_isReportPeriodBeginning)
+{
+    state->dataWeatherManager->TotReportPers = 1;
+    state->dataWeatherManager->ReportPeriodInput.allocate(state->dataWeatherManager->TotReportPers);
+
+    int periodIdx = 1;
+
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).startYear = 0;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).startMonth = 1;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).startDay = 1;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).startHour = 8;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).startJulianDate =
+        WeatherManager::computeJulianDate(state->dataWeatherManager->ReportPeriodInput(periodIdx).startYear,
+                                          state->dataWeatherManager->ReportPeriodInput(periodIdx).startMonth,
+                                          state->dataWeatherManager->ReportPeriodInput(periodIdx).startDay);
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).endYear = 0;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).endMonth = 1;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).endDay = 3;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).endHour = 18;
+    state->dataWeatherManager->ReportPeriodInput(periodIdx).endJulianDate =
+        WeatherManager::computeJulianDate(state->dataWeatherManager->ReportPeriodInput(periodIdx).endYear,
+                                          state->dataWeatherManager->ReportPeriodInput(periodIdx).endMonth,
+                                          state->dataWeatherManager->ReportPeriodInput(periodIdx).endDay);
+    state->dataEnvrn->Year = 0;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->HourOfDay = 8;
+    EXPECT_TRUE(isReportPeriodBeginning(*state, periodIdx));
+
+    state->dataEnvrn->Year = 0;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 10;
+    state->dataGlobal->HourOfDay = 8;
+    EXPECT_FALSE(isReportPeriodBeginning(*state, periodIdx));
+
+    state->dataEnvrn->Year = 0;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->HourOfDay = 15;
+    EXPECT_FALSE(isReportPeriodBeginning(*state, periodIdx));
+
+    state->dataEnvrn->Year = 0;
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->HourOfDay = 8;
+    EXPECT_FALSE(isReportPeriodBeginning(*state, periodIdx));
+}
+
 } // namespace EnergyPlus
