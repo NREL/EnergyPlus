@@ -586,11 +586,11 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         state.dataSysVars->ReportExtShadingSunlitFrac = false;
     }
-    int ExtShadingSchedNum;
     if (state.dataSysVars->shadingMethod == ShadingMethod::Imported) {
+        int ExtShadingSchedNum;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
-            if (ExtShadingSchedNum) {
+            if (ExtShadingSchedNum != 0) {
                 state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
                 state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
             } else {

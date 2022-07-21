@@ -734,14 +734,8 @@ namespace DXCoils {
     );
 
     Real64 GetMinOATCompressor(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
-                               std::string const &CoilName, // must match coil names for the coil type
-                               bool &ErrorsFound            // set to true if problem
-    );
-
-    Real64 GetMinOATCompressorUsingIndex(EnergyPlusData &state,
-                                         int const CoilIndex, // index to coil
-                                         bool &ErrorsFound    // set to true if problem
+                               int const CoilIndex, // index to coil
+                               bool &ErrorsFound    // set to true if problem
     );
 
     int GetCoilInletNode(EnergyPlusData &state,

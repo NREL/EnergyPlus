@@ -308,36 +308,6 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    std::string MakeUPPERCase(std::string_view const InputString)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This function returns the Upper Case representation of the InputString.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the Intrinsic SCAN function to scan the lowercase representation of
-        // characters (DataStringGlobals) for each character in the given string.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        std::string ResultString(InputString);
-
-        for (std::string::size_type i = 0, e = len(InputString); i < e; ++i) {
-            int const curCharVal = int(InputString[i]);
-            if ((97 <= curCharVal && curCharVal <= 122) || (224 <= curCharVal && curCharVal <= 255)) { // lowercase ASCII and accented characters
-                ResultString[i] = char(curCharVal - 32);
-            }
-        }
-
-        return ResultString;
-    }
-
     void VerifyName(EnergyPlusData &state,
                     std::string const &NameToVerify,
                     Array1D_string const &NamesList,

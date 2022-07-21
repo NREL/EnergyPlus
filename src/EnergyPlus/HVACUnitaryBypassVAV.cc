@@ -908,14 +908,13 @@ namespace HVACUnitaryBypassVAV {
                 if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:SingleSpeed")) {
                     CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
                     DXCoilErrFlag = false;
-                    CBVAV(CBVAVNum).MinOATCompressor =
-                        DXCoils::GetMinOATCompressor(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
+                    DXCoils::GetDXCoilIndex(
+                        state, CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
+                    CBVAV(CBVAVNum).MinOATCompressor = DXCoils::GetMinOATCompressor(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilInletNode =
                         DXCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode =
                         DXCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    DXCoils::GetDXCoilIndex(
-                        state, CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
                     if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:VariableSpeed")) {
@@ -924,7 +923,7 @@ namespace HVACUnitaryBypassVAV {
                     CBVAV(CBVAVNum).DXHeatCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
                         state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).MinOATCompressor =
-                        VariableSpeedCoils::GetVSCoilMinOATCompressor(state, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
+                        VariableSpeedCoils::GetVSCoilMinOATCompressor(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
                         state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
