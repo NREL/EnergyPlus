@@ -397,7 +397,7 @@ namespace ResultsFramework {
         void writeOutputs(EnergyPlusData &state);
 
         void addReportVariable(std::string const &keyedValue,
-                               std::string const &variableName,
+                               std::string_view const variableName,
                                std::string const &units,
                                OutputProcessor::ReportingFrequency const reportingInterval);
 
