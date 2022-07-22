@@ -7455,11 +7455,9 @@ namespace InternalHeatGains {
         // Object report variables
         for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
 
-            for (auto &pw : state.dataHeatBal->ZoneITEq(Loop).PowerRpt) {
-                pw = 0.0;
-            }
-            for (auto &ej : state.dataHeatBal->ZoneITEq(Loop).EnergyRpt) {
-                ej = 0.0;
+            for (int i = 0; i < (int)PERptVars::Num; ++i) {
+                state.dataHeatBal->ZoneITEq(Loop).PowerRpt[i] = 0.0;
+                state.dataHeatBal->ZoneITEq(Loop).EnergyRpt[i] = 0.0;
             }
 
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = 0.0;
@@ -7488,11 +7486,9 @@ namespace InternalHeatGains {
         // Zone total report variables
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
 
-            for (auto &pw : state.dataHeatBal->ZnRpt(Loop).PowerRpt) {
-                pw = 0.0;
-            }
-            for (auto &ej : state.dataHeatBal->ZnRpt(Loop).EnergyRpt) {
-                ej = 0.0;
+            for (int i = 0; i < (int)PERptVars::Num; ++i) {
+                state.dataHeatBal->ZnRpt(Loop).PowerRpt[i] = 0.0;
+                state.dataHeatBal->ZnRpt(Loop).EnergyRpt[i] = 0.0;
             }
 
             state.dataHeatBal->ZnRpt(Loop).ITEAdjReturnTemp = 0.0;
@@ -7515,11 +7511,9 @@ namespace InternalHeatGains {
         // Space total report variables
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
 
-            for (auto &pw : state.dataHeatBal->spaceRpt(spaceNum).PowerRpt) {
-                pw = 0.0;
-            }
-            for (auto &ej : state.dataHeatBal->spaceRpt(spaceNum).EnergyRpt) {
-                ej = 0.0;
+            for (int i = 0; i < (int)PERptVars::Num; ++i) {
+                state.dataHeatBal->spaceRpt(spaceNum).PowerRpt[i] = 0.0;
+                state.dataHeatBal->spaceRpt(spaceNum).EnergyRpt[i] = 0.0;
             }
 
             state.dataHeatBal->spaceRpt(spaceNum).ITEAdjReturnTemp = 0.0;
@@ -7697,21 +7691,9 @@ namespace InternalHeatGains {
 
             for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 state.dataHeatBal->ZnRpt(NZ).PowerRpt[i] += state.dataHeatBal->ZoneITEq(Loop).PowerRpt[i];
-            }
-
-            for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 state.dataHeatBal->spaceRpt(spaceNum).PowerRpt[i] += state.dataHeatBal->ZoneITEq(Loop).PowerRpt[i];
-            }
-
-            for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 state.dataHeatBal->ZoneITEq(Loop).EnergyRpt[i] = state.dataHeatBal->ZoneITEq(Loop).PowerRpt[i] * state.dataGlobal->TimeStepZoneSec;
-            }
-
-            for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 state.dataHeatBal->ZnRpt(NZ).EnergyRpt[i] += state.dataHeatBal->ZoneITEq(Loop).EnergyRpt[i];
-            }
-
-            for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 state.dataHeatBal->spaceRpt(spaceNum).EnergyRpt[i] += state.dataHeatBal->ZoneITEq(Loop).EnergyRpt[i];
             }
 
