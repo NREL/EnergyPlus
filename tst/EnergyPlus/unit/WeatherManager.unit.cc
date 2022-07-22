@@ -1825,8 +1825,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_GetReportPeriodData)
     EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endHour, 18);
 }
 
-TEST_F(EnergyPlusFixture, WeatherManager_CopyReportPeriodObject)
-{
+TEST_F(EnergyPlusFixture, WeatherManager_CopyReportPeriodObject) {
     int nReportPeriod = 2;
     state->dataWeatherManager->ReportPeriodInput.allocate(nReportPeriod);
 
