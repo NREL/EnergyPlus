@@ -167,7 +167,7 @@ bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue
     // This function looks up a key and variable name value and determines if they are
     // in the list of required variables for a simulation.
 
-    auto const found_variable = state.dataOutput->OutputVariablesForSimulation.find(VariableName);
+    auto const found_variable = state.dataOutput->OutputVariablesForSimulation.find(std::string{VariableName});
     if (found_variable == state.dataOutput->OutputVariablesForSimulation.end()) return false;
 
     auto found_key = found_variable->second.find(KeyedValue);
