@@ -1633,66 +1633,19 @@ void ScanForReports(EnergyPlusData &state,
 
             AvailRpt CheckAvailRpt =
                 static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
-            switch (CheckAvailRpt) {
-            case AvailRpt::None: {
-                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-            } break;
-            case AvailRpt::NotByUniqueKeyNames: {
-                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = true;
-                state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-            } break;
-            case AvailRpt::Verbose: {
-                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
-            } break;
-            default: {
-                state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
-                state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
-            } break;
-            }
+            state.dataRuntimeLang->OutputEMSActuatorAvailSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
+            state.dataRuntimeLang->OutputEMSActuatorAvailFull = (CheckAvailRpt == AvailRpt::Verbose);
 
             CheckAvailRpt =
                 static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-            switch (CheckAvailRpt) {
-            case AvailRpt::None: {
-                state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-            } break;
-            case AvailRpt::NotByUniqueKeyNames: {
-                state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                state.dataRuntimeLang->OutputEMSInternalVarsSmall = true;
-            } break;
-            case AvailRpt::Verbose: {
-                state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
-                state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-            } break;
-            default: {
-                state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
-                state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
-            } break;
-            }
+            state.dataRuntimeLang->OutputEMSInternalVarsSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
+            state.dataRuntimeLang->OutputEMSInternalVarsFull = (CheckAvailRpt == AvailRpt::Verbose);
 
             ERLdebugOutputLevel CheckERLlevel = static_cast<ERLdebugOutputLevel>(
                 getEnumerationValue(ERLdebugOutputLevelNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
-            switch (CheckERLlevel) {
-            case ERLdebugOutputLevel::None: {
-                state.dataRuntimeLang->OutputEMSErrors = false;
-                state.dataRuntimeLang->OutputFullEMSTrace = false;
-            } break;
-            case ERLdebugOutputLevel::ErrorsOnly: {
-                state.dataRuntimeLang->OutputEMSErrors = true;
-                state.dataRuntimeLang->OutputFullEMSTrace = false;
-            } break;
-            case ERLdebugOutputLevel::Verbose: {
-                state.dataRuntimeLang->OutputFullEMSTrace = true;
-                state.dataRuntimeLang->OutputEMSErrors = true;
-            } break;
-            default: {
-                state.dataRuntimeLang->OutputEMSErrors = false;
-                state.dataRuntimeLang->OutputFullEMSTrace = false;
-            } break;
-            }
+            state.dataRuntimeLang->OutputEMSErrors =
+                (CheckERLlevel == ERLdebugOutputLevel::ErrorsOnly || CheckERLlevel == ERLdebugOutputLevel::Verbose);
+            state.dataRuntimeLang->OutputFullEMSTrace = (CheckERLlevel == ERLdebugOutputLevel::Verbose);
         }
 
         state.dataGeneral->GetReportInput = false;

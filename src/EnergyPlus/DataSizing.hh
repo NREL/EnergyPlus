@@ -148,8 +148,7 @@ namespace DataSizing {
     constexpr int ZOAM_ProportionalControlDesOcc(9); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
     // to calculate the zone level outdoor air flow rates based on design occupancy
 
-    enum class SOAM
-    // System Outdoor Air Method
+    enum class SystemOAMethod
     {
         Invalid = -1,
         ZoneSum, // Sum the outdoor air flow rates of all zones
@@ -655,7 +654,7 @@ namespace DataSizing {
                                          // FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
         int ScaleHeatSAFMethod;          // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea,
                                          // FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-        SOAM SystemOAMethod;             // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
+        SystemOAMethod SystemOAMethod;   // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
         Real64 MaxZoneOAFraction;        // maximum value of min OA for zones served by system
         bool OAAutoSized;                // Set to true if design OA vol flow is set to 'autosize' in Sizing:System
         int CoolingCapMethod;            // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea,
@@ -681,7 +680,7 @@ namespace DataSizing {
             : AirLoopNum(0), LoadSizeType(0), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0), SysAirMinFlowRat(0.0),
               SysAirMinFlowRatWasAutoSized(false), PreheatTemp(0.0), PrecoolTemp(0.0), PreheatHumRat(0.0), PrecoolHumRat(0.0), CoolSupTemp(0.0),
               HeatSupTemp(0.0), CoolSupHumRat(0.0), HeatSupHumRat(0.0), CoolAirDesMethod(0), DesCoolAirFlow(0.0), HeatAirDesMethod(0),
-              DesHeatAirFlow(0.0), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), SystemOAMethod(SOAM::Invalid), MaxZoneOAFraction(0.0),
+              DesHeatAirFlow(0.0), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), SystemOAMethod(SystemOAMethod::Invalid), MaxZoneOAFraction(0.0),
               OAAutoSized(false), CoolingCapMethod(0), HeatingCapMethod(0), ScaledCoolingCapacity(0.0), ScaledHeatingCapacity(0.0),
               FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0), FlowPerFloorAreaCooled(0.0), FlowPerFloorAreaHeated(0.0),
               FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0), FlowPerCoolingCapacity(0.0),
@@ -794,7 +793,7 @@ namespace DataSizing {
         //   [kg water/kg dry air] [zone time step]
         Array1D<Real64> SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
         Array1D<Real64> SysDOASLatAddSeq;  // daily sequence of latent heat addition rate from DOAS supply air [W]
-        SOAM SystemOAMethod;               // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
+        SystemOAMethod SystemOAMethod;     // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
         Real64 MaxZoneOAFraction;          // maximum value of min OA for zones served by system
         Real64 SysUncOA;                   // uncorrected system outdoor air flow based on zone people and zone area
         bool OAAutoSized;                  // Set to true if design OA vol flow is set to 'autosize'
@@ -852,13 +851,14 @@ namespace DataSizing {
               EMSOverrideDesCoolVolFlowOn(false), EMSValueDesCoolVolFlow(0.0), SensCoolCap(0.0), TotCoolCap(0.0), HeatCap(0.0), PreheatCap(0.0),
               MixTempAtCoolPeak(0.0), MixHumRatAtCoolPeak(0.0), RetTempAtCoolPeak(0.0), RetHumRatAtCoolPeak(0.0), OutTempAtCoolPeak(0.0),
               OutHumRatAtCoolPeak(0.0), MassFlowAtCoolPeak(0.0), HeatMixTemp(0.0), HeatMixHumRat(0.0), HeatRetTemp(0.0), HeatRetHumRat(0.0),
-              HeatOutTemp(0.0), HeatOutHumRat(0.0), DesCoolVolFlowMin(0.0), SystemOAMethod(SOAM::Invalid), MaxZoneOAFraction(0.0), SysUncOA(0.0),
-              OAAutoSized(false), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), CoolingCapMethod(0), HeatingCapMethod(0), ScaledCoolingCapacity(0.0),
-              ScaledHeatingCapacity(0.0), FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0), FlowPerFloorAreaCooled(0.0),
-              FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0),
-              FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0), FractionOfAutosizedCoolingCapacity(1.0),
-              FractionOfAutosizedHeatingCapacity(1.0), CoolingTotalCapacity(0.0), HeatingTotalCapacity(0.0), CoolingPeakLoadType(0), // wfb
-              CoolCapControl(0),                                                                                                     // wfb
+              HeatOutTemp(0.0), HeatOutHumRat(0.0), DesCoolVolFlowMin(0.0), SystemOAMethod(SystemOAMethod::Invalid), MaxZoneOAFraction(0.0),
+              SysUncOA(0.0), OAAutoSized(false), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), CoolingCapMethod(0), HeatingCapMethod(0),
+              ScaledCoolingCapacity(0.0), ScaledHeatingCapacity(0.0), FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0),
+              FlowPerFloorAreaCooled(0.0), FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0),
+              FractionOfAutosizedHeatingAirflow(1.0), FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0),
+              FractionOfAutosizedCoolingCapacity(1.0), FractionOfAutosizedHeatingCapacity(1.0), CoolingTotalCapacity(0.0), HeatingTotalCapacity(0.0),
+              CoolingPeakLoadType(0), // wfb
+              CoolCapControl(0),      // wfb
               sysSizeHeatingDominant(false), sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0),
               DesCoolCoilVolFlow(0.0), DesHeatCoilVolFlow(0.0), DesMainCoilVolFlow(0.0), SysHeatCoilTimeStepPk(0), SysHeatAirTimeStepPk(0),
               HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0), SysHeatCoinSpaceSens(0.0)

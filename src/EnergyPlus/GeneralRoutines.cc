@@ -1458,12 +1458,13 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                         state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
                         continue;
                     if (Count == 1 && AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).InletNode)) {
-                        ShowSevereError(state, "Error in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(BCount).Name);
-                        ShowContinueError(state, "For AirLoopHVAC:SupplyPlenum=" + state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName);
-                        ShowContinueError(state, "Expected inlet node (supply air path)=" + AirPathNodeName);
+                        ShowSevereError(state, format("Error in AirLoopHVAC:SupplyPath={}", state.dataZoneEquip->SupplyAirPath(BCount).Name));
                         ShowContinueError(state,
-                                          "Encountered node name (supply plenum)=" +
-                                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).OutletNode(1)));
+                                          format("For AirLoopHVAC:SupplyPlenum={}", state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName));
+                        ShowContinueError(state, format("Expected inlet node (supply air path)={}", AirPathNodeName));
+                        ShowContinueError(state,
+                                          format("Encountered node name (supply plenum)={}",
+                                                 state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneSupPlenCond(Count2).OutletNode(1))));
                         ErrFound = true;
                         ++NumErr;
                     }
@@ -1788,12 +1789,12 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                         continue;
                     // Found correct Mixer (by name), check outlet node vs. return air path outlet node
                     if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode)) {
-                        ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
-                        ShowContinueError(state, "For Connector:Mixer=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
-                        ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
+                        ShowSevereError(state, format("Error in Return Air Path={}", state.dataZoneEquip->ReturnAirPath(BCount).Name));
+                        ShowContinueError(state, format("For Connector:Mixer={}", state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp)));
+                        ShowContinueError(state, format("Expected outlet node (return air path)={}", AirPathNodeName));
                         ShowContinueError(state,
-                                          "Encountered node name (mixer)=" +
-                                              state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode));
+                                          format("Encountered node name (mixer)={}",
+                                                 state.dataLoopNodes->NodeID(state.dataMixerComponent->MixerCond(Count2).OutletNode)));
                         ErrFound = true;
                         ++NumErr;
                     } else {
@@ -1825,12 +1826,13 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                         state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
                         continue;
                     if (AirPathNodeName != state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode)) {
-                        ShowSevereError(state, "Error in Return Air Path=" + state.dataZoneEquip->ReturnAirPath(BCount).Name);
-                        ShowContinueError(state, "For AirLoopHVAC:ReturnPlenum=" + state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp));
-                        ShowContinueError(state, "Expected outlet node (return air path)=" + AirPathNodeName);
+                        ShowSevereError(state, format("Error in Return Air Path={}", state.dataZoneEquip->ReturnAirPath(BCount).Name));
+                        ShowContinueError(
+                            state, format("For AirLoopHVAC:ReturnPlenum={}", state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp)));
+                        ShowContinueError(state, format("Expected outlet node (return air path)={}", AirPathNodeName));
                         ShowContinueError(state,
-                                          "Encountered node name (zone return plenum)=" +
-                                              state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode));
+                                          format("Encountered node name (zone return plenum)={}",
+                                                 state.dataLoopNodes->NodeID(state.dataZonePlenum->ZoneRetPlenCond(Count2).OutletNode)));
                         ErrFound = true;
                         ++NumErr;
                     } else {
