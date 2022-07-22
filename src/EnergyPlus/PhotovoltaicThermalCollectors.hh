@@ -195,6 +195,7 @@ namespace PhotovoltaicThermalCollectors {
         bool MySetPointCheckFlag;
         bool MyOneTimeFlag;
         bool SetLoopIndexFlag;
+        Real64 QdotSource; // Source/sink term
 
         // Default Constructor
         PVTCollectorStruct()
@@ -202,7 +203,7 @@ namespace PhotovoltaicThermalCollectors {
               PVfound(false), WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0),
               HVACOutletNodeNum(0), DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0),
               AreaCol(0.0), BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true),
-              SetLoopIndexFlag(true)
+              SetLoopIndexFlag(true), QdotSource(0.0)
         {
         }
 

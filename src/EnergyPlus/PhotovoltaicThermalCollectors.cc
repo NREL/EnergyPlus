@@ -488,21 +488,21 @@ namespace PhotovoltaicThermalCollectors {
                         NodeInputManager::GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(6),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            DataLoopNode::ConnectionType::Inlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     state.dataPhotovoltaicThermalCollector->PVT(Item).PlantOutletNodeNum =
                         NodeInputManager::GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(7),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            DataLoopNode::ConnectionType::Outlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     BranchNodeConnections::TestCompSet(state,
                                                        state.dataIPShortCut->cCurrentModuleObject,
@@ -511,28 +511,28 @@ namespace PhotovoltaicThermalCollectors {
                                                        state.dataIPShortCut->cAlphaArgs(7),
                                                        "Water Nodes");
 
-                    state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSideNum = DataPlant::DemandSupply_No;
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).WPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
                 }
                 if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
                     state.dataPhotovoltaicThermalCollector->PVT(Item).HVACInletNodeNum =
                         NodeInputManager::GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(8),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            DataLoopNode::ConnectionType::Inlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     state.dataPhotovoltaicThermalCollector->PVT(Item).HVACOutletNodeNum =
                         NodeInputManager::GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(9),
                                                             ErrorsFound,
-                                                            state.dataIPShortCut->cCurrentModuleObject,
+                                                            DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlatePhotovoltaicThermal,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            DataLoopNode::ConnectionType::Outlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
                     BranchNodeConnections::TestCompSet(state,
@@ -997,7 +997,7 @@ namespace PhotovoltaicThermalCollectors {
         // decide if PVT should be in cooling or heat mode and if it should be bypassed or not
 
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-            if (this->PVTModelType == SimplePVTmodel) || (this->PVTModelType == BIPVTmodel)) {
+            if ((this->PVTModelType == SimplePVTmodel) || (this->PVTModelType == BIPVTmodel)) {
                 if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
@@ -1103,17 +1103,16 @@ namespace PhotovoltaicThermalCollectors {
 
             Real64 Eff(0.0);
 
-                switch (this->Simple.ThermEfficMode) {
-                case ThermEfficEnum::FIXED: {
-                    Eff = this->Simple.ThermEffic;
-                } break;
-                case ThermEfficEnum::SCHEDULED: {
-                    Eff = ScheduleManager::GetCurrentScheduleValue(state, this->Simple.ThermEffSchedNum);
-                    this->Simple.ThermEffic = Eff;
-                } break;
-                default:
-                    break;
-                }
+            switch (this->Simple.ThermEfficMode) {
+            case ThermEfficEnum::FIXED: {
+              Eff = this->Simple.ThermEffic;
+            } break;
+            case ThermEfficEnum::SCHEDULED: {
+                Eff = ScheduleManager::GetCurrentScheduleValue(state, this->Simple.ThermEffSchedNum);
+                this->Simple.ThermEffic = Eff;
+            } break;
+            default:
+                break;
             }
 
             Real64 PotentialHeatGain = state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) * Eff * this->AreaCol;
@@ -1193,9 +1192,9 @@ namespace PhotovoltaicThermalCollectors {
                 CpInlet = Psychrometrics::CPHW(Tinlet);
             }
             Real64 Tcollector =
-                (2.0 * mdot * CpInlet * Tinlet +
-                 this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                  HrAir * state.dataHeatBalSurf->TH(1, 1, SurfNum) + HcExt * state.dataHeatBalSurf->TH(1, 1, SurfNum))) /
+                (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
+                                                                  HrAir * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum) + 
+                                                                  HcExt * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum))) /
                 (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
             PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
@@ -1438,7 +1437,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 tamb = state.dataEnvrn->OutDryBulbTemp;                   // ambient temperature (DegC)
         Real64 tsky = state.dataEnvrn->SkyTemp;                          // sky temperature (DegC)
         Real64 v_wind = state.dataEnvrn->WindSpeed;                      // wind speed (m/s)
-        Real64 t2 = state.dataHeatBalSurf->TH(1, 1, this->SurfNum), t2K; // temperature of bldg surface (DegC)
+        Real64 t2 = state.dataHeatBalSurf->SurfTempOutHist(this->SurfNum), t2K;         // temperature of bldg surface (DegC)
         Real64 mdot = this->MassFlowRate;                                // fluid mass flow rate (kg/s)
         Real64 mdot_bipvt(mdot), mdot_bipvt_new(mdot);                   // mass flow rate through the bipvt duct (kg/s)
         Real64 s(0.0);                                                   // solar radiation gain at pv surface (W/m2)
