@@ -5029,13 +5029,13 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
                 switch (state.dataSize->CurDuctType) {
                 case DataHVACGlobals::AirDuctType::Main: {
-                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                    } break;
+                    this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                } break;
                 case DataHVACGlobals::AirDuctType::Cooling: {
-                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
-                    } break;
+                    this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                } break;
                 case DataHVACGlobals::AirDuctType::Heating: {
-                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                    this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                 } break;
                 case DataHVACGlobals::AirDuctType::Other: {
                     this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;

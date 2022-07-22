@@ -1466,20 +1466,20 @@ namespace UnitarySystems {
         static constexpr std::string_view RoutineName("SizeUnitarySystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Iter;                  // iteration count
-        int MSHPIndex;             // Index to design Specification object
-        int BranchNum;             // Index to branch on air loop
-        Real64 SystemFlow;         // AirloopHVAC flow rate [m3/s]
-        Real64 BranchFanFlow;      // branch fan flow rate [m3/s]
-        bool ErrFound;             // logical error flag
-        std::string FanType;       // fan type
-        std::string m_FanName;     // fan name
-        std::string SystemType;    // type of air loop equipment
-        std::string HXCoilName;    // cooling coil name in HXAssisted parent
-        int ActualCoolCoilType;    // cooling coil type in HXAssisted parent
+        int Iter;                                     // iteration count
+        int MSHPIndex;                                // Index to design Specification object
+        int BranchNum;                                // Index to branch on air loop
+        Real64 SystemFlow;                            // AirloopHVAC flow rate [m3/s]
+        Real64 BranchFanFlow;                         // branch fan flow rate [m3/s]
+        bool ErrFound;                                // logical error flag
+        std::string FanType;                          // fan type
+        std::string m_FanName;                        // fan name
+        std::string SystemType;                       // type of air loop equipment
+        std::string HXCoilName;                       // cooling coil name in HXAssisted parent
+        int ActualCoolCoilType;                       // cooling coil type in HXAssisted parent
         DataHVACGlobals::AirDuctType SaveCurDuctType; // used during sizing to save the current duct type
-        Real64 QActual;            // water coil output [W]
-        Real64 capacityMultiplier; // used for ASHRAE model sizing
+        Real64 QActual;                               // water coil output [W]
+        Real64 capacityMultiplier;                    // used for ASHRAE model sizing
 
         Real64 TempSize;  // DataSizing::AutoSized value of input field
         int FieldNum = 2; // IDD numeric field number where input field description is found
