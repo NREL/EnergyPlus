@@ -827,6 +827,10 @@ namespace DataSizing {
 
         Real64 SysCoolCoinSpaceSens; // sum of zone space sensible cooling loads at coincident peak
         Real64 SysHeatCoinSpaceSens; //  sum of zone space sensible heating loads at coincident peak
+        Real64 SysDesCoolLoad;       // system peak load with coincident
+        int SysCoolLoadTimeStepPk;   // timestep in day of cooling load peak
+        Real64 SysDesHeatLoad;       // system peak load with coincident
+        int SysHeatLoadTimeStepPk;   // timestep in day of cooling load peak
         // Default Constructor
         SystemSizingData()
             : LoadSizeType(0), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0), SysAirMinFlowRat(0.0),
@@ -846,10 +850,10 @@ namespace DataSizing {
               FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0),
               FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0), FractionOfAutosizedCoolingCapacity(1.0),
               FractionOfAutosizedHeatingCapacity(1.0), CoolingTotalCapacity(0.0), HeatingTotalCapacity(0.0), CoolingPeakLoadType(0), // wfb
-              CoolCapControl(0),                                                                                                     // wfb
-              sysSizeHeatingDominant(false), sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0),
+              CoolCapControl(0), sysSizeHeatingDominant(false), sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0),
               DesCoolCoilVolFlow(0.0), DesHeatCoilVolFlow(0.0), DesMainCoilVolFlow(0.0), SysHeatCoilTimeStepPk(0), SysHeatAirTimeStepPk(0),
-              HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0), SysHeatCoinSpaceSens(0.0)
+              HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0), SysHeatCoinSpaceSens(0.0), SysDesCoolLoad(0.0), SysCoolLoadTimeStepPk(0),
+              SysDesHeatLoad(0.0), SysHeatLoadTimeStepPk(0)
         {
         }
     };
