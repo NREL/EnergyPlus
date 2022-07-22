@@ -1469,6 +1469,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    ScheduleTypeLimits,",
         "      Any Number;              !- Name",
 
+        "  Output:Table:SummaryReports,",
+        "      AllSummary,                             !- Report Name 1",
+        "      AllSummaryAndSizingPeriod;              !- Report Name 2",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
