@@ -888,7 +888,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         std::string const &KeyedValue,                    // Associated Key for this variable
                          Optional_string_const ReportFreq = _,             // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey = _,        // Meter Resource Type (Electricity, Gas, etc)
                          Optional_string_const EndUseKey = _,              // Meter End Use Key (Lights, Heating, Cooling, etc)
@@ -908,7 +908,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int &ActualVariable,                              // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         std::string const &KeyedValue,                    // Associated Key for this variable
                          Optional_string_const ReportFreq = _,             // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey = _              // Group identifier for SQL output
 );
