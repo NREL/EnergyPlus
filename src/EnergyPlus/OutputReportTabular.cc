@@ -13555,14 +13555,18 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
             }
 
             tableName = "Heating SET Degree-Hours";
+            Array1D_string rowHeadSET;
+            Array2D_string tableBodySET;
+            rowHeadSET.allocate(state.dataGlobal->NumOfZones + 3);
+            tableBodySET.allocate(columnNum, state.dataGlobal->NumOfZones + 3);
             WriteSETHoursTableNonPreDef(state,
                                         columnNum,
                                         tableName,
                                         columnHeadStr,
                                         columnWidth,
                                         state.dataHeatBalFanSys->ZoneLowSETHours,
-                                        rowHead,
-                                        tableBody,
+                                        rowHeadSET,
+                                        tableBodySET,
                                         degreeHourConversion);
             tableName = "Cooling SET Degree-Hours";
             WriteSETHoursTableNonPreDef(state,
@@ -13571,8 +13575,8 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                                         columnHeadStr,
                                         columnWidth,
                                         state.dataHeatBalFanSys->ZoneHighSETHours,
-                                        rowHead,
-                                        tableBody,
+                                        rowHeadSET,
+                                        tableBodySET,
                                         degreeHourConversion);
         }
 
