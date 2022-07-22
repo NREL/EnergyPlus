@@ -10531,7 +10531,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     EXPECT_EQ("-90.0", RetrieveEntryFromTableBody(tableBody, 2, 6));
 }
 
-TEST_F(EnergyPlusFixture, OutputReportTabularTest_RetrieveEntryFromTableBody) {
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_RetrieveEntryFromTableBody)
+{
 
     Array2D_string tableBody;
     int columnCount = 4;
@@ -10545,7 +10546,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_RetrieveEntryFromTableBody) {
     EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 1, 1), "1-1");
     EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 2, 1), "1-2");
     EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 3, 4), "4-3");
-
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPreDef)
@@ -10607,7 +10607,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPre
     }
 }
 
-TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef) {
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
+{
 
     int columnNum = 5;
     Array1D_string columnHead;
