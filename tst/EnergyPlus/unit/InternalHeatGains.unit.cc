@@ -482,20 +482,19 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 InitialPower = state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::CPU] +
-                          state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::Fan] +
-                          state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::UPS];
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
+    Real64 InitialPower =
+        thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
 
     state->dataLoopNodes->Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 NewPower = state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::CPU] + state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::Fan] +
-                      state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::UPS];
+    Real64 NewPower =
+        thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
     ASSERT_NE(InitialPower, NewPower);
     HVACManager::ResetNodeData(*state);
 
     InternalHeatGains::CalcZoneITEq(*state);
-    NewPower = state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::CPU] + state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::Fan] +
-               state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::UPS];
+    NewPower = thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
     ASSERT_EQ(InitialPower, NewPower);
 }
 
@@ -902,10 +901,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     state->dataLoopNodes->Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    ASSERT_DOUBLE_EQ(state->dataHeatBal->ZoneITEq(1).AirOutletDryBulbT + state->dataHeatBal->ZoneITEq(1).ReturnApproachTemp,
-                     state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
-    ASSERT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp + state->dataHeatBal->ZoneITEq(1).SupplyApproachTemp,
-                     state->dataHeatBal->ZoneITEq(1).AirInletDryBulbT);
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
+    ASSERT_DOUBLE_EQ(thisZoneITEq.AirOutletDryBulbT + thisZoneITEq.ReturnApproachTemp, state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
+    ASSERT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp + thisZoneITEq.SupplyApproachTemp, thisZoneITEq.AirInletDryBulbT);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
@@ -1055,12 +1053,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
 
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
-    Real64 DefaultUPSPower =
-        (state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::CPU] + state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::Fan]) *
-        max((1.0 - state->dataHeatBal->ZoneITEq(1).DesignUPSEfficiency), 0.0);
+    Real64 DefaultUPSPower = (thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan]) *
+                             max((1.0 - thisZoneITEq.DesignUPSEfficiency), 0.0);
 
-    ASSERT_EQ(DefaultUPSPower, state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::UPS]);
+    ASSERT_EQ(DefaultUPSPower, thisZoneITEq.PowerRpt[(int)PERptVars::UPS]);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
@@ -2593,11 +2591,13 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
 
     state->dataEnvrn->StdBaroPress = 101400.0;
 
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
+
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 calculatedResult1 = state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::CPU];
-    Real64 calculatedResult2 = state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::Fan];
-    Real64 calculatedResult3 = state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::UPS];
-    Real64 calculatedResult4 = state->dataHeatBal->ZoneITEq(1).PowerRpt[(int)PERptVars::UPSGainToZone];
+    Real64 calculatedResult1 = thisZoneITEq.PowerRpt[(int)PERptVars::CPU];
+    Real64 calculatedResult2 = thisZoneITEq.PowerRpt[(int)PERptVars::Fan];
+    Real64 calculatedResult3 = thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
+    Real64 calculatedResult4 = thisZoneITEq.PowerRpt[(int)PERptVars::UPSGainToZone];
 
     Real64 expectedResult1 = 480.024;
     Real64 expectedResult2 = 380.0;
@@ -2737,14 +2737,15 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
 
+    int Loop = 1;
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(Loop);
     // Test the processing results of the Environmental Class H1 input
-    EXPECT_TRUE(state->dataHeatBal->ZoneITEq(1).Class == DataHeatBalance::ITEClass::H1);
+    EXPECT_TRUE(thisZoneITEq.Class == DataHeatBalance::ITEClass::H1);
 
     state->dataEnvrn->StdBaroPress = 101325.0;
 
     InternalHeatGains::CalcZoneITEq(*state);
 
-    int Loop = 1;
     int NZ = 1;
     int spaceNum = 1;
     int EnvClass = 3;
@@ -2757,67 +2758,69 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
 
     EXPECT_NEAR(state->dataGlobal->TimeStepZone, 1.0, 1e-6);
 
+    auto &thisZnRpt = state->dataHeatBal->ZnRpt(NZ);
+    auto &thisspaceRpt = state->dataHeatBal->spaceRpt(spaceNum);
     // Test: The following test should pass
     // if (TAirIn > DBMax[EnvClass])
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_GT(state->dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT, 0.0);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_GT(thisZoneITEq.DryBulbTAboveDeltaT, 0.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT, 1.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, 1.0);
-    EXPECT_GE(state->dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT, 0.0);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT, 1.0);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, 1.0);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT, 1.0);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
+    EXPECT_GE(thisZoneITEq.DryBulbTAboveDeltaT, 0.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, 1.0);
 
     // if (TAirIn < DBMin[EnvClass])
-    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT, TAirIn - DBMin[EnvClass]);
-    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.TimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisZoneITEq.DryBulbTBelowDeltaT, TAirIn - DBMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 
     // This block should be activated and set to correct tests when PR9541 is merged
     //// if (TDPAirIn > DPMax[EnvClass])
-    // EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    //// EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
-    // EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisZoneITEq.TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    //// EXPECT_NE(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    // EXPECT_NE(thisZnRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisspaceRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 
     // if (TDPAirIn < DPMin[EnvClass])
-    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT, TDPAirIn - DPMin[EnvClass]);
-    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.TimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisZoneITEq.DewpointTBelowDeltaT, TDPAirIn - DPMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 
     // if (RHAirIn > RHMax[EnvClass])
-    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeAboveRH, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH, RHAirIn - RHMax[EnvClass]);
-    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.TimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisZoneITEq.RHAboveDeltaRH, RHAirIn - RHMax[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 
     // if (RHAirIn < RHMin[EnvClass])
-    EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).TimeBelowRH, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    // EXPECT_NE(state->dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH, RHAirIn - RHMin[EnvClass]);
-    EXPECT_NE(state->dataHeatBal->ZnRpt(NZ).ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
-    EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
-    EXPECT_EQ(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.TimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    // EXPECT_NE(thisZoneITEq.RHBelowDeltaRH, RHAirIn - RHMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 }
