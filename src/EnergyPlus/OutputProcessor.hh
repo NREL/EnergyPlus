@@ -585,18 +585,18 @@ namespace OutputProcessor {
 
     void CheckReportVariable(EnergyPlusData &state,
                              std::string const &KeyedValue, // Associated Key for this variable
-                             std::string const &VarName     // String Name of variable (without units)
+                             std::string_view const VarName     // String Name of variable (without units)
     );
 
     void BuildKeyVarList(EnergyPlusData &state,
                          std::string const &KeyedValue,   // Associated Key for this variable
-                         std::string const &VariableName, // String Name of variable
+                         std::string_view const VariableName, // String Name of variable
                          int MinIndx,                     // Min number (from previous routine) for this variable
                          int MaxIndx                      // Max number (from previous routine) for this variable
     );
 
     void AddBlankKeys(EnergyPlusData &state,
-                      std::string const &VariableName, // String Name of variable
+                      std::string_view const VariableName, // String Name of variable
                       int MinIndx,                     // Min number (from previous routine) for this variable
                       int MaxIndx                      // Max number (from previous routine) for this variable
     );
@@ -761,7 +761,7 @@ namespace OutputProcessor {
                                            std::string const &indexGroup,   // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &reportIDChr,  // The reporting ID for the data
                                            std::string const &keyedValue,   // The key name for the data
-                                           std::string const &variableName, // The variable's actual name
+                                           std::string_view const variableName, // The variable's actual name
                                            TimeStepType timeStepType,
                                            OutputProcessor::Unit unitsForVar, // The variables units
                                            Optional_string_const customUnitName = _,
@@ -1007,7 +1007,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
 void ProduceRDDMDD(EnergyPlusData &state);
 
 void AddToOutputVariableList(EnergyPlusData &state,
-                             std::string const &VarName, // Variable Name
+                             std::string_view const VarName, // Variable Name
                              OutputProcessor::TimeStepType TimeStepType,
                              OutputProcessor::StoreType StateType,
                              OutputProcessor::VariableType VariableType,

@@ -83,7 +83,7 @@ namespace DataOutputs {
     };
 
     // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
-    bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName);
+    bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string_view const VariableName);
 
 } // namespace DataOutputs
 

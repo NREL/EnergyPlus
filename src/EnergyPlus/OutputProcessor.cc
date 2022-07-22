@@ -272,7 +272,7 @@ namespace OutputProcessor {
         }
     }
 
-    void CheckReportVariable(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VarName)
+    void CheckReportVariable(EnergyPlusData &state, std::string const &KeyedValue, std::string_view const VarName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -351,7 +351,7 @@ namespace OutputProcessor {
 
     void BuildKeyVarList(EnergyPlusData &state,
                          std::string const &KeyedValue,   // Associated Key for this variable
-                         std::string const &VariableName, // String Name of variable
+                         std::string_view const VariableName, // String Name of variable
                          int const MinIndx,               // Min number (from previous routine) for this variable
                          int const MaxIndx                // Max number (from previous routine) for this variable
     )
@@ -408,7 +408,7 @@ namespace OutputProcessor {
     }
 
     void AddBlankKeys(EnergyPlusData &state,
-                      std::string const &VariableName, // String Name of variable
+                      std::string_view const VariableName, // String Name of variable
                       int const MinIndx,               // Min number (from previous routine) for this variable
                       int const MaxIndx                // Max number (from previous routine) for this variable
     )
@@ -3939,7 +3939,7 @@ namespace OutputProcessor {
                                            std::string const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &reportIDChr,           // The reporting ID for the data
                                            std::string const &keyedValue,            // The key name for the data
-                                           std::string const &variableName,          // The variable's actual name
+                                           std::string_view const variableName,          // The variable's actual name
                                            TimeStepType const timeStepType,
                                            OutputProcessor::Unit const unitsForVar, // The variables units
                                            Optional_string_const customUnitName,
@@ -5216,7 +5216,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     if (!op->OutputInitialized) InitializeOutput(state);
 
     // Variable name without units
-    const std::string &VarName = VariableName;
+    const std::string_view VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(state, KeyedValue, VarName);
@@ -5313,7 +5313,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisRvar = op->RVariableTypes(CV);
         thisRvar.timeStepType = TimeStepType;
         thisRvar.storeType = VariableType;
-        thisRvar.VarName = KeyedValue + ':' + VarName;
+        thisRvar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisRvar.VarNameOnly = VarName;
         thisRvar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisRvar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisRvar.VarName);
@@ -5354,14 +5354,14 @@ void SetupOutputVariable(EnergyPlusData &state,
             if (OnMeter) {
                 if (VariableType == StoreType::Averaged) {
                     ShowSevereError(state, "Meters can only be \"Summed\" variables");
-                    ShowContinueError(state, "..reference variable=" + KeyedValue + ':' + VariableName);
+                    ShowContinueError(state, fmt::format("..reference variable={}:{}", KeyedValue, VariableName));
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
                     bool ErrorsFound = false;
                     AttachMeters(
                         state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, zoneName, spaceType, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
-                        ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
+                        ShowContinueError(state, fmt::format("Invalid Meter spec for variable={}:{}", KeyedValue, VariableName));
                         op->ErrorsLogged = true;
                     }
                 }
@@ -5459,7 +5459,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     if (!op->OutputInitialized) InitializeOutput(state);
 
     // Variable name without units
-    const std::string &VarName = VariableName;
+    const std::string_view VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(state, KeyedValue, VarName);
@@ -5503,7 +5503,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisIVar = op->IVariableTypes(CV);
         thisIVar.timeStepType = TimeStepType;
         thisIVar.storeType = VariableType;
-        thisIVar.VarName = KeyedValue + ':' + VarName;
+        thisIVar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisIVar.VarNameOnly = VarName;
         thisIVar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
@@ -8475,7 +8475,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 }
 
 void AddToOutputVariableList(EnergyPlusData &state,
-                             std::string const &VarName, // Variable Name
+                             std::string_view const VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
                              OutputProcessor::StoreType const StateType,
                              OutputProcessor::VariableType const VariableType,

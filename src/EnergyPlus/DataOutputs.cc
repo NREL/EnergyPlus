@@ -154,7 +154,7 @@ OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::s
     }
 }
 
-bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName)
+bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string_view const VariableName)
 {
 
     // FUNCTION INFORMATION:
