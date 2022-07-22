@@ -50,7 +50,8 @@ protected:
                                                     slatTiltAngle,
                                                     curvatureRadius,
                                                     numOfSlatSegments,
-                                                    aDistribution);
+                                                    aDistribution,
+                                                    true);
     }
 
 public:
@@ -69,7 +70,7 @@ TEST_F(TestVenetianDirectionalShadeFlat45_5_Multiwavelength, TestVenetianMultiWa
     std::shared_ptr<std::vector<std::shared_ptr<CBSDFIntegrator>>> aResults =
       aLayer->getWavelengthResults();
 
-    size_t correctSize = 4;
+    size_t correctSize = 5;
 
     EXPECT_EQ(correctSize, aResults->size());
 

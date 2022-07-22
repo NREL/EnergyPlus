@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -84,6 +85,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -466,9 +468,23 @@ namespace WeatherManager {
                                 OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
-                                "Site Precipitation Depth",
+                                "Liquid Precipitation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEnvrn->LiquidPrecipitation,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Precipitation Rate",
+                                OutputProcessor::Unit::m_s,
+                                state.dataWaterData->RainFall.CurrentRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Precipitation Depth",
+                                OutputProcessor::Unit::m,
+                                state.dataWaterData->RainFall.CurrentAmount,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
@@ -692,7 +708,6 @@ namespace WeatherManager {
                                  state.dataEnvrn->EMSWindDirOverrideOn,
                                  state.dataEnvrn->EMSWindDirOverrideValue);
             }
-
             state.dataWeatherManager->GetEnvironmentFirstCall = false;
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.
@@ -996,6 +1011,8 @@ namespace WeatherManager {
                             EnDate += format("/{}", state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear);
                         }
                         state.dataEnvrn->EnvironmentStartEnd = StDate + " - " + EnDate;
+                        state.dataEnvrn->StartYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
+                        state.dataEnvrn->EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
 
                         int TWeekDay = (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DayOfWeek == 0)
                                            ? 1
@@ -1847,6 +1864,7 @@ namespace WeatherManager {
             state.dataWeatherManager->OutOfRange.WindDir = 0;
             state.dataWeatherManager->OutOfRange.DirectRad = 0;
             state.dataWeatherManager->OutOfRange.DiffuseRad = 0;
+            state.dataWeatherManager->IsRainThreshold = 0.8 / double(state.dataGlobal->NumOfTimeStepInHour); // [mm]
 
             if (!state.dataWeatherManager->RPReadAllWeatherData) {
                 printEnvrnStamp = true; // Set this to true so that on first non-warmup day (only) the environment header will print out
@@ -2292,12 +2310,27 @@ namespace WeatherManager {
         if (state.dataEnvrn->EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = state.dataEnvrn->EMSBeamSolarRadOverrideValue;
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
+        if ((state.dataEnvrn->RunPeriodEnvironment) && (!state.dataGlobal->WarmupFlag)) {
+            int month = state.dataEnvrn->Month;
+            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather.at(month - 1) += state.dataEnvrn->LiquidPrecipitation * 1000.0;
+            if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
+                state.dataWaterData->RainFall.numRainyHoursInWeather.at(month - 1) += 1;
+            }
+        }
+
+        WaterManager::UpdatePrecipitation(state);
+
         state.dataEnvrn->TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 
         if (state.dataWeatherManager->UseRainValues) {
-            state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(
-                state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
+            // It is set as LiquidPrecipitation >= .8 mm here: state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >=
+            // state.dataWeatherManager->IsRainThreshold;
+            state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+            if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign && state.dataEnvrn->RunPeriodEnvironment) {
+                // CurrentAmount unit: m
+                state.dataEnvrn->IsRain = state.dataWaterData->RainFall.CurrentAmount >= (state.dataWeatherManager->IsRainThreshold / 1000.0);
+            }
         } else {
             state.dataEnvrn->IsRain = false;
         }
@@ -3267,9 +3300,8 @@ namespace WeatherManager {
                     state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) =
                         state.dataWeatherManager->LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(hour) * WtNow;
                     state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) /= double(state.dataGlobal->NumOfTimeStepInHour);
-
-                    state.dataWeatherManager->TomorrowIsRain(ts, hour) = state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >=
-                                                                         (0.8 / double(state.dataGlobal->NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
+                    state.dataWeatherManager->TomorrowIsRain(ts, hour) =
+                        state.dataWeatherManager->TomorrowLiquidPrecip(ts, hour) >= state.dataWeatherManager->IsRainThreshold; // Wthr%IsRain(Hour)
                     state.dataWeatherManager->TomorrowIsSnow(ts, hour) = Wthr.IsSnow(hour);
                 } // End of TS Loop
 
@@ -9418,14 +9450,13 @@ namespace WeatherManager {
         Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
 
         if (!this->OADryBulbWeatherDataProcessed) {
-            const auto statFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
+            const auto statFileExists = FileSystem::fileExists(state.files.inStatFilePath.filePath);
             const auto epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
             if (statFileExists) {
-                auto statFile = state.files.inputWeatherFilePath.try_open();
+                auto statFile = state.files.inStatFilePath.try_open();
                 if (!statFile.good()) {
                     ShowSevereError(state,
-                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
-                                        " for input (read).");
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + statFile.filePath.string() + " for input (read).");
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
@@ -9439,20 +9470,35 @@ namespace WeatherManager {
                         }
                         lineIn = statFile.readLine();
                         lineAvg = lineIn.data;
+                        break;
                     }
                 }
-                int AnnualNumberOfDays = 0;
-                for (int i = 1; i <= 12; ++i) {
-                    MonthlyAverageDryBulbTemp(i) = OutputReportTabular::StrToReal(OutputReportTabular::GetColumnUsingTabs(lineAvg, i + 2));
-                    AnnualDailyAverageDryBulbTempSum += MonthlyAverageDryBulbTemp(i) * state.dataWeatherManager->EndDayOfMonth(i);
-                    MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyAverageDryBulbTemp(i));
-                    MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyAverageDryBulbTemp(i));
-                    AnnualNumberOfDays += state.dataWeatherManager->EndDayOfMonth(i);
+                if (lineAvg.empty()) {
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + statFile.filePath.string() +
+                                        "' does not have Monthly Statistics for Dry Bulb temperatures.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
+                    return;
+                } else if (lineAvg.find("Daily Avg") == std::string::npos) {
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Stat file '" + statFile.filePath.string() +
+                                        "' does not have the 'Daily Avg' line in the Monthly Statistics for Dry Bulb temperatures.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
+                    return;
+                } else {
+                    int AnnualNumberOfDays = 0;
+                    for (int i = 1; i <= 12; ++i) {
+                        MonthlyAverageDryBulbTemp(i) = OutputReportTabular::StrToReal(OutputReportTabular::GetColumnUsingTabs(lineAvg, i + 2));
+                        AnnualDailyAverageDryBulbTempSum += MonthlyAverageDryBulbTemp(i) * state.dataWeatherManager->EndDayOfMonth(i);
+                        MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyAverageDryBulbTemp(i));
+                        MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyAverageDryBulbTemp(i));
+                        AnnualNumberOfDays += state.dataWeatherManager->EndDayOfMonth(i);
+                    }
+                    this->AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
+                    this->MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
+                    this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
+                    this->OADryBulbWeatherDataProcessed = true;
                 }
-                this->AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
-                this->MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
-                this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
-                this->OADryBulbWeatherDataProcessed = true;
             } else if (epwFileExists) {
                 auto epwFile = state.files.inputWeatherFilePath.try_open();
                 bool epwHasLeapYear(false);

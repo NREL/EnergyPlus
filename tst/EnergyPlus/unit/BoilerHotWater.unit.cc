@@ -186,7 +186,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
     ASSERT_TRUE(process_idf(idf_objects));
     GetBoilerInput(*state);
 
-    EXPECT_EQ(1, state->dataBoilers->numBoilers);
+    EXPECT_EQ(1, (int)state->dataBoilers->Boiler.size());
     EXPECT_EQ(AutoSize, state->dataBoilers->Boiler(1).VolFlowRate);
 
     // Additional tests for fuel type input

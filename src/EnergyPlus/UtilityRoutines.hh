@@ -63,6 +63,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -220,6 +221,8 @@ namespace UtilityRoutines {
     template <class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
     {
     };
+
+    Real64 epElapsedTime();
 
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
@@ -432,7 +435,35 @@ namespace UtilityRoutines {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    std::string MakeUPPERCase(std::string_view const InputString); // Input String
+    inline std::string MakeUPPERCase(std::string_view const InputString) // Input String
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This function returns the Upper Case representation of the InputString.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the Intrinsic SCAN function to scan the lowercase representation of
+        // characters (DataStringGlobals) for each character in the given string.
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+        std::string ResultString(InputString);
+
+        for (std::string::size_type i = 0, e = len(InputString); i < e; ++i) {
+            int const curCharVal = int(InputString[i]);
+            if ((97 <= curCharVal && curCharVal <= 122) || (224 <= curCharVal && curCharVal <= 255)) { // lowercase ASCII and accented characters
+                ResultString[i] = char(curCharVal - 32);
+            }
+        }
+
+        return ResultString;
+    }
 
     constexpr bool SameString(std::string_view const s, std::string_view const t)
     {
@@ -574,12 +605,12 @@ namespace UtilityRoutines {
     // For map, you'd only need the comparator
     struct case_insensitive_hasher
     {
-        size_t operator()(const std::string_view key) const noexcept;
+        size_t operator()(std::string_view key) const noexcept;
     };
 
     struct case_insensitive_comparator
     {
-        bool operator()(const std::string_view a, const std::string_view b) const noexcept;
+        bool operator()(std::string_view a, std::string_view b) const noexcept;
     };
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
@@ -603,6 +634,12 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
         if (sList[i] == s) return i;
     }
     return -1;
+}
+
+constexpr BooleanSwitch getYesNoValue(const std::string_view s)
+{
+    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
+    return static_cast<BooleanSwitch>(getEnumerationValue(yesNo, s));
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct

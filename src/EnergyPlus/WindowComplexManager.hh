@@ -67,6 +67,18 @@ struct EnergyPlusData;
 
 namespace WindowComplexManager {
 
+    enum class RayIdentificationType
+    {
+        Invalid = -1,
+        Front_Incident,
+        Front_Transmitted,
+        Front_Reflected,
+        Back_Incident,
+        Back_Transmitted,
+        Back_Reflected,
+        Num
+    };
+
     // Using/Aliasing
     using DataBSDFWindow::BasisElemDescr;
     using DataBSDFWindow::BasisStruct;
@@ -94,19 +106,14 @@ namespace WindowComplexManager {
     struct WindowStateIndex
     {
         // Members
-        int InitInc;      // Flag indicating initialization needed on Incoming basis
-        int IncBasisIndx; // Index of basis list entry for Incoming basis
-        int CopyIncState; // Pointer to state from which geometry can be copied (Incident)
-        int InitTrn;      // Flag indicating initialization needed on Outgoing basis
-        int TrnBasisIndx; // Index of basis list entry for Outgoing basis
-        int CopyTrnState; // Pointer to state from which geometry can be copied (Outgoing)
-        int Konst;        // Index of state descript in Construct array
+        int InitInc = 0;      // Flag indicating initialization needed on Incoming basis
+        int IncBasisIndx = 0; // Index of basis list entry for Incoming basis
+        int CopyIncState = 0; // Pointer to state from which geometry can be copied (Incident)
+        int InitTrn = 0;      // Flag indicating initialization needed on Outgoing basis
+        int TrnBasisIndx = 0; // Index of basis list entry for Outgoing basis
+        int CopyTrnState = 0; // Pointer to state from which geometry can be copied (Outgoing)
+        int Konst = 0;        // Index of state descript in Construct array
         // INTEGER  ::  ThermConst  !Index of state thermal description in Construct array
-
-        // Default Constructor
-        WindowStateIndex()
-        {
-        }
     };
 
     // Functions
@@ -193,30 +200,30 @@ namespace WindowComplexManager {
     BSDFDaylghtPosition DaylghtAltAndAzimuth(Vector const &UnitVect); // vector which needs to be converted
 
     Vector WorldVectFromW6(EnergyPlusData &state,
-                           Real64 const Theta, // Polar angle in W6 Coords
-                           Real64 const Phi,   // Azimuthal angle in W6 Coords
-                           int const RadType,  // Type of radiation: Front_Incident, etc.
-                           Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
-                           Real64 const Alpha  // Surface azimuth, radians, world coordinate system
+                           Real64 const Theta,                  // Polar angle in W6 Coords
+                           Real64 const Phi,                    // Azimuthal angle in W6 Coords
+                           const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                           Real64 const Gamma,                  // Surface tilt angle, radians, world coordinate system
+                           Real64 const Alpha                   // Surface azimuth, radians, world coordinate system
     );
 
     int FindInBasis(EnergyPlusData &state,
-                    Vector const &RayToFind,  // Ray vector direction in world CS
-                    int const RadType,        // Type of radiation: Front_Incident, etc.
-                    int const ISurf,          // Window Surface number
-                    int const IState,         // Complex Fenestration state number
-                    BasisStruct const &Basis, // Complex Fenestration basis root
-                    Real64 &Theta,            // Theta value for ray
-                    Real64 &Phi               // Phi value for ray
+                    Vector const &RayToFind,             // Ray vector direction in world CS
+                    const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                    int const ISurf,                     // Window Surface number
+                    int const IState,                    // Complex Fenestration state number
+                    BasisStruct const &Basis,            // Complex Fenestration basis root
+                    Real64 &Theta,                       // Theta value for ray
+                    Real64 &Phi                          // Phi value for ray
     );
 
     void W6CoordsFromWorldVect(EnergyPlusData &state,
-                               Vector const &RayVect, // Ray vector direction in world CS
-                               int const RadType,     // Type of radiation: Front_Incident, etc.
-                               Real64 const Gamma,    // Surface tilt angle, world coordinate system
-                               Real64 const Alpha,    // Surface azimuth, world coordinate system
-                               Real64 &Theta,         // Polar angle in W6 Coords
-                               Real64 &Phi            // Azimuthal angle in W6 Coords
+                               Vector const &RayVect,               // Ray vector direction in world CS
+                               const RayIdentificationType RadType, // Type of radiation: Front_Incident, etc.
+                               Real64 const Gamma,                  // Surface tilt angle, world coordinate system
+                               Real64 const Alpha,                  // Surface azimuth, world coordinate system
+                               Real64 &Theta,                       // Polar angle in W6 Coords
+                               Real64 &Phi                          // Azimuthal angle in W6 Coords
     );
 
     void CalcComplexWindowThermal(EnergyPlusData &state,
@@ -253,13 +260,6 @@ struct WindowComplexManagerData : BaseGlobalStruct
     int const Copy_Geometry;
 
     int const TmpLen; // Length increment of temporary arrays
-
-    int const Front_Incident; // Ray identification types
-    int const Front_Transmitted;
-    int const Front_Reflected;
-    int const Back_Incident;
-    int const Back_Transmitted;
-    int const Back_Reflected;
 
     int NumComplexWind; // Total number of complex windows
 
@@ -390,8 +390,8 @@ struct WindowComplexManagerData : BaseGlobalStruct
 
     // Default Constructor
     WindowComplexManagerData()
-        : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2), TmpLen(20), Front_Incident(1), Front_Transmitted(2),
-          Front_Reflected(3), Back_Incident(4), Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0), NumBasis(0), MatrixNo(0)
+        : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2), TmpLen(20), NumComplexWind(0), NumBasis(0),
+          MatrixNo(0)
     {
     }
 };

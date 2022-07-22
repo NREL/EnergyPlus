@@ -169,6 +169,53 @@ F\(_{s_i}\) = View factor of surrounding surface i to the exterior surface.
 
 T\(_{s_i}\) = Outside surface temperature of the surrounding surface i.
 
+\subsubsection{External Longwave Radiation With Multiple Ground Surfaces}\label{external-longwave-radiation-with-multiple-ground-surfaces}
+
+Long-wave radiation exchange of an exterior surface with multiple ground surfaces is given by:
+
+\begin{equation}
+{q''_{gnd}} = \varepsilon \sigma \sum\limits_{j = 1}^{{N_{gnd}}} {F_{gnd,j}} \left(T_{gnd,j}^4 - T_{surf}^4 \right)
+\end{equation}
+
+The above equation can be recast using average temperature of multiple ground surfaces viewed by an exterior surface as follows:
+
+\begin{equation}
+{q''_{gnd}} = \varepsilon \sigma {F_{gnd,sum}} (T_{gnd,avg}^4 - T_{surf}^4)
+\end{equation}
+
+\begin{equation}
+{F_{gnd,sum}} = \sum\limits_{j = 1}^{{N_{gnd}}} {F_{gnd,j}}
+\end{equation}
+
+\begin{equation}
+{T_{gnd,avg}} = ((\sum\limits_{j = 1}^{{N_{gnd}}} {F_{gnd,j}} {T_{gnd,j}^4}) / {F_{gnd,sum}})^{1/4}
+\end{equation}
+
+\begin{equation}
+{h_{r,gnd,avg}} = \frac{{\varepsilon \sigma {F_{gnd, sum}}(T_{surf}^4 - T_{gnd,avg}^4)}}{{{T_{surf}} - {T_{gnd,avg}}}}
+\end{equation}
+
+where
+
+$\varepsilon$ = long-wave emittance of an exterior surface
+
+$\sigma$ = Stefan-Boltzmann constant
+
+F\(_{gnd,j}\) = view factor of an exterior surface to ground surface j
+
+T\(_{gnd,j}\) = temperature of ground surface j
+
+T\(_{surf}\) = outside temperature of an exterior surface
+
+N\(_{gnd}\) = number ground surfaces viewed by an exterior surface
+
+T\(_{gnd,avg}\) = view factor weighted average surface temperature of multiple ground surfaces seen by an exterior surface
+
+F\(_{gnd,sum}\) = sum of the view factors of an exterior surfaces to multiple ground surfaces 
+
+h\(_{r,gnd,avg}\) = linearized average radiative heat transfer coefficient between an exterior surface and multiple ground surfaces
+
+
 \subsection{References}\label{references-034}
 
 ASHRAE. 1993. 1993 ASHRAE Handbook -- Fundamentals. Atlanta: American Society of Heating, Refrigerating, and Air-Conditioning Engineers, Inc.

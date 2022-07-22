@@ -116,7 +116,6 @@ namespace WindowAC {
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::DrawThru;
-    using DataHVACGlobals::SingleHeatingSetPoint;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
@@ -184,7 +183,7 @@ namespace WindowAC {
 
         RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
-        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
             QZnReq = RemainingOutputToCoolingSP;
         } else {
             QZnReq = 0.0;
@@ -415,44 +414,44 @@ namespace WindowAC {
                                FanErrFlag,
                                CurrentModuleObject,
                                state.dataWindowAC->WindAC(WindACNum).Name);
-                    {
-                        auto const SELECT_CASE_var(state.dataWindowAC->WindAC(WindACNum).FanType_Num);
-                        if ((SELECT_CASE_var == FanType_SimpleOnOff) || (SELECT_CASE_var == FanType_SimpleConstVolume)) {
-                            GetFanIndex(state,
-                                        state.dataWindowAC->WindAC(WindACNum).FanName,
-                                        state.dataWindowAC->WindAC(WindACNum).FanIndex,
-                                        FanErrFlag,
-                                        CurrentModuleObject);
-                            if (FanErrFlag) {
-                                ShowContinueError(
-                                    state, " specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
-                                ErrorsFound = true;
-                            } else {
-                                GetFanVolFlow(state, state.dataWindowAC->WindAC(WindACNum).FanIndex, FanVolFlow);
-                                if (FanVolFlow != AutoSize) {
-                                    if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
-                                        ShowWarningError(state,
-                                                         format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow "
-                                                                "rate ({:.7T}) in the {} object.",
-                                                                FanVolFlow,
-                                                                state.dataWindowAC->WindAC(WindACNum).FanName,
-                                                                state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow,
-                                                                CurrentModuleObject));
-                                        ShowContinueError(state,
-                                                          " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " +
-                                                              CurrentModuleObject + " object.");
-                                        ShowContinueError(state,
-                                                          " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
-                                        ErrorsFound = true;
-                                    }
+
+                    if ((state.dataWindowAC->WindAC(WindACNum).FanType_Num == FanType_SimpleOnOff) ||
+                        (state.dataWindowAC->WindAC(WindACNum).FanType_Num == FanType_SimpleConstVolume)) {
+                        GetFanIndex(state,
+                                    state.dataWindowAC->WindAC(WindACNum).FanName,
+                                    state.dataWindowAC->WindAC(WindACNum).FanIndex,
+                                    FanErrFlag,
+                                    CurrentModuleObject);
+                        if (FanErrFlag) {
+                            ShowContinueError(state,
+                                              " specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
+                            ErrorsFound = true;
+                        } else {
+                            GetFanVolFlow(state, state.dataWindowAC->WindAC(WindACNum).FanIndex, FanVolFlow);
+                            if (FanVolFlow != AutoSize) {
+                                if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
+                                    ShowWarningError(state,
+                                                     format("Air flow rate = {:.7T} in fan object {} is less than the maximum supply air flow "
+                                                            "rate ({:.7T}) in the {} object.",
+                                                            FanVolFlow,
+                                                            state.dataWindowAC->WindAC(WindACNum).FanName,
+                                                            state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow,
+                                                            CurrentModuleObject));
+                                    ShowContinueError(state,
+                                                      " The fan flow rate must be >= to the " + cNumericFields(1) + " in the " + CurrentModuleObject +
+                                                          " object.");
+                                    ShowContinueError(state,
+                                                      " Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                                    ErrorsFound = true;
                                 }
                             }
-                        } else {
-                            ShowSevereError(state, CurrentModuleObject + " = \"" + Alphas(1) + "\".");
-                            ShowContinueError(state, "Fan Type must be Fan:OnOff, or Fan:ConstantVolume.");
-                            ErrorsFound = true;
                         }
+                    } else {
+                        ShowSevereError(state, CurrentModuleObject + " = \"" + Alphas(1) + "\".");
+                        ShowContinueError(state, "Fan Type must be Fan:OnOff, or Fan:ConstantVolume.");
+                        ErrorsFound = true;
                     }
+
                     // Get the fan's availability schedule
                     state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(
                         state, state.dataWindowAC->WindAC(WindACNum).FanType, state.dataWindowAC->WindAC(WindACNum).FanName, FanErrFlag);

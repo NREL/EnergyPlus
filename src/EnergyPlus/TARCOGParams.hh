@@ -108,22 +108,6 @@ enum class DeflectionCalculation : int
 constexpr int MMax = 5; // top m value for which "deflection sum" will be calculated
 constexpr int NMax = 5; // top n value for which "deflection sum" will be calculated
 
-enum class CalcForcedVentilation
-{
-    Invalid = -1,
-    Skip,
-    Allow,
-    Num
-};
-
-//  Calculation outcome
-enum class CalculationOutcome
-{
-    Invalid = -1,
-    OK,
-    Num
-};
-
 int constexpr NumOfIterations(100);
 
 // Program will examine convergence parameter in each iteration.  That convergence parameter should decrease each time.
@@ -159,10 +143,10 @@ Real64 constexpr C2_VENET_VERTICAL(0.000);
 Real64 constexpr C3_VENET_VERTICAL(0.270);
 Real64 constexpr C4_VENET_VERTICAL(0.012);
 
-Real64 constexpr C1_SHADE(0.05);
-Real64 constexpr C2_SHADE(1.08);
-Real64 constexpr C3_SHADE(0.79);
-Real64 constexpr C4_SHADE(0.50);
+Real64 constexpr C1_SHADE(0.078);
+Real64 constexpr C2_SHADE(1.2);
+Real64 constexpr C3_SHADE(1.0);
+Real64 constexpr C4_SHADE(1.0);
 
 } // namespace EnergyPlus::TARCOGParams
 

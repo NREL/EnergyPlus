@@ -85,21 +85,21 @@ namespace WeatherManager {
     enum class WaterMainsTempCalcMethod
     {
         Invalid = -1,
-        FixedDefault = 0,
-        Schedule = 1,
-        Correlation = 2,
-        CorrelationFromWeatherFile = 3,
+        FixedDefault,
+        Schedule,
+        Correlation,
+        CorrelationFromWeatherFile,
         Num
     };
 
     enum class DesignDaySolarModel
     {
         Invalid = -1,
-        ASHRAE_ClearSky = 0,     // Design Day solar model ASHRAE ClearSky (default)
-        Zhang_Huang = 1,         // Design Day solar model Zhang Huang
-        SolarModel_Schedule = 2, // Design Day solar model (beam and diffuse) from user entered schedule
-        ASHRAE_Tau = 3,          // Design Day solar model ASHRAE tau (per 2009 HOF)
-        ASHRAE_Tau2017 = 4,      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
+        ASHRAE_ClearSky,     // Design Day solar model ASHRAE ClearSky (default)
+        Zhang_Huang,         // Design Day solar model Zhang Huang
+        SolarModel_Schedule, // Design Day solar model (beam and diffuse) from user entered schedule
+        ASHRAE_Tau,          // Design Day solar model ASHRAE tau (per 2009 HOF)
+        ASHRAE_Tau2017,      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
         Num
     };
 
@@ -107,14 +107,14 @@ namespace WeatherManager {
     enum class DDHumIndType
     {
         Invalid = -1,
-        WetBulb = 0,   // Wetbulb (default)
-        DewPoint = 1,  // Dewpoint
-        Enthalpy = 2,  // Enthalpy
-        HumRatio = 3,  // Humidity Ratio
-        RelHumSch = 4, // relhum schedule
-        WBProfDef = 5, // Wetbulb default profile
-        WBProfDif = 6, // Wetbulb difference profile
-        WBProfMul = 7, // Wetbulb multiplier profile
+        WetBulb,   // Wetbulb (default)
+        DewPoint,  // Dewpoint
+        Enthalpy,  // Enthalpy
+        HumRatio,  // Humidity Ratio
+        RelHumSch, // relhum schedule
+        WBProfDef, // Wetbulb default profile
+        WBProfDif, // Wetbulb difference profile
+        WBProfMul, // Wetbulb multiplier profile
         Num
     };
 
@@ -122,24 +122,24 @@ namespace WeatherManager {
     enum class DDDBRangeType
     {
         Invalid = -1,
-        Default = 0,    // Default Multipliers
-        Multiplier = 1, // Multiplier Schedule
-        Difference = 2, // Difference Schedule
-        Profile = 3,    // Temperature Profile
+        Default,    // Default Multipliers
+        Multiplier, // Multiplier Schedule
+        Difference, // Difference Schedule
+        Profile,    // Temperature Profile
         Num
     };
 
     enum class EmissivityCalcType
     {
         Invalid = -1,
-        ClarkAllenModel = 0,    // Use Clark & Allen model for sky emissivity calculation
-        ScheduleValue = 1,      // User entered Schedule value for Weather Property
-        DryBulbDelta = 2,       // User entered DryBulb difference Schedule value for Weather Property
-        DewPointDelta = 3,      // User entered Dewpoint difference Schedule value for Weather Property
-        BruntModel = 4,         // Use Brunt model for sky emissivity calculation
-        IdsoModel = 5,          // Use Isdo model for sky emissivity calculation
-        BerdahlMartinModel = 6, // Use Martin & Berdahl model for sky emissivity calculation
-        SkyTAlgorithmA = 7,     // place holder
+        ClarkAllenModel,    // Use Clark & Allen model for sky emissivity calculation
+        ScheduleValue,      // User entered Schedule value for Weather Property
+        DryBulbDelta,       // User entered DryBulb difference Schedule value for Weather Property
+        DewPointDelta,      // User entered Dewpoint difference Schedule value for Weather Property
+        BruntModel,         // Use Brunt model for sky emissivity calculation
+        IdsoModel,          // Use Isdo model for sky emissivity calculation
+        BerdahlMartinModel, // Use Martin & Berdahl model for sky emissivity calculation
+        SkyTAlgorithmA,     // place holder
         Num
     };
 
@@ -1014,6 +1014,7 @@ struct WeatherManagerData : BaseGlobalStruct
     Real64 NextHrBeamSolarRad;
     Real64 NextHrDifSolarRad;
     Real64 NextHrLiquidPrecip;
+    Real64 IsRainThreshold; // precipitation threshold (m) for a rainy day
 
     // ProcessEPWHeader static vars
     std::string EPWHeaderTitle;

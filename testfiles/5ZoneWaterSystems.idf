@@ -8,7 +8,7 @@
 ! Highlights:              This input illustrates various uses of the water systems.
 !                          test file derived from 5ZoneBoilerOutsideReset.idf
 !
-! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
+! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 1 run periods,
 !                          Run Control executes the run periods using the weather file
 !
 ! Location:                Chicago, IL
@@ -16,7 +16,7 @@
 ! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 !                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 !
-! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
+! Run Period (Weather File): Full year, CHICAGO_IL_USA TMY2-94846
 !
 ! Run Control:             Zone and System sizing with weather file run control (no design days run)
 !
@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,22.1;
+  Version,22.2;
 
   Building,
     Building,                !- Name
@@ -159,17 +159,20 @@
     10,                      !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-! RunPeriod,
-!   1,                      !- Begin Month
-!   1,                       !- Begin Day Of Month
-!    12,                      !- End Month
-!    31,                      !- End Day Of Month
-!    Tuesday,                 !- Day Of Week For Start Day
-!    Yes,                     !- Use WeatherFile Holidays/Special Days
-!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-!    No,                      !- Apply Weekend Holiday Rule
-!    Yes,                     !- Use WeatherFile Rain Indicators
-!    Yes;                     !- Use WeatherFile Snow Indicators
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -266,83 +269,6 @@
 !   EPW: USA_IL_Chicago-OHare_TMY2.epw
 !   Ave Mon Precip Location: 111549 ORD CHICAGO OHARE INTL AP IL
 !   Ave Mon Precipitation [m]: 0.03759, 0.03581, 0.06071, 0.08534, 0.07595, 0.08331, 0.08306, 0.09982, 0.06502, 0.06147, 0.06604, 0.05359
-                             !- Field 10
-                             !- Field 18
-                             !- Field 22
-                             !- Field 26
-                             !- Field 34
-                             !- Field 38
-                             !- Field 42
-                             !- Field 82
-                             !- Field 138
-                             !- Field 150
-                             !- A156
-                             !- A168
-                             !- A172
-                             !- A180
-                             !- A188
-                             !- A200
-                             !- A204
-                             !- A212
-                             !- A216
-                             !- A224
-                             !- A234
-                             !- A238
-                             !- A246
-                             !- A250
-                             !- A254
-                             !- A258
-                             !- A262
-                             !- A278
-                             !- A282
-                             !- A298
-                             !- A308
-                             !- A312
-                             !- A336
-                             !- A340
-                             !- A344
-                             !- A362
-                             !- A370
-                             !- A378
-                             !- A2100
-                             !- A2112
-                             !- A2116
-                             !- A2152
-                             !- A2156
-                             !- A2164
-                             !- A2172
-                             !- A2184
-                             !- A2188
-                             !- A2202
-                             !- A2218
-                             !- A2230
-                             !- A2240
-                             !- A2244
-                             !- A2284
-                             !- A2288
-                             !- A2296
-                             !- A2328
-                             !- A2348
-                             !- A2352
-                             !- A2356
-                             !- A2360
-                             !- A2372
-                             !- A2388
-                             !- A2402
-                             !- A2414
-                             !- A2418
-                             !- A2430
-                             !- A2442
-                             !- A2446
-                             !- A2450
-                             !- A2466
-                             !- A2478
-                             !- A2482
-                             !- A2486
-                             !- A2496
-                             !- A2500
-                             !- A2512
-                             !- A2520
 
   Schedule:Compact,
     PrecipitationSchd,       !- Name
@@ -6131,6 +6057,10 @@
   Output:Variable,*,Water System Rainwater Collector Volume,timestep;
 
   Output:Variable,*,Site Precipitation Rate,timestep;
+
+  Output:Variable,*,Site Precipitation Depth,timestep;
+
+  Output:Variable,*,Liquid Precipitation Depth,timestep;
 
   Output:Variable,*,Water System Storage Tank Overflow Volume Flow Rate,timestep;
 

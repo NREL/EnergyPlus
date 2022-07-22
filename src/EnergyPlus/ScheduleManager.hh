@@ -68,11 +68,6 @@ struct EnergyPlusData;
 
 namespace ScheduleManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     int constexpr MaxDayTypes(12);
 
     enum class SchedType : int
@@ -86,11 +81,13 @@ namespace ScheduleManager {
         Num
     };
 
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // MODULE VARIABLE DECLARATIONS:
+    enum class OutputReportLevel
+    {
+        Invalid = -1,
+        Hourly,
+        TimeStep,
+        Num
+    };
 
     enum class ScheduleInterpolation
     {
@@ -100,10 +97,6 @@ namespace ScheduleManager {
         Linear,  // linear interpolation from the previous time to the current time for the entire schedule
         Num
     };
-
-    // Derived Types Variables
-
-    // Types
 
     struct ScheduleTypeData
     {
@@ -164,12 +157,13 @@ namespace ScheduleManager {
         Real64 MinValue;                        // Minimum value for this schedule
         Real64 CurrentValue;                    // For Reporting
         bool EMSActuatedOn;                     // indicates if EMS computed
-        Real64 EMSValue;
+        Real64 EMSValue;                        // EMS value
+        bool UseDaylightSaving;                 // Toggles between daylight saving option to be inclused as "No" or "Yes" (default)
 
         // Default Constructor
         ScheduleData()
             : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
-              EMSActuatedOn(false), EMSValue(0.0)
+              EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
         {
         }
     };
@@ -178,7 +172,7 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput(EnergyPlusData &state);
 
-    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(EnergyPlusData &state, OutputReportLevel const LevelOfDetail);
 
     // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex);
@@ -347,8 +341,7 @@ struct ScheduleManagerData : BaseGlobalStruct
     int NumSchedules = 0;
 
     // Logical Variables for Module
-    bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
-    bool ScheduleDSTSFileWarningIssued = false;
+    bool ScheduleInputProcessed = false;       // This is false until the Schedule Input has been processed.
     bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
 
     // Object Data
@@ -372,7 +365,6 @@ struct ScheduleManagerData : BaseGlobalStruct
         NumSchedules = 0;
 
         ScheduleInputProcessed = false;
-        ScheduleDSTSFileWarningIssued = false;
         ScheduleFileShadingProcessed = false;
 
         ScheduleType.clear(); // Allowed Schedule Types

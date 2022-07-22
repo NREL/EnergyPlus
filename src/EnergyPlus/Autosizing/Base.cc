@@ -159,6 +159,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataBypassFrac = state.dataSize->DataBypassFrac;
     this->dataIsDXCoil = state.dataSize->DataIsDXCoil;
     this->dataNonZoneNonAirloopValue = state.dataSize->DataNonZoneNonAirloopValue;
+    this->dataDXCoolsLowSpeedsAutozize = state.dataSize->DataDXCoolsLowSpeedsAutozize;
 }
 
 void BaseSizer::initializeFromAPI(EnergyPlusData &state, Real64 const elevation)
@@ -413,6 +414,9 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                 }
             }
             if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
+        } else if (this->wasAutoSized && this->autoSizedValue != DataSizing::AutoSize) {
+            this->reportSizerOutput(
+                state, this->compType, this->compName, "Design Size " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             this->addErrorMessage(msg);
@@ -544,6 +548,9 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                 }
             }
             if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
+        } else if (this->wasAutoSized && this->autoSizedValue != DataSizing::AutoSize) {
+            this->reportSizerOutput(
+                state, this->compType, this->compName, "Design Size " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             this->addErrorMessage(msg);
@@ -617,7 +624,7 @@ bool BaseSizer::checkInitialized(EnergyPlusData &state, bool &errorsFound)
     return true;
 }
 
-void BaseSizer::overrideSizingString(std::string &string)
+void BaseSizer::overrideSizingString(std::string_view const string)
 {
     this->sizingString = string;
     this->overrideSizeString = false;
@@ -769,6 +776,7 @@ void BaseSizer::clearState()
     dataAutosizable = false;
     dataConstantUsedForSizing = 0.0;
     dataFractionUsedForSizing = 0.0;
+    dataDXCoolsLowSpeedsAutozize = false;
     dataPltSizHeatNum = 0;
     dataWaterLoopNum = 0;
     dataFanIndex = -1;
