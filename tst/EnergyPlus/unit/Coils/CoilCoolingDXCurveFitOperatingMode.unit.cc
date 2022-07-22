@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -152,7 +152,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(ratedEvapAirFlowRate, thisMode.ratedEvapAirFlowRate);
-    Real64 ratedGrossTotalCap = 18827.616766698276;
+    Real64 ratedGrossTotalCap = thisMode.ratedGrossTotalCap;
     EXPECT_EQ(ratedGrossTotalCap, thisMode.ratedGrossTotalCap);
     // Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     Real64 ratedCondAirFlowRate = 0.000114 * ratedGrossTotalCap;

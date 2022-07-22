@@ -35,8 +35,11 @@ if(ENABLE_PCH)
   target_precompile_headers(
     cpp_pch_files
     INTERFACE
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/DataGlobalConstants.hh"
+    "${PROJECT_SOURCE_DIR}/src/EnergyPlus/DataGlobals.hh"
     "${PROJECT_SOURCE_DIR}/src/EnergyPlus/Data/EnergyPlusData.hh"
     "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array.functions.hh"
+    "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh"
     "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json.hpp"
     )
 endif()
@@ -156,13 +159,24 @@ endif()
 # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
 # If LINK_WITH_PYTHON, also request the Development (libs) at the same time, to ensure consistent version between interpreter and Development
 if(LINK_WITH_PYTHON)
-  find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
+  # find_package(Python) has the problem that on github actions in particular it'll pick up the most recent python (eg 3.9) from the tool cache
+  # even if you have used the setup-python action and set it to 3.8, so we make the exact version required
+  set(Python_REQUIRED_VERSION "" CACHE STRING "The specific Python version you want to link to (Optional)")
+  set(Python_ROOT_DIR "" CACHE PATH "The path to the root installation of your python version, if you want to explicitly set it (Optional)")
+  mark_as_advanced(Python_REQUIRED_VERSION)
+  mark_as_advanced(Python_ROOT_DIR)
+  if(Python_REQUIRED_VERSION)
+    find_package(Python ${Python_REQUIRED_VERSION} EXACT COMPONENTS Interpreter Development REQUIRED)
+  else()
+    find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
+  endif()
 else()
   find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
 endif()
 
 if(BUILD_TESTING)
   option(ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF)
+  option(ENABLE_REVERSE_DD_TESTING "Enable Reverse Design Day Tests" OFF)
   option(BUILD_WCE_TESTING "Build testing targets for Windows Calculation Engine" OFF)
   if(ENABLE_REGRESSION_TESTING)
     if(CMAKE_CL_64)
@@ -233,6 +247,7 @@ add_subdirectory(third_party)
 
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/fmt-8.0.1/include)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/btwxt/src)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/re2)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/doj)
@@ -266,8 +281,8 @@ target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
 
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6)
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.6/include)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP/include)
 
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING
@@ -295,6 +310,7 @@ configure_file("workflows/app_g_postprocess.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTOR
 configure_file("workflows/calc_soil_surface_temp.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/calc_soil_surface_temp.py")
 configure_file("workflows/coeff_check.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_check.py")
 configure_file("workflows/coeff_conv.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_conv.py")
+configure_file("workflows/convert_input_format.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/convert_input_format.py")
 configure_file("workflows/energyplus.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/energyplus.py")
 configure_file("workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/transition.py")
 
@@ -352,9 +368,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V9-5-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-6-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 9-5-0 to 9-6-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "idd/V22-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V22-2-0-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables 22-1-0 to 22-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement
@@ -404,6 +420,7 @@ mark_as_advanced(ENABLE_GTEST_DEBUG_MODE)
 mark_as_advanced(ENABLE_GTEST_SHUFFLE)
 mark_as_advanced(ENABLE_MEMORY_SANITIZER)
 mark_as_advanced(ENABLE_OPENMP)
+mark_as_advanced(USE_OpenMP)
 mark_as_advanced(KIVA_3D)
 mark_as_advanced(KIVA_COVERAGE)
 mark_as_advanced(KIVA_EXE_BUILD)

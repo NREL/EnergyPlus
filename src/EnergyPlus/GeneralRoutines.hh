@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -138,9 +140,7 @@ void ControlCompOutput(EnergyPlusData &state,
                        Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
                        Optional_int_const Action = _,             // 1=reverse; 2=normal
                        Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       Optional_int_const LoopNum = _,            // for plant components, plant loop index
-                       Optional_int_const LoopSide = _,           // for plant components, plant loop side index
-                       Optional_int_const BranchIndex = _,        // for plant components, plant branch index
+                       PlantLocation const &plantLoc = {},        // for plant components, Location
                        Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
 );
 
@@ -163,7 +163,7 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
                             bool &ZoneWasSized);
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
+                       std::string_view CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompName,  // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                // .TRUE. if this component pair is invalid
                        std::string const &CallString // Context of this pair -- for error message

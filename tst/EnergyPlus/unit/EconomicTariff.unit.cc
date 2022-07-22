@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
     EXPECT_EQ("EXAMPLEFMC", state->dataEconTariff->tariff(1).tariffName);
-    EXPECT_TRUE(compare_enums(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
+    EXPECT_TRUE(compare_enums(EconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
     EXPECT_EQ(37.75, state->dataEconTariff->tariff(1).monthChgVal);
 
     // qualify
@@ -274,7 +274,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EXPECT_EQ(kindMeterNotGas, state->dataEconTariff->tariff(1).kindGasMtr);
 
     // Check that if defaults the conversion choice correctly
-    EXPECT_TRUE(compare_enums(iEconConv::M3, state->dataEconTariff->tariff(1).convChoice));
+    EXPECT_TRUE(compare_enums(EconConv::M3, state->dataEconTariff->tariff(1).convChoice));
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).energyConv);
     EXPECT_EQ(3600, state->dataEconTariff->tariff(1).demandConv);
     EXPECT_EQ(10, state->dataEconTariff->tariff(1).monthChgVal);
@@ -317,7 +317,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     EXPECT_EQ(kindMeterNotGas, state->dataEconTariff->tariff(1).kindGasMtr);
 
     // Check conversion choice
-    EXPECT_TRUE(compare_enums(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice));
+    EXPECT_TRUE(compare_enums(EconConv::CCF, state->dataEconTariff->tariff(1).convChoice));
     ASSERT_DOUBLE_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
 }
 
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 
     // Check conversion choice
 
-    EXPECT_TRUE(compare_enums(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice));
+    EXPECT_TRUE(compare_enums(EconConv::CCF, state->dataEconTariff->tariff(1).convChoice));
     ASSERT_DOUBLE_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
 }
 
@@ -401,7 +401,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     EXPECT_EQ(kindMeterNotGas, state->dataEconTariff->tariff(1).kindGasMtr);
 
     // Check conversion choice, should force back to kWh
-    EXPECT_TRUE(compare_enums(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
+    EXPECT_TRUE(compare_enums(EconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
     ASSERT_DOUBLE_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
     ASSERT_DOUBLE_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
 }
@@ -603,7 +603,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
     EXPECT_EQ("SEASONAL_TARIFF", state->dataEconTariff->tariff(1).tariffName);
-    EXPECT_TRUE(compare_enums(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
+    EXPECT_TRUE(compare_enums(EconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).monthChgVal);
     EXPECT_EQ("ELECTRICITY SEASON SCHEDULE", state->dataEconTariff->tariff(1).seasonSchedule);
 
@@ -1146,8 +1146,8 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     OutputReportTabular::SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
     Real64 enerConv = OutputReportTabular::getSpecificUnitDivider(*state, "m2", "ft2");
     EXPECT_NEAR(enerConv, 0.092903, 0.001); // 0.092893973326981863
 
@@ -1224,8 +1224,8 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
     }
 
     // Second case dual-unit:
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     EconomicTariff::WriteTabularTariffReports(*state);
 

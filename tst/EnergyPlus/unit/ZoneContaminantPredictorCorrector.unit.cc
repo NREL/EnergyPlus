@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -215,8 +215,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
-
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
@@ -240,7 +238,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(1);
     state->dataContaminantBalance->ZoneSysContDemand.allocate(1);
-    state->dataContaminantBalance->NumContControlledZones = 1;
 
     state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
 
@@ -368,8 +365,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataHeatBalFanSys->CTMFL.allocate(1);
     state->dataHeatBalFanSys->MDotOA.allocate(1);
     state->dataHeatBalFanSys->MDotOA(1) = 0.0;
-
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
@@ -556,8 +551,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
-
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
@@ -598,7 +591,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(3);
     state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
-    state->dataContaminantBalance->NumContControlledZones = 3;
 
     state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 
@@ -764,8 +756,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
-
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
@@ -808,7 +798,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataContaminantBalance->GCPredictedRate.allocate(3);
 
     state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
-    state->dataContaminantBalance->NumContControlledZones = 3;
 
     state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 

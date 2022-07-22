@@ -65,7 +65,6 @@ set(INCLUDED_TEX
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-equipment.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-water-heaters.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-condenser-equipment.tex
-    ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-condenser-flow-control.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-air-distribution.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-airflow-network.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-zone-equipment.tex
@@ -80,6 +79,7 @@ set(INCLUDED_TEX
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-non-zone-equipment.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-solar-collectors.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-pumps.tex
+    ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-condenser-flow-control.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-heating-and-cooling-coils.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-fans.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-humidifiers-and-dehumidifiers.tex
@@ -123,6 +123,7 @@ set(INCLUDED_IMAGES
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithACStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithDCStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ElectPowerServiceOverview.png
+    ${PROJECT_SOURCE_DIR}/input-output-reference/media/NFRC100-Table4-3.PNG
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/OASysComponentMatrix.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ZoneComponentMatrix.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/calculation-of-dtop-for-a-shading-device-collage.png

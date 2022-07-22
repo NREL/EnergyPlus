@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #include "Instance.hpp"
@@ -23,7 +23,8 @@ void Instance::create() {
     outputMap.push_back(Surface::ST_WALL_INT);
   }
 
-  if (!foundation->useDetailedExposedPerimeter || !isConvex(foundation->polygon)) {
+  if (!foundation->useDetailedExposedPerimeter || !isConvex(foundation->polygon) ||
+      foundation->exposedFraction == 0) {
     if (foundation->reductionStrategy == Foundation::RS_BOUNDARY) {
       foundation->reductionStrategy = Foundation::RS_AP;
     }
@@ -39,12 +40,8 @@ void Instance::create() {
   ground->buildDomain();
 }
 
-void Instance::calculate(double ts) {
-	ground->calculate(*bcs, ts);
-}
+void Instance::calculate(double ts) { ground->calculate(*bcs, ts); }
 
-void Instance::calculate_surface_averages() {
-	ground->calculateSurfaceAverages();
-}
+void Instance::calculate_surface_averages() { ground->calculateSurfaceAverages(); }
 
 } // namespace Kiva

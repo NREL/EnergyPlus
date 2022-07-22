@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -107,12 +108,12 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
 
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::None, SetUnitsStyleFromString("None")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
@@ -206,7 +207,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
     Real64 curConversionOffset;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
 
     unitString = "";
     EXPECT_EQ(97, unitsFromHeading(*state, unitString));
@@ -1458,7 +1459,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
     state->dataGlobal->KindOfSim =
         DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
     // zone equipment should report single zone magnitude, multipliers do not apply, should be > 0 or what's the point
     EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleRadGain, state->dataHeatBal->ZnRpt(2).PeopleRadGain);
@@ -2220,32 +2221,32 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  DOAS DX Cooling Coil;    !- Cooling Coil Name",
 
         "Coil:Cooling:DX:SingleSpeed,",
-        "	DOAS DX Cooling Coil,   !- Name",
-        " 	AvailSched,            !- Availability Schedule Name",
-        "	autosize,              !- Gross Rated Total Cooling Capacity { W }",
-        "	autosize,              !- Gross Rated Sensible Heat Ratio",
-        "	4.40,                  !- Gross Rated Cooling COP { W / W }",
-        "	autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
-        "	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
-        "	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
-        "	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
-        "	Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
-        "	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
-        "	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
-        "	Cubic,                 !- Part Load Fraction Correlation Curve Name",
-        "	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
-        "	0.0,                   !- Nominal Time for Condensate Removal to Begin",
-        "	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
-        "	0.0,                   !- Maximum Cycling Rate",
-        "	0.0,                   !- Latent Capacity Time Constant",
-        "	Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
-        "	EvaporativelyCooled,   !- Condenser Type",
-        "	0.0,                   !- Evaporative Condenser Effectiveness",
-        "	,                      !- Evaporative Condenser Air Flow Rate",
-        "	autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
-        "	0.0,                   !- Crankcase Heater Capacity",
-        "	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+        "   DOAS DX Cooling Coil,   !- Name",
+        "   AvailSched,            !- Availability Schedule Name",
+        "   autosize,              !- Gross Rated Total Cooling Capacity { W }",
+        "   autosize,              !- Gross Rated Sensible Heat Ratio",
+        "   4.40,                  !- Gross Rated Cooling COP { W / W }",
+        "   autosize,              !- Rated Air Flow Rate { m3 / s }",
+        "   ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "   DOAS Mixed Air Outlet, !- Air Inlet Node Name",
+        "   DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
+        "   Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+        "   Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "   Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+        "   Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "   Cubic,                 !- Part Load Fraction Correlation Curve Name",
+        "   ,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "   0.0,                   !- Nominal Time for Condensate Removal to Begin",
+        "   0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+        "   0.0,                   !- Maximum Cycling Rate",
+        "   0.0,                   !- Latent Capacity Time Constant",
+        "   Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+        "   EvaporativelyCooled,   !- Condenser Type",
+        "   0.0,                   !- Evaporative Condenser Effectiveness",
+        "   ,                      !- Evaporative Condenser Air Flow Rate",
+        "   autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
+        "   0.0,                   !- Crankcase Heater Capacity",
+        "   10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "Coil:Heating:Fuel,",
         "  DOAS Heating Coil,       !- Name",
@@ -2500,7 +2501,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
     state->dataGlobal->KindOfSim =
         DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
     EXPECT_NEAR(1.86168, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
 }
@@ -3195,32 +3196,32 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"  DOAS DX Cooling Coil;    !- Cooling Coil Name",
 
 //"Coil:Cooling:DX:SingleSpeed,",
-//"	DOAS DX Cooling Coil,   !- Name",
-//" 	AvailSched,            !- Availability Schedule Name",
-//"	autosize,              !- Gross Rated Total Cooling Capacity { W }",
-//"	autosize,              !- Gross Rated Sensible Heat Ratio",
-//"	4.40,                  !- Gross Rated Cooling COP { W / W }",
-//"	autosize,              !- Rated Air Flow Rate { m3 / s }",
-//"	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
-//"	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
-//"	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
-//"	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
-//"	Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
-//"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
-//"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
-//"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
-//"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
-//"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
-//"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
-//"	0.0,                   !- Maximum Cycling Rate",
-//"	0.0,                   !- Latent Capacity Time Constant",
-//"	Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
-//"	EvaporativelyCooled,   !- Condenser Type",
-//"	0.0,                   !- Evaporative Condenser Effectiveness",
-//"	,                      !- Evaporative Condenser Air Flow Rate",
-//"	autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
-//"	0.0,                   !- Crankcase Heater Capacity",
-//"	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+//" DOAS DX Cooling Coil,   !- Name",
+//"     AvailSched,            !- Availability Schedule Name",
+//" autosize,              !- Gross Rated Total Cooling Capacity { W }",
+//" autosize,              !- Gross Rated Sensible Heat Ratio",
+//" 4.40,                  !- Gross Rated Cooling COP { W / W }",
+//" autosize,              !- Rated Air Flow Rate { m3 / s }",
+//" ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+//" DOAS Mixed Air Outlet, !- Air Inlet Node Name",
+//" DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
+//" Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+//" Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+//" Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+//" Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+//" Cubic,                 !- Part Load Fraction Correlation Curve Name",
+//" ,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+//" 0.0,                   !- Nominal Time for Condensate Removal to Begin",
+//" 0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+//" 0.0,                   !- Maximum Cycling Rate",
+//" 0.0,                   !- Latent Capacity Time Constant",
+//" Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+//" EvaporativelyCooled,   !- Condenser Type",
+//" 0.0,                   !- Evaporative Condenser Effectiveness",
+//" ,                      !- Evaporative Condenser Air Flow Rate",
+//" autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
+//" 0.0,                   !- Crankcase Heater Capacity",
+//" 10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
 //"Coil:Heating:Fuel,",
 //"  DOAS Heating Coil,       !- Name",
@@ -3544,20 +3545,20 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     state->dataEnvrn->Month = 12;
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 1, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 2, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
     ResetMonthlyGathering(*state);
 
     EXPECT_EQ(0., state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 1, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 }
 
@@ -3611,8 +3612,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -3621,20 +3622,20 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 3,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 6,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 9,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
@@ -3643,8 +3644,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     EXPECT_EQ(0., state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 3,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 }
@@ -3693,7 +3694,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(123., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3712,7 +3713,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         38.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(133., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3731,7 +3732,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         42.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(133., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3750,7 +3751,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         39.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(143., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3778,7 +3779,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataMixedAir->OAController.allocate(2);
     state->dataMixedAir->OAController(1).RelTotalLossRate = 1.0;
     state->dataMixedAir->OAController(2).RelTotalLossRate = 1.0;
-    state->dataCondenserLoopTowers->NumSimpleTowers = 1;
     state->dataCondenserLoopTowers->towers.allocate(1);
     state->dataCondenserLoopTowers->towers(1).Qactual = 1.0;
     state->dataCondenserLoopTowers->towers(1).FanEnergy = 50.0;
@@ -3787,7 +3787,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
-    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
 
     EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(reliefEnergy * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
@@ -3812,7 +3812,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
     Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
-    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
     EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
@@ -4967,7 +4967,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 ////state->dataGlobal->DDOnlySimulation = true;
 
 // ManageSimulation();
-////	compare_err_stream( "" );
+////    compare_err_stream( "" );
 
 // EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntTot, "Overhang" ) );
 // EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntExt, "Overhang" ) );
@@ -6762,54 +6762,54 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_AddTotalRowsForLoadSummary_test)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cSensInst, rRefrig) = 4.;
-    compLoad.cells(cLatent, rLights) = 10.;
-    compLoad.cells(cLatent, rRefrig) = 20.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights) = 3.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Refrig) = 4.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights) = 10.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Refrig) = 20.;
 
-    compLoad.cells(cArea, rLights) = 5.;
-    compLoad.cells(cArea, rRefrig) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Refrig) = 5.;
 
     AddTotalRowsForLoadSummary(compLoad);
 
-    EXPECT_EQ(3. + 4., compLoad.cells(cSensInst, rGrdTot));
-    EXPECT_EQ(10 + 20., compLoad.cells(cLatent, rGrdTot));
-    EXPECT_EQ(3. + 10., compLoad.cells(cTotal, rLights));
-    EXPECT_EQ(4 + 20., compLoad.cells(cTotal, rRefrig));
+    EXPECT_EQ(3. + 4., compLoad.cells(LoadCompCol::SensInst, LoadCompRow::GrdTot));
+    EXPECT_EQ(10 + 20., compLoad.cells(LoadCompCol::Latent, LoadCompRow::GrdTot));
+    EXPECT_EQ(3. + 10., compLoad.cells(LoadCompCol::Total, LoadCompRow::Lights));
+    EXPECT_EQ(4 + 20., compLoad.cells(LoadCompCol::Total, LoadCompRow::Refrig));
 
-    EXPECT_EQ(37., compLoad.cells(cTotal, rGrdTot));
+    EXPECT_EQ(37., compLoad.cells(LoadCompCol::Total, LoadCompRow::GrdTot));
 
-    EXPECT_EQ(100. * 13. / 37., compLoad.cells(cPerc, rLights));
-    EXPECT_EQ(100. * 24. / 37., compLoad.cells(cPerc, rRefrig));
+    EXPECT_EQ(100. * 13. / 37., compLoad.cells(LoadCompCol::Perc, LoadCompRow::Lights));
+    EXPECT_EQ(100. * 24. / 37., compLoad.cells(LoadCompCol::Perc, LoadCompRow::Refrig));
 
-    EXPECT_EQ(13. / 5., compLoad.cells(cPerArea, rLights));
-    EXPECT_EQ(24. / 5., compLoad.cells(cPerArea, rRefrig));
+    EXPECT_EQ(13. / 5., compLoad.cells(LoadCompCol::PerArea, LoadCompRow::Lights));
+    EXPECT_EQ(24. / 5., compLoad.cells(LoadCompCol::PerArea, LoadCompRow::Refrig));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cLatent, rLights) = 10.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights) = 3.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights) = 10.;
 
-    compLoad.cells(cArea, rLights) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights) = 5.;
 
     compLoad.outsideDryBulb = 20.;
     compLoad.mainFanAirFlow = 0.7;
     compLoad.airflowPerTotCap = 0.2;
     compLoad.totCapPerArea = 0.15;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
     Real64 powerConversion = getSpecificUnitMultiplier(*state, "W", "Btu/h");
     Real64 areaConversion = getSpecificUnitMultiplier(*state, "m2", "ft2");
     Real64 airFlowConversion = getSpecificUnitMultiplier(*state, "m3/s", "ft3/min");
@@ -6818,10 +6818,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test
 
     LoadSummaryUnitConversion(*state, compLoad);
 
-    EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
-    EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+    EXPECT_EQ(3. * powerConversion, compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights));
+    EXPECT_EQ(10. * powerConversion, compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
 
     EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
     EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);
@@ -7025,8 +7025,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     OutputReportTabular::SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     // We ask for the air loop component load summary since that's the one we test
     // We also ask for the zone component load summary because that's necessary to "copy" the load and trigger a potential double conversion
@@ -7375,8 +7375,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil with 10000W cooling";
@@ -7434,8 +7434,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil";
@@ -7872,8 +7872,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
 
     // Now we're ready to call the actual function of interest
     OutputReportTabular::WriteSourceEnergyEndUseSummary(*state);
@@ -7894,7 +7894,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
         {"Source Energy End Use Components Summary", eleckWh},
-        {"Source Energy End Use Component Per Conditioned Floor Area", 10000.0 / expectedBuildingConditionedFloorArea},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / expectedBuildingConditionedFloorArea},
         {"Source Energy End Use Components Per Total Floor Area", 10000.0 / expectedBuildingGrossFloorArea},
     });
 
@@ -7936,8 +7936,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject(*state);
@@ -8026,17 +8026,17 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
     state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 3,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -8050,9 +8050,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 6,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -8066,9 +8066,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 9,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -8230,41 +8230,29 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
 TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
 {
-    StatLineType lineTypeReturn = StatLineType::Initialized;
-    bool desCondLinePassed = false;
-    bool htgDesignLinePassed = false;
-    bool clgDesignLinePassed = false;
-    bool isKoppen = false;
+
+    auto getLineType = [](const std::string statLine) -> StatLineType {
+        StatLineType lineTypeReturn = StatLineType::Initialized;
+        bool desCondLinePassed = false;
+        bool htgDesignLinePassed = false;
+        bool clgDesignLinePassed = false;
+        bool isKoppen = false;
+        bool insideLiquidPrecipitation = false;
+        parseStatLine(statLine, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen, insideLiquidPrecipitation);
+        return lineTypeReturn;
+    };
+
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
-    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
-    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
-    parseStatLine(koppenLineWithDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineWithDots)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
-    parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineNoDots)));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
@@ -8467,7 +8455,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 
     state->dataHVACGlobal->TimeStepSys = 10.0;
     state->dataGlobal->TimeStepZone = 20.0;
-    state->dataDefineEquipment->NumAirDistUnits = 1;
 
     state->dataHeatBal->ZonePreDefRep.allocate(1);
     state->dataDefineEquipment->AirDistUnit.allocate(1);
@@ -8488,7 +8475,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
     state->dataHeatBal->ZoneWinHeatLossRepEnergy.allocate(1);
 
-    GatherHeatGainReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatGainReport(*state, OutputProcessor::TimeStepType::System);
 
     EXPECT_EQ(1.0 * (state->dataHVACGlobal->TimeStepSys) * DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
     EXPECT_EQ(0.0 * (state->dataHVACGlobal->TimeStepSys) * DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
@@ -8607,7 +8594,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8629,7 +8616,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout2.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::InchPound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8651,7 +8638,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout3.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::None));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8674,7 +8661,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8698,7 +8685,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8723,8 +8710,8 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     state->dataHeatBal->BuildingPreDefRep.emiTotHeat = 4000.00;        // * energyconversion, 2);
 
     // Test Combination 0: GJ
-    state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoGJ;
-    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
+    state->dataOutRptTab->unitsStyle = UnitsStyle::JtoGJ;
+    state->dataOutRptTab->unitsStyle_SQLite = UnitsStyle::JtoGJ;
     Real64 energyconversion = 1.0;
 
     WriteHeatEmissionTable(*state);
@@ -8778,8 +8765,8 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     }
 
     // Test Combination 1: None
-    state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
-    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
+    state->dataOutRptTab->unitsStyle = UnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = UnitsStyle::None;
     energyconversion = 1.0;
 
     WriteHeatEmissionTable(*state);
@@ -8833,8 +8820,8 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     }
 
     // Test Combination 2:
-    state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = UnitsStyle::InchPound;
 
     // Test 2.5:
     // Actually here is an additonal test unit for the getSpecificUnitDivider:
@@ -9026,8 +9013,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetupUnitConversions(*state);
     Real64 largeConv = getSpecificUnitDivider(*state, "J", "kBtu");
@@ -9058,7 +9045,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
         {"Source Energy End Use Components Summary", eleckWh / largeConv},
-        {"Source Energy End Use Component Per Conditioned Floor Area", 10000.0 / largeConv / (expectedBuildingConditionedFloorArea / areaConv)},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / largeConv / (expectedBuildingConditionedFloorArea / areaConv)},
         {"Source Energy End Use Components Per Total Floor Area", 10000.0 / largeConv / (expectedBuildingGrossFloorArea / areaConv)},
     });
 
@@ -9091,22 +9078,22 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
 TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cLatent, rLights) = 10.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights) = 3.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights) = 10.;
 
-    compLoad.cells(cArea, rLights) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights) = 5.;
 
     compLoad.outsideDryBulb = 20.;
     compLoad.mainFanAirFlow = 0.7;
     compLoad.airflowPerTotCap = 0.2;
     compLoad.totCapPerArea = 0.15;
 
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
     Real64 powerConversion = getSpecificUnitMultiplier(*state, "W", "Btu/h");
     Real64 areaConversion = getSpecificUnitMultiplier(*state, "m2", "ft2");
     Real64 airFlowConversion = getSpecificUnitMultiplier(*state, "m3/s", "ft3/min");
@@ -9116,10 +9103,10 @@ TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
     // LoadSummaryUnitConversion(*state, compLoad);
     LoadSummaryUnitConversion(*state, compLoad, state->dataOutRptTab->unitsStyle_SQLite);
 
-    EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
-    EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+    EXPECT_EQ(3. * powerConversion, compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights));
+    EXPECT_EQ(10. * powerConversion, compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
 
     EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
     EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);
@@ -9200,8 +9187,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::None;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetupUnitConversions(*state);
     Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
@@ -9396,8 +9383,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
     state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::None;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetupUnitConversions(*state);
     Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
@@ -9554,8 +9541,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
     Real64 enerConv = getSpecificUnitDivider(*state, "GJ", "kBtu"); // 948.45
     EXPECT_NEAR(1.0 / enerConv, 948.0, 0.5);
 
@@ -9646,17 +9633,17 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
     state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 3,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -9670,9 +9657,9 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 6,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -9686,9 +9673,9 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 9,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -9862,13 +9849,13 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 
     auto &ort(state->dataOutRptTab);
     ort->numStyles = 1;
-    ort->TableStyle(1) = OutputReportTabular::iTableStyle::HTML;
+    ort->TableStyle(1) = OutputReportTabular::TableStyle::HTML;
     ort->del(1) = DataStringGlobals::CharSpace; // space - this is not used much for HTML output
 
     ort->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    ort->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
+    ort->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
 
     SetPredefinedTables(*state);
     std::string CompName = "My Coil <coil is DX>";
@@ -10129,4 +10116,54 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
     }
+}
+
+TEST_F(SQLiteFixture, StatFile_TMYx)
+{
+    // Test for #9400 and #9420
+    state->files.inStatFilePath.filePath =
+        configured_source_directory() / "tst/EnergyPlus/unit/Resources/USA_IL_Chicago.OHare.Intl.AP.725300_TMYx.stat";
+
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
+
+    SetPredefinedTables(*state);
+
+    FillWeatherPredefinedEntries(*state);
+
+    // Enable the ClimaticDataSummary report, in a future-proof way
+    auto &predefReports = state->dataOutRptPredefined->reportName;
+    auto it = std::find_if(predefReports.begin(), predefReports.end(), [](const auto &s) { return s.name == "ClimaticDataSummary"; });
+    ASSERT_NE(it, predefReports.end());
+    it->show = true;
+    // EXPECT_EQ("ClimaticDataSummary", state->dataOutRptPredefined->reportName(1).name);
+    // EXPECT_TRUE(state->dataOutRptPredefined->reportName(1).show);
+
+    WritePredefinedTables(*state);
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // - Monthly Statistics for Liquid Precipitation [mm]
+    //              Jan     Feb     Mar     Apr     May     Jun     Jul     Aug     Sep     Oct     Nov     Dec
+    //    Total     41      18      65      48      110     106     75      53      24      143     63      61
+    //  Max Hourly  5       5       7       6       7       7       5       6       5       7       6       6
+    //  => Total: 807
+    //     Max hourly: 7, occurs in Mar
+
+    constexpr static auto queryStr = R"sqlite(SELECT Value FROM TabularDataWithStrings
+        WHERE ReportName = "ClimaticDataSummary"
+          AND TableName = "Weather Statistics File"
+          AND RowName = "{}";
+    )sqlite";
+    EXPECT_EQ(807.0, execAndReturnFirstDouble(fmt::format(queryStr, "Annual Total Precipitation")));
+    EXPECT_EQ(7.0, execAndReturnFirstDouble(fmt::format(queryStr, "Max Hourly Precipitation")));
+    auto result = queryResult(fmt::format(queryStr, "Max Hourly Precipitation Occurs in"), "TabularDataWithStrings");
+    ASSERT_EQ(1, result.size());
+    ASSERT_FALSE(result[0].empty());
+    EXPECT_EQ("Mar", result[0][0]);
 }

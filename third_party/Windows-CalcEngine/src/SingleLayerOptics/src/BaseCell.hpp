@@ -24,7 +24,8 @@ namespace SingleLayerOptics
     public:
         CBaseCell();
         CBaseCell(const std::shared_ptr<CMaterial> & t_Material,
-                  const std::shared_ptr<ICellDescription> & t_CellDescription);
+                  const std::shared_ptr<ICellDescription> & t_CellDescription,
+                  double rotation = 0);
 
         virtual void setSourceData(FenestrationCommon::CSeries & t_SourceData);
 
@@ -56,6 +57,9 @@ namespace SingleLayerOptics
     protected:
         std::shared_ptr<CMaterial> m_Material;
         std::shared_ptr<ICellDescription> m_CellDescription;
+
+        // This indicates cell rotation in phi angle
+        double m_CellRotation;
     };
 }   // namespace SingleLayerOptics
 

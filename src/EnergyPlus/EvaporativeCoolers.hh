@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,51 +67,55 @@ namespace EvaporativeCoolers {
     // MODULE PARAMETER DEFINITIONS
     enum class WaterSupply
     {
-        Unassigned,
+        Invalid = -1,
         FromMains,
-        FromTank
+        FromTank,
+        Num
     };
 
     enum class FanPlacement
     {
-        Unassigned,
+        Invalid = -1,
         BlowThruFan,
-        DrawThruFan
+        DrawThruFan,
+        Num
     };
 
     enum class ControlType
     {
-        Unassigned,
+        Invalid = -1,
         ZoneTemperatureDeadBandOnOffCycling,
         ZoneCoolingLoadOnOffCycling,
-        ZoneCoolingLoadVariableSpeedFan
+        ZoneCoolingLoadVariableSpeedFan,
+        Num
     };
 
     enum class OperatingMode
     {
-        Unassigned,
+        Invalid = -1,
         None,            // the indirect evaporative cooler Research Special is scheduled off or turned off
         DryModulated,    // the evaporative cooler Research Special is modulated in Dry Mode
         DryFull,         // the evaporative cooler Research Special is run in full capacity in Dry Mode
         DryWetModulated, // the evaporative cooler Research Special is modulated in Dry Mode or wet Mode
         WetModulated,    // the evaporative cooler Research Special is modulated in wet Mode
-        WetFull          // the evaporative cooler Research Special is run in full capacity in Wet Mode
+        WetFull,         // the evaporative cooler Research Special is run in full capacity in Wet Mode
+        Num
     };
 
     enum class EvapCoolerType
     {
-        Unassigned,
+        Invalid = -1,
         DirectCELDEKPAD,
         IndirectCELDEKPAD,
         IndirectWETCOIL,
         IndirectRDDSpecial,
-        DirectResearchSpecial
+        DirectResearchSpecial,
+        Num
     };
 
     struct EvapConditions
     {
-        // Members
-        std::string EvapCoolerName; // Name of the EvapCooler
+        std::string Name; // Name of the EvapCooler
         int EquipIndex;
         EvapCoolerType evapCoolerType; // Type of the EvapCooler
         std::string EvapControlType;   // Type of Control for the EvapCooler
@@ -212,7 +216,7 @@ namespace EvaporativeCoolers {
 
         // Default Constructor
         EvapConditions()
-            : EquipIndex(0), evapCoolerType(EvapCoolerType::Unassigned), SchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), OutletTemp(0.0),
+            : EquipIndex(0), evapCoolerType(EvapCoolerType::Invalid), SchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), OutletTemp(0.0),
               OuletWetBulbTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0), OutletMassFlowRate(0.0),
               OutletMassFlowRateMaxAvail(0.0), OutletMassFlowRateMinAvail(0.0), InitFlag(false), InletNode(0), OutletNode(0), SecondaryInletNode(0),
               SecondaryOutletNode(0), TertiaryInletNode(0), InletMassFlowRate(0.0), InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0),
@@ -222,14 +226,14 @@ namespace EvaporativeCoolers {
               SecOutletEnthalpy(0.0), SecOutletMassFlowRate(0.0), PadDepth(0.0), PadArea(0.0), RecircPumpPower(0.0), IndirectRecircPumpPower(0.0),
               IndirectPadDepth(0.0), IndirectPadArea(0.0), IndirectVolFlowRate(0.0), IndirectFanEff(0.0), IndirectFanDeltaPress(0.0),
               IndirectHXEffectiveness(0.0), DirectEffectiveness(0.0), WetCoilMaxEfficiency(0.0), WetCoilFlowRatio(0.0), EvapCoolerEnergy(0.0),
-              EvapCoolerPower(0.0), EvapWaterSupplyMode(WaterSupply::Unassigned), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
-              DriftFraction(0.0), BlowDownRatio(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapWaterStarvMakupRate(0.0),
-              EvapWaterStarvMakup(0.0), SatEff(0.0), StageEff(0.0), DPBoundFactor(0.0), EvapControlNodeNum(0), DesiredOutletTemp(0.0),
-              PartLoadFract(0.0), DewPointBoundFlag(0), MinOATDBEvapCooler(0.0), MaxOATDBEvapCooler(0.0), EvapCoolerOperationControlFlag(false),
-              MaxOATWBEvapCooler(0.0), DryCoilMaxEfficiency(0.0), IndirectFanPower(0.0), FanSizingSpecificPower(0.0), RecircPumpSizingFactor(0.0),
+              EvapCoolerPower(0.0), EvapWaterSupplyMode(WaterSupply::Invalid), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), DriftFraction(0.0),
+              BlowDownRatio(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapWaterStarvMakupRate(0.0), EvapWaterStarvMakup(0.0),
+              SatEff(0.0), StageEff(0.0), DPBoundFactor(0.0), EvapControlNodeNum(0), DesiredOutletTemp(0.0), PartLoadFract(0.0), DewPointBoundFlag(0),
+              MinOATDBEvapCooler(0.0), MaxOATDBEvapCooler(0.0), EvapCoolerOperationControlFlag(false), MaxOATWBEvapCooler(0.0),
+              DryCoilMaxEfficiency(0.0), IndirectFanPower(0.0), FanSizingSpecificPower(0.0), RecircPumpSizingFactor(0.0),
               IndirectVolFlowScalingFactor(0.0), WetbulbEffecCurveIndex(0), DrybulbEffecCurveIndex(0), FanPowerModifierCurveIndex(0),
               PumpPowerModifierCurveIndex(0), IECOperatingStatus(0), IterationLimit(0), IterationFailed(0),
-              EvapCoolerRDDOperatingMode(OperatingMode::Unassigned), FaultyEvapCoolerFoulingFlag(false), FaultyEvapCoolerFoulingIndex(0),
+              EvapCoolerRDDOperatingMode(OperatingMode::Invalid), FaultyEvapCoolerFoulingFlag(false), FaultyEvapCoolerFoulingIndex(0),
               FaultyEvapCoolerFoulingFactor(1.0), MySizeFlag(true)
         {
         }
@@ -237,7 +241,6 @@ namespace EvaporativeCoolers {
 
     struct ZoneEvapCoolerUnitStruct
     {
-        // Members
         std::string Name; // user identifier
         int ZoneNodeNum;
         int AvailSchedIndex;              // pointer to local availability schedule
@@ -314,9 +317,9 @@ namespace EvaporativeCoolers {
             : ZoneNodeNum(0), AvailSchedIndex(0), UnitIsAvailable(false), FanAvailStatus(0), OAInletNodeNum(0), UnitOutletNodeNum(0),
               UnitReliefNodeNum(0), FanType_Num(0), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0), FanInletNodeNum(0),
               FanOutletNodeNum(0), OpMode(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0), FanSpeedRatio(0.0),
-              FanLocation(FanPlacement::Unassigned), ControlSchemeType(ControlType::Unassigned), TimeElapsed(0.0), ThrottlingRange(0.0),
-              IsOnThisTimestep(false), WasOnLastTimestep(false), ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(EvapCoolerType::Unassigned),
-              EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(EvapCoolerType::Unassigned), EvapCooler_2_Index(0),
+              FanLocation(FanPlacement::Invalid), ControlSchemeType(ControlType::Invalid), TimeElapsed(0.0), ThrottlingRange(0.0),
+              IsOnThisTimestep(false), WasOnLastTimestep(false), ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(EvapCoolerType::Invalid),
+              EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(EvapCoolerType::Invalid), EvapCooler_2_Index(0),
               EvapCooler_2_AvailStatus(false), OAInletRho(0.0), OAInletCp(0.0), OAInletTemp(0.0), OAInletHumRat(0.0), OAInletMassFlowRate(0.0),
               UnitOutletTemp(0.0), UnitOutletHumRat(0.0), UnitOutletMassFlowRate(0.0), UnitReliefTemp(0.0), UnitReliefHumRat(0.0),
               UnitReliefMassFlowRate(0.0), UnitTotalCoolingRate(0.0), UnitTotalCoolingEnergy(0.0), UnitSensibleCoolingRate(0.0),
@@ -328,47 +331,21 @@ namespace EvaporativeCoolers {
         }
     };
 
-    struct ZoneEvapCoolerUnitFieldData
-    {
-        // Members
-        Array1D_string FieldNames;
-
-        // Default Constructor
-        ZoneEvapCoolerUnitFieldData() = default;
-    };
-
-    // Functions
-
     void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIndex, Real64 PartLoadRatio = 1.0);
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetEvapInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
     void SizeEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
-    // End Initialization Section of the Module
-    //******************************************************************************
+    void CalcDirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
+    void CalcDryIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcDirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcWetIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcDryIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
-
-    void CalcWetIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
-
-    void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum);
+    void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum);
 
     void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                                                        int EvapCoolNum,
@@ -402,9 +379,7 @@ namespace EvaporativeCoolers {
                                              Real64 EWBTSec,
                                              Real64 EHumRatSec);
 
-    Real64
-    CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state, Real64 AirMassFlowSec, std::array<Real64, 6> const &Par // Par( 6 ) is desired temperature C
-    );
+    Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state, Real64 AirMassFlowSec, std::array<Real64, 6> const &Par);
 
     Real64 IndEvapCoolerPower(EnergyPlusData &state,
                               int EvapCoolIndex,        // Unit index
@@ -416,26 +391,9 @@ namespace EvaporativeCoolers {
 
     void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 FanPLR = 1.0);
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the EvapCooler Module
-    // *****************************************************************************
-
     void UpdateEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
-    //        End of Update subroutines for the EvapCooler Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the EvapCooler Module
-    // *****************************************************************************
-
     void ReportEvapCooler(EnergyPlusData &state, int EvapCoolNum);
-
-    //***************
-    // Begin routines for zone HVAC Evaporative cooler unit
-    //_______________________________________________________________________________________________________________________
-    //***************
 
     void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
                                       std::string_view CompName,      // name of the packaged terminal heat pump
@@ -484,15 +442,10 @@ namespace EvaporativeCoolers {
                                      Real64 ZoneCoolingLoad // target cooling load
     );
 
-    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio, std::array<Real64, 5> const &Par // parameters
-    );
+    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio, std::array<Real64, 5> const &Par);
 
     void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number
 
-    //        End of Reporting subroutines for the EvaporativeCoolers Module
-    // *****************************************************************************
-
-    // Used to clear global data between Unit Tests, should not be normally called
     int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound);
 
     int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound);
@@ -510,25 +463,13 @@ struct EvaporativeCoolersData : BaseGlobalStruct
     bool GetInputZoneEvapUnit = true;
     Array1D<EvaporativeCoolers::EvapConditions> EvapCond;
     Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
-    Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
     std::unordered_map<std::string, std::string> UniqueEvapCondNames;
     bool MySetPointCheckFlag = true;
     bool ZoneEquipmentListChecked = false;
 
     void clear_state() override
     {
-        this->NumEvapCool = 0;
-        this->EvapCond.clear();
-        this->NumZoneEvapUnits = 0;
-        this->ZoneEvapUnit.clear();
-        this->ZoneEvapCoolerUnitFields.clear();
-        this->GetInputEvapComponentsFlag = true;
-        this->GetInputZoneEvapUnit = true;
-        this->CheckEquipName.clear();
-        this->CheckZoneEvapUnitName.clear();
-        this->UniqueEvapCondNames.clear();
-        this->MySetPointCheckFlag = true;
-        this->ZoneEquipmentListChecked = false;
+        *this = EvaporativeCoolersData();
     }
 };
 

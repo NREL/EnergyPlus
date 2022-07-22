@@ -17,27 +17,25 @@ configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/Configured
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema")
 
 if(LINK_WITH_PYTHON)
-  add_definitions("-DLINK_WITH_PYTHON=1")
-else()
-  add_definitions("-DLINK_WITH_PYTHON=0")
+  add_compile_definitions(LINK_WITH_PYTHON)
 endif()
 
 if(USE_PSYCHROMETRICS_CACHING)
   # Caching defaulted ON
 else()
-  add_definitions("-DEP_nocache_Psychrometrics")
+  add_compile_definitions(EP_nocache_Psychrometrics)
 endif()
 
 if(USE_GLYCOL_CACHING)
-  add_definitions("-DEP_cache_GlycolSpecificHeat")
+  add_compile_definitions(EP_cache_GlycolSpecificHeat)
 endif()
 
 if(USE_PSYCH_STATS)
-  add_definitions("-DEP_psych_stats")
+  add_compile_definitions(EP_psych_stats)
 endif()
 
 if(USE_PSYCH_ERRORS)
-  add_definitions("-DEP_psych_errors")
+  add_compile_definitions(EP_psych_errors)
 endif()
 
 set(SRC
@@ -48,8 +46,6 @@ set(SRC
     AirLoopHVACDOAS.cc
     AirLoopHVACDOAS.hh
     AirTerminalUnit.hh
-    AirflowNetworkBalanceManager.cc
-    AirflowNetworkBalanceManager.hh
     Autosizing/All_Simple_Sizing.cc
     Autosizing/All_Simple_Sizing.hh
     Autosizing/Base.cc
@@ -218,7 +214,6 @@ set(SRC
     DataSurfaces.hh
     DataSystemVariables.cc
     DataSystemVariables.hh
-    DataTimings.cc
     DataTimings.hh
     DataUCSDSharedData.hh
     DataVectorTypes.hh
@@ -245,6 +240,7 @@ set(SRC
     DualDuct.hh
     EMSManager.cc
     EMSManager.hh
+    EPVector.hh
     EarthTube.cc
     EarthTube.hh
     EcoRoofManager.cc
@@ -262,6 +258,8 @@ set(SRC
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc
     EvaporativeFluidCoolers.hh
+    ExhaustAirSystemManager.cc
+    ExhaustAirSystemManager.hh
     ExteriorEnergyUse.cc
     ExteriorEnergyUse.hh
     ExternalInterface.cc
@@ -465,7 +463,6 @@ set(SRC
     Plant/Component.hh
     Plant/ConnectedLoopData.hh
     Plant/Connection.hh
-    Plant/DataPlant.cc
     Plant/DataPlant.hh
     Plant/Enums.hh
     Plant/EquipAndOperations.hh
@@ -616,7 +613,6 @@ set(SRC
     ThermalEN673Calc.hh
     ThermalISO15099Calc.cc
     ThermalISO15099Calc.hh
-    Timer.h
     TranspiredCollector.cc
     TranspiredCollector.hh
     UFADManager.cc
@@ -699,7 +695,8 @@ set(INPUTPARSING_SRC
     InputProcessing/IdfParser.cc
     InputProcessing/IdfParser.hh
     InputProcessing/InputValidation.cc
-    InputProcessing/InputValidation.hh)
+    InputProcessing/InputValidation.hh
+    UtilityRoutines.hh)
 
 create_src_groups("${INPUTPARSING_SRC}")
 
@@ -831,7 +828,7 @@ option(BUILD_STATIC_ENERGYPLUS_API "Build a static library instead of a shared l
 mark_as_advanced(BUILD_STATIC_ENERGYPLUS_API)
 if(BUILD_STATIC_ENERGYPLUS_API)
   set(API_LIBRARY_TYPE STATIC)
-  add_definitions(-DENERGYPLUS_STATIC_API)
+  add_compile_definitions(ENERGYPLUS_STATIC_API)
 else()
   set(API_LIBRARY_TYPE SHARED)
 endif()
@@ -842,7 +839,7 @@ else() # windows
   add_library(energyplusapi ${API_LIBRARY_TYPE} CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC}
                             "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc")
 endif()
-target_link_libraries(energyplusapi PUBLIC energypluslib)
+target_link_libraries(energyplusapi PRIVATE energypluslib)
 target_link_libraries(energyplusapi PRIVATE project_options project_fp_options project_warnings)
 
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
@@ -977,8 +974,21 @@ if(BUILD_TESTING)
   add_executable(TestAPI_Runtime_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c)
   target_link_libraries(TestAPI_Runtime_C PRIVATE energyplusapi project_options project_fp_options)
   # target_compile_options(TestAPI_Runtime_C PRIVATE -Wall -Wextra -Wno-unused)
-
   add_test(NAME "API.TestRuntimeC" COMMAND TestAPI_Runtime_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtimeresetpython")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_executable(TestAPI_RuntimeResetState_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntimeResetState.c)
+  target_link_libraries(TestAPI_RuntimeResetState_C PRIVATE energyplusapi project_options project_fp_options)
+  # target_compile_options(TestAPI_RuntimeResetPython_C PRIVATE -Wall -Wextra -Wno-unused)
+  add_test(NAME "API.TestRuntimeResetStateC" COMMAND TestAPI_RuntimeResetState_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtimedeletepython")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_executable(TestAPI_RuntimeDeleteState_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntimeDeleteState.c)
+  target_link_libraries(TestAPI_RuntimeDeleteState_C PRIVATE energyplusapi project_options project_fp_options)
+  # target_compile_options(TestAPI_RuntimeDeletePython_C PRIVATE -Wall -Wextra -Wno-unused)
+  add_test(NAME "API.TestRuntimeDeleteStateC" COMMAND TestAPI_RuntimeDeleteState_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange")
   file(MAKE_DIRECTORY ${TEST_DIR})
@@ -1011,6 +1021,18 @@ if(BUILD_TESTING)
     add_test(NAME "API.TestRuntimePython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
   endif()
   set_tests_properties("API.TestRuntimePython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  # Runtime tests need a folder to be created for output files
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_resetstate_python")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_test(NAME "API.TestRuntimeResetStatePython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntimeResetState.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+  set_tests_properties("API.TestRuntimeResetStatePython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  # Runtime tests need a folder to be created for output files
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_deletestate_python")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_test(NAME "API.TestRuntimeDeleteStatePython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntimeDeleteState.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+  set_tests_properties("API.TestRuntimeDeleteStatePython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
 
   # Data exchange tests also need an output folder
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")

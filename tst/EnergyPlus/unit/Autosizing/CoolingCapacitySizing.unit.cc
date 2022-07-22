@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -233,7 +233,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(4862.02, sizedValue, 0.01);
+    EXPECT_NEAR(4981.71, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 7 - Zone DX Equipment, inlet side AT Mixer
@@ -248,7 +248,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(3843.78, sizedValue, 0.01);
+    EXPECT_NEAR(3899.81, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
     state->dataSize->ZoneEqSizing(1).ATMixerVolFlow = 0.0;
 
@@ -263,7 +263,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(4862.02, sizedValue, 0.01);
+    EXPECT_NEAR(4981.71, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
     state->dataSize->ZoneEqSizing(1).OAVolFlow = 0.0;
 
@@ -381,8 +381,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataFans->Fan(1).MotInAirFrac = 0.5;
     state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-    state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
+    state->dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
     // Test 14 - Airloop Equipment, with OA and precooling of OA stream, add fan heat
     // start with an autosized value
@@ -404,7 +404,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     // Test 15 - Airloop Equipment, with OA and precooling of OA stream, add fan heat, add scalable capacity sizing
     state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
     state->dataSize->FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing

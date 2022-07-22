@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+
+#include "WCETarcog.hpp"
 
 namespace EnergyPlus {
 
@@ -125,6 +127,8 @@ namespace HeatBalanceSurfaceManager {
 
     void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
 
+    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories(EnergyPlusData &state);
@@ -139,6 +143,8 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void ReportSurfaceHeatBalance(EnergyPlusData &state);
+
+    void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state);
 
     void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
@@ -192,6 +198,14 @@ namespace HeatBalanceSurfaceManager {
     void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
+
+    void InitSurfacePropertyViewFactors(EnergyPlusData &state);
+
+    void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state);
+
+    void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state);
+
+    void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum);
 
 } // namespace HeatBalanceSurfaceManager
 

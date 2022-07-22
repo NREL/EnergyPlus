@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef BESTEST_FIXTURE_HPP_
@@ -49,7 +49,8 @@ protected:
 
     bcs.localWindSpeed = 0;
     bcs.outdoorTemp = 283.15;
-    bcs.slabConvectiveTemp = bcs.wallConvectiveTemp = bcs.slabRadiantTemp = bcs.wallRadiantTemp = 303.15;
+    bcs.slabConvectiveTemp = bcs.wallConvectiveTemp = bcs.slabRadiantTemp = bcs.wallRadiantTemp =
+        303.15;
     bcs.deepGroundTemperature = 283.15;
 
     bcs.slabConvectionAlgorithm = KIVA_CONST_CONV(99999.);
