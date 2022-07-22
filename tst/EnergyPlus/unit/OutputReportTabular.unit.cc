@@ -10548,6 +10548,192 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_RetrieveEntryFromTableBody) {
 
 }
 
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPreDef)
+{
+    int columnNum = 5;
+    std::string tableName = "test table";
+    Array1D_string columnHead;
+    columnHead.allocate(columnNum);
+    columnHead(1) = "col 1";
+    columnHead(2) = "col 2";
+    columnHead(3) = "col 3";
+    columnHead(4) = "col 4";
+    columnHead(5) = "col 5";
+    Array1D_int columnWidth;
+    columnWidth.allocate(columnNum);
+    columnWidth = 10;
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    state->dataGlobal->NumOfZones = 2;
+    int numZone = state->dataGlobal->NumOfZones;
+    state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+    int rowNum = numZone + 4;
+    rowHead.allocate(rowNum);
+    tableBody.allocate(columnNum, rowNum);
+    Real64 unitConvMultiplier = 1.0;
+
+    state->dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(numZone);
+
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        state->dataHeatBalFanSys->ZoneHeatIndexHourBins(zone_i).assign(columnNum, 0.0);
+    }
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int j = 0; j < columnNum; j++) {
+            state->dataHeatBalFanSys->ZoneHeatIndexHourBins(zone_i)[j] = std::pow(j, 2) * zone_i;
+        }
+    }
+    WriteResilienceBinsTableNonPreDef(*state,
+                                      columnNum,
+                                      tableName,
+                                      columnHead,
+                                      columnWidth,
+                                      state->dataHeatBalFanSys->ZoneHeatIndexHourBins,
+                                      rowHead,
+                                      tableBody,
+                                      unitConvMultiplier);
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int j = 0; j < columnNum; j++) {
+            EXPECT_EQ(tableBody(j + 1, zone_i), RealToStr(std::pow(j, 2) * zone_i * 1.0, 2));
+        }
+    }
+
+    for (int j = 0; j < columnNum; j++) {
+        EXPECT_EQ(tableBody(j + 1, numZone + 1), RealToStr(std::pow(j, 2) * 1 * 1.0, 2));                                    // min
+        EXPECT_EQ(tableBody(j + 1, numZone + 2), RealToStr(std::pow(j, 2) * 2 * 1.0, 2));                                    // max
+        EXPECT_EQ(tableBody(j + 1, numZone + 3), RealToStr((std::pow(j, 2) * 1 * 1.0 + std::pow(j, 2) * 2 * 1.0) / 2.0, 2)); // mean
+        EXPECT_EQ(tableBody(j + 1, numZone + 4), RealToStr(std::pow(j, 2) * 1 * 1.0 + std::pow(j, 2) * 2 * 1.0, 2));         // sum
+    }
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef) {
+
+    int columnNum = 5;
+    Array1D_string columnHead;
+    columnHead.allocate(columnNum);
+    columnHead(1) = "col 1";
+    columnHead(2) = "col 2";
+    columnHead(3) = "col 3";
+    columnHead(4) = "col 4";
+    columnHead(5) = "col 5";
+    Array1D_int columnWidth;
+    columnWidth.allocate(columnNum);
+    columnWidth = 10;
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    state->dataGlobal->NumOfZones = 2;
+    int numZone = state->dataGlobal->NumOfZones;
+    state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+
+    state->dataHeatBalFanSys->ZoneLowSETHours.allocate(numZone);
+
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        state->dataHeatBalFanSys->ZoneLowSETHours(zone_i).assign(5, 0.0);
+    }
+
+    int encodedMonDayHrMin;
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int i = 0; i < 5; i++) {
+            state->dataHeatBalFanSys->ZoneLowSETHours(zone_i)[i] = float(zone_i) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+        }
+        General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
+        state->dataHeatBalFanSys->ZoneLowSETHours(zone_i)[4] = encodedMonDayHrMin;
+    }
+
+    std::string tableName = "Heating SET Degree-Hours";
+
+    rowHead.allocate(state->dataGlobal->NumOfZones + 3);
+    tableBody.allocate(columnNum, state->dataGlobal->NumOfZones + 3);
+    Real64 unitConvMultiplier = 1.0;
+
+    WriteSETHoursTableNonPreDef(
+        *state, columnNum, tableName, columnHead, columnWidth, state->dataHeatBalFanSys->ZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.0", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("4.00", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    EXPECT_EQ("-9.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("-2.0", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("8.00", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    EXPECT_EQ("-18.0", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 2, 5));
+
+    unitConvMultiplier = 1.8;
+    WriteSETHoursTableNonPreDef(
+        *state, columnNum, tableName, columnHead, columnWidth, state->dataHeatBalFanSys->ZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.8", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("7.20", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    //    duration hour don't change, 1, 1
+    EXPECT_EQ("-9.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("-3.6", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("14.40", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    //    duration hour don't change, 1, 1
+    EXPECT_EQ("-18.0", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 2, 5));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDef)
+{
+    std::string tableName = "Hours of Safety for Cold Events";
+    int columnNum = 5;
+    Array1D_string columnHead;
+    columnHead.allocate(columnNum);
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    Array1D_int columnWidth;
+    columnWidth.allocate(columnNum);
+    columnWidth = 10;
+    state->dataGlobal->NumOfZones = 2;
+    int numZone = state->dataGlobal->NumOfZones;
+    state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+    rowHead.allocate(numZone + 4);
+    tableBody.allocate(columnNum, numZone + 4);
+    columnHead(1) = "Hours of Safety [hr]";
+    columnHead(2) = "End Time of the Safety Duration";
+    columnHead(3) = "Safe Temperature Exceedance Hours [hr]";
+    columnHead(4) = "Safe Temperature Exceedance OccupantHours [hr]";
+    columnHead(5) = "Safe Temperature Exceedance OccupiedHours [hr]";
+
+    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins.allocate(numZone);
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(zone_i).assign(5, 0.0);
+    }
+    int timeColumnIdx = 2;
+    int encodedMonDayHrMin;
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int j = 0; j <= columnNum; j++) {
+            state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(zone_i)[j] = std::pow(j, 2) * zone_i;
+        }
+        General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
+        state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(zone_i)[timeColumnIdx - 1] = encodedMonDayHrMin;
+    }
+
+    WriteHourOfSafetyTableNonPreDef(
+        *state, columnNum, tableName, columnHead, columnWidth, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins, rowHead, tableBody, timeColumnIdx);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("4.00", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    EXPECT_EQ("9.00", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("16.00", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("8.00", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    EXPECT_EQ("18.00", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("32.00", RetrieveEntryFromTableBody(tableBody, 2, 5));
+}
+
 TEST_F(SQLiteFixture, StatFile_TMYx)
 {
     // Test for #9400 and #9420
