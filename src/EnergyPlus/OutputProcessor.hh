@@ -585,20 +585,20 @@ namespace OutputProcessor {
 
     void CheckReportVariable(EnergyPlusData &state,
                              std::string const &KeyedValue, // Associated Key for this variable
-                             std::string_view const VarName     // String Name of variable (without units)
+                             std::string_view const VarName // String Name of variable (without units)
     );
 
     void BuildKeyVarList(EnergyPlusData &state,
-                         std::string const &KeyedValue,   // Associated Key for this variable
+                         std::string const &KeyedValue,       // Associated Key for this variable
                          std::string_view const VariableName, // String Name of variable
-                         int MinIndx,                     // Min number (from previous routine) for this variable
-                         int MaxIndx                      // Max number (from previous routine) for this variable
+                         int MinIndx,                         // Min number (from previous routine) for this variable
+                         int MaxIndx                          // Max number (from previous routine) for this variable
     );
 
     void AddBlankKeys(EnergyPlusData &state,
                       std::string_view const VariableName, // String Name of variable
-                      int MinIndx,                     // Min number (from previous routine) for this variable
-                      int MaxIndx                      // Max number (from previous routine) for this variable
+                      int MinIndx,                         // Min number (from previous routine) for this variable
+                      int MaxIndx                          // Max number (from previous routine) for this variable
     );
 
     void GetReportVariableInput(EnergyPlusData &state);
@@ -756,11 +756,11 @@ namespace OutputProcessor {
     void WriteReportVariableDictionaryItem(EnergyPlusData &state,
                                            ReportingFrequency reportingInterval, // The reporting interval (e.g., hourly, daily)
                                            StoreType storeType,
-                                           int reportID,                    // The reporting ID for the data
-                                           int indexGroupKey,               // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,   // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &reportIDChr,  // The reporting ID for the data
-                                           std::string const &keyedValue,   // The key name for the data
+                                           int reportID,                        // The reporting ID for the data
+                                           int indexGroupKey,                   // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           std::string const &indexGroup,       // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           std::string const &reportIDChr,      // The reporting ID for the data
+                                           std::string const &keyedValue,       // The key name for the data
                                            std::string_view const variableName, // The variable's actual name
                                            TimeStepType timeStepType,
                                            OutputProcessor::Unit unitsForVar, // The variables units

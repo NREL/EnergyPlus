@@ -350,10 +350,10 @@ namespace OutputProcessor {
     }
 
     void BuildKeyVarList(EnergyPlusData &state,
-                         std::string const &KeyedValue,   // Associated Key for this variable
+                         std::string const &KeyedValue,       // Associated Key for this variable
                          std::string_view const VariableName, // String Name of variable
-                         int const MinIndx,               // Min number (from previous routine) for this variable
-                         int const MaxIndx                // Max number (from previous routine) for this variable
+                         int const MinIndx,                   // Min number (from previous routine) for this variable
+                         int const MaxIndx                    // Max number (from previous routine) for this variable
     )
     {
 
@@ -409,8 +409,8 @@ namespace OutputProcessor {
 
     void AddBlankKeys(EnergyPlusData &state,
                       std::string_view const VariableName, // String Name of variable
-                      int const MinIndx,               // Min number (from previous routine) for this variable
-                      int const MaxIndx                // Max number (from previous routine) for this variable
+                      int const MinIndx,                   // Min number (from previous routine) for this variable
+                      int const MaxIndx                    // Max number (from previous routine) for this variable
     )
     {
 
@@ -3939,7 +3939,7 @@ namespace OutputProcessor {
                                            std::string const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &reportIDChr,           // The reporting ID for the data
                                            std::string const &keyedValue,            // The key name for the data
-                                           std::string_view const variableName,          // The variable's actual name
+                                           std::string_view const variableName,      // The variable's actual name
                                            TimeStepType const timeStepType,
                                            OutputProcessor::Unit const unitsForVar, // The variables units
                                            Optional_string_const customUnitName,
@@ -5166,7 +5166,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Real64 &ActualVariable,                                 // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                      // Associated Key for this variable
+                         std::string const &KeyedValue,                          // Associated Key for this variable
                          Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this frequency
                          Optional_string_const ResourceTypeKey,                  // Meter Resource Type (Electricity, Gas, etc)
                          Optional_string_const EndUseKey,                        // Meter End Use Key (Lights, Heating, Cooling, etc)
@@ -5425,7 +5425,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int &ActualVariable,                                    // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                      // Associated Key for this variable
+                         std::string const &KeyedValue,                          // Associated Key for this variable
                          Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey                        // Group identifier for SQL output
 )
