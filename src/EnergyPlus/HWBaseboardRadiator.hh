@@ -184,7 +184,7 @@ namespace HWBaseboardRadiator {
 
     void GetHWBaseboardInput(EnergyPlusData &state);
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ZoneNum, bool const FirstHVACIteration);
+    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

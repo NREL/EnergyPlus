@@ -68,12 +68,12 @@ namespace ZoneAirLoopEquipmentManager {
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
                                     Real64 &LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
-                                    int ZoneNum,
+                                    int ControlledZoneNum,
                                     int &CompIndex);
 
     void GetZoneAirLoopEquipment(EnergyPlusData &state);
 
-    void InitZoneAirLoopEquipment(EnergyPlusData &state, int AirDistUnitNum, int ZoneNum);
+    void InitZoneAirLoopEquipment(EnergyPlusData &state, int AirDistUnitNum, int ControlledZoneNum);
 
     void InitZoneAirLoopEquipmentTimeStep(EnergyPlusData &state, int AirDistUnitNum);
 
@@ -83,7 +83,7 @@ namespace ZoneAirLoopEquipmentManager {
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
                                  bool FirstHVACIteration,
-                                 int ZoneNum);
+                                 int ControlledZoneNum);
 
 } // namespace ZoneAirLoopEquipmentManager
 

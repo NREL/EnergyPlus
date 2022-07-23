@@ -847,7 +847,7 @@ namespace SteamBaseboardRadiator {
         }
     }
 
-    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ZoneNum, bool const FirstHVACIteration)
+    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -902,7 +902,7 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SetLoopIndexFlag = true;
         }
 
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ZoneNum;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {

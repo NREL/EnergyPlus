@@ -827,7 +827,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ZoneNum, bool const FirstHVACIteration)
+    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -906,7 +906,7 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        HWBaseboard(BaseboardNum).ZonePtr = ZoneNum;
+        HWBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -1003,7 +1003,7 @@ namespace HWBaseboardRadiator {
 
         // Do the every time step initializations
         WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
-        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         HWBaseboard(BaseboardNum).WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
         HWBaseboard(BaseboardNum).WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         HWBaseboard(BaseboardNum).WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;

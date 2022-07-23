@@ -729,7 +729,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     }
 }
 
-void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ZoneNum, bool const FirstHVACIteration)
+void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNum, bool const FirstHVACIteration)
 {
 
     // SUBROUTINE INFORMATION:
@@ -763,7 +763,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
     auto &ThisInNode(state.dataLoopNodes->Node(ThisCP.WaterInletNode));
 
-    if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneNum;
+    if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ControlledZoneNum;
 
     // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
     if (!ThisCP.ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {

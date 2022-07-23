@@ -173,7 +173,7 @@ namespace SteamBaseboardRadiator {
 
     void GetSteamBaseboardInput(EnergyPlusData &state);
 
-    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ZoneNum, bool const FirstHVACIteration);
+    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

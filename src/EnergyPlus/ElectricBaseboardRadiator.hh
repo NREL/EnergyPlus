@@ -122,7 +122,7 @@ namespace ElectricBaseboardRadiator {
 
     void GetElectricBaseboardInput(EnergyPlusData &state);
 
-    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ZoneNum, bool const FirstHVACIteration);
+    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

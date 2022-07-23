@@ -1626,7 +1626,6 @@ namespace SystemAvailabilityManager {
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   August 2001
         //       MODIFIED       Brent Griffith, CR8376 initialize to NoAction every timestep
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the System Availability Manager objects.
@@ -1645,39 +1644,9 @@ namespace SystemAvailabilityManager {
 
         if (state.dataSystemAvailabilityManager->InitSysAvailManagers_MyOneTimeFlag) {
 
-            // for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNCycSysAvailMgrs; ++SysAvailNum) {
-            //     if (state.dataSystemAvailabilityManager->NightCycleData(SysAvailNum).nightCycleControlType == NightCycleControlType::OnControlZone)
-            //     {
-            //         // set the controlled zone numbers
-            //         for (int index = 1; index <= state.dataSystemAvailabilityManager->NightCycleData(SysAvailNum).NumOfCtrlZones; ++index) {
-            //             for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            //                 if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
-            //                     if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
-            //                         state.dataSystemAvailabilityManager->NightCycleData(SysAvailNum).CtrlZonePtrs(index)) {
-            //                         state.dataSystemAvailabilityManager->NightCycleData(SysAvailNum).CtrlZonePtrs(index) = ControlledZoneNum;
-            //                         break;
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-
             for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumOptStartSysAvailMgrs; ++SysAvailNum) {
                 auto &optimumStartMgr = state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum);
-                switch (optimumStartMgr.optimumStartControlType) {
-                case OptimumStartControlType::ControlZone: {
-                    //// set the controlled zone numbers
-                    // for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    //     if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
-                    //         if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum == optimumStartMgr.ZoneNum) {
-                    //             optimumStartMgr.ControlledZoneNum = ControlledZoneNum;
-                    //             break;
-                    //         }
-                    //     }
-                    // }
-                } break;
-                case OptimumStartControlType::MaximumOfZoneList: {
+                if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::MaximumOfZoneList) {
                     // a zone list
                     ZoneListNum = UtilityRoutines::FindItemInList(optimumStartMgr.ZoneListName, state.dataHeatBal->ZoneList);
                     if (ZoneListNum > 0) {
@@ -1690,24 +1659,8 @@ namespace SystemAvailabilityManager {
                             optimumStartMgr.ZonePtrs(ScanZoneListNum) = ZoneNum;
                         }
                     }
-                } break;
-                default:
-                    break;
                 }
             }
-
-            // for (SysAvailNum = 1; SysAvailNum <= state.dataSystemAvailabilityManager->NumNVentSysAvailMgrs; ++SysAvailNum) {
-            //     // set the controlled zone numbers
-            //     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            //         if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
-            //             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum ==
-            //                 state.dataSystemAvailabilityManager->NightVentData(SysAvailNum).ZoneNum) {
-            //                 state.dataSystemAvailabilityManager->NightVentData(SysAvailNum).ControlledZoneNum = ControlledZoneNum;
-            //                 break;
-            //             }
-            //         }
-            //     }
-            // }
 
             state.dataSystemAvailabilityManager->InitSysAvailManagers_MyOneTimeFlag = false;
 

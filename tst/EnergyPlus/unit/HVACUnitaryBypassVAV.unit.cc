@@ -188,8 +188,8 @@ protected:
         cbvav.Name = "CBVAVAirLoop";
         cbvav.UnitType = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
         cbvav.SchedPtr = -1;
-        cbvav.ZoneNodeNum.allocate(1);
-        cbvav.ZoneNodeNum(1) = 1;
+        cbvav.ControlledZoneNodeNum.allocate(1);
+        cbvav.ControlledZoneNodeNum(1) = 1;
         cbvav.DXCoolCoilIndexNum = 1;
         state->dataDXCoils->DXCoil.allocate(1);
         state->dataDXCoils->DXCoilNumericFields.allocate(1);

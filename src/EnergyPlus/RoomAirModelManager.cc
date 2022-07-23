@@ -3140,8 +3140,8 @@ namespace RoomAirModelManager {
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalDualDuctVAV) { // AirTerminal : DualDuct : VAV
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat) { // AirTerminal : SingleDuct :
-                                                                                                            // ConstantVolume : Reheat
+        } else if (TypeNum ==
+                   DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat) { // AirTerminal : SingleDuct : ConstantVolume : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat) { // AirTerminal : SingleDuct :

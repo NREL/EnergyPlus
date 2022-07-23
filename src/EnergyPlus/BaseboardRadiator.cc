@@ -539,7 +539,7 @@ namespace BaseboardRadiator {
         }
     }
 
-    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ZoneNum)
+    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -566,7 +566,7 @@ namespace BaseboardRadiator {
 
         auto &baseboard = state.dataBaseboardRadiator;
 
-        baseboard->baseboards(BaseboardNum).ZonePtr = ZoneNum;
+        baseboard->baseboards(BaseboardNum).ZonePtr = ControlledZoneNum;
 
         if (baseboard->baseboards(BaseboardNum).SetLoopIndexFlag && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
@@ -641,7 +641,7 @@ namespace BaseboardRadiator {
 
         // Do the every time step initializations
         WaterInletNode = baseboard->baseboards(BaseboardNum).WaterInletNode;
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         baseboard->baseboards(BaseboardNum).WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
         baseboard->baseboards(BaseboardNum).WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         baseboard->baseboards(BaseboardNum).WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
