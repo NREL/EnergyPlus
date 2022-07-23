@@ -5539,6 +5539,12 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                  ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay) /
                                  (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
             } // end of loop over zones cooled by central system
+            // Get peak system cooling load with coincident
+            auto &sysSizing = SysSizing(CurOverallSimDay, AirLoopNum);
+            if (sysSizing.SysDesCoolLoad < sysSizing.SumZoneCoolLoadSeq(TimeStepInDay)) {
+                sysSizing.SysDesCoolLoad = sysSizing.SumZoneCoolLoadSeq(TimeStepInDay);
+                sysSizing.SysCoolLoadTimeStepPk = TimeStepInDay;
+            }
             // check that there is system mass flow
             if (SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) > 0.0) {
                 // complete return air temp calc
@@ -5658,6 +5664,11 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                           ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
                                           (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                 } // end heated zones loop
+                // Get peak system heating load with coincident
+                if (abs(sysSizing.SysDesHeatLoad) > abs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
+                    sysSizing.SysDesHeatLoad = sysSizing.SumZoneHeatLoadSeq(TimeStepInDay);
+                    sysSizing.SysHeatLoadTimeStepPk = TimeStepInDay;
+                }
                 // check that the system flow rate is nonzero
                 if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > 0.0) {
                     // complete return air temp calc
@@ -5746,6 +5757,11 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                           ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
                                           (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                 } // end of cooled zones loop
+                // Get peak system heating load with coincident
+                if (abs(sysSizing.SysDesHeatLoad) < abs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
+                    sysSizing.SysDesHeatLoad = sysSizing.SumZoneHeatLoadSeq(TimeStepInDay);
+                    sysSizing.SysHeatLoadTimeStepPk = TimeStepInDay;
+                }
 
                 if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > 0.0) {
                     // complete return air temp calc
@@ -6571,6 +6587,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq = SysSizing(DDNum, AirLoopNum).SysDOASHeatAddSeq;
                         CalcSysSizing(AirLoopNum).SysDOASLatAddSeq = SysSizing(DDNum, AirLoopNum).SysDOASLatAddSeq;
                         CalcSysSizing(AirLoopNum).SysCoolCoinSpaceSens = SysSizing(DDNum, AirLoopNum).SysCoolCoinSpaceSens;
+                        CalcSysSizing(AirLoopNum).SysDesCoolLoad = SysSizing(DDNum, AirLoopNum).SysDesCoolLoad;
+                        CalcSysSizing(AirLoopNum).SysCoolLoadTimeStepPk = SysSizing(DDNum, AirLoopNum).SysCoolLoadTimeStepPk;
                     }
                 }
 
@@ -6641,6 +6659,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     CalcSysSizing(AirLoopNum).SysHeatAirTimeStepPk = SysSizing(DDNum, AirLoopNum).SysHeatAirTimeStepPk;
                     CalcSysSizing(AirLoopNum).HeatDDNum = DDNum;
                     CalcSysSizing(AirLoopNum).SysHeatCoinSpaceSens = SysSizing(DDNum, AirLoopNum).SysHeatCoinSpaceSens;
+                    CalcSysSizing(AirLoopNum).SysDesHeatLoad = SysSizing(DDNum, AirLoopNum).SysDesHeatLoad;
+                    CalcSysSizing(AirLoopNum).SysHeatLoadTimeStepPk = SysSizing(DDNum, AirLoopNum).SysHeatLoadTimeStepPk;
                 }
             }
 
@@ -6878,6 +6898,10 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             z.HeatDDNum = c.HeatDDNum;
             z.SysCoolCoinSpaceSens = c.SysCoolCoinSpaceSens;
             z.SysHeatCoinSpaceSens = c.SysHeatCoinSpaceSens;
+            z.SysDesCoolLoad = c.SysDesCoolLoad;
+            z.SysCoolLoadTimeStepPk = c.SysCoolLoadTimeStepPk;
+            z.SysDesHeatLoad = c.SysDesHeatLoad;
+            z.SysHeatLoadTimeStepPk = c.SysHeatLoadTimeStepPk;
         }
 
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
