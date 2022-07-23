@@ -2,45 +2,21 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 1ZoneEvapCooler.idf
+! 1ZoneEvapCooler_ReportPeriodPowerOutage.idf
 !
 ! Basic file description:  This file models a small one-zone house with a whole-house direct evaporative cooler system.
-!                          Because evaporative coolers cannot be controlled with the ZoneControl:Thermostat object,
-!                          this file illustrates how an evaporative cooler system can be thermostatically controlled
-!                          in a crude manner using the AvailabilityManager objects:
-!
-!                              AvailabilityManager:LowTemperatureTurnOff
-!                              AvailabilityManager:HighTemperatureTurnOn
+!                          It is developed based on 1ZoneEvapCooler.idf It demonstrated how to use availability manager
+!                          to simulate a poweroutage.
 !
 !                          Availability managers are capable of turning on or off the fan for an air system (or the pump
-!                          for a plant system) by monitoring temperature conditions at a user-specified system node.
-!                          In this model, the availability managers are monitoring the zone outlet air node to act as
-!                          a crude thermostatic control for the zone.
+!                          for a plant system) with a schedule. In this model, the availability managers is used to turn
+!                          off all the equipment during a power outage.
 !
 !                          Keep in mind that availability manager control is "lagged".  This means that the node
 !                          conditions from the previous time step are used to make control decisions at the current
 !                          time step.
 !
-!                          There are two ways to use the availability managers for controlling an evaporative cooler:
-!
-!                              Method 1.  The fan is scheduled to be available at all times, meaning that the system
-!                                         is on all the time by default.  This usually results in over-cooling.
-!                                         To prevent over-cooling, the LOW TEMPERATURE TURN OFF object is used to
-!                                         turn off the system fan when the temperature falls below the setpoint (23 C).
-!
-!                              Method 2.  The fan is scheduled to be unavailable at all times, meaning that the system
-!                                         is off all the time by default.  This usually results in under-cooling.
-!                                         To prevent under-cooling, the HIGH TEMPERATURE TURN ON object is used to
-!                                         turn on the system fan when the temperature rises above the setpoint (26 C).
-!
-!                          With either method, all other equipment is scheduled to be always available.  In this file,
-!                          for demonstration purposes only, the fan is scheduled to be available from 12 AM-12 PM to
-!                          to demonstrate Method 1, and scheduled to be unavailable from 12 PM-12 AM for Method 2.
-!
-!                          Note that ZoneControl:Thermostat is still used in this model to control the baseboard
-!                          heating in the winter, but it does not effect the evaporative cooler system.
-!
-! Highlights:              Test of AvailabilityManagers for controlling an air system.
+! Highlights:              Test of AvailabilityManagers for creating a power outage.
 !
 ! Simulation Location/Run: DENVER_STAPLETON_CO_USA_WMO_724690, 2 design days, 1 run period,
 !                          Run Control executes two design days (see RUN PERIOD object)
