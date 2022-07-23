@@ -1345,11 +1345,11 @@ void EIRFuelFiredHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
 
     // will leave like this for now
     // need to update these to better values later
-    Real64 sourceSideInitTemp = 20;
+    Real64 sourceSideInitTemp = 20.0;
     Real64 sourceSideHumRat = 0.0;
     if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         // same here; update later
-        sourceSideInitTemp = 20;
+        sourceSideInitTemp = 20.0;
     }
 
     Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
@@ -1359,21 +1359,21 @@ void EIRFuelFiredHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     if (this->sourceSideDesignVolFlowRateWasAutoSized) {
         // load-side capacity should already be set, so unless the flow rate is specified, we can set
         // an assumed reasonable flow rate since this doesn't affect downstream components
-        Real64 DeltaT_src = 10;
+        Real64 DeltaT_src = 10.0;
         // to get the source flow, we first must calculate the required heat impact on the source side
         // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
         // Then the energy balance:     Qsrc = Qload + Power
         // Substituting for Power:      Qsrc = Qload + Qload/COP, therefore Qsrc = Qload (1 + 1/COP)
-        Real64 const designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+        Real64 const designSourceSideHeatTransfer = tmpCapacity * (1.0 + 1.0 / this->referenceCOP);
         // To get the design source flow rate, just apply the sensible heat rate equation:
         //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
         //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
         tmpSourceVolFlow = designSourceSideHeatTransfer / (rhoSrc * CpSrc * DeltaT_src);
-    } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate > 0) {
+    } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate > 0.0) {
         // given the value by the user
         // set it directly
         tmpSourceVolFlow = this->sourceSideDesignVolFlowRate;
-    } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate == 0) { // LCOV_EXCL_LINE
+    } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate == 0.0) { // LCOV_EXCL_LINE
         // user gave a flow rate of 0
         // protected by the input processor to be >0.0
         // fatal out just in case
@@ -1693,8 +1693,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 auto &capFtName = fields.at("normalized_capacity_function_of_temperature_curve_name");
                 thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state, "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName.get<std::string>());
+                    ShowSevereError(state,
+                                    fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                                thisPLHP.name,
+                                                capFtName.get<std::string>()));
                     errorsFound = true;
                 }
 
@@ -1703,8 +1705,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.powerRatioFuncTempCurveIndex =
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
-                    ShowSevereError(
-                        state, "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name + "; entered curve name: " + eirFtName.get<std::string>());
+                    ShowSevereError(state,
+                                    fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                                thisPLHP.name,
+                                                eirFtName.get<std::string>()));
                     errorsFound = true;
                 }
                 // A13 fuel_energy_input_ratio_function_of_plr_curve_name
@@ -1713,8 +1717,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(state,
-                                    "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + eirFplrName.get<std::string>());
+                                    fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                                thisPLHP.name,
+                                                eirFplrName.get<std::string>()));
                     errorsFound = true;
                 }
 
@@ -1728,9 +1733,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
-                                        "EIR PLFFHP: minimum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                     // LCOV_EXCL_LINE
+                        ShowSevereError(state,                                                                   // LCOV_EXCL_LINE
+                                        "EIR PLFFHP: minimum PLR not entered and could not get default value."); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                      // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.minPLR = defaultVal;
                     }
@@ -1746,9 +1751,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                  // LCOV_EXCL_LINE
-                                        "EIR PLFFHP: maximum PLR not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                     // LCOV_EXCL_LINE
+                        ShowSevereError(state,                                                                   // LCOV_EXCL_LINE
+                                        "EIR PLFFHP: maximum PLR not entered and could not get default value."); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                      // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.maxPLR = defaultVal;
                     }
@@ -1765,8 +1770,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                             CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirDefrostName.get<std::string>()));
                         if (thisPLHP.defrostEIRCurveIndex == 0) {
                             ShowSevereError(state,
-                                            "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
-                                                "; entered curve name: " + eirDefrostName.get<std::string>());
+                                            fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
+                                                        thisPLHP.name,
+                                                        eirDefrostName.get<std::string>()));
                             errorsFound = true;
                         }
                     } else {
@@ -1799,9 +1805,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                             // this error condition would mean that someone broke the input dictionary, not their
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage
-                            ShowSevereError(state,                                                                            // LCOV_EXCL_LINE
-                                            "EIR PLFFHP: defrost time fraction not entered and could not get default value"); // LCOV_EXCL_LINE
-                            errorsFound = true;                                                                               // LCOV_EXCL_LINE
+                            ShowSevereError(state,                                                                             // LCOV_EXCL_LINE
+                                            "EIR PLFFHP: defrost time fraction not entered and could not get default value."); // LCOV_EXCL_LINE
+                            errorsFound = true;                                                                                // LCOV_EXCL_LINE
                         } else {
                             thisPLHP.defrostOpTimeFrac = defaultVal;
                         }
@@ -1822,9 +1828,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                             // input file.  I can't really unit test it so I'll leave it here as a severe error
                             // but excluding it from coverage
                             ShowSevereError(
-                                state,                                                                                           // LCOV_EXCL_LINE
-                                "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value"); // LCOV_EXCL_LINE
-                            errorsFound = true;                                                                                  // LCOV_EXCL_LINE
+                                state,                                                                                            // LCOV_EXCL_LINE
+                                "EIR PLFFHP: max defrost operation OA temperature not entered and could not get default value."); // LCOV_EXCL_LINE
+                            errorsFound = true;                                                                                   // LCOV_EXCL_LINE
                         } else {
                             thisPLHP.defrostMaxOADBT = defaultVal;
                         }
@@ -1838,8 +1844,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(cycRatioCurveName.get<std::string>()));
                     if (thisPLHP.cycRatioCurveIndex == 0) {
                         ShowSevereError(state,
-                                        "Invalid curve name for EIR PLFFHP (name=" + thisPLHP.name +
-                                            "; entered curve name: " + cycRatioCurveName.get<std::string>());
+                                        fmt::format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}",
+                                                    thisPLHP.name,
+                                                    cycRatioCurveName.get<std::string>()));
                         errorsFound = true;
                     }
                 } else {
@@ -1856,9 +1863,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                                       // LCOV_EXCL_LINE
-                                        "EIR PLFFHP: nominal auxiliary electric power not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                                          // LCOV_EXCL_LINE
+                        ShowSevereError(
+                            state,                                                                                        // LCOV_EXCL_LINE
+                            "EIR PLFFHP: nominal auxiliary electric power not entered and could not get default value."); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                               // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.nominalAuxElecPower = defaultVal;
                     }
@@ -1871,8 +1879,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFTName.get<std::string>()));
                     if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
                         ShowSevereError(state,
-                                        "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
-                                            "; entered curve name: " + auxEIRFTName.get<std::string>());
+                                        fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
+                                                    thisPLHP.name,
+                                                    auxEIRFTName.get<std::string>()));
                         errorsFound = true;
                     }
                 } else {
@@ -1886,8 +1895,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(auxEIRFPLRName.get<std::string>()));
                     if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
                         ShowSevereError(state,
-                                        "Invalid curve name for EIR FFHP (name=" + thisPLHP.name +
-                                            "; entered curve name: " + auxEIRFPLRName.get<std::string>());
+                                        fmt::format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}",
+                                                    thisPLHP.name,
+                                                    auxEIRFPLRName.get<std::string>()));
                         errorsFound = true;
                     }
                 } else {
@@ -1904,9 +1914,9 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                         // this error condition would mean that someone broke the input dictionary, not their
                         // input file.  I can't really unit test it so I'll leave it here as a severe error
                         // but excluding it from coverage
-                        ShowSevereError(state,                                                                           // LCOV_EXCL_LINE
-                                        "EIR FFHP: standby electric power not entered and could not get default value"); // LCOV_EXCL_LINE
-                        errorsFound = true;                                                                              // LCOV_EXCL_LINE
+                        ShowSevereError(state,                                                                            // LCOV_EXCL_LINE
+                                        "EIR FFHP: standby electric power not entered and could not get default value."); // LCOV_EXCL_LINE
+                        errorsFound = true;                                                                               // LCOV_EXCL_LINE
                     } else {
                         thisPLHP.standbyElecPower = defaultVal;
                     }
@@ -1947,9 +1957,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(state,
-                                     "Invalid heat pump condenser type (name=" + thisPLHP.name + // LCOV_EXCL_LINE
-                                         "; entered type: " + condenserType);                    // LCOV_EXCL_LINE
-                    errorsFound = true;                                                          // LCOV_EXCL_LINE
+                                     fmt::format("Invalid heat pump condenser type (name={}; entered type: {}",
+                                                 thisPLHP.name,   // LCOV_EXCL_LINE
+                                                 condenserType)); // LCOV_EXCL_LINE
+                    errorsFound = true;                           // LCOV_EXCL_LINE
                 }
                 thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                      sourceSideInletNodeName,
@@ -2212,7 +2223,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         }
 
         if (errFlag) {
-            ShowFatalError(state, routineName + ": Program terminated due to previous condition(s).");
+            ShowFatalError(state, fmt::format("{}: Program terminated due to previous condition(s).", routineName));
         }
         this->oneTimeInitFlag = false;
     }
