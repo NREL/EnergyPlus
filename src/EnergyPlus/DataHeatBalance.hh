@@ -1024,6 +1024,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;                                                  // Which zone infiltration is in
+        int spaceIndex = 0;                                               // Space index for this infiltration instance
         int SchedPtr = 0;                                                 // Schedule for infiltration
         InfiltrationModelType ModelType = InfiltrationModelType::Invalid; // which model is used for infiltration
         // Design Flow Rate model terms
@@ -1069,6 +1070,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;
+        int spaceIndex = 0; // Space index for this ventilation instance
         int SchedPtr = 0;
         VentilationModelType ModelType =
             VentilationModelType::Invalid; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
@@ -1139,9 +1141,11 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;
+        int spaceIndex = 0; // Space index for this mixing instance
         int SchedPtr = 0;
         Real64 DesignLevel = 0.0;
         int FromZone = 0;
+        int fromSpaceIndex = 0; // Source space index for this mixing instance
         Real64 DeltaTemperature = 0.0;
         Real64 DesiredAirFlowRate = 0.0;
         Real64 DesiredAirFlowRateSaved = 0.0;
@@ -1980,8 +1984,6 @@ struct HeatBalanceData : BaseGlobalStruct
     int NumLightsStatements = 0;        // Number of Lights objects in input - possibly global assignments
     int NumZoneElectricStatements = 0;  // Number of ZoneElectric objects in input - possibly global assignments
     int NumZoneGasStatements = 0;       // Number of ZoneGas objects in input - possibly global assignments
-    int NumInfiltrationStatements = 0;  // Number of Design Flow Infiltration objects in input - possibly global assignments
-    int NumVentilationStatements = 0;   // Number of Design Flow Ventilation objects in input - possibly global assignments
     int NumHotWaterEqStatements = 0;    // number of Hot Water Equipment objects in input. - possibly global assignments
     int NumSteamEqStatements = 0;       // number of Steam Equipment objects in input. - possibly global assignments
     int NumOtherEqStatements = 0;       // number of Other Equipment objects in input. - possibly global assignments
@@ -1995,15 +1997,10 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotHWEquip = 0;                 // Total Hot Water Equipment instances after expansion to spaces
     int TotStmEquip = 0;                // Total Steam Equipment instances after expansion to spaces
     int TotITEquip = 0;                 // Total IT Equipment instances after expansion to spaces
-    int TotInfiltration = 0;            // Total Infiltration Statements in input and extrapolated from global assignments
-    int TotDesignFlowInfiltration = 0;  // number of Design Flow rate ZoneInfiltration in input
-    int TotShermGrimsInfiltration = 0;  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
-    int TotAIM2Infiltration = 0;        // number of AIM2 (ZoneInfiltration:ResidentialEnhanced) in input
-    int TotVentilation = 0;             // Total Ventilation Statements in input
-    int TotDesignFlowVentilation = 0;   // number of Design Flow rate ZoneVentilation in input
-    int TotWindAndStackVentilation = 0; // number of wind and stack open area ZoneVentilation in input
-    int TotMixing = 0;                  // Total Mixing Statements in input
-    int TotCrossMixing = 0;             // Total Cross Mixing Statements in input
+    int TotInfiltration = 0;            // Total Infiltration (all types) instances after expansion to spaces
+    int TotVentilation = 0;             // Total Ventilation (all types) instances after expansion to spaces
+    int TotMixing = 0;                  // Total Mixing Statementsn instances after expansion to spaces
+    int TotCrossMixing = 0;             // Total Cross Mixing Statementsn instances after expansion to spaces
     int TotRefDoorMixing = 0;           // Total RefrigerationDoor Mixing Statements in input
     int TotBBHeat = 0;                  // Total BBHeat Statements instances after expansion to spaces
     int TotMaterials = 0;               // Total number of unique materials (layers) in this simulation
@@ -2236,7 +2233,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ITEqObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneBBHeatObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
     EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
     EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;
