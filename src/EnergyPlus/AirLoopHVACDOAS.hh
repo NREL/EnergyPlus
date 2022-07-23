@@ -133,7 +133,6 @@ namespace AirLoopHVACDOAS {
 
         bool m_HeatExchangerFlag = false;
         bool SizingOnceFlag = true;
-        bool DXCoilFlag = false;
         bool FanBlowTroughFlag = false;
 
         AirLoopMixer *m_CompPointerAirLoopMixer = nullptr;

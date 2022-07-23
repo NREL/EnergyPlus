@@ -7985,64 +7985,10 @@ namespace VariableSpeedCoils {
     }
 
     Real64 GetVSCoilMinOATCompressor(EnergyPlusData &state,
-                                     std::string const &CoilName, // must match coil names for the coil type
-                                     bool &ErrorsFound            // set to true if problem
+                                     int const CoilIndex, // index to cooling coil
+                                     bool &ErrorsFound    // set to true if problem
     )
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bo Shen
-        //       DATE WRITTEN   July 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up the given coil and returns min OAT for compressor operation.  If
-        // incorrect coil  name is given, ErrorsFound is returned as true.
-
-        // Return value
-        Real64 MinOAT; // returned min OAT for compressor operation
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WhichCoil;
-
-        // Obtains and Allocates WatertoAirHP related parameters from input file
-        if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput(state);
-            //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
-            state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
-        }
-
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
-        if (WhichCoil != 0) {
-            MinOAT = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).MinOATCompressor;
-        } else {
-            ShowSevereError(state, "GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Coil Name=\"" + CoilName + "\"");
-            ErrorsFound = true;
-            MinOAT = -1000.0;
-        }
-
-        return MinOAT;
-    }
-
-    Real64 GetVSCoilMinOATCompressorUsingIndex(EnergyPlusData &state,
-                                               int const CoilIndex, // index to cooling coil
-                                               bool &ErrorsFound    // set to true if problem
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         R. Raustad
-        //       DATE WRITTEN   August 2019
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up the the min oat for the cooling coil compressor and returns it.  If
-        // incorrect coil index is given, ErrorsFound is returned as true and value is returned
-        // as negative 1000.
-
-        // Return value
-        Real64 MinOAT; // returned min oa temperature of matched coil
-
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
             GetVarSpeedCoilInput(state);
@@ -8050,18 +7996,13 @@ namespace VariableSpeedCoils {
         }
 
         if (CoilIndex == 0) {
-
-            ShowSevereError(state, "GetVSCoilMinOATCompressorUsingIndex: Index passed = 0");
+            ShowSevereError(state, "GetVSCoilMinOATCompressor: Index passed = 0");
             ShowContinueError(state, "... returning Min OAT as -1000.");
             ErrorsFound = true;
-            MinOAT = -1000.0;
-
+            return -1000.0;
         } else {
-
-            MinOAT = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).MinOATCompressor;
+            return state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).MinOATCompressor;
         }
-
-        return MinOAT;
     }
 
     int GetVSCoilNumOfSpeeds(EnergyPlusData &state,
