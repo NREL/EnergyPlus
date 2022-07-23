@@ -1552,7 +1552,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::addReportVariable(std::string const &keyedValue,
+    void ResultsFramework::addReportVariable(std::string_view const keyedValue,
                                              std::string_view const variableName,
                                              std::string const &units,
                                              OutputProcessor::ReportingFrequency const reportingInterval)

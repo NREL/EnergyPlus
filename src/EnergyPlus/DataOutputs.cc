@@ -154,7 +154,7 @@ OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::s
     }
 }
 
-bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string_view const VariableName)
+bool FindItemInVariableList(EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName)
 {
 
     // FUNCTION INFORMATION:
@@ -170,7 +170,7 @@ bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue
     auto const found_variable = state.dataOutput->OutputVariablesForSimulation.find(std::string{VariableName});
     if (found_variable == state.dataOutput->OutputVariablesForSimulation.end()) return false;
 
-    auto found_key = found_variable->second.find(KeyedValue);
+    auto found_key = found_variable->second.find(std::string{KeyedValue});
     if (found_key != found_variable->second.end()) return true;
 
     found_key = found_variable->second.find("*");
@@ -179,9 +179,9 @@ bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue
     for (auto it = found_variable->second.begin(); it != found_variable->second.end(); ++it) {
         if (equali(KeyedValue, it->second.key)) return true;
         if (it->second.is_simple_string) continue;
-        if ((it->second.pattern != nullptr && RE2::FullMatch(KeyedValue, *it->second.pattern)) || // match against regex as written
+        if ((it->second.pattern != nullptr && RE2::FullMatch(std::string{KeyedValue}, *it->second.pattern)) || // match against regex as written
             (it->second.case_insensitive_pattern != nullptr &&
-             RE2::FullMatch(KeyedValue, *it->second.case_insensitive_pattern)) // attempt case-insensitive regex comparison
+             RE2::FullMatch(std::string{KeyedValue}, *it->second.case_insensitive_pattern)) // attempt case-insensitive regex comparison
         ) {
             return true;
         }
