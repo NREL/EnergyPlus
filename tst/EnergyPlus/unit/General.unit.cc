@@ -429,7 +429,8 @@ TEST_F(EnergyPlusFixture, General_MovingAvg)
     }
 }
 
-TEST_F(EnergyPlusFixture, General_BetweenDateHoursLeftInclusive) {
+TEST_F(EnergyPlusFixture, General_BetweenDateHoursLeftInclusive)
+{
     int currentYear = 2018;
     int currentMonth = 5;
     int currentDay = 13;
@@ -563,7 +564,8 @@ TEST_F(EnergyPlusFixture, General_isReportPeriodBeginning)
     EXPECT_FALSE(isReportPeriodBeginning(*state, periodIdx));
 }
 
-TEST_F(EnergyPlusFixture, General_findReportPeriodIdx) {
+TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
+{
 
     state->dataWeatherManager->TotThermalReportPers = 2;
     state->dataWeatherManager->ThermalReportPeriodInput.allocate(state->dataWeatherManager->TotThermalReportPers);
@@ -724,6 +726,5 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx) {
         *state, state->dataWeatherManager->ThermalReportPeriodInput, state->dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
-
 }
 } // namespace EnergyPlus
