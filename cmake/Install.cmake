@@ -299,6 +299,7 @@ install(FILES "${PROJECT_SOURCE_DIR}/datasets/SolarCollectors.idf" DESTINATION "
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/StandardReports.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/SurfaceColorSchemes.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/USHolidays-DST.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Water_to_air_heat_pumps.dat" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/Window5DataFile.dat" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowBlindMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowConstructs.idf" DESTINATION "./DataSets" COMPONENT Datasets)
