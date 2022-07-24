@@ -249,9 +249,7 @@ namespace InternalHeatGains {
 
         // TODO MJW: Punt for now, sometimes unit test need these to be allocated in AllocateZoneHeatBalArrays, but simulations need them here
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
-            state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-            state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
-            state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+            DataHeatBalance::AllocateIntGains(state);
             state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
         }
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);

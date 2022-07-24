@@ -4760,15 +4760,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // are currently set to zero when the CTF only version is used.
 
         // if no surface in the zone uses EMPD or HAMT then zero
-        bool no_ht_EMPD_or_HAMT(true);
-        for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
-            auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-            if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
-                no_ht_EMPD_or_HAMT = false;
-                break;
-            }
-        }
-        if (no_ht_EMPD_or_HAMT) {
+        if (state.dataHeatBal->no_ht_EMPD_or_HAMT(ZoneNum)) {
             state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
             state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
         }
@@ -5772,15 +5764,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // operating and system shutdown.
     // SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
     // are currently set to zero to remind us where they need to be in the future
-    bool no_ht_EMPD_or_HAMT(true);
-    for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
-        auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-        if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
-            no_ht_EMPD_or_HAMT = false;
-            break;
-        }
-    }
-    if (no_ht_EMPD_or_HAMT) {
+    if (state.dataHeatBal->no_ht_EMPD_or_HAMT(ZoneNum)) {
         state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
         state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
     }

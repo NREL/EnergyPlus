@@ -1410,4 +1410,12 @@ void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
     }
 }
 
+void AllocateIntGains(EnergyPlusData &state)
+{
+    state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
+    state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
+    state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+    state.dataHeatBal->no_ht_EMPD_or_HAMT.allocate(state.dataGlobal->NumOfZones);
+}
+
 } // namespace EnergyPlus::DataHeatBalance

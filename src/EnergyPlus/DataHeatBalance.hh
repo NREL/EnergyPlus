@@ -1914,6 +1914,8 @@ namespace DataHeatBalance {
 
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
 
+    void AllocateIntGains(EnergyPlusData &state);
+
 } // namespace DataHeatBalance
 
 struct HeatBalanceData : BaseGlobalStruct
@@ -2165,6 +2167,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
     Array1D<bool> EnclSolAbsFirstCalc;   // for error message
     Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
+    Array1D<bool> no_ht_EMPD_or_HAMT;    // True if surface heat balance uses EMPD or HAMT
 
     bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
 
