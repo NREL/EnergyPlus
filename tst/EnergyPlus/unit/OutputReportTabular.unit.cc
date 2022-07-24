@@ -10581,7 +10581,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPre
     }
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
         for (int j = 0; j < columnNum; j++) {
-            state->dataHeatBalFanSys->ZoneHeatIndexHourBins(zone_i)[j] = std::pow(j, 2) * zone_i;
+            state->dataHeatBalFanSys->ZoneHeatIndexHourBins(zone_i).at(j) = std::pow(j, 2) * zone_i;
         }
     }
     WriteResilienceBinsTableNonPreDef(*state,
@@ -10638,7 +10638,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
     int encodedMonDayHrMin;
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
         for (int i = 0; i < 5; i++) {
-            state->dataHeatBalFanSys->ZoneLowSETHours(zone_i)[i] = float(zone_i) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+            state->dataHeatBalFanSys->ZoneLowSETHours(zone_i).at(i) = float(zone_i) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }
         General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
         state->dataHeatBalFanSys->ZoneLowSETHours(zone_i)[4] = encodedMonDayHrMin;
@@ -10713,8 +10713,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDe
     int timeColumnIdx = 2;
     int encodedMonDayHrMin;
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
-        for (int j = 0; j <= columnNum; j++) {
-            state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(zone_i)[j] = std::pow(j, 2) * zone_i;
+        for (int j = 0; j < columnNum; j++) {
+            state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(zone_i).at(j) = std::pow(j, 2) * zone_i;
         }
         General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
         state->dataHeatBalFanSys->ZoneColdHourOfSafetyBins(zone_i)[timeColumnIdx - 1] = encodedMonDayHrMin;
