@@ -99,8 +99,8 @@ struct OutputsData : BaseGlobalStruct
     int iTotalAutoSizableFields;          // number of fields that can be autosized
     int iNumberOfAutoCalcedFields;        // number of autocalculated fields
     int iTotalAutoCalculatableFields;     // number of fields that can be autocalculated
-    std::unordered_map<std::string,
-                       std::unordered_map<std::string,
+    std::unordered_map<std::string_view,
+                       std::unordered_map<std::string_view,
                                           DataOutputs::OutputReportingVariables,
                                           UtilityRoutines::case_insensitive_hasher,
                                           UtilityRoutines::case_insensitive_comparator>,
