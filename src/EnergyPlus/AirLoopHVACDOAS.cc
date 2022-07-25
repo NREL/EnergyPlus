@@ -955,7 +955,6 @@ namespace AirLoopHVACDOAS {
         }
         state.dataSize->CurSysNum = state.dataHVACGlobal->NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
         state.dataSize->CurOASysNum = this->m_OASystemNum;
-
     }
 
     void getAirLoopHVACDOASInput(EnergyPlusData &state)
