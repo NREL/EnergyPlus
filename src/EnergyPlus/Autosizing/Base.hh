@@ -175,6 +175,7 @@ struct BaseSizer
     // HeatingWaterflowSizer
     Real64 dataConstantUsedForSizing = 0.0;
     Real64 dataFractionUsedForSizing = 0.0;
+    bool dataDXCoolsLowSpeedsAutozize = false;
 
     // HeatingWaterDesCoilWaterVolFlowUsedForUASizer
     int dataPltSizHeatNum = 0;
@@ -238,7 +239,7 @@ struct BaseSizer
     // CoolingAirFlowSizing
     Real64 dataBypassFrac = 0.0;
 
-    Real64 dataIsDXCoil = false;
+    bool dataIsDXCoil = false;
 
     Real64 dataNonZoneNonAirloopValue = 0.0;
 

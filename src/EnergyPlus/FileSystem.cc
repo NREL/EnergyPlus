@@ -80,6 +80,17 @@ namespace FileSystem {
     std::string const exeExtension;
 #endif
 
+    static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
+        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
+    static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExtUC{
+        "EPJSON", "JSON", "GLHE", "CBOR", "MSGPACK", "UBJSON", "BSON", "IDF", "IMF", "CSV", "TSV", "TXT", "ESO", "MTR"};
+
+    static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
+    static_assert(FileTypesExtUC.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExtUC array.");
+
+    static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
+    static_assert(!FileTypesExtUC.back().empty(), "Likely missing an enum from FileTypes in FileTypesExtUC array.");
+
     fs::path makeNativePath(fs::path const &path)
     {
         // path.make_preferred() on windows will change "/" to "\\", because '/' is a fallback separator
@@ -223,7 +234,8 @@ namespace FileSystem {
 #endif
 
         extension.remove_prefix(extension.find_last_of('.') + 1);
-        return static_cast<FileTypes>(getEnumerationValue(FileTypesExt, extension));
+        std::string stringExtension = std::string(extension);
+        return static_cast<FileTypes>(getEnumerationValue(FileTypesExtUC, UtilityRoutines::MakeUPPERCase(stringExtension)));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
@@ -345,7 +357,7 @@ namespace FileSystem {
         } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
             fopen_mode = "rb";
         } else {
-            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+            throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
@@ -392,7 +404,7 @@ namespace FileSystem {
         } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
             fopen_mode = "rb";
         } else {
-            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+            throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
         auto close_file = [](FILE *f) { fclose(f); };

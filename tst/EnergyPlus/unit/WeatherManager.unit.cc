@@ -949,7 +949,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
         expectedValue = std::get<1>(v);
 
         std::string query("SELECT Value From TabularDataWithStrings"
-                          "  WHERE ReportName = 'Initialization Summary'"
+                          "  WHERE ReportName = 'InitializationSummary'"
                           "  AND TableName = 'Environment:Design Day Data'"
                           "  AND ColumnName = '" +
                           columnName + "'");
