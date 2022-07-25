@@ -819,7 +819,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6632.0666, sizedValue, 0.01); // capacity includes system fan heat
-    sizer.autoSizedValue = 0.0;             // reset for next test
+    sizer.autoSizedValue = 0.0;               // reset for next test
 
     // reset eio stream
     has_eio_output(true);
