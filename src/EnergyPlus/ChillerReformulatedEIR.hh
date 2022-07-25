@@ -236,7 +236,7 @@ namespace ChillerReformulatedEIR {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void size(EnergyPlusData &state);
+        virtual void size(EnergyPlusData &state);
 
         void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 

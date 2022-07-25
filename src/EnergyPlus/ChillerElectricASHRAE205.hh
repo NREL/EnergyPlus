@@ -63,8 +63,34 @@ namespace EnergyPlus {
     struct EnergyPlusData;
 
     namespace ChillerElectricASHRAE205 {
+
+        enum class AmbientTemp
+        {
+            Invalid = -1,
+            Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
+            TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
+            OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
+            ZoneAndOA,  // applicable to HPWH only, inlet air is mixture of OA and zone air
+            Num,
+        };
+
+//        constexpr std::array<std::string_view, static_cast<int>(AmbientTemp::Num)> AmbientTempNamesUC{
+//                "SCHEDULE", "ZONEAIRONLY", "OUTDOORAIRONLY", "ZONEANDOUTDOORAIR"};
+
+        constexpr std::array<std::string_view, static_cast<int>(AmbientTemp::Num) - 1> AmbientTempNamesUC{
+                "SCHEDULE",
+                "ZONE",
+                "OUTDOORS",
+        };
+
         struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs {
             std::shared_ptr<tk205::rs_instance_base> RS;      // ASHRAE205 representation instance
+            AmbientTemp AmbientTempIndicator;
+            int AmbientTempSchedule{0};                       // Schedule index pointer
+            int AmbientTempZone{0};                           // Number of ambient zone around tank
+            int AmbientTempOutsideAirNode{0};                 // Number of outside air node
+            Real64 AmbientTemp{0.0};
+            Real64 AmbientZoneGain;                           // Internal gain to zone from tank losses (W)
 
             std::string EndUseSubcategory{""};                // identifier use for the end use subcategory
 
@@ -83,7 +109,7 @@ namespace EnergyPlus {
 
             void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
-            void size(EnergyPlusData &state);
+            void size(EnergyPlusData &state) override;
 
             void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
 
