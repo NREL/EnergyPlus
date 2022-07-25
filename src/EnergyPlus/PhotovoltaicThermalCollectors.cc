@@ -1105,7 +1105,7 @@ namespace PhotovoltaicThermalCollectors {
 
             switch (this->Simple.ThermEfficMode) {
             case ThermEfficEnum::FIXED: {
-              Eff = this->Simple.ThermEffic;
+                Eff = this->Simple.ThermEffic;
             } break;
             case ThermEfficEnum::SCHEDULED: {
                 Eff = ScheduleManager::GetCurrentScheduleValue(state, this->Simple.ThermEffSchedNum);
@@ -1450,9 +1450,9 @@ namespace PhotovoltaicThermalCollectors {
         Real64 s1(0.0);                                                     // solar radiation gain at pv backing surface (W/m2)
         Real64 k_taoalpha_beam(0.0);
         Real64 k_taoalpha_sky(0.0);
-        Real64 k_taoalpha_ground(0.0);  // solar radiation gain at pv backing surface (W/m2)
-        Real64 iam_pv_beam(1.0);   // incident angle modifier pv cells
-        Real64 iam_back_beam(1.0); // incident angle modifier back
+        Real64 k_taoalpha_ground(0.0); // solar radiation gain at pv backing surface (W/m2)
+        Real64 iam_pv_beam(1.0);       // incident angle modifier pv cells
+        Real64 iam_back_beam(1.0);     // incident angle modifier back
         Real64 iam_pv_sky(1.0);
         Real64 iam_back_sky(1.0);
         Real64 iam_pv_ground(1.0);
@@ -1867,7 +1867,7 @@ namespace PhotovoltaicThermalCollectors {
                     state.dataSurface->OSCM(thisOSCM).HConv = this->BIPVT.HcPlen;
                     state.dataSurface->OSCM(thisOSCM).TRad = this->BIPVT.Tcoll;
                     state.dataSurface->OSCM(thisOSCM).HRad = this->BIPVT.HrPlen;
-                 }
+                }
             } break;
             default:
                 break;
