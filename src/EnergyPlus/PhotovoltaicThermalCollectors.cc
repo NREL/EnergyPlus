@@ -1371,7 +1371,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Numerical & Analytical
 
-        const Real64 pi(3.14159);
+        constexpr Real64 pi(3.14159);
         // BIPVT system geometry
         Real64 w = this->BIPVT.EffCollWidth;                                          // width of BIPVT panel (m)
         Real64 l = this->BIPVT.EffCollHeight;                                         // length of BIPVT panel (m)
@@ -1417,7 +1417,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 hpv_1;                           // conductance of pv backing (W/m2-K)
         Real64 hrad12;                          // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
         Real64 hrad_surr;                       // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
-        const Real64 sigma(5.67e-8);            // stephan bolzmann constant
+        constexpr Real64 sigma(5.67e-8);        // stephan bolzmann constant
         Real64 reynolds(0.0);                   // Reynolds inside collector
         Real64 nusselt(0.0);                    // Nusselt inside collector
         Real64 vel(0.0);                        // flow velocity (m/s)
@@ -1463,19 +1463,19 @@ namespace PhotovoltaicThermalCollectors {
         Real64 wind_incidence(0);                                                               // wind incidence angle on surface
 
         // other parameters
-        const Real64 small_num(1.0e-10);                                      // small real number
+        constexpr Real64 small_num(1.0e-10);                                  // small real number
         Real64 a(0), b(0), c(0), d(0), e(0);                                  // variables used for solving average fluid temperature
         Real64 err_tpvg(1.0), err_tpv(1.0), err_t1(1.0), err_mdot_bipvt(1.0); // convergence errors for temperatures
-        const Real64 tol(1.0e-3);                                             // temperature convergence tolerance
-        const Real64 rf(0.75);                                                // relaxation factor
-        const Real64 degc_to_kelvin(273.15);                                  // conversion constant degC to Kelvin
+        constexpr Real64 tol(1.0e-3);                                             // temperature convergence tolerance
+        constexpr Real64 rf(0.75);                                                // relaxation factor
+        constexpr Real64 degc_to_kelvin(273.15);                                  // conversion constant degC to Kelvin
         Real64 ebal1, ebal2, ebal3;                                           // energy balances on 3 surfaces
         Real64 jj[9];                                                         // 3x3 array for coefficient matrix
         Real64 f[3];                                                          // 3 element array for constant term
         Real64 y[3];                                                          // solution array for tpvg,tpv, and t1
         int m(3);                                                             // parameter for number of unknwons
         int i;                                                                // index
-        const int MaxNumIter(50);                                             // maximum number of iterations
+        constexpr int MaxNumIter(50);                                         // maximum number of iterations
         int iter(0);                                                          // iteration counter
 
         emiss_2 = state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfNum).Construction)
