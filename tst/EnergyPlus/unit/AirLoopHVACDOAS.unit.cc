@@ -9110,7 +9110,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanHeatAddeToCoolingCoilSize)
     // OA flow rate
     EXPECT_NEAR(state->dataHVACFan->fanObjs[0]->designAirVolFlowRate, 0.4167, 0.001);
     // Recalculate precooltemp by adding fan heat
-    EXPECT_NEAR(thisAirLoopDOASObjec.PrecoolTemp, 16.7892, 0.001);
+    EXPECT_NEAR(thisAirLoopDOASObjec.PrecoolTemp, 17.5, 0.001);
 }
 
 } // namespace EnergyPlus

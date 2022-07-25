@@ -807,7 +807,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].HeatOutTemp = 5.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PreheatTemp = 11.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBeforeCoolingCoilFlag = true;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
 
     // start with an autosized value
@@ -818,7 +818,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(6448.73, sizedValue, 0.01); // capacity includes system fan heat
+    EXPECT_NEAR(6632.0666, sizedValue, 0.01); // capacity includes system fan heat
     sizer.autoSizedValue = 0.0;             // reset for next test
 
     // reset eio stream
@@ -840,7 +840,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Heating Capacity [W], 6448.73336\n"
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Heating Capacity [W], 6632.06669\n"
                             " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Heating Capacity [W], 4200.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

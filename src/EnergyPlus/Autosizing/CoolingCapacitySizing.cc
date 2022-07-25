@@ -275,10 +275,30 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     auto &thisAirloopDOAS = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum];
                     DesVolFlow = thisAirloopDOAS.SizingMassFlow / state.dataEnvrn->StdRhoAir;
                     CoilInTemp = thisAirloopDOAS.SizingCoolOATemp;
-                    if (thisAirloopDOAS.m_FanIndex > -1 && thisAirloopDOAS.FanBlowTroughFlag &&
-                        thisAirloopDOAS.m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
-                        int FanIndex = thisAirloopDOAS.m_FanIndex;
-                        Real64 DeltaT = state.dataHVACFan->fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
+                    Real64 DeltaT = 0.0;
+                    if (thisAirloopDOAS.m_FanIndex > -1 && thisAirloopDOAS.FanBeforeCoolingCoilFlag) {
+                        if (thisAirloopDOAS.m_FanTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) {
+                            Fans::FanInputsForDesHeatGain(state,
+                                                          thisAirloopDOAS.m_FanIndex,
+                                                          this->deltaP,
+                                                          this->motEff,
+                                                          this->totEff,
+                                                          this->motInAirFrac,
+                                                          this->fanShaftPow,
+                                                          this->motInPower,
+                                                          this->fanCompModel);
+                            FanCoolLoad = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
+                            this->dataFanEnumType = this->dataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
+                        } else if (thisAirloopDOAS.m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
+                            state.dataHVACFan->fanObjs[thisAirloopDOAS.m_FanIndex]->FanInputsForDesignHeatGain(
+                                state, this->deltaP, this->motEff, this->totEff, this->motInAirFrac);
+                            Real64 fanPowerTot = (DesVolFlow * this->deltaP) / this->totEff; 
+                            FanCoolLoad = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
+                            this->dataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
+                        }
+                        this->dataFanIndex = thisAirloopDOAS.m_FanIndex;
+                        Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(thisAirloopDOAS.m_FanInletNodeNum).HumRat);
+                        DeltaT = FanCoolLoad / (thisAirloopDOAS.SizingMassFlow * CpAir);
                         CoilInTemp += DeltaT;
                     }
                     CoilInHumRat = thisAirloopDOAS.SizingCoolOAHumRat;
