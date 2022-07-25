@@ -508,8 +508,8 @@ TEST_F(EnergyPlusFixture, Test_SimulationControl_ZeroSimulation)
     // Test for #9191
     std::string const idf_objects = delimited_string({
         "SimulationControl,",
-        "  Yes,                      !- Do Zone Sizing Calculation",
-        "  Yes,                      !- Do System Sizing Calculation",
+        "  No,                       !- Do Zone Sizing Calculation",
+        "  No,                       !- Do System Sizing Calculation",
         "  Yes,                      !- Do Plant Sizing Calculation",
         "  No,                       !- Run Simulation for Sizing Periods",
         "  No,                       !- Run Simulation for Weather File Run Periods",
@@ -525,11 +525,40 @@ TEST_F(EnergyPlusFixture, Test_SimulationControl_ZeroSimulation)
     // no error message from PerformancePrecisionTradeoffs objects
     //
     std::string const error_string = delimited_string({
-        "   ** Severe  ** All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.",
+        "   ** Severe  ** All elements of SimulationControl are set to \"No\". No simulations can be done. Program terminates.",
         "   **  Fatal  ** Program terminates due to preceding conditions.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.",
+        "   ..... Last severe error=All elements of SimulationControl are set to \"No\". No simulations can be done. Program terminates.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, Test_SimulationControl_PureLoadCalc)
+{
+    // Test for #9191
+    std::string const idf_objects = delimited_string({
+        "SimulationControl,",
+        "  Yes,                      !- Do Zone Sizing Calculation",
+        "  Yes,                      !- Do System Sizing Calculation",
+        "  No,                       !- Do Plant Sizing Calculation",
+        "  No,                       !- Run Simulation for Sizing Periods",
+        "  No,                       !- Run Simulation for Weather File Run Periods",
+        "  No,                       !- Do HVAC Sizing Simulation for Sizing Periods",
+        "  1;                        !- Maximum Number of HVAC Sizing Simulation Passes",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+
+    EXPECT_NO_THROW(SimulationManager::CheckForMisMatchedEnvironmentSpecifications(*state));
+    // no error message from PerformancePrecisionTradeoffs objects
+    //
+    std::string const error_string = delimited_string({
+        "   ** Warning ** \"Run Simulation for Sizing Periods\" and \"Run Simulation for Weather File Run Periods\" are both set to \"No\". "
+        "No simulations will be performed, and most input will not be read.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
