@@ -7327,7 +7327,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
             continue;
         }
 
-        // Electric lighting power reduction factor for a zone due to daylighting
+        // Electric lighting power reduction factor for a given daylighting control
         Real64 &TotReduction = thisDaylightControl.PowerReductionFactor;
         TotReduction = 0.0;
         Real64 ZFTOT = 0.0;
