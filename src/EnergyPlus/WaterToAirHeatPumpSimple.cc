@@ -926,7 +926,6 @@ namespace WaterToAirHeatPumpSimple {
         int WaterInletNode;          // Node Number of the Water inlet
         Real64 RatedAirMassFlowRate; // coil rated air mass flow rates
         Real64 rho;                  // local fluid density
-        Real64 Cp;                   // local fluid specific heat
         bool errFlag;
 
         if (state.dataWaterToAirHeatPumpSimple->MyOneTimeFlag) {
