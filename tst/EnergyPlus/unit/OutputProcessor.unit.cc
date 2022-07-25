@@ -5694,7 +5694,6 @@ namespace OutputProcessor {
                             OutputProcessor::SOVStoreType::Summed,
                             "*");
         SystemReports::AllocateAndSetUpVentReports(*state);
-        SystemReports::AllocateAndSetUpVentReports(*state);
         GetCustomMeterInput(*state, errors_found);
         EXPECT_FALSE(errors_found);
         EXPECT_EQ(15, state->dataOutputProcessor->NumEnergyMeters);
