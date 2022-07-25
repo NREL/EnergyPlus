@@ -1215,10 +1215,15 @@ namespace WaterToAirHeatPumpSimple {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 rhoair;
         Real64 MixTemp;                   // Mixed air temperature at cooling design conditions
+        Real64 MixTempSys;                // Mixed air temperature at cooling design conditions at system air flow
         Real64 HeatMixTemp;               // Mixed air temperature at heating design conditions
+        Real64 HeatMixTempSys;            // Mixed air temperature at heating design conditions at system air flow
         Real64 MixHumRat;                 // Mixed air humidity ratio at cooling design conditions
+        Real64 MixHumRatSys;              // Mixed air humidity ratio at cooling design conditions at system air flow
         Real64 HeatMixHumRat;             // Mixed air humidity ratio at heating design conditions
+        Real64 HeatMixHumRatSys;          // Mixed air humidity ratio at heating design conditions at system air flow
         Real64 MixEnth;                   // Mixed air enthalpy at cooling design conditions
+        Real64 MixEnthSys;                // Mixed air enthalpy at cooling design conditions at system air flow
         Real64 MixWetBulb;                // Mixed air wet-bulb temperature at cooling design conditions
         Real64 RatedMixWetBulb = 0.0;     // Rated mixed air wetbulb temperature
         Real64 RatedMixDryBulb = 0.0;     // Rated mixed air drybulb temperature
@@ -1239,7 +1244,9 @@ namespace WaterToAirHeatPumpSimple {
         Real64 RatedratioTS;              // Rated cooling source-side temperature ratio
         Real64 RatedHeatratioTS;          // Rated heating source-side temperature ratio
         Real64 OutAirFrac;                // Outdoor air fraction at cooling design conditions
+        Real64 OutAirFracSys;             // Outdoor air fraction at cooling design conditions at system air flow
         Real64 HeatOutAirFrac;            // Outdoor air fraction at heating design conditions
+        Real64 HeatOutAirFracSys;         // Outdoor air fraction at heating design conditions at system air flow
         Real64 VolFlowRate;
         Real64 CoolCapAtPeak;                  // Load on the cooling coil at cooling design conditions
         Real64 HeatCapAtPeak;                  // Load on the heating coil at heating design conditions
@@ -1281,6 +1288,15 @@ namespace WaterToAirHeatPumpSimple {
         Real64 RatedCapCoolHeatDD;        // Rated cooling coil capacity based on heating design conditions
         bool SizingDesRunThisAirSys;      // true if a particular air system had a Sizing:System object and system sizing done
         bool SizingDesRunThisZone;        // true if a particular zone had a Sizing:Zone object and zone sizing was done
+        Real64 HeatdTratio = 1.0;         // Temperature difference across coil adjustment factor
+        Real64 dHratio = 1.0;             // Enthalpy difference across coil adjustment factor
+        Real64 HeatOAFrac;                // Outdoor air fraction at heating design conditions
+        Real64 HeatOAFracSys;             // Outdoor air fraction at heating design conditions at system air flow
+        Real64 HeatOATemp;                // Outdoor air temperature at heating design conditions
+        Real64 OAFrac;                    // Outdooor air fraction
+        Real64 OAFracSys;                 // Outdoor air fraction at system air flow
+        Real64 OATemp;                    // Outdoor air temperature at cooling design conditions
+        Real64 OAHumRat;                  // Humidity ratio at cooling design conditions
 
         PltSizNum = 0;
         ErrorsFound = false;
@@ -1428,24 +1444,39 @@ namespace WaterToAirHeatPumpSimple {
                             MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
                             SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
                             SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
+                            MixTempSys = MixTemp;
+                            MixHumRat = MixHumRat;
                         } else { // coil is on the main air loop
                             SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
                             SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
+                            if (VolFlowRate > 0.0) {
+                                OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
+                                OutAirFracSys = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / RatedAirVolFlowRateDes;
+                            } else {
+                                OutAirFrac = 1.0;
+                                OutAirFracSys = OutAirFrac;
+                            }
+                            OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                            OutAirFracSys = min(1.0, max(0.0, OutAirFracSys));
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils ==
                                 0) { // there is no precooling of the OA stream
                                 MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak;
                                 MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak;
+                                // calculate mixed air temperature with system airflow
+                                MixTempSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak +
+                                             (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
+                                MixHumRatSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak +
+                                               (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
                             } else { // there is precooling of OA stream
-                                if (VolFlowRate > 0.0) {
-                                    OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
-                                } else {
-                                    OutAirFrac = 1.0;
-                                }
-                                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                                 MixTemp = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp +
                                           (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
                                 MixHumRat = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
                                             (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
+                                // calculate mixed air temperature with system airflow
+                                MixTempSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp +
+                                             (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
+                                MixHumRatSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
+                                               (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
                             }
                         }
                         // supply air condition is capped with that of mixed air to avoid SHR > 1.0
@@ -1453,7 +1484,10 @@ namespace WaterToAirHeatPumpSimple {
                         SupHumRat = min(MixHumRat, SupHumRat);
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
+                        MixEnthSys = Psychrometrics::PsyHFnTdbW(MixTempSys, MixHumRatSys);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
+                        // determine the coil ratio of coil dT with system air flow to design heating air flow
+                        dHratio = (SupEnth - MixTempSys) / (SupEnth - MixEnth);
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
@@ -1559,13 +1593,30 @@ namespace WaterToAirHeatPumpSimple {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
                                 MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
                                 MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
+                                // calculate mixed air temperature and humidity with system airflow
+                                OAFrac = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA / CoolingAirVolFlowRateDes;
+                                OAFracSys = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA / RatedAirVolFlowRateDes;
+                                OATemp = (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp -
+                                          (1.0 - OAFrac) * state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneTempAtCoolPeak) /
+                                         OAFrac;
+                                OAHumRat = (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInHumRat -
+                                            (1.0 - OAFrac) * state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak) /
+                                           OAFrac;
+                                MixTempSys = OAFracSys * OATemp +
+                                             (1.0 - OAFracSys) * state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneTempAtCoolPeak;
+                                MixHumRatSys = OAFracSys * OAHumRat +
+                                               (1.0 - OAFracSys) * state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak;
                             } else {
                                 MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak;
                                 MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak;
+                                MixTempSys = MixTemp;
+                                MixHumRatSys = MixHumRat;
                             }
                         } else {
                             MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
                             MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
+                            MixTempSys = MixTemp;
+                            MixHumRatSys = MixHumRat;
                         }
                         SupTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesTemp;
                         SupHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesHumRat;
@@ -1581,7 +1632,10 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
+                        MixEnthSys = Psychrometrics::PsyHFnTdbW(MixTempSys, MixHumRatSys);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
+                        // determine the coil ratio of coil dH with system air flow to design heating air flow
+                        dHratio = (SupEnth - MixTempSys) / (SupEnth - MixEnth);
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
                             case DataAirSystems::StructArrayLegacyFanModels: {
@@ -1947,8 +2001,8 @@ namespace WaterToAirHeatPumpSimple {
                                 RatedCapCoolTotalDes = RatedCapCoolHeatDD;
 
                                 // adjust for system air flow -- capacity is based on heating design day calcs
-                                // adjust by ratio of system to heating air flow rate
-                                RatedCapCoolTotalDes *= RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes;
+                                // adjust by ratio of system to heating air flow rate and temperature delta across the coil at these different airflow
+                                RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
 
                                 if (RatedCapCoolSensAutoSized) {
                                     // adjust sensible capacity assuming that the SHR is constant
@@ -1962,8 +2016,8 @@ namespace WaterToAirHeatPumpSimple {
                                                                          "Heating");
                             } else {
                                 // adjust for system air flow -- capacity is based on cooling design day calcs
-                                // adjust by ratio of system to cooling air flow rate
-                                RatedCapCoolTotalDes *= RatedAirVolFlowRateDes / CoolingAirVolFlowRateDes;
+                                // adjust by ratio of system to cooling air flow rate and enthalpy delta across the coil at these different airflow
+                                RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / CoolingAirVolFlowRateDes) * dHratio;
 
                                 simpleWatertoAirHP.RatedCapCoolTotal = RatedCapCoolTotalDes;
                                 OutputReportPredefined::PreDefTableEntry(state,
@@ -1990,16 +2044,16 @@ namespace WaterToAirHeatPumpSimple {
                             // case 3: companion heating coil is not of the "equationfit" type and hence doesn't use the rated heating to cooling
                             // coil capacity ratio
                             // adjust for system air flow -- capacity is based on cooling design day calcs
-                            // adjust by ratio of system to cooling air flow rate
-                            RatedCapCoolTotalDes *= RatedAirVolFlowRateDes / CoolingAirVolFlowRateDes;
+                            // adjust by ratio of system to cooling air flow rate and enthalpy delta across the coil at these different airflow
+                            RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / CoolingAirVolFlowRateDes) * dHratio;
                             simpleWatertoAirHP.RatedCapCoolTotal = RatedCapCoolTotalDes;
                             // Set the global DX cooling coil capacity variable for use by other objects
                             state.dataSize->DXCoolCap = simpleWatertoAirHP.RatedCapCoolTotal;
                         }
                     } else {
                         // adjust for system air flow -- capacity is based on cooling design day calcs
-                        // adjust by ratio of system to cooling air flow rate
-                        RatedCapCoolTotalDes *= RatedAirVolFlowRateDes / CoolingAirVolFlowRateDes;
+                        // adjust by ratio of system to cooling air flow rate and enthalpy delta across the coil at these different airflow
+                        RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / CoolingAirVolFlowRateDes) * dHratio;
 
                         simpleWatertoAirHP.RatedCapCoolTotal = RatedCapCoolTotalDes;
                         state.dataSize->DXCoolCap = simpleWatertoAirHP.RatedCapCoolTotal;
@@ -2275,9 +2329,14 @@ namespace WaterToAirHeatPumpSimple {
                         } else { // coil is on the main air loop
                             if (VolFlowRate > 0.0) {
                                 HeatOutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
+                                HeatOutAirFracSys =
+                                    state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / RatedAirVolFlowRateDes;
                             } else {
                                 HeatOutAirFrac = 1.0;
+                                HeatOutAirFracSys = HeatOutAirFrac;
                             }
+                            HeatOutAirFrac = min(1.0, max(0.0, HeatOutAirFrac));
+                            HeatOutAirFracSys = min(1.0, max(0.0, HeatOutAirFracSys));
                             HeatSupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOAHeatCoils ==
                                 0) { // there is no preheating of the OA stream
@@ -2285,13 +2344,27 @@ namespace WaterToAirHeatPumpSimple {
                                               (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
                                 HeatMixHumRat = HeatOutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutHumRat +
                                                 (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
+                                // calculate mixed air temperature with system airflow
+                                HeatMixTempSys = HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutTemp +
+                                                 (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
+                                HeatMixHumRatSys =
+                                    HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutHumRat +
+                                    (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
                             } else { // there is preheating of OA stream
                                 HeatOutAirFrac = min(1.0, max(0.0, HeatOutAirFrac));
                                 HeatMixTemp = HeatOutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatTemp +
                                               (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
                                 HeatMixHumRat = HeatOutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatHumRat +
                                                 (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
+                                // calculate mixed air temperature with system airflow
+                                HeatMixTempSys = HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatTemp +
+                                                 (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
+                                HeatMixHumRatSys =
+                                    HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatHumRat +
+                                    (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
                             }
+                            // determine the coil ratio of coil dT with system air flow to design heating air flow
+                            HeatdTratio = (HeatSupTemp - HeatMixTempSys) / (HeatSupTemp - HeatMixTemp);
                         }
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HeatMixTemp, HeatMixHumRat, RoutineName);
                         HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
@@ -2393,15 +2466,30 @@ namespace WaterToAirHeatPumpSimple {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
                                 HeatMixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInTemp;
                                 HeatMixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInHumRat;
+                                // calculate mixed air temperature with system airflow
+                                HeatOAFrac = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA / HeatingAirVolFlowRateDes;
+                                HeatOAFracSys = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA / RatedAirVolFlowRateDes;
+                                HeatOAFrac = min(1.0, max(0.0, HeatOAFrac));
+                                HeatOAFracSys = min(1.0, max(0.0, HeatOAFracSys));
+                                HeatOATemp = (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInTemp -
+                                              (1.0 - HeatOAFrac) * state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneTempAtHeatPeak) /
+                                             HeatOAFrac;
+                                HeatMixTempSys =
+                                    HeatOAFracSys * HeatOATemp +
+                                    (1.0 - HeatOAFracSys) * state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneTempAtHeatPeak;
                             } else {
                                 HeatMixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtHeatPeak;
                                 HeatMixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak;
+                                HeatMixTempSys = HeatMixTemp;
                             }
                         } else {
                             HeatMixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInTemp;
                             HeatMixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInHumRat;
+                            HeatMixTempSys = HeatMixTemp;
                         }
                         HeatSupTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesTemp;
+                        // determine the coil ratio of coil dT with system air flow to design heating air flow
+                        HeatdTratio = (HeatSupTemp - HeatMixTempSys) / (HeatSupTemp - HeatMixTemp);
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HeatMixTemp, HeatMixHumRat, RoutineName);
                         HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
                                         (HeatSupTemp - HeatMixTemp);                                     // heating coil load
@@ -2521,8 +2609,8 @@ namespace WaterToAirHeatPumpSimple {
                         // total cooling capacity
                         RatedCapCoolTotalDes = RatedCapCoolHeatDD;
                         // adjust for system air flow -- capacity is based on heating design day calcs
-                        // adjust by ratio of system to heating air flow rate
-                        RatedCapCoolTotalDes *= RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes;
+                        // adjust by ratio of system to heating air flow rate and temperature delta across the coil at these different airflow
+                        RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / HeatingAirVolFlowRateDes) * HeatdTratio;
                         // calculate ajustment factor over previous capacity for sensible capacity adjustment
                         Real64 CapCoolAdjFac = RatedCapCoolTotalDes / state.dataSize->DXCoolCap;
                         // update cooling coil rated capacity after adjustments based on heating coil size
