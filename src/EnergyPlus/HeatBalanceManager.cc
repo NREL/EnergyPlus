@@ -6108,7 +6108,8 @@ namespace HeatBalanceManager {
                 max(state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
-            if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 && !state.dataGlobal->DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 &&
+                (!state.dataGlobal->DoingSizing || state.dataGlobal->DoPureLoadCalc)) {
                 state.dataHeatBalMgr->WarmupTempDiff(ZoneNum) =
                     std::abs(state.dataHeatBalMgr->TempZoneSecPrevDay(ZoneNum) - state.dataHeatBalMgr->TempZonePrevDay(ZoneNum));
                 state.dataHeatBalMgr->WarmupLoadDiff(ZoneNum) =
@@ -6493,7 +6494,9 @@ namespace HeatBalanceManager {
         ReportScheduleValues(state);
 
         if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DoOutputReporting) {
-            CalcMoreNodeInfo(state);
+            if (!state.dataGlobal->DoingSizing) {
+                CalcMoreNodeInfo(state);
+            }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
@@ -6538,7 +6541,9 @@ namespace HeatBalanceManager {
                     state.dataEnvrn->PrintEnvrnStampWarmup = false;
                 }
             }
-            CalcMoreNodeInfo(state);
+            if (!state.dataGlobal->DoingSizing) {
+                CalcMoreNodeInfo(state);
+            }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
