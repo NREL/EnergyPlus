@@ -321,6 +321,30 @@
     15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
+  People,
+    Main Zone People 1,      !- Name
+    Main Zone,               !- Zone or ZoneList Name
+    BLDG_OCC_SCH,            !- Number of People Schedule Name
+    People,                  !- Number of People Calculation Method
+    1,                       !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.3000,                  !- Fraction Radiant
+    AUTOCALCULATE,           !- Sensible Heat Fraction
+    ACTIVITY_SCH,            !- Activity Level Schedule Name
+    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
+    10.5,                    !- Cold Stress Temperature Threshold [C]
+    25,                      !- Heat Stress Temperature Threshold [C]
+    No,                      !- Enable ASHRAE 55 Comfort Warnings
+    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    WORK_EFF_SCH,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    CLOTHING_SCH,            !- Clothing Insulation Schedule Name
+    AIR_VELO_SCH,            !- Air Velocity Schedule Name
+    PIERCE;                  !- Thermal Comfort Model 1 Type
+
   ZoneInfiltration:DesignFlowRate,
     Main Zone Infiltration,  !- Name
     Main Zone,               !- Zone or ZoneList Name
@@ -352,6 +376,68 @@
     FOR: AllDays,            !- Field 2
     UNTIL: 12:00,1,          !- Field 3
     UNTIL: 24:00,0;          !- Field 5
+
+  Schedule:Compact,
+    ACTIVITY_SCH,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,120.;       !- Field 3
+
+  Schedule:Compact,
+    AIR_VELO_SCH,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.2;        !- Field 3
+
+  Schedule:Compact,
+    CLOTHING_SCH,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 04/30,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0,        !- Field 3
+    Through: 09/30,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,0.5,        !- Field 7
+    Through: 12/31,          !- Field 9
+    For: AllDays,            !- Field 10
+    Until: 24:00,1.0;        !- Field 11
+
+  Schedule:Compact,
+    WORK_EFF_SCH,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
+
+  Schedule:Compact,
+    BLDG_OCC_SCH,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: SummerDesignDay,    !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 22:00,1.0,        !- Field 5
+    Until: 24:00,0.05,       !- Field 7
+    For: Weekdays,           !- Field 9
+    Until: 06:00,0.0,        !- Field 10
+    Until: 07:00,0.1,        !- Field 12
+    Until: 08:00,0.2,        !- Field 14
+    Until: 12:00,0.95,       !- Field 16
+    Until: 13:00,0.5,        !- Field 18
+    Until: 17:00,0.95,       !- Field 20
+    Until: 18:00,0.7,        !- Field 22
+    Until: 20:00,0.4,        !- Field 24
+    Until: 22:00,0.1,        !- Field 26
+    Until: 24:00,0.05,       !- Field 28
+    For: Saturday,           !- Field 30
+    Until: 06:00,0.0,        !- Field 31
+    Until: 08:00,0.1,        !- Field 33
+    Until: 14:00,0.5,        !- Field 35
+    Until: 17:00,0.1,        !- Field 37
+    Until: 24:00,0.0,        !- Field 39
+    For: AllOtherDays,       !- Field 41
+    Until: 24:00,0.0;        !- Field 42
 
   AirLoopHVAC,
     Evap Cooler System,      !- Name
@@ -551,17 +637,17 @@
   Schedule:Compact,
     ReportPeriodOff,         !- Name
     Fraction,                !- Schedule Type Limits Name
-    Through: 7/31,           !- Field 1
+    Through: 7/24,           !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1.0,        !- Field 6
-    Through: 8/1,            !- Field 1
+    Through: 7/25,           !- Field 1
     For: AllDays,            !- Field 2
     Until: 6:00,1.0,         !- Field 3
     Until: 24:00,0.0,        !- Field 3
-    Through: 8/2,            !- Field 4
+    Through: 7/26,           !- Field 4
     For: AllDays,            !- Field 2
     Until: 24:00,0.0,        !- Field 3
-    Through: 8/3,            !- Field 4
+    Through: 7/27,           !- Field 4
     For: AllDays,            !- Field 5
     Until: 18:00,0.0,        !- Field 6
     Until: 24:00,1.0,        !- Field 6
@@ -627,10 +713,10 @@
    ThermalResilienceReportTimeSummer,  !- field Name,
    ThermalResilienceSummary,     !- field Report Name,
    ,                             !- Begin Year
-   8,                            !- Begin Month
-   1,                            !- Begin Day of Month
+   7,                            !- Begin Month
+   25,                           !- Begin Day of Month
    8,                            !- Begin Hour of Day
    ,                             !- End Year
-   8,                            !- End Month
-   3,                            !- End Day of Month
+   7,                            !- End Month
+   27,                           !- End Day of Month
    18;                           !- End Hour of Day
