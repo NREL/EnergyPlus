@@ -1466,9 +1466,9 @@ namespace PhotovoltaicThermalCollectors {
         constexpr Real64 small_num(1.0e-10);                                  // small real number
         Real64 a(0), b(0), c(0), d(0), e(0);                                  // variables used for solving average fluid temperature
         Real64 err_tpvg(1.0), err_tpv(1.0), err_t1(1.0), err_mdot_bipvt(1.0); // convergence errors for temperatures
-        constexpr Real64 tol(1.0e-3);                                             // temperature convergence tolerance
-        constexpr Real64 rf(0.75);                                                // relaxation factor
-        constexpr Real64 degc_to_kelvin(273.15);                                  // conversion constant degC to Kelvin
+        constexpr Real64 tol(1.0e-3);                                         // temperature convergence tolerance
+        constexpr Real64 rf(0.75);                                            // relaxation factor
+        constexpr Real64 degc_to_kelvin(273.15);                              // conversion constant degC to Kelvin
         Real64 ebal1, ebal2, ebal3;                                           // energy balances on 3 surfaces
         Real64 jj[9];                                                         // 3x3 array for coefficient matrix
         Real64 f[3];                                                          // 3 element array for constant term
