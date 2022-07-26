@@ -553,12 +553,12 @@
 
   People,
     HEARTLAND AREA,          !- Name
-    HEARTLAND AREA,          !- Zone or ZoneList Name
+    HEARTLAND AREA,          !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     48.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -575,7 +575,7 @@
 
   Lights,
     HEARTLAND AREA Lights 1, !- Name
-    HEARTLAND AREA,          !- Zone or ZoneList Name
+    HEARTLAND AREA,          !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     23190.00,                !- Lighting Level {W}
@@ -589,7 +589,7 @@
 
   ElectricEquipment,
     HEARTLAND AREA ElecEq 1, !- Name
-    HEARTLAND AREA,          !- Zone or ZoneList Name
+    HEARTLAND AREA,          !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     11600.00,                !- Design Level {W}
@@ -601,12 +601,12 @@
 
   People,
     OREGON WING,             !- Name
-    OREGON WING,             !- Zone or ZoneList Name
+    OREGON WING,             !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -623,7 +623,7 @@
 
   Lights,
     OREGON WING Lights 1,    !- Name
-    OREGON WING,             !- Zone or ZoneList Name
+    OREGON WING,             !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -637,7 +637,7 @@
 
   ElectricEquipment,
     OREGON WING ElecEq 1,    !- Name
-    OREGON WING,             !- Zone or ZoneList Name
+    OREGON WING,             !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3880.000,                !- Design Level {W}
@@ -649,12 +649,12 @@
 
   People,
     GEORGIA WING,            !- Name
-    GEORGIA WING,            !- Zone or ZoneList Name
+    GEORGIA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -671,7 +671,7 @@
 
   Lights,
     GEORGIA WING Lights 1,   !- Name
-    GEORGIA WING,            !- Zone or ZoneList Name
+    GEORGIA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -685,7 +685,7 @@
 
   ElectricEquipment,
     GEORGIA WING ElecEq 1,   !- Name
-    GEORGIA WING,            !- Zone or ZoneList Name
+    GEORGIA WING,            !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3880.000,                !- Design Level {W}
@@ -697,12 +697,12 @@
 
   People,
     ARIZONA WING,            !- Name
-    ARIZONA WING,            !- Zone or ZoneList Name
+    ARIZONA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -719,7 +719,7 @@
 
   Lights,
     ARIZONA WING Lights 1,   !- Name
-    ARIZONA WING,            !- Zone or ZoneList Name
+    ARIZONA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -733,7 +733,7 @@
 
   ElectricEquipment,
     ARIZONA WING ElecEq 1,   !- Name
-    ARIZONA WING,            !- Zone or ZoneList Name
+    ARIZONA WING,            !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3870.000,                !- Design Level {W}
@@ -745,12 +745,12 @@
 
   People,
     MAINE WING,              !- Name
-    MAINE WING,              !- Zone or ZoneList Name
+    MAINE WING,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -767,7 +767,7 @@
 
   Lights,
     MAINE WING Lights 1,     !- Name
-    MAINE WING,              !- Zone or ZoneList Name
+    MAINE WING,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -781,7 +781,7 @@
 
   ElectricEquipment,
     MAINE WING ElecEq 1,     !- Name
-    MAINE WING,              !- Zone or ZoneList Name
+    MAINE WING,              !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3880.000,                !- Design Level {W}
@@ -1189,15 +1189,15 @@
     Zn001:IntM001,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    130.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    130.0000;                !- Surface Area {m2}
 
   InternalMass,
     Zn001:IntM002,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    920.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    920.0000;                !- Surface Area {m2}
 
 ! Floor subdivided:
 !  BuildingSurface:Detailed,
@@ -1422,8 +1422,8 @@
     Zn001:IntM003,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    2380.000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    2380.000;                !- Surface Area {m2}
 
   BuildingSurface:Detailed,
     Zn002:Wall001,           !- Name
@@ -2274,7 +2274,7 @@
     0.0,                     !- Sky View Factor
     ,                        !- Sky Temperature Schedule Name
     ,                        !- Ground View Factor
-    ,                        !- Ground Temperature Schedule Name    
+    ,                        !- Ground Temperature Schedule Name
     SurroundingSurface1,     !- Surrounding Surface 1 Name
     1.0,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 1;  !- Surrounding Surface 1 Temperature Schedule Name
@@ -2302,25 +2302,12 @@
     0.2,                     !- Surrounding Surface 1 View Factor
     Surrounding Temp Sch 2;  !- Surrounding Surface 1 Temperature Schedule Name
 
- SurfaceProperty:GroundSurfaces,
-    GndSurfs:Zn005:Wall002:Win001,  !- Name
-    Gnd Surfs Wall002:Win001 Name,  !- Ground Surface 1 Name
-    0.3;                     !- Ground Surface 1 View Factor
-
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn005:Wall002,    !- Name
     Zn005:Wall002,           !- Exterior Surface Name
     ,                        !- External Shading Fraction Schedule Name
     SrdSurfs:Zn005:Wall002,  !- Surrounding Surfaces Object Name
     ;                        !- Outdoor Air Node Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn005:Wall002:Win001,  !- Name
-    Zn005:Wall002:Win001,    !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    SrdSurfs:Zn005:Wall002:Win001,  !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn005:Wall002:Win001;  !- Ground Surfaces Object Name
 
   SurfaceProperty:LocalEnvironment,
     LocEnv:Zn003:Roof001,    !- Name
@@ -2334,7 +2321,12 @@
     Temperature,             !- Schedule Type Limits Name
     LocalEnvData.csv,        !- File Name
     2,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:Compact,
     Surrounding Temp Sch 2,  !- Name
@@ -2367,175 +2359,41 @@
     For: AllDays,            !- Field 2
     Until: 24:00,0.1;        !- Field 3
 
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn004:Wall001,    !- Name
-    Zn004:Wall001,           !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn004:Wall001:Win001, !- Name
-    Zn004:Wall001:Win001,    !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn004:Wall001:Win002, !- Name
-    Zn004:Wall001:Win002,    !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn004:Wall001;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:GroundSurfaces,
-    GndSurfs:Zn004:Wall001,  !- Name
-    GndSurfs:Grass,          !- Ground Surface 1 Name
-    0.2,                     !- Ground Surface 1 View Factor
-    GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
-    GndSurfs:Parking,        !- Ground Surface 2 Name
-    0.2,                     !- Ground Surface 2 View Factor
-    GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-    GndSurfs:ParkingRefl,    !- Ground Surface 2 Reflectance Schedule Name
-    GndSurfs:Pond,           !- Ground Surface 3 Name
-    0.1,                     !- Ground Surface 3 View Factor
-    GndSurfs:PondTemp,       !- Ground Surface 3 Temperature Schedule Name
-    GndSurfs:PondRefl;       !- Ground Surface 3 Reflectance Schedule Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn003:Wall001,    !- Name
-    Zn003:Wall001,           !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn003:Wall001:Win001, !- Name
-    Zn003:Wall001:Win001,    !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn003:Wall001:Win002, !- Name
-    Zn003:Wall001:Win002,    !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn003:Wall001;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:GroundSurfaces,
-    GndSurfs:Zn003:Wall001,  !- Name
-    GndSurfs:Grass,          !- Ground Surface 1 Name
-    0.2,                     !- Ground Surface 1 View Factor
-    GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
-    GndSurfs:Parking,        !- Ground Surface 2 Name
-    0.1,                     !- Ground Surface 2 View Factor
-    GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-    GndSurfs:ParkingRefl,    !- Ground Surface 2 Reflectance Schedule Name
-    GndSurfs:Pond,           !- Ground Surface 3 Name
-    0.2,                     !- Ground Surface 3 View Factor
-    GndSurfs:PondTemp,       !- Ground Surface 3 Temperature Schedule Name
-    GndSurfs:PondRefl;       !- Ground Surface 3 Reflectance Schedule Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn002:Wall003,    !- Name
-    Zn002:Wall003,           !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn002:Wall003:Win001, !- Name
-    Zn002:Wall003:Win001,    !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn002:Wall003:Win002, !- Name
-    Zn002:Wall003:Win002,    !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn002:Wall003;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:GroundSurfaces,
-    GndSurfs:Zn002:Wall003,  !- Name
-    GndSurfs:Grass,          !- Ground Surface 1 Name
-    0.3,                     !- Ground Surface 1 View Factor
-    GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
-    GndSurfs:Parking,        !- Ground Surface 2 Name
-    0.2,                     !- Ground Surface 2 View Factor
-    GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-    GndSurfs:ParkingRefl;    !- Ground Surface 2 Reflectance Schedule Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn005:Wall003,    !- Name
-    Zn005:Wall003,           !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn005:Wall003:Door001, !- Name
-    Zn005:Wall003:Door001,   !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:LocalEnvironment,
-    LocEnv:Zn005:Wall003:Door002, !- Name
-    Zn005:Wall003:Door002,   !- Exterior Surface Name
-    ,                        !- External Shading Fraction Schedule Name
-    ,                        !- Surrounding Surfaces Object Name
-    ,                        !- Outdoor Air Node Name
-    GndSurfs:Zn005:Wall003;  !- Ground Surfaces Object Name
-
-  SurfaceProperty:GroundSurfaces,
-    GndSurfs:Zn005:Wall003,  !- Name
-    GndSurfs:Grass,          !- Ground Surface 1 Name
-    0.35,                    !- Ground Surface 1 View Factor
-    GndSurfs:GrassTemp,      !- Ground Surface 1 Temperature Schedule Name
-    GndSurfs:GrassRefl,      !- Ground Surface 1 Reflectance Schedule Name
-    GndSurfs:Parking,        !- Ground Surface 2 Name
-    0.15,                    !- Ground Surface 2 View Factor
-    GndSurfs:ParkingTemp,    !- Ground Surface 2 Temperature Schedule Name
-    GndSurfs:ParkingRefl;    !- Ground Surface 2 Reflectance Schedule Name
-
   Schedule:File,
     GndSurfs:GrassTemp,      !- Name
     Temperature,             !- Schedule Type Limits Name
     SurfacePropGndSurfs.csv, !- File Name
     2,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     GndSurfs:ParkingTemp,    !- Name
     Temperature,             !- Schedule Type Limits Name
     SurfacePropGndSurfs.csv, !- File Name
     3,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     GndSurfs:PondTemp,       !- Name
     Temperature,             !- Schedule Type Limits Name
     SurfacePropGndSurfs.csv, !- File Name
     4,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:Compact,
     GndSurfs:GrassRefl,      !- Name
@@ -2665,3 +2523,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+

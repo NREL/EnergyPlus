@@ -436,19 +436,19 @@
 
   People,
     Office Buildings,        !- Name
-    AllZones,                !- Zone or ZoneList Name
+    AllZones,                !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    9.29,                    !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    9.29,                    !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     0.55,                    !- Sensible Heat Fraction
     ActSchd134;              !- Activity Level Schedule Name
 
   Lights,
     Office Buildings,        !- Name
-    AllZones,                !- Zone or ZoneList Name
+    AllZones,                !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED-BldgAvg,       !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -462,7 +462,7 @@
 
   ElectricEquipment,
     Office Buildings,        !- Name
-    AllZones,                !- Zone or ZoneList Name
+    AllZones,                !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED-BldgAvg,       !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -474,7 +474,7 @@
 
   HotWaterEquipment,
     Office Buildings,        !- Name
-    AllZones,                !- Zone or ZoneList Name
+    AllZones,                !- Zone or ZoneList or Space or SpaceList Name
     DHW-SCHED-BldgAvg,       !- Schedule Name
     Watts/Person,            !- Design Level Calculation Method
     ,                        !- Design Level {W}

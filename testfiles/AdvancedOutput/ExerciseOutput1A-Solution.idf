@@ -960,12 +960,12 @@
 
   People,
     ZONE ONE People 1,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     4,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
@@ -975,7 +975,7 @@
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     200.0,                   !- Design Level {W}
@@ -989,7 +989,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE ONE Infil 1,        !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch 1,                   !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.018,                   !- Design Flow Rate {m3/s}

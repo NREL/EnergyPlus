@@ -967,12 +967,12 @@
 
   People,
     Dining People,           !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    1.39,                    !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    1.39,                    !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -989,12 +989,12 @@
 
   People,
     Kitchen People,          !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     6.25,                    !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -1013,7 +1013,7 @@
 
   Lights,
     Dining_Lights,           !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1028,7 +1028,7 @@
 
   Lights,
     Kitchen_Lights,          !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1045,7 +1045,7 @@
 
   ElectricEquipment,
     Dining_MiscElec_Equip,   !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     15000,                   !- Design Level {W}
@@ -1058,7 +1058,7 @@
 
   ElectricEquipment,
     Kitchen_MiscElec_Equip,  !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     35000,                   !- Design Level {W}
@@ -1071,7 +1071,7 @@
 
   GasEquipment,
     Kitchen_MiscGas_Equip,   !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     GAS_EQUIP_SCH,           !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     150055,                  !- Design Level {W}
@@ -1096,7 +1096,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Dining_Infiltration,     !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL_HALF_ON_SCH,       !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1112,7 +1112,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Kitchen_Infiltration,    !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     INFIL_HALF_ON_SCH,       !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1130,15 +1130,15 @@
     Dining Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Dining,                  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    232.3430;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    232.3430;                !- Surface Area {m2}
 
   InternalMass,
     Kitchen Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
     Kitchen,                 !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    232.3430;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    232.3430;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
 
@@ -1318,7 +1318,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     attic_Infiltration,      !- Name
-    attic,                   !- Zone or ZoneList Name
+    attic,                   !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}

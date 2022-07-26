@@ -766,8 +766,8 @@
     TRUSSES,                 !- Name
     Trusses,                 !- Construction Name
     Attic Thermal Zone,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    3.9;                     !- Extended Field
+    ,                        !- Space or SpaceList Name
+    3.9;                     !- Surface Area {m2}
 
   Schedule:Compact,
     Heating/Cooling Setpoints,  !- Name
@@ -900,7 +900,11 @@
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
-    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    1.0,                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    No,                      !- Height Dependence of External Node Temperature
+    SkylineLU,               !- Solver
+    No,                      !- Allow Unsupported Zone Equipment
+    No;                      !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     Attic Thermal Zone,      !- Zone Name

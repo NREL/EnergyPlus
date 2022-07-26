@@ -313,7 +313,7 @@
 
   Lights,
     Lights 1,                !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     ON,                      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     960.0,                   !- Lighting Level {W}

@@ -664,36 +664,36 @@
     Internal-ZONE1,          !- Name
     Medium Furniture,        !- Construction Name
     ZONE1,                   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    94.;                     !- Extended Field
+    ,                        !- Space or SpaceList Name
+    94.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-PER-2T,         !- Name
     Medium Furniture,        !- Construction Name
     ZONE1,                   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    59.;                     !- Extended Field
+    ,                        !- Space or SpaceList Name
+    59.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-PER-3T,         !- Name
     Medium Furniture,        !- Construction Name
     ZONE1,                   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    94.;                     !- Extended Field
+    ,                        !- Space or SpaceList Name
+    94.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-PER-4T,         !- Name
     Medium Furniture,        !- Construction Name
     ZONE1,                   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    59.;                     !- Extended Field
+    ,                        !- Space or SpaceList Name
+    59.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-COR-1T,         !- Name
     Medium Furniture,        !- Construction Name
     ZONE1,                   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    390.;                    !- Extended Field
+    ,                        !- Space or SpaceList Name
+    390.;                    !- Surface Area {m2}
 
   RoomAirModelType,
     DV,                      !- Name
@@ -944,67 +944,67 @@
 
   People,
     ZONE1 People 1,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     15,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     ZONE1 People 2,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     10,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     ZONE1 People 3,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     15,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     ZONE1 People 4,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     10,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     ZONE1 People 5,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     60,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     ZONE1 Lights 1,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2633,                    !- Lighting Level {W}
@@ -1018,7 +1018,7 @@
 
   Lights,
     ZONE1 Lights 2,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1657,                    !- Lighting Level {W}
@@ -1032,7 +1032,7 @@
 
   Lights,
     ZONE1 Lights 3,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2633,                    !- Lighting Level {W}
@@ -1046,7 +1046,7 @@
 
   Lights,
     ZONE1 Lights 4,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1657,                    !- Lighting Level {W}
@@ -1060,7 +1060,7 @@
 
   Lights,
     ZONE1 Lights 5,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     10080,                   !- Lighting Level {W}
@@ -1074,7 +1074,7 @@
 
   ElectricEquipment,
     ZONE1 ElecEq 1,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3038,                    !- Design Level {W}
@@ -1086,7 +1086,7 @@
 
   ElectricEquipment,
     ZONE1 ElecEq 2,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1912,                    !- Design Level {W}
@@ -1098,7 +1098,7 @@
 
   ElectricEquipment,
     ZONE1 ElecEq 3,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3038,                    !- Design Level {W}
@@ -1110,7 +1110,7 @@
 
   ElectricEquipment,
     ZONE1 ElecEq 4,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1912,                    !- Design Level {W}
@@ -1122,7 +1122,7 @@
 
   ElectricEquipment,
     ZONE1 ElecEq 5,          !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     12600,                   !- Design Level {W}
@@ -1134,7 +1134,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE1 Infil 1,           !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0478,                  !- Design Flow Rate {m3/s}
@@ -1148,7 +1148,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE1 Infil 2,           !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.03,                    !- Design Flow Rate {m3/s}
@@ -1162,7 +1162,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE1 Infil 3,           !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0478,                  !- Design Flow Rate {m3/s}
@@ -1176,7 +1176,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE1 Infil 4,           !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.03,                    !- Design Flow Rate {m3/s}
@@ -1190,7 +1190,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE1 Infil 5,           !- Name
-    ZONE1,                   !- Zone or ZoneList Name
+    ZONE1,                   !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.1982,                  !- Design Flow Rate {m3/s}
@@ -2165,7 +2165,19 @@
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
-    ;                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Free Convection Nominal Capacity Sizing Factor
+    35.0,                    !- Design Inlet Air Dry-Bulb Temperature {C}
+    25.6,                    !- Design Inlet Air Wet-Bulb Temperature {C}
+    autosize,                !- Design Approach Temperature {deltaC}
+    autosize,                !- Design Range Temperature {deltaC}
+    0.0,                     !- Basin Heater Capacity {W/K}
+    2.0,                     !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    SaturatedExit,           !- Evaporation Loss Mode
+    0.2,                     !- Evaporation Loss Factor {percent/K}
+    0.008,                   !- Drift Loss Percent {percent}
+    ConcentrationRatio,      !- Blowdown Calculation Mode
+    3.0;                     !- Blowdown Concentration Ratio
 
   Pump:VariableSpeed,
     Cond Circ Pump,          !- Name

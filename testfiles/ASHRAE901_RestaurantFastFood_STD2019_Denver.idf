@@ -35,7 +35,7 @@
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
     30,                      !- Shading Calculation Update Frequency
-    200;                    !- Maximum Figures in Shadow Overlap Calculations
+    200;                     !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -56,7 +56,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    15,                       !- Minimum System Timestep {minutes}
+    15,                      !- Minimum System Timestep {minutes}
     5;                       !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
@@ -132,7 +132,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -143,34 +143,34 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 2,              !- Name
-    4,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    4,                        !- End Month
-    30,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 2,             !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    4,                       !- End Month
+    30,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 3,              !- Name
-    7,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    7,                        !- End Month
-    31,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 3,             !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -2462,12 +2462,12 @@
 
   People,
     Dining,                  !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    1.327,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    1.327,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2484,12 +2484,12 @@
 
   People,
     Kitchen,                 !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     6.2733,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2508,7 +2508,7 @@
 
   Lights,
     Dining_Lights,           !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_DINING_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2523,7 +2523,7 @@
 
   Lights,
     Kitchen_Lights,          !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_KITCHEN_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2540,7 +2540,7 @@
 
   ElectricEquipment,
     Dining_MiscElec_Equip,   !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     13567.3111,              !- Design Level {W}
@@ -2553,7 +2553,7 @@
 
   ElectricEquipment,
     Kitchen_MiscElec_Equip,  !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     31468.723,               !- Design Level {W}
@@ -2566,7 +2566,7 @@
 
   ElectricEquipment,
     Kitchen_Reach-in-Freezer,!- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     Always_on,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     277.5,                   !- Design Level {W}
@@ -2579,7 +2579,7 @@
 
   ElectricEquipment,
     Kitchen_Reach-in-Refrigerator,  !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     Always_on,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     313.3,                   !- Design Level {W}
@@ -2594,7 +2594,7 @@
 
   GasEquipment,
     Kitchen_MiscGas_Equip,   !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     FF_GAS_EQUIP_SCH,        !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     91932.60058,             !- Design Level {W}
@@ -2610,7 +2610,7 @@
 
   Daylighting:Controls,
     Dining_DaylCtrl,         !- Name
-    Dining,                  !- Zone Name
+    Dining,                  !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -2623,24 +2623,24 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Dining_DaylRefPt1,       !- Daylighting Reference Point 1 Name
-    0.38,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.38,                    !- Fraction of Lights Controlled by Reference Point 1
     215.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Dining_DaylRefPt2,       !- Daylighting Reference Point 2 Name
-    0.38,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.38,                    !- Fraction of Lights Controlled by Reference Point 2
     215.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
 !-   ===========  ALL OBJECTS IN CLASS: DAYLIGHTING:REFERENCEPOINT ===========
 
   Daylighting:ReferencePoint,
     Dining_DaylRefPt1,       !- Name
-    Dining,                  !- Zone Name
+    Dining,                  !- Zone or Space Name
     2.654800,                !- X-Coordinate of Reference Point {m}
     2.654800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Dining_DaylRefPt2,       !- Name
-    Dining,                  !- Zone Name
+    Dining,                  !- Zone or Space Name
     12.588000,               !- X-Coordinate of Reference Point {m}
     2.654800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
@@ -2649,7 +2649,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Dining_Infiltration,     !- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     flow/exteriorarea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -2663,7 +2663,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Dining_Door_Infiltration,!- Name
-    Dining,                  !- Zone or ZoneList Name
+    Dining,                  !- Zone or ZoneList or Space or SpaceList Name
     VESTIBULE_DOOR_INFIL_SCH,!- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.583798439,             !- Design Flow Rate {m3/s}
@@ -2677,7 +2677,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Kitchen_Infiltration,    !- Name
-    Kitchen,                 !- Zone or ZoneList Name
+    Kitchen,                 !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     flow/exteriorarea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -2691,7 +2691,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     attic_Infiltration,      !- Name
-    attic,                   !- Zone or ZoneList Name
+    attic,                   !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0729,                  !- Design Flow Rate {m3/s}
@@ -3061,7 +3061,7 @@
     Hours_of_operation,      !- Availability Schedule Name
     1,                       !- Fan Total Efficiency
     0,                       !- Pressure Rise {Pa}
-    0.41605,       !- Maximum Flow Rate {m3/s}
+    0.41605,                 !- Maximum Flow Rate {m3/s}
     Dining Exhaust Fan Node, !- Air Inlet Node Name
     Dining Exhaust Fan Outlet Node Name,  !- Air Outlet Node Name
     General;                 !- End-Use Subcategory
@@ -3071,7 +3071,7 @@
     Hours_of_operation,      !- Availability Schedule Name
     0.385,                   !- Fan Total Efficiency
     124.5,                   !- Pressure Rise {Pa}
-    1.5574,                !- Maximum Flow Rate {m3/s}
+    1.5574,                  !- Maximum Flow Rate {m3/s}
     Kitchen Exhaust Fan Node,!- Air Inlet Node Name
     Kitchen Exhaust Fan Outlet Node Name,  !- Air Outlet Node Name
     General,                 !- End-Use Subcategory
@@ -4461,3 +4461,4 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,hourly;
 
   Output:Meter:MeterFileOnly,NaturalGas:Facility,hourly;
+

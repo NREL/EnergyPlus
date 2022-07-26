@@ -1264,7 +1264,11 @@
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     90,                      !- Azimuth Angle of Long Axis of Building {deg}
-    0.4;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    0.4,                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    No,                      !- Height Dependence of External Node Temperature
+    SkylineLU,               !- Solver
+    No,                      !- Allow Unsupported Zone Equipment
+    No;                      !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     West_Zone,               !- Zone Name
