@@ -846,7 +846,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
                 thisInfiltration.Name = thisInfiltrationInput.names(Item1);
                 int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
-                int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
                 thisInfiltration.spaceIndex = spaceNum;
                 thisInfiltration.ZonePtr = zoneNum;
 
@@ -890,7 +891,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 switch (flow) {
                 case AirflowSpecAlt::Flow:
                 case AirflowSpecAlt::FlowPerZone:
-                    thisInfiltration.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
@@ -899,13 +899,31 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                 thisInfiltration.Name,
                                                 cAlphaFieldNames(4),
                                                 cNumericFieldNames(1)));
+                    } else {
+                        Real64 spaceFrac = 1.0;
+                        if (!thisInfiltrationInput.spaceListActive && (thisInfiltrationInput.numOfSpaces > 1)) {
+                            Real64 const zoneVolume = state.dataHeatBal->Zone(zoneNum).Volume;
+                            if (zoneVolume > 0.0) {
+                                spaceFrac = thisSpace.Volume / zoneVolume;
+                            } else {
+                                ShowSevereError(state, std::string(RoutineName) + "Zone volume is zero when allocating Infiltration to Spaces.");
+                                ShowContinueError(state,
+                                                  format("Occurs for {}=\"{}\" in Zone=\"{}\".",
+                                                         cCurrentModuleObject,
+                                                         thisInfiltrationInput.Name,
+                                                         state.dataHeatBal->Zone(zoneNum).Name));
+                                ErrorsFound = true;
+                            }
+                        }
+
+                        thisInfiltration.DesignLevel = rNumericArgs(1) * spaceFrac;
                     }
                     break;
 
                 case AirflowSpecAlt::FlowPerArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea;
+                            thisInfiltration.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
                             if (thisInfiltration.ZonePtr > 0) {
                                 if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea <= 0.0) {
                                     ShowWarningError(state,
@@ -941,7 +959,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpecAlt::FlowPerExteriorArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea;
+                            thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExteriorTotalSurfArea;
                             if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Exterior Surface Area = 0.  0 Infiltration will result.",
@@ -975,7 +993,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpecAlt::FlowPerExteriorWallArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea;
+                            thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExtGrossWallArea;
                             if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Exterior Wall Area = 0.  0 Infiltration will result.",
@@ -1007,10 +1025,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpecAlt::AirChanges:
-                    if (thisInfiltration.ZonePtr != 0) {
+                    if (thisInfiltration.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisInfiltration.DesignLevel =
-                                rNumericArgs(4) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume / DataGlobalConstants::SecInHour;
+                            thisInfiltration.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
                             if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Zone Volume = 0.  0 Infiltration will result.",
@@ -1035,7 +1052,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
                                                 RoutineName,
                                                 cCurrentModuleObject,
-                                                thisInfiltration.Name,
+                                                thisInfiltrationInput.Name,
                                                 cAlphaFieldNames(4),
                                                 cNumericFieldNames(4)));
                     }
@@ -1092,6 +1109,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisInfiltration.Name = thisInfiltrationInput.names(Item1);
                 int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
                 int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 thisInfiltration.spaceIndex = spaceNum;
                 thisInfiltration.ZonePtr = zoneNum;
 
@@ -1130,21 +1148,46 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     ErrorsFound = true;
                 }
-                thisInfiltration.LeakageArea = rNumericArgs(1);
                 thisInfiltration.BasicStackCoefficient = rNumericArgs(2);
                 thisInfiltration.BasicWindCoefficient = rNumericArgs(3);
 
-                // check if zone has exterior surfaces
-                if (thisInfiltration.ZonePtr > 0) {
-                    if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea <= 0.0) {
+                if (lNumericFieldBlanks(1)) {
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\", field {} is blank.  0 Infiltration will result.",
+                                            RoutineName,
+                                            cCurrentModuleObject,
+                                            thisInfiltrationInput.Name,
+                                            cNumericFieldNames(1)));
+                } else {
+                    Real64 spaceFrac = 1.0;
+                    if (!thisInfiltrationInput.spaceListActive && (thisInfiltrationInput.numOfSpaces > 1)) {
+                        Real64 const zoneExteriorTotalSurfArea = state.dataHeatBal->Zone(zoneNum).ExteriorTotalSurfArea;
+                        if (zoneExteriorTotalSurfArea > 0.0) {
+                            spaceFrac = thisSpace.ExteriorTotalSurfArea / zoneExteriorTotalSurfArea;
+                        } else {
+                            ShowSevereError(state,
+                                            std::string(RoutineName) + "Zone exterior surface area is zero when allocating Infiltration to Spaces.");
+                            ShowContinueError(state,
+                                              format("Occurs for {}=\"{}\" in Zone=\"{}\".",
+                                                     cCurrentModuleObject,
+                                                     thisInfiltrationInput.Name,
+                                                     state.dataHeatBal->Zone(zoneNum).Name));
+                            ErrorsFound = true;
+                        }
+                    }
+
+                    thisInfiltration.LeakageArea = rNumericArgs(1) * spaceFrac;
+                }
+                // check if space has exterior surfaces
+                if (spaceNum > 0) {
+                    if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
                         ShowWarningError(state,
-                                         format(R"({}{}="{}", {}="{}" does not have surfaces exposed to outdoors.)",
+                                         format(R"({}{}="{}", Space="{}" does not have surfaces exposed to outdoors.)",
                                                 RoutineName,
                                                 cCurrentModuleObject,
-                                                cAlphaArgs(1),
-                                                cAlphaFieldNames(2),
-                                                cAlphaArgs(2)));
-                        ShowContinueError(state, "Infiltration model is appropriate for exterior zones not interior zones, simulation continues.");
+                                                thisInfiltrationInput.Name,
+                                                thisSpace.Name));
+                        ShowContinueError(state, "Infiltration model is appropriate for exterior spaces not interior spaces, simulation continues.");
                     }
                 }
             }
@@ -1174,6 +1217,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisInfiltration.Name = thisInfiltrationInput.names(Item1);
                 int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
                 int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 thisInfiltration.spaceIndex = spaceNum;
                 thisInfiltration.ZonePtr = zoneNum;
 
@@ -1205,19 +1249,49 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                     ErrorsFound = true;
                 }
-                thisInfiltration.FlowCoefficient = rNumericArgs(1);
                 thisInfiltration.AIM2StackCoefficient = rNumericArgs(2);
                 thisInfiltration.PressureExponent = rNumericArgs(3);
                 thisInfiltration.AIM2WindCoefficient = rNumericArgs(4);
                 thisInfiltration.ShelterFactor = rNumericArgs(5);
 
-                // check if zone has exterior surfaces
-                if (thisInfiltration.ZonePtr > 0) {
-                    if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea <= 0.0) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) +
-                                             "=\"" + cAlphaArgs(2) + "\" does not have surfaces exposed to outdoors.");
-                        ShowContinueError(state, "Infiltration model is appropriate for exterior zones not interior zones, simulation continues.");
+                if (lNumericFieldBlanks(1)) {
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\", field {} is blank.  0 Infiltration will result.",
+                                            RoutineName,
+                                            cCurrentModuleObject,
+                                            thisInfiltrationInput.Name,
+                                            cNumericFieldNames(1)));
+                } else {
+                    Real64 spaceFrac = 1.0;
+                    if (!thisInfiltrationInput.spaceListActive && (thisInfiltrationInput.numOfSpaces > 1)) {
+                        Real64 const zoneExteriorTotalSurfArea = state.dataHeatBal->Zone(zoneNum).ExteriorTotalSurfArea;
+                        if (zoneExteriorTotalSurfArea > 0.0) {
+                            spaceFrac = thisSpace.ExteriorTotalSurfArea / zoneExteriorTotalSurfArea;
+                        } else {
+                            ShowSevereError(state,
+                                            std::string(RoutineName) + "Zone exterior surface area is zero when allocating Infiltration to Spaces.");
+                            ShowContinueError(state,
+                                              format("Occurs for {}=\"{}\" in Zone=\"{}\".",
+                                                     cCurrentModuleObject,
+                                                     thisInfiltrationInput.Name,
+                                                     state.dataHeatBal->Zone(zoneNum).Name));
+                            ErrorsFound = true;
+                        }
+                    }
+
+                    thisInfiltration.FlowCoefficient = rNumericArgs(1) * spaceFrac;
+                    // check if space has exterior surfaces
+                    if (spaceNum > 0) {
+                        if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
+                            ShowWarningError(state,
+                                             format(R"({}{}="{}", Space="{}" does not have surfaces exposed to outdoors.)",
+                                                    RoutineName,
+                                                    cCurrentModuleObject,
+                                                    thisInfiltrationInput.Name,
+                                                    thisSpace.Name));
+                            ShowContinueError(state,
+                                              "Infiltration model is appropriate for exterior spaces not interior spaces, simulation continues.");
+                        }
                     }
                 }
             }
@@ -1698,11 +1772,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (thisVentilation.MinIndoorTempSchedPtr > 0) {
                     if (Item1 == 1) {
                         if (!lNumericFieldBlanks(11))
-                            ShowWarningError(
-                                state,
-                                std::string{RoutineName} +
-                                    "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                    cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                            ShowWarningError(state,
+                                             std::string{RoutineName} +
+                                                 "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will "
+                                                 "be used in the " +
+                                                 cCurrentModuleObject + " object = " + cAlphaArgs(1));
                         // Check min and max values in the schedule to ensure both values are within the range
                         if (!CheckScheduleValueMinMax(state, thisVentilation.MinIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
                             ShowSevereError(
@@ -1753,11 +1827,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (thisVentilation.MaxIndoorTempSchedPtr > 0) {
                     if (Item1 == 1) {
                         if (!lNumericFieldBlanks(12))
-                            ShowWarningError(
-                                state,
-                                std::string{RoutineName} +
-                                    "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                    cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                            ShowWarningError(state,
+                                             std::string{RoutineName} +
+                                                 "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will "
+                                                 "be used in the " +
+                                                 cCurrentModuleObject + " object = " + cAlphaArgs(1));
                         // Check min and max values in the schedule to ensure both values are within the range
                         if (!CheckScheduleValueMinMax(state, thisVentilation.MaxIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
                             ShowSevereError(
@@ -2327,11 +2401,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisVentilation.MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
                 if (thisVentilation.MinOutdoorTempSchedPtr > 0) {
                     if (!lNumericFieldBlanks(9))
-                        ShowWarningError(
-                            state,
-                            std::string{RoutineName} +
-                                "The Minimum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                        ShowWarningError(state,
+                                         std::string{RoutineName} +
+                                             "The Minimum Outdoor Temperature value and schedule are provided. The scheduled temperature will be "
+                                             "used in the " +
+                                             cCurrentModuleObject + " object = " + cAlphaArgs(1));
                     // Check min and max values in the schedule to ensure both values are within the range
                     if (!CheckScheduleValueMinMax(state, thisVentilation.MinOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
                         ShowSevereError(
@@ -2372,11 +2446,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisVentilation.MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
                 if (thisVentilation.MaxOutdoorTempSchedPtr > 0) {
                     if (!lNumericFieldBlanks(10))
-                        ShowWarningError(
-                            state,
-                            std::string{RoutineName} +
-                                "The Maximum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                        ShowWarningError(state,
+                                         std::string{RoutineName} +
+                                             "The Maximum Outdoor Temperature value and schedule are provided. The scheduled temperature will be "
+                                             "used in the " +
+                                             cCurrentModuleObject + " object = " + cAlphaArgs(1));
                     if (!CheckScheduleValueMinMax(state, thisVentilation.MaxOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
                         ShowSevereError(
                             state,
