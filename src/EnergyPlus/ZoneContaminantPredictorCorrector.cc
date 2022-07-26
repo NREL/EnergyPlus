@@ -2454,14 +2454,8 @@ void CorrectZoneContaminants(EnergyPlusData &state,
 
     static constexpr std::string_view RoutineName("CorrectZoneContaminants");
 
-    int NodeNum;
-    int ZoneNodeNum;
-    int ZoneEquipConfigNum;
-    bool ControlledZoneAirFlag;
-    int ZoneRetPlenumNum;
-    int ZoneSupPlenumNum;
-    bool ZoneRetPlenumAirFlag;
-    bool ZoneSupPlenumAirFlag;
+    bool ZoneRetPlenumAirFlag = false;
+    bool ZoneSupPlenumAirFlag = false;
     Real64 CO2Gain;             // Zone CO2 internal gain
     Real64 CO2GainExceptPeople; // Added for hybrid model, Zone CO2 internal gain
     Real64 GCGain;              // Zone generic contaminant internal gain
@@ -2478,12 +2472,11 @@ void CorrectZoneContaminants(EnergyPlusData &state,
     int ADUNum;
     int ADUInNode;
     int ADUOutNode;
-    int ZoneNum;
 
     auto &Node(state.dataLoopNodes->Node);
 
     // Update zone CO2
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataContaminantBalance->AZ(ZoneNum) = 0.0;
@@ -2566,22 +2559,18 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
 
         // Check to see if this is a controlled zone
-        ControlledZoneAirFlag = false;
-        for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-            if (!state.dataHeatBal->Zone(ZoneEquipConfigNum).IsControlled) continue;
-            if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
-            ControlledZoneAirFlag = true;
-            break;
-        } // ZoneEquipConfigNum
+        const bool ControlledZoneAirFlag = state.dataHeatBal->Zone(ZoneNum).IsControlled;
 
         // Check to see if this is a plenum zone
         ZoneRetPlenumAirFlag = false;
+        int ZoneRetPlenumNum = 0;
         for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
             if (state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneRetPlenumAirFlag = true;
             break;
         } // ZoneRetPlenumNum
         ZoneSupPlenumAirFlag = false;
+        int ZoneSupPlenumNum = 0;
         for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= state.dataZonePlenum->NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
             if (state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneSupPlenumAirFlag = true;
@@ -2591,24 +2580,24 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         if (ControlledZoneAirFlag) { // If there is system flow then calculate the flow rates
 
             // Calculate moisture flow rate into each zone
-            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+            for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
 
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    CO2MassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                        Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).CO2) /
+                    CO2MassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate *
+                                        Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).CO2) /
                                        ZoneMult;
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    GCMassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                       Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).GenContam) /
+                    GCMassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate *
+                                       Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).GenContam) /
                                       ZoneMult;
                 }
-                ZoneMassFlowRate += Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+                ZoneMassFlowRate += Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
             } // NodeNum
 
             // Do the calculations for the plenum zone
         } else if (ZoneRetPlenumAirFlag) {
-            for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+            for (int NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
 
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     CO2MassFlowRate += (Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
@@ -2748,7 +2737,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
                 InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
             }
             // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
-            ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+            const int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
             if (ZoneNodeNum > 0) {
                 Node(ZoneNodeNum).CO2 = state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum);
             }
@@ -2815,7 +2804,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             state.dataContaminantBalance->ZoneAirGC(ZoneNum) = state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum);
 
             // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
-            ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+            const int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
             if (ZoneNodeNum > 0) {
                 Node(ZoneNodeNum).GenContam = state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum);
             }
