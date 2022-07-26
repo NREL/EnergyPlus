@@ -71,17 +71,17 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone2";
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
-    EXPECT_EQ(0, GetSystemNodeNumberForZone(*state, "NonExistingZone"));
-    EXPECT_EQ(1, GetSystemNodeNumberForZone(*state, "Zone1"));
+    EXPECT_EQ(0, GetSystemNodeNumberForZone(*state, 0));
+    EXPECT_EQ(1, GetSystemNodeNumberForZone(*state, 1));
 
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
 }

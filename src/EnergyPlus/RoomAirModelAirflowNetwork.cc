@@ -253,7 +253,6 @@ namespace RoomAirModelAirflowNetwork {
         int NodeNum;
         int NodeIn;
         int Link;
-        int IdZone;
         int IdNode;
         int EquipLoop;
         int MaxNodeNum;
@@ -339,13 +338,7 @@ namespace RoomAirModelAirflowNetwork {
                 for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                     if (!state.dataHeatBal->Zone(LoopZone).IsControlled) continue;
                     if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
-                    // find actualZoneID in ZoneEquipConfig
-                    for (IdZone = 1; IdZone <= state.dataGlobal->NumOfZones; ++IdZone) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(IdZone).ActualZoneNum == LoopZone) {
-                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).ActualZoneID = IdZone;
-                            break;
-                        }
-                    }
+                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).ActualZoneID = LoopZone;
                     SupplyFrac = 0.0;
                     ReturnFrac = 0.0;
                     NodeFound = false;
@@ -836,8 +829,6 @@ namespace RoomAirModelAirflowNetwork {
         Real64 NodeTemp;     // System node temperature
         Real64 NodeW;        // System node humidity ratio
         Real64 MassFlowRate; // System node mass flow rate
-        int ZoneEquipConfigNum;
-        bool ControlledZoneAirFlag;
         int ZoneRetPlenumNum;
         int ZoneSupPlenumNum;
         bool ZoneRetPlenumAirFlag;
@@ -909,13 +900,7 @@ namespace RoomAirModelAirflowNetwork {
 
         // Check to see if this is a controlled zone
 
-        ControlledZoneAirFlag = false;
-        for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-            if (!state.dataHeatBal->Zone(ZoneEquipConfigNum).IsControlled) continue;
-            if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
-            ControlledZoneAirFlag = true;
-            break; // sloppy way of finding ZoneEquipConfigNum for later use.
-        }          // ZoneEquipConfigNum
+        bool ControlledZoneAirFlag = state.dataHeatBal->Zone(ZoneNum).IsControlled;
 
         // Check to see if this is a plenum zone
         ZoneRetPlenumAirFlag = false;
@@ -933,19 +918,19 @@ namespace RoomAirModelAirflowNetwork {
 
         // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
         if (ControlledZoneAirFlag) {
-            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+            auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
+            for (NodeNum = 1; NodeNum <= thisZoneEquipConfig.NumInletNodes; ++NodeNum) {
                 // Get node conditions
                 // this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call ?
                 // how can we tell ? predict step must be lagged ? correct step, systems have run.
                 for (EquipLoop = 1; EquipLoop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumHVACs;
                      ++EquipLoop) {
                     if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupNodeNum ==
-                        state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)) {
-                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        NodeW = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat;
-                        MassFlowRate =
-                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
+                        thisZoneEquipConfig.InletNode(NodeNum)) {
+                        NodeTemp = state.dataLoopNodes->Node(thisZoneEquipConfig.InletNode(NodeNum)).Temp;
+                        NodeW = state.dataLoopNodes->Node(thisZoneEquipConfig.InletNode(NodeNum)).HumRat;
+                        MassFlowRate = state.dataLoopNodes->Node(thisZoneEquipConfig.InletNode(NodeNum)).MassFlowRate *
+                                       state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
                         CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1278,26 +1263,14 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveWater) {
                 //'ZoneHVAC:Baseboard:RadiantConvective:Water' 13
-                SimHWBaseboard(state,
-                               ThisRAFNNode.HVAC(I).Name,
-                               ZoneNum,
-                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
-                               false,
-                               SysOutputProvided,
-                               ThisRAFNNode.HVAC(I).CompIndex);
+                SimHWBaseboard(state, ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
                 // LatOutputProvided = 0.0d0 !This baseboard does not add / remove any latent heat
             }
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam) {
                 // CASE(BBSteam_Num) !'ZoneHVAC:Baseboard:RadiantConvective:Steam' 14
-                SimSteamBaseboard(state,
-                                  ThisRAFNNode.HVAC(I).Name,
-                                  ZoneNum,
-                                  state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
-                                  false,
-                                  SysOutputProvided,
-                                  ThisRAFNNode.HVAC(I).CompIndex);
+                SimSteamBaseboard(state, ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
 
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
                 // LatOutputProvided = 0.0d0 !This baseboard does not add / remove any latent heat
@@ -1305,25 +1278,14 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardConvectiveWater) {
                 // CASE(BBWaterConvective_Num)  !'ZoneHVAC:Baseboard:Convective:Water' 16
-                SimBaseboard(state,
-                             ThisRAFNNode.HVAC(I).Name,
-                             ZoneNum,
-                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
-                             false,
-                             SysOutputProvided,
-                             ThisRAFNNode.HVAC(I).CompIndex);
+                SimBaseboard(state, ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
                 // LatOutputProvided = 0.0d0 !This baseboard does not add / remove any latent heat
             }
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardConvectiveElectric) {
                 // CASE(BBElectricConvective_Num)  !'ZoneHVAC:Baseboard:Convective:Electric' 15
-                SimElectricBaseboard(state,
-                                     ThisRAFNNode.HVAC(I).Name,
-                                     ZoneNum,
-                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
-                                     SysOutputProvided,
-                                     ThisRAFNNode.HVAC(I).CompIndex);
+                SimElectricBaseboard(state, ThisRAFNNode.HVAC(I).Name, ZoneNum, SysOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
                 // LatOutputProvided = 0.0d0 !This baseboard does not add / remove any latent heat
             }
@@ -1337,13 +1299,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric) {
                 // CASE(BBElectric_Num)  !'ZoneHVAC:Baseboard:RadiantConvective:Electric' 12
-                SimElecBaseboard(state,
-                                 ThisRAFNNode.HVAC(I).Name,
-                                 ZoneNum,
-                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
-                                 false,
-                                 SysOutputProvided,
-                                 ThisRAFNNode.HVAC(I).CompIndex);
+                SimElecBaseboard(state, ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
                 // LatOutputProvided = 0.0d0 !This baseboard does not add / remove any latent heat
             }
