@@ -204,7 +204,7 @@ namespace StandardRatings {
                          int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,                    // Minimum unloading ratio
                          Real64 &IPLV,
-                         Optional<Real64 const> EvapVolFlowRate,
+                         Optional<Real64 const> CondVolFlowRate,
                          Optional_int_const CondLoopNum,
                          Optional<Real64 const> OpenMotorEff)
     {
@@ -374,7 +374,7 @@ namespace StandardRatings {
                 Par(2) = EvapOutletTemp;
                 Par(3) = Cp;
                 Par(4) = ReducedPLR[RedCapNum];
-                Par(5) = EvapVolFlowRate * Rho;
+                Par(5) = CondVolFlowRate * Rho;
                 Par(6) = CapFTempCurveIndex;
                 Par(7) = EIRFTempCurveIndex;
                 Par(8) = EIRFPLRCurveIndex;
@@ -520,7 +520,7 @@ namespace StandardRatings {
         // par(2)  = Evaporator outlet temperature [C]
         // par(3)  = Water specific heat [J/(kg*C)]
         // par(4)  = Part load ratio
-        // par(5)  = Evaporator mass flow rate [kg/s]
+        // par(5)  = Condenser mass flow rate [kg/s]
         // par(6)  = Index for the total cooling capacity modifier curve
         // par(7)  = Index for the energy input ratio modifier curve
         // par(8)  = Index for the EIR vs part-load ratio curve

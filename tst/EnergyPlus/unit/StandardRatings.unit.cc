@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -68,6 +69,7 @@ using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::ChillerElectricEIR;
+using namespace EnergyPlus::ChillerReformulatedEIR;
 
 namespace EnergyPlus {
 
@@ -430,6 +432,123 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
                     Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.44); // 18.56 IPLV
+}
+
+TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
+{
+
+    using StandardRatings::CalcChillerIPLV;
+
+    // Setup a water-cooled Chiller:Electric:ReformulatedEIR chiller with reference conditions being at non-rated conditions
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller.allocate(1);
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes";
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).RefCap = 471200; // W
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).RefCOP = 5.89;   // W/W
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).MinUnloadRat = 0.10;
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).MaxPartLoadRat = 1.08;
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).CondVolFlowRate = 0.01924;
+
+    int CurveNum;
+    state->dataCurveManager->NumCurves = 3;
+    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+
+    state->dataCurveManager->NumCurves = 3;
+    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+
+    // Cap=f(T)
+    CurveNum = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = -4.862465E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -7.293218E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -8.514849E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 1.463106E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -4.474066E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 9.813408E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.81;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 35.09;
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerCapFTIndex = 1;
+
+    // EIR=f(T)
+    CurveNum = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 3.522647E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -3.311790E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -1.374491E-04;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 3.469525E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -3.624458E-04;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 6.749423E-04;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.81;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 35.09;
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFTIndex = 2;
+
+    // EIR=f(PLR)
+    CurveNum = 3;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiCubic;
+    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Name = "ReformEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 8.215998E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -2.209969E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -1.725652E-05;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -3.831448E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 1.896948E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 2.308518E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff7 = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff8 = 1.349969E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff9 = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff10 = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 17.52;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 33.32;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.10;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.08;
+    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFPLRIndex = 3;
+
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
+    loopside.TotalBranches = 1;
+    loopside.Branch.allocate(1);
+    auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
+    loopsidebranch.TotalComponents = 1;
+    loopsidebranch.Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+
+    Real64 IPLV;
+    CalcChillerIPLV(*state,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).Name,
+                    DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).RefCap,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).RefCOP,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).CondenserType,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerCapFTIndex,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFTIndex,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFPLRIndex,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).MinUnloadRat,
+                    IPLV,
+                    state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).CondVolFlowRate,
+                    1,
+                    1.0);
+
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 4.87);
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
