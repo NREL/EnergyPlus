@@ -1645,7 +1645,6 @@ void InitZoneContSetPoints(EnergyPlusData &state)
         // From decay model
         for (auto &con : state.dataContaminantBalance->ZoneContamGenericDecay) {
             int Sch = ScheduleManager::GetCurrentScheduleValue(state, con.GCEmiRateSchedPtr);
-            int ZoneNum = con.ActualZoneNum;
             if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
                 con.GCTime = 0.0;
             } else {
@@ -2246,7 +2245,6 @@ void InverseModelCO2(EnergyPlusData &state,
                          (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
                          (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum));
 
-            Real64 zone_M_CO2 = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration;
             Real64 delta_CO2 = (state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration - state.dataContaminantBalance->OutdoorCO2) / 1000;
             Real64 CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
             Real64 AirDensity = PsyRhoAirFnPbTdbW(state,

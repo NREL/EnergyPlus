@@ -5758,8 +5758,6 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
     Real64 oldTime0 = 0.0;
     Real64 oldTime1 = oldTime0 - OldTimeStep;
     Real64 oldTime2 = oldTime1 - OldTimeStep;
-    Real64 oldTime3 = oldTime2 - OldTimeStep;
-    Real64 oldTime4 = oldTime3 - OldTimeStep;
 
     Real64 newTime0 = 0.0;
     Real64 newTime1 = newTime0 - NewTimeStep;
@@ -5821,7 +5819,6 @@ void InverseModelTemperature(EnergyPlusData &state,
     Real64 AA(0.0);
     Real64 BB(0.0);
     Real64 FractionConvection(0.0); // Default convection portion of the sensible heat from people
-    Real64 ActivityLevel(0.0);      // People activity level
 
     auto &zone = state.dataHeatBal->Zone(ZoneNum);
     auto &ZT = state.dataHeatBalFanSys->ZT(ZoneNum);
@@ -6096,7 +6093,6 @@ void InverseModelHumidity(EnergyPlusData &state,
 
             Real64 delta_HR = (zone.ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat);
 
-            Real64 CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
             Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, zone.OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineName);
 
             Real64 M_inf = 0.0;
@@ -6514,7 +6510,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         }
         // add in the leaks
         for (int ADUListIndex = 1; ADUListIndex <= zoneRetPlenCond.NumADUs; ++ADUListIndex) {
-            int ADUNum = zoneRetPlenCond.ADUIndex(ADUListIndex);
             auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(zoneRetPlenCond.ADUIndex(ADUListIndex));
             if (airDistUnit.UpStreamLeak) {
                 CalcZoneSensibleOutput(airDistUnit.MassFlowRateUpStrLk, Node(airDistUnit.InletNodeNum).Temp, MAT, zoneAirHumRat, QSensRate);
