@@ -1309,6 +1309,34 @@
     Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
     Air Loop Outlet Node;    !- Supply Side Outlet Node Names
 
+  AirflowNetwork:SimulationControl,
+    House AirflowNetwork,    !- Name
+    MultizoneWithDistribution,  !- AirflowNetwork Control
+    INPUT,                   !- Wind Pressure Coefficient Type
+    ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
+    LOWRISE,                 !- Building Type
+    500,                     !- Maximum Number of Iterations {dimensionless}
+    ZeroNodePressures,       !- Initialization Type
+    1.0E-05,                 !- Relative Airflow Convergence Tolerance {dimensionless}
+    1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
+    -0.5,                    !- Convergence Acceleration Limit {dimensionless}
+    0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
+    1.0,                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    No,                      !- Height Dependence of External Node Temperature
+    SkylineLU,               !- Solver
+    No,                      !- Allow Unsupported Zone Equipment
+    Yes;                     !- Do Distribution Duct Sizing Calculation
+
+  AirflowNetwork:Distribution:DuctSizing,
+    Duct Sizing,             !- Name
+    PressureLoss,            !- Duct Sizing Method
+    1.0,                     !- Duct Sizing Factor
+    5.0,                     !- Maximum Airflow Velocity {m/s}
+    5.0,                     !- Total Pressure Loss Across Supply Trunk {Pa}
+    70.0,                    !- Total Pressure Loss Across Supply Branch {Pa}
+    4.0,                     !- Total Pressure Loss Across Return Trunk {Pa}
+    4.0;                     !- Total Pressure Loss Across Return Branch {Pa}
+
   AirflowNetwork:MultiZone:Zone,
     LIVING ZONE,             !- Zone Name
     Temperature,             !- Ventilation Control Mode

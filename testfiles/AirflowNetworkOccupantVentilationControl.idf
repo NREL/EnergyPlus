@@ -1066,10 +1066,10 @@
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
     1.0,                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
-    No,                      !- Height Dependence of External Node Temperature
-    SkylineLU,               !- Solver
-    No,                      !- Allow Unsupported Zone Equipment
-    No;                      !- Do Distribution Duct Sizing Calculation
+    ,                        !- Height Dependence of External Node Temperature
+    ,                        !- Solver
+    ,                        !- Allow Unsupported Zone Equipment
+    ;                        !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     WEST_ZONE,               !- Zone Name

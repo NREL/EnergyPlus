@@ -11658,23 +11658,22 @@
     InteriorShade,           !- Shading Type
     ,                        !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
-    v,                       !- Schedule Name
-    ,                        !- Setpoint {W/m2, W or deg C}
-    20,                      !- Shading Control Is Scheduled
-    Yes,                     !- Glare Control Is Active
-    No,                      !- Shading Device Material Name
-    WindowCoolingShade,      !- Type of Slat Angle Control for Blinds
-    FixedSlatAngle,          !- Slat Angle Schedule Name
+    ,                        !- Schedule Name
+    20,                      !- Setpoint {W/m2, W or deg C}
+    Yes,                     !- Shading Control Is Scheduled
+    No,                      !- Glare Control Is Active
+    WindowCoolingShade,      !- Shading Device Material Name
+    FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
     ,                        !- Setpoint 2 {W/m2 or deg C}
     ,                        !- Daylighting Control Object Name
-    ,                        !- Multiple Surface Control Type
-    Sequential,              !- Fenestration Surface 1 Name
-    W_GuestRoom402_405_5_0_0_0_1,  !- Fenestration Surface 2 Name
-    W_GuestRoom402_405_5_0_0_0_2,  !- Fenestration Surface 3 Name
-    W_GuestRoom402_405_5_0_0_0_3,  !- Fenestration Surface 4 Name
-    W_GuestRoom406_408_5_0_0_0_0,  !- Fenestration Surface 5 Name
-    W_GuestRoom406_408_5_0_0_0_1,  !- Fenestration Surface 6 Name
-    W_GuestRoom406_408_5_0_0_0_2;  !- Fenestration Surface 7 Name
+    Sequential,              !- Multiple Surface Control Type
+    W_GuestRoom402_405_5_0_0_0_1,  !- Fenestration Surface 1 Name
+    W_GuestRoom402_405_5_0_0_0_2,  !- Fenestration Surface 2 Name
+    W_GuestRoom402_405_5_0_0_0_3,  !- Fenestration Surface 3 Name
+    W_GuestRoom406_408_5_0_0_0_0,  !- Fenestration Surface 4 Name
+    W_GuestRoom406_408_5_0_0_0_1,  !- Fenestration Surface 5 Name
+    W_GuestRoom406_408_5_0_0_0_2;  !- Fenestration Surface 6 Name
 
   WindowMaterial:Shade,
     WindowCoolingShade,      !- Name
@@ -11880,18 +11879,17 @@
     InteriorShade,           !- Shading Type
     ,                        !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
-    v,                       !- Schedule Name
-    ,                        !- Setpoint {W/m2, W or deg C}
-    20,                      !- Shading Control Is Scheduled
-    Yes,                     !- Glare Control Is Active
-    No,                      !- Shading Device Material Name
-    WindowShadeHighTrans,    !- Type of Slat Angle Control for Blinds
-    FixedSlatAngle,          !- Slat Angle Schedule Name
+    ,                        !- Schedule Name
+    20,                      !- Setpoint {W/m2, W or deg C}
+    Yes,                     !- Shading Control Is Scheduled
+    No,                      !- Glare Control Is Active
+    WindowShadeHighTrans,    !- Shading Device Material Name
+    FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
     ,                        !- Setpoint 2 {W/m2 or deg C}
     ,                        !- Daylighting Control Object Name
-    ,                        !- Multiple Surface Control Type
-    Sequential,              !- Fenestration Surface 1 Name
-    W_GuestRoom415_418_3_0_0_0_0;  !- Fenestration Surface 2 Name
+    Sequential,              !- Multiple Surface Control Type
+    W_GuestRoom415_418_3_0_0_0_0;  !- Fenestration Surface 1 Name
 
   WindowMaterial:Shade,
     WindowShadeHighTrans,    !- Name
@@ -11932,18 +11930,17 @@
     InteriorShade,           !- Shading Type
     ,                        !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
-    v,                       !- Schedule Name
-    ,                        !- Setpoint {W/m2, W or deg C}
-    20,                      !- Shading Control Is Scheduled
-    Yes,                     !- Glare Control Is Active
-    No,                      !- Shading Device Material Name
-    WindowShadeMidTrans,     !- Type of Slat Angle Control for Blinds
-    FixedSlatAngle,          !- Slat Angle Schedule Name
+    ,                        !- Schedule Name
+    20,                      !- Setpoint {W/m2, W or deg C}
+    Yes,                     !- Shading Control Is Scheduled
+    No,                      !- Glare Control Is Active
+    WindowShadeMidTrans,     !- Shading Device Material Name
+    FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
     ,                        !- Setpoint 2 {W/m2 or deg C}
     ,                        !- Daylighting Control Object Name
-    ,                        !- Multiple Surface Control Type
-    Sequential,              !- Fenestration Surface 1 Name
-    W_GuestRoom415_418_3_0_0_0_1;  !- Fenestration Surface 2 Name
+    Sequential,              !- Multiple Surface Control Type
+    W_GuestRoom415_418_3_0_0_0_1;  !- Fenestration Surface 1 Name
 
   WindowMaterial:Shade,
     WindowShadeMidTrans,     !- Name
@@ -11984,18 +11981,17 @@
     InteriorShade,           !- Shading Type
     ,                        !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
-    v,                       !- Schedule Name
-    ,                        !- Setpoint {W/m2, W or deg C}
-    20,                      !- Shading Control Is Scheduled
-    Yes,                     !- Glare Control Is Active
-    No,                      !- Shading Device Material Name
-    WindowShadeLowTrans,     !- Type of Slat Angle Control for Blinds
-    FixedSlatAngle,          !- Slat Angle Schedule Name
+    ,                        !- Schedule Name
+    20,                      !- Setpoint {W/m2, W or deg C}
+    Yes,                     !- Shading Control Is Scheduled
+    No,                      !- Glare Control Is Active
+    WindowShadeLowTrans,     !- Shading Device Material Name
+    FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
     ,                        !- Setpoint 2 {W/m2 or deg C}
     ,                        !- Daylighting Control Object Name
-    ,                        !- Multiple Surface Control Type
-    Sequential,              !- Fenestration Surface 1 Name
-    W_GuestRoom415_418_3_0_0_0_2;  !- Fenestration Surface 2 Name
+    Sequential,              !- Multiple Surface Control Type
+    W_GuestRoom415_418_3_0_0_0_2;  !- Fenestration Surface 1 Name
 
   WindowMaterial:Shade,
     WindowShadeLowTrans,     !- Name
@@ -12036,18 +12032,17 @@
     InteriorShade,           !- Shading Type
     ,                        !- Construction with Shading Name
     OnIfHighSolarOnWindow,   !- Shading Control Type
-    v,                       !- Schedule Name
-    ,                        !- Setpoint {W/m2, W or deg C}
-    20,                      !- Shading Control Is Scheduled
-    Yes,                     !- Glare Control Is Active
-    No,                      !- Shading Device Material Name
-    WindowShadeLowTransLowCond,  !- Type of Slat Angle Control for Blinds
-    FixedSlatAngle,          !- Slat Angle Schedule Name
+    ,                        !- Schedule Name
+    20,                      !- Setpoint {W/m2, W or deg C}
+    Yes,                     !- Shading Control Is Scheduled
+    No,                      !- Glare Control Is Active
+    WindowShadeLowTransLowCond,  !- Shading Device Material Name
+    FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
     ,                        !- Setpoint 2 {W/m2 or deg C}
     ,                        !- Daylighting Control Object Name
-    ,                        !- Multiple Surface Control Type
-    Sequential,              !- Fenestration Surface 1 Name
-    W_GuestRoom415_418_3_0_0_0_3;  !- Fenestration Surface 2 Name
+    Sequential,              !- Multiple Surface Control Type
+    W_GuestRoom415_418_3_0_0_0_3;  !- Fenestration Surface 1 Name
 
   WindowMaterial:Shade,
     WindowShadeLowTransLowCond,  !- Name

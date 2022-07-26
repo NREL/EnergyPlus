@@ -562,66 +562,82 @@
   Space,
     Space 5 Office,          !- Name
     Zone 5,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Office,                  !- Volume {m3}
-    Std 62.1 Office Space,   !- Floor Area {m2}
-    Std 90.1 Office-Open Plan;  !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Office,                  !- Space Type
+    Std 62.1 Office Space,   !- Tag 1
+    Std 90.1 Office-Open Plan;  !- Tag 2
 
   Space,
     Space 5 Conference,      !- Name
     Zone 5,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Conference,              !- Volume {m3}
-    Std 62.1 Conference/meeting,  !- Floor Area {m2}
-    Std 90.1 Conference/Meeting/Multipurpose;  !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Conference,              !- Space Type
+    Std 62.1 Conference/meeting,  !- Tag 1
+    Std 90.1 Conference/Meeting/Multipurpose;  !- Tag 2
 
   Space,
     Space 2,                 !- Name
     Zone 2,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Reception,               !- Volume {m3}
-    Std 62.1 Reception areas,!- Floor Area {m2}
-    Std 90.1 Lobby;          !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Reception,               !- Space Type
+    Std 62.1 Reception areas,!- Tag 1
+    Std 90.1 Lobby;          !- Tag 2
 
   Space,
     Space 3 Open Office 1,   !- Name
     Zone 3,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Office,                  !- Volume {m3}
-    Std 62.1 Office Space,   !- Floor Area {m2}
-    Std 90.1 Office-Open Plan;  !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Office,                  !- Space Type
+    Std 62.1 Office Space,   !- Tag 1
+    Std 90.1 Office-Open Plan;  !- Tag 2
 
   Space,
     Space 3 Open Office 2,   !- Name
     Zone 3,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Office,                  !- Volume {m3}
-    Std 62.1 Office Space,   !- Floor Area {m2}
-    Std 90.1 Office-Open Plan;  !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Office,                  !- Space Type
+    Std 62.1 Office Space,   !- Tag 1
+    Std 90.1 Office-Open Plan;  !- Tag 2
 
   Space,
     Space 3 Storage,         !- Name
     Zone 3,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Storage,                 !- Volume {m3}
-    Std 62.1 Storage,        !- Floor Area {m2}
-    Std 90.1 Storage;        !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Storage,                 !- Space Type
+    Std 62.1 Storage,        !- Tag 1
+    Std 90.1 Storage;        !- Tag 2
 
   Space,
     Space 4,                 !- Name
     Zone 4,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Office,                  !- Volume {m3}
-    Std 62.1 Office Space,   !- Floor Area {m2}
-    Std 90.1 Office-Open Plan;  !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Office,                  !- Space Type
+    Std 62.1 Office Space,   !- Tag 1
+    Std 90.1 Office-Open Plan;  !- Tag 2
 
   Space,
     Space 1,                 !- Name
     Zone 1,                  !- Zone Name
-    ,                        !- Ceiling Height {m}
-    Office,                  !- Volume {m3}
-    Std 62.1 Office Space,   !- Floor Area {m2}
-    Std 90.1 Office-Open Plan;  !- Space Type
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    ,                        !- Floor Area {m2}
+    Office,                  !- Space Type
+    Std 62.1 Office Space,   !- Tag 1
+    Std 90.1 Office-Open Plan;  !- Tag 2
 
   SpaceList,
     AllConditionedSpaces,    !- Name

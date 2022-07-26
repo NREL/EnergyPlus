@@ -2989,7 +2989,7 @@
     ,                        !- Height Dependence of External Node Temperature
     ,                        !- Solver
     Yes,                     !- Allow Unsupported Zone Equipment
-    No;                      !- Do Distribution Duct Sizing Calculation
+    ;                        !- Do Distribution Duct Sizing Calculation
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:ZONE ===========
 

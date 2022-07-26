@@ -2090,18 +2090,18 @@
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
-    35.0,                    !- Design Inlet Air Dry-Bulb Temperature {C}
-    25.6,                    !- Design Inlet Air Wet-Bulb Temperature {C}
-    autosize,                !- Design Approach Temperature {deltaC}
-    autosize,                !- Design Range Temperature {deltaC}
-    0.0,                     !- Basin Heater Capacity {W/K}
-    2.0,                     !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    SaturatedExit,           !- Evaporation Loss Mode
-    0.2,                     !- Evaporation Loss Factor {percent/K}
-    0.008,                   !- Drift Loss Percent {percent}
-    ConcentrationRatio,      !- Blowdown Calculation Mode
-    3.0;                     !- Blowdown Concentration Ratio
+    ,                        !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    ,                        !- Drift Loss Percent {percent}
+    ,                        !- Blowdown Calculation Mode
+    ;                        !- Blowdown Concentration Ratio
 
 !-   ===========  ALL OBJECTS IN CLASS: PLANTLOOP ===========
 
