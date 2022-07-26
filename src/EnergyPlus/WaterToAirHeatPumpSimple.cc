@@ -1445,7 +1445,7 @@ namespace WaterToAirHeatPumpSimple {
                             SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
                             SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
                             MixTempSys = MixTemp;
-                            MixHumRat = MixHumRat;
+                            MixHumRatSys = MixHumRat;
                         } else { // coil is on the main air loop
                             SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
                             SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
