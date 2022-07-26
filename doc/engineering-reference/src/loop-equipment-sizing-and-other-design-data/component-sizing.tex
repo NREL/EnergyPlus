@@ -617,7 +617,7 @@ Where:
 \item \(\dot{Q}_{coil,rated,total,HDD}\): rated total cooling capacity determined based on the heating companion coil capacity (determined from heating design day calculations) divided by the user-specified \emph{Ratio of Rated Heating Capacity to Rated Cooling Capacity} input
 \end{itemize}
 
-If the design air flow used to determine the capacity is different from the system air flow ($= max($design cooling air flow rate, design heating air flow rate$)$) then the capacity is adjusted by the ratio of system air flow rate to design air flow rate.
+If the design air flow used to determine the capacity is different from the system air flow ($= max($design cooling air flow rate, design heating air flow rate$)$) then the capacity is adjusted by the ratio of system air flow rate to design air flow rate. The capacity is also adjusted by the ratio of temperature (for heating coils) or enthalpy (for cooling coils) difference across the coil at the system air flow to the temperature or enthalpy difference at the design air flow to make sure that the capacity of the coil is based on the design supply air temperature/humidity ratio.
 
 \subsubsection{Rated Sensible Cooling Capacity}\label{rated-sensible-cooling-capacity}
 

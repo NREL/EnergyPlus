@@ -219,7 +219,7 @@ Where:
 \item \(\dot{Q}_{coil,rated,total,HDD}\): rated total cooling capacity determined based on the heating companion coil capacity (determined from heating design day calculations) divided by the user-specified \emph{Ratio of Rated Heating Capacity to Rated Cooling Capacity} input
 \end{itemize}
 
-If the design air flow used to determine the capacity is different from the system air flow ($= max($design cooling air flow rate, design heating air flow rate$)$) then the capacity is adjusted by the ratio of system air flow rate to design air flow rate.
+If the design air flow used to determine the capacity is different from the system air flow ($= max($design cooling air flow rate, design heating air flow rate$)$) then the capacity is adjusted by the ratio of system air flow rate to design air flow rate. The capacity is also adjusted by the ratio of temperature (for heating coils) or enthalpy (for cooling coils) difference across the coil at the system air flow to the temperature or enthalpy difference at the design air flow.
 ```
 
 The "Rated Sensible Cooling Capacity" subsection will be modified as follows:
@@ -315,7 +315,7 @@ Residential Buildings. ASHRAE, Atlanta, GA
 ### Heating Design Day Calculations ###
 Calculations of a rated heating capacity based on peak heating conditions will be added to the cooling coil section of `SizeHVACWaterToAir`. A rated cooling capacity will be calculated based on the rated heating capacity using the new proposed input ("Ratio of Rated Heating Capacity to Rated Cooling Capacity") by dividing the rated heating capacity by the new input. The actual autosized rated cooling capacity will be the maximum of the latter and the rated cooling capacity calculated based on the peak cooling conditions. Heating capacity will not be just set to be the rated cooling capacity as it is currently done but to be the rated cooling capacity multiplied by the new input. If the heating design day based cooling capacity is selected, the sensible capacity will be adjusted by assuming that the SHR is constant (i.e. same as for the cooling design day calculations).
 
-The cooling and heating design day peak load will be calculated using the cooling and heating design air flow instead of the system air flow. The final capacities will be adjusted by the ratio of system (maximum of the cooling and heating design air flow) to design air flow to take into account that the system might operate a different air flow than the design one.
+The cooling and heating design day peak load will be calculated using the cooling and heating design air flow instead of the system air flow. The final capacities will be adjusted by the ratio of system (maximum of the cooling and heating design air flow) to design air flow to take into account that the system might operate a different air flow than the design one. The capacity is also adjusted by the ratio of temperature (for heating coils) or enthalpy (for cooling coils) difference across the coil at the system air flow to the temperature or enthalpy difference at the design air flow to make sure that the capacity of the coil is based on the design supply air temperature/humidity ratio.
 
 ### Curve Output at Rated Temperatures ###
 A new function, `CheckSimpleWAHPRatedCurvesOutputs`, will be created and called when getting the input for the coil object, the function will check the curve output at the rated conditions and issue a warning if they differ by more than 2%.
