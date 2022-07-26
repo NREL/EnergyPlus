@@ -195,6 +195,10 @@
     ROOF31,                  !- Name
     R31LAYER;                !- Outside Layer
 
+  Construction:WindowDataFile,
+    DoubleClear,             !- Name
+    ..\datasets\Window5DataFile.dat;  !- File Name
+
   Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;
 
   Zone,
@@ -235,6 +239,21 @@
     0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
     15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    DoubleClear,             !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}
+    5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}
+    5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Wall002,           !- Name
@@ -334,7 +353,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     10.5,                    !- Cold Stress Temperature Threshold [C]
-    25,                      !- Heat Stress Temperature Threshold [C]
+    30,                      !- Heat Stress Temperature Threshold [C]
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
