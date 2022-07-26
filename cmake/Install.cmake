@@ -288,6 +288,7 @@ install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2018.i
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2019.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2020.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2021.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2022.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/MoistureMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/PerfCurves.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/PrecipitationSchedulesUSA.idf" DESTINATION "./DataSets" COMPONENT Datasets)
