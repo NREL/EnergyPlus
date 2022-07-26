@@ -226,47 +226,10 @@
     Until: 24:00,0.00,       !- Field 3
     Through: 7/27,           !- Field 5
     For: Alldays,            !- Field 6
-    Until: 1:00,0.00,        !- Field 7
-    Until: 7:00,1.00,        !- Field 9
-    Until: 24:00,0.00,       !- Field 11
+    Until: 24:00,1.00,       !- Field 11
     Through: 12/31,          !- Field 16
     For: Alldays,            !- Field 17
     Until: 24:00,0.00;       !- Field 18
-
-  Schedule:Compact,
-    MinIndoorTemp,           !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,18;         !- Field 3
-
-  Schedule:Compact,
-    MaxIndoorTemp,           !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,100;        !- Field 3
-
-  Schedule:Compact,
-    DeltaTemp,               !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,2;          !- Field 3
-
-  Schedule:Compact,
-    MinOutdoorTemp,          !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,-100;       !- Field 3
-
-  Schedule:Compact,
-    MaxOutdoorTemp,          !- Name
-    Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,100;        !- Field 3
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -321,16 +284,16 @@
     0,                       !- Temperature Term Coefficient
     0,                       !- Velocity Term Coefficient
     0,                       !- Velocity Squared Term Coefficient
-    ,                        !- Minimum Indoor Temperature {C}
-    MinIndoorTemp,           !- Minimum Indoor Temperature Schedule Name
-    ,                        !- Maximum Indoor Temperature {C}
-    MaxIndoorTemp,           !- Maximum Indoor Temperature Schedule Name
-    ,                        !- Delta Temperature {deltaC}
-    DeltaTemp,               !- Delta Temperature Schedule Name
-    ,                        !- Minimum Outdoor Temperature {C}
-    MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
-    ,                        !- Maximum Outdoor Temperature {C}
-    MaxOutdoorTemp,          !- Maximum Outdoor Temperature Schedule Name
+    18,                      !- Minimum Indoor Temperature {C}
+    ,                        !- Minimum Indoor Temperature Schedule Name
+    100,                     !- Maximum Indoor Temperature {C}
+    ,                        !- Maximum Indoor Temperature Schedule Name
+    2.0,                     !- Delta Temperature {deltaC}
+    ,                        !- Delta Temperature Schedule Name
+    -100,                    !- Minimum Outdoor Temperature {C}
+    ,                        !- Minimum Outdoor Temperature Schedule Name
+    100,                     !- Maximum Outdoor Temperature {C}
+    ,                        !- Maximum Outdoor Temperature Schedule Name
     40;                      !- Maximum Wind Speed {m/s}
 
   BuildingSurface:Detailed,
@@ -431,7 +394,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     10.5,                    !- Cold Stress Temperature Threshold [C]
-    25,                      !- Heat Stress Temperature Threshold [C]
+    30,                      !- Heat Stress Temperature Threshold [C]
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
