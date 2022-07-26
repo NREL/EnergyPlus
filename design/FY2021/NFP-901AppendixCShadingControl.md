@@ -3,7 +3,7 @@
 **Xuechen (Jerry) Lei, Jeremy Lerond, and Jian Zhang. PNNL**
 
 - Original Date: 06/09/2021
-- Revision Date: 01/06/2021
+- Revision Date: 01/06/2022
 
 ## Justification for New Feature
 
@@ -45,15 +45,9 @@ Two setpoints need to be specificd for this shading control option in the idf fi
 
 Based on the current setpoints setup, for the new control option, direct solar transmitted energy can be directly specified in `Setpoint2`.
 
-<!-- while the specification of luminance setpoint may be implemented following the similar approach as another existing window shading control option: `MeetDaylightIlluminanceSetpoint`. In this existing control option, it is only for `ShadingType = SwitchableGlazing`, and the illuminance setpoint used by this control is specified in the `Daylighting:Control` object for the Zone (daylight illuminance set point at the first daylighting reference point), not `WindowShadingControl` `Setpoint`. -->
-
-<!-- To add a setpoint for luminance based control in the option to be implemented, we will be using `Daylighting:Control` object for the Zone luminance setpoint. This requires adding one more field for luminance setpoint in the `Daylighting:Control` object and expanding the application of `Daylighting:Control` object as it was dedicated for illuminance based control in its current version. -->
-
 To add a setpoint for luminance based control in the option to be implemented, we will be using the Setpoint field of `WindowShadingControl` object for the Zone luminance setpoint and expand the application of this field with "cd/m2 for luminance-based controls". We choose not to use `Daylighting:Control` object as this object is dedicated for illuminance based control and adding luminance based control would change its scope and cause confusion (for instance, we would not support luminance based electric lighting control).
 
 In the meantime, we decide to continue using the daylighting objects (control and reference points) to specify daylighting reference points for measuring luminance values and to calculate luminance values with existing routines associated with daylighting control object.
-
-<!-- ## Design document - Adding a new window shading control method "OnIfHighLuminanceOrHighSolarTillMidnight" -->
 
 ## Approach
 
@@ -66,11 +60,6 @@ In the meantime, we decide to continue using the daylighting objects (control an
    1. Compare solar gain of the current timestep with setpoint. This is implemented in `WindowShadingManager` and shading will be turned on (by flags `shadingOn` and `shadingOffButGlareControlOn`) if solar is above setpoint. If luminance is below setpoint, do nothing because shades will only be turned off when it is the end of the day.
    2. Compare total window view luminance to reference point of the current timestep with setpoint. This is implemented in the new function of `DayltgInteriorLumTillMidnight` and shading will be turned on if luminance is above setpoint (by directly modifying value of `state.dataSurface->SurfWinShadingFlag`). If luminance is below setpoint, do nothing because shades will only be turned off when it is the end of the day.
    3. If window shading control is `HiLumin_HiSolar_OffMidNight`, check timestep of the day, if it is the first timestep of the day, reset window shading to off by `state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::ShadeOff`. This is also implemented in the same new function of `DayltgInteriorLumTillMidnight`.
-
-<!-- 7. Add luminance based shading control logic code in `energyplusapi.dll!EnergyPlus::DaylightingManager::DayltgInteriorIllum(EnergyPlus::EnergyPlusData & state, int & ZoneNum)` (or add a new method dedicated for luminance based control and call it from `\EnergyPlus\src\EnergyPlus\HeatBalanceSurfaceManager.cc` ) at `EnergyPlus\src\EnergyPlus\DaylightingManager.cc`, following the same coding pattern as the `WindowShadingControlType::MeetDaylIlumSetp`
-8. Luminance value to be used in checking the requirement will be `LumWinFromRefPtRep`. (This value is reported as an output variable and its illuminance counterpart is used in the illuminance based shading control (Reference in `DaylightingManager.cc`))
-9. Solar based control for this logic will be added following code patterns for "HiSolar" related window shading options in `EnergyPlus\src\EnergyPlus\SolarShading.cc`.
-10. The logic of keeping the shade done until end of day (midnight) is to be implemented either in Item 1 or 2 above, together with related logic. -->
 
 ## Testing/Validation/Data Sources
 
@@ -91,13 +80,6 @@ Under 1.10.58 WindowShadingControl
 ## Outputs Description
 
 N/A
-
-<!-- - Add a new output variable option: `Daylighting Reference Point {} Luminance` -->
-<!-- - We may need to add a report variable for luminance based control, check illuminance based one to see what's in there. -->
-
-<!-- ## Engineering Reference
-
-To be added according to overview. -->
 
 ## Example File and Transition Changes
 
