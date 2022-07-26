@@ -794,7 +794,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     int numLeakageAreaInfiltrationObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     int totLeakageAreaInfiltration = 0; // Total ZoneInfiltration:EffectiveLeakageArea instances after expansion to spaces
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> infiltrationLeakageAreaObjects;
-    infiltrationDesignFlowRateObjects.allocate(numDesignFlowInfiltrationObjects);
+    infiltrationLeakageAreaObjects.allocate(numLeakageAreaInfiltrationObjects);
     bool const zoneListNotAllowed = true;
     InternalHeatGains::setupIHGZonesAndSpaces(state,
                                               cCurrentModuleObject,
@@ -808,7 +808,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     int numFlowCoefficientInfiltrationObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     int totFlowCoefficientInfiltration = 0; // Total ZoneInfiltration:FlowCoefficient instances after expansion to spaces
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> infiltrationFlowCoefficientObjects;
-    infiltrationDesignFlowRateObjects.allocate(numFlowCoefficientInfiltrationObjects);
+    infiltrationFlowCoefficientObjects.allocate(numFlowCoefficientInfiltrationObjects);
     InternalHeatGains::setupIHGZonesAndSpaces(state,
                                               cCurrentModuleObject,
                                               infiltrationFlowCoefficientObjects,
@@ -1088,7 +1088,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     if (totLeakageAreaInfiltration > 0) {
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-        for (int infilInputNum = 1; infilInputNum <= numDesignFlowInfiltrationObjects; ++infilInputNum) {
+        for (int infilInputNum = 1; infilInputNum <= numLeakageAreaInfiltrationObjects; ++infilInputNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      infilInputNum,
@@ -1196,7 +1196,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     if (totFlowCoefficientInfiltration > 0) {
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-        for (int infilInputNum = 1; infilInputNum <= numDesignFlowInfiltrationObjects; ++infilInputNum) {
+        for (int infilInputNum = 1; infilInputNum <= numFlowCoefficientInfiltrationObjects; ++infilInputNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      infilInputNum,
@@ -1210,7 +1210,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
             // Create one Infiltration instance for every space associated with this input object
-            auto &thisInfiltrationInput = infiltrationDesignFlowRateObjects(infilInputNum);
+            auto &thisInfiltrationInput = infiltrationFlowCoefficientObjects(infilInputNum);
             for (int Item1 = 1; Item1 <= thisInfiltrationInput.numOfSpaces; ++Item1) {
                 ++infiltrationNum;
                 auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
