@@ -6624,17 +6624,17 @@ namespace UnitarySystems {
         // get from coil module
         errFlag = false;
         if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, this->m_CoolingCoilIndex, errFlag);
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
-            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, this->m_CoolingCoilIndex, errFlag);
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, this->m_CoolingCoilIndex, errFlag);
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+            this->m_MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, this->m_CoolingCoilIndex, errFlag);
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-            this->m_MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, loc_m_CoolingCoilName, errFlag);
+            this->m_MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, this->m_CoolingCoilIndex, errFlag);
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-            // TODO: Set this->m_minOATCompressorCooling
+            // already found in getInput
         } else {
             this->m_MinOATCompressorCooling = -1000.0;
         }
@@ -6647,11 +6647,10 @@ namespace UnitarySystems {
         // get from coil module
         errFlag = false;
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-            this->m_MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, loc_m_HeatingCoilName, errFlag);
+            this->m_MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, this->m_HeatingCoilIndex, errFlag);
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                    this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-            this->m_MinOATCompressorHeating = DXCoils::GetMinOATCompressor(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
-            //       ELSEIF  ***... make sure we catch all possible coil types here ...***
+            this->m_MinOATCompressorHeating = DXCoils::GetMinOATCompressor(state, this->m_HeatingCoilIndex, errFlag);
         } else {
             this->m_MinOATCompressorHeating = -1000.0;
         }
@@ -10210,7 +10209,7 @@ namespace UnitarySystems {
         }
 
         // Determine the m_Staged status
-        if (allocated(state.dataZoneCtrls->StageZoneLogic) && this->m_DesignSpecMSHPIndex > 0) {
+        if (allocated(state.dataZoneCtrls->StageZoneLogic) && this->m_DesignSpecMSHPIndex > -1) {
             if (state.dataZoneCtrls->StageZoneLogic(this->ControlZoneNum)) {
                 this->m_Staged = true;
                 this->m_StageNum = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum;
@@ -10234,7 +10233,7 @@ namespace UnitarySystems {
             } else {
                 QZnReq =
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired / this->ControlZoneMassFlowFrac;
-                if (this->m_StageNum > 0) {
+                if (QZnReq > 0.0) {
                     state.dataUnitarySystems->HeatingLoad = true;
                     state.dataUnitarySystems->CoolingLoad = false;
                 } else {
