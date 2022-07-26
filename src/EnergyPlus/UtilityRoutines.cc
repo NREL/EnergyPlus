@@ -398,13 +398,13 @@ namespace UtilityRoutines {
         return false;
     }
 
-    size_t case_insensitive_hasher::operator()(const std::string_view key) const noexcept
+    size_t case_insensitive_hasher::operator()(std::string_view const key) const noexcept
     {
         std::string keyCopy = MakeUPPERCase(key);
         return std::hash<std::string>()(keyCopy);
     }
 
-    bool case_insensitive_comparator::operator()(const std::string_view a, const std::string_view b) const noexcept
+    bool case_insensitive_comparator::operator()(std::string_view const a, std::string_view const b) const noexcept
     {
         return SameString(a, b);
     }

@@ -99,13 +99,13 @@ struct OutputsData : BaseGlobalStruct
     int iTotalAutoSizableFields;          // number of fields that can be autosized
     int iNumberOfAutoCalcedFields;        // number of autocalculated fields
     int iTotalAutoCalculatableFields;     // number of fields that can be autocalculated
-    std::unordered_map<std::string,
-                       std::unordered_map<std::string,
-                                          DataOutputs::OutputReportingVariables,
-                                          UtilityRoutines::case_insensitive_hasher,
-                                          UtilityRoutines::case_insensitive_comparator>,
-                       UtilityRoutines::case_insensitive_hasher,
-                       UtilityRoutines::case_insensitive_comparator>
+    std::map<std::string,
+             std::map<std::string,
+                      DataOutputs::OutputReportingVariables,
+                      // UtilityRoutines::case_insensitive_hasher,
+                      UtilityRoutines::case_insensitive_comparator>,
+             // UtilityRoutines::case_insensitive_hasher,
+             UtilityRoutines::case_insensitive_comparator>
         OutputVariablesForSimulation;
 
     void clear_state() override
