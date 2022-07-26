@@ -318,11 +318,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     std::string StringOut;
     std::string NameThisObject;
-    int VentiCount;
     bool ControlFlag;
-    int Item1;
-    bool errFlag;
-    int ZLItem;
     Array1D<Real64> TotInfilVentFlow;
     Array1D<Real64> TotMixingFlow;
     Array1D<Real64> ZoneMixingNum;
@@ -1526,7 +1522,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                               ErrorsFound,
                                               zoneListNotAllowed);
 
-    state.dataHeatBal->TotVentilation = numDesignFlowVentilationObjects + numWindStackVentilationObjects;
+    state.dataHeatBal->TotVentilation = totDesignFlowVentilation + totWindStackVentilation;
     state.dataHeatBal->Ventilation.allocate(state.dataHeatBal->TotVentilation);
 
     int ventilationNum = 0;
