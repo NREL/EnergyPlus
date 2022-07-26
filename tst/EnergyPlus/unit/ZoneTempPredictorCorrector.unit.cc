@@ -1769,3 +1769,37 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     ExpectedResult = 10800.0;
     EXPECT_NEAR(OutReqToCoolSP, ExpectedResult, AcceptableTolerance);
 }
+
+TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
+{
+    Real64 PriorTimeStep = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.125;
+    Real64 myVarValue = 5.0;
+    Real64 HistoryValue1 = 1.0;
+    Real64 HistoryValue2 = 2.0;
+    Real64 HistoryValue3 = 3.0;
+    Real64 HistoryValue4 = 4.0;
+    Real64 DSHistoryValue1 = 0.0;
+    Real64 DSHistoryValue2 = 0.0;
+    Real64 DSHistoryValue3 = 0.0;
+    Real64 DSHistoryValue4 = 0.0;
+
+    EXPECT_NEAR(myVarValue, 5.0, 0.000001); // value after corrector and before simulation down-shifts
+    DownInterpolate4HistoryValues(PriorTimeStep,
+                                  state->dataHVACGlobal->TimeStepSys,
+                                  HistoryValue1,
+                                  HistoryValue2,
+                                  HistoryValue3,
+                                  HistoryValue4,
+                                  HistoryValue4,
+                                  myVarValue,
+                                  DSHistoryValue1,
+                                  DSHistoryValue2,
+                                  DSHistoryValue3,
+                                  DSHistoryValue4);
+    EXPECT_NEAR(myVarValue, HistoryValue1, 0.000001); // setting up history terms for shortened time step simulation
+    EXPECT_NEAR(DSHistoryValue1, 1.5, 0.000001);      // values are interpolated to provide history terms at the new time step
+    EXPECT_NEAR(DSHistoryValue2, 2.0, 0.000001);
+    EXPECT_NEAR(DSHistoryValue3, 2.5, 0.000001);
+    EXPECT_NEAR(DSHistoryValue4, 3.0, 0.000001);
+}
