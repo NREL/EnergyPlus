@@ -4691,7 +4691,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     Real64 latentMassFlowRate = zoneSysMoistureDemand.TotalOutputRequired / calcZoneSizing.CoolDesHumRatDiff;
     EXPECT_EQ(calcZoneSizing.CoolDesHumRatDiff, 0.005);
     EXPECT_EQ(calcZoneSizing.HeatDesHumRatDiff, 0.005);
-    // when latent load exists, no sensible load will use zone temp as supply air temp and calculated humrat based on SA humrat difference (0.005)
+    // when latent load and no sensible load exists, use zone temp as supply air temp and calculated humrat based on SA humrat difference (0.005)
     EXPECT_NEAR(zoneNode.Temp, 23.0, 0.000001);
     EXPECT_NEAR(supplyNode.Temp, 23.0, 0.000001);
     EXPECT_NEAR(zoneNode.HumRat, 0.008, 0.000001);
@@ -4716,7 +4716,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     latentMassFlowRate = zoneSysMoistureDemand.TotalOutputRequired / -calcZoneSizing.CoolDesHumRatDiff;
     EXPECT_EQ(calcZoneSizing.CoolDesHumRatDiff, 0.005);
     EXPECT_EQ(calcZoneSizing.HeatDesHumRatDiff, 0.005);
-    // when latent load exists, no sensible load will use zone temp as supply air temp and calculated humrat based on SA humrat difference (0.005)
+    // when latent load and no sensible load exists, use zone temp as supply air temp and calculated humrat based on SA humrat difference (0.005)
     EXPECT_NEAR(zoneNode.Temp, 23.0, 0.000001);
     EXPECT_NEAR(supplyNode.Temp, 23.0, 0.000001);
     EXPECT_NEAR(zoneNode.HumRat, 0.008, 0.000001);
