@@ -613,7 +613,6 @@ namespace UtilityRoutines {
     {
         using is_transparent = void;
         bool operator()(std::string_view a, std::string_view b) const noexcept;
-        // bool operator()(std::string a, std::string b) const noexcept;
     };
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);

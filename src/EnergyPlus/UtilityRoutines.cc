@@ -406,7 +406,7 @@ namespace UtilityRoutines {
 
     bool case_insensitive_comparator::operator()(std::string_view const a, std::string_view const b) const noexcept
     {
-        return SameString(a, b);
+        return lessthani(a, b); // SameString(a, b);
     }
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn)
