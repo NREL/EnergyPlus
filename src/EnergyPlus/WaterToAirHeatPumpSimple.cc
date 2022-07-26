@@ -1487,7 +1487,7 @@ namespace WaterToAirHeatPumpSimple {
                         MixEnthSys = Psychrometrics::PsyHFnTdbW(MixTempSys, MixHumRatSys);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
                         // determine the coil ratio of coil dT with system air flow to design heating air flow
-                        dHratio = (SupEnth - MixTempSys) / (SupEnth - MixEnth);
+                        dHratio = (SupEnth - MixEnthSys) / (SupEnth - MixEnth);
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
@@ -1635,7 +1635,7 @@ namespace WaterToAirHeatPumpSimple {
                         MixEnthSys = Psychrometrics::PsyHFnTdbW(MixTempSys, MixHumRatSys);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
                         // determine the coil ratio of coil dH with system air flow to design heating air flow
-                        dHratio = (SupEnth - MixTempSys) / (SupEnth - MixEnth);
+                        dHratio = (SupEnth - MixEnthSys) / (SupEnth - MixEnth);
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
                             case DataAirSystems::StructArrayLegacyFanModels: {
