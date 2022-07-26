@@ -44,6 +44,7 @@ HEADER_FMT = """! The source of the values for the following objects is:
 !
 ! The factors are from a file available upon request from NIST called ENCOSTxx.TXT and are
 ! converted into EnergyPlus objects using scripts/dev/update_nist_escalation.py
+! https://www.energy.gov/eere/femp/building-life-cycle-cost-programs
 
 """
 
@@ -133,6 +134,7 @@ def parse_encost(fpath: Path) -> Tuple[List[dict], int]:
 def plot_escalations(
     results: List[dict], escalation_start_year: Optional[int] = None
 ):
+    # Lazy import, these are stdlib deps, so only for local use
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
@@ -214,7 +216,7 @@ def produce_idf(results: List[dict], escalation_start_year: int):
             content.append(
                 format_field(
                     f"{value:.4f}",
-                    f"Year {i+1: <2} [{year}]",
+                    f"Year {i+1: <2} Escalation [{year}]",
                     last_field=(i + 1 == len(escalations)),
                 )
             )
