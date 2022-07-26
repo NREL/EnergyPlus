@@ -5757,7 +5757,6 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
     // first construct data on timestamps for interpolating with later
     Real64 oldTime0 = 0.0;
     Real64 oldTime1 = oldTime0 - OldTimeStep;
-    Real64 oldTime2 = oldTime1 - OldTimeStep;
 
     Real64 newTime0 = 0.0;
     Real64 newTime1 = newTime0 - NewTimeStep;
