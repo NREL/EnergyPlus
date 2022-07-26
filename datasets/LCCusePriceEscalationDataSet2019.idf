@@ -15,6 +15,7 @@
 ! The factors are from a file available upon request from NIST called ENCOSTxx.TXT and are
 ! converted into EnergyPlus objects using scripts/dev/update_nist_escalation.py
 ! https://www.energy.gov/eere/femp/building-life-cycle-cost-programs
+! https://www.energy.gov/sites/prod/files/2019/05/f62/encost19.txt
 
 LifeCycleCost:UsePriceEscalation,
     NorthEast Residential-Electricity,  !- Name
