@@ -512,7 +512,7 @@ namespace DataSizing {
         std::string cCoolNoDOASDDDate;           // date of design day causing cooling peak without DOAS
         Array1D<Real64> HeatLoadNoDOASSeq;       // daily sequence of zone heating load No DOAS (zone time step)
         Array1D<Real64> CoolLoadNoDOASSeq;       // daily sequence of zone cooling load No DOAS (zone time step)
-        Array1D<Real64> HeatLatentLoadSeq;       // daily sequence of zone latent heating load (zone time step) [W]
+        Array1D<Real64> LatentHeatLoadSeq;       // daily sequence of zone latent heating load (zone time step) [W]
         Array1D<Real64> LatentCoolLoadSeq;       // daily sequence of zone latent cooling load (zone time step) [W]
         Array1D<Real64> HeatLatentLoadNoDOASSeq; // daily sequence of zone latent heating load No DOAS (zone time step) [W]
         Array1D<Real64> CoolLatentLoadNoDOASSeq; // daily sequence of zone latent cooling load No DOAS (zone time step) [W]

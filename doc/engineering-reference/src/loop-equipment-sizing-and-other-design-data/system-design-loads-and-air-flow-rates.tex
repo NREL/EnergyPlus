@@ -77,7 +77,7 @@ SysHeatOutHumRatSeq & daily sequence of system heating outside humidity ratios (
 
 \subsection{System Design Flow Rate and Load Summation and Adjustment}\label{system-design-flow-rate-and-load-summation-and-adjustment}
 
-There is no system level subroutine corresponding to \emph{SizeZoneEquipment.} Instead the system design loads and flow rates are calculated using the zone level results. The zone design flow rates for the zones served by an air loop are summed to obtain the system level design flow rates. These air flows are mixed with the system level design minimum outside air flow rate to obtain system design coil loads. These activities are all performed within the \emph{UpdateSysSizing} subroutine in the \emph{SimAirServingZones} module. It is called at the start of each design day (\emph{CallIndicator = BeginDay}), at the zone time-step (\emph{CallIndicator = DuringDay}), at the end of the design day (\emph{CallIndicator = EndDay}) and at the end of the zone design calculation (\emph{CallIndicator = EndSysSizingCalc}).
+There is no system level subroutine corresponding to \emph{SizeZoneEquipment.} Instead the system design loads and flow rates are calculated using the zone level results. If latent sizing is requested and latent loads are greater than sensible loads the latent design load and air mass flow rate are used for that zone. The zone design flow rates for the zones served by an air loop are summed to obtain the system level design flow rates. These air flows are mixed with the system level design minimum outside air flow rate to obtain system design coil loads. These activities are all performed within the \emph{UpdateSysSizing} subroutine in the \emph{SimAirServingZones} module. It is called at the start of each design day (\emph{CallIndicator = BeginDay}), at the zone time-step (\emph{CallIndicator = DuringDay}), at the end of the design day (\emph{CallIndicator = EndDay}) and at the end of the zone design calculation (\emph{CallIndicator = EndSysSizingCalc}).
 
 There is a logical flag \emph{SysSizingCalc} corresponding to \emph{ZoneSizingCalc}. It is used to allow the component routines to distinguish a normal simulation call from a being called during a system sizing calculation.
 
@@ -153,6 +153,8 @@ And save the corresponding mixed, return and outside conditions:
 \emph{CoolOutTemp\(_{sys}\)} = \emph{T\(_{outside}\)}
 
 \emph{CoolOutHumRat\(_{sys}\)} = \emph{W\(_{outside}\)}
+
+When latent sizing is requested the cooling outlet humidity ratio used during latent sizing is used for cooling coil sizing. The latent sizing cooling outlet humidity ratio value is a mass flow rate weighted average of each zone's latent cooling supply air humidity ratio. See \hyperref[sizingzone]{Sizing:Zone} field \hyperref[field-zone-latent-cooling-design-supply-air-humidity-ratio-input-method]{Zone Latent Cooling Design Supply Air Humidity Ratio Input Method}. This value is used only when one or more zone latent load is found to be greater than the zone's sensible load, or latent only sizing is requested.
 
 Here $\rho$\(_{air}\) is the density of dry air at 20\(^{\circ}\)C and standard elevation corrected pressure, {[}kg/m\(^{3}\){]};
 

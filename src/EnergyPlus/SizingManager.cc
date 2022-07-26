@@ -778,7 +778,11 @@ void ManageSizing(EnergyPlusData &state)
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
             } else if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
-                coolPeakLoadKind = "Total";
+                if (FinalSysSizing(AirLoopNum).LoadSizeType == DataSizing::Latent && state.dataHeatBal->DoLatentSizing) {
+                    coolPeakLoadKind = "Latent";
+                } else {
+                    coolPeakLoadKind = "Total";
+                }
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
@@ -3744,7 +3748,8 @@ void GetSystemSizingInput(EnergyPlusData &state)
         // assign CoolingPeakLoadType based on LoadSizeType for now
         if (SysSizInput(SysSizIndex).LoadSizeType == Sensible) {
             SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
-        } else if (SysSizInput(SysSizIndex).LoadSizeType == Total) {
+        } else if (SysSizInput(SysSizIndex).LoadSizeType == Total ||
+                   (SysSizInput(SysSizIndex).LoadSizeType == Latent && state.dataHeatBal->DoLatentSizing)) {
             SysSizInput(SysSizIndex).CoolingPeakLoadType = TotalCoolingLoad;
         } else {
             SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;

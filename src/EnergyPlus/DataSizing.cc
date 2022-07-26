@@ -171,7 +171,7 @@ void ZoneSizingData::zeroMemberData()
     std::fill(this->CoolOutHumRatSeq.begin(), this->CoolOutHumRatSeq.end(), 0.0);
     std::fill(this->HeatLoadNoDOASSeq.begin(), this->HeatLoadNoDOASSeq.end(), 0.0);
     std::fill(this->CoolLoadNoDOASSeq.begin(), this->CoolLoadNoDOASSeq.end(), 0.0);
-    std::fill(this->HeatLatentLoadSeq.begin(), this->HeatLatentLoadSeq.end(), 0.0);
+    std::fill(this->LatentHeatLoadSeq.begin(), this->LatentHeatLoadSeq.end(), 0.0);
     std::fill(this->LatentCoolLoadSeq.begin(), this->LatentCoolLoadSeq.end(), 0.0);
     std::fill(this->HeatLatentLoadNoDOASSeq.begin(), this->HeatLatentLoadNoDOASSeq.end(), 0.0);
     std::fill(this->CoolLatentLoadNoDOASSeq.begin(), this->CoolLatentLoadNoDOASSeq.end(), 0.0);
@@ -317,7 +317,7 @@ void ZoneSizingData::allocateMemberArrays(int const numOfTimeStepInDay)
     this->DOASTotCoolLoadSeq.dimension(numOfTimeStepInDay, 0.0);
     this->HeatLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
     this->CoolLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
-    this->HeatLatentLoadSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->LatentHeatLoadSeq.dimension(numOfTimeStepInDay, 0.0);
     this->LatentCoolLoadSeq.dimension(numOfTimeStepInDay, 0.0);
     this->HeatLatentLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
     this->CoolLatentLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);

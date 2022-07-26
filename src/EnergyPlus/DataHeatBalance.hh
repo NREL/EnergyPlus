@@ -2049,6 +2049,7 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoCfactorConstructionsUsed = true;
     bool NoRegularMaterialsUsed = true;
     bool DoLatentSizing = false; // true when latent sizing is performed during zone sizing
+    bool isAnyLatentLoad = false;
 
     Array1D<Real64> ZoneSNLoadHeatEnergy;
     Array1D<Real64> ZoneSNLoadCoolEnergy;
