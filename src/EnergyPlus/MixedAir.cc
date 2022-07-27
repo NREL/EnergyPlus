@@ -3917,14 +3917,12 @@ void VentilationMechanicalProps::CalcMechVentController(
     static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)));
 
     // new local variables for DCV
-    Real64 ZoneOAPeople; // Zone OA flow rate based on number of occupants [m3/s]
-    Real64 ZoneOAArea;   // Zone OA flow rate based on space floor area [m3/s]
-    Real64 ZoneOAFlow;   // Zone OA flow rate based on simple flow [m3/s]
-    Real64 ZoneOAACH;    // Zone OA flow rate based on air changes per hour [m3/s]
-    Real64 ZoneOABZ;     // Zone breathing-zone OA flow rate [m3/s]
-    Real64 ZoneOAMin;    // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
+    std::array<Real64, static_cast<int>(DataSizing::OAFlowCalcMethod::Num)> ZoneOACalc{
+        0.0};         // Zone OA flow rate based on each calculation method [m3/s]
+    Real64 ZoneOABZ;  // Zone breathing-zone OA flow rate [m3/s]
+    Real64 ZoneOAMin; // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
     // used for "ProportionalControl" System outdoor air method
-    Real64 ZoneOAMax; // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOAArea)
+    Real64 ZoneOAMax; // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)])
     // used for "ProportionalControl" System outdoor air method
     Real64 ZoneOA;        // Zone OA flow rate [m3/s]
     Real64 ZoneOAFrac;    // Zone OA fraction (as a fraction of actual supply air flow rate)
@@ -4009,47 +4007,38 @@ void VentilationMechanicalProps::CalcMechVentController(
                 // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
                 //  Checking DCV flag before calculating zone OA per person
                 if (this->DCVFlag && this->SystemOAMethod != DataSizing::SystemOAMethod::ProportionalControlDesOcc) {
-                    ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier *
-                                   this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC *
+                                                                                            curZone.Multiplier * curZone.ListMultiplier *
+                                                                                            this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
                 } else {
-                    ZoneOAPeople =
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] =
                         curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
                 }
 
                 // Calc the zone OA flow rate based on the floor area component
-                ZoneOAArea = curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate(ZoneIndex) * curZoneOASchValue;
-                ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate(ZoneIndex) * curZoneOASchValue;
-                ZoneOAACH =
+                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)] =
+                    curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate(ZoneIndex) * curZoneOASchValue;
+                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)] =
+                    curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate(ZoneIndex) * curZoneOASchValue;
+                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)] =
                     curZone.Multiplier * curZone.ListMultiplier * (this->ZoneOAACHRate(ZoneIndex) * curZone.Volume) * curZoneOASchValue / 3600.0;
+                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::Sum)] =
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] +
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)] +
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)] +
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)];
+                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::Max)] =
+                    max(ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)],
+                        ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)],
+                        ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)],
+                        ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)]);
 
                 // Calc the breathing-zone OA flow rate
                 OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                 if (OAIndex > 0) {
-                    switch (state.dataSize->OARequirements(OAIndex).OAFlowMethod) {
-                    case OAFlowCalcMethod::PerPerson: {
-                        ZoneOABZ = ZoneOAPeople;
-                    } break;
-                    case OAFlowCalcMethod::PerZone: {
-                        ZoneOABZ = ZoneOAFlow;
-                    } break;
-                    case OAFlowCalcMethod::PerArea: {
-                        ZoneOABZ = ZoneOAArea;
-                    } break;
-                    case OAFlowCalcMethod::ACH: {
-                        ZoneOABZ = ZoneOAACH;
-                    } break;
-                    case OAFlowCalcMethod::Sum: {
-                        ZoneOABZ = ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH;
-                    } break;
-                    case OAFlowCalcMethod::Max: {
-                        ZoneOABZ = max(ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH);
-                    } break;
-                    default: {
-                        ZoneOABZ = 0.0;
-                    } break;
-                    }
+                    ZoneOABZ = ZoneOACalc[static_cast<int>(state.dataSize->OARequirements(OAIndex).OAFlowMethod)];
                 } else {
-                    ZoneOABZ = ZoneOAPeople;
+                    ZoneOABZ = ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)];
                 }
 
                 if (this->SystemOAMethod == DataSizing::SystemOAMethod::ZoneSum) {
@@ -4096,11 +4085,13 @@ void VentilationMechanicalProps::CalcMechVentController(
                     // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
                     //  Checking DCV flag before calculating zone OA per person
                     if (this->DCVFlag && this->SystemOAMethod != DataSizing::SystemOAMethod::ProportionalControlDesOcc) {
-                        ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier *
-                                       this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
+                        ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC *
+                                                                                                curZone.Multiplier * curZone.ListMultiplier *
+                                                                                                this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
                     } else {
-                        ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate(ZoneIndex) *
-                                       curZoneOASchValue;
+                        ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] = curZone.TotOccupants * curZone.Multiplier *
+                                                                                                curZone.ListMultiplier *
+                                                                                                this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
                         CO2PeopleGeneration = 0.0;
                         if (this->SystemOAMethod == DataSizing::SystemOAMethod::ProportionalControlDesOcc) {
                             // Accumulate CO2 generation from people at design occupancy and current activity level
@@ -4114,24 +4105,33 @@ void VentilationMechanicalProps::CalcMechVentController(
                     }
 
                     // Calc the zone OA flow rate based on the floor area component
-                    ZoneOAArea =
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)] =
                         curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate(ZoneIndex) * curZoneOASchValue;
-                    ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate(ZoneIndex) * curZoneOASchValue;
-                    ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier *
-                                (this->ZoneOAACHRate(ZoneIndex) * state.dataHeatBal->Zone(ZoneIndex).Volume) * curZoneOASchValue / 3600.0;
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)] =
+                        curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate(ZoneIndex) * curZoneOASchValue;
+                    ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)] =
+                        curZone.Multiplier * curZone.ListMultiplier * (this->ZoneOAACHRate(ZoneIndex) * state.dataHeatBal->Zone(ZoneIndex).Volume) *
+                        curZoneOASchValue / 3600.0;
 
                     // Calc the breathing-zone OA flow rate
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                     if (OAIndex > 0) {
-                        std::array<Real64, static_cast<int>(OAFlowCalcMethod::Num)> BZOAFlowRate{ZoneOAPeople,
-                                                                                                 ZoneOAFlow,
-                                                                                                 ZoneOAArea,
-                                                                                                 ZoneOAACH,
-                                                                                                 ZoneOAPeople + ZoneOAArea + ZoneOAFlow + ZoneOAACH,
-                                                                                                 max(ZoneOAPeople, ZoneOAArea, ZoneOAFlow, ZoneOAACH),
-                                                                                                 0.0,
-                                                                                                 0.0,
-                                                                                                 0.0};
+                        std::array<Real64, static_cast<int>(OAFlowCalcMethod::Num)> BZOAFlowRate{
+                            ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)],
+                            ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)],
+                            ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)],
+                            ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)],
+                            ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] +
+                                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)] +
+                                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)] +
+                                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)],
+                            max(ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)],
+                                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)],
+                                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)],
+                                ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)]),
+                            0.0,
+                            0.0,
+                            0.0};
 
                         ZoneOABZ = BZOAFlowRate[static_cast<int>(state.dataSize->OARequirements(OAIndex).OAFlowMethod)];
                     }
@@ -4171,8 +4171,10 @@ void VentilationMechanicalProps::CalcMechVentController(
                             // Check the availability schedule value for ZoneControl:ContaminantController
                             ZoneContamControllerSched = GetCurrentScheduleValue(state, curZone.ZoneContamControllerSchedIndex);
                             if (ZoneContamControllerSched > 0.0) {
-                                ZoneOAMin = ZoneOAArea / ZoneEz;
-                                ZoneOAMax = (ZoneOAArea + ZoneOAPeople) / ZoneEz;
+                                ZoneOAMin = ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)] / ZoneEz;
+                                ZoneOAMax = (ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)] +
+                                             ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)]) /
+                                            ZoneEz;
                                 if (this->SystemOAMethod == DataSizing::SystemOAMethod::ProportionalControlDesOARate) {
                                     ZoneOAMax = ZoneOABZ / ZoneEz;
                                     if (this->OAPropCtlMinRateSchPtr(ZoneIndex) > 0) {
@@ -4206,7 +4208,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                     }
                                 }
 
-                                if (ZoneOAPeople > 0.0) {
+                                if (ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] > 0.0) {
                                     if (state.dataContaminantBalance->ZoneCO2GainFromPeople(ZoneNum) > 0.0) {
                                         if (curZone.ZoneMinCO2SchedIndex > 0.0) {
                                             // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
@@ -4319,7 +4321,8 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                 ZoneOA = ZoneOAMin;
                                             } else if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) >= ZoneMaxCO2) {
                                                 // Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow
-                                                // rate to maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
+                                                // rate to maximum Zone OA flow rate (i.e.
+                                                // ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)] + ZoneOAPeople)
                                                 ZoneOA = ZoneOAMax;
                                             } else {
                                                 // Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
@@ -4382,7 +4385,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                         ZoneOA = ZoneOABZ / ZoneEz;
                                     }
                                 } else {
-                                    // ZoneOAPeople is less than or equal to zero
+                                    // ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] is less than or equal to zero
                                     ZoneOA = ZoneOABZ / ZoneEz;
                                 }
                             } else {
