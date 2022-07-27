@@ -1913,6 +1913,8 @@ namespace DataHeatBalance {
 
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
 
+    void AllocateIntGains(EnergyPlusData &state);
+
 } // namespace DataHeatBalance
 
 struct HeatBalanceData : BaseGlobalStruct
