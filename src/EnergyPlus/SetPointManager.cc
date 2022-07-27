@@ -1364,12 +1364,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         }
         state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes.allocate(NumZones);
-        state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum.allocate(NumZones);
         state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum.allocate(NumZones);
 
         for (ZoneNum = 1; ZoneNum <= NumZones; ++ZoneNum) {
             state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(ZoneNum) = NodeNums(ZoneNum);
-            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(ZoneNum) = 0;
             state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(ZoneNum) = 0;
         }
 
@@ -1468,13 +1466,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         }
         state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes.allocate(NumZones);
-        state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum.allocate(NumZones);
         state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum.allocate(NumZones);
 
         for (ZoneNum = 1; ZoneNum <= NumZones; ++ZoneNum) {
             state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(ZoneNum) = NodeNums(ZoneNum);
             //   Actual zone node and controlled zone numbers set in Init subroutine
-            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(ZoneNum) = 0;
             state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(ZoneNum) = 0;
         }
 
@@ -3395,7 +3391,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
-        state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(state, cAlphaArgs(2));
         // get the actual zone number of the control zone
         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum =
             UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
@@ -3404,6 +3399,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
             ErrorsFound = true;
         } else {
+            state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ZoneNodeNum =
+                GetSystemNodeNumberForZone(state, state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum);
             if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
                 if (!state.dataZoneCtrls->StageZoneLogic(state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
                     ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -3506,7 +3503,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
-        state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(state, cAlphaArgs(2));
         // get the actual zone number of the control zone
         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum =
             UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
@@ -3515,6 +3511,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
             ErrorsFound = true;
         } else {
+            state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ZoneNodeNum =
+                GetSystemNodeNumberForZone(state, state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum);
             if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
                 if (!state.dataZoneCtrls->StageZoneLogic(state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
                     ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -4391,8 +4389,6 @@ void InitSetPointManagers(EnergyPlusData &state)
                         if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode ==
                             state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                             state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) =
-                                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
                             break;
                         }
                     }
@@ -4403,14 +4399,14 @@ void InitSetPointManagers(EnergyPlusData &state)
                         ShowContinueError(
                             state,
                             "could not find Controlled Zone=" +
-                                state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                                state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum)).Name);
                         ErrorsFound = true;
                     } else {
                         // make sure humidity controlled zone
                         HstatZoneFound = false;
                         for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                             if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum))
+                                state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum))
                                 continue;
                             HstatZoneFound = true;
                             break;
@@ -4422,7 +4418,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                             ShowContinueError(
                                 state,
                                 "could not locate Humidistat in Zone=" +
-                                    state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                                    state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum)).Name);
                             ErrorsFound = true;
                         }
                     }
@@ -4438,8 +4434,6 @@ void InitSetPointManagers(EnergyPlusData &state)
                         if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode ==
                             state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                             state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) =
-                                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
                             break;
                         }
                     }
@@ -4450,14 +4444,14 @@ void InitSetPointManagers(EnergyPlusData &state)
                         ShowContinueError(
                             state,
                             "could not find Controlled Zone=" +
-                                state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                                state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum)).Name);
                         ErrorsFound = true;
                     } else {
                         // make sure humidity controlled zone
                         HstatZoneFound = false;
                         for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                             if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum))
+                                state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum))
                                 continue;
                             HstatZoneFound = true;
                             break;
@@ -4469,7 +4463,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                             ShowContinueError(
                                 state,
                                 "could not locate Humidistat in Zone=" +
-                                    state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                                    state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum)).Name);
                             ErrorsFound = true;
                         }
                     }
@@ -6424,7 +6418,6 @@ void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
     //       DATE WRITTEN   October 2000
     //       MODIFIED       Shirey/Raustad Jan 2002
     //                      Gu, Dec 2007
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // From humidity load of the control zone, calculate the supply air humidity
@@ -6439,22 +6432,18 @@ void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
     using DataHVACGlobals::SmallMassFlow;
     using Psychrometrics::PsyWFnTdbRhPb;
 
-    int ZoneNode;
-    Real64 ZoneMassFlow;
-    int ZoneNum;
     Real64 MoistureLoad; // Zone moisture load (kg moisture/second) required to meet the relative humidity setpoint
     // Value obtained from ZoneTempPredictorCorrector (via ZoneSysMoistureDemand in DataZoneEnergyDemands)
     Real64 SupplyAirHumRat; // Desired air humidity ratio
 
     this->SetPt = 0.0;
     // Only use one zone for now
-    ZoneNode = this->ZoneNodes(1);
-    ZoneMassFlow = state.dataLoopNodes->Node(ZoneNode).MassFlowRate;
-    ZoneNum = this->ZoneNum(1);
+    int ZoneNode = this->ZoneNodes(1);
+    Real64 ZoneMassFlow = state.dataLoopNodes->Node(ZoneNode).MassFlowRate;
 
     if (ZoneMassFlow > SmallMassFlow) {
 
-        MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToHumidifyingSP;
+        MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->CtrlZoneNum(1)).OutputRequiredToHumidifyingSP;
 
         SupplyAirHumRat = max(0.0, state.dataLoopNodes->Node(ZoneNode).HumRat + MoistureLoad / ZoneMassFlow);
 
@@ -6471,7 +6460,6 @@ void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     //       AUTHOR         Raustad/Shirey, FSEC
     //       DATE WRITTEN   January 2004
     //       MODIFIED       Gu, Dec. 2007
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // From humidity load of the control zone, calculate the supply air humidity
@@ -6500,7 +6488,7 @@ void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
 
     if (ZoneMassFlow > SmallMassFlow) {
 
-        MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToDehumidifyingSP;
+        MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->CtrlZoneNum(1)).OutputRequiredToDehumidifyingSP;
 
         SystemMassFlow = state.dataLoopNodes->Node(this->CtrlNodes(1)).MassFlowRate;
 
@@ -6755,8 +6743,6 @@ void DefineWarmestSetPointManager::calculate(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2002
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate the "warmest" supply air setpoint temperature that will satisfy the cooling
@@ -6776,25 +6762,20 @@ void DefineWarmestSetPointManager::calculate(EnergyPlusData &state)
     int AirLoopNum;          // the index of the air loop served by this setpoint manager
     Real64 TotCoolLoad;      // sum of the zone cooling loads for this air loop [W]
     int ZonesCooledIndex;    // DO loop index for zones cooled by the air loop
-    int CtrlZoneNum;         // the controlled zone index
-    int ZoneInletNode;       // the zone inlet node number
     Real64 ZoneTemp;         // zone temperature [C]
     Real64 ZoneSetPointTemp; // zone supply air temperature [C]
     Real64 SetPointTemp;     // the system setpoint temperature [C]
-    int ZoneNode;            // the zone node number of the current zone
-    int ZoneNum;             // the actual zone number
 
     AirLoopNum = this->AirLoopNum;
     TotCoolLoad = 0.0;
     SetPointTemp = this->MaxSetTemp;
 
     for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-        CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-        ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-        ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+        int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+        int ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
         ZoneMassFlowMax = state.dataLoopNodes->Node(ZoneInletNode).MassFlowRateMax;
-        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
         ZoneTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
         ZoneSetPointTemp = this->MaxSetTemp;
         if (ZoneLoad < 0.0) {
@@ -6841,14 +6822,9 @@ void DefineColdestSetPointManager::calculate(EnergyPlusData &state)
     Real64 CpAir;            // inlet air specific heat [J/kg-C]
     int AirLoopNum;          // the index of the air loop served by this setpoint manager
     Real64 TotHeatLoad;      // sum of the zone heating loads for this air loop [W]
-    int ZonesHeatedIndex;    // DO loop index for zones heated by the air loop
-    int CtrlZoneNum;         // the controlled zone index
-    int ZoneInletNode;       // the zone inlet node number
     Real64 ZoneTemp;         // zone temperature [C]
     Real64 ZoneSetPointTemp; // zone supply air temperature [C]
     Real64 SetPointTemp;     // the system setpoint temperature [C]
-    int ZoneNode;            // the zone node number of the current zone
-    int ZoneNum;             // the actual zone number
 
     AirLoopNum = this->AirLoopNum;
     TotHeatLoad = 0.0;
@@ -6856,13 +6832,12 @@ void DefineColdestSetPointManager::calculate(EnergyPlusData &state)
 
     if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
         // dual-duct heated only zones
-        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++ZonesHeatedIndex) {
-            CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedIndex);
-            ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZonesHeatedIndex);
-            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-            ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+        for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++ZonesHeatedIndex) {
+            int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedIndex);
+            int ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZonesHeatedIndex);
+            int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowMax = state.dataLoopNodes->Node(ZoneInletNode).MassFlowRateMax;
-            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
             ZoneSetPointTemp = this->MinSetTemp;
             if (ZoneLoad > 0.0) {
@@ -6876,13 +6851,12 @@ void DefineColdestSetPointManager::calculate(EnergyPlusData &state)
         }
     } else {
         // single-duct or central heated and cooled zones
-        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
-            CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
-            ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
-            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-            ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+        for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
+            int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
+            int ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
+            int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowMax = state.dataLoopNodes->Node(ZoneInletNode).MassFlowRateMax;
-            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
             ZoneSetPointTemp = this->MinSetTemp;
             if (ZoneLoad > 0.0) {
@@ -6930,14 +6904,9 @@ void DefWarmestSetPtManagerTempFlow::calculate(EnergyPlusData &state)
     Real64 CpAir;            // inlet air specific heat [J/kg-C]
     int AirLoopNum;          // the index of the air loop served by this setpoint manager
     Real64 TotCoolLoad;      // sum of the zone cooling loads for this air loop [W]
-    int ZonesCooledIndex;    // DO loop index for zones cooled by the air loop
-    int CtrlZoneNum;         // the controlled zone index
-    int ZoneInletNode;       // the zone inlet node number
     Real64 ZoneTemp;         // zone temperature [C]
     Real64 ZoneSetPointTemp; // zone supply air temperature [C]
     Real64 SetPointTemp;     // the system setpoint temperature [C]
-    int ZoneNode;            // the zone node number of the current zone
-    int ZoneNum;             // the actual zone number
     Real64 MinFracFlow;
     Real64 ZoneFracFlow;
     Real64 FracFlow;
@@ -6957,13 +6926,12 @@ void DefWarmestSetPtManagerTempFlow::calculate(EnergyPlusData &state)
     CritZoneNumTemp = 0;
     CritZoneNumFlow = 0;
 
-    for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-        CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-        ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-        ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+    for (int ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+        int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+        int ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
         ZoneMassFlowMax = state.dataLoopNodes->Node(ZoneInletNode).MassFlowRateMax;
-        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
         ZoneTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
         ZoneSetPointTemp = MaxSetPointTemp;
         ZoneFracFlow = MinFracFlow;
@@ -6996,11 +6964,11 @@ void DefWarmestSetPtManagerTempFlow::calculate(EnergyPlusData &state)
         }
         if (ZoneSetPointTemp < SetPointTemp) {
             SetPointTemp = ZoneSetPointTemp;
-            CritZoneNumTemp = ZoneNum;
+            CritZoneNumTemp = CtrlZoneNum;
         }
         if (ZoneFracFlow > FracFlow) {
             FracFlow = ZoneFracFlow;
-            CritZoneNumFlow = ZoneNum;
+            CritZoneNumFlow = CtrlZoneNum;
         }
     }
 

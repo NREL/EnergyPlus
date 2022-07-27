@@ -10706,7 +10706,7 @@ namespace SurfaceGeometry {
                     }
                     std::string callDescription = cCurrentModuleObject + "=" + state.dataSurface->Surface(SurfNum).Name;
                     state.dataSurface->SurfWinAirflowReturnNodePtr(SurfNum) =
-                        DataZoneEquipment::GetReturnAirNodeForZone(state, state.dataSurface->Surface(SurfNum).ZoneName, retNodeName, callDescription);
+                        DataZoneEquipment::GetReturnAirNodeForZone(state, state.dataSurface->Surface(SurfNum).Zone, retNodeName, callDescription);
                     if (state.dataSurface->SurfWinAirflowReturnNodePtr(SurfNum) == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataSurface->Surface(SurfNum).Name +

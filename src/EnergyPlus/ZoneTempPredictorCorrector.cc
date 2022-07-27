@@ -5651,8 +5651,6 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the zone humidities.
@@ -5664,16 +5662,8 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // Using/Aliasing
     using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CorrectZoneHumRat");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NodeNum;
-    int ZoneNodeNum;
-    int ZoneEquipConfigNum;
-    bool ControlledZoneAirFlag;
-    int ZoneRetPlenumNum;
-    int ZoneSupPlenumNum;
     bool ZoneRetPlenumAirFlag;
     bool ZoneSupPlenumAirFlag;
     Real64 LatentGain;             // Zone latent load
@@ -5705,27 +5695,26 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 
     // Check to see if this is a controlled zone
-    ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
+    bool ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
 
     // Check to see if this is a plenum zone
     ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
     ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
 
     if (ControlledZoneAirFlag) { // If there is system flow then calculate the flow rates
-        ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
         // Calculate moisture flow rate into each zone
-        for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+        for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
 
-            MoistureMassFlowRate += (Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                     Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat) /
-                                    ZoneMult;
-            ZoneMassFlowRate += Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+            MoistureMassFlowRate +=
+                (Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate * Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).HumRat) /
+                ZoneMult;
+            ZoneMassFlowRate += Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
         } // NodeNum
 
         // Do the calculations for the plenum zone
     } else if (ZoneRetPlenumAirFlag) {
-        ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-        for (NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+        int ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
+        for (int NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
 
             MoistureMassFlowRate += (Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate *
                                      Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).HumRat) /
@@ -5748,7 +5737,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         }
 
     } else if (ZoneSupPlenumAirFlag) {
-        ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
+        int ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
         MoistureMassFlowRate += (Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate *
                                  Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).HumRat) /
                                 ZoneMult;
@@ -5859,7 +5848,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     }
 
     // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
-    ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
+    int ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
     if (ZoneNodeNum > 0) {
         Node(ZoneNodeNum).HumRat = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
         Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum));
@@ -6412,7 +6401,6 @@ void CalcZoneSums(EnergyPlusData &state,
     //       DATE WRITTEN   July 2003
     //       MODIFIED       Aug 2003, FCW: add SumHA contributions from window frame and divider
     //                      Aug 2003, CC: change how the reference temperatures are used
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calculates the various sums that go into the zone heat balance
@@ -6434,16 +6422,9 @@ void CalcZoneSums(EnergyPlusData &state,
     using namespace DataHeatBalSurface;
     using InternalHeatGains::SumAllInternalConvectionGains;
     using InternalHeatGains::SumAllReturnAirConvectionGains;
-    // using ZonePlenum::ZoneRetPlenCond;
-    // using ZonePlenum::ZoneSupPlenCond;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 NodeTemp(0.0); // System node temperature //Autodesk:Init Initialization added to elim poss of use uninitialized
     Real64 MassFlowRate;  // System node mass flow rate
-    int ZoneEquipConfigNum;
-    bool ControlledZoneAirFlag;
-    int ZoneRetPlenumNum;
-    int ZoneSupPlenumNum;
     bool ZoneRetPlenumAirFlag;
     bool ZoneSupPlenumAirFlag;
     Real64 CpAir;      // Specific heat of air
@@ -6500,7 +6481,7 @@ void CalcZoneSums(EnergyPlusData &state,
 
     // Sum all system air flow: SumSysMCp, SumSysMCpT
     // Check to see if this is a controlled zone
-    ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
+    bool ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
     if (CorrectorFlag) {
         // Check to see if this is a plenum zone
         ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
@@ -6508,8 +6489,7 @@ void CalcZoneSums(EnergyPlusData &state,
 
         // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
         if (ControlledZoneAirFlag) {
-            ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
-            auto const &zec(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
+            auto const &zec(state.dataZoneEquip->ZoneEquipConfig(ZoneNum));
             for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                 // Get node conditions
                 //  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
@@ -6525,7 +6505,7 @@ void CalcZoneSums(EnergyPlusData &state,
             } // NodeNum
 
         } else if (ZoneRetPlenumAirFlag) {
-            ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
+            int ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
             auto const &zrpc(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum));
             Real64 const air_hum_rat(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
             for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
@@ -6565,7 +6545,7 @@ void CalcZoneSums(EnergyPlusData &state,
             }
 
         } else if (ZoneSupPlenumAirFlag) {
-            ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
+            int ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
             // Get node conditions
             NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
@@ -6733,13 +6713,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     using InternalHeatGains::SumAllReturnAirConvectionGains;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NodeNum;          // System node number
     Real64 NodeTemp(0.0); // System node temperature //Autodesk:Init Initialization added to elim poss of use uninitialized
     Real64 MassFlowRate;  // System node mass flow rate
-    int ZoneEquipConfigNum;
-    bool ControlledZoneAirFlag;
-    int ZoneRetPlenumNum;
-    int ZoneSupPlenumNum;
     bool ZoneRetPlenumAirFlag;
     bool ZoneSupPlenumAirFlag;
     Real64 RhoAir;
@@ -6747,7 +6722,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     int SurfNum;  // Surface number
     Real64 Area;  // Effective surface area
     int ADUListIndex;
-    int ADUNum;
     int ADUInNode;
     int ADUOutNode;
     Real64 Threshold;
@@ -6766,7 +6740,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     SumEnthalpyM = 0.0;
     SumEnthalpyH = 0.0;
     ADUHeatAddRate = 0.0;
-    ADUNum = 0;
     QSensRate = 0;
 
     auto &Zone = state.dataHeatBal->Zone;
@@ -6815,7 +6788,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     // Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums
 
     // Check to see if this is a controlled zone
-    ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
+    const bool ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
 
     // Check to see if this is a plenum zone
     ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
@@ -6823,15 +6796,14 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
     // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
     if (ControlledZoneAirFlag) {
-        ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
-        for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+        for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
             // Get node conditions
-            NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-            MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+            NodeTemp = Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).Temp;
+            MassFlowRate = Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate;
             CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
             SumMCpDTsystem += QSensRate;
 
-            ADUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
+            int ADUNum = ZoneEquipConfig(ZoneNum).InletNodeADUNum(NodeNum);
             if (ADUNum > 0) {
                 NodeTemp = Node(AirDistUnit(ADUNum).OutletNodeNum).Temp;
                 MassFlowRate = Node(AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
@@ -6845,8 +6817,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         } // NodeNum
 
     } else if (ZoneRetPlenumAirFlag) {
-        ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-        for (NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+        const int ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
+        for (int NodeNum = 1; NodeNum <= ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
             // Get node conditions
             NodeTemp = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
             MassFlowRate = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
@@ -6856,7 +6828,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         } // NodeNum
         // add in the leaks
         for (ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
-            ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+            const int ADUNum = ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
             if (AirDistUnit(ADUNum).UpStreamLeak) {
                 ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                 NodeTemp = Node(ADUInNode).Temp;
@@ -6874,7 +6846,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         }
 
     } else if (ZoneSupPlenumAirFlag) {
-        ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
+        const int ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
         // Get node conditions
         NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
         MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;

@@ -171,7 +171,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -189,7 +188,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -325,7 +323,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -343,7 +340,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -474,7 +470,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(3);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -489,7 +484,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
 
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
@@ -501,7 +495,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
-    state->dataZoneEquip->ZoneEquipConfig(3).ActualZoneNum = 3;
 
     state->dataZoneEquip->ZoneEquipConfig(3).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(3).InletNode.allocate(1);
@@ -516,7 +509,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataHeatBal->Zone.allocate(3);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(3);
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -524,13 +516,11 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
-    state->dataHeatBal->Zone(2).ZoneEqNum = 1;
     state->dataHeatBal->Zone(2).Multiplier = 1.0;
     state->dataHeatBal->Zone(2).Volume = 1000.0;
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 5;
     state->dataHeatBal->Zone(2).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
-    state->dataHeatBal->Zone(3).ZoneEqNum = 1;
     state->dataHeatBal->Zone(3).Multiplier = 1.0;
     state->dataHeatBal->Zone(3).Volume = 1000.0;
     state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 5;
@@ -679,7 +669,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(3);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -694,7 +683,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
 
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
@@ -706,7 +694,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
     state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
-    state->dataZoneEquip->ZoneEquipConfig(3).ActualZoneNum = 3;
 
     state->dataZoneEquip->ZoneEquipConfig(3).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(3).InletNode.allocate(1);
@@ -721,7 +708,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataHeatBal->Zone.allocate(3);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(3);
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -729,13 +715,11 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
-    state->dataHeatBal->Zone(2).ZoneEqNum = 1;
     state->dataHeatBal->Zone(2).Multiplier = 1.0;
     state->dataHeatBal->Zone(2).Volume = 1000.0;
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 5;
     state->dataHeatBal->Zone(2).ZoneVolCapMultpMoist = 1.0;
     state->dataHeatBal->Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
-    state->dataHeatBal->Zone(3).ZoneEqNum = 1;
     state->dataHeatBal->Zone(3).Multiplier = 1.0;
     state->dataHeatBal->Zone(3).Volume = 1000.0;
     state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 5;

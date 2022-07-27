@@ -295,7 +295,7 @@ namespace DataSizing {
         // 3=supply cold ventilation air
         Real64 DOASLowSetpoint;         // Dedicated Outside Air Low Setpoint for Design [C]
         Real64 DOASHighSetpoint;        // Dedicated Outside Air High Setpoint for Design [C]
-        int ActualZoneNum;              // index into the Zone data array (in DataHeatBalance)
+        int ZoneNum;                    // index into the Zone data array (in DataHeatBalance)
         Real64 DesHeatMassFlow;         // zone design heating air mass flow rate [kg/s]
         Real64 DesHeatMassFlowNoOA;     // zone design heating air mass flow rate without applying MinOA as a limit [kg/s]
         Real64 DesHeatOAFlowFrac;       // zone design heating OA air volume fraction [-]
@@ -437,7 +437,7 @@ namespace DataSizing {
               DesOAFlowPerArea(0.0), CoolAirDesMethod(0), InpDesCoolAirFlow(0.0), DesCoolMinAirFlowPerArea(0.0), DesCoolMinAirFlow(0.0),
               DesCoolMinAirFlowFrac(0.0), HeatAirDesMethod(0), InpDesHeatAirFlow(0.0), DesHeatMaxAirFlowPerArea(0.0), DesHeatMaxAirFlow(0.0),
               DesHeatMaxAirFlowFrac(0.0), HeatSizingFactor(0.0), CoolSizingFactor(0.0), AccountForDOAS(false), DOASControlStrategy(0),
-              DOASLowSetpoint(0.0), DOASHighSetpoint(0.0), ActualZoneNum(0), DesHeatMassFlow(0.0), DesHeatMassFlowNoOA(0.0), DesHeatOAFlowFrac(0.0),
+              DOASLowSetpoint(0.0), DOASHighSetpoint(0.0), ZoneNum(0), DesHeatMassFlow(0.0), DesHeatMassFlowNoOA(0.0), DesHeatOAFlowFrac(0.0),
               EMSOverrideDesHeatMassOn(false), EMSValueDesHeatMassFlow(0.0), DesCoolMassFlow(0.0), DesCoolMassFlowNoOA(0.0), DesCoolOAFlowFrac(0.0),
               EMSOverrideDesCoolMassOn(false), EMSValueDesCoolMassFlow(0.0), DesHeatLoad(0.0), NonAirSysDesHeatLoad(0.0),
               EMSOverrideDesHeatLoadOn(false), EMSValueDesHeatLoad(0.0), DesCoolLoad(0.0), NonAirSysDesCoolLoad(0.0), EMSOverrideDesCoolLoadOn(false),
