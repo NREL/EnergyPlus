@@ -690,7 +690,7 @@ namespace DataHeatBalance {
         bool anySurfacesWithSpace = false;    // True if any surfaces in a zone have a space assigned in input
         EPVector<int> spaceIndexes;           // Indexes to spaces in this zone
         int numSpaces = 0;                    // Number of spaces in this zone
-        bool noEMPDorHAMT = true;             // False if surface heat balance uses EMPD or HAMT
+        bool noEMPDorHAMT = true;             // Set to false in InitSurfaceHeatBalance if surface heat balance uses EMPD or HAMT
 
         // Default Constructor
         ZoneData() : Centroid(0.0, 0.0, 0.0)
