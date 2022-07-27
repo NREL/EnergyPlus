@@ -1137,6 +1137,30 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         } else {
             if (vrf.CoolEIRFPLR1 > 0) EIRFPLRModFac = CurveValue(state, vrf.CoolEIRFPLR1, max(vrf.MinPLR, CoolingPLR));
         }
+
+        if (EIRFPLRModFac < 0.0) {
+            if (vrf.CoolEIRFPLRErrorIndex == 0) {
+                ShowSevereMessage(state, std::string(cVRFTypes(VRF_HeatPump)) + " \"" + vrf.Name + "\":");
+                ShowContinueError(state,
+                                  fmt::format(" Cooling Capacity Modifier curve (function of PLR) output is negative ({:.3T}).", EIRFPLRModFac));
+                ShowContinueError(state,
+                                  fmt::format(" Negative value occurs using an outdoor air temperature of {:.1T} C and an average indoor air "
+                                              "wet-bulb temperature of {:.1T} C.",
+                                              CondInletTemp,
+                                              InletAirWetBulbC));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            }
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                fmt::format("{} \"{}\": Cooling Capacity Modifier curve (function of PLR) output is negative warning continues...",
+                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                            vrf.Name),
+                vrf.CoolEIRFPLRErrorIndex,
+                EIRFPLRModFac,
+                EIRFPLRModFac);
+            EIRFPLRModFac = 0.0;
+        }
+
         // find part load fraction to calculate RTF
         if (vrf.CoolPLFFPLR > 0) {
             PartLoadFraction = max(0.7, CurveValue(state, vrf.CoolPLFFPLR, CyclingRatio));
