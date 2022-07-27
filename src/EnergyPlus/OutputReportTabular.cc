@@ -13171,7 +13171,6 @@ void WriteSETHoursTableNonPreDefUseZoneData(EnergyPlusData &state,
     }
 }
 
-
 void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                        int const columnNum,
                                        int const periodIdx,
@@ -13301,7 +13300,6 @@ void WriteHourOfSafetyTableNonPreDefUseZoneData(EnergyPlusData &state,
             tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
     }
 }
-
 
 void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
                                            int const columnNum,
