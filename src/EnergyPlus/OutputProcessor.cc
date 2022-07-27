@@ -1684,14 +1684,11 @@ namespace OutputProcessor {
             } else if (meterType == "ENERGYTRANSFER" || meterType == "ENERGYXFER" || meterType == "XFER") {
                 OutResourceType = "EnergyTransfer";
 
-            } else if (meterType == "STEAM") {
-                OutResourceType = "Steam";
-
             } else if (meterType == "DISTRICTCOOLING") {
                 OutResourceType = "DistrictCooling";
 
-            } else if (meterType == "DISTRICTHEATING") {
-                OutResourceType = "DistrictHeating";
+            } else if (meterType == "DISTRICTHEATINGWater") {
+                OutResourceType = "DistrictHeatingWater";
 
             } else if (meterType == "DISTRICTHEATINGSTEAM") {
                 OutResourceType = "DistrictHeatingSteam";
@@ -8101,11 +8098,11 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
     using namespace OutputProcessor;
     // SUBROUTINE PARAMETER DEFINITIONS:
     //             Now for the Pollution Meters
-    static Array1D_string const PollutionMeters({1, 30},
+    static Array1D_string const PollutionMeters({1, 29},
                                                 {"Electricity:Facility",
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
-                                                 "DistrictHeating:Facility",
+                                                 "DistrictHeatingWater:Facility",
                                                  "DistrictHeatingSteam:Facility",
                                                  "NaturalGas:Facility",
                                                  "GASOLINE:Facility",
@@ -8114,7 +8111,6 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
                                                  "FuelOilNo2:Facility",
                                                  "Propane:Facility",
                                                  "ElectricityProduced:Facility",
-                                                 "Steam:Facility",
                                                  "CO2:Facility",
                                                  "CO:Facility",
                                                  "CH4:Facility",
