@@ -1816,7 +1816,6 @@ void PredictZoneContaminants(EnergyPlusData &state,
             }
         }
 
-        int sizeArray = (int)state.dataContaminantBalance->ContaminantControlledZone.size();
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
 
             state.dataContaminantBalance->CO2PredictedRate(ZoneNum) = 0.0;
@@ -1826,8 +1825,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
             // Check to see if this is a "CO2 controlled zone"
             bool ControlledCO2ZoneFlag = false;
             // Check all the controlled zones to see if it matches the zone simulated
-            for (int ContControlledZoneNum = 1; ContControlledZoneNum <= sizeArray; ++ContControlledZoneNum) {
-                auto &contaminantControlledZone = state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum);
+            for (auto const &contaminantControlledZone : state.dataContaminantBalance->ContaminantControlledZone) {
                 if (contaminantControlledZone.ActualZoneNum == ZoneNum) {
                     if (ScheduleManager::GetCurrentScheduleValue(state, contaminantControlledZone.AvaiSchedPtr) > 0.0) {
                         ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(contaminantControlledZone.ActualZoneNum);
@@ -1840,8 +1838,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 }
             }
             if (!ControlledCO2ZoneFlag) {
-                for (int ContControlledZoneNum = 1; ContControlledZoneNum <= sizeArray; ++ContControlledZoneNum) {
-                    auto &contaminantControlledZone = state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum);
+                for (auto const &contaminantControlledZone : state.dataContaminantBalance->ContaminantControlledZone) {
                     if (ScheduleManager::GetCurrentScheduleValue(state, contaminantControlledZone.AvaiSchedPtr) > 0.0) {
                         ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(contaminantControlledZone.ActualZoneNum);
                         if (contaminantControlledZone.EMSOverrideCO2SetPointOn) {
@@ -1948,15 +1945,12 @@ void PredictZoneContaminants(EnergyPlusData &state,
             // Check to see if this is a "GC controlled zone"
             bool ControlledGCZoneFlag = false;
             // Check all the controlled zones to see if it matches the zone simulated
-            for (int ContControlledZoneNum = 1; ContControlledZoneNum <= sizeArray; ++ContControlledZoneNum) {
-                if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
-                    if (ScheduleManager::GetCurrentScheduleValue(
-                            state, state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
-                        ZoneAirGCSetPoint = state.dataContaminantBalance->ZoneGCSetPoint(
-                            state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
-                        if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
-                            ZoneAirGCSetPoint =
-                                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
+            for (auto const &contaminantControlledZone : state.dataContaminantBalance->ContaminantControlledZone) {
+                if (contaminantControlledZone.ActualZoneNum == ZoneNum) {
+                    if (ScheduleManager::GetCurrentScheduleValue(state, contaminantControlledZone.AvaiSchedPtr) > 0.0) {
+                        ZoneAirGCSetPoint = state.dataContaminantBalance->ZoneGCSetPoint(contaminantControlledZone.ActualZoneNum);
+                        if (contaminantControlledZone.EMSOverrideCO2SetPointOn) {
+                            ZoneAirGCSetPoint = contaminantControlledZone.EMSOverrideGCSetPointValue;
                         }
                         ControlledGCZoneFlag = true;
                         break;
@@ -1964,8 +1958,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 }
             }
             if (!ControlledGCZoneFlag) {
-                for (int ContControlledZoneNum = 1; ContControlledZoneNum <= sizeArray; ++ContControlledZoneNum) {
-                    auto &contaminantControlledZone = state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum);
+                for (auto const &contaminantControlledZone : state.dataContaminantBalance->ContaminantControlledZone) {
                     if (ScheduleManager::GetCurrentScheduleValue(state, contaminantControlledZone.AvaiSchedPtr) > 0.0) {
                         ZoneAirGCSetPoint = state.dataContaminantBalance->ZoneGCSetPoint(contaminantControlledZone.ActualZoneNum);
                         if (contaminantControlledZone.EMSOverrideCO2SetPointOn) {
