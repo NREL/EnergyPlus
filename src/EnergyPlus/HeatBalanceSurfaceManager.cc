@@ -550,18 +550,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) {
         DisplayString(state, "Completed Initializing Surface Heat Balance");
-        if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
-            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                for (int SurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                     ++SurfNum) {
-                    if ((state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) ||
-                        (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT)) {
-                        state.dataHeatBal->Zone(zoneNum).noEMPDorHAMT = false;
-                        break;
-                    }
-                }
-            }
-        }
     }
     state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime = false;
 }
@@ -7613,6 +7601,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
+
+        // these SumHmA* variables are only used for EMPD and HAMT and should be reset each time step
+        state.dataHeatBalFanSys->SumHmAW = 0.0;
+        state.dataHeatBalFanSys->SumHmARa = 0.0;
+        state.dataHeatBalFanSys->SumHmARaW = 0.0;
+
         for (int SurfNum : HTNonWindowSurfs) {
             auto const &surface(Surface(SurfNum));
             int ZoneNum = surface.Zone;

@@ -4758,17 +4758,8 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
 void CalcHeatBalanceAir(EnergyPlusData &state)
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Legacy Code
-    //       DATE WRITTEN   na
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calculates the air component of the heat balance.
-
-    // Using/Aliasing
-    using HVACManager::ManageHVAC;
 
     if (state.dataGlobal->externalHVACManager) {
         if (!state.dataGlobal->externalHVACManagerInitialized) {
@@ -4776,13 +4767,8 @@ void CalcHeatBalanceAir(EnergyPlusData &state)
         }
         state.dataGlobal->externalHVACManager(&state);
     } else {
-        ManageHVAC(state);
+        HVACManager::ManageHVAC(state);
     }
-
-    // Do Final Temperature Calculations for Heat Balance before next Time step
-    state.dataHeatBalFanSys->SumHmAW = 0.0;
-    state.dataHeatBalFanSys->SumHmARa = 0.0;
-    state.dataHeatBalFanSys->SumHmARaW = 0.0;
 }
 
 // END Algorithm Section of the Module

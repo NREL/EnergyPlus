@@ -153,8 +153,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->EAMFLxHumRat.allocate(1);
     state->dataHeatBalFanSys->CTMFL.allocate(1);
 
-    state->dataHeatBalFanSys->SumHmARaW.allocate(1);
-    state->dataHeatBalFanSys->SumHmARa.allocate(1);
+    state->dataHeatBalFanSys->SumHmARaW.dimension(1, 0.0);
+    state->dataHeatBalFanSys->SumHmARa.dimension(1, 0.0);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
     state->dataHeatBalFanSys->MDotOA.allocate(1);

@@ -4736,12 +4736,6 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // SumHmARaW and SumHmARa will be used with the Moisture Balance on the building elements and
         // are currently set to zero when the CTF only version is used.
 
-        // if no surface in the zone uses EMPD or HAMT then zero
-        if (state.dataHeatBal->Zone(ZoneNum).noEMPDorHAMT) {
-            state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
-            state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
-        }
-
         // The density of air and latent heat of vaporization are calculated as functions.
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT, zoneAirHumRat, RoutineName);
         H2OHtOfVap = PsyHgAirFnWTdb(zoneAirHumRat, ZT);
@@ -5632,12 +5626,6 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // zone humidity ratio.  The A, B, C coefficients are analogous to the
     // heat balance.  There are 2 cases that should be considered, system
     // operating and system shutdown.
-    // SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
-    // are currently set to zero to remind us where they need to be in the future
-    if (state.dataHeatBal->Zone(ZoneNum).noEMPDorHAMT) {
-        state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
-        state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
-    }
 
     auto &ZT = state.dataHeatBalFanSys->ZT(ZoneNum);
     Real64 RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
