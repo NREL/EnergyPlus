@@ -593,7 +593,7 @@ void ManageSizing(EnergyPlusData &state)
                 }
                 ReportZoneSizing(state,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 "Cooling",
+                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolSizingType,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
@@ -677,7 +677,7 @@ void ManageSizing(EnergyPlusData &state)
                 }
                 ReportZoneSizing(state,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 "Heating",
+                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatSizingType,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
@@ -779,7 +779,7 @@ void ManageSizing(EnergyPlusData &state)
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
             } else if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
                 if (FinalSysSizing(AirLoopNum).LoadSizeType == DataSizing::Latent && state.dataHeatBal->DoLatentSizing) {
-                    coolPeakLoadKind = "Latent";
+                    coolPeakLoadKind = "Total Based on Latent";
                 } else {
                     coolPeakLoadKind = "Total";
                 }

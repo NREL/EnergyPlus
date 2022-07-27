@@ -538,6 +538,8 @@ namespace DataSizing {
         std::string LatCoolNoDOASDesDay;         // name of a cooling design day without DOAS
         std::string LatHeatNoDOASDesDay;         // name of a heating design day without DOAS
         ZoneSizing zoneSizingMethod;             // type of zone load to sizing on: sensible, latent, sensibleandlatent, sensibleonlynolatent
+        std::string CoolSizingType;              // string reported to eio
+        std::string HeatSizingType;              // string reported to eio
 
         // Default Constructor
         ZoneSizingData()

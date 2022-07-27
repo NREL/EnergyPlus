@@ -1778,6 +1778,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             calcZoneSizing.LatentHeatDDNum = state.dataSize->CurOverallSimDay;
             calcZoneSizing.LatentCoolNoDOASDDNum = state.dataSize->CurOverallSimDay;
             calcZoneSizing.LatentHeatNoDOASDDNum = state.dataSize->CurOverallSimDay;
+            calcZoneSizing.CoolSizingType = "Cooling"; // string reported to eio
+            calcZoneSizing.HeatSizingType = "Heating"; // string reported to eio
         }
     } break;
     case DataGlobalConstants::CallIndicator::DuringDay: {
@@ -1988,6 +1990,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             auto &calcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
             auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
+            calcFinalZoneSizing.CoolSizingType = calcZoneSizing.CoolSizingType;
+            calcFinalZoneSizing.HeatSizingType = calcZoneSizing.HeatSizingType;
 
             // save the sequence values at the heating peak
             for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2991,6 +2995,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                     (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent &&
                      calcFinalZoneSizing.DesLatentCoolLoad > calcFinalZoneSizing.DesCoolLoad)) {
                     state.dataHeatBal->isAnyLatentLoad = true;
+                    calcFinalZoneSizing.CoolSizingType = "Latent Cooling"; // string reported to eio
                     calcFinalZoneSizing.DesCoolVolFlow = calcFinalZoneSizing.DesLatentCoolVolFlow;
                     calcFinalZoneSizing.DesCoolMassFlow = calcFinalZoneSizing.DesLatentCoolMassFlow;
                     calcFinalZoneSizing.DesCoolLoad = calcFinalZoneSizing.DesLatentCoolLoad;
@@ -3024,7 +3029,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         calcZoneSizing.CoolDDNum = calcZoneSizing.LatentCoolDDNum;
                         calcZoneSizing.TimeStepNumAtCoolMax = calcZoneSizing.TimeStepNumAtLatentCoolMax;
                         calcZoneSizing.CoolFlowSeq = calcZoneSizing.LatentCoolFlowSeq;
-                        // should use max here? sens DesCoolCoilInTemp = 24 C, DesLatentCoolCoilInTemp = 20 C
+                        // should use max here?
                         calcZoneSizing.DesCoolCoilInTemp = calcZoneSizing.DesLatentCoolCoilInTemp;
                         calcZoneSizing.DesCoolCoilInHumRat = calcZoneSizing.DesLatentCoolCoilInHumRat;
                         calcZoneSizing.ZoneRetTempAtCoolPeak = calcZoneSizing.ZoneRetTempAtLatentCoolPeak;
@@ -3044,6 +3049,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                     (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent &&
                      calcFinalZoneSizing.DesLatentHeatLoad > calcFinalZoneSizing.DesHeatLoad)) {
 
+                    calcFinalZoneSizing.HeatSizingType = "Latent Heating"; // string reported to eio
                     calcFinalZoneSizing.DesHeatVolFlow = calcFinalZoneSizing.DesLatentHeatVolFlow;
                     calcFinalZoneSizing.DesHeatMassFlow = calcFinalZoneSizing.DesLatentHeatMassFlow;
                     calcFinalZoneSizing.DesHeatLoad = calcFinalZoneSizing.DesLatentHeatLoad;
