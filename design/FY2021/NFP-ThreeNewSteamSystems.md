@@ -9,14 +9,14 @@ Implement steam features
 
 ## Justification for New Feature ##
 
-Steam heating for hot water loops is common in university campuses and cities like New York. Often, steam energy is transferred at the building to a hot water system via a heat exchanger. Currently users can make both steam and hot water systems, but cannot link them together. This forces modelers to use HW boilers/systems to approximate the steam systems, which isn’t accurate and reduces confidence in the energy model. The request for steam to water heat exchanger came from Bractlet. There have also been several upvotes on the new feature request from EnergyPlus Github. In addition, the current energyplus does not allow to use districtheating and LoadProfile:Plant in a steam loop.
+Steam heating for hot water loops is common in university campuses and cities like New York. Often, steam energy is transferred at the building to a hot water system via a heat exchanger. Currently, users can make both steam and hot water systems, but cannot link them together. This forces modelers to use HW boilers/systems to approximate the steam systems, which isn’t accurate and reduces confidence in the energy model. The request for a steam to water heat exchanger came from Bractlet. There have also been several upvotes on the new feature request from EnergyPlus Github. In addition, the current energyplus does not allow to use of districtheating and LoadProfile:Plant in a steam loop.
 
 ## E-mail and Conference Call Conclusions ##
 
 EnergyPlus Technicalities Call on 2/24/2021
-- We only have one phase steam plant fluid modeling. There is a lot of room for improvement and basic validation of current steam plant.
-- If we are going to add more complexity to remove assumptions, we need new ways to find those value; for example, how do we calculate the quality if we want to remove quality 0 & 1 assumption?
-- New systems could use current assumption for now. And if CoolProp is implemented, the steam systems can be renewed with enthalpy-based system.
+- We only have one phase of steam plant fluid modeling. There is a lot of room for improvement and basic validation of the current steam plant.
+- If we are going to add more complexity to remove assumptions, we need new ways to find those values; for example, how do we calculate the quality if we want to remove the quality 0 & 1 assumption?
+- New systems could use the current assumption for now. And if CoolProp is implemented, the steam systems can be renewed with an enthalpy-based system.
 
 EnergyPlus Iteration Call on 2/2/2022
 - Instead of a separate object (PlantLoadProfile:Steam), a few optional input fields for a steam loop should be added to the current object (PlantLoadProfile).
@@ -25,7 +25,7 @@ EnergyPlus Technicalities Call on 2/9/2022
 - Currently, there is "steam" as a resource type. This should be changed to DistrictHeatingSteam.
 - Current "DistrictHeating" should be "DistrictHeatingWater".
 - "DistrictHeatingWater" and "DistrictHeatingSteam" are better than "DistrictHeating:Water" and "DistrictHeating:Steam" because full meter names are a combination of resource type, end-use, etc. which are joined by colons so another colon would be confusing.
-- Keep these "DistrictHeatingWater" and "DistrictHeatingSteam" separate for output report since hot water and steam basically have difference source factors and emission factors.
+- Keep these "DistrictHeatingWater" and "DistrictHeatingSteam" separate for output report since hot water and steam basically have different source factors and emission factors.
 - SteamEquipment should go on the same meter as this (DistrictHeatingSteam)
 - As for Steam to Water Heat Exchanger, we stick with two explicit objects because it's better for user standpoint.
 
