@@ -5582,7 +5582,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     bool ZoneSupPlenumAirFlag = zone.IsSupplyPlenum;
 
     if (ControlledZoneAirFlag) { // If there is system flow then calculate the flow rates
-        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zone.ZoneEqNum);
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
         // Calculate moisture flow rate into each zone
         for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumInletNodes; ++NodeNum) {
             auto &inletNode = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum));
@@ -6244,7 +6244,7 @@ void CalcZoneSums(EnergyPlusData &state,
 
         // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
         if (ControlledZoneAirFlag) {
-            auto const &zec(state.dataZoneEquip->ZoneEquipConfig(zone.ZoneEqNum));
+            auto const &zec(state.dataZoneEquip->ZoneEquipConfig(ZoneNum));
             for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                 // Get node conditions, this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
                 //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
@@ -6481,7 +6481,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     // Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums
     // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
     if (zone.IsControlled) {
-        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zone.ZoneEqNum);
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
         for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumInletNodes; ++NodeNum) {
             // Get node conditions
             CalcZoneSensibleOutput(

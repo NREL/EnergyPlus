@@ -2469,8 +2469,8 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         if (ControlledZoneAirFlag) { // If there is system flow then calculate the flow rates
 
             // Calculate moisture flow rate into each zone
-            for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                auto &node = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum));
+            for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+                auto &node = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum));
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     CO2MassFlowRate += (node.MassFlowRate * node.CO2) / ZoneMult;
                 }
