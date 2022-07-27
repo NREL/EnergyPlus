@@ -297,10 +297,11 @@ namespace HVACVariableRefrigerantFlow {
         bool EMSOverrideHPOperatingMode;
         Real64 EMSValueForHPOperatingMode;
         int HPOperatingModeErrorIndex;
-        Real64 VRFHeatRec;       // Heat Recovery heat reclaim power (W)
+        Real64 VRFHeatRec;         // Heat Recovery heat reclaim power (W)
         Real64 VRFHeatEnergyRec;   // Heat Recovery heat reclain energy (J)
         int HeatCapFTErrorIndex;   // warning message index
         int CoolCapFTErrorIndex;   // warning message index
+        int HeatEIRFPLRErrorIndex; // warning message index
         int CoolEIRFPLRErrorIndex; // warning message index
                                    // The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
         int AlgorithmIUCtrl;       // VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
@@ -401,16 +402,16 @@ namespace HVACVariableRefrigerantFlow {
               CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), BasinHeaterPowerFTempDiff(0.0),
               BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), BasinHeaterSchedulePtr(0),
               EMSOverrideHPOperatingMode(false), EMSValueForHPOperatingMode(0.0), HPOperatingModeErrorIndex(0), VRFHeatRec(0.0),
-              VRFHeatEnergyRec(0.0), HeatCapFTErrorIndex(0), CoolCapFTErrorIndex(0), CoolEIRFPLRErrorIndex(0), AlgorithmIUCtrl(1),
-              CondensingTemp(44.0), CondTempFixed(0.0), CoffEvapCap(1.0), CompActSpeed(0.0), CompMaxDeltaP(0.0), C1Te(0.0), C2Te(0.0), C3Te(0.0),
-              C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), DiffOUTeTo(5), EffCompInverter(0.95), EvaporatingTemp(6.0), EvapTempFixed(0.0), HROUHexRatio(0.0),
-              IUEvaporatingTemp(6.0), IUCondensingTemp(44.0), IUEvapTempLow(4.0), IUEvapTempHigh(15.0), IUCondTempLow(42.0), IUCondTempHigh(46.0),
-              IUCondHeatRate(0.0), IUEvapHeatRate(0.0), Ncomp(0.0), NcompCooling(0.0), NcompHeating(0.0), OUEvapTempLow(-30.0), OUEvapTempHigh(20.0),
-              OUCondTempLow(30.0), OUCondTempHigh(96.0), OUAirFlowRate(0.0), OUAirFlowRatePerCapcity(0.0), OUCondHeatRate(0.0), OUEvapHeatRate(0.0),
-              OUFanPower(0.0), RatedEvapCapacity(40000.0), RatedHeatCapacity(0.0), RatedCompPower(14000.0), RatedCompPowerPerCapcity(0.35),
-              RatedOUFanPower(0.0), RatedOUFanPowerPerCapcity(0.0), RateBFOUEvap(0.45581), RateBFOUCond(0.21900), RefPipDiaSuc(0.0),
-              RefPipDiaDis(0.0), RefPipLen(0.0), RefPipEquLen(0.0), RefPipHei(0.0), RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0), SC(0.0), SCHE(0.0),
-              SHLow(0.0), SCLow(0.0), SHHigh(0.0), SCHigh(0.0), VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
+              VRFHeatEnergyRec(0.0), HeatCapFTErrorIndex(0), CoolCapFTErrorIndex(0), HeatEIRFPLRErrorIndex(0), CoolEIRFPLRErrorIndex(0),
+              AlgorithmIUCtrl(1), CondensingTemp(44.0), CondTempFixed(0.0), CoffEvapCap(1.0), CompActSpeed(0.0), CompMaxDeltaP(0.0), C1Te(0.0),
+              C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), DiffOUTeTo(5), EffCompInverter(0.95), EvaporatingTemp(6.0), EvapTempFixed(0.0),
+              HROUHexRatio(0.0), IUEvaporatingTemp(6.0), IUCondensingTemp(44.0), IUEvapTempLow(4.0), IUEvapTempHigh(15.0), IUCondTempLow(42.0),
+              IUCondTempHigh(46.0), IUCondHeatRate(0.0), IUEvapHeatRate(0.0), Ncomp(0.0), NcompCooling(0.0), NcompHeating(0.0), OUEvapTempLow(-30.0),
+              OUEvapTempHigh(20.0), OUCondTempLow(30.0), OUCondTempHigh(96.0), OUAirFlowRate(0.0), OUAirFlowRatePerCapcity(0.0), OUCondHeatRate(0.0),
+              OUEvapHeatRate(0.0), OUFanPower(0.0), RatedEvapCapacity(40000.0), RatedHeatCapacity(0.0), RatedCompPower(14000.0),
+              RatedCompPowerPerCapcity(0.35), RatedOUFanPower(0.0), RatedOUFanPowerPerCapcity(0.0), RateBFOUEvap(0.45581), RateBFOUCond(0.21900),
+              RefPipDiaSuc(0.0), RefPipDiaDis(0.0), RefPipLen(0.0), RefPipEquLen(0.0), RefPipHei(0.0), RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0),
+              SC(0.0), SCHE(0.0), SHLow(0.0), SCLow(0.0), SHHigh(0.0), SCHigh(0.0), VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
         {
         }
 
