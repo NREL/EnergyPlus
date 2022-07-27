@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -1416,6 +1417,7 @@ void AllocateIntGains(EnergyPlusData &state)
     state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
     state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
     state.dataHeatBal->no_ht_EMPD_or_HAMT.allocate(state.dataGlobal->NumOfZones);
+    state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
 }
 
 } // namespace EnergyPlus::DataHeatBalance
