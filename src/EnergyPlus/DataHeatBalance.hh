@@ -660,10 +660,40 @@ namespace DataHeatBalance {
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this zone
 
         // People Thermal Resilience Related
-        Real64 ColdStressTempThresh;
-        Real64 HeatStressTempThresh;
+        Real64 ColdStressTempThresh = 15.56;
+        Real64 HeatStressTempThresh = 30.0;
         Real64 PierceSET;
-        Real64 PMV;
+        Real64 PMV = 0.0;
+        Real64 ZonePierceSET;
+        Real64 ZonePierceSETLastStep;
+        Real64 ZoneHeatIndex = 0.0;
+        Real64 ZoneHumidex = 0.0;
+        Real64 ZoneNumOcc = 0.0;
+        bool CrossedColdThresh = false;
+        bool CrossedHeatThresh = false;
+
+        // Thermal resilience table related
+        std::array<Real64, 5> ZoneHeatIndexHourBins = {0.0};
+        std::array<Real64, 5> ZoneHeatIndexOccuHourBins = {0.0};
+        std::array<Real64, 5> ZoneHeatIndexOccupiedHourBins = {0.0};
+        std::array<Real64, 5> ZoneHumidexHourBins = {0.0};
+        std::array<Real64, 5> ZoneHumidexOccuHourBins = {0.0};
+        std::array<Real64, 5> ZoneHumidexOccupiedHourBins = {0.0};
+        std::array<Real64, 5> ZoneLowSETHours = {0.0};
+        std::array<Real64, 5> ZoneHighSETHours = {0.0};
+        std::array<Real64, 5> ZoneColdHourOfSafetyBins = {0.0};
+        std::array<Real64, 5> ZoneHeatHourOfSafetyBins = {0.0};
+        std::array<Real64, 6> ZoneUnmetDegreeHourBins = {0.0};
+        std::array<Real64, 4> ZoneDiscomfortWtExceedOccuHourBins = {0.0};
+        std::array<Real64, 4> ZoneDiscomfortWtExceedOccupiedHourBins = {0.0};
+
+        std::array<Real64, 3> ZoneCO2LevelHourBins = {0.0};
+        std::array<Real64, 3> ZoneCO2LevelOccuHourBins = {0.0};
+        std::array<Real64, 3> ZoneCO2LevelOccupiedHourBins = {0.0};
+
+        std::array<Real64, 4> ZoneLightingLevelHourBins = {0.0};
+        std::array<Real64, 4> ZoneLightingLevelOccuHourBins = {0.0};
+        std::array<Real64, 4> ZoneLightingLevelOccupiedHourBins = {0.0};
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature = 0.0;               // Measured zone air temperature input by user

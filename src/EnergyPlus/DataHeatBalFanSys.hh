@@ -253,23 +253,12 @@ struct HeatBalFanSysData : BaseGlobalStruct
     EPVector<DataHVACGlobals::ThermostatType> ComfortControlType;
     EPVector<int> ComfortControlTypeRpt;
 
-    Array1D<Real64> ZoneHeatIndex;
-    Array1D<Real64> ZoneHumidex;
-    Array1D<bool> CrossedColdThresh;
-    Array1D<bool> CrossedHeatThresh;
     Array2D<bool> CrossedColdThreshRepPeriod;
     Array2D<bool> CrossedHeatThreshRepPeriod;
-    Array1D<Real64> ZoneNumOcc;
 
-    Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
-    Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneHeatIndexOccupiedHourBins;
     Array2D<std::vector<Real64>> ZoneHeatIndexHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHeatIndexOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHeatIndexOccupiedHourBinsRepPeriod;
-    Array1D<std::vector<Real64>> ZoneHumidexHourBins;
-    Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneHumidexOccupiedHourBins;
     Array2D<std::vector<Real64>> ZoneHumidexHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHumidexOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHumidexOccupiedHourBinsRepPeriod;
@@ -277,33 +266,18 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array2D<Real64> highSETLongestHoursRepPeriod;
     Array2D<int> lowSETLongestStartRepPeriod;
     Array2D<int> highSETLongestStartRepPeriod;
-    Array1D<std::vector<Real64>> ZoneColdHourOfSafetyBins;
-    Array1D<std::vector<Real64>> ZoneHeatHourOfSafetyBins;
     Array2D<std::vector<Real64>> ZoneColdHourOfSafetyBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneHeatHourOfSafetyBinsRepPeriod;
-    Array1D<std::vector<Real64>> ZoneUnmetDegreeHourBins;
     Array2D<std::vector<Real64>> ZoneUnmetDegreeHourBinsRepPeriod;
-    Array1D<std::vector<Real64>> ZoneDiscomfortWtExceedOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneDiscomfortWtExceedOccupiedHourBins;
     Array2D<std::vector<Real64>> ZoneDiscomfortWtExceedOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod;
-    Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
-    Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneCO2LevelOccupiedHourBins;
     Array2D<std::vector<Real64>> ZoneCO2LevelHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneCO2LevelOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneCO2LevelOccupiedHourBinsRepPeriod;
-    Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
-    Array1D<std::vector<Real64>> ZoneLightingLevelOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneLightingLevelOccupiedHourBins;
     Array2D<std::vector<Real64>> ZoneLightingLevelHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneLightingLevelOccuHourBinsRepPeriod;
     Array2D<std::vector<Real64>> ZoneLightingLevelOccupiedHourBinsRepPeriod;
 
-    Array1D<Real64> ZonePierceSET;
-    Array1D<Real64> ZonePierceSETLastStep;
-    Array1D<std::vector<Real64>> ZoneLowSETHours;
-    Array1D<std::vector<Real64>> ZoneHighSETHours;
     Array2D<std::vector<Real64>> ZoneLowSETHoursRepPeriod;
     Array2D<std::vector<Real64>> ZoneHighSETHoursRepPeriod;
 
