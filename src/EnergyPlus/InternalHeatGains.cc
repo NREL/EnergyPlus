@@ -1290,8 +1290,7 @@ namespace InternalHeatGains {
                         }
                     }
                     if (thisLights.ZonePtr > 0) {
-                        thisLights.ZoneReturnNum =
-                            DataZoneEquipment::GetReturnNumForZone(state, state.dataHeatBal->Zone(zoneNum).Name, thisLights.RetNodeName);
+                        thisLights.ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(state, thisLights.ZonePtr, thisLights.RetNodeName);
                     }
 
                     if ((thisLights.ZoneReturnNum == 0) && (thisLights.FractionReturnAir > 0.0) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
@@ -1332,8 +1331,8 @@ namespace InternalHeatGains {
                                 ErrorsFound = true;
                             } else {
                                 if (thisLights.ZoneReturnNum > 0) {
-                                    state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(thisLights.ZonePtr).ZoneEqNum)
-                                        .ReturnNodeExhaustNodeNum(thisLights.ZoneReturnNum) = thisLights.ZoneExhaustNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(thisLights.ZonePtr).ReturnNodeExhaustNodeNum(thisLights.ZoneReturnNum) =
+                                        thisLights.ZoneExhaustNodeNum;
                                     CheckSharedExhaustFlag = true;
                                 } else {
                                     ShowSevereError(state,

@@ -5571,7 +5571,6 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     //       DATE WRITTEN   2000
     // REFERENCES: Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron for BLAST.
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CorrectZoneHumRat");
 
     Real64 MoistureMassFlowRate = 0.0;

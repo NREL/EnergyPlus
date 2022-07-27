@@ -2361,9 +2361,6 @@ void CorrectZoneContaminants(EnergyPlusData &state,
 
     static constexpr std::string_view RoutineName("CorrectZoneContaminants");
 
-    int ZoneEquipConfigNum;
-    int ZoneRetPlenumNum;
-    int ZoneSupPlenumNum;
     Real64 CO2Gain;             // Zone CO2 internal gain
     Real64 CO2GainExceptPeople; // Added for hybrid model, Zone CO2 internal gain
     Real64 GCGain;              // Zone generic contaminant internal gain
@@ -2451,21 +2448,18 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         int ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
 
         // Check to see if this is a controlled zone
-        bool ControlledZoneAirFlag = false;
-        for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-            if (!state.dataHeatBal->Zone(ZoneEquipConfigNum).IsControlled) continue;
-            if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
-            ControlledZoneAirFlag = true;
-            break;
-        }
+        const bool ControlledZoneAirFlag = state.dataHeatBal->Zone(ZoneNum).IsControlled;
+
         // Check to see if this is a plenum zone
         bool ZoneRetPlenumAirFlag = false;
+        int ZoneRetPlenumNum = 0;
         for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
             if (state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneRetPlenumAirFlag = true;
             break;
         }
         bool ZoneSupPlenumAirFlag = false;
+        int ZoneSupPlenumNum = 0;
         for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= state.dataZonePlenum->NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
             if (state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneSupPlenumAirFlag = true;
@@ -2616,7 +2610,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
                 InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
             }
             // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
-            int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+            const int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
             if (ZoneNodeNum > 0) {
                 state.dataLoopNodes->Node(ZoneNodeNum).CO2 = zoneAirCO2Temp;
             }
@@ -2681,7 +2675,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             state.dataContaminantBalance->ZoneAirGC(ZoneNum) = zoneAirGCTemp;
 
             // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
-            int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+            const int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
             if (ZoneNodeNum > 0) {
                 state.dataLoopNodes->Node(ZoneNodeNum).GenContam = zoneAirGCTemp;
             }

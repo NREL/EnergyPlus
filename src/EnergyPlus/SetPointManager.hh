@@ -336,7 +336,6 @@ namespace SetPointManager {
         int NumZones;            // number of zones whose humidity is being controlled
         int NumCtrlNodes;        // number of nodes whose humidity ratio is being set
         Array1D_int ZoneNodes;   // zone node numbers of zones being controlled
-        Array1D_int ZoneNum;     // actual zone number ( index into Zone array)
         Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
         Array1D_int CtrlNodes;   // nodes where humidity ratio is being set
         Real64 SetPt;            // the setpoint
@@ -355,7 +354,6 @@ namespace SetPointManager {
         int NumZones;            // number of zones whose humidity is being controlled
         int NumCtrlNodes;        // number of nodes whose humidity ratio is being set
         Array1D_int ZoneNodes;   // zone node numbers of zones being controlled
-        Array1D_int ZoneNum;     // actual zone number (index into Zone array)
         Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
         Array1D_int CtrlNodes;   // nodes where humidity ratio is being set
         Real64 SetPt;            // the setpoint

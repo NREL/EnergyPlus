@@ -105,7 +105,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -124,7 +123,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -1003,7 +1001,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -1019,7 +1016,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;

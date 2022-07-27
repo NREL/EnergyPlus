@@ -176,7 +176,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->ZoneIntGain.allocate(1);
     state->dataHeatBal->no_ht_EMPD_or_HAMT.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -241,7 +240,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 0; // No HT surface here.
@@ -678,7 +676,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneContaminants variable initialization
@@ -731,7 +728,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 0;
