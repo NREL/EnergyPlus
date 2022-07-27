@@ -13000,60 +13000,6 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
     }
 }
 
-void WriteResilienceBinsTableNonPreDef(EnergyPlusData &state,
-                                       int const columnNum,
-                                       const std::string tableName,
-                                       Array1D_string const &columnHead,
-                                       Array1D_int columnWidth,
-                                       Array1D<std::vector<Real64>> const &ZoneBins,
-                                       Array1D_string &rowHead,
-                                       Array2D_string &tableBody,
-                                       Real64 const unitConvMultiplier)
-{
-    WriteSubtitle(state, tableName);
-
-    std::vector<Real64> columnMax(columnNum, 0);
-    std::vector<Real64> columnMin(columnNum, 0);
-    std::vector<Real64> columnSum(columnNum, 0);
-
-    for (int j = 0; j < columnNum; j++) {
-        columnMin.at(j) = ZoneBins(1).at(j) * unitConvMultiplier;
-    }
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ZoneNum++) {
-        rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
-        std::string ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
-        for (int j = 0; j < columnNum; j++) {
-            Real64 curValue = ZoneBins(ZoneNum).at(j) * unitConvMultiplier;
-            if (curValue > columnMax.at(j)) columnMax.at(j) = curValue;
-            if (curValue < columnMin.at(j)) columnMin.at(j) = curValue;
-            columnSum.at(j) += curValue;
-            tableBody(j + 1, ZoneNum) = RealToStr(curValue, 2);
-        }
-    }
-
-    rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
-    rowHead(state.dataGlobal->NumOfZones + 2) = "Max";
-    rowHead(state.dataGlobal->NumOfZones + 3) = "Average";
-    rowHead(state.dataGlobal->NumOfZones + 4) = "Sum";
-
-    for (int j = 0; j < columnNum; j++) {
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 1) = RealToStr(columnMin.at(j), 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 2) = RealToStr(columnMax.at(j), 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 3) = RealToStr(columnSum.at(j) / state.dataGlobal->NumOfZones, 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 4) = RealToStr(columnSum.at(j), 2);
-    }
-
-    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-    if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
-    }
-    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
-    }
-}
-
 template <typename T>
 void WriteResilienceBinsTableNonPreDefUseZoneData(EnergyPlusData &state,
                                                   int const columnNum,
@@ -13225,64 +13171,6 @@ void WriteSETHoursTableNonPreDefUseZoneData(EnergyPlusData &state,
     }
 }
 
-void WriteSETHoursTableNonPreDef(EnergyPlusData &state,
-                                 int const columnNum,
-                                 const std::string tableName,
-                                 Array1D_string const &columnHead,
-                                 Array1D_int columnWidth,
-                                 Array1D<std::vector<Real64>> const &ZoneBins,
-                                 Array1D_string &rowHead,
-                                 Array2D_string &tableBody,
-                                 Real64 const unitConvMultiplier)
-{
-
-    WriteSubtitle(state, tableName);
-
-    std::vector<Real64> columnMax(columnNum - 1, 0);
-    std::vector<Real64> columnMin(columnNum - 1, 0);
-    std::vector<Real64> columnSum(columnNum - 1, 0);
-    std::vector<Real64> multiplier(columnNum - 1, unitConvMultiplier);
-    multiplier[columnNum - 2] = 1.0;
-
-    for (int j = 0; j < columnNum - 1; j++) {
-        columnMin.at(j) = ZoneBins(1).at(j) * multiplier.at(j);
-    }
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ZoneNum++) {
-        std::string ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
-        rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
-        for (int j = 0; j < columnNum - 1; j++) {
-            Real64 curValue = ZoneBins(ZoneNum).at(j) * multiplier.at(j);
-            if (curValue > columnMax.at(j)) columnMax.at(j) = curValue;
-            if (curValue < columnMin.at(j)) columnMin.at(j) = curValue;
-            columnSum.at(j) += curValue;
-            tableBody(j + 1, ZoneNum) = RealToStr(curValue, 2);
-        }
-        tableBody(columnNum, ZoneNum) = DateToString(ZoneBins(ZoneNum)[columnNum - 1]);
-    }
-
-    rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
-    rowHead(state.dataGlobal->NumOfZones + 2) = "Max";
-    rowHead(state.dataGlobal->NumOfZones + 3) = "Average";
-
-    for (int j = 0; j < columnNum - 1; j++) {
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 1) = RealToStr(columnMin.at(j), 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 2) = RealToStr(columnMax.at(j), 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 3) = RealToStr(columnSum.at(j) / state.dataGlobal->NumOfZones, 2);
-    }
-    tableBody(columnNum, state.dataGlobal->NumOfZones + 1) = "-";
-    tableBody(columnNum, state.dataGlobal->NumOfZones + 2) = "-";
-    tableBody(columnNum, state.dataGlobal->NumOfZones + 3) = "-";
-
-    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-    if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
-    }
-    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
-    }
-}
 
 void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                        int const columnNum,
@@ -13414,69 +13302,6 @@ void WriteHourOfSafetyTableNonPreDefUseZoneData(EnergyPlusData &state,
     }
 }
 
-void WriteHourOfSafetyTableNonPreDef(EnergyPlusData &state,
-                                     int const columnNum,
-                                     const std::string tableName,
-                                     Array1D_string const &columnHead,
-                                     Array1D_int columnWidth,
-                                     Array1D<std::vector<Real64>> const &ZoneBins,
-                                     Array1D_string &rowHead,
-                                     Array2D_string &tableBody,
-                                     int const dateColIdx)
-{
-
-    WriteSubtitle(state, tableName);
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
-        for (int j = 1; j <= columnNum; j++) {
-            tableBody(j, ZoneNum) = RealToStr(ZoneBins(ZoneNum).at(j - 1), 2);
-        }
-        tableBody(dateColIdx, ZoneNum) = DateToString(ZoneBins(ZoneNum).at(dateColIdx - 1));
-    }
-
-    std::vector<Real64> columnMax(columnNum, 0);
-    std::vector<Real64> columnMin(columnNum, 0);
-    std::vector<Real64> columnSum(columnNum, 0);
-
-    for (int j = 0; j < columnNum; j++) {
-        columnMin.at(j) = ZoneBins(1).at(j);
-    }
-    for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
-        std::string ZoneName = state.dataHeatBal->Zone(i).Name;
-        for (int j = 0; j < columnNum; j++) {
-            Real64 curValue = ZoneBins(i).at(j);
-            if (curValue > columnMax.at(j)) columnMax.at(j) = curValue;
-            if (curValue < columnMin.at(j)) columnMin.at(j) = curValue;
-            columnSum.at(j) += curValue;
-        }
-    }
-
-    rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
-    rowHead(state.dataGlobal->NumOfZones + 2) = "Max";
-    rowHead(state.dataGlobal->NumOfZones + 3) = "Average";
-    rowHead(state.dataGlobal->NumOfZones + 4) = "Sum";
-
-    for (int j = 0; j < columnNum; j++) {
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 1) = RealToStr(columnMin.at(j), 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 2) = RealToStr(columnMax.at(j), 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 3) = RealToStr(columnSum.at(j) / state.dataGlobal->NumOfZones, 2);
-        tableBody(j + 1, state.dataGlobal->NumOfZones + 4) = RealToStr(columnSum.at(j), 2);
-    }
-
-    for (int i = 1; i < 5; i++) {
-        tableBody(dateColIdx, state.dataGlobal->NumOfZones + i) = "-";
-    }
-
-    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-    if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
-    }
-    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-            tableBody, rowHead, columnHead, "AnnualThermalResilienceSummary", "Entire Facility", tableName);
-    }
-}
 
 void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
                                            int const columnNum,
