@@ -13690,9 +13690,11 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         std::array<Real64, 5> DataHeatBalance::ZoneData::*ptrHumidexOccuHour = &DataHeatBalance::ZoneData::ZoneHumidexOccuHourBins;
         std::array<Real64, 5> DataHeatBalance::ZoneData::*ptrHumidexOccupiedHour = &DataHeatBalance::ZoneData::ZoneHumidexOccupiedHourBins;
         tableName = "Humidex Hours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidex, rowHead, tableBody);
+        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
+            state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidex, rowHead, tableBody);
         tableName = "Humidex OccupantHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidexOccuHour, rowHead, tableBody);
+        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
+            state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidexOccuHour, rowHead, tableBody);
         tableName = "Humidex OccupiedHours";
         WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
             state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidexOccupiedHour, rowHead, tableBody);
@@ -13749,86 +13751,86 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
                 state, columnNum, tableName, columnHeadStr, columnWidth, ptrHighSETHours, rowHeadSET, tableBodySET, degreeHourConversion);
         }
 
-            columnNum = 5;
+        columnNum = 5;
 
-            std::array<Real64, 5> DataHeatBalance::ZoneData::*ptrColdHourOfSafetyBins = &DataHeatBalance::ZoneData::ZoneColdHourOfSafetyBins;
-            std::array<Real64, 5> DataHeatBalance::ZoneData::*ptrHeatHourOfSafetyBins = &DataHeatBalance::ZoneData::ZoneHeatHourOfSafetyBins;
-            tableName = "Hours of Safety for Cold Events";
-            columnHeadStr(1) = "Hours of Safety [hr]";
-            columnHeadStr(2) = "End Time of the Safety Duration";
-            columnHeadStr(3) = "Safe Temperature Exceedance Hours [hr]";
-            columnHeadStr(4) = "Safe Temperature Exceedance OccupantHours [hr]";
-            columnHeadStr(5) = "Safe Temperature Exceedance OccupiedHours [hr]";
-            WriteHourOfSafetyTableNonPreDefUseZoneData(
-                state, columnNum, tableName, columnHeadStr, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, 2);
-            tableName = "Hours of Safety for Heat Events";
-            WriteHourOfSafetyTableNonPreDefUseZoneData(
-                state, columnNum, tableName, columnHeadStr, columnWidth, ptrHeatHourOfSafetyBins, rowHead, tableBody, 2);
+        std::array<Real64, 5> DataHeatBalance::ZoneData::*ptrColdHourOfSafetyBins = &DataHeatBalance::ZoneData::ZoneColdHourOfSafetyBins;
+        std::array<Real64, 5> DataHeatBalance::ZoneData::*ptrHeatHourOfSafetyBins = &DataHeatBalance::ZoneData::ZoneHeatHourOfSafetyBins;
+        tableName = "Hours of Safety for Cold Events";
+        columnHeadStr(1) = "Hours of Safety [hr]";
+        columnHeadStr(2) = "End Time of the Safety Duration";
+        columnHeadStr(3) = "Safe Temperature Exceedance Hours [hr]";
+        columnHeadStr(4) = "Safe Temperature Exceedance OccupantHours [hr]";
+        columnHeadStr(5) = "Safe Temperature Exceedance OccupiedHours [hr]";
+        WriteHourOfSafetyTableNonPreDefUseZoneData(
+            state, columnNum, tableName, columnHeadStr, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, 2);
+        tableName = "Hours of Safety for Heat Events";
+        WriteHourOfSafetyTableNonPreDefUseZoneData(
+            state, columnNum, tableName, columnHeadStr, columnWidth, ptrHeatHourOfSafetyBins, rowHead, tableBody, 2);
 
-                int columnNumUnmetDegHr = 6;
-                Array1D_int columnWidthUnmetDegHr;
-                columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
-                columnWidthUnmetDegHr = 10;
-                Array1D_string columnHeadUnmetDegHr;
-                columnHeadUnmetDegHr.allocate(columnNumUnmetDegHr);
-                Array2D_string tableBodyUnmetDegHr;
-                tableBodyUnmetDegHr.allocate(columnNumUnmetDegHr, state.dataGlobal->NumOfZones + 4);
-                tableName = "Unmet Degree-Hours";
-                columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
-                columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
-                columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]";
-                columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours [°C·hr]";
-                columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
-                columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+        int columnNumUnmetDegHr = 6;
+        Array1D_int columnWidthUnmetDegHr;
+        columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
+        columnWidthUnmetDegHr = 10;
+        Array1D_string columnHeadUnmetDegHr;
+        columnHeadUnmetDegHr.allocate(columnNumUnmetDegHr);
+        Array2D_string tableBodyUnmetDegHr;
+        tableBodyUnmetDegHr.allocate(columnNumUnmetDegHr, state.dataGlobal->NumOfZones + 4);
+        tableName = "Unmet Degree-Hours";
+        columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+        columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
 
-                if (unitsStyle_cur == UnitsStyle::InchPound) {
-                    int indexUnitConv;
-                    std::string curUnits;
-                    for (int i = 1; i < columnNumUnmetDegHr; i++) {
-                        LookupSItoIP(state, columnHeadUnmetDegHr(i), indexUnitConv, curUnits);
-                        columnHeadUnmetDegHr(i) = curUnits;
-                    }
-                }
-
-                std::array<Real64, 6> DataHeatBalance::ZoneData::*ptrUnmetDegreeHourBins = &DataHeatBalance::ZoneData::ZoneUnmetDegreeHourBins;
-                WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 6>>(state,
-                                                                                    columnNumUnmetDegHr,
-                                                                                    tableName,
-                                                                                    columnHeadUnmetDegHr,
-                                                                                    columnWidthUnmetDegHr,
-                                                                                    ptrUnmetDegreeHourBins,
-                                                                                    rowHead,
-                                                                                    tableBodyUnmetDegHr,
-                                                                                    degreeHourConversion);
-
-                columnNum = 4;
-                columnHeadStr.allocate(columnNum);
-                columnWidth.allocate(columnNum);
-                columnWidth = 10;
-                tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
-                columnHeadStr(1) = "Very-cold Exceedance OccupantHours [hr]";
-                columnHeadStr(2) = "Cool Exceedance OccupantHours [hr]";
-                columnHeadStr(3) = "Warm Exceedance OccupantHours [hr]";
-                columnHeadStr(4) = "Very-hot Exceedance OccupantHours [hr]";
-
-                std::array<Real64, 4> DataHeatBalance::ZoneData::*ptrDiscomfortWtExceedOccuHourBins =
-                    &DataHeatBalance::ZoneData::ZoneDiscomfortWtExceedOccuHourBins;
-                std::array<Real64, 4> DataHeatBalance::ZoneData::*ptrDiscomfortWtExceedOccupiedHourBins =
-                    &DataHeatBalance::ZoneData::ZoneDiscomfortWtExceedOccupiedHourBins;
-                tableName = "Discomfort-weighted Exceedance OccupantHours";
-                WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 4>>(
-                    state, columnNum, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccuHourBins, rowHead, tableBody);
-                tableName = "Discomfort-weighted Exceedance OccupiedHours";
-                WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 4>>(
-                    state, columnNum, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccupiedHourBins, rowHead, tableBody);
-                rowHead.deallocate();
-                columnHeadStr.deallocate();
-                tableBody.deallocate();
-                tableBodyUnmetDegHr.deallocate();
-                columnWidth.deallocate();
-                columnHeadUnmetDegHr.deallocate();
-                columnWidthUnmetDegHr.deallocate();
+        if (unitsStyle_cur == UnitsStyle::InchPound) {
+            int indexUnitConv;
+            std::string curUnits;
+            for (int i = 1; i < columnNumUnmetDegHr; i++) {
+                LookupSItoIP(state, columnHeadUnmetDegHr(i), indexUnitConv, curUnits);
+                columnHeadUnmetDegHr(i) = curUnits;
+            }
         }
+
+        std::array<Real64, 6> DataHeatBalance::ZoneData::*ptrUnmetDegreeHourBins = &DataHeatBalance::ZoneData::ZoneUnmetDegreeHourBins;
+        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 6>>(state,
+                                                                            columnNumUnmetDegHr,
+                                                                            tableName,
+                                                                            columnHeadUnmetDegHr,
+                                                                            columnWidthUnmetDegHr,
+                                                                            ptrUnmetDegreeHourBins,
+                                                                            rowHead,
+                                                                            tableBodyUnmetDegHr,
+                                                                            degreeHourConversion);
+
+        columnNum = 4;
+        columnHeadStr.allocate(columnNum);
+        columnWidth.allocate(columnNum);
+        columnWidth = 10;
+        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
+        columnHeadStr(1) = "Very-cold Exceedance OccupantHours [hr]";
+        columnHeadStr(2) = "Cool Exceedance OccupantHours [hr]";
+        columnHeadStr(3) = "Warm Exceedance OccupantHours [hr]";
+        columnHeadStr(4) = "Very-hot Exceedance OccupantHours [hr]";
+
+        std::array<Real64, 4> DataHeatBalance::ZoneData::*ptrDiscomfortWtExceedOccuHourBins =
+            &DataHeatBalance::ZoneData::ZoneDiscomfortWtExceedOccuHourBins;
+        std::array<Real64, 4> DataHeatBalance::ZoneData::*ptrDiscomfortWtExceedOccupiedHourBins =
+            &DataHeatBalance::ZoneData::ZoneDiscomfortWtExceedOccupiedHourBins;
+        tableName = "Discomfort-weighted Exceedance OccupantHours";
+        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 4>>(
+            state, columnNum, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccuHourBins, rowHead, tableBody);
+        tableName = "Discomfort-weighted Exceedance OccupiedHours";
+        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 4>>(
+            state, columnNum, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccupiedHourBins, rowHead, tableBody);
+        rowHead.deallocate();
+        columnHeadStr.deallocate();
+        tableBody.deallocate();
+        tableBodyUnmetDegHr.deallocate();
+        columnWidth.deallocate();
+        columnHeadUnmetDegHr.deallocate();
+        columnWidthUnmetDegHr.deallocate();
+    }
 }
 
 void WriteCO2ResilienceTables(EnergyPlusData &state)

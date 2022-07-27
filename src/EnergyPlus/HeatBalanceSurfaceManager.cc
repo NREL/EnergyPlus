@@ -5531,7 +5531,6 @@ void ReportThermalResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->highSETLongestHoursRepPeriod = 0.0;
             state.dataHeatBalFanSys->lowSETLongestStartRepPeriod = 0.0;
             state.dataHeatBalFanSys->highSETLongestStartRepPeriod = 0.0;
-
         }
         state.dataHeatBalSurfMgr->lowSETLongestHours.assign(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalSurfMgr->highSETLongestHours.assign(state.dataGlobal->NumOfZones, 0.0);
@@ -5557,7 +5556,7 @@ void ReportThermalResilience(EnergyPlusData &state)
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
             state.dataHeatBal->Zone(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                           GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+                                                          GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
             state.dataHeatBal->Zone(ZoneNum).ZonePierceSETLastStep = state.dataHeatBal->Zone(ZoneNum).ZonePierceSET;
             if (state.dataHeatBal->People(iPeople).Pierce) {
                 state.dataHeatBal->Zone(ZoneNum).ZonePierceSET = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
@@ -6085,7 +6084,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
             state.dataHeatBal->Zone(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                           GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+                                                          GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
 
         Array1D_bool reportPeriodFlags;
@@ -6176,7 +6175,7 @@ void ReportVisualResilience(EnergyPlusData &state)
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
             state.dataHeatBal->Zone(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                           GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+                                                          GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
         // Accumulate across daylighting controls first
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
