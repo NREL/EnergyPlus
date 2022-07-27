@@ -4737,7 +4737,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // are currently set to zero when the CTF only version is used.
 
         // if no surface in the zone uses EMPD or HAMT then zero
-        if (state.dataHeatBal->no_ht_EMPD_or_HAMT(ZoneNum)) {
+        if (state.dataHeatBal->Zone(ZoneNum).noEMPDorHAMT) {
             state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
             state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
         }
@@ -5634,7 +5634,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // operating and system shutdown.
     // SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
     // are currently set to zero to remind us where they need to be in the future
-    if (state.dataHeatBal->no_ht_EMPD_or_HAMT(ZoneNum)) {
+    if (state.dataHeatBal->Zone(ZoneNum).noEMPDorHAMT) {
         state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
         state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
     }

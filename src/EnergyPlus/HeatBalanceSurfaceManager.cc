@@ -550,13 +550,15 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) {
         DisplayString(state, "Completed Initializing Surface Heat Balance");
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            for (int SurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                 ++SurfNum) {
-                if ((state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) ||
-                    (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT)) {
-                    state.dataHeatBal->no_ht_EMPD_or_HAMT(zoneNum) = false;
-                    break;
+        if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                for (int SurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+                     ++SurfNum) {
+                    if ((state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) ||
+                        (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT)) {
+                        state.dataHeatBal->Zone(zoneNum).noEMPDorHAMT = false;
+                        break;
+                    }
                 }
             }
         }

@@ -690,6 +690,7 @@ namespace DataHeatBalance {
         bool anySurfacesWithSpace = false;    // True if any surfaces in a zone have a space assigned in input
         EPVector<int> spaceIndexes;           // Indexes to spaces in this zone
         int numSpaces = 0;                    // Number of spaces in this zone
+        bool noEMPDorHAMT = false;            // True if surface heat balance uses EMPD or HAMT
 
         // Default Constructor
         ZoneData() : Centroid(0.0, 0.0, 0.0)
@@ -2166,7 +2167,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
     Array1D<bool> EnclSolAbsFirstCalc;   // for error message
     Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
-    Array1D<bool> no_ht_EMPD_or_HAMT;    // True if surface heat balance uses EMPD or HAMT
 
     bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
 

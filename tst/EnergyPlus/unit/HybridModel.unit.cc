@@ -177,7 +177,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
-    state->dataHeatBal->no_ht_EMPD_or_HAMT.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneHumRat variable initialization
