@@ -5751,19 +5751,19 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
     // METHODOLOGY EMPLOYED:
     // This routine assumes that the direction is to a shorter timestep.
     // The down step ratio, DSRatio = OldTimeStep/ NewTimeStep
-    //  is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
+    // is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
 
     // first construct data on timestamps for interpolating with later
-    Real64 oldTime0 = 0.0;
-    Real64 oldTime1 = oldTime0 - OldTimeStep;
+    Real64 const oldTime0 = 0.0;
+    Real64 const oldTime1 = oldTime0 - OldTimeStep;
 
-    Real64 newTime0 = 0.0;
-    Real64 newTime1 = newTime0 - NewTimeStep;
-    Real64 newTime2 = newTime1 - NewTimeStep;
-    Real64 newTime3 = newTime2 - NewTimeStep;
-    Real64 newTime4 = newTime3 - NewTimeStep;
+    Real64 const newTime0 = 0.0;
+    Real64 const newTime1 = newTime0 - NewTimeStep;
+    Real64 const newTime2 = newTime1 - NewTimeStep;
+    Real64 const newTime3 = newTime2 - NewTimeStep;
+    Real64 const newTime4 = newTime3 - NewTimeStep;
 
-    Real64 DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
+    Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
 
     newVal0 = oldVal0;
 
@@ -5782,7 +5782,7 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
         // last point lie between oldVal1 and oldVal2
         newVal4 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime4) / (OldTimeStep));
 
-    } else if (DSRatio > 3.99) { // DSRatio = 4 or more
+    } else { // DSRatio = 4 or more
         // all new points lie between oldVal0 and oldVal1
         newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
         newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
