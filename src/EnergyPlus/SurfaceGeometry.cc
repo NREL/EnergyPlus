@@ -12246,7 +12246,9 @@ namespace SurfaceGeometry {
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 // don't touch if already user-specified
                 if (thisSpace.Volume > 0.0) continue;
-                if (thisZone.FloorArea > 0.0) {
+                if (thisZone.numSpaces == 1) {
+                    thisSpace.Volume = thisZone.Volume;
+                }else if (thisZone.FloorArea > 0.0) {
                     thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.FloorArea;
                 }
             }
