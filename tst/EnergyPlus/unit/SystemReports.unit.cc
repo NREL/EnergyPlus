@@ -224,7 +224,6 @@ TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
 
     // Set up controlled zone equipment with just enough info for the ventilation report test
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneDesignSpecOAIndex = 1;
     state->dataHeatBal->Zone(1).Volume = 10.0;
     state->dataZoneEquip->ZoneEquipConfig(1).EquipListIndex = 1;

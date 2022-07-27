@@ -98,12 +98,10 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     state->dataDualDuct->dd_airterminal(1).CtrlZoneNum = 1;
     state->dataDualDuct->dd_airterminal(1).OARequirementsPtr = 1;
     state->dataDualDuct->dd_airterminal(1).NoOAFlowInputFromUser = false;
-    state->dataDualDuct->dd_airterminal(1).ActualZoneNum = 1;
     state->dataDualDuct->dd_airterminal(1).AirLoopNum = 1;
     state->dataDualDuct->dd_airterminal(2).CtrlZoneNum = 1;
     state->dataDualDuct->dd_airterminal(2).NoOAFlowInputFromUser = false;
     state->dataDualDuct->dd_airterminal(2).OARequirementsPtr = 1;
-    state->dataDualDuct->dd_airterminal(2).ActualZoneNum = 1;
     state->dataDualDuct->dd_airterminal(2).AirLoopNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);

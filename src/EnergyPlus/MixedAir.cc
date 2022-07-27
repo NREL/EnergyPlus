@@ -2362,9 +2362,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
             AirLoopFound = false;
             OASysFound = false;
             for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum !=
-                    state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum)
-                    continue;
+                if (ControlledZoneNum != state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum) continue;
                 //           Find the controlled zone number for the specified humidistat location
                 state.dataMixedAir->OAController(OutAirNum).NodeNumofHumidistatZone =
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -4147,7 +4145,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                         // Get schedule value for the zone air distribution effectiveness
                         ZoneEz = GetCurrentScheduleValue(state, ADEffSchPtr);
                     } else {
-                        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneEquipConfig.ActualZoneNum).TotalOutputRequired;
+                        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
 
                         // Zone in cooling mode
                         if (ZoneLoad < 0.0) ZoneEz = this->ZoneADEffCooling(ZoneIndex);

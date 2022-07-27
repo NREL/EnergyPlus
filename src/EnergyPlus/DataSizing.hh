@@ -305,7 +305,7 @@ namespace DataSizing {
         // 3=supply cold ventilation air
         Real64 DOASLowSetpoint;         // Dedicated Outside Air Low Setpoint for Design [C]
         Real64 DOASHighSetpoint;        // Dedicated Outside Air High Setpoint for Design [C]
-        int ActualZoneNum;              // index into the Zone data array (in DataHeatBalance)
+        int ZoneNum;                    // index into the Zone data array (in DataHeatBalance)
         Real64 DesHeatMassFlow;         // zone design heating air mass flow rate [kg/s]
         Real64 DesHeatMassFlowNoOA;     // zone design heating air mass flow rate without applying MinOA as a limit [kg/s]
         Real64 DesHeatOAFlowFrac;       // zone design heating OA air volume fraction [-]
@@ -447,7 +447,7 @@ namespace DataSizing {
               DesOAFlowPerArea(0.0), CoolAirDesMethod(0), InpDesCoolAirFlow(0.0), DesCoolMinAirFlowPerArea(0.0), DesCoolMinAirFlow(0.0),
               DesCoolMinAirFlowFrac(0.0), HeatAirDesMethod(0), InpDesHeatAirFlow(0.0), DesHeatMaxAirFlowPerArea(0.0), DesHeatMaxAirFlow(0.0),
               DesHeatMaxAirFlowFrac(0.0), HeatSizingFactor(0.0), CoolSizingFactor(0.0), AccountForDOAS(false), DOASControlStrategy(0),
-              DOASLowSetpoint(0.0), DOASHighSetpoint(0.0), ActualZoneNum(0), DesHeatMassFlow(0.0), DesHeatMassFlowNoOA(0.0), DesHeatOAFlowFrac(0.0),
+              DOASLowSetpoint(0.0), DOASHighSetpoint(0.0), ZoneNum(0), DesHeatMassFlow(0.0), DesHeatMassFlowNoOA(0.0), DesHeatOAFlowFrac(0.0),
               EMSOverrideDesHeatMassOn(false), EMSValueDesHeatMassFlow(0.0), DesCoolMassFlow(0.0), DesCoolMassFlowNoOA(0.0), DesCoolOAFlowFrac(0.0),
               EMSOverrideDesCoolMassOn(false), EMSValueDesCoolMassFlow(0.0), DesHeatLoad(0.0), NonAirSysDesHeatLoad(0.0),
               EMSOverrideDesHeatLoadOn(false), EMSValueDesHeatLoad(0.0), DesCoolLoad(0.0), NonAirSysDesCoolLoad(0.0), EMSOverrideDesCoolLoadOn(false),
@@ -838,6 +838,10 @@ namespace DataSizing {
 
         Real64 SysCoolCoinSpaceSens; // sum of zone space sensible cooling loads at coincident peak
         Real64 SysHeatCoinSpaceSens; //  sum of zone space sensible heating loads at coincident peak
+        Real64 SysDesCoolLoad;       // system peak load with coincident
+        int SysCoolLoadTimeStepPk;   // timestep in day of cooling load peak
+        Real64 SysDesHeatLoad;       // system peak load with coincident
+        int SysHeatLoadTimeStepPk;   // timestep in day of cooling load peak
         // Default Constructor
         SystemSizingData()
             : LoadSizeType(0), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0), SysAirMinFlowRat(0.0),
@@ -851,17 +855,16 @@ namespace DataSizing {
               EMSOverrideDesCoolVolFlowOn(false), EMSValueDesCoolVolFlow(0.0), SensCoolCap(0.0), TotCoolCap(0.0), HeatCap(0.0), PreheatCap(0.0),
               MixTempAtCoolPeak(0.0), MixHumRatAtCoolPeak(0.0), RetTempAtCoolPeak(0.0), RetHumRatAtCoolPeak(0.0), OutTempAtCoolPeak(0.0),
               OutHumRatAtCoolPeak(0.0), MassFlowAtCoolPeak(0.0), HeatMixTemp(0.0), HeatMixHumRat(0.0), HeatRetTemp(0.0), HeatRetHumRat(0.0),
-              HeatOutTemp(0.0), HeatOutHumRat(0.0), DesCoolVolFlowMin(0.0), SystemOAMethod(SystemOAMethod::Invalid), MaxZoneOAFraction(0.0),
-              SysUncOA(0.0), OAAutoSized(false), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), CoolingCapMethod(0), HeatingCapMethod(0),
-              ScaledCoolingCapacity(0.0), ScaledHeatingCapacity(0.0), FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0),
-              FlowPerFloorAreaCooled(0.0), FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0),
-              FractionOfAutosizedHeatingAirflow(1.0), FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0),
-              FractionOfAutosizedCoolingCapacity(1.0), FractionOfAutosizedHeatingCapacity(1.0), CoolingTotalCapacity(0.0), HeatingTotalCapacity(0.0),
-              CoolingPeakLoadType(0), // wfb
-              CoolCapControl(0),      // wfb
-              sysSizeHeatingDominant(false), sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0),
+              HeatOutTemp(0.0), HeatOutHumRat(0.0), DesCoolVolFlowMin(0.0), SystemOAMethod(SystemOAMethod::Invalid), MaxZoneOAFraction(0.0), SysUncOA(0.0),
+              OAAutoSized(false), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), CoolingCapMethod(0), HeatingCapMethod(0), ScaledCoolingCapacity(0.0),
+              ScaledHeatingCapacity(0.0), FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0), FlowPerFloorAreaCooled(0.0),
+              FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0),
+              FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0), FractionOfAutosizedCoolingCapacity(1.0),
+              FractionOfAutosizedHeatingCapacity(1.0), CoolingTotalCapacity(0.0), HeatingTotalCapacity(0.0), CoolingPeakLoadType(0), // wfb
+              CoolCapControl(0), sysSizeHeatingDominant(false), sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0),
               DesCoolCoilVolFlow(0.0), DesHeatCoilVolFlow(0.0), DesMainCoilVolFlow(0.0), SysHeatCoilTimeStepPk(0), SysHeatAirTimeStepPk(0),
-              HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0), SysHeatCoinSpaceSens(0.0)
+              HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0), SysHeatCoinSpaceSens(0.0), SysDesCoolLoad(0.0), SysCoolLoadTimeStepPk(0),
+              SysDesHeatLoad(0.0), SysHeatLoadTimeStepPk(0)
         {
         }
     };
@@ -1105,6 +1108,7 @@ struct SizingData : BaseGlobalStruct
     bool ZoneHeatingOnlyFan = false;                 // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
     bool ZoneSizingRunDone = false;                  // True if a zone sizing run has been successfully completed.
     bool DataErrorsFound = false;                    // used for simulation termination when errors are found
+    bool DataDXCoolsLowSpeedsAutozize = false;       // true allows reporting lower speed CoilCoolingCurveFits Autosize
     Real64 AutoVsHardSizingThreshold = 0.1;          // criteria threshold used to determine if user hard size and autosize disagree 10%
     Real64 AutoVsHardSizingDeltaTempThreshold = 1.5; // temperature criteria threshold for autosize versus hard size [C]
     Real64 DataCoilSizingAirInTemp = 0.0;            // saves sizing data for use in coil object reporting
@@ -1285,6 +1289,7 @@ struct SizingData : BaseGlobalStruct
         this->ZoneHeatingOnlyFan = false;
         this->ZoneSizingRunDone = false;
         this->DataErrorsFound = false;
+        this->DataDXCoolsLowSpeedsAutozize = false;
         this->AutoVsHardSizingThreshold = 0.1;
         this->AutoVsHardSizingDeltaTempThreshold = 1.5;
         this->DataCoilSizingAirInTemp = 0.0;
