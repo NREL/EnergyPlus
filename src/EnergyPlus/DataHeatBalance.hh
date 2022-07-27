@@ -570,7 +570,6 @@ namespace DataHeatBalance {
         bool IsControlled = false;                      // True when this is a controlled zone.
         bool IsSupplyPlenum = false;                    // True when this zone is a supply plenum
         bool IsReturnPlenum = false;                    // True when this zone is a return plenum
-        int ZoneEqNum = 0;                              // Controlled zone equip config number
         int PlenumCondNum = 0;                          // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex = 0;                // this is the index number for TempControlledZone structure for lookup
         // Pointers to Surface Data Structure
@@ -1951,6 +1950,8 @@ namespace DataHeatBalance {
     );
 
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
+
+    void AllocateIntGains(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
 

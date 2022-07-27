@@ -6397,10 +6397,9 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
 
             // air loop name
             std::string airLoopName = "";
-            int ctrlZoneNum = Zone(iZone).ZoneEqNum;
-            if (ctrlZoneNum > 0) {
-                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
-                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+            if (Zone(iZone).IsControlled) {
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(iZone).NumInletNodes; ++zoneInNode) {
+                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(iZone).InletNodeAirLoopNum(zoneInNode);
                     if (airLoopNumber > 0) {
                         if (airLoopName.empty()) {
                             airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
