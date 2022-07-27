@@ -690,6 +690,8 @@ namespace DataHeatBalance {
         Real64 delta_HumRat = 0.0;                          // Indoor and outdoor humidity ratio delta
 
         Real64 ZeroSourceSumHATsurf = 0.0; // From Chilled Ceiling Panel, equal to the SumHATsurf for all the walls in a zone with no source
+        bool zoneOAQuadratureSum = false;  // True when zone OA balance method is Quadrature
+        int zoneOABalanceIndex = 0;        // Index to ZoneAirBalance for this zone, if any
 
         // Spaces
         bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
@@ -1050,8 +1052,6 @@ namespace DataHeatBalance {
         Real64 ShelterFactor = 0.0;         // "s" shelter factor
         bool EMSOverrideOn = false;         // if true then EMS is requesting to override
         Real64 EMSAirFlowRateValue = 0.0;   // value EMS is setting for air flow rate
-        bool QuadratureSum = false;         // If quadrature sum of zone air balance method is used
-        int OABalancePtr = 0;               // A pointer to ZoneAirBalance If quadrature is true
         Real64 VolumeFlowRate = 0.0;        // infiltration air volume flow rate
         Real64 MassFlowRate = 0.0;          // infiltration air mass flow rate
         Real64 MCpI_temp = 0.0;             // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
@@ -1109,8 +1109,6 @@ namespace DataHeatBalance {
         HybridCtrlType HybridControlType = HybridCtrlType::Indiv; // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
         int HybridControlMasterNum = 0;                           // Hybrid ventilation control master object number
         bool HybridControlMasterStatus = false;                   // Hybrid ventilation control master object opening status
-        bool QuadratureSum = false;                               // If quadrature sum of zone air balance method is used
-        int OABalancePtr = 0;                                     // A pointer to ZoneAirBalance
         // WindandStackOpenArea
         Real64 OpenArea = 0.0;    // Opening area [m2]
         int OpenAreaSchedPtr = 0; // Opening area fraction schedule pointer

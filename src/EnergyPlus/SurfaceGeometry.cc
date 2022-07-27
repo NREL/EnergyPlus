@@ -12248,7 +12248,7 @@ namespace SurfaceGeometry {
                 if (thisSpace.Volume > 0.0) continue;
                 if (thisZone.numSpaces == 1) {
                     thisSpace.Volume = thisZone.Volume;
-                }else if (thisZone.FloorArea > 0.0) {
+                } else if (thisZone.FloorArea > 0.0) {
                     thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.FloorArea;
                 }
             }
