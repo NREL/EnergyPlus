@@ -9048,7 +9048,6 @@ namespace SurfaceGeometry {
         Real64 SurfWorldAz;
         Real64 SurfTilt;
         Real64 Perimeter; // Perimeter length of the surface
-        int Vrt;          // Used for calculating perimeter
         Real64 Xb;        // Intermediate calculation
         Real64 Yb;        // Intermediate calculation
         int ZoneNum;
@@ -9170,121 +9169,58 @@ namespace SurfaceGeometry {
         }
 
         if (NSides > 2) {
-            DistanceCheck = distance(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides),
-                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1));
-            if (DistanceCheck < 0.01) {
-                if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + "Distance between two vertices < .01, possibly coincident. for Surface=" +
-                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
-                                         ", in Zone=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName);
-                    ShowContinueError(
-                        state,
-                        format("Vertex [{}", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides) +
-                            format("]=({:.2R},{:.2R},{:.2R})",
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides).x,
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides).y,
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides).z));
-                    ShowContinueError(state,
-                                      format("Vertex [{}", 1) +
-                                          format("]=({:.2R},{:.2R},{:.2R}",
-                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1).x,
-                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1).y,
-                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1).z) +
-                                          ')');
-                }
-                ++state.dataErrTracking->TotalCoincidentVertices;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides > 3) {
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, format("Dropping Vertex [{}].", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
+            auto &surface = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+            auto &vertices = surface.Vertex;
+            auto &nSides = surface.Sides;
+
+            bool poppedVertex = true;
+            while (poppedVertex) {
+                poppedVertex = false;
+                Perimeter = 0.0;
+
+                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+                    auto itnext = std::next(it);
+                    if (itnext == std::end(vertices)) {
+                        itnext = std::begin(vertices);
                     }
-                    --state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.redimension(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
-                } else {
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(
-                            state,
-                            format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a degenerate surface.",
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
-                    }
-                    ++state.dataErrTracking->TotalDegenerateSurfaces;
-                    // mark degenerate surface?
-                }
-                DistanceCheck = 0.0;
-            }
-            Perimeter = DistanceCheck;
-            //      DO Vrt=2,SurfaceTmp(SurfNum)%Sides
-            Vrt = 2;
-            while (true) {
-                DistanceCheck = distance(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt),
-                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1));
-                if (DistanceCheck < 0.01) {
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + "Distance between two vertices < .01, possibly coincident. for Surface=" +
-                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
-                                             ", in Zone=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName);
-                        ShowContinueError(state,
-                                          format("Vertex [{}", Vrt) + format("]=({:.2R},{:.2R},{:.2R})",
-                                                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).x,
-                                                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).y,
-                                                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).z));
-                        ShowContinueError(state,
-                                          format("Vertex [{}]=({:.2R},", Vrt - 1, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1).x) +
-                                              format("{:.2R},{:.2R})",
-                                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1).y,
-                                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1).z));
-                    }
-                    ++state.dataErrTracking->TotalCoincidentVertices;
-                    if (Vrt == state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides) {
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides > 3) {
+
+                    // TODO: use isAlmostEqual3Pt for consistency? (which uses 0.0127 m / 1/2inch instead of 0.01 m)
+                    DistanceCheck = distance(*it, *itnext);
+                    if (DistanceCheck < 0.01) {
+                        int curVertexIndex = std::distance(vertices.begin(), it) + 1;
+                        int nextVertexIndex = std::distance(vertices.begin(), itnext) + 1;
+                        if (state.dataGlobal->DisplayExtraWarnings) {
+                            ShowWarningError(state,
+                                             format("{}Distance between two vertices < .01, possibly coincident. for Surface={}, in Zone={}",
+                                                    RoutineName,
+                                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+                            ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", curVertexIndex, it->x, it->y, it->z));
+                            ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", nextVertexIndex, itnext->x, itnext->y, it->z));
+                        }
+                        ++state.dataErrTracking->TotalCoincidentVertices;
+                        if (nSides > 3) {
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowContinueError(state, format("Dropping Vertex [{}].", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
+                                ShowContinueError(state, format("Dropping Vertex [{}].", nextVertexIndex));
                             }
-                            --state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
-                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.redimension(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
+                            --nSides;
+                            vertices.erase(itnext);
+                            poppedVertex = true;
+                            break;
                         } else {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowContinueError(
                                     state,
                                     format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a degenerate surface.",
-                                           state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
+                                           curVertexIndex));
                             }
                             ++state.dataErrTracking->TotalDegenerateSurfaces;
                             // mark degenerate surface?
                         }
-                        DistanceCheck = 0.0;
                     } else {
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides > 3) {
-                            if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowContinueError(state, format("Dropping Vertex [{}].", Vrt));
-                            }
-                            for (n = Vrt; n <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides - 1; ++n) {
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x =
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n + 1).x;
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y =
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n + 1).y;
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).z =
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n + 1).z;
-                            }
-                            --state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
-                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.redimension(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
-                        } else {
-                            if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowContinueError(
-                                    state,
-                                    format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a degenerate surface.",
-                                           state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
-                            }
-                            ++state.dataErrTracking->TotalDegenerateSurfaces;
-                            // mark degenerate surface?
-                        }
-                        DistanceCheck = 0.0;
+                        Perimeter += DistanceCheck;
                     }
                 }
-                Perimeter += DistanceCheck;
-                ++Vrt;
-                if (Vrt > state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides) break;
             }
 
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = Perimeter;
