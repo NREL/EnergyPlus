@@ -337,17 +337,6 @@ namespace DataSurfaces {
     constexpr int IntBlindConditionallyOff(60);
     constexpr int ExtBlindConditionallyOff(70);
 
-    // WindowShadingControl Shading Types
-    constexpr int WSC_ST_NoShade(0);
-    constexpr int WSC_ST_InteriorShade(1);
-    constexpr int WSC_ST_SwitchableGlazing(2);
-    constexpr int WSC_ST_ExteriorShade(3);
-    constexpr int WSC_ST_InteriorBlind(4);
-    constexpr int WSC_ST_ExteriorBlind(5);
-    constexpr int WSC_ST_BetweenGlassShade(6);
-    constexpr int WSC_ST_BetweenGlassBlind(7);
-    constexpr int WSC_ST_ExteriorScreen(8);
-
     // WindowShadingControl Control Types
     constexpr int WSCT_AlwaysOn(1);                       // AlwaysOn
     constexpr int WSCT_AlwaysOff(2);                      // AlwaysOff
