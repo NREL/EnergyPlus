@@ -176,8 +176,6 @@ namespace ZoneTempPredictorCorrector {
                                        Real64 &oldVal0,
                                        Real64 &oldVal1,
                                        Real64 &oldVal2,
-                                       Real64 &oldVal3,
-                                       Real64 &oldVal4,
                                        Real64 &newVal0,
                                        Real64 &newVal1,
                                        Real64 &newVal2,

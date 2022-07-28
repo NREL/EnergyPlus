@@ -228,7 +228,6 @@ protected:
 
         auto &thisZoneEqConfig(state->dataZoneEquip->ZoneEquipConfig(zoneNum));
         thisZoneEqConfig.IsControlled = true;
-        thisZoneEqConfig.ActualZoneNum = 1;
         thisZoneEqConfig.ZoneName = "ZONE1";
         thisZoneEqConfig.EquipListName = "ZONE1EQUIPMENT";
         thisZoneEqConfig.ZoneNode = zoneNode;
