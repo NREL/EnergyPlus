@@ -4200,12 +4200,12 @@ void ReportVentilationLoads(EnergyPlusData &state)
             case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir:
             case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir:
             case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
-                int OutAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerOANode();
+                int OutAirNode = thisZoneEquipList.compPointer[thisEquipIndex]->getMixerOANode();
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-                int ZoneInletAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getAirOutletNode();
+                int ZoneInletAirNode = thisZoneEquipList.compPointer[thisEquipIndex]->getAirOutletNode();
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerMixNode();
-                int ReturnAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerRetNode();
+                int MixedAirNode = thisZoneEquipList.compPointer[thisEquipIndex]->getMixerMixNode();
+                int ReturnAirNode = thisZoneEquipList.compPointer[thisEquipIndex]->getMixerRetNode();
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
