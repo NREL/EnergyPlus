@@ -337,29 +337,6 @@ namespace DataSurfaces {
     constexpr int IntBlindConditionallyOff(60);
     constexpr int ExtBlindConditionallyOff(70);
 
-    // WindowShadingControl Control Types
-    constexpr int WSCT_AlwaysOn(1);                       // AlwaysOn
-    constexpr int WSCT_AlwaysOff(2);                      // AlwaysOff
-    constexpr int WSCT_OnIfScheduled(3);                  // OnIfScheduleAllows
-    constexpr int WSCT_HiSolar(4);                        // OnIfHighSolarOnWindow
-    constexpr int WSCT_HiHorzSolar(5);                    // OnIfHighHorizontalSolar
-    constexpr int WSCT_HiOutAirTemp(6);                   // OnIfHighOutsideAirTemp
-    constexpr int WSCT_HiZoneAirTemp(7);                  // OnIfHighZoneAirTemp
-    constexpr int WSCT_HiZoneCooling(8);                  // OnIfHighZoneCooling
-    constexpr int WSCT_HiGlare(9);                        // OnIfHighGlare
-    constexpr int WSCT_MeetDaylIlumSetp(10);              // MeetDaylightIlluminanceSetpoint
-    constexpr int WSCT_OnNightLoOutTemp_OffDay(11);       // OnNightIfLowOutsideTemp/OffDay
-    constexpr int WSCT_OnNightLoInTemp_OffDay(12);        // OnNightIfLowInsideTemp/OffDay
-    constexpr int WSCT_OnNightIfHeating_OffDay(13);       // OnNightIfHeating/OffDay
-    constexpr int WSCT_OnNightLoOutTemp_OnDayCooling(14); // OnNightIfLowOutsideTemp/OnDayIfCooling
-    constexpr int WSCT_OnNightIfHeating_OnDayCooling(15); // OnNightIfHeating/OnDayIfCooling
-    constexpr int WSCT_OffNight_OnDay_HiSolarWindow(16);  // OffNight/OnDayIfCoolingAndHighSolarOnWindow
-    constexpr int WSCT_OnNight_OnDay_HiSolarWindow(17);   // OnNight/OnDayIfCoolingAndHighSolarOnWindow
-    constexpr int WSCT_OnHiOutTemp_HiSolarWindow(18);     // OnIfHighOutsideAirTempAndHighSolarOnWindow
-    constexpr int WSCT_OnHiOutTemp_HiHorzSolar(19);       // OnIfHighOutsideAirTempAndHighHorizontalSolar
-    constexpr int WSCT_OnHiZoneTemp_HiSolarWindow(20);    // OnIfHighZoneAirTempAndHighSolarOnWindow
-    constexpr int WSCT_OnHiZoneTemp_HiHorzSolar(21);      // OnIfHighZoneAirTempAndHighHorizontalSolar
-
     // WindowShadingControl Slat Angle Control for Blinds
     constexpr int WSC_SAC_FixedSlatAngle(1);
     constexpr int WSC_SAC_ScheduledSlatAngle(2);
