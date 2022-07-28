@@ -279,6 +279,8 @@ namespace SimulationManager {
         CheckIfAnyIdealCondEntSetPoint(state);
         createFacilityElectricPowerServiceObject(state);
         createCoilSelectionReportObj(state);
+        // read object information early in simulation
+        state.dataInputProcessing->inputProcessor->getSimInputObjects(state);
 
         ManageBranchInput(state); // just gets input and returns.
 
