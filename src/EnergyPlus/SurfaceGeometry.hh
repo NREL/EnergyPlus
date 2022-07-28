@@ -298,6 +298,11 @@ namespace SurfaceGeometry {
         EdgeOfSurf() : start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
         {
         }
+
+        bool operator==(const EdgeOfSurf &other) const;
+        bool operator!=(const EdgeOfSurf &other) const;
+        bool containsPoints(const Vector &vertex) const;
+        double length() const;
     };
 
     bool isEnclosedVolume(DataVectorTypes::Polyhedron const &zonePoly, std::vector<EdgeOfSurf> &edgeNot2);
