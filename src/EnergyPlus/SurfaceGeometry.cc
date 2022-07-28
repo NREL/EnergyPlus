@@ -12749,6 +12749,28 @@ namespace SurfaceGeometry {
         return false;
     }
 
+    bool EdgeOfSurf::operator==(const EdgeOfSurf &other) const
+    {
+        return ((isAlmostEqual3dPt(this->start, other.start) && isAlmostEqual3dPt(this->end, other.end)) ||
+                (isAlmostEqual3dPt(this->start, other.end) && isAlmostEqual3dPt(this->end, other.start)));
+    }
+
+    bool EdgeOfSurf::operator!=(const EdgeOfSurf &other) const
+    {
+        return !(*this == other);
+    }
+
+    bool EdgeOfSurf::containsPoints(const Vector &vertex) const
+    {
+        return (!isAlmostEqual3dPt(this->start, vertex) && !isAlmostEqual3dPt(this->end, vertex) &&
+                isPointOnLineBetweenPoints(this->start, this->end, vertex));
+    }
+
+    double EdgeOfSurf::length() const
+    {
+        return distance(this->start, this->end);
+    }
+
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound)
     {
 
