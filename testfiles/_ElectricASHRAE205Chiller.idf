@@ -1445,24 +1445,20 @@
 
   Chiller:Electric:ASHRAE205,
     A205Chiller Trane CGWD 207kW/3.99COP/None,  !- Name
-    A205ExampleChiller.json,                    !- Representation File Name
-    ,                        !- Zone Name
+    A205ExampleChiller.RS0001.a205.cbor,  !- Representation File Name
     ,                        !- Reference Capacity
     1.0,                     !- Sizing Factor
+    Zone,                    !- Ambient Temperature Indicator
+    ,                        !- Ambient Temperature Schedule Name
+    North Zone,              !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
     Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
     Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+    0.0755,                  !- Chilled Water Maximum Requested Flow Rate
     Big Chiller Condenser Inlet Node,           !- Condenser Inlet Node Name
     Big Chiller Condenser Outlet Node,          !- Condenser Outlet Node Name
-    NotModulated,            !- Chiller Flow Mode Type
-    0.0755,                  !- Chilled Water Maximum Requested Flow Rate
     0.0957,                  !- Condenser Maximum Requested Flow Rate
-    ,                        !- Oil Cooler Inlet Node Name
-    ,                        !- Oil Cooler Outlet Node Name
-    ,                        !- Auxiliary Inlet Node Name
-    ,                        !- Auxiliary Outlet Node Name
-    ,                        !- Heat Recovery Inlet Node Name
-    ,                        !- Heat Recovery Outlet Node Name
-    ;                        !- End Use Subcategory
+    NotModulated;            !- Chiller Flow Mode Type
 
   Chiller:ConstantCOP,
     Little Chiller,          !- Name
