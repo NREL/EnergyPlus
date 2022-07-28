@@ -929,13 +929,6 @@ namespace EnergyPlus::ChillerElectricASHRAE205 {
         int BranchNum = this->CWPlantLoc.branchNum;
         int CompNum = this->CWPlantLoc.compNum;
 
-#if 0 // Performance curves not used
-        // Set performance curve outputs to 0.0 when chiller is off
-        this->ChillerCapFT = 0.0;
-        this->ChillerEIRFT = 0.0;
-        this->ChillerEIRFPLR = 0.0;
-#endif
-
         // Set module-level chiller evaporator and condenser inlet temperature variables
         // using prior time step's temperature
         Real64 condInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
@@ -983,7 +976,6 @@ namespace EnergyPlus::ChillerElectricASHRAE205 {
 #endif // 0
 
         // Set mass flow rates
-
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             this->CondMassFlowRate = this->CondMassFlowRateMax;
             PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
@@ -1161,6 +1153,28 @@ namespace EnergyPlus::ChillerElectricASHRAE205 {
         } else {
             ShowSevereError(state, "ControlReformEIRChillerModel: Condenser flow = 0, for ElecReformEIRChiller=" + this->Name);
             ShowContinueErrorTimeStamp(state, "");
+        }
+
+        // Oil cooler and Auxiliary Heat delta-T calculations
+        if (this->OilCoolerInletNode) {
+            auto oilCoolerDeltaTemp{0.0};
+            PlantUtilities::SetComponentFlowRate(state, this->OilCoolerMassFlowRate, this->OilCoolerInletNode, this->OilCoolerOutletNode, this->OCPlantLoc);
+            if (this->OilCoolerMassFlowRate != 0.0) {
+                oilCoolerDeltaTemp = lookupVariablesCooling.oil_cooler_heat / this->OilCoolerMassFlowRate / Cp;
+            } else {
+                oilCoolerDeltaTemp = 0.0;
+            }
+            state.dataLoopNodes->Node(this->OilCoolerOutletNode).Temp = state.dataLoopNodes->Node(this->OilCoolerInletNode).Temp - oilCoolerDeltaTemp;
+        }
+        if (this->AuxiliaryHeatInletNode) {
+            auto auxiliaryDeltaTemp{0.0};
+            PlantUtilities::SetComponentFlowRate(state, this->AuxiliaryMassFlowRate, this->AuxiliaryHeatInletNode, this->AuxiliaryHeatOutletNode, this->AHPlantLoc);
+            if (this->AuxiliaryMassFlowRate != 0.0) {
+                auxiliaryDeltaTemp = lookupVariablesCooling.auxiliary_heat / this->AuxiliaryMassFlowRate / Cp;
+            } else {
+                auxiliaryDeltaTemp = 0.0;
+            }
+            state.dataLoopNodes->Node(this->AuxiliaryHeatOutletNode).Temp = state.dataLoopNodes->Node(this->AuxiliaryHeatInletNode).Temp - auxiliaryDeltaTemp;
         }
     }
 

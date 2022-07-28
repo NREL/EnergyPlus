@@ -90,11 +90,13 @@ namespace EnergyPlus {
             int     OilCoolerOutletNode{0};
             Real64  OilCoolerVolFlowRate{0};
             Real64  OilCoolerMassFlowRate{0};
+            Real64  OilCoolerOutletTemp{0};
             PlantLocation OCPlantLoc{0,DataPlant::LoopSideLocation::Invalid,0,0};
             int     AuxiliaryHeatInletNode{0};
             int     AuxiliaryHeatOutletNode{0};
             Real64  AuxiliaryVolFlowRate{0};
             Real64  AuxiliaryMassFlowRate{0};
+            Real64  AuxiliaryOutletTemp{0};
             PlantLocation AHPlantLoc{0,DataPlant::LoopSideLocation::Invalid,0,0};
             Real64  QOilHeater{0};
             Real64  QAuxiliary{0};
