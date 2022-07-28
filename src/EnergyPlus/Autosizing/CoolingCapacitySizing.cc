@@ -288,7 +288,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                                           this->motInPower,
                                                           this->fanCompModel);
                             FanCoolLoad = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
-                            this->dataFanEnumType = this->dataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
+                            this->dataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
                         } else if (thisAirloopDOAS.m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
                             state.dataHVACFan->fanObjs[thisAirloopDOAS.m_FanIndex]->FanInputsForDesignHeatGain(
                                 state, this->deltaP, this->motEff, this->totEff, this->motInAirFrac);
