@@ -684,6 +684,7 @@ add_simulation_test(IDF_FILE _DemandVentilationReductionRatioAndHighPriority.idf
 add_simulation_test(IDF_FILE _DemandVentilationReductionRatioAndLowPriority.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE _DualDuctConstVolDamperMultizoneAverageSetPointManager.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE _ElectricREformulatedEIRChiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE _ElectricASHRAE205Chiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE _FanCoilHybridVentAFN.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE _FollowSysNodeTemp.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE _FuelCellTest200.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
