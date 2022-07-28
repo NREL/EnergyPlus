@@ -1177,8 +1177,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         if (EIRFPLRModFac < 0.0) {
             if (vrf.HeatEIRFPLRErrorIndex == 0) {
                 ShowSevereMessage(state, fmt::format("{} \"{}\":", std::string(cVRFTypes(VRF_HeatPump)), vrf.Name));
-                ShowContinueError(state, fmt::format(" Heating EIR Modifier curve (function of PLR) output is negative ({:.3T}).", EIRFPLRModFac));
-                ShowContinueError(state, fmt::format(" Negative value occurs using a heating Part Load Ratio (PLR) of {:.2T}.", HeatingPLR));
+                ShowContinueError(state, format(" Heating EIR Modifier curve (function of PLR) output is negative ({:.3T}).", EIRFPLRModFac));
+                ShowContinueError(state, format(" Negative value occurs using a heating Part Load Ratio (PLR) of {:.2T}.", HeatingPLR));
                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
             }
             ShowRecurringWarningErrorAtEnd(
