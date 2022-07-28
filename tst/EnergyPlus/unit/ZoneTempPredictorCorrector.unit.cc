@@ -105,7 +105,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -124,7 +123,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -155,8 +153,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->EAMFLxHumRat.allocate(1);
     state->dataHeatBalFanSys->CTMFL.allocate(1);
 
-    state->dataHeatBalFanSys->SumHmARaW.allocate(1);
-    state->dataHeatBalFanSys->SumHmARa.allocate(1);
+    state->dataHeatBalFanSys->SumHmARaW.dimension(1, 0.0);
+    state->dataHeatBalFanSys->SumHmARa.dimension(1, 0.0);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
     state->dataHeatBalFanSys->MDotOA.allocate(1);
@@ -1002,7 +1000,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -1018,7 +1015,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
@@ -1778,7 +1774,6 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
     Real64 HistoryValue1 = 1.0;
     Real64 HistoryValue2 = 2.0;
     Real64 HistoryValue3 = 3.0;
-    Real64 HistoryValue4 = 4.0;
     Real64 DSHistoryValue1 = 0.0;
     Real64 DSHistoryValue2 = 0.0;
     Real64 DSHistoryValue3 = 0.0;
@@ -1790,8 +1785,6 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
                                   HistoryValue1,
                                   HistoryValue2,
                                   HistoryValue3,
-                                  HistoryValue4,
-                                  HistoryValue4,
                                   myVarValue,
                                   DSHistoryValue1,
                                   DSHistoryValue2,
