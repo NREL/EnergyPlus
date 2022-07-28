@@ -95,11 +95,11 @@ namespace ZoneEquipmentManager {
 
     void SimZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration, bool &SimAir);
 
-    void SetZoneEquipSimOrder(EnergyPlusData &state, int ControlledZoneNum, int ActualZoneNum);
+    void SetZoneEquipSimOrder(EnergyPlusData &state, int ControlledZoneNum);
 
     void InitSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration, bool ResetSimOrder = false);
 
-    void DistributeSystemOutputRequired(EnergyPlusData &state, int ActualZoneNum, bool FirstHVACIteration);
+    void DistributeSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration);
 
     void UpdateSystemOutputRequired(EnergyPlusData &state,
                                     int ZoneNum,

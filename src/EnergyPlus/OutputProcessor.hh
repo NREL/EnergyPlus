@@ -166,7 +166,7 @@ namespace OutputProcessor {
         return "Impossible day"; // even though the above switch block will *always* either return a string or assert, compilers still warn...
     }
 
-    static constexpr std::array<std::string_view, 16> endUseCategoryNames = {"HEATING",
+    static constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
                                                                              "COOLING",
                                                                              "INTERIORLIGHTS",
                                                                              "EXTERIORLIGHTS",
@@ -179,9 +179,7 @@ namespace OutputProcessor {
                                                                              "HEATRECOVERY",
                                                                              "WATERSYSTEMS",
                                                                              "REFRIGERATION",
-                                                                             "COGENERATION",
-                                                                             "LATENT HEATING",
-                                                                             "LATENT COOLING"};
+                                                                             "COGENERATION"};
 
     constexpr int RVarAllocInc(1000);
     constexpr int LVarAllocInc(1000);

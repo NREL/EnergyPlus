@@ -2148,17 +2148,11 @@ namespace OutputProcessor {
             } else if (endUseMeter == "HEATING" || endUseMeter == "HTG") {
                 EndUse = "Heating";
 
-            } else if (endUseMeter == "LATENT HEATING") {
-                EndUse = "Latent Heating";
-
             } else if (endUseMeter == "HEATPRODUCED") {
                 EndUse = "HeatProduced";
 
             } else if (endUseMeter == "COOLING" || endUseMeter == "CLG") {
                 EndUse = "Cooling";
-
-            } else if (endUseMeter == "LATENT COOLING") {
-                EndUse = "Latent Cooling";
 
             } else if (endUseMeter == "DOMESTICHOTWATER" || endUseMeter == "DHW" || endUseMeter == "DOMESTIC HOT WATER") {
                 EndUse = "WaterSystems";
