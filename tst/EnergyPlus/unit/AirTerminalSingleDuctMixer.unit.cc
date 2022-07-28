@@ -7832,9 +7832,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     QUnitOut = 0.0;
     QLatOut = 0.0;
 
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
     EXPECT_EQ(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail, 0.0); // check init value
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     SecondaryAirMassFlowRate = state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check results in heating mode operation
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -7876,9 +7876,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     QZnReq = zoneSysEnergyDemand.RemainingOutputRequired;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
     EXPECT_EQ(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRateMinAvail, 0.0); // check init value
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     SecondaryAirMassFlowRate = state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check results in cooling mode operation
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -8267,8 +8267,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     QZnReq = zoneSysEnergyDemand.RemainingOutputRequired;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // check results when the fan coil unit is not available
     EXPECT_NEAR(0.0, QUnitOut, 0.1); // fan coil unit is off
     EXPECT_NEAR(thisFanCoil.PLR, 0.0, 0.00001);
@@ -8294,8 +8294,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
         state->dataHVACGlobal->ZoneCompTurnFansOn = true;
         state->dataHVACGlobal->ZoneCompTurnFansOff = false;
     }
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 3.0);
     EXPECT_NEAR(thisFanCoil.PLR, 0.187, 0.001);
     EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate,

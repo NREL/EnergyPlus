@@ -83,8 +83,7 @@ namespace BaseboardElectric {
     const char *cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:Convective:Electric";
     constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
 
-    void SimElectricBaseboard(
-        EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
+    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -137,7 +136,7 @@ namespace BaseboardElectric {
 
         InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
         // Simulate baseboard
         SimElectricConvective(state, BaseboardNum, QZnReq);

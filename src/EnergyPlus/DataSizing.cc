@@ -284,6 +284,8 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataSysScalableFlowSizingON = false;
     state.dataSize->DataSysScalableCapSizingON = false;
     state.dataSize->DataDesAccountForFanHeat = true;
+    state.dataSize->DataDXCoolsLowSpeedsAutozize = false;
+
     state.dataSize->DataDesInletWaterTemp = 0.0;
     state.dataSize->DataDesInletAirHumRat = 0.0;
     state.dataSize->DataDesInletAirTemp = 0.0;
