@@ -125,7 +125,6 @@ protected:
         state->dataZoneEquip->NumOfZoneEquipLists = 1;
         state->dataHeatBal->Zone(1).IsControlled = true;
         state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-        state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "EAST ZONE";
         state->dataZoneEquip->ZoneEquipConfig(1).EquipListName = "ZONE2EQUIPMENT";
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
@@ -133,8 +132,7 @@ protected:
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 21;
         state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
-        state->dataHeatBal->Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
-            state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
+        state->dataHeatBal->Zone(1).SystemZoneNodeNumber = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONE2EQUIPMENT";
         int maxEquipCount = 1;
@@ -11070,7 +11068,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                            // expect no errors

@@ -166,7 +166,6 @@ namespace SteamBaseboardRadiator {
 
     void SimSteamBaseboard(EnergyPlusData &state,
                            std::string const &EquipName,
-                           int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
                            Real64 &PowerMet,
@@ -174,7 +173,7 @@ namespace SteamBaseboardRadiator {
 
     void GetSteamBaseboardInput(EnergyPlusData &state);
 
-    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

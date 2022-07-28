@@ -2585,13 +2585,8 @@ namespace RoomAirModelManager {
                                         state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
 
                     // set zone equip pointer in the UCSDUI data structure
-                    for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == state.dataRoomAirModelMgr->Loop) {
-                            state.dataRoomAirMod->ZoneUCSDUI(state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirModelMgr->Loop)).ZoneEquipPtr =
-                                ZoneEquipConfigNum;
-                            break;
-                        }
-                    } // ZoneEquipConfigNum
+                    state.dataRoomAirMod->ZoneUCSDUI(state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirModelMgr->Loop)).ZoneEquipPtr =
+                        state.dataRoomAirModelMgr->Loop;
                 }
                 for (state.dataRoomAirModelMgr->Loop = 1; state.dataRoomAirModelMgr->Loop <= state.dataGlobal->NumOfZones;
                      ++state.dataRoomAirModelMgr->Loop) {
@@ -2676,13 +2671,8 @@ namespace RoomAirModelManager {
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(state.dataRoomAirModelMgr->Loop).Name);
                     // set zone equip pointer in the UCSDUE data structure
-                    for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == state.dataRoomAirModelMgr->Loop) {
-                            state.dataRoomAirMod->ZoneUCSDUE(state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirModelMgr->Loop)).ZoneEquipPtr =
-                                ZoneEquipConfigNum;
-                            break;
-                        }
-                    } // ZoneEquipConfigNum
+                    state.dataRoomAirMod->ZoneUCSDUE(state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirModelMgr->Loop)).ZoneEquipPtr =
+                        state.dataRoomAirModelMgr->Loop;
                 }
             }
 
@@ -3176,8 +3166,8 @@ namespace RoomAirModelManager {
                                                                                                             // ConstantVolume : FourPipeInduction
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan) { // AirTerminal : SingleDuct : VAV :
-                                                                                                                 // Reheat : VariableSpeedFan
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan) { // AirTerminal : SingleDuct : VAV
+                                                                                                                 // : Reheat : VariableSpeedFan
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat) { // AirTerminal : SingleDuct : VAV :

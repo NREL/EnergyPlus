@@ -6099,39 +6099,33 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode =
                                             state.dataZoneEquip->ZoneEquipConfig(state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum).ZoneNode;
-                                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum !=
+                                        int ControlledZoneNum = state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum;
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
                                                 state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                 continue;
-                                            for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
-                                                    state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
-                                                    continue;
-                                                state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
-                                                    TUIndex;
-                                                AirNodeFound = true;
-                                                ctrlZoneNum = ControlledZoneNum;
-                                                goto EquipList_exit;
-                                            }
-                                            for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones;
-                                                 ++TstatZoneNum) {
-                                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
-                                                    state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
-                                                    continue;
-                                                state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
-                                                    TUIndex;
-                                                AirNodeFound = true;
-                                                ctrlZoneNum = ControlledZoneNum;
-                                                goto EquipList_exit;
-                                            }
-                                            if (!AirNodeFound && state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
-                                                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                                ShowContinueError(state,
-                                                                  "Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
-                                                // ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " +
-                                                // loc_controlZoneName);
-                                                errorsFound = true;
-                                            }
+                                            state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
+                                                TUIndex;
+                                            AirNodeFound = true;
+                                            ctrlZoneNum = ControlledZoneNum;
+                                            goto EquipList_exit;
+                                        }
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                            if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
+                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
+                                                continue;
+                                            state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
+                                                TUIndex;
+                                            AirNodeFound = true;
+                                            ctrlZoneNum = ControlledZoneNum;
+                                            goto EquipList_exit;
+                                        }
+                                        if (!AirNodeFound && state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
+                                            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                                            ShowContinueError(state, "Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                                            // ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " +
+                                            // loc_controlZoneName);
+                                            errorsFound = true;
                                         }
                                     } else if (AirLoopFound) { // control zone name not entered in TU object input
                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).isSetPointControlled = true;
