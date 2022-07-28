@@ -127,7 +127,7 @@ namespace ZoneEquipmentManager {
                            bool AdjustZoneInfiltrationFlowFlag = false // flags to djust zone infiltration air flow rate
     );
 
-    void GetStandAloneERVNodes(EnergyPlusData &state, int OutdoorNum); // Zone Air Balance Outdoor index
+    void GetStandAloneERVNodes(EnergyPlusData &state, DataHeatBalance::ZoneAirBalanceData &thisZoneAirBalance);
 
     void CalcZoneMixingFlowRateOfReceivingZone(EnergyPlusData &state, int ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
 
