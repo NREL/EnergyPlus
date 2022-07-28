@@ -237,9 +237,9 @@ namespace HVACVariableRefrigerantFlow {
         Real64 EvapCondPumpElecPower;                       // VRF Condenser evaporatively cooled condenser pump power (W)
         Real64 EvapCondPumpElecConsumption;                 // VRF Condenser evaporatively cooled condenser pump elec consumption (J)
         Real64 EvapWaterConsumpRate;                        // VRF Condenser evaporatively cooled condenser water consumption (m3/s)
-        int HRMaxTempLimitIndex;                            // Warning message recurring error index
-        int CoolingMaxTempLimitIndex;                       // Warning message recurring error index
-        int HeatingMaxTempLimitIndex;                       // Warning message recurring error index
+        int HRMaxTempLimitIndex = 0;                        // Warning message recurring error index
+        int CoolingMaxTempLimitIndex = 0;                   // Warning message recurring error index
+        int HeatingMaxTempLimitIndex = 0;                   // Warning message recurring error index
         std::string FuelType;                               // Fuel type
         DataGlobalConstants::ResourceType FuelTypeNum;      // Fuel type number
         Real64 SUMultiplier;                                // exponential timer for mode changes
@@ -247,34 +247,34 @@ namespace HVACVariableRefrigerantFlow {
         Real64 TUHeatingLoad;                               // total TU heating load for each VRF system
         bool SwitchedMode;                                  // used to derate capacity/power when system changes operating mode
         // begin variables used for heat recovery mode
-        Real64 OperatingCOP;         // Operating VRF heat pump COP (total TU capacity/total power)
-        Real64 MinOATHeatRecovery;   // Minimum outdoor air temperature for heat recovery operation (C)
-        Real64 MaxOATHeatRecovery;   // Maximum outdoor air temperature for heat recovery operation (C)
-        int HRCAPFTCool;             // Index to cool capacity as a function of temperature curve for heat recovery
-        Real64 HRCAPFTCoolConst;     // constant used if curve is blank
-        Real64 HRInitialCoolCapFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
-        Real64 HRCoolCapTC;          // Time constant used to recover from intial degratation in cooling heat recovery
-        int HREIRFTCool;             // Index to cool EIR as a function of temperature curve for heat recovery
-        Real64 HREIRFTCoolConst;     // constant used if curve is blank
-        Real64 HRInitialCoolEIRFrac; // Fractional EIR degradation at the start of heat recovery from cooling mode
-        Real64 HRCoolEIRTC;          // Time constant used to recover from intial degratation in cooling heat recovery
-        int HRCAPFTHeat;             // Index to heat capacity as a function of temperature curve for heat recovery
-        Real64 HRCAPFTHeatConst;     // constant used if curve is blank
-        Real64 HRInitialHeatCapFrac; // Fractional heating degradation at the start of heat recovery from heating mode
-        Real64 HRHeatCapTC;          // Time constant used to recover from intial degratation in heating heat recovery
-        int HREIRFTHeat;             // Index to heat EIR as a function of temperature curve for heat recovery
-        Real64 HREIRFTHeatConst;     // constant used if curve is blank
-        Real64 HRInitialHeatEIRFrac; // Fractional EIR degradation at the start of heat recovery from heating mode
-        Real64 HRHeatEIRTC;          // Time constant used to recover from intial degratation in heating heat recovery
-        bool HRCoolingActive;        // heat recovery mode active in cooling mode
-        bool HRHeatingActive;        // heat recovery mode active in heating mode
-        bool ModeChange;             // tracks changes in operating mode
-        bool HRModeChange;           // tracks changes in heat recovery operating mode
-        Real64 HRTimer;              // timer used to model changes in system performance as mode changes
-        Real64 HRTime;               // length of time system has been in same mode (hr)
-        int EIRFTempCoolErrorIndex;  // warning message index for recurring warnings
-        int EIRFTempHeatErrorIndex;  // warning message index for recurring warnings
-        int DefrostHeatErrorIndex;   // warning message index for recurring warnings
+        Real64 OperatingCOP;            // Operating VRF heat pump COP (total TU capacity/total power)
+        Real64 MinOATHeatRecovery;      // Minimum outdoor air temperature for heat recovery operation (C)
+        Real64 MaxOATHeatRecovery;      // Maximum outdoor air temperature for heat recovery operation (C)
+        int HRCAPFTCool;                // Index to cool capacity as a function of temperature curve for heat recovery
+        Real64 HRCAPFTCoolConst;        // constant used if curve is blank
+        Real64 HRInitialCoolCapFrac;    // Fractional cooling degradation at the start of heat recovery from cooling mode
+        Real64 HRCoolCapTC;             // Time constant used to recover from intial degratation in cooling heat recovery
+        int HREIRFTCool;                // Index to cool EIR as a function of temperature curve for heat recovery
+        Real64 HREIRFTCoolConst;        // constant used if curve is blank
+        Real64 HRInitialCoolEIRFrac;    // Fractional EIR degradation at the start of heat recovery from cooling mode
+        Real64 HRCoolEIRTC;             // Time constant used to recover from intial degratation in cooling heat recovery
+        int HRCAPFTHeat;                // Index to heat capacity as a function of temperature curve for heat recovery
+        Real64 HRCAPFTHeatConst;        // constant used if curve is blank
+        Real64 HRInitialHeatCapFrac;    // Fractional heating degradation at the start of heat recovery from heating mode
+        Real64 HRHeatCapTC;             // Time constant used to recover from intial degratation in heating heat recovery
+        int HREIRFTHeat;                // Index to heat EIR as a function of temperature curve for heat recovery
+        Real64 HREIRFTHeatConst;        // constant used if curve is blank
+        Real64 HRInitialHeatEIRFrac;    // Fractional EIR degradation at the start of heat recovery from heating mode
+        Real64 HRHeatEIRTC;             // Time constant used to recover from intial degratation in heating heat recovery
+        bool HRCoolingActive;           // heat recovery mode active in cooling mode
+        bool HRHeatingActive;           // heat recovery mode active in heating mode
+        bool ModeChange;                // tracks changes in operating mode
+        bool HRModeChange;              // tracks changes in heat recovery operating mode
+        Real64 HRTimer;                 // timer used to model changes in system performance as mode changes
+        Real64 HRTime;                  // length of time system has been in same mode (hr)
+        int EIRFTempCoolErrorIndex = 0; // warning message index for recurring warnings
+        int EIRFTempHeatErrorIndex = 0; // warning message index for recurring warnings
+        int DefrostHeatErrorIndex = 0;  // warning message index for recurring warnings
         // end variables used for heat recovery mode
         // begin variables for Water System interactions
         EvapWaterSupply EvapWaterSupplyMode; // where does water come from
@@ -297,14 +297,14 @@ namespace HVACVariableRefrigerantFlow {
         bool EMSOverrideHPOperatingMode;
         Real64 EMSValueForHPOperatingMode;
         int HPOperatingModeErrorIndex;
-        Real64 VRFHeatRec;         // Heat Recovery heat reclaim power (W)
-        Real64 VRFHeatEnergyRec;   // Heat Recovery heat reclain energy (J)
-        int HeatCapFTErrorIndex;   // warning message index
-        int CoolCapFTErrorIndex;   // warning message index
-        int HeatEIRFPLRErrorIndex; // warning message index
-        int CoolEIRFPLRErrorIndex; // warning message index
-                                   // The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
-        int AlgorithmIUCtrl;       // VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
+        Real64 VRFHeatRec;             // Heat Recovery heat reclaim power (W)
+        Real64 VRFHeatEnergyRec;       // Heat Recovery heat reclain energy (J)
+        int HeatCapFTErrorIndex = 0;   // warning message index
+        int CoolCapFTErrorIndex = 0;   // warning message index
+        int HeatEIRFPLRErrorIndex = 0; // warning message index
+        int CoolEIRFPLRErrorIndex = 0; // warning message index
+        // The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+        int AlgorithmIUCtrl;              // VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
         Array1D<Real64> CompressorSpeed;  // compressor speed array [rps]
         Real64 CondensingTemp;            // VRV system outdoor unit condensing temperature [C]
         Real64 CondTempFixed;             // Inddor unit condensing temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
@@ -391,27 +391,25 @@ namespace HVACVariableRefrigerantFlow {
               CondenserOutletNodeNum(0), WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0),
               CoolCombRatioPTR(0), HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0),
               CoolElecConsumption(0.0), HeatElecConsumption(0.0), CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0),
-              EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0),
-              CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), FuelTypeNum(DataGlobalConstants::ResourceType::None), SUMultiplier(0.0),
-              TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0), MaxOATHeatRecovery(0.0),
-              HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0), HREIRFTCoolConst(1.1),
-              HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0), HRHeatCapTC(0.0),
-              HREIRFTHeat(0), HREIRFTHeatConst(1.1), HRInitialHeatEIRFrac(1.0), HRHeatEIRTC(0.0), HRCoolingActive(false), HRHeatingActive(false),
-              ModeChange(false), HRModeChange(false), HRTimer(0.0), HRTime(0.0), EIRFTempCoolErrorIndex(0), EIRFTempHeatErrorIndex(0),
-              DefrostHeatErrorIndex(0), EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
-              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), BasinHeaterPowerFTempDiff(0.0),
-              BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), BasinHeaterSchedulePtr(0),
-              EMSOverrideHPOperatingMode(false), EMSValueForHPOperatingMode(0.0), HPOperatingModeErrorIndex(0), VRFHeatRec(0.0),
-              VRFHeatEnergyRec(0.0), HeatCapFTErrorIndex(0), CoolCapFTErrorIndex(0), HeatEIRFPLRErrorIndex(0), CoolEIRFPLRErrorIndex(0),
-              AlgorithmIUCtrl(1), CondensingTemp(44.0), CondTempFixed(0.0), CoffEvapCap(1.0), CompActSpeed(0.0), CompMaxDeltaP(0.0), C1Te(0.0),
-              C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), DiffOUTeTo(5), EffCompInverter(0.95), EvaporatingTemp(6.0), EvapTempFixed(0.0),
-              HROUHexRatio(0.0), IUEvaporatingTemp(6.0), IUCondensingTemp(44.0), IUEvapTempLow(4.0), IUEvapTempHigh(15.0), IUCondTempLow(42.0),
-              IUCondTempHigh(46.0), IUCondHeatRate(0.0), IUEvapHeatRate(0.0), Ncomp(0.0), NcompCooling(0.0), NcompHeating(0.0), OUEvapTempLow(-30.0),
-              OUEvapTempHigh(20.0), OUCondTempLow(30.0), OUCondTempHigh(96.0), OUAirFlowRate(0.0), OUAirFlowRatePerCapcity(0.0), OUCondHeatRate(0.0),
-              OUEvapHeatRate(0.0), OUFanPower(0.0), RatedEvapCapacity(40000.0), RatedHeatCapacity(0.0), RatedCompPower(14000.0),
-              RatedCompPowerPerCapcity(0.35), RatedOUFanPower(0.0), RatedOUFanPowerPerCapcity(0.0), RateBFOUEvap(0.45581), RateBFOUCond(0.21900),
-              RefPipDiaSuc(0.0), RefPipDiaDis(0.0), RefPipLen(0.0), RefPipEquLen(0.0), RefPipHei(0.0), RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0),
-              SC(0.0), SCHE(0.0), SHLow(0.0), SCLow(0.0), SHHigh(0.0), SCHigh(0.0), VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
+              EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0),
+              FuelTypeNum(DataGlobalConstants::ResourceType::None), SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false),
+              OperatingCOP(0.0), MinOATHeatRecovery(0.0), MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5),
+              HRCoolCapTC(0.15), HREIRFTCool(0), HREIRFTCoolConst(1.1), HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0),
+              HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0), HRHeatCapTC(0.0), HREIRFTHeat(0), HREIRFTHeatConst(1.1), HRInitialHeatEIRFrac(1.0),
+              HRHeatEIRTC(0.0), HRCoolingActive(false), HRHeatingActive(false), ModeChange(false), HRModeChange(false), HRTimer(0.0), HRTime(0.0),
+              EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateTankID(0),
+              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0),
+              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), BasinHeaterSchedulePtr(0), EMSOverrideHPOperatingMode(false),
+              EMSValueForHPOperatingMode(0.0), HPOperatingModeErrorIndex(0), VRFHeatRec(0.0), VRFHeatEnergyRec(0.0), AlgorithmIUCtrl(1),
+              CondensingTemp(44.0), CondTempFixed(0.0), CoffEvapCap(1.0), CompActSpeed(0.0), CompMaxDeltaP(0.0), C1Te(0.0), C2Te(0.0), C3Te(0.0),
+              C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), DiffOUTeTo(5), EffCompInverter(0.95), EvaporatingTemp(6.0), EvapTempFixed(0.0), HROUHexRatio(0.0),
+              IUEvaporatingTemp(6.0), IUCondensingTemp(44.0), IUEvapTempLow(4.0), IUEvapTempHigh(15.0), IUCondTempLow(42.0), IUCondTempHigh(46.0),
+              IUCondHeatRate(0.0), IUEvapHeatRate(0.0), Ncomp(0.0), NcompCooling(0.0), NcompHeating(0.0), OUEvapTempLow(-30.0), OUEvapTempHigh(20.0),
+              OUCondTempLow(30.0), OUCondTempHigh(96.0), OUAirFlowRate(0.0), OUAirFlowRatePerCapcity(0.0), OUCondHeatRate(0.0), OUEvapHeatRate(0.0),
+              OUFanPower(0.0), RatedEvapCapacity(40000.0), RatedHeatCapacity(0.0), RatedCompPower(14000.0), RatedCompPowerPerCapcity(0.35),
+              RatedOUFanPower(0.0), RatedOUFanPowerPerCapcity(0.0), RateBFOUEvap(0.45581), RateBFOUCond(0.21900), RefPipDiaSuc(0.0),
+              RefPipDiaDis(0.0), RefPipLen(0.0), RefPipEquLen(0.0), RefPipHei(0.0), RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0), SC(0.0), SCHE(0.0),
+              SHLow(0.0), SCLow(0.0), SHHigh(0.0), SCHigh(0.0), VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
         {
         }
 
