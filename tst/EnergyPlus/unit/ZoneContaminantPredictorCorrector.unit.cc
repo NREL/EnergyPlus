@@ -248,12 +248,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     EXPECT_NEAR(1.041692180, state->dataContaminantBalance->CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(76.89754831, state->dataContaminantBalance->GCPredictedRate(1), 0.00001);
 
-    CorrectZoneContaminants(*state, state->dataHVACGlobal->ShortenTimeStepSys, state->dataHVACGlobal->UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(*state, state->dataHVACGlobal->UseZoneTimeStepHistory);
     EXPECT_NEAR(489.931000, state->dataLoopNodes->Node(5).CO2, 0.00001);
     EXPECT_NEAR(0.09093100, state->dataLoopNodes->Node(5).GenContam, 0.00001);
-
-    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
-    state->dataContaminantBalance->Contaminant.GenericContamSimulation = false;
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContaminantsTest)
@@ -316,10 +313,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataContaminantBalance->ZoneCO21(1) = state->dataContaminantBalance->OutdoorCO2;
     state->dataContaminantBalance->ZoneGC1(1) = state->dataContaminantBalance->OutdoorGC;
 
-    Real64 PriorTimeStep;
-
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
-    PriorTimeStep = state->dataHVACGlobal->TimeStepSys;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
@@ -383,12 +377,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataHeatBalFanSys->ZT(1) = 24.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
 
-    CorrectZoneContaminants(*state, state->dataHVACGlobal->ShortenTimeStepSys, state->dataHVACGlobal->UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(*state, state->dataHVACGlobal->UseZoneTimeStepHistory);
     EXPECT_NEAR(490.0, state->dataLoopNodes->Node(5).CO2, 0.00001);
     EXPECT_NEAR(90.000999, state->dataLoopNodes->Node(5).GenContam, 0.00001);
-
-    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
-    state->dataContaminantBalance->Contaminant.GenericContamSimulation = false;
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlTest)
