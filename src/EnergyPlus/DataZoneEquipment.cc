@@ -547,6 +547,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::PkgTermHPAirToAir ||
                     thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::PkgTermHPWaterToAir) {
                     UnitarySystems::UnitarySys thisSys;
+                    // loop index accesses correct pointer to equipment on this equipment list
+                    // EquipIndex is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
                     thisZoneEquipList.compPointer[ZoneEquipTypeNum] =
                         thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
                     thisZoneEquipList.EquipIndex(ZoneEquipTypeNum) = thisZoneEquipList.compPointer[ZoneEquipTypeNum]->getEquipIndex();
