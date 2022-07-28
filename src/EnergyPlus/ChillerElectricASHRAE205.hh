@@ -84,14 +84,27 @@ namespace EnergyPlus {
         };
 
         struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs {
-            std::shared_ptr<tk205::rs_instance_base> RS;      // ASHRAE205 representation instance
-            AmbientTemp AmbientTempIndicator;
+            std::shared_ptr<tk205::rs_instance_base> Representation;      // ASHRAE205 representation instance
+
+            int     OilCoolerInletNode{0};
+            int     OilCoolerOutletNode{0};
+            Real64  OilCoolerVolFlowRate{0};
+            Real64  OilCoolerMassFlowRate{0};
+            PlantLocation OCPlantLoc{0,DataPlant::LoopSideLocation::Invalid,0,0};
+            int     AuxiliaryHeatInletNode{0};
+            int     AuxiliaryHeatOutletNode{0};
+            Real64  AuxiliaryVolFlowRate{0};
+            Real64  AuxiliaryMassFlowRate{0};
+            PlantLocation AHPlantLoc{0,DataPlant::LoopSideLocation::Invalid,0,0};
+            Real64  QOilHeater{0};
+            Real64  QAuxiliary{0};
+
+            AmbientTemp AmbientTempIndicator{AmbientTemp::Invalid};
             int AmbientTempSchedule{0};                       // Schedule index pointer
             int AmbientTempZone{0};                           // Number of ambient zone around tank
             int AmbientTempOutsideAirNode{0};                 // Number of outside air node
-            Real64 AmbientTemp{0.0};
-            Real64 AmbientZoneGain;                           // Internal gain to zone from tank losses (W)
-
+            Real64 AmbientTemp{0};
+            Real64 AmbientZoneGain{0};                           // Internal gain to zone from tank losses (W)
             std::string EndUseSubcategory{""};                // identifier use for the end use subcategory
 
             // Default Constructor
@@ -113,7 +126,7 @@ namespace EnergyPlus {
 
             void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
 
-            Real64 findCapacityResidual(EnergyPlusData &state, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
+            Real64 findCapacityResidual(EnergyPlusData&, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
 
             //void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
@@ -130,7 +143,7 @@ namespace EnergyPlus {
             void oneTimeInit(EnergyPlusData &state) override;
         };
 
-        void getInput(EnergyPlusData &state);
+        void getChillerASHRAE205Input(EnergyPlusData &state);
 
     } // namespace ChillerElectricASHRAE205
 

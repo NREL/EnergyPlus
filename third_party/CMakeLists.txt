@@ -1,3 +1,7 @@
+# Automatically update dependencies before building
+include(initialize_submodules)
+initialize_submodules()
+
 #### Create interface for JSON for Modern C++ so we can include it in targets
 # add_library( ModernJSON INTERFACE )
 # target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/nlohmann" "${PROJECT_SOURCE_DIR}/doj" )
