@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, ExerciseBaseboardElectric)
     int zoneNum = 1;
     Real64 powerMet = 0.0;
     int compIndex = 0;
-    BaseboardElectric::SimElectricBaseboard(*state, "ZONE1BASEBOARD", zoneNum, zoneNum, powerMet, compIndex);
+    BaseboardElectric::SimElectricBaseboard(*state, "ZONE1BASEBOARD", zoneNum, powerMet, compIndex);
 }
 
 } // namespace EnergyPlus

@@ -739,9 +739,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -1299,11 +1297,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_FALSE(has_err_output(true));
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -1828,7 +1824,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
@@ -2408,7 +2403,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
@@ -2984,11 +2978,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -4687,9 +4679,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Daylit Zone";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -4702,9 +4692,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Daylit Attic Zone";
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     state->dataHeatBal->Zone(2).IsControlled = true;
-    state->dataHeatBal->Zone(2).ZoneEqNum = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
@@ -5830,7 +5818,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     auto &zoneEquipConfig = state->dataZoneEquip->ZoneEquipConfig(1);
 
     zoneEquipConfig.ZoneName = "LIVING ZONE";
-    zoneEquipConfig.ActualZoneNum = 1;
     zoneEquipConfig.NumInletNodes = 2;
     zoneEquipConfig.InletNode.allocate(2);
     zoneEquipConfig.InletNode(1) = 1;
@@ -7076,7 +7063,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     auto &zoneEquipConfig = state->dataZoneEquip->ZoneEquipConfig(1);
 
     zoneEquipConfig.ZoneName = "LIVING ZONE";
-    zoneEquipConfig.ActualZoneNum = 1;
     zoneEquipConfig.NumInletNodes = 2;
     zoneEquipConfig.InletNode.allocate(2);
     zoneEquipConfig.InletNode(1) = 1;
