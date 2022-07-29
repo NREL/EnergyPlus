@@ -61,12 +61,12 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricASHRAE205.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/ChillerElectricASHRAE205.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -3669,16 +3669,16 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                         }
                     } break;
-                        case DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205: { //        = 10
-                            this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                            if (LoopSideCtr == LoopSideLocation::Demand) {
-                                this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
-                                this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
-                            } else {
-                                this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
-                                this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
-                            }
-                        } break;
+                    case DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205: { //        = 10
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        if (LoopSideCtr == LoopSideLocation::Demand) {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                        } else {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
+                        }
+                    } break;
                     case DataPlant::PlantEquipmentType::Chiller_EngineDriven: { //             = 11
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;

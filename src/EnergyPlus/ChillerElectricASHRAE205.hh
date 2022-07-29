@@ -100,7 +100,7 @@ namespace ChillerElectricASHRAE205 {
         Real64 QOilHeater{0};
         Real64 QAuxiliary{0};
 
-        AmbientTempIndicator AmbientTempIndicator{AmbientTempIndicator::Invalid};
+        AmbientTempIndicator AmbientTempType{AmbientTempIndicator::Invalid};
         int AmbientTempSchedule{0};       // Schedule index pointer
         int AmbientTempZone{0};           // Number of ambient zone around tank
         int AmbientTempOutsideAirNode{0}; // Number of outside air node
