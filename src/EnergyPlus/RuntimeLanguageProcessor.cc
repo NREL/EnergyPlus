@@ -3665,8 +3665,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ResourceTypeString = "Steam";
                     } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
                         ResourceTypeString = "DistrictCooling";
-                    } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                        ResourceTypeString = "DistrictHeating";
+                    } else if (SELECT_CASE_var == "DISTRICTHEATINGWATER") {
+                        ResourceTypeString = "DistrictHeatingWater";
                     } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
                         ResourceTypeString = "DistrictHeatingSteam";
                     } else if (SELECT_CASE_var == "ELECTRICITYPRODUCEDONSITE") {
