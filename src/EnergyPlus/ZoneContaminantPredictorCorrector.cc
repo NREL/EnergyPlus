@@ -134,7 +134,7 @@ void ManageZoneContaminanUpdates(EnergyPlusData &state,
         PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep: {
-        CorrectZoneContaminants(state, UseZoneTimeStepHistory, PriorTimeStep);
+        CorrectZoneContaminants(state, UseZoneTimeStepHistory);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories: {
         RevertZoneTimestepHistories(state);
