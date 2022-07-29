@@ -783,18 +783,16 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     // Set up and process ZoneInfiltration:* inputs
 
     cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-    int numDesignFlowInfiltrationObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numDesignFlowInfiltrationObjects = 0;
     int totDesignFlowInfiltration = 0; // Total ZoneInfiltration:DesignFlowRate instances after expansion to spaces
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> infiltrationDesignFlowRateObjects;
-    infiltrationDesignFlowRateObjects.allocate(numDesignFlowInfiltrationObjects);
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> infiltrationDesignFlowRateObjects;
     InternalHeatGains::setupIHGZonesAndSpaces(
         state, cCurrentModuleObject, infiltrationDesignFlowRateObjects, numDesignFlowInfiltrationObjects, totDesignFlowInfiltration, ErrorsFound);
 
     cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-    int numLeakageAreaInfiltrationObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numLeakageAreaInfiltrationObjects = 0;
     int totLeakageAreaInfiltration = 0; // Total ZoneInfiltration:EffectiveLeakageArea instances after expansion to spaces
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> infiltrationLeakageAreaObjects;
-    infiltrationLeakageAreaObjects.allocate(numLeakageAreaInfiltrationObjects);
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> infiltrationLeakageAreaObjects;
     bool const zoneListNotAllowed = true;
     InternalHeatGains::setupIHGZonesAndSpaces(state,
                                               cCurrentModuleObject,
@@ -805,10 +803,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                               zoneListNotAllowed);
 
     cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-    int numFlowCoefficientInfiltrationObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numFlowCoefficientInfiltrationObjects = 0;
     int totFlowCoefficientInfiltration = 0; // Total ZoneInfiltration:FlowCoefficient instances after expansion to spaces
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> infiltrationFlowCoefficientObjects;
-    infiltrationFlowCoefficientObjects.allocate(numFlowCoefficientInfiltrationObjects);
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> infiltrationFlowCoefficientObjects;
     InternalHeatGains::setupIHGZonesAndSpaces(state,
                                               cCurrentModuleObject,
                                               infiltrationFlowCoefficientObjects,
@@ -1465,18 +1462,16 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     RepVarSet = true;
 
     cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-    int numDesignFlowVentilationObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numDesignFlowVentilationObjects = 0;
     int totDesignFlowVentilation = 0; // Total ZoneVentilation:DesignFlowRate instances after expansion to spaces
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ventilationDesignFlowRateObjects;
-    ventilationDesignFlowRateObjects.allocate(numDesignFlowVentilationObjects);
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> ventilationDesignFlowRateObjects;
     InternalHeatGains::setupIHGZonesAndSpaces(
         state, cCurrentModuleObject, ventilationDesignFlowRateObjects, numDesignFlowVentilationObjects, totDesignFlowVentilation, ErrorsFound);
 
     cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-    int numWindStackVentilationObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numWindStackVentilationObjects = 0;
     int totWindStackVentilation = 0; // Total ZoneVentilation:WindandStackOpenArea instances after expansion to spaces
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ventilationWindStackObjects;
-    ventilationWindStackObjects.allocate(numWindStackVentilationObjects);
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> ventilationWindStackObjects;
     InternalHeatGains::setupIHGZonesAndSpaces(state,
                                               cCurrentModuleObject,
                                               ventilationWindStackObjects,

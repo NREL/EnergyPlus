@@ -733,22 +733,6 @@ namespace DataHeatBalance {
         int Multiplier = 1; // Zone List multiplier
     };
 
-    struct GlobalInternalGainMiscObject
-    {
-        // Members
-        std::string Name;
-        int ZoneOrZoneListPtr = 0;
-        int NumOfZones = 0;
-        int StartPtr = 0;
-        bool ZoneListActive = false;
-        int spaceOrSpaceListPtr = 0;
-        int numOfSpaces = 0;
-        int spaceStartPtr = 0;
-        bool spaceListActive = false;
-        EPVector<int> spaceNums;     // Indexes to spaces associated with this input object
-        EPVector<std::string> names; // Names for each instance created from this input object
-    };
-
     enum class ClothingType
     {
         Invalid = -1,
@@ -1985,15 +1969,6 @@ struct HeatBalanceData : BaseGlobalStruct
     // END SiteData
     int NumOfZoneLists = 0;            // Total number of zone lists
     int NumOfZoneGroups = 0;           // Total number of zone groups
-    int NumPeopleStatements = 0;       // Number of People objects in input - possibly global assignments
-    int NumLightsStatements = 0;       // Number of Lights objects in input - possibly global assignments
-    int NumZoneElectricStatements = 0; // Number of ZoneElectric objects in input - possibly global assignments
-    int NumZoneGasStatements = 0;      // Number of ZoneGas objects in input - possibly global assignments
-    int NumHotWaterEqStatements = 0;   // number of Hot Water Equipment objects in input. - possibly global assignments
-    int NumSteamEqStatements = 0;      // number of Steam Equipment objects in input. - possibly global assignments
-    int NumOtherEqStatements = 0;      // number of Other Equipment objects in input. - possibly global assignments
-    int NumZoneITEqStatements = 0;     // number of Other Equipment objects in input. - possibly global assignments
-    int NumZoneBBHeatStatements = 0;   // number of ZoneBaseboard heat objects in input. - possibly global assignments
     int TotPeople = 0;                 // Total People instances after expansion to spaces
     int TotLights = 0;                 // Total Lights instances after expansion to spaces
     int TotElecEquip = 0;              // Total Electric Equipment instances after expansion to spaces
@@ -2229,16 +2204,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
     EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ITEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneBBHeatObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
     EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
     EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;
     EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
