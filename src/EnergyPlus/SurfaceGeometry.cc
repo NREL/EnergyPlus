@@ -246,7 +246,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinInsideRevealSolAbs.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinOutsideRevealSolAbs.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinScreenNumber.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinAirflowSource.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowSource.dimension(NumSurfaces, DataSurfaces::WindowAirFlowSource::Invalid);
         state.dataSurface->SurfWinAirflowDestination.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinAirflowReturnNodePtr.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinMaxAirflow.dimension(NumSurfaces, 0);
@@ -2842,7 +2842,7 @@ namespace SurfaceGeometry {
                     auto &surface(state.dataSurface->Surface(surfNum));
                     // Conditions where surface always needs to be unique
                     bool forceUniqueSurface =
-                        surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) ||
+                        surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) != DataSurfaces::WindowAirFlowSource::Invalid ||
                         state.dataConstruction->Construct(surface.Construction).SourceSinkPresent || surface.Class == SurfaceClass::TDD_Dome ||
                         (surface.Class == SurfaceClass::Window && (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
                                                                    state.dataSurface->SurfWinWindowModelType(surfNum) != Window5DetailedModel ||
@@ -10672,9 +10672,9 @@ namespace SurfaceGeometry {
             if (SurfNum > 0) {
                 state.dataSurface->AirflowWindows = true;
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "IndoorAir")) {
-                    state.dataSurface->SurfWinAirflowSource(SurfNum) = AirFlowWindow_Source_IndoorAir;
+                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::IndoorAir;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "OutdoorAir")) {
-                    state.dataSurface->SurfWinAirflowSource(SurfNum) = AirFlowWindow_Source_OutdoorAir;
+                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::OutdoorAir;
                 }
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "IndoorAir")) {
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_IndoorAir;

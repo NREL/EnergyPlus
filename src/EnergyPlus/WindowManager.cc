@@ -2755,9 +2755,9 @@ namespace WindowManager {
             if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 Tleft = state.dataWindowManager->thetas[2 * state.dataWindowManager->ngllayer - 3] - state.dataWindowManager->TKelvin;
                 Tright = state.dataWindowManager->thetas[2 * state.dataWindowManager->ngllayer - 2] - state.dataWindowManager->TKelvin;
-                if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
+                if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::IndoorAir) {
                     if (Tleft < RoomDewPoint || Tright < RoomDewPoint) state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 1;
-                } else if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_OutdoorAir) {
+                } else if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::OutdoorAir) {
                     if (Tleft < state.dataEnvrn->OutDewPointTemp || Tright < state.dataEnvrn->OutDewPointTemp)
                         state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 1;
                 }
@@ -3943,7 +3943,7 @@ namespace WindowManager {
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
                 if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir ||
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
+                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::IndoorAir) {
                         InletAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;
@@ -4509,7 +4509,7 @@ namespace WindowManager {
         GapNum = NGlass - 1;
         TAve = 0.5 * (TGlassFace1 + TGlassFace2);
 
-        if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
+        if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::IndoorAir) {
             TGapInlet = state.dataWindowManager->tin; // Source is inside air
         } else {
             TGapInlet = state.dataWindowManager->tout; // Source is outside air
@@ -4635,7 +4635,7 @@ namespace WindowManager {
             }
         }
 
-        if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
+        if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::IndoorAir) {
             TGapInlet = state.dataWindowManager->tin;
         } else {
             TGapInlet = state.dataWindowManager->tout;

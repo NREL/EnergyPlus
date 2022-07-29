@@ -335,10 +335,13 @@ namespace DataSurfaces {
         Num
     };
 
-
     // Parameters for air flow window source
-    constexpr int AirFlowWindow_Source_IndoorAir(1);
-    constexpr int AirFlowWindow_Source_OutdoorAir(2);
+    enum class WindowAirFlowSource {
+        Invalid = -1,
+        IndoorAir,
+        OutdoorAir,
+        Num
+    };
 
     // Parameters for air flow window destination
     constexpr int AirFlowWindow_Destination_IndoorAir(1);
@@ -1700,7 +1703,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinInsideRevealSolAbs;       // Solar absorptance of inside reveal
     Array1D<Real64> SurfWinOutsideRevealSolAbs;      // Solar absorptance of outside reveal
     Array1D<int> SurfWinScreenNumber;                // Screen number for a window with a screen (do not confuse with material number)
-    Array1D<int> SurfWinAirflowSource;               // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+    Array1D<DataSurfaces::WindowAirFlowSource> SurfWinAirflowSource;               // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
     Array1D<int> SurfWinAirflowDestination;          // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
     Array1D<int> SurfWinAirflowReturnNodePtr;        // Return node pointer for destination = ReturnAir
     Array1D<Real64> SurfWinMaxAirflow;               // Maximum gap airflow (m3/s per m of glazing width)
