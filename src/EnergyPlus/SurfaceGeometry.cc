@@ -10677,11 +10677,11 @@ namespace SurfaceGeometry {
                     state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::OutdoorAir;
                 }
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "IndoorAir")) {
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_IndoorAir;
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = WindowAirFlowDestination::IndoorAir;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "OutdoorAir")) {
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_OutdoorAir;
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = WindowAirFlowDestination::OutdoorAir;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ReturnAir")) {
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_ReturnAir;
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = WindowAirFlowDestination::ReturnAir;
                     int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, state.dataSurface->Surface(SurfNum).ZoneName);
                     if (controlledZoneNum > 0) {
                         state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;

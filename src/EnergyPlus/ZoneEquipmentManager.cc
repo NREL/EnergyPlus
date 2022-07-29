@@ -4880,7 +4880,6 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
     // Using/Aliasing
     using DataHVACGlobals::RetTempMax;
     using DataHVACGlobals::RetTempMin;
-    using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
     using InternalHeatGains::SumAllReturnAirConvectionGains;
     using InternalHeatGains::SumAllReturnAirLatentGains;
 
@@ -4950,7 +4949,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                 for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                      ++SurfNum) {
                     if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::ReturnAir) {
                         FlowThisTS = PsyRhoAirFnPbTdbW(state,
                                                        state.dataEnvrn->OutBaroPress,
                                                        state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),

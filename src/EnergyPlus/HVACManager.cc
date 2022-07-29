@@ -2944,7 +2944,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
     // Using/Aliasing
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
     using ScheduleManager::CheckScheduleValue;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleMaxValue;
@@ -3017,7 +3016,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
                     }
                 }
                 for (int SurfNum = Zone(ControlledZoneNum).HTSurfaceFirst; SurfNum <= Zone(ControlledZoneNum).HTSurfaceLast; ++SurfNum) {
-                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::ReturnAir) {
                         ShowWarningError(state,
                                          "For zone=" + Zone(ControlledZoneNum).Name +
                                              " return air heat gain from air flow windows will be applied to the zone air.");
