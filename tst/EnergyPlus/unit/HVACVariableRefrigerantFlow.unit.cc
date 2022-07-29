@@ -15957,7 +15957,7 @@ TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
         "    Dimensionless;           !- Output Unit Type",
 
         "  Curve:Cubic,",
-        "    EIRfPLR,                 !- Name",
+        "    EIRfPLR_BadCurve,                 !- Name",
         "    0.0,                     !- Coefficient1 Constant",
         "    -1.0,                    !- Coefficient2 x",
         "    0.0,                     !- Coefficient3 x**2",
@@ -16102,7 +16102,7 @@ TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.0);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 0.0);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.25);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
@@ -16150,7 +16150,7 @@ TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 5000.0);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 5000.0);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.25);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
