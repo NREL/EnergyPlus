@@ -10189,13 +10189,13 @@ void WindowGapAirflowControl(EnergyPlusData &state)
             if (state.dataSurface->SurfWinMaxAirflow(ISurf) == 0.0) continue;
             if (state.dataSurface->Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
             switch (state.dataSurface->SurfWinAirflowControlType(ISurf)) {
-            case AirFlowWindow_ControlType_MaxFlow: {
+            case WindowAirFlowControlType::MaxFlow: {
                 state.dataSurface->SurfWinAirflowThisTS(ISurf) = state.dataSurface->SurfWinMaxAirflow(ISurf);
             } break;
-            case AirFlowWindow_ControlType_AlwaysOff: {
+            case WindowAirFlowControlType::AlwaysOff: {
                 state.dataSurface->SurfWinAirflowThisTS(ISurf) = 0.0;
             } break;
-            case AirFlowWindow_ControlType_Schedule: {
+            case WindowAirFlowControlType::Schedule: {
                 if (state.dataSurface->SurfWinAirflowHasSchedule(ISurf)) {
                     int SchedulePtr = state.dataSurface->SurfWinAirflowSchedulePtr(ISurf); // Schedule pointer
                     Real64 ScheduleMult = GetCurrentScheduleValue(state, SchedulePtr);     // Multiplier value from schedule

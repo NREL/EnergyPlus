@@ -353,9 +353,13 @@ namespace DataSurfaces {
     constexpr int AirFlowWindow_Destination_ReturnAir(3);
 
     // Parameters for air flow window control
-    constexpr int AirFlowWindow_ControlType_MaxFlow(1);
-    constexpr int AirFlowWindow_ControlType_AlwaysOff(2);
-    constexpr int AirFlowWindow_ControlType_Schedule(3);
+    enum class WindowAirFlowControlType {
+        Invalid = -1,
+        MaxFlow,
+        AlwaysOff,
+        Schedule,
+        Num
+    };
 
     // Parameters for window model selection
     enum class WindowModel{
@@ -1715,7 +1719,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfWinAirflowDestination;          // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
     Array1D<int> SurfWinAirflowReturnNodePtr;        // Return node pointer for destination = ReturnAir
     Array1D<Real64> SurfWinMaxAirflow;               // Maximum gap airflow (m3/s per m of glazing width)
-    Array1D<int> SurfWinAirflowControlType;          // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
+    Array1D<DataSurfaces::WindowAirFlowControlType> SurfWinAirflowControlType;          // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
     Array1D<bool> SurfWinAirflowHasSchedule;         // True if gap airflow is scheduled
     Array1D<int> SurfWinAirflowSchedulePtr;          // Gap airflow schedule pointer
     Array1D<Real64> SurfWinAirflowThisTS;            // Gap airflow this timestep (m3/s per m of glazing width)

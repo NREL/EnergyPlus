@@ -10494,7 +10494,7 @@ namespace SurfaceGeometry {
 
             // Error if base window has airflow control
             if (SurfNum > 0) {
-                if (state.dataSurface->SurfWinAirflowControlType(SurfNum) != 0) {
+                if (state.dataSurface->SurfWinAirflowControlType(SurfNum) != DataSurfaces::WindowAirFlowControlType::Invalid) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
                     ShowContinueError(state, " cannot be used because it is an airflow window (i.e., has WindowProperty:AirflowControl specified)");
                     ErrorsFound = true;
@@ -10713,11 +10713,11 @@ namespace SurfaceGeometry {
                     }
                 }
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "AlwaysOnAtMaximumFlow")) {
-                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_MaxFlow;
+                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = WindowAirFlowControlType::MaxFlow;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "AlwaysOff")) {
-                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_AlwaysOff;
+                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = WindowAirFlowControlType::AlwaysOff;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "ScheduledOnly")) {
-                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_Schedule;
+                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = WindowAirFlowControlType::Schedule;
                 }
                 state.dataSurface->SurfWinMaxAirflow(SurfNum) = state.dataIPShortCut->rNumericArgs(1);
                 if (state.dataIPShortCut->cAlphaArgs(4) == "SCHEDULEDONLY" && state.dataIPShortCut->cAlphaArgs(5) == "YES") {
