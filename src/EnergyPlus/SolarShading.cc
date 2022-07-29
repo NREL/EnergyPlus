@@ -9902,7 +9902,7 @@ void WindowShadingManager(EnergyPlusData &state)
 
                     // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
                     if (state.dataHeatBal->Blind(BlNum).SlatWidth <= state.dataHeatBal->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
-                        if (state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds == WSC_SAC_BlockBeamSolar) {
+                        if (state.dataSurface->WindowShadingControl(IShadingCtrl).slatAngleControlForBlinds == WindowShadingControlSlatAngleControl::BlockBeamSolar) {
                             ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
                             if (std::abs(std::cos(ProfAng) * state.dataHeatBal->Blind(BlNum).SlatSeparation /
                                          state.dataHeatBal->Blind(BlNum).SlatWidth) <= 1.0) {
@@ -9926,15 +9926,15 @@ void WindowShadingManager(EnergyPlusData &state)
                         }
                     }
 
-                    switch (state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds) {
-                    case WSC_SAC_FixedSlatAngle: { // 'FIXEDSLATANGLE'
+                    switch (state.dataSurface->WindowShadingControl(IShadingCtrl).slatAngleControlForBlinds) {
+                    case WindowShadingControlSlatAngleControl::FixedSlatAngle: { // 'FIXEDSLATANGLE'
                         state.dataSurface->SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
                         if ((state.dataSurface->SurfWinSlatAngThisTS(ISurf) <= state.dataSolarShading->ThetaSmall ||
                              state.dataSurface->SurfWinSlatAngThisTS(ISurf) >= state.dataSolarShading->ThetaBig) &&
                             (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
                             state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                     } break;
-                    case WSC_SAC_ScheduledSlatAngle: { // 'SCHEDULEDSLATANGLE'
+                    case WindowShadingControlSlatAngleControl::ScheduledSlatAngle: { // 'SCHEDULEDSLATANGLE'
                         state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
                             GetCurrentScheduleValue(state, state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
                         state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
@@ -9946,7 +9946,7 @@ void WindowShadingManager(EnergyPlusData &state)
                             (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation) && (BeamSolarOnWindow > 0.0))
                             state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                     } break;
-                    case WSC_SAC_BlockBeamSolar: { // 'BLOCKBEAMSOLAR'
+                    case WindowShadingControlSlatAngleControl::BlockBeamSolar: { // 'BLOCKBEAMSOLAR'
                         if (BeamSolarOnWindow > 0.0) {
                             if (state.dataHeatBal->Blind(BlNum).SlatSeparation >= state.dataHeatBal->Blind(BlNum).SlatWidth) {
                                 // TH 5/20/2010. CR 8064.

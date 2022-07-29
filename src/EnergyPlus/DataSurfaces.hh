@@ -321,9 +321,13 @@ namespace DataSurfaces {
     }
 
     // WindowShadingControl Slat Angle Control for Blinds
-    constexpr int WSC_SAC_FixedSlatAngle(1);
-    constexpr int WSC_SAC_ScheduledSlatAngle(2);
-    constexpr int WSC_SAC_BlockBeamSolar(3);
+    enum class WindowShadingControlSlatAngleControl {
+        Invalid = -1,
+        FixedSlatAngle,
+        ScheduledSlatAngle,
+        BlockBeamSolar,
+        Num
+    };
 
     // Parameter for window screens beam reflectance accounting
     enum class ScreenBeamReflectanceAccounting
@@ -1054,8 +1058,8 @@ namespace DataSurfaces {
         bool ShadingControlIsScheduled; // True if shading control has a schedule
         bool GlareControlIsActive;      // True if shading control to reduce daylight glare is active
         int SlatAngleSchedule;          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
-        int SlatAngleControlForBlinds;  // Takes one of the following values that specifies
-                                        //  CHARACTER(len=32) :: SlatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
+        WindowShadingControlSlatAngleControl slatAngleControlForBlinds;  // Takes one of the following values that specifies
+                                        //  CHARACTER(len=32) :: slatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
                                         //  how slat angle is controled in a blind when ShadingType =
                                         //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
                                         //  FixedSlatAngle: the slat angle is fixed at the constant value given in the
@@ -1076,7 +1080,7 @@ namespace DataSurfaces {
         WindowShadingControlData()
             : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0),
               ShadingControlType(WindowShadingControlType::UnControlled), Schedule(0), SetPoint(0.0), SetPoint2(0.0),
-              ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), SlatAngleControlForBlinds(0),
+              ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), slatAngleControlForBlinds(WindowShadingControlSlatAngleControl::Invalid),
               DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {
         }
