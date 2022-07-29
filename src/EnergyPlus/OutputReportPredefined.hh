@@ -1074,8 +1074,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchLeedPerfOtherFuel2Dem = 0;
     int pdchLeedPerfDisClEneUse = 0;
     int pdchLeedPerfDisClDem = 0;
-    int pdchLeedPerfDisHtEneUse = 0;
-    int pdchLeedPerfDisHtDem = 0;
+    int pdchLeedPerfDisHtWtrEneUse = 0;
+    int pdchLeedPerfDisHtWtrDem = 0;
     int pdchLeedPerfDisHtStEneUse = 0;
     int pdchLeedPerfDisHtStDem = 0;
 
@@ -2009,8 +2009,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchLeedPerfOtherFuel2Dem = 0;
         this->pdchLeedPerfDisClEneUse = 0;
         this->pdchLeedPerfDisClDem = 0;
-        this->pdchLeedPerfDisHtEneUse = 0;
-        this->pdchLeedPerfDisHtDem = 0;
+        this->pdchLeedPerfDisHtWtrEneUse = 0;
+        this->pdchLeedPerfDisHtWtrDem = 0;
         this->pdchLeedPerfDisHtStEneUse = 0;
         this->pdchLeedPerfDisHtStDem = 0;
         this->pdstLeedEneUseSum = 0;
