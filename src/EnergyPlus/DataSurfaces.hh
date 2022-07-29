@@ -326,9 +326,15 @@ namespace DataSurfaces {
     constexpr int WSC_SAC_BlockBeamSolar(3);
 
     // Parameter for window screens beam reflectance accounting
-    constexpr int DoNotModel(0);
-    constexpr int ModelAsDirectBeam(1);
-    constexpr int ModelAsDiffuse(2);
+    enum class ScreenBeamReflectanceAccounting
+    {
+        Invalid = -1,
+        DoNotModel,
+        ModelAsDirectBeam,
+        ModelAsDiffuse,
+        Num
+    };
+
 
     // Parameters for air flow window source
     constexpr int AirFlowWindow_Source_IndoorAir(1);

@@ -960,11 +960,6 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     //  CALL's passing the screen number without the relative azimuth and altitude angles is not allowed
     //  CALL CalcScreenTransmittance(0, ScreenNumber=ScNum) ! DO NOT use this syntax
 
-    // Using/Aliasing
-    using DataSurfaces::DoNotModel;
-    using DataSurfaces::ModelAsDiffuse;
-    using DataSurfaces::ModelAsDirectBeam;
-
     // Locals
     // FUNCTION ARGUMENT DEFINITIONS:
     // The optional arguments Phi and Theta are used to integrate over a hemisphere and are passed as pairs
@@ -1169,7 +1164,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Tscattered = max(0.0, Tscattered);
     TscatteredVis = max(0.0, TscatteredVis);
 
-    if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
+    if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceAccounting::DoNotModel) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
@@ -1181,7 +1176,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
+    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceAccounting::ModelAsDirectBeam) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
@@ -1193,7 +1188,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
+    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceAccounting::ModelAsDiffuse) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
