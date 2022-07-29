@@ -3123,3 +3123,274 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     EXPECT_DOUBLE_EQ(0.40, win_Surface.ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.40, win_Surface.ViewFactorGroundIR);
 }
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
+{
+    //    state->dataSurface->Surface.allocate(1);
+    //    state->dataSurface->Surface(1).Sides = 4;
+    //
+    //    state->dataSurface->Surface(1).Vertex.allocate(4);
+    //    state->dataSurface->Surface(1).Vertex(1) = Vector(+7.0711, +12.2474, +0.0000);
+    //    state->dataSurface->Surface(1).Vertex(2) = Vector(-12.2474, +7.0711, +0.0000);
+    //    state->dataSurface->Surface(1).Vertex(3) = Vector(-7.0711, -12.2474, +0.0000);
+    //    state->dataSurface->Surface(1).Vertex(4) = Vector(+12.2474, -7.0711, +0.0000);
+
+    // Test for #9432
+    // So this is a perfect square. Expect I am going to rotate the building by 15 degrees (Not by building north axis, but by vertices adjustments)
+    // Surface.Vertex(1) will end up having the highest X and highest Y, and we will trigger a bug where if will fail
+    // the XdYu ones (lo X, high Y), that is the top left corner [2] because  the RoofGeo BoundingBoxVertStruct are initialized to Vertex(1) and:
+    //     vertex.x <= RoofGeo.XdYuZd.Vertex.x => True
+    //     vertex.y => RoofGeo.XdYuZd.Vertex.y => False
+    //
+    //          y
+    //         ▲      ◄──┐ Rotate by 15 degrees
+    //       10│         │
+    // [2]┌────┼────┐[1]
+    //    │    │    │
+    //    │    │    │
+    //  ──┼────┼────┼────►
+    // -10│    │    │10   x
+    //    │    │    │
+    // [3]└────┼────┘[4]
+    //      -10│
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,                        !- Starting Vertex Position",
+        "  Counterclockwise,                       !- Vertex Entry Direction",
+        "  Relative,                               !- Coordinate System",
+        "  Relative,                               !- Daylighting Reference Point Coordinate System",
+        "  Relative;                               !- Rectangular Surface Coordinate System",
+
+        "Building,",
+        "  Building 1,                             !- Name",
+        "  20,                                     !- North Axis {deg}",
+        "  ,                                       !- Terrain",
+        "  ,                                       !- Loads Convergence Tolerance Value {W}",
+        "  ,                                       !- Temperature Convergence Tolerance Value {deltaC}",
+        "  ,                                       !- Solar Distribution",
+        "  ,                                       !- Maximum Number of Warmup Days",
+        "  ;                                       !- Minimum Number of Warmup Days",
+
+        "Zone,",
+        "  Zone1,                                  !- Name",
+        "  0,                                      !- Direction of Relative North {deg}",
+        "  0,                                      !- X Origin {m}",
+        "  0,                                      !- Y Origin {m}",
+        "  0,                                      !- Z Origin {m}",
+        "  ,                                       !- Type",
+        "  1,                                      !- Multiplier",
+        "  ,                                       !- Ceiling Height {m}",
+        "  ,                                       !- Volume {m3}",
+        "  ,                                       !- Floor Area {m2}",
+        "  ,                                       !- Zone Inside Convection Algorithm",
+        "  ,                                       !- Zone Outside Convection Algorithm",
+        "  Yes;                                    !- Part of Total Floor Area",
+
+        "Material:NoMass,",
+        "  R13-IP,                                 !- Name",
+        "  Smooth,                                 !- Roughness",
+        "  2.28943238786998,                       !- Thermal Resistance {m2-K/W}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "Construction,",
+        "  R13 Construction,                       !- Name",
+        "  R13-IP;                                 !- Layer 1",
+
+        "BuildingSurface:Detailed,",
+        "  1-SOUTH - ABS AZIMUTH 165.00,           !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -7.07106781186548, -12.2474487139159, 3, !- X,Y,Z Vertex 1 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 2 {m}",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  12.2474487139159, -7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  2-WEST - ABS AZIMUTH 255.00,            !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -12.2474487139159, 7.07106781186548, 3, !- X,Y,Z Vertex 1 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 2 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 3 {m}",
+        "  -7.07106781186548, -12.2474487139159, 3; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  3-EAST - ABS AZIMUTH 75.00,             !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  12.2474487139159, -7.07106781186548, 3, !- X,Y,Z Vertex 1 {m}",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 2 {m}",
+        "  7.07106781186548, 12.2474487139159, 0,  !- X,Y,Z Vertex 3 {m}",
+        "  7.07106781186548, 12.2474487139159, 3;  !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  4-NORTH - ABS AZIMUTH 345.00,           !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  7.07106781186548, 12.2474487139159, 3,  !- X,Y,Z Vertex 1 {m}",
+        "  7.07106781186548, 12.2474487139159, 0,  !- X,Y,Z Vertex 2 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  -12.2474487139159, 7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  FLOOR,                                  !- Name",
+        "  Floor,                                  !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Ground,                                 !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  NoSun,                                  !- Sun Exposure",
+        "  NoWind,                                 !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 1 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 2 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  7.07106781186548, 12.2474487139159, 0;  !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  ROOF,                                   !- Name",
+        "  Roof,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  7.07106781186548, 12.2474487139159, 3,  !- X,Y,Z Vertex 1 {m}",
+        "  -12.2474487139159, 7.07106781186548, 3, !- X,Y,Z Vertex 2 {m}",
+        "  -7.07106781186548, -12.2474487139159, 3, !- X,Y,Z Vertex 3 {m}",
+        "  12.2474487139159, -7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);                                 // expect no errors
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                            // expect no errors
+
+    // TODO: I think GetSurfaceData is enough? SetupZoneGeometry => GetSurfaceData => CalcSurfaceCentroid
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    const auto &surfaces = state->dataSurface->Surface;
+    const auto it = std::find_if(surfaces.begin(), surfaces.end(), [](const auto &s) { return s.Name == "ROOF"; });
+    ASSERT_NE(it, surfaces.end());
+    const auto &surface = *it;
+    const int surfNum = std::distance(surfaces.begin(), it) + 1;
+    EXPECT_EQ(6, surfNum);
+    EXPECT_DOUBLE_EQ(-12.247448713915899, state->dataSurface->X0(surfNum));
+    EXPECT_DOUBLE_EQ(7.0710678118654799, state->dataSurface->Y0(surfNum));
+    EXPECT_DOUBLE_EQ(3.0, state->dataSurface->Z0(surfNum));
+
+    const auto &vertices = surface.Vertex;
+    std::vector<Vector> expectedOriVertices{
+        {+7.0711, +12.2474, +3.0000},
+        {-12.2474, +7.0711, +3.0000},
+        {-7.0711, -12.2474, +3.0000},
+        {+12.2474, -7.0711, +3.0000},
+    };
+    for (size_t i = 0; i < 4; ++i) {
+
+        EXPECT_TRUE(SurfaceGeometry::isAlmostEqual3dPt(expectedOriVertices[i], vertices[i]))
+            << "Failed for vertice " << i << ", expected=" << expectedOriVertices[i] << ", got=" << vertices[i];
+    }
+
+    auto const &lcsx(surface.lcsx);
+    auto const &lcsy(surface.lcsy);
+    auto const &lcsz(surface.lcsz);
+
+    Vector expected_lcsx(0.25881904510252079, -0.96592582628906831, 0.0);
+    Vector expected_lcsy(0.96592582628906831, 0.25881904510252079, -0.0);
+    Vector expected_lcsz(0.0, 0.0, 1.0);
+
+    EXPECT_EQ(expected_lcsx, lcsx);
+    EXPECT_EQ(expected_lcsy, lcsy);
+    EXPECT_EQ(expected_lcsz, lcsz);
+
+    Array1D<Real64> xs(4, 0.0);
+    Array1D<Real64> ys(4, 0.0);
+    Array1D<Real64> zs(4, 0.0);
+
+    int const NS = surfNum;   // Surface number whose vertex coordinates are being transformed
+    int const NGRS = surfNum; // Base surface number for surface NS
+    int NVT = 4;              // Number of vertices for surface NS
+
+    // I'm projecting the surface onto itself...
+    SolarShading::CTRANS(*state, NS, NGRS, NVT, xs, ys, zs);
+
+    double expected_perimeter = 20.0 * 4;
+    EXPECT_DOUBLE_EQ(expected_perimeter, surface.Perimeter);
+
+    std::vector<Vector> transformedVertices;
+    for (int i = 1; i <= 4; ++i) {
+        transformedVertices.emplace_back(xs(i), ys(i), zs(i));
+    }
+    double perimeter = 0.0;
+    for (auto it = transformedVertices.begin(); it != transformedVertices.end(); ++it) {
+
+        auto itnext = std::next(it);
+        if (itnext == std::end(transformedVertices)) {
+            itnext = std::begin(transformedVertices);
+        }
+        perimeter += SurfaceGeometry::distance(*it, *itnext);
+    }
+    EXPECT_DOUBLE_EQ(expected_perimeter, perimeter);
+
+    std::vector<Vector> expectedVertices{
+        {+0.0000, +20.0000, +0.0000},
+        {+0.0000, +0.0000, +0.0000},
+        {+20.0000, +0.0000, +0.0000},
+        {+20.0000, +20.0000, +0.0000},
+    };
+    for (size_t i = 0; i < 4; ++i) {
+        EXPECT_TRUE(SurfaceGeometry::isAlmostEqual3dPt(expectedVertices[i], transformedVertices[i])) << "Failed for vertice " << i;
+    }
+}
