@@ -564,7 +564,6 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(5600.23, sizedValue, 0.01); // capacity includes system fan heat
     sizer.autoSizedValue = 0.0;             // reset for next test
-
 }
 
 } // namespace EnergyPlus
