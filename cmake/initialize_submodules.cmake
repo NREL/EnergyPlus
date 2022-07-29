@@ -45,6 +45,8 @@ git submodule update --init --recursive
 
 "
                         )
+                file(CHMOD "${PROJECT_SOURCE_DIR}/.git/hooks/post-checkout"
+                     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
             endif()
             # post-merge
             if (NOT EXISTS "${PROJECT_SOURCE_DIR}/.git/hooks/post-merge")
@@ -64,6 +66,8 @@ git submodule update --init --recursive
 
 "
                         )
+                file(CHMOD "${PROJECT_SOURCE_DIR}/.git/hooks/post-merge"
+                     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
             endif()
             # pre-push
             if (NOT EXISTS "${PROJECT_SOURCE_DIR}/.git/hooks/pre-push")
@@ -81,6 +85,8 @@ fi
 
 "
                         )
+                file(CHMOD "${PROJECT_SOURCE_DIR}/.git/hooks/pre-push"
+                     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
             endif()
         endif()
     endif()
