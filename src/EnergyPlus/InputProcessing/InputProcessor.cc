@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
 #include <EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh>
@@ -70,6 +71,9 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -466,16 +470,22 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
     return errorsFound;
 }
 
-void InputProcessor::getSimInputObjects(EnergyPlusData &state)
+void InputProcessor::isInputObjectUsed(EnergyPlusData &state)
 {
     // there is a need to know if certain object are used in the simulation
     // this may not be the best place to do this but it's a start at early reading of input data
     // this concept could grow to include reading all inputs prior to the start of the simulation so all data is available
     // once inputs are processed, read in all getInputs. They will be read early and will not be read again so there is no duplication
 
-    // for example, AirLoopHVAC:DOAS system autosize on weather data, and WeatherManager processes that data
+    // for example, AirLoopHVAC:DOAS systems autosize on weather data, and WeatherManager processes that data
     // there is no need to process that data if there are no DOAS used in the simulation
-    state.dataInputProcessing->DOASUsedInSim = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") > 0);
+    state.dataInputProcessing->AirLoopHVACDOASUsedInSim =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") > 0;
+    EMSManager::CheckIfAnyEMS(state);
+    PlantManager::CheckIfAnyPlant(state);
+    PlantPipingSystemsManager::CheckIfAnySlabs(state);
+    PlantPipingSystemsManager::CheckIfAnyBasements(state);
+    SetPointManager::CheckIfAnyIdealCondEntSetPoint(state);
 }
 
 bool InputProcessor::processErrors(EnergyPlusData &state)

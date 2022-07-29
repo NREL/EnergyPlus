@@ -198,10 +198,11 @@ namespace WeatherManager {
         bool ActualWeather;              // true when using actual weather data
         int RawSimDays;                  // number of basic sim days.
         bool firstHrInterpUseHr1;        // true when using Hour 1 for first hour interpolations; false to use Hour 24
-        Real64 maxCoolingOATSizing;      // max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
-        Real64 maxCoolingOADPSizing;     // outdoor dew point at max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
-        Real64 minHeatingOATSizing;      // min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
-        Real64 minHeatingOADPSizing;     // outdoor dew point at min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+
+        Real64 maxCoolingOATSizing = -1000.0;  // max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 maxCoolingOADPSizing = -1000.0; // outdoor dew point at max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 minHeatingOATSizing = 1000.0;   // min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 minHeatingOADPSizing = 1000.0;  // outdoor dew point at min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
 
         // Default Constructor
         EnvironmentData()
@@ -211,8 +212,7 @@ namespace WeatherManager {
               UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),
               SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
               RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0),
-              firstHrInterpUseHr1(false), maxCoolingOATSizing(-999.0), maxCoolingOADPSizing(-999.0), minHeatingOATSizing(999.0),
-              minHeatingOADPSizing(999.0)
+              firstHrInterpUseHr1(false)
         {
         }
     };

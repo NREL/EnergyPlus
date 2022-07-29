@@ -210,7 +210,7 @@ public:
 
     bool checkForUnsupportedObjects(EnergyPlusData &state);
 
-    void getSimInputObjects(EnergyPlusData &state);
+    void isInputObjectUsed(EnergyPlusData &state);
 
     //    void clear_state();
 private:
@@ -338,13 +338,13 @@ private:
 struct DataInputProcessing : BaseGlobalStruct
 {
     std::unique_ptr<InputProcessor> inputProcessor = InputProcessor::factory();
-    bool DOASUsedInSim = false;
+    bool AirLoopHVACDOASUsedInSim = false;
 
     void clear_state() override
     {
         inputProcessor.reset();
         inputProcessor = EnergyPlus::InputProcessor::factory();
-        DOASUsedInSim = false;
+        AirLoopHVACDOASUsedInSim = false;
     }
 };
 
