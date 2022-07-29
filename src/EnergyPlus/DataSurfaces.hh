@@ -330,10 +330,6 @@ namespace DataSurfaces {
     constexpr int ModelAsDirectBeam(1);
     constexpr int ModelAsDiffuse(2);
 
-    // Parameters for window divider type
-    constexpr int DividedLite(1);
-    constexpr int Suspended(2);
-
     // Parameters for air flow window source
     constexpr int AirFlowWindow_Source_IndoorAir(1);
     constexpr int AirFlowWindow_Source_OutdoorAir(2);
@@ -894,8 +890,8 @@ namespace DataSurfaces {
     enum class FrameDividerType : int
     {
         Invalid = -1,
-        DividedLite = 0,
-        Suspended = 1,
+        DividedLite,
+        Suspended,
         Num
     };
 

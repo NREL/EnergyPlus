@@ -147,9 +147,7 @@ namespace HeatBalanceManager {
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;
-    using DataSurfaces::DividedLite;
     using DataSurfaces::FrameDividerProperties;
-    using DataSurfaces::Suspended;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
     using WindowComplexManager::CalculateBasisLength;
