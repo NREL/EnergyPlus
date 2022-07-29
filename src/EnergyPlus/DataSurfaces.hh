@@ -358,9 +358,13 @@ namespace DataSurfaces {
     constexpr int AirFlowWindow_ControlType_Schedule(3);
 
     // Parameters for window model selection
-    constexpr int Window5DetailedModel(100); // indicates original winkelmann window 5 implementation
-    constexpr int WindowBSDFModel(101);      // indicates complex fenestration window 6 implementation
-    constexpr int WindowEQLModel(102);       // indicates equivalent layer window model implementation
+    enum class WindowModel{
+        Invalid = -1,
+        Detailed, // indicates original winkelmann window 5 implementation
+        BSDF,     // indicates complex fenestration window 6 implementation
+        EQL,      // indicates equivalent layer window model implementation
+        Num
+    };
 
     // Parameters for PierceSurface
     constexpr std::size_t nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
@@ -1731,7 +1735,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinDividerHeatLoss;
     Array1D<Real64> SurfWinTCLayerTemp;           // The temperature of the thermochromic layer of the window
     Array1D<Real64> SurfWinSpecTemp;              // The specification temperature of the TC layer glass Added for W6 integration June 2010
-    Array1D<Real64> SurfWinWindowModelType;       // if set to WindowBSDFModel, then uses BSDF methods
+    Array1D<DataSurfaces::WindowModel> SurfWinWindowModelType;       // if set to WindowModel:: BSDF, then uses BSDF methods
     Array1D<Real64> SurfWinTDDPipeNum;            // Tubular daylighting device pipe number for TDD domes and diffusers
     Array1D<int> SurfWinStormWinConstr;           // Construction with storm window (windows only)
     Array1D<int> SurfActiveConstruction;          // The currently active construction with or without storm window

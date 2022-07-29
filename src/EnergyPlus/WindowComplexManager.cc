@@ -197,7 +197,7 @@ namespace WindowComplexManager {
                 continue; // Only BSDF windows
             // Simon Check: Thermal construction removed
             // ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
-            state.dataSurface->SurfWinWindowModelType(ISurf) = WindowBSDFModel;
+            state.dataSurface->SurfWinWindowModelType(ISurf) = WindowModel:: BSDF;
             state.dataHeatBal->AnyBSDF = true;
             ++state.dataWindowComplexManager->NumComplexWind;
             NumStates = 1;
@@ -849,7 +849,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (state.dataSurface->SurfWinWindowModelType(JSurf) == WindowBSDFModel) continue;
+            if (state.dataSurface->SurfWinWindowModelType(JSurf) == WindowModel:: BSDF) continue;
             if (!(state.dataSurface->Surface(JSurf).Class == SurfaceClass::Window ||
                   state.dataSurface->Surface(JSurf).Class == SurfaceClass::GlassDoor))
                 continue;
@@ -1896,7 +1896,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {  // back surface loop
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (state.dataSurface->SurfWinWindowModelType(JSurf) != WindowBSDFModel) continue;
+            if (state.dataSurface->SurfWinWindowModelType(JSurf) != WindowModel:: BSDF) continue;
 
             //  Directional-hemispherical back reflectance
             Sum1 = 0.0;

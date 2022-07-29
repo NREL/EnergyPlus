@@ -1589,7 +1589,7 @@ namespace WindowManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
             if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
-            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
+            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: BSDF) continue; // Irrelevant for Complex Fen
             if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue; // not required
             ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
@@ -2288,7 +2288,7 @@ namespace WindowManager {
         auto &surface(state.dataSurface->Surface(SurfNum));
         int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
-        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
+        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: BSDF) {
 
             temp = 0;
 
@@ -2326,7 +2326,7 @@ namespace WindowManager {
                      (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
                 surface.ViewFactorGroundIR * state.dataWindowManager->Ebout;
 
-        } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
+        } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: EQL) {
 
             EQLWindowSurfaceHeatBalance(
                 state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Invalid);

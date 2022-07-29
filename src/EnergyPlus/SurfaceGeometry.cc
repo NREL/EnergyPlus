@@ -268,7 +268,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinDividerHeatLoss.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinTCLayerTemp.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinSpecTemp.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, Window5DetailedModel);
+        state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, WindowModel:: Detailed);
         state.dataSurface->SurfWinTDDPipeNum.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinStormWinConstr.dimension(NumSurfaces, 0);
         state.dataSurface->SurfActiveConstruction.dimension(NumSurfaces, 0);
@@ -2845,7 +2845,7 @@ namespace SurfaceGeometry {
                         surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) != DataSurfaces::WindowAirFlowSource::Invalid ||
                         state.dataConstruction->Construct(surface.Construction).SourceSinkPresent || surface.Class == SurfaceClass::TDD_Dome ||
                         (surface.Class == SurfaceClass::Window && (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
-                                                                   state.dataSurface->SurfWinWindowModelType(surfNum) != Window5DetailedModel ||
+                                                                   state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel:: Detailed ||
                                                                    state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
                                                                    state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
                     if (!forceUniqueSurface) {
@@ -8964,7 +8964,7 @@ namespace SurfaceGeometry {
         for (Item = 1; Item <= state.dataSurface->TotSurfaces; ++Item) {
             if (state.dataSurface->Surface(Item).Class == SurfaceClass::Window || state.dataSurface->Surface(Item).Class == SurfaceClass::GlassDoor) {
                 // todo, add complex fenestration switch  HeatTransferModel_ComplexFenestration
-                if (state.dataSurface->SurfWinWindowModelType(Item) == WindowBSDFModel) {
+                if (state.dataSurface->SurfWinWindowModelType(Item) == WindowModel:: BSDF) {
                     state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::ComplexFenestration;
                 } else {
                     state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::Window5;
