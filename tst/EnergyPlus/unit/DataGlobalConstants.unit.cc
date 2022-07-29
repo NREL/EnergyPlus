@@ -78,9 +78,9 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::WellWater, DataGlobalConstants::AssignResourceTypeNum("WellWater")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Condensate, DataGlobalConstants::AssignResourceTypeNum("Condensate")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::EnergyTransfer, DataGlobalConstants::AssignResourceTypeNum("EnergyTransfer")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Steam, DataGlobalConstants::AssignResourceTypeNum("Steam")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictCooling, DataGlobalConstants::AssignResourceTypeNum("DistrictCooling")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeating, DataGlobalConstants::AssignResourceTypeNum("DistrictHeating")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeatingWater, DataGlobalConstants::AssignResourceTypeNum("DistrictHeatingWater")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeatingSteam, DataGlobalConstants::AssignResourceTypeNum("DistrictHeatingSteam")));
     EXPECT_TRUE(
         compare_enums(DataGlobalConstants::ResourceType::ElectricityProduced, DataGlobalConstants::AssignResourceTypeNum("ElectricityProduced")));
     EXPECT_TRUE(
@@ -135,9 +135,9 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::WellWater), "WellWater");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Condensate), "Condensate");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::EnergyTransfer), "EnergyTransfer");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Steam), "Steam");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::DistrictCooling), "DistrictCooling");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::DistrictHeating), "DistrictHeating");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::DistrictHeatingWater), "DistrictHeating");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::DistrictHeatingSteam), "DistrictHeatingSteam");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::ElectricityProduced), "ElectricityProduced");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::ElectricityPurchased), "ElectricityPurchased");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::ElectricitySurplusSold), "ElectricitySurplusSold");

@@ -217,7 +217,7 @@ namespace WaterThermalTanks {
         Steam,
         OtherFuel1,
         OtherFuel2,
-        DistrictHeating,
+        DistrictHeatingWater,
         DistrictHeatingSteam,
         Num
     };

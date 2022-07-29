@@ -619,7 +619,7 @@ namespace UtilityRoutines {
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
-                          bool AllowSteamAndDistrict = false);
+                          bool AllowDistrict = false);
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
