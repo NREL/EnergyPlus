@@ -126,8 +126,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         ip->markObjectAsUsed(state.dataIPShortCut->cCurrentModuleObject, thisObjectName);
 
         auto rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
-        fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), "getChillerASHRAE205Input: ");
-        thisChiller.Representation = rs_instance_factory::Create("RS0001", rep_file_path.c_str());
+        fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(RoutineName));
+        thisChiller.Representation = rs_instance_factory::Create("RS0001", rep_file_path.string().c_str());
 
         auto const evap_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_inlet_node_name");
         auto const evap_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_outlet_node_name");
@@ -220,9 +220,9 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             thisChiller.CondVolFlowRateWasAutoSized = true;
         }
 
-        thisChiller.AmbientTempIndicator = static_cast<AmbientTempIndicator>(getEnumerationValue(
+        thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumerationValue(
             AmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
-        switch (thisChiller.AmbientTempIndicator) {
+        switch (thisChiller.AmbientTempType) {
         case AmbientTempIndicator::Schedule: {
             const auto ambient_temp_schedule = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_schedule");
             thisChiller.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, ambient_temp_schedule);
@@ -504,7 +504,7 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
         this->MyInitFlag = false;
     }
 
-    switch (this->AmbientTempIndicator) {
+    switch (this->AmbientTempType) {
     case AmbientTempIndicator::Schedule: {
         this->AmbientTemp = ScheduleManager::GetCurrentScheduleValue(state, this->AmbientTempSchedule);
         break;
