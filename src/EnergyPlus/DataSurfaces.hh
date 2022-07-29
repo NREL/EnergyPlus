@@ -320,23 +320,6 @@ namespace DataSurfaces {
         return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
     }
 
-    // Parameters for window shade status
-    constexpr int NoShade(-1);
-    constexpr int ShadeOff(0);
-    constexpr int IntShadeOn(1); // Interior shade on
-    constexpr int SwitchableGlazing(2);
-    constexpr int ExtShadeOn(3);  // Exterior shade on
-    constexpr int ExtScreenOn(4); // Exterior screen on
-    constexpr int IntBlindOn(6);  // Interior blind on
-    constexpr int ExtBlindOn(7);  // Exterior blind on
-    constexpr int BGShadeOn(8);   // Between-glass shade on
-    constexpr int BGBlindOn(9);   // Between-glass blind on
-    constexpr int IntShadeConditionallyOff(10);
-    constexpr int GlassConditionallyLightened(20);
-    constexpr int ExtShadeConditionallyOff(30);
-    constexpr int IntBlindConditionallyOff(60);
-    constexpr int ExtBlindConditionallyOff(70);
-
     // WindowShadingControl Slat Angle Control for Blinds
     constexpr int WSC_SAC_FixedSlatAngle(1);
     constexpr int WSC_SAC_ScheduledSlatAngle(2);
