@@ -1137,6 +1137,25 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         } else {
             if (vrf.CoolEIRFPLR1 > 0) EIRFPLRModFac = CurveValue(state, vrf.CoolEIRFPLR1, max(vrf.MinPLR, CoolingPLR));
         }
+
+        if (EIRFPLRModFac < 0.0) {
+            if (vrf.CoolEIRFPLRErrorIndex == 0) {
+                ShowSevereMessage(state, fmt::format("{} \"{}\":", std::string(cVRFTypes(VRF_HeatPump)), vrf.Name));
+                ShowContinueError(state, format(" Cooling EIR Modifier curve (function of PLR) output is negative ({:.3T}).", EIRFPLRModFac));
+                ShowContinueError(state, format(" Negative value occurs using a cooling Part Load Ratio (PLR) of {:.2T}.", CoolingPLR));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            }
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                fmt::format("{} \"{}\": Cooling EIR Modifier curve (function of PLR) output is negative warning continues...",
+                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                            vrf.Name),
+                vrf.CoolEIRFPLRErrorIndex,
+                EIRFPLRModFac,
+                EIRFPLRModFac);
+            EIRFPLRModFac = 0.0;
+        }
+
         // find part load fraction to calculate RTF
         if (vrf.CoolPLFFPLR > 0) {
             PartLoadFraction = max(0.7, CurveValue(state, vrf.CoolPLFFPLR, CyclingRatio));
@@ -1154,6 +1173,25 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         } else {
             if (vrf.HeatEIRFPLR1 > 0) EIRFPLRModFac = CurveValue(state, vrf.HeatEIRFPLR1, max(vrf.MinPLR, HeatingPLR));
         }
+
+        if (EIRFPLRModFac < 0.0) {
+            if (vrf.HeatEIRFPLRErrorIndex == 0) {
+                ShowSevereMessage(state, fmt::format("{} \"{}\":", std::string(cVRFTypes(VRF_HeatPump)), vrf.Name));
+                ShowContinueError(state, format(" Heating EIR Modifier curve (function of PLR) output is negative ({:.3T}).", EIRFPLRModFac));
+                ShowContinueError(state, format(" Negative value occurs using a heating Part Load Ratio (PLR) of {:.2T}.", HeatingPLR));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            }
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                fmt::format("{} \"{}\": Heating EIR Modifier curve (function of PLR) output is negative warning continues...",
+                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                            vrf.Name),
+                vrf.HeatEIRFPLRErrorIndex,
+                EIRFPLRModFac,
+                EIRFPLRModFac);
+            EIRFPLRModFac = 0.0;
+        }
+
         // find part load fraction to calculate RTF
         if (vrf.HeatPLFFPLR > 0) {
             PartLoadFraction = max(0.7, CurveValue(state, vrf.HeatPLFFPLR, CyclingRatio));
