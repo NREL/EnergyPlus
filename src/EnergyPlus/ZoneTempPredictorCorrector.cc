@@ -4930,7 +4930,6 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
     Real64 TempSupplyAir;
     Real64 ZoneMult;
-    int LoopNode;
 
     // Initializations
     ZoneTempChange = DataPrecisionGlobals::constant_zero;
