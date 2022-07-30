@@ -247,10 +247,10 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinOutsideRevealSolAbs.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinScreenNumber.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinAirflowSource.dimension(NumSurfaces, DataSurfaces::WindowAirFlowSource::Invalid);
-        state.dataSurface->SurfWinAirflowDestination.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowDestination.dimension(NumSurfaces, DataSurfaces::WindowAirFlowDestination::Invalid);
         state.dataSurface->SurfWinAirflowReturnNodePtr.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinMaxAirflow.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinAirflowControlType.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowControlType.dimension(NumSurfaces, DataSurfaces::WindowAirFlowControlType::Invalid);
         state.dataSurface->SurfWinAirflowHasSchedule.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinAirflowSchedulePtr.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinAirflowThisTS.dimension(NumSurfaces, 0);
