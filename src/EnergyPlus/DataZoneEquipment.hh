@@ -282,7 +282,6 @@ namespace DataZoneEquipment {
     {
         // Members
         std::string ZoneName;
-        int ActualZoneNum; // index into the Zone data
         std::string EquipListName;
         int EquipListIndex;
         std::string ControlListName;
@@ -339,9 +338,9 @@ namespace DataZoneEquipment {
 
         // Default Constructor
         EquipConfiguration()
-            : ZoneName("Uncontrolled Zone"), ActualZoneNum(0), EquipListIndex(0), ZoneNode(0), NumInletNodes(0), NumExhaustNodes(0),
-              NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false), ZonalSystemOnly(false), IsControlled(false),
-              ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0), TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0),
+            : ZoneName("Uncontrolled Zone"), EquipListIndex(0), ZoneNode(0), NumInletNodes(0), NumExhaustNodes(0), NumReturnNodes(0),
+              NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false), ZonalSystemOnly(false), IsControlled(false), ZoneExh(0.0),
+              ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0), TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0),
               TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
               ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0),
               AirLoopDesSupply(0.0)
@@ -485,17 +484,17 @@ namespace DataZoneEquipment {
     int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
                                                            int TrialZoneNodeNum); // Node number to match into Controlled Zone structure
 
-    int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+    int GetSystemNodeNumberForZone(EnergyPlusData &state, int const zoneNum);
 
     int GetReturnAirNodeForZone(EnergyPlusData &state,
-                                std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
+                                int const zoneNum,
                                 std::string const &NodeName,             // Return air node name to match (may be blank)
                                 std::string const &calledFromDescription // String identifying the calling function and object
     );
 
     int GetReturnNumForZone(EnergyPlusData &state,
-                            std::string const &ZoneName, // Zone name to match into Controlled Zone structure
-                            std::string const &NodeName  // Return air node name to match (may be blank)
+                            int const zoneNum,
+                            std::string const &NodeName // Return air node name to match (may be blank)
     );
 
     int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquip const ZoneEquipTypeNum, std::string const &EquipmentName);

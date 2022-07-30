@@ -160,7 +160,6 @@ void ManageHVAC(EnergyPlusData &state)
     using SizingManager::UpdateFacilitySizing;
     using SystemAvailabilityManager::ManageHybridVentilation;
     using SystemReports::InitEnergyReports;
-    using SystemReports::ReportMaxVentilationLoads;
     using SystemReports::ReportSystemEnergyUse;
     using WaterManager::ManageWater;
     using WaterManager::ManageWaterInits;
@@ -428,7 +427,7 @@ void ManageHVAC(EnergyPlusData &state)
                 if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
             }
             if (state.dataGlobal->DoOutputReporting) {
-                ReportMaxVentilationLoads(state);
+                SystemReports::ReportVentilationLoads(state);
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                     state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
@@ -2931,8 +2930,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   February 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This sets some flags at the air loop and zone level: these flags indicate
@@ -2952,12 +2949,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleMaxValue;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirLoopNum(0);      // the air loop index
-    int ZoneNum(0);         // zone index
-    int ControlledZoneNum;  // controlled zone index
     bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
-    int LightNum;           // Lights object index
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2967,7 +2959,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
     if (state.dataHVACMgr->MyOneTimeFlag) {
         // set the air loop Any Continuous Fan flag
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             if (AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
                 if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
                     Real64 CycFanMaxVal = GetScheduleMaxValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
@@ -2984,8 +2976,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
             }
         }
         // check to see if a controlled zone is served exclusively by a zonal system
-        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            ZoneNum = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             bool airLoopFound = false;
             for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                 if (ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) > 0) {
@@ -2998,12 +2989,11 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         }
         // issue warning messages if zone is served by a zonal system or a cycling system and the input calls for
         // heat gain to return air
-        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-            ZoneNum = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
             CyclingFan = false;
             for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                int AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
                     if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
                         CyclingFan = CheckScheduleValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
@@ -3011,16 +3001,17 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
                 }
             }
             if (ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly || CyclingFan) {
-                if (Zone(ZoneNum).RefrigCaseRA) {
+                if (Zone(ControlledZoneNum).RefrigCaseRA) {
                     ShowWarningError(state,
-                                     "For zone=" + Zone(ZoneNum).Name + " return air cooling by refrigerated cases will be applied to the zone air.");
+                                     "For zone=" + Zone(ControlledZoneNum).Name +
+                                         " return air cooling by refrigerated cases will be applied to the zone air.");
                     ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                 }
-                for (LightNum = 1; LightNum <= state.dataHeatBal->TotLights; ++LightNum) {
-                    if (state.dataHeatBal->Lights(LightNum).ZonePtr != ZoneNum) continue;
+                for (int LightNum = 1; LightNum <= state.dataHeatBal->TotLights; ++LightNum) {
+                    if (state.dataHeatBal->Lights(LightNum).ZonePtr != ControlledZoneNum) continue;
                     if (state.dataHeatBal->Lights(LightNum).FractionReturnAir > 0.0) {
-                        ShowWarningError(state,
-                                         "For zone=" + Zone(ZoneNum).Name + " return air heat gain from lights will be applied to the zone air.");
+                        ShowWarningError(
+                            state, "For zone=" + Zone(ControlledZoneNum).Name + " return air heat gain from lights will be applied to the zone air.");
                         ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                         break;
                     }
@@ -3042,7 +3033,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     }
 
     // set the air loop fan operation mode
-    for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+    for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
             if (GetCurrentScheduleValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
                 AirLoopControlInfo(AirLoopNum).FanOpMode = CycFanCycCoil;
@@ -3053,16 +3044,15 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     }
     // set the zone level NoHeatToReturnAir flag
     // if any air loop in the zone is continuous fan, then set NoHeatToReturnAir = false and sort it out node-by-node
-    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
         if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-        ZoneNum = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
-        Zone(ZoneNum).NoHeatToReturnAir = true;
+        Zone(ControlledZoneNum).NoHeatToReturnAir = true;
         if (!ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly) {
             for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                int AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
                     if (AirLoopControlInfo(AirLoopNum).FanOpMode == ContFanCycCoil) {
-                        Zone(ZoneNum).NoHeatToReturnAir = false;
+                        Zone(ControlledZoneNum).NoHeatToReturnAir = false;
                         break;
                     }
                 }

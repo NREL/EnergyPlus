@@ -117,17 +117,12 @@ namespace ElectricBaseboardRadiator {
         }
     };
 
-    void SimElecBaseboard(EnergyPlusData &state,
-                          std::string const &EquipName,
-                          int const ActualZoneNum,
-                          int const ControlledZoneNum,
-                          bool const FirstHVACIteration,
-                          Real64 &PowerMet,
-                          int &CompIndex);
+    void SimElecBaseboard(
+        EnergyPlusData &state, std::string const &EquipName, int const ZoneNum, bool const FirstHVACIteration, Real64 &PowerMet, int &CompIndex);
 
     void GetElectricBaseboardInput(EnergyPlusData &state);
 
-    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

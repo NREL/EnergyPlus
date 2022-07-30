@@ -68,6 +68,10 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <algorithm>
+#include <iterator>
+#include <vector>
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
@@ -3116,6 +3120,165 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
     EXPECT_EQ(8.0, state->dataSurface->Surface(ThisSurf).Vertex(2).y);
     EXPECT_EQ(15.0, state->dataSurface->Surface(ThisSurf).Vertex(3).x);
     EXPECT_EQ(8.0, state->dataSurface->Surface(ThisSurf).Vertex(3).y);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_9118)
+{
+
+    // Test for #9118. The key point is that a collinear vertex should be found on the first occurence (that is vertex 2 is collinear with 1 and 3)
+    //      y
+    //     ▲
+    //     │ [5]     [4]
+    //  10 o──────o──────o[3]
+    //     │             │
+    //     │             │
+    //     │             │
+    //   5 o [6]         o [2]
+    //     │             │
+    //     │             │
+    //     │ [7]  [8]    │ [1]
+    //     o──────o──────o───►
+    //   0        5      10   x
+
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->MaxVerticesPerSurface = 8;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+    auto &surface = state->dataSurfaceGeometry->SurfaceTmp(1);
+    surface.Vertex.allocate(8);
+
+    surface.Azimuth = 0.0;
+    surface.Tilt = 0.0;
+    surface.Sides = 8;
+    surface.GrossArea = 100.0;
+
+    std::vector<Vector> baseVertices = {
+        {10.0, 0.0, 0.0},
+        {10.0, 10.0, 0.0},
+        {0.0, 10.0, 0.0},
+        {0.0, 0.0, 0.0},
+    };
+    int i = 0;
+    auto &vertices = surface.Vertex;
+
+    for (auto it = std::cbegin(baseVertices); it != std::cend(baseVertices); ++it) {
+        auto itnext = std::next(it);
+        if (itnext == std::cend(baseVertices)) {
+            itnext = std::cbegin(baseVertices);
+        }
+        vertices(++i) = *it;
+        Vector midPoint = (*it + *itnext) / 2.0; // V1 + (V2 - V1) / 2.0 == (V1 + V2) / 2.0
+        vertices(++i) = midPoint;
+    }
+
+    std::vector<Vector> actualVertices = {
+        {+10.0000, +0.0000, +0.0000},
+        {+10.0000, +5.0000, +0.0000},
+        {+10.0000, +10.0000, +0.0000},
+        {+5.0000, +10.0000, +0.0000},
+        {+0.0000, +10.0000, +0.0000},
+        {+0.0000, +5.0000, +0.0000},
+        {+0.0000, +0.0000, +0.0000},
+        {+5.0000, +0.0000, +0.0000},
+    };
+    i = -1;
+    for (const auto &v : vertices) {
+        EXPECT_EQ(actualVertices[++i], v);
+    }
+
+    CheckConvexity(*state, 1, surface.Sides);
+
+    EXPECT_EQ(4, surface.Sides);
+    EXPECT_TRUE(surface.IsConvex);
+
+    for (int i = 1; i <= 4; ++i) {
+        EXPECT_EQ(baseVertices[i - 1], vertices(i)) << "Failed for Vertex " << i;
+    }
+
+    // Now perform the same test, except the first vertices is colinear, to ensure we also get that case covered
+    // We move all vertices in the clockwise order by one
+    //      y
+    //     ▲
+    //     │ [6]     [5]
+    //  10 o──────o──────o[4]
+    //     │             │
+    //     │             │
+    //     │             │
+    //   5 o [7]         o [3]
+    //     │             │
+    //     │             │
+    //     │ [8]  [1]    │ [2]
+    //     o──────o──────o───►
+    //   0        5      10   x
+    std::rotate(actualVertices.rbegin(), actualVertices.rbegin() + 1, actualVertices.rend());
+    surface.Azimuth = 0.0;
+    surface.Tilt = 0.0;
+    surface.Sides = 8;
+    surface.GrossArea = 100.0;
+    vertices.deallocate();
+    vertices.allocate(8);
+    vertices = actualVertices;
+    CheckConvexity(*state, 1, surface.Sides);
+
+    EXPECT_EQ(4, surface.Sides);
+    EXPECT_TRUE(surface.IsConvex);
+
+    for (int i = 1; i <= 4; ++i) {
+        EXPECT_EQ(baseVertices[i - 1], vertices(i)) << "Failed for Vertex " << i;
+    }
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_ASHRAE901_Hospital_STD2019_Denver)
+{
+
+    // Test for #9118. This is ASHRAE901_Hospital_STD2019_Denver.idf
+    //  y
+    //    ▲
+    //    │
+    //    │            6 ┌──────┐ 5
+    //    │    8         │      │
+    //    │    ┌─────────┘7     │
+    //    │    │                │
+    //    │    │   ┌────────────┘
+    //    │    │   │3             4
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    │    │   │
+    //    └────┴───┴────────────────────►
+    //         1   2                     x
+
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->MaxVerticesPerSurface = 8;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+    auto &surface = state->dataSurfaceGeometry->SurfaceTmp(1);
+
+    surface.Azimuth = 0.0;
+    surface.Tilt = 0.0;
+    surface.Sides = 8;
+    surface.GrossArea = 100.0;
+    surface.Name = "CORRIDOR_FLR_5_CEILING";
+    surface.Vertex.allocate(8);
+    std::vector<Vector> vertices = {
+        {9.1440, 0.0000, 21.3415},
+        {15.2400, 0.0000, 21.3415},
+        {15.2400, 42.6720, 21.3415},
+        {39.6240, 42.6720, 21.3415},
+        {39.6240, 53.3400, 21.3415},
+        {27.4320, 53.3400, 21.3415},
+        {27.4320, 48.7680, 21.3415},
+        {9.1440, 48.7680, 21.3415},
+    };
+    surface.Vertex = vertices;
+
+    CheckConvexity(*state, 1, surface.Sides);
+
+    EXPECT_EQ(8, surface.Sides);
+    EXPECT_FALSE(surface.IsConvex);
 }
 
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
@@ -9234,4 +9397,119 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     EXPECT_EQ("GNDSURFS LAKEAREA", GndSurfsProperty.GndSurfs(3).Name);
     EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(3).ViewFactor);
     EXPECT_DOUBLE_EQ(0.4, GndSurfsProperty.SurfsViewFactorSum);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
+{
+    // Test for #9123
+    std::string const idf_objects = delimited_string({
+        "BuildingSurface:Detailed,",
+        "  Zn001:Ceiling002,        !- Name",
+        "  Ceiling,                 !- Surface Type",
+        "  FLOOR,                   !- Construction Name",
+        "  ZONE 1,                  !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Surface,                 !- Outside Boundary Condition",
+        "  Zn002:Flr002,            !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  ,                        !- View Factor to Ground",
+        "  ,                        !- Number of Vertices",
+        "  54.379, -28.887, 3.7,    !- X,Y,Z Vertex 1 {m}",
+        "  54.379, -23.003, 3.7,    !- X,Y,Z Vertex 2 {m}",
+        "  54.36,  -23.003, 3.7,    !- X,Y,Z Vertex 3 {m}",
+        "  54.36,  -28.881, 3.7,    !- X,Y,Z Vertex 4 {m}",
+        "  54.373, -28.881, 3.7,    !- X,Y,Z Vertex 5 {m}",
+        "  54.373, -28.887, 3.7;    !- X,Y,Z Vertex 6 {m}",
+        "",
+        "BuildingSurface:Detailed,",
+        "  Zn002:Flr002,            !- Name",
+        "  Floor,                   !- Surface Type",
+        "  FLOOR,                   !- Construction Name",
+        "  ZONE 2,                  !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Surface,                 !- Outside Boundary Condition",
+        "  Zn001:Ceiling002,        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  ,                        !- View Factor to Ground",
+        "  ,                        !- Number of Vertices",
+        "  54.373, -28.887, 3.7,    !- X,Y,Z Vertex 1 {m}",
+        "  54.373, -28.881, 3.7,    !- X,Y,Z Vertex 2 {m}",
+        "  54.36,  -28.881, 3.7,    !- X,Y,Z Vertex 3 {m}",
+        "  54.36,  -23.003, 3.7,    !- X,Y,Z Vertex 4 {m}",
+        "  54.379, -23.003, 3.7,    !- X,Y,Z Vertex 5 {m}",
+        "  54.379, -28.887, 3.7;    !- X,Y,Z Vertex 6 {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(2).Name = "ZONE 2";
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(2);
+    int SurfNum = 0;
+    int TotHTSurfs = 2;
+    Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(
+        3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof});
+    int NeedToAddSurfaces;
+
+    bool ErrorsFound(false);
+    GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(1);
+    state->dataConstruction->Construct(1).Name = "FLOOR";
+
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    EXPECT_FALSE(ErrorsFound);
+
+    EXPECT_EQ(2, SurfNum);
+    auto const error_string = delimited_string({
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN001:CEILING002, in Zone=ZONE 1",
+        "   **   ~~~   ** Vertex [5]=(54.37,-28.88,3.70)",
+        "   **   ~~~   ** Vertex [6]=(54.37,-28.89,3.70)",
+        "   **   ~~~   ** Dropping Vertex [6].",
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN001:CEILING002, in Zone=ZONE 1",
+        "   **   ~~~   ** Vertex [5]=(54.37,-28.88,3.70)",
+        "   **   ~~~   ** Vertex [1]=(54.38,-28.89,3.70)",
+        "   **   ~~~   ** Dropping Vertex [1].",
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
+        "   **   ~~~   ** Vertex [1]=(54.37,-28.89,3.70)",
+        "   **   ~~~   ** Vertex [2]=(54.37,-28.88,3.70)",
+        "   **   ~~~   ** Dropping Vertex [2].",
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
+        "   **   ~~~   ** Vertex [5]=(54.38,-28.89,3.70)",
+        "   **   ~~~   ** Vertex [1]=(54.37,-28.89,3.70)",
+        "   **   ~~~   ** Dropping Vertex [1].",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    const auto &sf_temps = state->dataSurfaceGeometry->SurfaceTmp;
+    EXPECT_EQ(2, sf_temps.size());
+    EXPECT_EQ("ZN001:CEILING002", sf_temps(1).Name);
+    EXPECT_EQ("ZN002:FLR002", sf_temps(2).Name);
+
+    EXPECT_EQ(4, sf_temps(1).Sides);
+    EXPECT_EQ(4, sf_temps(1).Vertex.size());
+
+    EXPECT_EQ(4, sf_temps(2).Sides);
+    EXPECT_EQ(4, sf_temps(2).Vertex.size());
+
+    EXPECT_NEAR(11.80, sf_temps(1).Perimeter, 0.02);
+    EXPECT_NEAR(11.80, sf_temps(2).Perimeter, 0.02);
 }

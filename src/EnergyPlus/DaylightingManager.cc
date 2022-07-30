@@ -7309,29 +7309,15 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     // REFERENCES:
     // Based on DOE-2.1E subroutine DLTSYS.
 
-    using ScheduleManager::GetCurrentScheduleValue;
-
-    Real64 TotReduction; // Electric lighting power reduction factor for a zone
-    //  due to daylighting
-    int NREFPT;                          // Number of daylighting reference points in a zone
-    Real64 ZFTOT = 0.;                   // Fraction of zone's floor area that has daylighting controls
-    int IL;                              // Reference point index
-    DataDaylighting::LtgCtrlType LSYSTP; // Lighting control type: 1=continuous dimming, 2=stepped,
-    //  3=continuous dimming then off
-    Real64 ZFRAC; // Fraction of zone controlled by a reference point
-    Real64 FL;    // Fraction electric lighting output required to meet setpoint
-    Real64 FP;    // Fraction electric lighting power input required to meet setpoint
-    Real64 XRAN;  // Random number between 0 and 1
-    bool ScheduledAvailable;
-
-    if ((int)state.dataDaylightingData->daylightControl.size() == 0) return;
+    if (state.dataDaylightingData->daylightControl.empty()) {
+        return;
+    }
     // Reset space power reduction factors
     for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
         state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
     }
 
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
-        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+    for (auto &thisDaylightControl : state.dataDaylightingData->daylightControl) {
 
         if (thisDaylightControl.DaylightMethod != DataDaylighting::DaylightingMethod::SplitFlux) {
             // Set space power reduction factors
@@ -7349,67 +7335,68 @@ void DayltgElecLightingControl(EnergyPlusData &state)
             continue;
         }
 
+        // Electric lighting power reduction factor for a given daylighting control
+        Real64 &TotReduction = thisDaylightControl.PowerReductionFactor;
         TotReduction = 0.0;
-        ZFTOT = 0.0;
-        //  ScheduledAvailable = .TRUE.
+        Real64 ZFTOT = 0.0;
 
         // check if scheduled to be available
-        //  IF (ZoneDaylight(ZoneNum)%AvailSchedNum > 0) THEN
-        if (GetCurrentScheduleValue(state, thisDaylightControl.AvailSchedNum) > 0.0) {
-            ScheduledAvailable = true;
-        } else {
-            ScheduledAvailable = false;
-        }
-        //  ENDIF
-
-        if (ScheduledAvailable) {
-            NREFPT = thisDaylightControl.TotalDaylRefPoints;
+        if (ScheduleManager::GetCurrentScheduleValue(state, thisDaylightControl.AvailSchedNum) > 0.0) {
 
             // Loop over reference points
-            for (IL = 1; IL <= NREFPT; ++IL) {
+            for (int IL = 1; IL <= thisDaylightControl.TotalDaylRefPoints; ++IL) {
 
                 // Total fraction of zone that is daylit
                 ZFTOT += thisDaylightControl.FracZoneDaylit(IL);
 
                 state.dataDaylightingManager->DaylIllum(IL) = thisDaylightControl.DaylIllumAtRefPt(IL);
-                if (state.dataDaylightingManager->DaylIllum(IL) >= thisDaylightControl.IllumSetPoint(IL)) {
-                    FL = 0.0;
-                } else {
+                Real64 FL = 0.0;
+                if (state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL)) {
                     FL =
                         (thisDaylightControl.IllumSetPoint(IL) - state.dataDaylightingManager->DaylIllum(IL)) / thisDaylightControl.IllumSetPoint(IL);
                 }
 
                 // BRANCH ON LIGHTING SYSTEM TYPE
-                LSYSTP = thisDaylightControl.LightControlType;
+                auto LSYSTP = thisDaylightControl.LightControlType;
+                Real64 FP = 0.0;
                 if (LSYSTP != DataDaylighting::LtgCtrlType::Stepped) {
                     // Continuously dimmable system with linear power curve
                     // Fractional output power required to meet setpoint
                     FP = 1.0;
                     // LIGHT-CTRL-TYPE = CONTINUOUS (LSYSTP = 1)
-                    if (FL <= thisDaylightControl.MinLightFraction) FP = thisDaylightControl.MinPowerFraction;
+                    if (FL <= thisDaylightControl.MinLightFraction) {
+                        FP = thisDaylightControl.MinPowerFraction;
+                    }
                     // LIGHT-CTRL-TYPE = CONTINUOUS/OFF (LSYSTP = 3)
-                    if (FL <= thisDaylightControl.MinLightFraction && LSYSTP == DataDaylighting::LtgCtrlType::ContinuousOff) FP = 0.0;
-                    if (FL > thisDaylightControl.MinLightFraction && FL < 1.0)
+                    if (FL <= thisDaylightControl.MinLightFraction && LSYSTP == DataDaylighting::LtgCtrlType::ContinuousOff) {
+                        FP = 0.0;
+                    }
+                    if (FL > thisDaylightControl.MinLightFraction && FL < 1.0) {
                         FP = (FL + (1.0 - FL) * thisDaylightControl.MinPowerFraction - thisDaylightControl.MinLightFraction) /
                              (1.0 - thisDaylightControl.MinLightFraction);
+                    }
 
                 } else { // LSYSTP = 2
                     // Stepped system
                     FP = 0.0;
-                    if (state.dataDaylightingManager->DaylIllum(IL) > 0.0 &&
-                        state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL))
+                    // #9060: Use a tolerance, otherwise at very low (< 1e-12) daylighting conditions, you can get a multiplier > 1.0
+                    if (state.dataDaylightingManager->DaylIllum(IL) < 0.1) {
+                        FP = 1.0;
+                    } else if (state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL)) {
                         FP = double(int(thisDaylightControl.LightControlSteps * FL) + 1) / double(thisDaylightControl.LightControlSteps);
-
-                    if (state.dataDaylightingManager->DaylIllum(IL) == 0.0) FP = 1.0;
+                    }
 
                     if (thisDaylightControl.LightControlProbability < 1.0) {
                         // Manual operation.  Occupant sets lights one level too high a fraction of the time equal to
                         // 1. - ZoneDaylight(ZoneNum)%LightControlProbability.  RANDOM_NUMBER returns a random number
                         // between 0 and 1.
+                        Real64 XRAN;
                         RANDOM_NUMBER(XRAN);
                         if (XRAN >= thisDaylightControl.LightControlProbability) {
                             // Set level one higher
-                            if (FP < 1.0) FP += (1.0 / double(thisDaylightControl.LightControlSteps));
+                            if (FP < 1.0) {
+                                FP += (1.0 / double(thisDaylightControl.LightControlSteps));
+                            }
                         } // XRAN
                     }     // Light Control Probability < 1
                 }         // Lighting System Type
@@ -7417,8 +7404,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
                 thisDaylightControl.RefPtPowerReductionFactor(IL) = FP;
 
                 // Accumulate net ltg power reduction factor for entire zone
-                ZFRAC = thisDaylightControl.FracZoneDaylit(IL);
-                TotReduction += thisDaylightControl.RefPtPowerReductionFactor(IL) * ZFRAC;
+                TotReduction += thisDaylightControl.RefPtPowerReductionFactor(IL) * thisDaylightControl.FracZoneDaylit(IL);
 
             } // End of loop over reference points, IL
 
@@ -7430,7 +7416,6 @@ void DayltgElecLightingControl(EnergyPlusData &state)
         } else { // controls not currently available
             TotReduction = 1.0;
         }
-        thisDaylightControl.PowerReductionFactor = TotReduction;
 
         // Set space power reduction factors
         if (thisDaylightControl.spaceIndex > 0) {
@@ -7448,7 +7433,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     if ((int)state.dataDaylightingData->IllumMap.size() > 0 && !state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
         for (int mapNum = 1; mapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapNum) {
             if (state.dataGlobal->TimeStep == 1) state.dataDaylightingData->mapResultsToReport = false;
-            for (IL = 1; IL <= state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints; ++IL) {
+            for (int IL = 1; IL <= state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints; ++IL) {
                 state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPtHr(IL) +=
                     state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPt(IL) / double(state.dataGlobal->NumOfTimeStepInHour);
                 if (state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPtHr(IL) > 0.0) {
