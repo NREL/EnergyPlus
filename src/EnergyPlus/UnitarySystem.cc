@@ -2170,7 +2170,9 @@ namespace UnitarySystems {
             state.dataSize->DXCoolCap = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
                 state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
             EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
-            EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
+            if (this->m_DXHeatingCoil) {
+                EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
+            }
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 this->m_CoolVolumeFlowRate[Iter] = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(Iter);
