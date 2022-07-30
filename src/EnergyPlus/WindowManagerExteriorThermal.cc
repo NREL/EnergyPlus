@@ -134,7 +134,7 @@ namespace WindowManager {
             Real64 aTemp = 0;
             for (auto aSide : FenestrationCommon::EnumSide()) {
                 aTemp = aLayer->getTemperature(aSide);
-                state.dataWindowManager->thetas(i) = aTemp;
+                state.dataWindowManager->thetas[i - 1] = aTemp;
                 if (i == 1) {
                     SurfOutsideTemp = aTemp - DataGlobalConstants::KelvinConv;
                 }
@@ -159,7 +159,7 @@ namespace WindowManager {
                 }
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp +
-                     EffGlEmiss * (state.dataWindowManager->thetas(2 * totSolidLayers - 2) - state.dataWindowManager->TKelvin)) /
+                     EffGlEmiss * (state.dataWindowManager->thetas[2 * totSolidLayers - 3] - state.dataWindowManager->TKelvin)) /
                     (EffShBlEmiss + EffGlEmiss);
             }
         }
@@ -189,15 +189,15 @@ namespace WindowManager {
             auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
-                    (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
-                EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1), 4) - rmir) *
+                    (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1], 4) - rmir) +
+                EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 2], 4) - rmir) *
                     RhoGlIR2 * TauShIR / ShGlReflFacIR;
             auto NetIRHeatGainGlass =
                 ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) *
-                (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
+                (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglface - 1], 4) - rmir);
             auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
             auto ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
-                                                 (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
+                                                 (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1] - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
 
@@ -249,17 +249,17 @@ namespace WindowManager {
         state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
+            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas[2 * k - 2];
+            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas[2 * k - 1];
 
             // temperatures for reporting
-            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas(2 * k - 1) - DataGlobalConstants::KelvinConv;
-            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas(2 * k) - DataGlobalConstants::KelvinConv;
+            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 2] - DataGlobalConstants::KelvinConv;
+            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 1] - DataGlobalConstants::KelvinConv;
         }
     }
 
-    double
-    GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const double windowWidth, const double windowHeight)
+    Real64
+    GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const Real64 windowWidth, const Real64 windowHeight)
     {
         const auto tilt{90.0};
 
@@ -271,7 +271,7 @@ namespace WindowManager {
         return winterGlassUnit->getUValue();
     }
 
-    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight)
+    Real64 GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, Real64 windowWidth, Real64 windowHeight)
     {
         const auto tilt{90.0};
 
@@ -285,12 +285,12 @@ namespace WindowManager {
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
                                         int constrNum,
-                                        double windowWidth,
-                                        double windowHeight,
+                                        Real64 windowWidth,
+                                        Real64 windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
-                                        double &uvalue,
-                                        double &shgc,
-                                        double &vt)
+                                        Real64 &uvalue,
+                                        Real64 &shgc,
+                                        Real64 &vt)
     {
         auto &surface(state.dataSurface->Surface(surfNum));
         auto &frameDivider(state.dataSurface->FrameDivider(surface.FrameDivider));
@@ -406,7 +406,14 @@ namespace WindowManager {
         : m_Surface(surface), m_Window(state.dataSurface->SurfaceWindow(t_SurfNum)), m_ShadePosition(ShadePosition::NoShade), m_SurfNum(t_SurfNum),
           m_SolidLayerIndex(0), m_ConstructionNumber(t_ConstrNum), m_TotLay(getNumOfLayers(state)), m_InteriorBSDFShade(false), m_ExteriorShade(false)
     {
-        const auto ShadeFlag{getShadeType(state, t_ConstrNum)};
+        if (!state.dataConstruction->Construct(m_ConstructionNumber).WindowTypeBSDF &&
+            state.dataSurface->SurfWinShadingFlag.size() >= static_cast<size_t>(m_SurfNum)) {
+            if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
+                m_ConstructionNumber = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
+                m_TotLay = getNumOfLayers(state);
+            }
+        }
+        const auto ShadeFlag{getShadeType(state, m_ConstructionNumber)};
 
         if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
             m_ShadePosition = ShadePosition::Interior;
@@ -451,7 +458,7 @@ namespace WindowManager {
     }
 
     std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(
-        EnergyPlusData &state, bool const useSummerConditions, const double width, const double height, const double tilt)
+        EnergyPlusData &state, bool const useSummerConditions, const Real64 width, const Real64 height, const Real64 tilt)
     {
         auto Indoor = getIndoorNfrc(useSummerConditions);
         auto Outdoor = getOutdoorNfrc(useSummerConditions);
@@ -484,14 +491,15 @@ namespace WindowManager {
         auto ConstrNum = m_ConstructionNumber;
 
         // BSDF window do not have special shading flag
-        if (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) {
+        if (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF &&
+            state.dataSurface->SurfWinShadingFlag.size() >= static_cast<size_t>(m_SurfNum)) {
             if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
                 ConstrNum = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
             }
         }
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));
-        auto LayPtr = construction.LayerPoint(t_Index);
+        const auto LayPtr = construction.LayerPoint(t_Index);
         return &state.dataMaterial->Material(LayPtr);
     }
 

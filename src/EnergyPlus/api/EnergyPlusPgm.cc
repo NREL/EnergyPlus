@@ -219,8 +219,21 @@
 #include <unistd.h>
 #endif
 
-int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath)
+int EnergyPlusPgm(int argc, const char *argv[], std::string const &filepath)
 {
+    EnergyPlus::EnergyPlusData state;
+    //// these need to be set early to be used in help and version output messaging
+    Array1D_int value(8);
+    std::string datestring; // supposedly returns blank when no date available.
+    date_and_time(datestring, _, _, value);
+    if (!datestring.empty()) {
+        state.dataStrGlobals->CurrentDateTime = fmt::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
+    } else {
+        state.dataStrGlobals->CurrentDateTime = " unknown date/time";
+    }
+    state.dataStrGlobals->VerStringVar = EnergyPlus::DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
+
+    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv);
     return RunEnergyPlus(state, filepath);
 }
 
@@ -254,10 +267,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state)
 #endif
 #endif
 
-    state.dataSysVars->Time_Start = DataTimings::epElapsedTime();
-#ifdef EP_Detailed_Timings
-    epStartTime("EntireRun=");
-#endif
+    state.dataSysVars->Time_Start = UtilityRoutines::epElapsedTime();
 
     state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 

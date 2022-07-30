@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -153,7 +154,7 @@ protected:
         state->dataLoopNodes->NodeID.allocate(50);
 
         state->dataHeatBalFanSys->TempControlType.allocate(numZones);
-        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
@@ -228,7 +229,6 @@ protected:
 
         auto &thisZoneEqConfig(state->dataZoneEquip->ZoneEquipConfig(zoneNum));
         thisZoneEqConfig.IsControlled = true;
-        thisZoneEqConfig.ActualZoneNum = 1;
         thisZoneEqConfig.ZoneName = "ZONE1";
         thisZoneEqConfig.EquipListName = "ZONE1EQUIPMENT";
         thisZoneEqConfig.ZoneNode = zoneNode;
@@ -305,11 +305,9 @@ protected:
         // set up air loop
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumBranches = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumInletBranches = 1;
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum.allocate(1);
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum[0] = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumOutletBranches = 1;
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum.allocate(1);
-        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum(1) = 1;
+        state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum[0] = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).TotalComponents = 1;
         state->dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp.allocate(1);
@@ -3869,8 +3867,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
               state->dataZoneEquip->ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
                   .InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCombinationRatio);
-    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
-    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
+    EXPECT_NEAR(11612.363, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
+    EXPECT_NEAR(11612.363, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
     EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
 
     // test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
@@ -4059,7 +4057,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo = 21.0;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType = 4;
+    state->dataHeatBalFanSys->TempControlType = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZT = 25.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
@@ -4099,7 +4097,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 LatOutputProvided);
     EXPECT_NEAR(SysOutputProvided,
                 state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
-                5.0); // system output should be less than 0 and approx = to VRF capacity * SHR
+                7.0); // system output should be less than 0 and approx = to VRF capacity * SHR
 
     // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
     int DXCoolingCoilIndex = 1;
@@ -5950,7 +5948,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
               0.0); // flow should be = 0 for cycling fan mode
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0; // set constant fan operating mode
@@ -8428,7 +8426,6 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->NumSteamCoils = 1;
     state->dataSteamCoils->SteamCoil.allocate(state->dataSteamCoils->NumSteamCoils);
     state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
     state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -8446,7 +8443,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
-    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
+    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::CoilControlType::ZoneLoadControl;
     state->dataSteamCoils->GetSteamCoilsInputFlag = false;
     state->dataSteamCoils->CheckEquipName.dimension(state->dataSteamCoils->NumSteamCoils, true);
     state->dataSteamCoils->MySizeFlag.allocate(CoilNum);
@@ -15934,6 +15931,247 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.0001);
     EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
+{
+    // Test for PR9573 that fixes Issue 9572
+    std::string const idf_objects = delimited_string({
+
+        "  Curve:Biquadratic,",
+        "    BiquadraticCurve,        !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    EIRfPLR_BadCurve,                 !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    -1.0,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    CurveManager::GetCurveInput(*state);
+
+    int VRFCond = 1;
+    state->dataHVACVarRefFlow->VRF.allocate(1);
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum = 0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
+    state->dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity = 20000.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity = 20000.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP = 3.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP = 3.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower =
+        state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCOP;
+    state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionCooling = 1.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).PipingCorrectionHeating = 1.0;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolCapFT = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFT = 1;
+    state->dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR1 = 2;
+    state->dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR1 = 2;
+    state->dataHVACVarRefFlow->CoolCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->CoolCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->HeatCombinationRatio.allocate(1);
+    state->dataHVACVarRefFlow->HeatCombinationRatio(VRFCond) = 1.0;
+    state->dataHVACVarRefFlow->LastModeCooling.allocate(1);
+    state->dataHVACVarRefFlow->LastModeHeating.allocate(1);
+
+    state->dataHVACVarRefFlow->TerminalUnitList.allocate(1);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList = 5;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRCoolRequest = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HRHeatRequest = false;
+
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable.allocate(5);
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable.allocate(5);
+    // all TU coils are available
+    state->dataHVACVarRefFlow->TerminalUnitList(1).CoolingCoilAvailable = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).HeatingCoilAvailable = true;
+
+    state->dataHVACVarRefFlow->CoolingLoad.allocate(1);
+    state->dataHVACVarRefFlow->HeatingLoad.allocate(1);
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+
+    state->dataDXCoils->DXCoilCoolInletAirWBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(10);
+    state->dataDXCoils->DXCoilHeatInletAirWBTemp.allocate(10);
+
+    state->dataHVACVarRefFlow->VRFTU.allocate(5);
+    for (int NumTU = 1; NumTU <= state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList; ++NumTU) {
+        state->dataHVACVarRefFlow->VRFTU(NumTU).CoolCoilIndex = NumTU;
+        state->dataHVACVarRefFlow->VRFTU(NumTU).HeatCoilIndex = state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU;
+        state->dataHVACVarRefFlow->TerminalUnitList(1).ZoneTUPtr(NumTU) = NumTU;
+        // initialize DX coil inlet conditions
+        state->dataDXCoils->DXCoilCoolInletAirWBTemp(NumTU) = 19.4;
+        state->dataDXCoils->DXCoilHeatInletAirDBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 20.0;
+        state->dataDXCoils->DXCoilHeatInletAirWBTemp(state->dataHVACVarRefFlow->TerminalUnitList(1).NumTUInList + NumTU) = 17.0;
+    }
+
+    // set up environment
+    state->dataGlobal->DayOfSim = 1;
+    state->dataGlobal->CurrentTime = 0.25;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.01;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
+
+    // TU's are off
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 0.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).CrankCaseHeaterPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpElecPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).EvapWaterConsumpRate, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingCoolingCOP, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingHeatingCOP, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingCOP, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SCHE, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).BasinHeaterPower, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).QCondEnergy, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.0);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingMode, 0.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+
+    // TU's are in cooling mode only
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = false;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 1000.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.25);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
+
+    // This should be reset to zero after the fix
+    EXPECT_NE(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedCoolingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
+
+    // Test warning messages
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "AirConditioner:VariableRefrigerantFlow \"\":");
+    EXPECT_EQ(state->dataErrTracking->NumRecurringErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[0].MinValue, -0.25);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[0].MaxValue, -0.25);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[0].Count, 1);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[0].Message,
+              " ** Warning ** AirConditioner:VariableRefrigerantFlow \"\": Cooling EIR Modifier curve (function of PLR) output is negative warning "
+              "continues...");
+
+    // TU's are in heating mode only
+    state->dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+    state->dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+    state->dataHVACVarRefFlow->LastModeCooling(VRFCond) = false;
+    state->dataHVACVarRefFlow->LastModeHeating(VRFCond) = true;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(2) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
+    state->dataHVACVarRefFlow->TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
+
+    CalcVRFCondenser(*state, VRFCond);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUCoolingLoad, 0.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TUHeatingLoad, 5000.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.25);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondRTF, 1.0);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).SUMultiplier, 1.0);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower, 0.0);
+
+    // This should be reset to zero after the fix
+    EXPECT_NE(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower,
+              state->dataHVACVarRefFlow->VRF(VRFCond).RatedHeatingPower * state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR);
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.0);
+
+    // Test warning messages
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 2);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "AirConditioner:VariableRefrigerantFlow \"\":");
+    EXPECT_EQ(state->dataErrTracking->NumRecurringErrors, 2);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[1].MinValue, -0.25);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[1].MaxValue, -0.25);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[1].Count, 1);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors[1].Message,
+              " ** Warning ** AirConditioner:VariableRefrigerantFlow \"\": Heating EIR Modifier curve (function of PLR) output is negative warning "
+              "continues...");
 }
 
 } // end of namespace EnergyPlus

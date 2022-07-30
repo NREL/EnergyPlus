@@ -1069,7 +1069,7 @@ namespace UserDefinedComponents {
                                                                 state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                                 DataLoopNode::NodeFluidType::Air,
                                                                 DataLoopNode::ConnectionType::Inlet,
-                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
                                                                 DataLoopNode::ObjectIsNotParent);
 
                         const auto LoopStr = fmt::to_string(ConnectionLoop);
@@ -1108,7 +1108,7 @@ namespace UserDefinedComponents {
                                                                 state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                                 DataLoopNode::NodeFluidType::Air,
                                                                 DataLoopNode::ConnectionType::Outlet,
-                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
                                                                 DataLoopNode::ObjectIsNotParent);
                         SetupEMSActuator(state,
                                          "Air Connection " + LoopStr,
@@ -1137,16 +1137,11 @@ namespace UserDefinedComponents {
                     }
 
                     if (!lAlphaFieldBlanks(8)) {
-                        {
-                            auto const SELECT_CASE_var(cAlphaArgs(8));
-
-                            if (SELECT_CASE_var == "YES") {
-                                state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = true;
-                            } else if (SELECT_CASE_var == "NO") {
-                                state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = false;
-                            }
+                        if (cAlphaArgs(8) == "YES") {
+                            state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = true;
+                        } else if (cAlphaArgs(8) == "NO") {
+                            state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = false;
                         }
-
                     } else {
                         state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected = false;
                     }
@@ -1160,7 +1155,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::ConnectionType::Inlet,
-                                                                NodeInputManager::CompFluidStream::Secondary,
+                                                                NodeInputManager::CompFluidStream::Tertiary,
                                                                 DataLoopNode::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.OutletNodeNum =
                             NodeInputManager::GetOnlySingleNode(state,
@@ -1170,7 +1165,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::ConnectionType::Outlet,
-                                                                NodeInputManager::CompFluidStream::Secondary,
+                                                                NodeInputManager::CompFluidStream::Tertiary,
                                                                 DataLoopNode::ObjectIsNotParent);
 
                         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(9), cAlphaArgs(10), "Plant Nodes");
@@ -1993,7 +1988,7 @@ namespace UserDefinedComponents {
                 BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
 
                 int ADUNum = 0;
-                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                     if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum ==
                         state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                         //        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum

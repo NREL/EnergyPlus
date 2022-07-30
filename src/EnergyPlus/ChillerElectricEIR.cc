@@ -229,19 +229,18 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
     bool ErrorsFound(false); // True when input errors are found
 
     state.dataIPShortCut->cCurrentModuleObject = "Chiller:Electric:EIR";
-    state.dataChillerElectricEIR->NumElectricEIRChillers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    int NumElectricEIRChillers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-    if (state.dataChillerElectricEIR->NumElectricEIRChillers <= 0) {
+    if (NumElectricEIRChillers <= 0) {
         ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
         ErrorsFound = true;
     }
 
     // ALLOCATE ARRAYS
-    state.dataChillerElectricEIR->ElectricEIRChiller.allocate(state.dataChillerElectricEIR->NumElectricEIRChillers);
+    state.dataChillerElectricEIR->ElectricEIRChiller.allocate(NumElectricEIRChillers);
 
     // Load arrays with electric EIR chiller data
-    for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++EIRChillerNum) {
+    for (int EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum) {
         int NumAlphas = 0; // Number of elements in the alpha array
         int NumNums = 0;   // Number of elements in the numeric array
         int IOStat = 0;    // IO Status when calling get input subroutine
@@ -456,24 +455,16 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                "Condenser (unknown?) Nodes");
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(10));
-            if (SELECT_CASE_var == "CONSTANTFLOW") {
-                thisChiller.FlowMode = DataPlant::FlowMode::Constant;
-            } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
-                thisChiller.FlowMode = DataPlant::FlowMode::LeavingSetpointModulated;
-            } else if (SELECT_CASE_var == "NOTMODULATED") {
-                thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
-            } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
-                thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
-            }
-        }
+        thisChiller.FlowMode =
+            static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+        if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
+            ShowSevereError(
+                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
+            ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
+            ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
+            thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
+        };
 
         //   Chiller rated performance data
         thisChiller.RefCap = state.dataIPShortCut->rNumericArgs(1);

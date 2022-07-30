@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -3565,8 +3566,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
-    EXPECT_NEAR(15944.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
 
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", state->dataDXCoils->DXCoil(2).Name);
@@ -3577,8 +3578,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(1.75, state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2));
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(1));
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(2).MSRatedTotCap(2), 0.01);
-    EXPECT_NEAR(15944.0, state->dataDXCoils->DXCoil(2).MSRatedTotCap(1), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(2).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(2).MSRatedTotCap(1), 0.01);
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
@@ -3818,12 +3819,12 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
-    EXPECT_NEAR(15944.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
     // Design SHR at speed 2 and speed 1
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
 
     // test SHR design size when partial autosizing (capacity is hardsized)
     state->dataDXCoils->DXCoil(1).MSRatedTotCap(1) = 17500.0; // DataSizing::AutoSize;
@@ -3831,10 +3832,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     SizeDXCoil(*state, 1);
     // Design size SHR at speed 2 and speed 1
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
-    EXPECT_NEAR(0.80099, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80038, state->dataDXCoils->DXCoil(1).MSRatedSHR(1), 0.00001);
     // Design Capacity at speed 2 and speed 1
-    EXPECT_NEAR(31888.0, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
+    EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCapDes(2), 0.01);
     EXPECT_EQ(35000.0, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2));
     EXPECT_EQ(35000.0 * 0.5, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1));
     // Design flow rate at speed 2 and speed 1
@@ -4328,6 +4329,136 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+}
+
+TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "    OnOff,                   !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    1,                       !- Upper Limit Value",
+        "    Discrete,                !- Numeric Type",
+        "    availability;            !- Unit Type",
+
+        "Schedule:Constant,",
+        "    Always On Discrete,      !- Name",
+        "    OnOff,                   !- Schedule Type Limits Name",
+        "    1;                       !- Hourly Value",
+
+        "Fan:VariableVolume,",
+        "    Fan Variable Volume,     !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    0.60,                    !- Fan Total Efficiency",
+        "    500,                     !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    0,                       !- Fan Power Minimum Flow Fraction",
+        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.90,                    !- Motor Efficiency",
+        "    1,                       !- Motor In Airstream Fraction",
+        "    0.040759894,             !- Fan Power Coefficient 1",
+        "    0.08804497,              !- Fan Power Coefficient 2",
+        "    -0.07292612,             !- Fan Power Coefficient 3",
+        "    0.943739823,             !- Fan Power Coefficient 4",
+        "    0,                       !- Fan Power Coefficient 5",
+        "    Node 11,                 !- Air Inlet Node Name",
+        "    Node 3;                  !- Air Outlet Node Name",
+
+        "Coil:Cooling:DX:TwoSpeed,",
+        "    CCooling DX Two Speed,   !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    17580.0,                 !- High Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
+        "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
+        "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    400,                     !- Unit Internal Static Air Pressure {Pa}",
+        "    Node 9,                  !- Air Inlet Node Name",
+        "    Node 10,                 !- Air Outlet Node Name",
+        "    CoolCAPFT,               !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    CoolCAPFFF,              !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    CoolEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name",
+        "    CoolEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    CoolPLFFPLR,             !- Part Load Fraction Correlation Curve Name",
+        "    4300.0,                  !- Low Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.70,                    !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
+        "    0.30,                    !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    LSCoolCAPFT,             !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    LSCoolEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- High Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Low Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    2;                       !- Basin Heater Setpoint Temperature {C}",
+
+        "Curve:Quadratic,CoolCAPFFF,0.77136,0.34053,-0.11088,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolEIRFFF,1.2055,-0.32953,0.12308,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolPLFFPLR,0.771,0.229, 0.0, 0.0, 1.0, 0.0, 1.0, Dimensionless, Dimensionless; ",
+        "Curve:Biquadratic,CoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,CoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    GetCurveInput(*state);
+    Fans::GetFanInput(*state);
+    GetDXCoils(*state);
+    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
+    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan.FanName;
+    coolcoilTwoSpeed.SupplyFan_TypeNum = supplyFan.FanType_Num;
+    state->dataGlobal->SysSizingCalc = true;
+    coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
+    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    InletNode.MassFlowRate = 1.0;
+    InletNode.MassFlowRateMax = 1.0;
+    InletNode.MassFlowRateMaxAvail = 1.0;
+    InletNode.MassFlowRateMinAvail = 0.0;
+    OutletNode.MassFlowRate = 1.0;
+    OutletNode.MassFlowRateMax = 1.0;
+    OutletNode.MassFlowRateMaxAvail = 1.0;
+    OutletNode.MassFlowRateMinAvail = 0.0;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    // test 1: using internal static and fan pressure rise
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ(coolcoilTwoSpeed.Name, "CCOOLING DX TWO SPEED");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType, "Coil:Cooling:DX:TwoSpeed");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, CoilDX_CoolingTwoSpeed);
+    EXPECT_EQ(coolcoilTwoSpeed.InternalStaticPressureDrop, 400.0);
+    EXPECT_TRUE(coolcoilTwoSpeed.RateWithInternalStaticAndFanObject);
+    EXPECT_EQ("8.77", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("11.25", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+    // test 2: using default fan power per evap air flow rate, 365 W/1000 scfm or 773.3 W/(m3/s)
+    coolcoilTwoSpeed.RateWithInternalStaticAndFanObject = false;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ("8.72", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("10.15", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
 }
 
 } // namespace EnergyPlus

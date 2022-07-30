@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef GROUND_HPP_
@@ -18,8 +18,31 @@
 #include <string>
 #include <vector>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4127) // Conditional expression is constant
+#pragma warning(disable : 4459) // Declaration hides global declaration
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#if __clang_major__ >= 13
+#pragma clang diagnostic ignored "-Wdeprecated-copy"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+#elif defined(__GNUC__) && defined(__linux__)
+#pragma GCC diagnostic push
+#if __GNUC__ >= 9
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif
+#endif
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/SparseCore>
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__) && defined(__linux__)
+#pragma GCC diagnostic pop
+#endif
 
 namespace Kiva {
 
@@ -91,8 +114,8 @@ private:
   void calculateADI(int dim);
 
   // Misc. Functions
-  void setAmatValue(const int i, const int j, const double val);
-  void setbValue(const int i, const double val);
+  void setAmatValue(const std::size_t i, const std::size_t j, const double val);
+  void setbValue(const std::size_t i, const double val);
   void setValuesADI(const std::size_t &index, const double &A, const double (&Alt)[2],
                     const double &bVal);
   void solveLinearSystem();

@@ -1,8 +1,8 @@
 EnergyPlus [![](https://img.shields.io/github/release/NREL/energyplus.svg)](https://github.com/NREL/EnergyPlus/releases/latest)
 ==========
 
-![](https://img.shields.io/github/downloads/NREL/EnergyPlus/latest/total?color=5AC451)
-![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg?color=5AC451&label=downloads_since_v8.1)
+[![](https://img.shields.io/github/downloads/NREL/EnergyPlus/latest/total?color=5AC451)](https://github.com/NREL/EnergyPlus/releases/latest)
+[![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg?color=5AC451&label=downloads_since_v8.1)](https://github.com/NREL/EnergyPlus/releases)
 
 This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.
 
@@ -11,11 +11,13 @@ This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole buildin
  - The Department of Energy maintains a [public website for EnergyPlus](https://energyplus.net) where you can find much more information about the program.
  - For detailed developer information, consult the [wiki](https://github.com/nrel/EnergyPlusTeam/wiki).
  - Many users (and developers) of EnergyPlus are active on [Unmet Hours](https://unmethours.com/), so that's a great place to start if you have a question about EnergyPlus or building simulation.
- - For more in-depth, developer-driven support, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
+ - For more in-depth, developer-driven support, please utilize the [EnergyPlus Helpdesk](https://energyplushelp.freshdesk.com/).
 
 ## Testing
 
-![](https://github.com/NREL/EnergyPlus/workflows/Custom%20Check/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Documentation/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/CppCheck/badge.svg)
+[![](https://github.com/NREL/EnergyPlus/workflows/Custom%20Check/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/custom_check.yml) 
+[![](https://github.com/NREL/EnergyPlus/workflows/Documentation/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/documentation.yml) 
+[![](https://github.com/NREL/EnergyPlus/workflows/CppCheck/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/cppcheck.yml)
 
 Every commit and every release of EnergyPlus undergoes rigorous testing.
 The testing consists of building EnergyPlus, of course, then there are unit tests, integration tests, API tests, and regression tests.
@@ -25,7 +27,9 @@ In the meantime, while Decent CI is still handling the regression and bulkier te
 
 ## Releases
 
-![](https://github.com/NREL/EnergyPlus/workflows/Windows%20Releases/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Mac%20Releases/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Linux%20Releases/badge.svg)
+[![](https://github.com/NREL/EnergyPlus/workflows/Windows%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/windows_release.yml) 
+[![](https://github.com/NREL/EnergyPlus/workflows/Mac%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/mac_release.yml) 
+[![](https://github.com/NREL/EnergyPlus/workflows/Linux%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/linux_release.yml)
 
 EnergyPlus is released twice annually, usually in March and September.
 It is recommended all use of EnergyPlus is production workflows use these formal, public releases.

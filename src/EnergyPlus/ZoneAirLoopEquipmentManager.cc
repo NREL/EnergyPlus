@@ -91,8 +91,7 @@ namespace ZoneAirLoopEquipmentManager {
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
                                     Real64 &LatOutputProvided, // Latent add/removal supplied by air dist unit (kg/s), dehumid = negative
-                                    int const ActualZoneNum,
-                                    int &ControlledZoneNum,
+                                    int const ControlledZoneNum,
                                     int &CompIndex)
     {
         // SUBROUTINE INFORMATION:
@@ -124,11 +123,11 @@ namespace ZoneAirLoopEquipmentManager {
             CompIndex = AirDistUnitNum;
         } else {
             AirDistUnitNum = CompIndex;
-            if (AirDistUnitNum > state.dataDefineEquipment->NumAirDistUnits || AirDistUnitNum < 1) {
+            if (AirDistUnitNum > (int)state.dataDefineEquipment->AirDistUnit.size() || AirDistUnitNum < 1) {
                 ShowFatalError(state,
                                format("ManageZoneAirLoopEquipment:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       AirDistUnitNum,
-                                      state.dataDefineEquipment->NumAirDistUnits,
+                                      (int)state.dataDefineEquipment->AirDistUnit.size(),
                                       ZoneAirLoopEquipName));
             }
             if (ZoneAirLoopEquipName != state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name) {
@@ -140,15 +139,14 @@ namespace ZoneAirLoopEquipmentManager {
             }
         }
         state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
-        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum);
         InitZoneAirLoopEquipmentTimeStep(state, AirDistUnitNum);
 
-        SimZoneAirLoopEquipment(
-            state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum);
+        SimZoneAirLoopEquipment(state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum);
 
         // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
         // matched to zone euqip config nodes
-        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum);
     }
 
     void GetZoneAirLoopEquipment(EnergyPlusData &state)
@@ -196,15 +194,13 @@ namespace ZoneAirLoopEquipmentManager {
         Array1D_bool lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE.
         bool DualDuctRecircIsUsed;        // local temporary for deciding if recirc side used by dual duct terminal
 
-        state.dataDefineEquipment->NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        state.dataDefineEquipment->AirDistUnit.allocate(state.dataDefineEquipment->NumAirDistUnits);
-        state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(state.dataDefineEquipment->NumAirDistUnits);
-        state.dataZoneAirLoopEquipmentManager->EachOnceFlag = true;
+        state.dataDefineEquipment->AirDistUnit.allocate(NumAirDistUnits);
 
-        if (state.dataDefineEquipment->NumAirDistUnits > 0) {
+        if (NumAirDistUnits > 0) {
 
-            for (AirDistUnitNum = 1; AirDistUnitNum <= state.dataDefineEquipment->NumAirDistUnits; ++AirDistUnitNum) {
+            for (AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          AirDistUnitNum,
@@ -504,7 +500,7 @@ namespace ZoneAirLoopEquipmentManager {
                 }
 
             } // End of Air Dist Do Loop
-            for (AirDistUnitNum = 1; AirDistUnitNum <= state.dataDefineEquipment->NumAirDistUnits; ++AirDistUnitNum) {
+            for (AirDistUnitNum = 1; AirDistUnitNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++AirDistUnitNum) {
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
@@ -540,7 +536,7 @@ namespace ZoneAirLoopEquipmentManager {
         }
     }
 
-    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum)
+    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -553,14 +549,14 @@ namespace ZoneAirLoopEquipmentManager {
         if (!state.dataZoneAirLoopEquipmentManager->InitAirDistUnitsFlag) {
             return;
         }
-        if (state.dataZoneAirLoopEquipmentManager->EachOnceFlag(AirDistUnitNum) &&
+        if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EachOnceFlag &&
             (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum > 0)) {
 
             {
                 auto &thisADU(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum));
                 {
                     auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum));
-                    thisADU.ZoneNum = ActualZoneNum;
+                    thisADU.ZoneNum = ControlledZoneNum;
                     for (int inletNum = 1; inletNum <= thisZoneEqConfig.NumInletNodes; ++inletNum) {
                         if (thisZoneEqConfig.InletNode(inletNum) == thisADU.OutletNodeNum)
                             thisZoneEqConfig.InletNodeADUNum(inletNum) = AirDistUnitNum;
@@ -599,9 +595,9 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 }
             }
-            state.dataZoneAirLoopEquipmentManager->EachOnceFlag(AirDistUnitNum) = false;
+            state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EachOnceFlag = false;
             ++state.dataZoneAirLoopEquipmentManager->numADUInitialized;
-            if (state.dataZoneAirLoopEquipmentManager->numADUInitialized == state.dataDefineEquipment->NumAirDistUnits) {
+            if (state.dataZoneAirLoopEquipmentManager->numADUInitialized == (int)state.dataDefineEquipment->AirDistUnit.size()) {
                 // If all ADUs are initialized, set InitAirDistUnitsFlag to false
                 state.dataZoneAirLoopEquipmentManager->InitAirDistUnitsFlag = false;
             }
@@ -628,8 +624,7 @@ namespace ZoneAirLoopEquipmentManager {
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
                                  bool const FirstHVACIteration,
-                                 int const ControlledZoneNum,
-                                 int const ActualZoneNum)
+                                 int const ControlledZoneNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -700,7 +695,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateDualDuct(state,
                                  state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                  FirstHVACIteration,
-                                 ActualZoneNum,
+                                 ControlledZoneNum,
                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                  state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -708,7 +703,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateDualDuct(state,
                                  state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                  FirstHVACIteration,
-                                 ActualZoneNum,
+                                 ControlledZoneNum,
                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                  state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -716,7 +711,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateDualDuct(state,
                                  state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                  FirstHVACIteration,
-                                 ActualZoneNum,
+                                 ControlledZoneNum,
                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                  state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -724,7 +719,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateSingleDuct(state,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                    FirstHVACIteration,
-                                   ActualZoneNum,
+                                   ControlledZoneNum,
                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -732,7 +727,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateSingleDuct(state,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                    FirstHVACIteration,
-                                   ActualZoneNum,
+                                   ControlledZoneNum,
                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -740,7 +735,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateSingleDuct(state,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                    FirstHVACIteration,
-                                   ActualZoneNum,
+                                   ControlledZoneNum,
                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -748,7 +743,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateSingleDuct(state,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                    FirstHVACIteration,
-                                   ActualZoneNum,
+                                   ControlledZoneNum,
                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -756,7 +751,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateSingleDuct(state,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                    FirstHVACIteration,
-                                   ActualZoneNum,
+                                   ControlledZoneNum,
                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -764,7 +759,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateSingleDuct(state,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                    FirstHVACIteration,
-                                   ActualZoneNum,
+                                   ControlledZoneNum,
                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -772,7 +767,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimPIU(state,
                        state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                        FirstHVACIteration,
-                       ActualZoneNum,
+                       ControlledZoneNum,
                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                        state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -780,7 +775,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimPIU(state,
                        state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                        FirstHVACIteration,
-                       ActualZoneNum,
+                       ControlledZoneNum,
                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                        state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -788,7 +783,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimIndUnit(state,
                            state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                            FirstHVACIteration,
-                           ActualZoneNum,
+                           ControlledZoneNum,
                            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                            state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -796,7 +791,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimulateSingleDuct(state,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                    FirstHVACIteration,
-                                   ActualZoneNum,
+                                   ControlledZoneNum,
                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;
@@ -804,7 +799,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimCoolBeam(state,
                             state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                             FirstHVACIteration,
-                            ActualZoneNum,
+                            ControlledZoneNum,
                             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                             state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum),
                             NonAirSysOutput);
@@ -816,7 +811,7 @@ namespace ZoneAirLoopEquipmentManager {
                 SimAirTerminalUserDefined(state,
                                           state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                           FirstHVACIteration,
-                                          ActualZoneNum,
+                                          ControlledZoneNum,
                                           state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                           state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
             } break;

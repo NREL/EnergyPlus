@@ -91,23 +91,23 @@ protected:
     }
 
 public:
-    std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getSystem() const
+    [[nodiscard]] std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getSystem() const
     {
         return m_TarcogSystem;
-    };
+    }
 };
 
 TEST_F(DoubleIGU_With_TIR_and_Openness, Test1)
 {
     SCOPED_TRACE("Begin Test: Outdoor Shade - Air");
 
-    auto aSystem = getSystem();
+    const auto aSystem = getSystem();
 
-    auto temperature = aSystem->getTemperatures();
-    auto radiosity = aSystem->getRadiosities();
+    const auto temperature = aSystem->getTemperatures();
+    const auto radiosity = aSystem->getRadiosities();
 
-    std::vector<double> correctTemp = {259.333390, 259.706267, 279.738283, 280.415196};
-    std::vector<double> correctJ = {253.860589, 272.423758, 348.553579, 349.022496};
+    const std::vector correctTemp{259.350462, 259.724865, 279.767733, 280.443187};
+    const std::vector correctJ{253.917317, 272.505694, 348.677765, 349.142912};
 
     EXPECT_EQ(correctTemp.size(), temperature.size());
     EXPECT_EQ(correctJ.size(), radiosity.size());
@@ -121,9 +121,12 @@ TEST_F(DoubleIGU_With_TIR_and_Openness, Test1)
     const auto numOfIter = aSystem->getNumberOfIterations();
     EXPECT_EQ(20, int(numOfIter));
 
-    const auto ventilatedFlow = aSystem->getVentilationFlow(Tarcog::ISO15099::Environment::Outdoor);
-    EXPECT_NEAR(8.433710, ventilatedFlow, 1e-6);
+    const auto ventilatedFlowOutdoor = aSystem->getVentilationFlow(Tarcog::ISO15099::Environment::Outdoor);
+    EXPECT_NEAR(0.0, ventilatedFlowOutdoor, 1e-6);
+
+    const auto ventilatedFlowIndoor = aSystem->getVentilationFlow(Tarcog::ISO15099::Environment::Indoor);
+    EXPECT_NEAR(9.152949, ventilatedFlowIndoor, 1e-6);
 
     const auto uValue = aSystem->getUValue();
-    EXPECT_NEAR(3.136796, uValue, 1e-6);
+    EXPECT_NEAR(3.149632, uValue, 1e-6);
 }

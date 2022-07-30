@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -1309,34 +1310,36 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
 
     isValid = true;
     // exterior conditions
-    {
-        auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).ExtBoundCond);
-        if (SELECT_CASE_var == ExternalEnvironment) {
-            outsideFilm = 0.0299387; // All exterior conditions
-        } else if ((SELECT_CASE_var == Ground) || (SELECT_CASE_var == GroundFCfactorMethod)) {
-            outsideFilm = 0.0; // No outside film when underground
-        } else {
-            if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
-                // use companion surface in adjacent zone
-                switch (state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class) {
-                case SurfaceClass::Wall:
-                case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                    outsideFilm = 0.1197548;
-                } break;
-                case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                    outsideFilm = 0.1620212;
-                } break;
-                case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                    outsideFilm = 0.1074271;
-                } break;
-                default: {
-                    outsideFilm = 0.0810106; // All semi-exterior surfaces
-                } break;
-                }
-            } else {
+    switch (state.dataSurface->Surface(numSurf).ExtBoundCond) {
+    case ExternalEnvironment: {
+        outsideFilm = 0.0299387; // All exterior conditions
+    } break;
+    case Ground:
+    case GroundFCfactorMethod: {
+        outsideFilm = 0.0; // No outside film when underground
+    } break;
+    default: {
+        if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
+            // use companion surface in adjacent zone
+            switch (state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class) {
+            case SurfaceClass::Wall:
+            case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                outsideFilm = 0.1197548;
+            } break;
+            case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                outsideFilm = 0.1620212;
+            } break;
+            case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                outsideFilm = 0.1074271;
+            } break;
+            default: {
                 outsideFilm = 0.0810106; // All semi-exterior surfaces
+            } break;
             }
+        } else {
+            outsideFilm = 0.0810106; // All semi-exterior surfaces
         }
+    } break;
     }
     // interior conditions
     if (state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction) > 0.0) {
@@ -1406,6 +1409,14 @@ void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
             }
         }
     }
+}
+
+void AllocateIntGains(EnergyPlusData &state)
+{
+    state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
+    state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
+    state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+    state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
 }
 
 } // namespace EnergyPlus::DataHeatBalance

@@ -140,6 +140,7 @@ std::ostream::pos_type InputFile::position() const noexcept
 void InputFile::open(bool, bool)
 {
     file_size = fs::file_size(filePath);
+    // basic_fstream is a template, it has no problem with wchar_t (which filePath.c_str() returns on Windows)
     is = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
     // is->imbue(std::locale("C"));
 }

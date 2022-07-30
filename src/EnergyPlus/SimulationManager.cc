@@ -252,7 +252,6 @@ namespace SimulationManager {
         PostIPProcessing(state);
 
         state.dataGlobal->BeginSimFlag = true;
-        state.dataGlobal->BeginFullSimFlag = false;
         state.dataGlobal->DoOutputReporting = false;
         state.dataReportFlag->DisplayPerfSimulationFlag = false;
         state.dataReportFlag->DoWeatherInitReporting = false;
@@ -289,7 +288,6 @@ namespace SimulationManager {
         state.dataGlobal->DoingSizing = true;
         ManageSizing(state);
 
-        state.dataGlobal->BeginFullSimFlag = true;
         SimsDone = false;
         if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoHVACSizingSimulation) {
             state.dataGlobal->DoOutputReporting = true;
@@ -439,16 +437,6 @@ namespace SimulationManager {
             DisplayString(state, "Initializing New Environment Parameters");
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
-                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                     .suppressBegEnvReset)) {
-                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
-                // easily converge fewer warmup days are allowed
-                DisplayString(state, "Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
-                state.dataGlobal->beginEnvrnWarmStartFlag = true;
-            } else {
-                state.dataGlobal->beginEnvrnWarmStartFlag = false;
-            }
             state.dataGlobal->EndEnvrnFlag = false;
             state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
@@ -572,7 +560,6 @@ namespace SimulationManager {
                         state.dataGlobal->BeginDayFlag = false;
                         state.dataGlobal->BeginEnvrnFlag = false;
                         state.dataGlobal->BeginSimFlag = false;
-                        state.dataGlobal->BeginFullSimFlag = false;
                     } // TimeStep loop
 
                     state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
@@ -606,9 +593,6 @@ namespace SimulationManager {
 
         if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteBegin(); // for final data to write
 
-#ifdef EP_Detailed_Timings
-        epStartTime("Closeout Reporting=");
-#endif
         SimCostEstimate(state);
 
         ComputeTariff(state); //     Compute the utility bills
@@ -630,9 +614,6 @@ namespace SimulationManager {
 
         DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
-#ifdef EP_Detailed_Timings
-        epStopTime("Closeout Reporting=");
-#endif
         CloseOutputFiles(state);
 
         // state.dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
@@ -741,14 +722,9 @@ namespace SimulationManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            {
-                auto const SELECT_CASE_var(Alphas(1));
-                if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
-                    (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED") || (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCESIMPLIFIED")) {
-                    CondFDAlgo = true;
-                } else {
-                }
-            }
+            static constexpr std::array<std::string_view, 4> condFDTypes = {
+                "CONDUCTIONFINITEDIFFERENCE", "CONDFD", "CONDUCTIONFINITEDIFFERENCEDETAILED", "CONDUCTIONFINITEDIFFERENCESIMPLIFIED"};
+            CondFDAlgo = std::find(condFDTypes.begin(), condFDTypes.end(), Alphas(1)) != condFDTypes.end();
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -766,14 +742,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(Alphas(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-
-                    } else {
-                    }
-                }
+                if (Alphas(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
@@ -792,13 +761,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(Alphas(3));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (Alphas(3) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
@@ -817,13 +780,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (state.dataIPShortCut->cAlphaArgs(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
@@ -842,13 +799,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (state.dataIPShortCut->cAlphaArgs(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
 
@@ -1280,6 +1231,7 @@ namespace SimulationManager {
                         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
                         state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                        state.dataGlobal->OverrideTimestep = true;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(
@@ -1986,7 +1938,6 @@ namespace SimulationManager {
             state.dataGlobal->BeginDayFlag = false;
             state.dataGlobal->BeginEnvrnFlag = false;
             state.dataGlobal->BeginSimFlag = false;
-            state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
             if (state.dataSysVars->DeveloperFlag)

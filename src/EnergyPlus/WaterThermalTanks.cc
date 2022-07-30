@@ -2016,10 +2016,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
                 bool FoundInletNode = false;
                 bool FoundOutletNode = false;
-                int ZoneNum;
-                for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                    if (HPWH.AmbientTempZone == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum) break;
-                }
+                int ZoneNum = HPWH.AmbientTempZone;
                 if (ZoneNum <= state.dataGlobal->NumOfZones) {
                     for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++SupAirIn) {
                         if (HPWH.HeatPumpAirOutletNode != state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(SupAirIn)) continue;
@@ -4388,67 +4385,47 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataZoneEquip->ZoneEquipList)) {
                             bool FoundTankInList = false;
                             bool TankNotLowestPriority = false;
-                            for (int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                                if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != HPWH.AmbientTempZone) continue;
-                                if (ZoneEquipConfigNum <= state.dataGlobal->NumOfZones) {
-                                    for (int ZoneEquipListNum = 1; ZoneEquipListNum <= state.dataGlobal->NumOfZones; ++ZoneEquipListNum) {
-                                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).EquipListName !=
-                                            state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).Name)
-                                            continue;
-                                        int TankCoolingPriority = 0;
-                                        int TankHeatingPriority = 0;
-                                        if (ZoneEquipConfigNum <= state.dataGlobal->NumOfZones) {
-                                            for (int EquipmentTypeNum = 1;
-                                                 EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
-                                                 ++EquipmentTypeNum) {
-                                                if (state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipName(EquipmentTypeNum) != HPWH.Name)
-                                                    continue;
-                                                FoundTankInList = true;
-                                                TankCoolingPriority =
-                                                    state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum);
-                                                TankHeatingPriority =
-                                                    state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum);
-                                                break;
-                                            } // EquipmentTypeNum
-                                            if (!FoundTankInList) {
-                                                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                                                ShowContinueError(state,
-                                                                  "Heat pump water heater type and name must be listed in the correct "
-                                                                  "ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to "
-                                                                  "ZoneAirOnly or ZoneAndOutdoorAir.");
-                                                ErrorsFound = true;
-                                            }
-                                            //                     check that tank has lower priority than all other non-HPWH objects in Zone
-                                            //                     Equipment List
-                                            for (int EquipmentTypeNum = 1;
-                                                 EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
-                                                 ++EquipmentTypeNum) {
-                                                if (UtilityRoutines::SameString(
-                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipType(EquipmentTypeNum),
-                                                        state.dataIPShortCut->cCurrentModuleObject))
-                                                    continue;
-                                                if (TankCoolingPriority >
-                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum) ||
-                                                    TankHeatingPriority >
-                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum)) {
-                                                    TankNotLowestPriority = true;
-                                                }
-                                            } // EquipmentTypeNum
-                                            if (TankNotLowestPriority && FoundTankInList) {
-                                                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                                                ShowContinueError(state,
-                                                                  "Heat pump water heaters should be simulated first, before other space "
-                                                                  "conditioning equipment.");
-                                                ShowContinueError(state,
-                                                                  "Poor temperature control may result if the Heating/Cooling sequence number is "
-                                                                  "not 1 in the ZoneHVAC:EquipmentList.");
-                                            }
-                                            break;
-                                        } // ZoneEquipConfigNum .LE. NumOfZoneEquipLists
-                                    }     // ZoneEquipListNum
-                                    break;
-                                } // ZoneEquipConfigNum .LE. NumOfZones
-                            }     // ZoneEquipConfigNum
+                            int ZoneEquipConfigNum = HPWH.AmbientTempZone;
+                            int ZoneEquipListNum = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).EquipListIndex;
+                            int TankCoolingPriority = 0;
+                            int TankHeatingPriority = 0;
+                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
+                                 ++EquipmentTypeNum) {
+                                if (state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipName(EquipmentTypeNum) != HPWH.Name) continue;
+                                FoundTankInList = true;
+                                TankCoolingPriority = state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum);
+                                TankHeatingPriority = state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum);
+                                break;
+                            } // EquipmentTypeNum
+                            if (!FoundTankInList) {
+                                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                                ShowContinueError(state,
+                                                  "Heat pump water heater type and name must be listed in the correct "
+                                                  "ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to "
+                                                  "ZoneAirOnly or ZoneAndOutdoorAir.");
+                                ErrorsFound = true;
+                            }
+                            //                     check that tank has lower priority than all other non-HPWH objects in Zone
+                            //                     Equipment List
+                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
+                                 ++EquipmentTypeNum) {
+                                if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipType(EquipmentTypeNum),
+                                                                state.dataIPShortCut->cCurrentModuleObject))
+                                    continue;
+                                if (TankCoolingPriority > state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum) ||
+                                    TankHeatingPriority > state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum)) {
+                                    TankNotLowestPriority = true;
+                                }
+                            } // EquipmentTypeNum
+                            if (TankNotLowestPriority && FoundTankInList) {
+                                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                                ShowContinueError(state,
+                                                  "Heat pump water heaters should be simulated first, before other space "
+                                                  "conditioning equipment.");
+                                ShowContinueError(state,
+                                                  "Poor temperature control may result if the Heating/Cooling sequence number is "
+                                                  "not 1 in the ZoneHVAC:EquipmentList.");
+                            }
                         } else {
                             ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
                             ShowContinueError(state,
@@ -6118,12 +6095,12 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         // (use HPWH or Desuperheater heating coil set point if applicable)
         int SchIndex;
         if (this->HeatPumpNum > 0) {
-            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Mode = state.dataWaterThermalTanks->floatMode;
-            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SaveMode = state.dataWaterThermalTanks->floatMode;
-            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SaveWHMode = state.dataWaterThermalTanks->floatMode;
+            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Mode = TankOperatingMode::Floating;
+            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SaveMode = TankOperatingMode::Floating;
+            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SaveWHMode = TankOperatingMode::Floating;
             SchIndex = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTempSchedule;
         } else if (this->DesuperheaterNum > 0) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Mode = state.dataWaterThermalTanks->floatMode;
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Mode = TankOperatingMode::Floating;
             SchIndex = state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).SetPointTempSchedule;
         } else {
             SchIndex = this->SetPointTempSchedule;
@@ -6156,8 +6133,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
 
         this->SavedHeaterOn1 = false;
         this->SavedHeaterOn2 = false;
-        this->Mode = state.dataWaterThermalTanks->floatMode;
-        this->SavedMode = state.dataWaterThermalTanks->floatMode;
+        this->Mode = TankOperatingMode::Floating;
+        this->SavedMode = TankOperatingMode::Floating;
         this->FirstRecoveryDone = false;
         this->FirstRecoveryFuel = 0.0;
         this->UnmetEnergy = 0.0;
@@ -6188,10 +6165,10 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         // (otherwise with a dynamic storage model it is difficult for the user to see the initial performance if it isn't periodic.)
         int SchIndex;
         if (this->HeatPumpNum > 0) {
-            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Mode = state.dataWaterThermalTanks->floatMode;
+            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Mode = TankOperatingMode::Floating;
             SchIndex = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).SetPointTempSchedule;
         } else if (this->DesuperheaterNum > 0) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Mode = state.dataWaterThermalTanks->floatMode;
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Mode = TankOperatingMode::Floating;
             SchIndex = state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).SetPointTempSchedule;
         } else {
             SchIndex = this->SetPointTempSchedule;
@@ -6222,8 +6199,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         this->SavedUseOutletTemp = this->SavedTankTemp;
         this->SavedHeaterOn1 = false;
         this->SavedHeaterOn2 = false;
-        this->Mode = 0;
-        this->SavedMode = 0;
+        this->Mode = TankOperatingMode::Floating;
+        this->SavedMode = TankOperatingMode::Floating;
         this->WarmupFlag = false;
     }
     if (state.dataGlobal->WarmupFlag) this->WarmupFlag = true;
@@ -6743,7 +6720,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
     }
 
     Real64 TankTemp_loc = this->SavedTankTemp;
-    int Mode_loc = this->SavedMode;
+    TankOperatingMode Mode_loc = this->SavedMode;
 
     Real64 Qmaxcap = this->MaxCapacity;
     Real64 Qmincap = this->MinCapacity;
@@ -6833,6 +6810,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
 
     // Calculate steady-state use heat rate.
     Real64 Quse = UseMassFlowRate_loc * Cp * (UseInletTemp_loc - SetPointTemp_loc);
+    Real64 Qloss = 0.0, PLF = 0.0;
 
     while (TimeRemaining > 0.0) {
 
@@ -6842,262 +6820,133 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
         Real64 LossCoeff_loc = 0.0;
         Real64 LossFracToZone = 0.0;
 
-        {
-            auto const SELECT_CASE_var(Mode_loc);
+        switch (Mode_loc) {
 
-            if (SELECT_CASE_var == state.dataWaterThermalTanks->heatMode) { // Heater is on
+        case TankOperatingMode::Heating: // Heater is on
 
-                // Calculate heat rate needed to maintain the setpoint at steady-state conditions
-                LossCoeff_loc = this->OnCycLossCoeff;
-                LossFracToZone = this->OnCycLossFracToZone;
-                Real64 Qloss = LossCoeff_loc * (AmbientTemp_loc - SetPointTemp_loc);
-                Qneeded = -Quse - Qsource - Qloss - Qoncycheat;
+            // Calculate heat rate needed to maintain the setpoint at steady-state conditions
+            LossCoeff_loc = this->OnCycLossCoeff;
+            LossFracToZone = this->OnCycLossFracToZone;
+            Qloss = LossCoeff_loc * (AmbientTemp_loc - SetPointTemp_loc);
+            Qneeded = -Quse - Qsource - Qloss - Qoncycheat;
 
-                if (TankTemp_loc > SetPointTemp_loc) {
-                    // Heater is not needed after all, possibly due to step change in scheduled SetPointTemp
+            if (TankTemp_loc > SetPointTemp_loc) {
+                // Heater is not needed after all, possibly due to step change in scheduled SetPointTemp
 
+                Qheater = 0.0;
+                Qunmet = 0.0;
+                Mode_loc = TankOperatingMode::Floating;
+                continue;
+
+            } else if (TankTemp_loc < SetPointTemp_loc) {
+                // Attempt to recover to the setpoint as quickly as possible by using maximum heater capacity
+
+                // Qneeded is calculated above
+                // Qneeded does not account for the extra energy needed to recover to the setpoint
+                Qheater = Qmaxcap;
+                Qunmet = max(Qneeded - Qheater, 0.0);
+                Qheat = Qoncycheat + Qheater + Qheatpump;
+
+                // Calculate time needed to recover to the setpoint at maximum heater capacity
+                TimeNeeded = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTimeNeeded(TankTemp_loc,
+                                                                                                 SetPointTemp_loc,
+                                                                                                 AmbientTemp_loc,
+                                                                                                 UseInletTemp_loc,
+                                                                                                 SourceInletTemp_loc,
+                                                                                                 TankMass,
+                                                                                                 Cp,
+                                                                                                 UseMassFlowRate_loc,
+                                                                                                 SourceMassFlowRate_loc,
+                                                                                                 LossCoeff_loc,
+                                                                                                 Qheat);
+
+                if (TimeNeeded > TimeRemaining) {
+                    // Heater is at maximum capacity and heats for all of the remaining time
+                    // Setpoint temperature WILL NOT be recovered
+
+                    TimeNeeded = TimeRemaining;
+
+                    NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
+                                                                                                    AmbientTemp_loc,
+                                                                                                    UseInletTemp_loc,
+                                                                                                    SourceInletTemp_loc,
+                                                                                                    TankMass,
+                                                                                                    Cp,
+                                                                                                    UseMassFlowRate_loc,
+                                                                                                    SourceMassFlowRate_loc,
+                                                                                                    LossCoeff_loc,
+                                                                                                    Qheat,
+                                                                                                    TimeNeeded);
+
+                } else { // TimeNeeded <= TimeRemaining
+                    // Heater is at maximum capacity but will not heat for all of the remaining time (at maximum anyway)
+                    // Setpoint temperature WILL be recovered
+
+                    NewTankTemp = SetPointTemp_loc;
+
+                    SetPointRecovered = true;
+
+                } // TimeNeeded > TimeRemaining
+
+            } else { // TankTemp == SetPointTemp
+                // Attempt to maintain the setpoint by using the needed heater capacity (modulating, if allowed)
+
+                if (Qneeded <= 0.0) {
+                    // Heater is not needed
+
+                    Qneeded = 0.0;
                     Qheater = 0.0;
                     Qunmet = 0.0;
-                    Mode_loc = state.dataWaterThermalTanks->floatMode;
+                    Mode_loc = TankOperatingMode::Floating;
                     continue;
 
-                } else if (TankTemp_loc < SetPointTemp_loc) {
-                    // Attempt to recover to the setpoint as quickly as possible by using maximum heater capacity
+                } else if (Qneeded < Qmincap) {
+                    // Heater is required at less than the minimum capacity
+                    // If cycling, Qmincap = Qmaxcap.  Once the setpoint is reached, heater will almost always be shut off here
 
-                    // Qneeded is calculated above
-                    // Qneeded does not account for the extra energy needed to recover to the setpoint
-                    Qheater = Qmaxcap;
-                    Qunmet = max(Qneeded - Qheater, 0.0);
-                    Qheat = Qoncycheat + Qheater + Qheatpump;
-
-                    // Calculate time needed to recover to the setpoint at maximum heater capacity
-                    TimeNeeded = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTimeNeeded(TankTemp_loc,
-                                                                                                     SetPointTemp_loc,
-                                                                                                     AmbientTemp_loc,
-                                                                                                     UseInletTemp_loc,
-                                                                                                     SourceInletTemp_loc,
-                                                                                                     TankMass,
-                                                                                                     Cp,
-                                                                                                     UseMassFlowRate_loc,
-                                                                                                     SourceMassFlowRate_loc,
-                                                                                                     LossCoeff_loc,
-                                                                                                     Qheat);
-
-                    if (TimeNeeded > TimeRemaining) {
-                        // Heater is at maximum capacity and heats for all of the remaining time
-                        // Setpoint temperature WILL NOT be recovered
-
-                        TimeNeeded = TimeRemaining;
-
-                        NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
-                                                                                                        AmbientTemp_loc,
-                                                                                                        UseInletTemp_loc,
-                                                                                                        SourceInletTemp_loc,
-                                                                                                        TankMass,
-                                                                                                        Cp,
-                                                                                                        UseMassFlowRate_loc,
-                                                                                                        SourceMassFlowRate_loc,
-                                                                                                        LossCoeff_loc,
-                                                                                                        Qheat,
-                                                                                                        TimeNeeded);
-
-                    } else { // TimeNeeded <= TimeRemaining
-                        // Heater is at maximum capacity but will not heat for all of the remaining time (at maximum anyway)
-                        // Setpoint temperature WILL be recovered
-
-                        NewTankTemp = SetPointTemp_loc;
-
-                        SetPointRecovered = true;
-
-                    } // TimeNeeded > TimeRemaining
-
-                } else { // TankTemp == SetPointTemp
-                    // Attempt to maintain the setpoint by using the needed heater capacity (modulating, if allowed)
-
-                    if (Qneeded <= 0.0) {
-                        // Heater is not needed
-
-                        Qneeded = 0.0;
+                    if (this->ControlType == HeaterControlMode::Cycle) {
+                        // Control will cycle on and off based on DeadBandTemp
                         Qheater = 0.0;
                         Qunmet = 0.0;
-                        Mode_loc = state.dataWaterThermalTanks->floatMode;
+                        Mode_loc = TankOperatingMode::Floating;
                         continue;
 
-                    } else if (Qneeded < Qmincap) {
-                        // Heater is required at less than the minimum capacity
-                        // If cycling, Qmincap = Qmaxcap.  Once the setpoint is reached, heater will almost always be shut off here
+                    } else if (this->ControlType == HeaterControlMode::Modulate) {
+                        // Control will cycle on and off based on DeadBandTemp until Qneeded > Qmincap again
+                        Qheater = 0.0;
+                        Qunmet = Qneeded;
+                        Mode_loc = TankOperatingMode::Floating;
+                        continue;
 
-                        if (this->ControlType == HeaterControlMode::Cycle) {
-                            // Control will cycle on and off based on DeadBandTemp
-                            Qheater = 0.0;
-                            Qunmet = 0.0;
-                            Mode_loc = state.dataWaterThermalTanks->floatMode;
-                            continue;
+                        // CASE (ControlTypeModulateWithOverheat)  ! Not yet implemented
+                        // Calculate time to reach steady-state temp; check for venting at MaxTemp limit
+                        // Qheater = Qmincap
 
-                        } else if (this->ControlType == HeaterControlMode::Modulate) {
-                            // Control will cycle on and off based on DeadBandTemp until Qneeded > Qmincap again
-                            Qheater = 0.0;
-                            Qunmet = Qneeded;
-                            Mode_loc = state.dataWaterThermalTanks->floatMode;
-                            continue;
+                        // CASE (ControlTypeModulateWithUnderheat)  ! Not yet implemented
+                        // Heater must not come back on until Qneeded >= Qmincap
+                        // Mode = modfloatMode
+                    }
 
-                            // CASE (ControlTypeModulateWithOverheat)  ! Not yet implemented
-                            // Calculate time to reach steady-state temp; check for venting at MaxTemp limit
-                            // Qheater = Qmincap
+                } else if (Qneeded <= Qmaxcap) {
+                    // Heater can exactly meet the needed heat rate (usually by modulating) and heats for all of the remaining time
+                    // Setpoint temperature WILL be maintained
 
-                            // CASE (ControlTypeModulateWithUnderheat)  ! Not yet implemented
-                            // Heater must not come back on until Qneeded >= Qmincap
-                            // Mode = modfloatMode
-                        }
+                    TimeNeeded = TimeRemaining;
 
-                    } else if (Qneeded <= Qmaxcap) {
-                        // Heater can exactly meet the needed heat rate (usually by modulating) and heats for all of the remaining time
-                        // Setpoint temperature WILL be maintained
+                    Qheater = Qneeded;
+                    Qunmet = 0.0;
 
-                        TimeNeeded = TimeRemaining;
+                    NewTankTemp = SetPointTemp_loc;
 
-                        Qheater = Qneeded;
-                        Qunmet = 0.0;
+                } else { // Qneeded > Qmaxcap
+                    // Heater is at maximum capacity and heats for all of the remaining time
+                    // Setpoint temperature WILL NOT be maintained
 
-                        NewTankTemp = SetPointTemp_loc;
+                    TimeNeeded = TimeRemaining;
 
-                    } else { // Qneeded > Qmaxcap
-                        // Heater is at maximum capacity and heats for all of the remaining time
-                        // Setpoint temperature WILL NOT be maintained
-
-                        TimeNeeded = TimeRemaining;
-
-                        Qheater = Qmaxcap;
-                        Qunmet = Qneeded - Qheater;
-                        Qheat = Qoncycheat + Qheater + Qheatpump;
-
-                        NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
-                                                                                                        AmbientTemp_loc,
-                                                                                                        UseInletTemp_loc,
-                                                                                                        SourceInletTemp_loc,
-                                                                                                        TankMass,
-                                                                                                        Cp,
-                                                                                                        UseMassFlowRate_loc,
-                                                                                                        SourceMassFlowRate_loc,
-                                                                                                        LossCoeff_loc,
-                                                                                                        Qheat,
-                                                                                                        TimeNeeded);
-
-                    } // Qneeded > Qmaxcap
-
-                } // TankTemp > SetPointTemp
-
-                // Update summed values
-                Eneeded += Qneeded * TimeNeeded;
-                Eheater += Qheater * TimeNeeded;
-                Eunmet += Qunmet * TimeNeeded;
-                Eoncycfuel += Qoncycfuel * TimeNeeded;
-
-                if (Qmaxcap > 0.0) PLR = Qheater / Qmaxcap;
-                Real64 PLF = this->PartLoadFactor(state, PLR);
-                Efuel += Qheater * TimeNeeded / (PLF * this->Efficiency);
-
-                Runtime += TimeNeeded;
-                PLRsum += PLR * TimeNeeded;
-
-                if (!this->FirstRecoveryDone) {
-                    this->FirstRecoveryFuel += Efuel + Eoffcycfuel + Eoncycfuel;
-                    if (SetPointRecovered) this->FirstRecoveryDone = true;
-                }
-
-            } else if ((SELECT_CASE_var == state.dataWaterThermalTanks->floatMode) ||
-                       (SELECT_CASE_var == state.dataWaterThermalTanks->coolMode)) { // Heater is off
-
-                // Calculate heat rate needed to maintain the setpoint at steady-state conditions
-                LossCoeff_loc = this->OffCycLossCoeff;
-                LossFracToZone = this->OffCycLossFracToZone;
-                Real64 Qloss = LossCoeff_loc * (AmbientTemp_loc - SetPointTemp_loc);
-                Qneeded = -Quse - Qsource - Qloss - Qoffcycheat;
-
-                // This section really needs to work differently depending on ControlType
-                // CYCLE will look at TankTemp, MODULATE will look at Qneeded
-
-                if ((TankTemp_loc < DeadBandTemp) && (!this->IsChilledWaterTank)) {
-                    // Tank temperature is already below the minimum, possibly due to step change in scheduled SetPointTemp
-
-                    Mode_loc = state.dataWaterThermalTanks->heatMode;
-                    ++CycleOnCount_loc;
-                    continue;
-
-                } else if ((TankTemp_loc >= DeadBandTemp) && (!this->IsChilledWaterTank)) {
-
-                    Qheat = Qoffcycheat + Qheatpump;
-
-                    // Calculate time needed for tank temperature to fall to minimum (setpoint - deadband)
-                    TimeNeeded = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTimeNeeded(TankTemp_loc,
-                                                                                                     DeadBandTemp,
-                                                                                                     AmbientTemp_loc,
-                                                                                                     UseInletTemp_loc,
-                                                                                                     SourceInletTemp_loc,
-                                                                                                     TankMass,
-                                                                                                     Cp,
-                                                                                                     UseMassFlowRate_loc,
-                                                                                                     SourceMassFlowRate_loc,
-                                                                                                     LossCoeff_loc,
-                                                                                                     Qheat);
-
-                    if (TimeNeeded <= TimeRemaining) {
-                        // Heating will be needed in this DataGlobals::TimeStep
-
-                        NewTankTemp = DeadBandTemp;
-                        Mode_loc = state.dataWaterThermalTanks->heatMode;
-                        ++CycleOnCount_loc;
-
-                    } else { // TimeNeeded > TimeRemaining
-                        // Heating will not be needed for all of the remaining time
-
-                        NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
-                                                                                                        AmbientTemp_loc,
-                                                                                                        UseInletTemp_loc,
-                                                                                                        SourceInletTemp_loc,
-                                                                                                        TankMass,
-                                                                                                        Cp,
-                                                                                                        UseMassFlowRate_loc,
-                                                                                                        SourceMassFlowRate_loc,
-                                                                                                        LossCoeff_loc,
-                                                                                                        Qheat,
-                                                                                                        TimeRemaining);
-
-                        if ((NewTankTemp < MaxTemp) || (this->IsChilledWaterTank)) {
-                            // Neither heating nor venting is needed for all of the remaining time
-
-                            TimeNeeded = TimeRemaining;
-
-                        } else { // NewTankTemp >= MaxTemp
-                            // Venting will be needed in this DataGlobals::TimeStep
-
-                            // Calculate time needed for tank temperature to rise to the maximum
-                            TimeNeeded = CalcTimeNeeded(TankTemp_loc,
-                                                        MaxTemp,
-                                                        AmbientTemp_loc,
-                                                        UseInletTemp_loc,
-                                                        SourceInletTemp_loc,
-                                                        TankMass,
-                                                        Cp,
-                                                        UseMassFlowRate_loc,
-                                                        SourceMassFlowRate_loc,
-                                                        LossCoeff_loc,
-                                                        Qheat);
-
-                            // if limit NewTankTemp >= MaxTemp
-                            if (TankTemp_loc >= MaxTemp) {
-                                TimeNeeded = TimeRemaining;
-                            }
-                            NewTankTemp = MaxTemp;
-                            Mode_loc = state.dataWaterThermalTanks->ventMode;
-
-                        } // NewTankTemp >= MaxTemp
-
-                    } // TimeNeeded <= TimeRemaining
-
-                } else if ((TankTemp_loc > DeadBandTemp) && (this->IsChilledWaterTank)) {
-                    Mode_loc = state.dataWaterThermalTanks->coolMode;
-                    Qheat = Qheatpump;
+                    Qheater = Qmaxcap;
+                    Qunmet = Qneeded - Qheater;
+                    Qheat = Qoncycheat + Qheater + Qheatpump;
 
                     NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
                                                                                                     AmbientTemp_loc,
@@ -7109,38 +6958,124 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
                                                                                                     SourceMassFlowRate_loc,
                                                                                                     LossCoeff_loc,
                                                                                                     Qheat,
-                                                                                                    TimeRemaining);
-                    TimeNeeded = TimeRemaining;
-                } else if ((TankTemp_loc <= DeadBandTemp) && (this->IsChilledWaterTank)) {
+                                                                                                    TimeNeeded);
 
-                    if (TankTemp_loc < SetPointTemp_loc) Mode_loc = state.dataWaterThermalTanks->floatMode;
+                } // Qneeded > Qmaxcap
 
-                    Qheat = Qheatpump;
+            } // TankTemp > SetPointTemp
 
-                    NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
-                                                                                                    AmbientTemp_loc,
-                                                                                                    UseInletTemp_loc,
-                                                                                                    SourceInletTemp_loc,
-                                                                                                    TankMass,
-                                                                                                    Cp,
-                                                                                                    UseMassFlowRate_loc,
-                                                                                                    SourceMassFlowRate_loc,
-                                                                                                    LossCoeff_loc,
-                                                                                                    Qheat,
-                                                                                                    TimeRemaining);
-                    TimeNeeded = TimeRemaining;
-                } // TankTemp vs DeadBandTemp for heaters and chilled water tanks
+            // Update summed values
+            Eneeded += Qneeded * TimeNeeded;
+            Eheater += Qheater * TimeNeeded;
+            Eunmet += Qunmet * TimeNeeded;
+            Eoncycfuel += Qoncycfuel * TimeNeeded;
 
-                // Update summed values
-                Eneeded += Qneeded * TimeNeeded;
-                Eunmet += Qunmet * TimeNeeded; // Qunmet may be propagated thru from the previous iteration
-                Eoffcycfuel += Qoffcycfuel * TimeNeeded;
+            if (Qmaxcap > 0.0) PLR = Qheater / Qmaxcap;
+            PLF = this->PartLoadFactor(state, PLR);
+            Efuel += Qheater * TimeNeeded / (PLF * this->Efficiency);
 
-            } else if (SELECT_CASE_var == state.dataWaterThermalTanks->ventMode) { // Excess heat is vented
+            Runtime += TimeNeeded;
+            PLRsum += PLR * TimeNeeded;
 
-                LossCoeff_loc = this->OffCycLossCoeff;
-                LossFracToZone = this->OffCycLossFracToZone;
+            if (!this->FirstRecoveryDone) {
+                this->FirstRecoveryFuel += Efuel + Eoffcycfuel + Eoncycfuel;
+                if (SetPointRecovered) this->FirstRecoveryDone = true;
+            }
+            break;
+
+        case TankOperatingMode::Floating:
+        case TankOperatingMode::Cooling: // Heater is off
+
+            // Calculate heat rate needed to maintain the setpoint at steady-state conditions
+            LossCoeff_loc = this->OffCycLossCoeff;
+            LossFracToZone = this->OffCycLossFracToZone;
+            Qloss = LossCoeff_loc * (AmbientTemp_loc - SetPointTemp_loc);
+            Qneeded = -Quse - Qsource - Qloss - Qoffcycheat;
+
+            // This section really needs to work differently depending on ControlType
+            // CYCLE will look at TankTemp, MODULATE will look at Qneeded
+
+            if ((TankTemp_loc < DeadBandTemp) && (!this->IsChilledWaterTank)) {
+                // Tank temperature is already below the minimum, possibly due to step change in scheduled SetPointTemp
+
+                Mode_loc = TankOperatingMode::Heating;
+                ++CycleOnCount_loc;
+                continue;
+
+            } else if ((TankTemp_loc >= DeadBandTemp) && (!this->IsChilledWaterTank)) {
+
                 Qheat = Qoffcycheat + Qheatpump;
+
+                // Calculate time needed for tank temperature to fall to minimum (setpoint - deadband)
+                TimeNeeded = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTimeNeeded(TankTemp_loc,
+                                                                                                 DeadBandTemp,
+                                                                                                 AmbientTemp_loc,
+                                                                                                 UseInletTemp_loc,
+                                                                                                 SourceInletTemp_loc,
+                                                                                                 TankMass,
+                                                                                                 Cp,
+                                                                                                 UseMassFlowRate_loc,
+                                                                                                 SourceMassFlowRate_loc,
+                                                                                                 LossCoeff_loc,
+                                                                                                 Qheat);
+
+                if (TimeNeeded <= TimeRemaining) {
+                    // Heating will be needed in this DataGlobals::TimeStep
+
+                    NewTankTemp = DeadBandTemp;
+                    Mode_loc = TankOperatingMode::Heating;
+                    ++CycleOnCount_loc;
+
+                } else { // TimeNeeded > TimeRemaining
+                    // Heating will not be needed for all of the remaining time
+
+                    NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
+                                                                                                    AmbientTemp_loc,
+                                                                                                    UseInletTemp_loc,
+                                                                                                    SourceInletTemp_loc,
+                                                                                                    TankMass,
+                                                                                                    Cp,
+                                                                                                    UseMassFlowRate_loc,
+                                                                                                    SourceMassFlowRate_loc,
+                                                                                                    LossCoeff_loc,
+                                                                                                    Qheat,
+                                                                                                    TimeRemaining);
+
+                    if ((NewTankTemp < MaxTemp) || (this->IsChilledWaterTank)) {
+                        // Neither heating nor venting is needed for all of the remaining time
+
+                        TimeNeeded = TimeRemaining;
+
+                    } else { // NewTankTemp >= MaxTemp
+                        // Venting will be needed in this DataGlobals::TimeStep
+
+                        // Calculate time needed for tank temperature to rise to the maximum
+                        TimeNeeded = CalcTimeNeeded(TankTemp_loc,
+                                                    MaxTemp,
+                                                    AmbientTemp_loc,
+                                                    UseInletTemp_loc,
+                                                    SourceInletTemp_loc,
+                                                    TankMass,
+                                                    Cp,
+                                                    UseMassFlowRate_loc,
+                                                    SourceMassFlowRate_loc,
+                                                    LossCoeff_loc,
+                                                    Qheat);
+
+                        // if limit NewTankTemp >= MaxTemp
+                        if (TankTemp_loc >= MaxTemp) {
+                            TimeNeeded = TimeRemaining;
+                        }
+                        NewTankTemp = MaxTemp;
+                        Mode_loc = TankOperatingMode::Venting;
+
+                    } // NewTankTemp >= MaxTemp
+
+                } // TimeNeeded <= TimeRemaining
+
+            } else if ((TankTemp_loc > DeadBandTemp) && (this->IsChilledWaterTank)) {
+                Mode_loc = TankOperatingMode::Cooling;
+                Qheat = Qheatpump;
 
                 NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
                                                                                                 AmbientTemp_loc,
@@ -7153,35 +7088,77 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
                                                                                                 LossCoeff_loc,
                                                                                                 Qheat,
                                                                                                 TimeRemaining);
+                TimeNeeded = TimeRemaining;
+            } else if ((TankTemp_loc <= DeadBandTemp) && (this->IsChilledWaterTank)) {
 
-                if (NewTankTemp < MaxTemp) {
-                    // Venting is no longer needed because conditions have changed
+                if (TankTemp_loc < SetPointTemp_loc) Mode_loc = TankOperatingMode::Floating;
 
-                    Mode_loc = state.dataWaterThermalTanks->floatMode;
-                    continue;
+                Qheat = Qheatpump;
 
-                } else { // NewTankTemp >= MaxTemp
+                NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
+                                                                                                AmbientTemp_loc,
+                                                                                                UseInletTemp_loc,
+                                                                                                SourceInletTemp_loc,
+                                                                                                TankMass,
+                                                                                                Cp,
+                                                                                                UseMassFlowRate_loc,
+                                                                                                SourceMassFlowRate_loc,
+                                                                                                LossCoeff_loc,
+                                                                                                Qheat,
+                                                                                                TimeRemaining);
+                TimeNeeded = TimeRemaining;
+            } // TankTemp vs DeadBandTemp for heaters and chilled water tanks
 
-                    TimeNeeded = TimeRemaining;
+            // Update summed values
+            Eneeded += Qneeded * TimeNeeded;
+            Eunmet += Qunmet * TimeNeeded; // Qunmet may be propagated thru from the previous iteration
+            Eoffcycfuel += Qoffcycfuel * TimeNeeded;
+            break;
 
-                    // Calculate the steady-state venting rate needed to maintain the tank at maximum temperature
-                    Real64 Qloss = LossCoeff_loc * (AmbientTemp_loc - MaxTemp);
-                    Quse = UseMassFlowRate_loc * Cp * (UseInletTemp_loc - MaxTemp);
-                    Qsource = SourceMassFlowRate_loc * Cp * (SourceInletTemp_loc - MaxTemp);
-                    Qvent = -Quse - Qsource - Qloss - Qoffcycheat;
+        case TankOperatingMode::Venting: // Excess heat is vented
 
-                    NewTankTemp = MaxTemp;
+            LossCoeff_loc = this->OffCycLossCoeff;
+            LossFracToZone = this->OffCycLossFracToZone;
+            Qheat = Qoffcycheat + Qheatpump;
 
-                } // NewTankTemp < MaxTemp
+            NewTankTemp = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp_loc,
+                                                                                            AmbientTemp_loc,
+                                                                                            UseInletTemp_loc,
+                                                                                            SourceInletTemp_loc,
+                                                                                            TankMass,
+                                                                                            Cp,
+                                                                                            UseMassFlowRate_loc,
+                                                                                            SourceMassFlowRate_loc,
+                                                                                            LossCoeff_loc,
+                                                                                            Qheat,
+                                                                                            TimeRemaining);
 
-                // Update summed values
-                Event += Qvent * TimeNeeded;
-                Eoffcycfuel += Qoffcycfuel * TimeNeeded;
+            if (NewTankTemp < MaxTemp) {
+                // Venting is no longer needed because conditions have changed
 
-            } else {
-                // No default
-                assert(false);
-            }
+                Mode_loc = TankOperatingMode::Floating;
+                continue;
+
+            } else { // NewTankTemp >= MaxTemp
+
+                TimeNeeded = TimeRemaining;
+
+                // Calculate the steady-state venting rate needed to maintain the tank at maximum temperature
+                Real64 Qloss = LossCoeff_loc * (AmbientTemp_loc - MaxTemp);
+                Quse = UseMassFlowRate_loc * Cp * (UseInletTemp_loc - MaxTemp);
+                Qsource = SourceMassFlowRate_loc * Cp * (SourceInletTemp_loc - MaxTemp);
+                Qvent = -Quse - Qsource - Qloss - Qoffcycheat;
+
+                NewTankTemp = MaxTemp;
+
+            } // NewTankTemp < MaxTemp
+
+            // Update summed values
+            Event += Qvent * TimeNeeded;
+            Eoffcycfuel += Qoffcycfuel * TimeNeeded;
+            break;
+        default:
+            assert(false); // should never get here
         }
 
         Real64 deltaTsum = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(TankTemp_loc,
@@ -7233,7 +7210,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
 
     // Calculate average values over the DataGlobals::TimeStep based on summed values, Q > 0 is a gain to the tank,  Q < 0 is a loss to the tank
     Real64 TankTempAvg_loc = Tsum / SecInTimeStep;
-    Real64 Qloss = Eloss / SecInTimeStep;
+    Qloss = Eloss / SecInTimeStep;
     Real64 Qlosszone = Elosszone / SecInTimeStep;
     Quse = Euse / SecInTimeStep;
     Qsource = Esource / SecInTimeStep;
@@ -7250,7 +7227,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
 
     if (this->ControlType == HeaterControlMode::Cycle) {
         // Recalculate Part Load Factor and fuel energy based on Runtime Fraction, instead of Part Load Ratio
-        Real64 PLF = this->PartLoadFactor(state, RTF);
+        PLF = this->PartLoadFactor(state, RTF);
         Efuel = Eheater / (PLF * this->Efficiency);
     }
 
@@ -8433,7 +8410,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
     // simulate only the water heater tank if the desuperheater coil is scheduled off
     Real64 AvailSchedule = ScheduleManager::GetCurrentScheduleValue(state, DesupHtr.AvailSchedPtr);
     if (AvailSchedule == 0.0) {
-        DesupHtr.Mode = state.dataWaterThermalTanks->floatMode;
+        DesupHtr.Mode = TankOperatingMode::Floating;
         this->CalcWaterThermalTank(state);
         return;
     }
@@ -8444,7 +8421,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
         int SourceID = DesupHtr.ReclaimHeatingSourceIndexNum;
         if (DesupHtr.ReclaimHeatingSource == ReclaimHeatObjectType::CondenserRefrigeration) {
             if (state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).AvailTemperature <= this->SourceInletTemp) {
-                DesupHtr.Mode = state.dataWaterThermalTanks->floatMode;
+                DesupHtr.Mode = TankOperatingMode::Floating;
                 this->CalcWaterThermalTank(state);
                 ShowRecurringWarningErrorAtEnd(state,
                                                "WaterHeating:Desuperheater " + DesupHtr.Name +
@@ -8569,6 +8546,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
 
     // change to tanktypenum using parameters?
     Real64 partLoadRatio = 0.0;
+    Real64 NewTankTemp;
     {
         auto const TankType(DesupHtr.TankTypeNum);
 
@@ -8586,41 +8564,162 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                                           std::placeholders::_2,
                                           std::placeholders::_3);
 
-            {
-                auto const SELECT_CASE_var1(DesupHtr.Mode);
-                if (SELECT_CASE_var1 == state.dataWaterThermalTanks->heatMode) {
-                    // Calculate until consistency of desuperheater and tank source side energy transfer achieved
+            switch (DesupHtr.Mode) {
+            case TankOperatingMode::Heating:
+                // Calculate until consistency of desuperheater and tank source side energy transfer achieved
+                while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) && count < max_count) {
+                    count++;
+                    firstThrough = false;
+                    PreTankAvgTemp = this->TankTempAvg;
+                    partLoadRatio = DesupHtr.DXSysPLR;
+                    if (MdotWater > 0.0) {
+                        state.dataLoopNodes->Node(WaterOutletNode).Temp = this->SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
+                    } else {
+                        state.dataLoopNodes->Node(WaterOutletNode).Temp = this->SourceOutletTemp;
+                    }
+
+                    //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
+                    this->SourceInletTemp = state.dataLoopNodes->Node(WaterOutletNode).Temp;
+
+                    //         set the source mass flow rate for the tank
+                    this->SourceMassFlowRate = MdotWater * partLoadRatio;
+
+                    this->MaxCapacity = DesupHtr.BackupElementCapacity;
+                    this->MinCapacity = DesupHtr.BackupElementCapacity;
+                    DesupHtr.DesuperheaterPLR = partLoadRatio;
+                    DesupHtr.HeaterRate = QHeatRate * partLoadRatio;
+                    this->CalcWaterThermalTank(state);
+                    Real64 NewTankTemp = this->TankTemp;
+
+                    if (NewTankTemp > desupHtrSetPointTemp) {
+                        //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
+                        if (NewTankTemp > DesupHtr.SetPointTemp) {
+                            DesupHtr.Mode = TankOperatingMode::Floating;
+                        }
+                        Par(1) = desupHtrSetPointTemp;
+                        Par(2) = static_cast<int>(DesupHtr.SaveWHMode);
+                        if (FirstHVACIteration) {
+                            Par(4) = 1.0;
+                        } else {
+                            Par(4) = 0.0;
+                        }
+                        Par(5) = MdotWater;
+                        int SolFla;
+                        std::string IterNum;
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
+                        if (SolFla == -1) {
+                            IterNum = fmt::to_string(MaxIte);
+                            if (!state.dataGlobal->WarmupFlag) {
+                                ++DesupHtr.IterLimitExceededNum1;
+                                if (DesupHtr.IterLimitExceededNum1 == 1) {
+                                    ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                    ShowContinueError(state,
+                                                      format("Iteration limit exceeded calculating desuperheater unit part-load ratio, "
+                                                             "maximum iterations = {}. Part-load ratio returned = {:.3R}",
+                                                             IterNum,
+                                                             partLoadRatio));
+                                    ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
+                                } else {
+                                    ShowRecurringWarningErrorAtEnd(state,
+                                                                   DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                                       "\":  Iteration limit exceeded in heating mode warning continues. "
+                                                                       "Part-load ratio statistics follow.",
+                                                                   DesupHtr.IterLimitErrIndex1,
+                                                                   partLoadRatio,
+                                                                   partLoadRatio);
+                                }
+                            }
+                        } else if (SolFla == -2) {
+                            partLoadRatio =
+                                max(0.0, min(DesupHtr.DXSysPLR, (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
+                            this->SourceMassFlowRate = MdotWater * partLoadRatio;
+                            this->CalcWaterThermalTank(state);
+                            if (!state.dataGlobal->WarmupFlag) {
+                                ++DesupHtr.RegulaFalsiFailedNum1;
+                                if (DesupHtr.RegulaFalsiFailedNum1 == 1) {
+                                    ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                    ShowContinueError(state,
+                                                      format("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 "
+                                                             "exceeded. Part-load ratio used = {:.3R}",
+                                                             partLoadRatio));
+                                    ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
+                                    ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
+                                } else {
+                                    ShowRecurringWarningErrorAtEnd(state,
+                                                                   DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                                       "\":  Part-load ratio calculation failed in heating mode warning "
+                                                                       "continues. Part-load ratio statistics follow.",
+                                                                   DesupHtr.RegulaFalsiFailedIndex1,
+                                                                   partLoadRatio,
+                                                                   partLoadRatio);
+                                }
+                            }
+                        }
+                    } else {
+                        partLoadRatio = DesupHtr.DXSysPLR;
+                    }
+                    NewTankAvgTemp = this->TankTempAvg;
+                }
+                break;
+            case TankOperatingMode::Floating:
+                if (MdotWater > 0.0) {
+                    state.dataLoopNodes->Node(WaterOutletNode).Temp =
+                        state.dataLoopNodes->Node(WaterInletNode).Temp + QHeatRate / (MdotWater * CpWater);
+                } else {
+                    state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataLoopNodes->Node(WaterInletNode).Temp;
+                }
+                //         check tank temperature by setting source inlet mass flow rate to zero
+                partLoadRatio = 0.0;
+
+                //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
+                this->SourceInletTemp = state.dataLoopNodes->Node(WaterOutletNode).Temp;
+
+                //         check tank temperature by setting source inlet mass flow rate to zero
+                this->SourceMassFlowRate = 0.0;
+
+                //         disable the tank heater to find PLR of the HPWH
+                this->MaxCapacity = 0.0;
+                this->MinCapacity = 0.0;
+                DesupHtr.DesuperheaterPLR = partLoadRatio;
+                DesupHtr.HeaterRate = QHeatRate * partLoadRatio;
+                this->CalcWaterThermalTank(state);
+                NewTankTemp = this->TankTemp;
+
+                if (NewTankTemp <= (desupHtrSetPointTemp - DeadBandTempDiff)) {
+                    this->Mode = DesupHtr.SaveWHMode;
+                    if ((this->SavedTankTemp - NewTankTemp) != 0.0) {
+                        partLoadRatio =
+                            min(DesupHtr.DXSysPLR,
+                                max(0.0, ((desupHtrSetPointTemp - DeadBandTempDiff) - NewTankTemp) / (this->SavedTankTemp - NewTankTemp)));
+                    } else {
+                        partLoadRatio = DesupHtr.DXSysPLR;
+                    }
                     while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) && count < max_count) {
                         count++;
                         firstThrough = false;
                         PreTankAvgTemp = this->TankTempAvg;
-                        partLoadRatio = DesupHtr.DXSysPLR;
+                        DesupHtr.Mode = TankOperatingMode::Heating;
                         if (MdotWater > 0.0) {
                             state.dataLoopNodes->Node(WaterOutletNode).Temp = this->SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
                         } else {
                             state.dataLoopNodes->Node(WaterOutletNode).Temp = this->SourceOutletTemp;
                         }
 
-                        //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
+                        //           set the full load outlet temperature on the water heater source inlet node
                         this->SourceInletTemp = state.dataLoopNodes->Node(WaterOutletNode).Temp;
 
-                        //         set the source mass flow rate for the tank
+                        //           set the source mass flow rate for the tank and enable backup heating element
                         this->SourceMassFlowRate = MdotWater * partLoadRatio;
-
                         this->MaxCapacity = DesupHtr.BackupElementCapacity;
                         this->MinCapacity = DesupHtr.BackupElementCapacity;
                         DesupHtr.DesuperheaterPLR = partLoadRatio;
                         DesupHtr.HeaterRate = QHeatRate * partLoadRatio;
                         this->CalcWaterThermalTank(state);
-                        Real64 NewTankTemp = this->TankTemp;
+                        NewTankTemp = this->TankTemp;
 
                         if (NewTankTemp > desupHtrSetPointTemp) {
-                            //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
-                            if (NewTankTemp > DesupHtr.SetPointTemp) {
-                                DesupHtr.Mode = state.dataWaterThermalTanks->floatMode;
-                            }
                             Par(1) = desupHtrSetPointTemp;
-                            Par(2) = DesupHtr.SaveWHMode;
+                            Par(2) = static_cast<int>(DesupHtr.SaveWHMode);
                             if (FirstHVACIteration) {
                                 Par(4) = 1.0;
                             } else {
@@ -8633,21 +8732,21 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                             if (SolFla == -1) {
                                 IterNum = fmt::to_string(MaxIte);
                                 if (!state.dataGlobal->WarmupFlag) {
-                                    ++DesupHtr.IterLimitExceededNum1;
-                                    if (DesupHtr.IterLimitExceededNum1 == 1) {
+                                    ++DesupHtr.IterLimitExceededNum2;
+                                    if (DesupHtr.IterLimitExceededNum2 == 1) {
                                         ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
                                         ShowContinueError(state,
                                                           format("Iteration limit exceeded calculating desuperheater unit part-load ratio, "
                                                                  "maximum iterations = {}. Part-load ratio returned = {:.3R}",
                                                                  IterNum,
                                                                  partLoadRatio));
-                                        ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
+                                        ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
                                     } else {
                                         ShowRecurringWarningErrorAtEnd(state,
                                                                        DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                                           "\":  Iteration limit exceeded in heating mode warning continues. "
+                                                                           "\":  Iteration limit exceeded in float mode warning continues. "
                                                                            "Part-load ratio statistics follow.",
-                                                                       DesupHtr.IterLimitErrIndex1,
+                                                                       DesupHtr.IterLimitErrIndex2,
                                                                        partLoadRatio,
                                                                        partLoadRatio);
                                     }
@@ -8655,160 +8754,38 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                             } else if (SolFla == -2) {
                                 partLoadRatio = max(
                                     0.0, min(DesupHtr.DXSysPLR, (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
-                                this->SourceMassFlowRate = MdotWater * partLoadRatio;
-                                this->CalcWaterThermalTank(state);
                                 if (!state.dataGlobal->WarmupFlag) {
-                                    ++DesupHtr.RegulaFalsiFailedNum1;
-                                    if (DesupHtr.RegulaFalsiFailedNum1 == 1) {
+                                    ++DesupHtr.RegulaFalsiFailedNum2;
+                                    if (DesupHtr.RegulaFalsiFailedNum2 == 1) {
                                         ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
                                         ShowContinueError(state,
-                                                          format("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 "
-                                                                 "exceeded. Part-load ratio used = {:.3R}",
+                                                          format("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to "
+                                                                 "1 exceeded. Part-load ratio used = {:.3R}",
                                                                  partLoadRatio));
                                         ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
-                                        ShowContinueErrorTimeStamp(state, "This error occurred in heating mode.");
+                                        ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
                                     } else {
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                                                       DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                                           "\":  Part-load ratio calculation failed in heating mode warning "
-                                                                           "continues. Part-load ratio statistics follow.",
-                                                                       DesupHtr.RegulaFalsiFailedIndex1,
-                                                                       partLoadRatio,
-                                                                       partLoadRatio);
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                "\": Part-load ratio calculation failed in float mode warning "
+                                                "continues. Part-load ratio statistics follow.",
+                                            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
+                                            partLoadRatio,
+                                            partLoadRatio);
                                     }
                                 }
                             }
-                        } else {
-                            partLoadRatio = DesupHtr.DXSysPLR;
                         }
                         NewTankAvgTemp = this->TankTempAvg;
                     }
-                } else if (SELECT_CASE_var1 == state.dataWaterThermalTanks->floatMode) {
-                    if (MdotWater > 0.0) {
-                        state.dataLoopNodes->Node(WaterOutletNode).Temp =
-                            state.dataLoopNodes->Node(WaterInletNode).Temp + QHeatRate / (MdotWater * CpWater);
-                    } else {
-                        state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataLoopNodes->Node(WaterInletNode).Temp;
-                    }
-                    //         check tank temperature by setting source inlet mass flow rate to zero
-                    partLoadRatio = 0.0;
-
-                    //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
-                    this->SourceInletTemp = state.dataLoopNodes->Node(WaterOutletNode).Temp;
-
-                    //         check tank temperature by setting source inlet mass flow rate to zero
-                    this->SourceMassFlowRate = 0.0;
-
-                    //         disable the tank heater to find PLR of the HPWH
-                    this->MaxCapacity = 0.0;
-                    this->MinCapacity = 0.0;
-                    DesupHtr.DesuperheaterPLR = partLoadRatio;
-                    DesupHtr.HeaterRate = QHeatRate * partLoadRatio;
-                    this->CalcWaterThermalTank(state);
-                    Real64 NewTankTemp = this->TankTemp;
-
-                    if (NewTankTemp <= (desupHtrSetPointTemp - DeadBandTempDiff)) {
-                        this->Mode = DesupHtr.SaveWHMode;
-                        if ((this->SavedTankTemp - NewTankTemp) != 0.0) {
-                            partLoadRatio =
-                                min(DesupHtr.DXSysPLR,
-                                    max(0.0, ((desupHtrSetPointTemp - DeadBandTempDiff) - NewTankTemp) / (this->SavedTankTemp - NewTankTemp)));
-                        } else {
-                            partLoadRatio = DesupHtr.DXSysPLR;
-                        }
-                        while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) && count < max_count) {
-                            count++;
-                            firstThrough = false;
-                            PreTankAvgTemp = this->TankTempAvg;
-                            DesupHtr.Mode = state.dataWaterThermalTanks->heatMode;
-                            if (MdotWater > 0.0) {
-                                state.dataLoopNodes->Node(WaterOutletNode).Temp = this->SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
-                            } else {
-                                state.dataLoopNodes->Node(WaterOutletNode).Temp = this->SourceOutletTemp;
-                            }
-
-                            //           set the full load outlet temperature on the water heater source inlet node
-                            this->SourceInletTemp = state.dataLoopNodes->Node(WaterOutletNode).Temp;
-
-                            //           set the source mass flow rate for the tank and enable backup heating element
-                            this->SourceMassFlowRate = MdotWater * partLoadRatio;
-                            this->MaxCapacity = DesupHtr.BackupElementCapacity;
-                            this->MinCapacity = DesupHtr.BackupElementCapacity;
-                            DesupHtr.DesuperheaterPLR = partLoadRatio;
-                            DesupHtr.HeaterRate = QHeatRate * partLoadRatio;
-                            this->CalcWaterThermalTank(state);
-                            NewTankTemp = this->TankTemp;
-
-                            if (NewTankTemp > desupHtrSetPointTemp) {
-                                Par(1) = desupHtrSetPointTemp;
-                                Par(2) = DesupHtr.SaveWHMode;
-                                if (FirstHVACIteration) {
-                                    Par(4) = 1.0;
-                                } else {
-                                    Par(4) = 0.0;
-                                }
-                                Par(5) = MdotWater;
-                                int SolFla;
-                                std::string IterNum;
-                                General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
-                                if (SolFla == -1) {
-                                    IterNum = fmt::to_string(MaxIte);
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        ++DesupHtr.IterLimitExceededNum2;
-                                        if (DesupHtr.IterLimitExceededNum2 == 1) {
-                                            ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
-                                            ShowContinueError(state,
-                                                              format("Iteration limit exceeded calculating desuperheater unit part-load ratio, "
-                                                                     "maximum iterations = {}. Part-load ratio returned = {:.3R}",
-                                                                     IterNum,
-                                                                     partLoadRatio));
-                                            ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                                           DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                                               "\":  Iteration limit exceeded in float mode warning continues. "
-                                                                               "Part-load ratio statistics follow.",
-                                                                           DesupHtr.IterLimitErrIndex2,
-                                                                           partLoadRatio,
-                                                                           partLoadRatio);
-                                        }
-                                    }
-                                } else if (SolFla == -2) {
-                                    partLoadRatio = max(
-                                        0.0,
-                                        min(DesupHtr.DXSysPLR, (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
-                                    if (!state.dataGlobal->WarmupFlag) {
-                                        ++DesupHtr.RegulaFalsiFailedNum2;
-                                        if (DesupHtr.RegulaFalsiFailedNum2 == 1) {
-                                            ShowWarningError(state, DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
-                                            ShowContinueError(state,
-                                                              format("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to "
-                                                                     "1 exceeded. Part-load ratio used = {:.3R}",
-                                                                     partLoadRatio));
-                                            ShowContinueError(state, "Please send this information to the EnergyPlus support group.");
-                                            ShowContinueErrorTimeStamp(state, "This error occurred in float mode.");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(
-                                                state,
-                                                DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                    "\": Part-load ratio calculation failed in float mode warning "
-                                                    "continues. Part-load ratio statistics follow.",
-                                                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
-                                                partLoadRatio,
-                                                partLoadRatio);
-                                        }
-                                    }
-                                }
-                            }
-                            NewTankAvgTemp = this->TankTempAvg;
-                        }
-                    } else {
-                        this->MaxCapacity = DesupHtr.BackupElementCapacity;
-                        this->MinCapacity = DesupHtr.BackupElementCapacity;
-                    }
-
                 } else {
+                    this->MaxCapacity = DesupHtr.BackupElementCapacity;
+                    this->MinCapacity = DesupHtr.BackupElementCapacity;
                 }
+                break;
+            default:
+                break;
             }
 
             //   should never get here, case is checked in GetWaterThermalTankInput
@@ -8950,11 +8927,11 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         state.dataHVACGlobal->HPWHInletDBTemp < HeatPump.MinAirTempForHPOperation ||
         state.dataHVACGlobal->HPWHInletDBTemp > HeatPump.MaxAirTempForHPOperation || HPSetPointTemp >= this->TankTempLimit ||
         (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime && this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed &&
-         this->SavedMode == state.dataWaterThermalTanks->heatMode) ||
+         this->SavedMode == TankOperatingMode::Heating) ||
         (!HeatPump.AllowHeatingElementAndHeatPumpToRunAtSameTime &&
          this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterStratified && (this->SavedHeaterOn1 || this->SavedHeaterOn2))) {
         //   revert to float mode any time HPWH compressor is OFF
-        HeatPump.Mode = state.dataWaterThermalTanks->floatMode;
+        HeatPump.Mode = TankOperatingMode::Floating;
         if (InletAirMixerNode > 0) {
             state.dataLoopNodes->Node(InletAirMixerNode) = state.dataLoopNodes->Node(HPAirInletNode);
         }
@@ -9175,11 +9152,11 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
     // Select mode of operation (float mode or heat mode) from last iteration.
     // Determine if heating will occur this iteration and get an estimate of the PLR
-    if (HeatPump.Mode == state.dataWaterThermalTanks->heatMode) {
+    if (HeatPump.Mode == TankOperatingMode::Heating) {
         // HPWH was heating last iteration and will continue to heat until the set point is reached
         state.dataWaterThermalTanks->hpPartLoadRatio = 1.0;
         if (savedTankTemp > HPSetPointTemp) { // tank set point temp may have been reduced since last iteration and float mode may be needed
-            HeatPump.Mode = state.dataWaterThermalTanks->floatMode;
+            HeatPump.Mode = TankOperatingMode::Floating;
             state.dataWaterThermalTanks->hpPartLoadRatio = 0.0;
             // check to see if HP needs to operate
             // set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
@@ -9217,7 +9194,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             if (NewTankTemp <= (HPSetPointTemp - DeadBandTempDiff)) {
 
                 // HPWH is now in heating mode
-                HeatPump.Mode = state.dataWaterThermalTanks->heatMode;
+                HeatPump.Mode = TankOperatingMode::Heating;
 
                 // Reset the water heater's mode (call above may have changed modes)
                 this->Mode = HeatPump.SaveWHMode;
@@ -9260,7 +9237,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             if (NewTankTemp > HPSetPointTemp) {
 
                 // HPWH is now in floating mode
-                HeatPump.Mode = state.dataWaterThermalTanks->floatMode;
+                HeatPump.Mode = TankOperatingMode::Floating;
 
             } else {
 
@@ -9272,7 +9249,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             this->Mode = HeatPump.SaveWHMode;
         }
     } else {
-        assert(HeatPump.Mode == state.dataWaterThermalTanks->floatMode);
+        assert(HeatPump.Mode == TankOperatingMode::Floating);
         // HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
 
         // set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
@@ -9310,7 +9287,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         if (NewTankTemp <= (HPSetPointTemp - DeadBandTempDiff)) {
 
             // HPWH is now in heating mode
-            HeatPump.Mode = state.dataWaterThermalTanks->heatMode;
+            HeatPump.Mode = TankOperatingMode::Heating;
 
             // Reset the water heater's mode (call above may have changed modes)
             this->Mode = HeatPump.SaveWHMode;
@@ -9322,7 +9299,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     if (HeatPump.bIsIHP) // mark the water heating call, if existing
     {
         if (state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).CheckWHCall) {
-            if (1 == HeatPump.Mode)
+            if (HeatPump.Mode == TankOperatingMode::Heating)
                 state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).IsWHCallAvail = true;
             else
                 state.dataIntegratedHP->IntegratedHeatPumps(HeatPump.DXCoilNum).IsWHCallAvail = false;
@@ -9333,7 +9310,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     // heating would be needed during this DataGlobals::TimeStep to maintain setpoint, do the heating calculation.
     int SpeedNum = 0;
     Real64 SpeedRatio = 0.0;
-    if (HeatPump.Mode == state.dataWaterThermalTanks->heatMode) {
+    if (HeatPump.Mode == TankOperatingMode::Heating) {
 
         // set up air flow on DX coil inlet node
         state.dataLoopNodes->Node(DXCoilAirInletNode).MassFlowRate =
@@ -9449,9 +9426,9 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
         Array1D<Real64> Par(5); // Parameters passed to RegulaFalsi
         if (NewTankTemp > HPSetPointTemp) {
-            HeatPump.Mode = state.dataWaterThermalTanks->floatMode;
+            HeatPump.Mode = TankOperatingMode::Floating;
             Par(1) = HPSetPointTemp;
-            Par(2) = HeatPump.SaveWHMode;
+            Par(2) = static_cast<int>(HeatPump.SaveWHMode);
             if (FirstHVACIteration) {
                 Par(4) = 1.0;
             } else {
@@ -9573,7 +9550,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
         } else if (bIterSpeed) {
             for (int loopIter = 1; loopIter <= 4; ++loopIter) {
-                HeatPump.Mode = state.dataWaterThermalTanks->heatMode; // modHeatMode is important for system convergence
+                HeatPump.Mode = TankOperatingMode::Heating; // modHeatMode is important for system convergence
                 state.dataWaterThermalTanks->hpPartLoadRatio = 1.0;
                 SpeedRatio = 1.0;
                 int LowSpeedNum = 2;
@@ -9652,7 +9629,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     ParVS(5) = HPWaterOutletNode;
                     ParVS(6) = RhoWater;
                     ParVS(7) = HPSetPointTemp;
-                    ParVS(8) = HeatPump.SaveWHMode;
+                    ParVS(8) = static_cast<int>(HeatPump.SaveWHMode);
                     if (FirstHVACIteration) {
                         ParVS(9) = 1.0;
                     } else {
@@ -10293,7 +10270,7 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
     int HPWaterInletNode = int(Par(4));
     int HPWaterOutletNode = int(Par(5));
     Real64 RhoWater = Par(6);
-    this->Mode = int(Par(8));
+    this->Mode = static_cast<TankOperatingMode>(Par(8));
     bool FirstHVACIteration = (Par(9) == 1.0);
 
     state.dataWaterThermalTanks->hpPartLoadRatio = 1.0;
@@ -10387,7 +10364,7 @@ Real64 WaterThermalTankData::PLRResidualWaterThermalTank(EnergyPlusData &state,
     // par(4) = FirstHVACIteration
     // par(5) = MdotWater
 
-    this->Mode = int(Par(2));
+    this->Mode = static_cast<TankOperatingMode>(Par(2));
     this->SourceMassFlowRate = Par(5) * HPPartLoadRatio;
     this->CalcWaterThermalTank(state);
     Real64 NewTankTemp = this->TankTemp;
@@ -10419,7 +10396,7 @@ Real64 WaterThermalTankData::PLRResidualHPWH(EnergyPlusData &state, Real64 const
 
     HeatPumpWaterHeaterData &HeatPump = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
     bool const isVariableSpeed = (HeatPump.NumofSpeed > 0);
-    this->Mode = int(Par(2));
+    this->Mode = static_cast<TankOperatingMode>(Par(2));
     // Apply the PLR
     if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
         // For a mixed tank, the PLR is applied to the source mass flow rate.
@@ -10472,9 +10449,9 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
                 NeedsHeatOrCool = true;
             } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp_loc)) {
                 // inside the deadband, use saved mode from water heater calcs
-                if (this->SavedMode == state.dataWaterThermalTanks->heatMode) {
+                if (this->SavedMode == TankOperatingMode::Heating) {
                     NeedsHeatOrCool = true;
-                } else if (this->SavedMode == state.dataWaterThermalTanks->floatMode) {
+                } else if (this->SavedMode == TankOperatingMode::Floating) {
                     NeedsHeatOrCool = false;
                 }
 
@@ -10489,9 +10466,9 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
                 NeedsHeatOrCool = true;
             } else if ((OutletTemp >= AltDeadBandTemp) && (OutletTemp < AltSetpointTemp)) {
                 // inside the deadband, use saved mode from water heater calcs
-                if (this->SavedMode == state.dataWaterThermalTanks->heatMode) {
+                if (this->SavedMode == TankOperatingMode::Heating) {
                     NeedsHeatOrCool = true;
-                } else if (this->SavedMode == state.dataWaterThermalTanks->floatMode) {
+                } else if (this->SavedMode == TankOperatingMode::Floating) {
                     NeedsHeatOrCool = false;
                 }
 
@@ -10511,9 +10488,9 @@ bool WaterThermalTankData::SourceHeatNeed(EnergyPlusData &state, Real64 const Ou
         } else if ((OutletTemp <= DeadBandTemp) && (OutletTemp > SetPointTemp_loc)) {
             // inside the deadband, use saved mode from water thermal tank calcs (modes only for mixed)
             if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) {
-                if (this->SavedMode == state.dataWaterThermalTanks->coolMode) {
+                if (this->SavedMode == TankOperatingMode::Cooling) {
                     NeedsHeatOrCool = true;
-                } else if (this->SavedMode == state.dataWaterThermalTanks->floatMode) {
+                } else if (this->SavedMode == TankOperatingMode::Floating) {
                     NeedsHeatOrCool = false;
                 }
             } else if (this->WaterThermalTankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {

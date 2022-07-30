@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
+#include <algorithm>
 #include <array>
 
 // EnergyPlus Headers
@@ -1051,6 +1052,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface(SurfNum).Zone = 1;
     state->dataSurface->Surface(SurfNum).Construction = 1;
     state->dataSurface->SurfTAirRef.allocate(1);
+    state->dataSurface->SurfTAirRefRpt.allocate(1);
     state->dataSurface->SurfTAirRef(SurfNum) = 0;
     state->dataConstruction->Construct(1).TypeIsWindow = false;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
@@ -1082,7 +1084,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
@@ -1094,7 +1096,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
@@ -1106,7 +1108,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Case 2 - High ACH
@@ -1122,7 +1124,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 4.122;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
@@ -1133,7 +1135,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 9.476;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
@@ -1144,7 +1146,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HcExpectedValue = 3.212;
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
-    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
     EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 }
 
@@ -1179,7 +1181,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 
     // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
-    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->SurfIntConvCoeffIndex(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
@@ -1190,7 +1192,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     EXPECT_NEAR(Hn, 1.520, 0.001);
 
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
-    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->SurfIntConvCoeffIndex(SurfNum) = 0.0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
@@ -2836,5 +2838,762 @@ TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
         expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 135, 0, 1);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
         ASSERT_EQ(state->dataConvectionCoefficient->CalcBlockenWindwardErrorIDX, 1);
+    }
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocation1)
+{
+    std::string const idf_objects = delimited_string({
+        "SurfaceProperty:ConvectionCoefficients:MultipleSurface,",
+        "AllExteriorWindows,      !- Surface Type",
+        "Inside,                 !- Convection Coefficient 1 Location",
+        "MoWitt,                  !- Convection Coefficient 1 Type",
+        ", !- Convection Coefficient 1",
+        ", !- Convection Coefficient 1 Schedule Name",
+        ", !- Convection Coefficient 1 User Curve Name",
+        "Inside,                 !- Convection Coefficient 2 Location",
+        "MoWitt,                  !- Convection Coefficient 2 Type",
+        ", !- Convection Coefficient 2",
+        ", !- Convection Coefficient 2 Schedule Name",
+        "; !- Convection Coefficient 2 User Curve Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(2);
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(2);
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 2u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 0u);
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocation2)
+{
+    std::string const idf_objects = delimited_string({
+        "SurfaceProperty:ConvectionCoefficients:MultipleSurface,",
+        "AllExteriorSurfaces,      !- Surface Type",
+        "Outside,                 !- Convection Coefficient 1 Location",
+        "MoWitt,                  !- Convection Coefficient 1 Type",
+        ", !- Convection Coefficient 1",
+        ", !- Convection Coefficient 1 Schedule Name",
+        ", !- Convection Coefficient 1 User Curve Name",
+        "Outside,                 !- Convection Coefficient 2 Location",
+        "MoWitt,                  !- Convection Coefficient 2 Type",
+        ", !- Convection Coefficient 2",
+        ", !- Convection Coefficient 2 Schedule Name",
+        "; !- Convection Coefficient 2 User Curve Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(2);
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(2);
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 0u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 2u);
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation1)
+{
+    std::string const idf_objects = delimited_string({"SurfaceProperty:ConvectionCoefficients,",
+                                                      "  FakeSurface, !- Surface Name",
+                                                      "  Inside, !- Convection Coefficient 1 Location",
+                                                      "  Value, !- Convection Coefficient 1 Type",
+                                                      "  1, !- Convection Coefficient 1",
+                                                      "  FakeSchName, !- Convection Coefficient 1 Schedule Name",
+                                                      "  FakeCurve, !- Convection Coefficient 1 User Curve Name",
+                                                      "  Outside, !- Convection Coefficient 2 Location",
+                                                      "  Value, !- Convection Coefficient 2 Type",
+                                                      "  10;   !- Convection Coefficient 2"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "FAKESURFACE";
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfIntConvCoeffIndex(1) = 0;
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfExtConvCoeffIndex(1) = 0;
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 1u);
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation2)
+{
+    std::string const idf_objects = delimited_string({"SurfaceProperty:ConvectionCoefficients,",
+                                                      "  FakeSurface, !- Surface Name",
+                                                      "  Outside, !- Convection Coefficient 1 Location",
+                                                      "  Value, !- Convection Coefficient 1 Type",
+                                                      "  1, !- Convection Coefficient 1",
+                                                      "  FakeSchName, !- Convection Coefficient 1 Schedule Name",
+                                                      "  FakeCurve, !- Convection Coefficient 1 User Curve Name",
+                                                      "  Inside, !- Convection Coefficient 2 Location",
+                                                      "  Value, !- Convection Coefficient 2 Type",
+                                                      "  10;   !- Convection Coefficient 2"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "FAKESURFACE";
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfIntConvCoeffIndex(1) = 0;
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(1);
+    state->dataSurface->SurfExtConvCoeffIndex(1) = 0;
+
+    GetUserConvectionCoefficients(*state);
+    EXPECT_EQ(state->dataSurface->UserIntConvectionCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->UserExtConvectionCoeffs.size(), 1u);
+}
+
+TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
+{
+
+    // Test for #9432
+    // So this is a perfect square. Expect I am going to rotate the building by 15 degrees (Not by building north axis, but by vertices adjustments)
+    // Surface.Vertex(1) will end up having the highest X and highest Y, and we will trigger a bug where if will fail
+    // the XdYu ones (lo X, high Y), that is the top left corner [2] because  the RoofGeo BoundingBoxVertStruct are initialized to Vertex(1) and:
+    //     vertex.x <= RoofGeo.XdYuZd.Vertex.x => True
+    //     vertex.y => RoofGeo.XdYuZd.Vertex.y => False
+    //
+    //          y
+    //         ▲      ◄──┐ Rotate by 15 degrees
+    //       10│         │
+    // [2]┌────┼────┐[1]
+    //    │    │    │
+    //    │    │    │
+    //  ──┼────┼────┼────►
+    // -10│    │    │10   x
+    //    │    │    │
+    // [3]└────┼────┘[4]
+    //      -10│
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,                        !- Starting Vertex Position",
+        "  Counterclockwise,                       !- Vertex Entry Direction",
+        "  Relative,                               !- Coordinate System",
+        "  Relative,                               !- Daylighting Reference Point Coordinate System",
+        "  Relative;                               !- Rectangular Surface Coordinate System",
+
+        "Building,",
+        "  Building 1,                             !- Name",
+        "  20,                                     !- North Axis {deg}",
+        "  ,                                       !- Terrain",
+        "  ,                                       !- Loads Convergence Tolerance Value {W}",
+        "  ,                                       !- Temperature Convergence Tolerance Value {deltaC}",
+        "  ,                                       !- Solar Distribution",
+        "  ,                                       !- Maximum Number of Warmup Days",
+        "  ;                                       !- Minimum Number of Warmup Days",
+
+        "Zone,",
+        "  Zone1,                                  !- Name",
+        "  0,                                      !- Direction of Relative North {deg}",
+        "  0,                                      !- X Origin {m}",
+        "  0,                                      !- Y Origin {m}",
+        "  0,                                      !- Z Origin {m}",
+        "  ,                                       !- Type",
+        "  1,                                      !- Multiplier",
+        "  ,                                       !- Ceiling Height {m}",
+        "  ,                                       !- Volume {m3}",
+        "  ,                                       !- Floor Area {m2}",
+        "  ,                                       !- Zone Inside Convection Algorithm",
+        "  ,                                       !- Zone Outside Convection Algorithm",
+        "  Yes;                                    !- Part of Total Floor Area",
+
+        "Material:NoMass,",
+        "  R13-IP,                                 !- Name",
+        "  Smooth,                                 !- Roughness",
+        "  2.28943238786998,                       !- Thermal Resistance {m2-K/W}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "Construction,",
+        "  R13 Construction,                       !- Name",
+        "  R13-IP;                                 !- Layer 1",
+
+        "BuildingSurface:Detailed,",
+        "  1-SOUTH - ABS AZIMUTH 165.00,           !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -7.07106781186548, -12.2474487139159, 3, !- X,Y,Z Vertex 1 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 2 {m}",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  12.2474487139159, -7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  2-WEST - ABS AZIMUTH 255.00,            !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -12.2474487139159, 7.07106781186548, 3, !- X,Y,Z Vertex 1 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 2 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 3 {m}",
+        "  -7.07106781186548, -12.2474487139159, 3; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  3-EAST - ABS AZIMUTH 75.00,             !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  12.2474487139159, -7.07106781186548, 3, !- X,Y,Z Vertex 1 {m}",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 2 {m}",
+        "  7.07106781186548, 12.2474487139159, 0,  !- X,Y,Z Vertex 3 {m}",
+        "  7.07106781186548, 12.2474487139159, 3;  !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  4-NORTH - ABS AZIMUTH 345.00,           !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  7.07106781186548, 12.2474487139159, 3,  !- X,Y,Z Vertex 1 {m}",
+        "  7.07106781186548, 12.2474487139159, 0,  !- X,Y,Z Vertex 2 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  -12.2474487139159, 7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  FLOOR,                                  !- Name",
+        "  Floor,                                  !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Ground,                                 !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  NoSun,                                  !- Sun Exposure",
+        "  NoWind,                                 !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  12.2474487139159, -7.07106781186548, 0, !- X,Y,Z Vertex 1 {m}",
+        "  -7.07106781186548, -12.2474487139159, 0, !- X,Y,Z Vertex 2 {m}",
+        "  -12.2474487139159, 7.07106781186548, 0, !- X,Y,Z Vertex 3 {m}",
+        "  7.07106781186548, 12.2474487139159, 0;  !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  ROOF,                                   !- Name",
+        "  Roof,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  7.07106781186548, 12.2474487139159, 3,  !- X,Y,Z Vertex 1 {m}",
+        "  -12.2474487139159, 7.07106781186548, 3, !- X,Y,Z Vertex 2 {m}",
+        "  -7.07106781186548, -12.2474487139159, 3, !- X,Y,Z Vertex 3 {m}",
+        "  12.2474487139159, -7.07106781186548, 3; !- X,Y,Z Vertex 4 {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);                                 // expect no errors
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                            // expect no errors
+
+    // TODO: I think GetSurfaceData is enough? SetupZoneGeometry => GetSurfaceData => CalcSurfaceCentroid
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    // This is a square of width 20, just rotated around the center point, so the centroid is still xy=(0, 0) and the perimeter is 80 m
+
+    auto &surfaces = state->dataSurface->Surface;
+    auto it = std::find_if(surfaces.begin(), surfaces.end(), [](const auto &s) { return s.Name == "ROOF"; });
+    ASSERT_NE(it, surfaces.end());
+    auto &surface = *it;
+    EXPECT_NEAR(surface.Centroid.x, 0.0, 0.0001);
+    EXPECT_NEAR(surface.Centroid.y, 0.0, 0.0001);
+    EXPECT_NEAR(surface.Centroid.z, 3.0, 0.0001);
+
+    // GetUserConvectionCoefficients => SetupAdaptiveConvectionStaticMetaData (which is where the perimeter thing is calculated)
+    ConvectionCoefficients::GetUserConvectionCoefficients(*state);
+
+    double actual_roof_perimeter = 0.0;
+    for (int i = 1; i <= surface.Sides; ++i) {
+        int inext = i + 1;
+        if (i == surface.Sides) {
+            inext = 1;
+        }
+        actual_roof_perimeter += distance(surface.Vertex(i), surface.Vertex(inext));
+    }
+    EXPECT_NEAR(80.0, actual_roof_perimeter, 0.0001);
+
+    EXPECT_NEAR(actual_roof_perimeter, state->dataConvectionCoefficient->RoofGeo.Perimeter, 0.0001);
+}
+
+TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_WeirderShape)
+{
+    // Test for #9432
+    //
+    // This is a top view of the building:
+    //                  y
+    //                   ▲
+    //                   │
+    //          [2]      │
+    //           x    20 ┤
+    //                   │         [1]
+    //                15 ┤       x
+    //                   │
+    //                   ┤
+    //      Centroid     │
+    //   (-1.39, 0.60)   ┤
+    //          │        │
+    //          └────► o │
+    //  ─┬───┬───┬───┬───┼───┬───┬───┬───┬───►
+    //                   │   5   10      20   x
+    //                   ┤               x
+    //                   │                 [4]
+    //                   ┤
+    //                   │
+    //                   ┤
+    //                   │
+    //   x               ┤
+    //    [3]            │
+    //                   │
+
+    std::string const idf_objects = delimited_string({
+        "GlobalGeometryRules,",
+        "  UpperLeftCorner,                        !- Starting Vertex Position",
+        "  Counterclockwise,                       !- Vertex Entry Direction",
+        "  Relative,                               !- Coordinate System",
+        "  Relative,                               !- Daylighting Reference Point Coordinate System",
+        "  Relative;                               !- Rectangular Surface Coordinate System",
+
+        "Building,",
+        "  Building 1,                             !- Name",
+        "  0,                                      !- North Axis {deg}",
+        "  ,                                       !- Terrain",
+        "  ,                                       !- Loads Convergence Tolerance Value {W}",
+        "  ,                                       !- Temperature Convergence Tolerance Value {deltaC}",
+        "  ,                                       !- Solar Distribution",
+        "  ,                                       !- Maximum Number of Warmup Days",
+        "  ;                                       !- Minimum Number of Warmup Days",
+
+        "Zone,",
+        "  Zone1,                                  !- Name",
+        "  0,                                      !- Direction of Relative North {deg}",
+        "  0,                                      !- X Origin {m}",
+        "  0,                                      !- Y Origin {m}",
+        "  0,                                      !- Z Origin {m}",
+        "  ,                                       !- Type",
+        "  1,                                      !- Multiplier",
+        "  ,                                       !- Ceiling Height {m}",
+        "  ,                                       !- Volume {m3}",
+        "  ,                                       !- Floor Area {m2}",
+        "  ,                                       !- Zone Inside Convection Algorithm",
+        "  ,                                       !- Zone Outside Convection Algorithm",
+        "  Yes;                                    !- Part of Total Floor Area",
+
+        "Material:NoMass,",
+        "  R13-IP,                                 !- Name",
+        "  Smooth,                                 !- Roughness",
+        "  2.28943238786998,                       !- Thermal Resistance {m2-K/W}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "Construction,",
+        "  R13 Construction,                       !- Name",
+        "  R13-IP;                                 !- Layer 1",
+
+        "BuildingSurface:Detailed,",
+        "  1-SOUTH - ABS AZIMUTH 159.44,           !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -20, -20, 3,                            !- X,Y,Z Vertex 1 {m}",
+        "  -20, -20, 0,                            !- X,Y,Z Vertex 2 {m}",
+        "  20, -5, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  20, -5, 3;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  2-WEST - ABS AZIMUTH 284.04,            !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  -10, 20, 3,                             !- X,Y,Z Vertex 1 {m}",
+        "  -10, 20, 0,                             !- X,Y,Z Vertex 2 {m}",
+        "  -20, -20, 0,                            !- X,Y,Z Vertex 3 {m}",
+        "  -20, -20, 3;                            !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  3-EAST - ABS AZIMUTH 63.43,             !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  20, -5, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  20, -5, 0,                              !- X,Y,Z Vertex 2 {m}",
+        "  10, 15, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  10, 15, 3;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  4-NORTH - ABS AZIMUTH 14.04,            !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 15, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  10, 15, 0,                              !- X,Y,Z Vertex 2 {m}",
+        "  -10, 20, 0,                             !- X,Y,Z Vertex 3 {m}",
+        "  -10, 20, 3;                             !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  FLOOR,                                  !- Name",
+        "  Floor,                                  !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Ground,                                 !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  NoSun,                                  !- Sun Exposure",
+        "  NoWind,                                 !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  20, -5, 0,                              !- X,Y,Z Vertex 1 {m}",
+        "  -20, -20, 0,                            !- X,Y,Z Vertex 2 {m}",
+        "  -10, 20, 0,                             !- X,Y,Z Vertex 3 {m}",
+        "  10, 15, 0;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  ROOF,                                   !- Name",
+        "  Roof,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 15, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  -10, 20, 3,                             !- X,Y,Z Vertex 2 {m}",
+        "  -20, -20, 3,                            !- X,Y,Z Vertex 3 {m}",
+        "  20, -5, 3;                              !- X,Y,Z Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);                                 // expect no errors
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                            // expect no errors
+
+    // TODO: I think GetSurfaceData is enough? SetupZoneGeometry => GetSurfaceData => CalcSurfaceCentroid
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    auto &surfaces = state->dataSurface->Surface;
+    auto it = std::find_if(surfaces.begin(), surfaces.end(), [](const auto &s) { return s.Name == "ROOF"; });
+    ASSERT_NE(it, surfaces.end());
+    auto &surface = *it;
+    EXPECT_NEAR(surface.Centroid.x, -1.38889, 0.0001);
+    EXPECT_NEAR(surface.Centroid.y, 0.601852, 0.0001);
+    EXPECT_NEAR(surface.Centroid.z, 3.0, 0.0001);
+
+    // GetUserConvectionCoefficients => SetupAdaptiveConvectionStaticMetaData (which is where the perimeter thing is calculated)
+    ConvectionCoefficients::GetUserConvectionCoefficients(*state);
+
+    double actual_roof_perimeter = 0.0;
+    for (int i = 1; i <= surface.Sides; ++i) {
+        int inext = i + 1;
+        if (i == surface.Sides) {
+            inext = 1;
+        }
+        actual_roof_perimeter += distance(surface.Vertex(i), surface.Vertex(inext));
+    }
+    EXPECT_NEAR(126.92728, actual_roof_perimeter, 0.0001);
+
+    EXPECT_NEAR(actual_roof_perimeter, state->dataConvectionCoefficient->RoofGeo.Perimeter, 0.0001);
+}
+
+TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
+{
+
+    {
+        state->dataSurface->Surface.allocate(1);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(1).Name = "Normal Surface";
+        state->dataSurface->Surface(1).Sides = 4;
+        state->dataSurface->Surface(1).Vertex.dimension(4);
+        state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(1).Tilt = 0.0;
+        state->dataSurface->Surface(1).Azimuth = 0.0;
+        state->dataSurface->Surface(1).Area = 400.0;
+        state->dataSurface->Surface(1).Vertex(1) = Vector(10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(1).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(80.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    {
+        // Same, just translated by Vector(20.0, 0.0, 0.0) so that it's next to it (sharing one edge)
+        state->dataSurface->Surface.resize(2);
+        state->dataSurface->Surface(2).Name = "Translated Normal Surface";
+        state->dataSurface->Surface(2).Sides = 4;
+        state->dataSurface->Surface(2).Vertex.dimension(4);
+        state->dataSurface->Surface(2).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(2).Tilt = 0.0;
+        state->dataSurface->Surface(2).Azimuth = 0.0;
+        state->dataSurface->Surface(2).Area = 400.0;
+        state->dataSurface->Surface(2).Vertex(1) = Vector(30.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(2) = Vector(10.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(3) = Vector(10.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(4) = Vector(30.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(2).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(800.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(120.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    {
+        // Same, just translated by Vector(20.0, 0.0, 3.0) so that it's next to it but at a different height (not sharing an edge)
+        state->dataSurface->Surface.resize(3);
+        state->dataSurface->Surface(3).Name = "Translated Normal Surface different Z";
+        state->dataSurface->Surface(3).Sides = 4;
+        state->dataSurface->Surface(3).Vertex.dimension(4);
+        state->dataSurface->Surface(3).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(3).Tilt = 0.0;
+        state->dataSurface->Surface(3).Azimuth = 0.0;
+        state->dataSurface->Surface(3).Area = 400.0;
+        state->dataSurface->Surface(3).Vertex(1) = Vector(50.0, 10.0, 6.0);
+        state->dataSurface->Surface(3).Vertex(2) = Vector(30.0, 10.0, 6.0);
+        state->dataSurface->Surface(3).Vertex(3) = Vector(30.0, -10.0, 6.0);
+        state->dataSurface->Surface(3).Vertex(4) = Vector(50.0, -10.0, 6.0);
+        state->dataSurface->Surface(3).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(3).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(1200.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(200.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    // This is getting confusing, let's clear and restart
+    state->dataSurface->Surface.deallocate();
+
+    {
+        state->dataSurface->Surface.allocate(1);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(1).Name = "Titled Roof 1";
+        state->dataSurface->Surface(1).Sides = 4;
+        state->dataSurface->Surface(1).Vertex.dimension(4);
+        state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(1).Tilt = 22.61986494804042;
+        state->dataSurface->Surface(1).Azimuth = 270.0;
+        state->dataSurface->Surface(1).Area = 130.0;
+        state->dataSurface->Surface(1).Vertex(1) = Vector(12.0, 10.0, 5.0);
+        state->dataSurface->Surface(1).Vertex(2) = Vector(0.0, 10.0, 0.0);
+        state->dataSurface->Surface(1).Vertex(3) = Vector(0.0, 0.0, 0.0);
+        state->dataSurface->Surface(1).Vertex(4) = Vector(12.0, 0.0, 5.0);
+        state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(1).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(130.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(5.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ((13.0 + 10.0) * 2.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(22.61986494804042, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(270, RoofGeo.Azimuth);
+    }
+    {
+        // This becomes a gabbled roof
+        state->dataSurface->Surface.resize(2);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(2).Name = "Titled Roof 2";
+        state->dataSurface->Surface(2).Sides = 4;
+        state->dataSurface->Surface(2).Vertex.dimension(4);
+        state->dataSurface->Surface(2).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(2).Tilt = 22.61986494804042;
+        state->dataSurface->Surface(2).Azimuth = 90.0;
+        state->dataSurface->Surface(2).Area = 130.0;
+        state->dataSurface->Surface(2).Vertex(1) = Vector(24.0, 10.0, 0.0);
+        state->dataSurface->Surface(2).Vertex(2) = Vector(12.0, 10.0, 5.0);
+        state->dataSurface->Surface(2).Vertex(3) = Vector(12.0, 0.0, 5.0);
+        state->dataSurface->Surface(2).Vertex(4) = Vector(24.0, 0.0, 0.0);
+        state->dataSurface->Surface(2).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(2).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(260.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(5.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(13.0 * 4 + 10.0 * 2.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(22.61986494804042, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(180.0, RoofGeo.Azimuth);
+    }
+    {
+        // This becomes a gabbled roof + another surface that is flat (horizontal) and that has has the same area as the two gabbled ones combined
+        state->dataSurface->Surface.resize(3);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(3).Name = "Flat Roof";
+        state->dataSurface->Surface(3).Sides = 4;
+        state->dataSurface->Surface(3).Vertex.dimension(4);
+        state->dataSurface->Surface(3).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(3).Tilt = 0.0;
+        state->dataSurface->Surface(3).Azimuth = 0.0;
+        state->dataSurface->Surface(3).Area = 260.0;
+        state->dataSurface->Surface(3).Vertex(1) = Vector(50.0, 10.0, 0.0);
+        state->dataSurface->Surface(3).Vertex(2) = Vector(24.0, 10.0, 0.0);
+        state->dataSurface->Surface(3).Vertex(3) = Vector(24.0, 0.0, 0.0);
+        state->dataSurface->Surface(3).Vertex(4) = Vector(50.0, 0.0, 0.0);
+        state->dataSurface->Surface(3).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(3).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(520.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(2.5, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(13.0 * 4 + 10.0 * 2.0 + 26.0 * 2, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(22.61986494804042 / 2.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(90.0, RoofGeo.Azimuth);
+    }
+
+    // This is getting confusing, let's clear and restart
+    state->dataSurface->Surface.deallocate();
+
+    {
+        state->dataSurface->Surface.allocate(1);
+
+        // 20 x 20 rectangle, centered on zero
+        state->dataSurface->Surface(1).Name = "Normal Surface";
+        state->dataSurface->Surface(1).Sides = 4;
+        state->dataSurface->Surface(1).Vertex.dimension(4);
+        state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(1).Tilt = 0.0;
+        state->dataSurface->Surface(1).Azimuth = 0.0;
+        state->dataSurface->Surface(1).Area = 400.0;
+        state->dataSurface->Surface(1).Vertex(1) = Vector(10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+        state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(1).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(80.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+    }
+
+    {
+        // Same, just translated by Vector(30.0, 0.0, 0.0) so that it's detached
+        state->dataSurface->Surface.resize(2);
+        state->dataSurface->Surface(2).Name = "Translated Normal Surface not touching";
+        state->dataSurface->Surface(2).Sides = 4;
+        state->dataSurface->Surface(2).Vertex.dimension(4);
+        state->dataSurface->Surface(2).Class = EnergyPlus::DataSurfaces::SurfaceClass::Wall;
+        state->dataSurface->Surface(2).Tilt = 0.0;
+        state->dataSurface->Surface(2).Azimuth = 0.0;
+        state->dataSurface->Surface(2).Area = 400.0;
+        state->dataSurface->Surface(2).Vertex(1) = Vector(40.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(2) = Vector(20.0, 10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(3) = Vector(20.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).Vertex(4) = Vector(40.0, -10.0, 3.0);
+        state->dataSurface->Surface(2).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        state->dataSurface->Surface(2).HeatTransSurf = true;
+
+        ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+        EXPECT_DOUBLE_EQ(800.0, RoofGeo.Area);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+        EXPECT_DOUBLE_EQ(160.0, RoofGeo.Perimeter);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+        EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
     }
 }

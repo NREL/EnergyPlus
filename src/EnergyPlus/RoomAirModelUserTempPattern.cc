@@ -765,7 +765,6 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // Using/Aliasing
     using DataHVACGlobals::RetTempMax;
     using DataHVACGlobals::RetTempMin;
-    using DataSurfaces::AdjacentAirTemp;
     using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
     using InternalHeatGains::SumAllReturnAirConvectionGains;
     using InternalHeatGains::SumAllReturnAirLatentGains;
@@ -808,10 +807,9 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving;
     }
 
-    int zoneEquipNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
-    for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).NumReturnNodes; ++nodeCount) {
+    for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
         // BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
-        int ReturnNode = state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ReturnNode(nodeCount);
+        int ReturnNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(nodeCount);
         ZoneNode = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID;
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
         // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
@@ -832,7 +830,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         WinGapTtoRA = 0.0;
         WinGapFlowTtoRA = 0.0;
 
-        if (state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
+        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
             for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
@@ -943,7 +941,8 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
     // set flag for reference air temperature mode
     for (int i = SurfFirst; i <= SurfLast; ++i) {
-        state.dataSurface->SurfTAirRef(i) = AdjacentAirTemp;
+        state.dataSurface->SurfTAirRef(i) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+        state.dataSurface->SurfTAirRefRpt(i) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(i)];
     }
 }
 

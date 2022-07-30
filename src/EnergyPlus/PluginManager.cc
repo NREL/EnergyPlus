@@ -402,7 +402,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 #endif
 }
 
-PluginManager::PluginManager(EnergyPlusData &state)
+PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
 {
 #if LINK_WITH_PYTHON
     // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
@@ -432,7 +432,10 @@ PluginManager::PluginManager(EnergyPlusData &state)
     // now that we have set the path, we can initialize python
     // from https://docs.python.org/3/c-api/init.html
     // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
-    Py_InitializeEx(0);
+    bool alreadyInitialized = (Py_IsInitialized() != 0);
+    if (!alreadyInitialized) {
+        Py_InitializeEx(0);
+    }
 
     // Take control of the global interpreter lock while we are here, make sure to release it...
     PyGILState_STATE gil = PyGILState_Ensure();
@@ -513,8 +516,9 @@ PluginManager::PluginManager(EnergyPlusData &state)
                         state,
                         "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping.");
                 } else {
-                    if (FileSystem::pathExists(epinPathObject)) {
-                        fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinPathObject);
+                    auto epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
+                    if (FileSystem::pathExists(epinRootDir)) {
+                        fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinRootDir);
                         PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
                     } else {
                         EnergyPlus::ShowWarningMessage(state,
@@ -536,6 +540,21 @@ PluginManager::PluginManager(EnergyPlusData &state)
             } catch (nlohmann::json::out_of_range &e) {
                 // catch when no paths are passed
                 // nothing to do here
+            }
+        }
+    } else {
+        // if no search path objects exist, we still need to do the default searching
+        PluginManager::addToPythonPath(state, ".", false);
+        fs::path sanitizedInputFileDir = PluginManager::sanitizedPath(state.dataStrGlobals->inputDirPath);
+        PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
+        std::string epin_path;
+        get_environment_variable("epin", epin_path);
+        fs::path epinPathObject = fs::path(epin_path);
+        if (!epinPathObject.empty()) {
+            auto epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
+            if (FileSystem::pathExists(epinRootDir)) {
+                fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinRootDir);
+                PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
             }
         }
     }
@@ -648,7 +667,14 @@ PluginManager::PluginManager(EnergyPlusData &state)
 PluginManager::~PluginManager()
 {
 #if LINK_WITH_PYTHON
-    Py_FinalizeEx();
+    if (!this->eplusRunningViaPythonAPI) {
+        bool alreadyInitialized = (Py_IsInitialized() != 0);
+        if (alreadyInitialized) {
+            if (Py_FinalizeEx() < 0) {
+                exit(120);
+            }
+        }
+    }
 #endif // LINK_WITH_PYTHON
 }
 

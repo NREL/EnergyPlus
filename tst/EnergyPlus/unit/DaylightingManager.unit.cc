@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(1, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(1, (int)state->dataDaylightingData->DaylRefPt.size());
 
     GetDaylightingControls(*state, foundErrors);
     compare_err_stream("");
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
     GetDaylightingControls(*state, foundErrors);
     compare_err_stream("");
@@ -337,7 +337,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
     EXPECT_EQ("WEST ZONE_DAYLREFPT1", state->dataDaylightingData->DaylRefPt(1).Name);
     EXPECT_EQ(1, state->dataDaylightingData->DaylRefPt(1).ZoneNum);
@@ -404,7 +404,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     GetInputIlluminanceMap(*state, foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
 
-    EXPECT_EQ(1, state->dataDaylightingData->TotIllumMaps);
+    EXPECT_EQ(1, (int)state->dataDaylightingData->IllumMap.size());
 
     EXPECT_EQ("MAP1", state->dataDaylightingData->IllumMap(1).Name);
     EXPECT_EQ(1, state->dataDaylightingData->IllumMap(1).zoneIndex);
@@ -892,7 +892,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     GetDaylightingParametersInput(*state);
     state->dataDaylightingManager->CalcDayltghCoefficients_firstTime = false;
     compare_err_stream("");
-    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
     EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
     EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
@@ -967,8 +967,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
     state->dataGlobal->NumOfZones = 4;
-    state->dataDaylightingData->totDaylightingControls = state->dataGlobal->NumOfZones;
-    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl.allocate(4);
     state->dataDaylightingData->daylightControl(1).Name = "ZD1";
     state->dataDaylightingData->daylightControl(2).Name = "ZD2";
     state->dataDaylightingData->daylightControl(3).Name = "ZD3";
@@ -1038,9 +1037,11 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     state->dataHeatBal->space.allocate(zn);
     state->dataHeatBal->space(1).solarEnclosureNum = 1;
 
-    CreateShadeDeploymentOrder(*state, zn);
+    std::size_t maxShadeDeployOrderSize = 0;
+    maxShadeDeployOrderSize = CreateShadeDeploymentOrder(*state, zn);
 
     EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(maxShadeDeployOrderSize, 6ul);
 
     std::vector<int> compare1;
     compare1.push_back(8);
@@ -1117,9 +1118,11 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataHeatBal->space(zn).solarEnclosureNum = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->NumOfZones);
 
-    CreateShadeDeploymentOrder(*state, zn);
+    std::size_t maxShadeDeployOrderSize = 0;
+    maxShadeDeployOrderSize = CreateShadeDeploymentOrder(*state, zn);
 
     EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(maxShadeDeployOrderSize, 6ul);
 
     state->dataDaylightingData->daylightControl(zn).TotalDaylRefPoints = 1;
     state->dataViewFactor->EnclSolInfo(zn).TotalEnclosureDaylRefPoints = 1;
@@ -1617,7 +1620,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(10, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(10, (int)state->dataDaylightingData->DaylRefPt.size());
 
     DaylightingManager::GetDaylightingControls(*state, foundErrors);
     // Used to throw
@@ -1733,7 +1736,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(2, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(2, (int)state->dataDaylightingData->DaylRefPt.size());
 
     DaylightingManager::GetDaylightingControls(*state, foundErrors);
 
@@ -2238,7 +2241,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         delim);
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true)); // reset eio stream after compare
-    EXPECT_EQ(4, state->dataDaylightingData->TotRefPoints);
+    EXPECT_EQ(4, (int)state->dataDaylightingData->DaylRefPt.size());
 
     EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
     EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
@@ -2994,16 +2997,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
 {
     int MapNum = 1;
     state->dataDaylightingManager->ReportIllumMap_firstTime = false;
-    state->dataDaylightingData->TotIllumMaps = 1;
 
-    state->dataDaylightingManager->FirstTimeMaps.dimension(state->dataDaylightingData->TotIllumMaps, true);
-    state->dataDaylightingManager->EnvrnPrint.dimension(state->dataDaylightingData->TotIllumMaps, false);
+    state->dataDaylightingManager->FirstTimeMaps.dimension(1, true);
+    state->dataDaylightingManager->EnvrnPrint.dimension(1, false);
     state->dataGlobal->NumOfZones = 1;
-    state->dataDaylightingData->totDaylightingControls = 1;
-    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
+    state->dataDaylightingData->daylightControl.allocate(1);
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 3;
     state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
-    state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
+    state->dataDaylightingManager->SavedMnDy.allocate(1);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->IllumMap(MapNum).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
@@ -3326,4 +3327,70 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     EXPECT_NEAR(255, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(60), 1);
     EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(91), 1);
     EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(100), 1);
+}
+
+TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightConditions)
+{
+    // Test for #9060
+
+    state->dataDaylightingData->daylightControl.allocate(1);
+    auto &thisDaylightControl = state->dataDaylightingData->daylightControl(1);
+    int nRefPts = 1;
+    thisDaylightControl.TotalDaylRefPoints = nRefPts;
+    thisDaylightControl.DaylRefPtAbsCoord.allocate(3, nRefPts);
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataGlobal->numSpaces = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataDaylightingData->spacePowerReductionFactor.allocate(1);
+
+    thisDaylightControl.zoneIndex = 1;
+
+    thisDaylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    thisDaylightControl.LightControlType = DataDaylighting::LtgCtrlType::Stepped;
+    thisDaylightControl.LightControlProbability = 1.0;
+    thisDaylightControl.AvailSchedNum = -1; // Always Available
+    thisDaylightControl.LightControlSteps = 4;
+
+    thisDaylightControl.FracZoneDaylit.allocate(nRefPts);
+    thisDaylightControl.FracZoneDaylit(1) = 1.0;
+
+    thisDaylightControl.IllumSetPoint.allocate(nRefPts);
+    thisDaylightControl.IllumSetPoint(1) = 400.0;
+
+    thisDaylightControl.RefPtPowerReductionFactor.allocate(nRefPts);
+
+    thisDaylightControl.DaylIllumAtRefPt.allocate(nRefPts);
+    auto &illum = thisDaylightControl.DaylIllumAtRefPt(1);
+    state->dataDaylightingManager->DaylIllum.allocate(nRefPts);
+
+    illum = 1.0;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    illum = 1e-6;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    illum = 1e-20;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    // Test with Lighting Probability
+    illum = 101.0;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(0.75, thisDaylightControl.PowerReductionFactor);
+
+    // that way I KNOW that it'll try to set it one level higher no matter what random number is generated
+    thisDaylightControl.LightControlProbability = 0.00;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
+
+    // Ensure we don't go higher than 1.0
+    illum = 1.0;
+    DayltgElecLightingControl(*state);
+    EXPECT_DOUBLE_EQ(1.0, thisDaylightControl.PowerReductionFactor);
 }
