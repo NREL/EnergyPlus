@@ -69,7 +69,7 @@
 #include <fmt/format.h>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
@@ -4344,9 +4344,8 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                                                          state.dataCondenserLoopTowers->towers(iCooler).FanEnergy +
                                                          state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
     }
-    for (int iCooler = 1; iCooler <= state.dataEvapFluidCoolers->NumSimpleEvapFluidCoolers; ++iCooler) {
-        state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec +
-                                                         state.dataEvapFluidCoolers->SimpleEvapFluidCooler(iCooler).FanEnergy;
+    for (auto &thisCooler : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
+        state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCooler.Qactual * TimeStepSysSec + thisCooler.FanEnergy;
     }
     for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
@@ -4424,7 +4423,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // VAV coils - air to air
     auto &VarSpeedCoil(state.dataVariableSpeedCoils->VarSpeedCoil);
     for (int iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
-        if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+        if (VarSpeedCoil(iCoil).VSCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             if (VarSpeedCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                                                  VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
@@ -4433,7 +4432,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                                                                  VarSpeedCoil(iCoil).BasinHeaterConsumption +
                                                                  VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-        } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+        } else if (VarSpeedCoil(iCoil).VSCoilType == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                                              VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
         }
@@ -4452,10 +4451,10 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Packaged TES
     auto &TESCoil(state.dataPackagedThermalStorageCoil->TESCoil);
     for (int iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
-        if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+        if (TESCoil(iCoil).CondenserType == PackagedThermalStorageCoil::TESCondenserType::Air) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
                                                              TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
-        } else if (TESCoil(iCoil).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
+        } else if (TESCoil(iCoil).CondenserType == PackagedThermalStorageCoil::TESCondenserType::Evap) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption +
                                                              TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
                                                              TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
@@ -5363,7 +5362,8 @@ void parseStatLine(const std::string &lineIn,
                    bool &desConditionlinepassed,
                    bool &heatingDesignlinepassed,
                    bool &coolingDesignlinepassed,
-                   bool &isKoppen)
+                   bool &isKoppen,
+                   bool &insideLiquidPrecipitation)
 {
     // assumes that all the variables are initialized outside of this routine -- it does not re-initialize them
     if (has_prefix(lineIn, "Statistics")) {
@@ -5412,13 +5412,16 @@ void parseStatLine(const std::string &lineIn,
         lineType = StatLineType::WithHDDLine;
     } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
         lineType = StatLineType::WithCDDLine;
-    } else if (has(lineIn, "Max Hourly")) {
+
+    } else if (has(lineIn, "Statistics for Liquid Precipitation")) {
+        insideLiquidPrecipitation = true;
+    } else if (insideLiquidPrecipitation && has(lineIn, "Total")) {
+        lineType = StatLineType::MonthlyPrec;
+    } else if (insideLiquidPrecipitation && has(lineIn, "Max Hourly")) {
         lineType = StatLineType::MaxHourlyPrec;
-    } else if (has(lineIn, "Total")) {
-        if (!has(lineIn, "Statistics for Total Sky Cover")) {
-            lineType = StatLineType::MonthlyPrec;
-        }
+        insideLiquidPrecipitation = false;
     }
+
     // these not part of big if/else because sequential
     if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
     if (lineType == StatLineType::KoppenLine && isKoppen) lineType = StatLineType::KoppenDes1Line;
@@ -5454,9 +5457,6 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
 
     StatLineType lineType = StatLineType::Initialized;
     StatLineType lineTypeinterim = StatLineType::Initialized;
-    bool isASHRAE;
-    bool iscalc;
-    bool isKoppen;
     std::string::size_type ashPtr;
     std::string::size_type lnPtr;
     int col1;
@@ -5473,20 +5473,17 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
     std::string curNameWithSIUnits;
     std::string curNameAndUnits;
     int indexUnitConv;
+
+    bool isASHRAE = false;
+    bool iscalc = false;
+    bool isKoppen = false;
+    bool heatingDesignlinepassed = false;
+    bool coolingDesignlinepassed = false;
+    bool desConditionlinepassed = false;
+    bool insideLiquidPrecipitation = false;
     std::string storeASHRAEHDD;
     std::string storeASHRAECDD;
-    bool heatingDesignlinepassed;
-    bool coolingDesignlinepassed;
-    bool desConditionlinepassed;
 
-    isASHRAE = false;
-    iscalc = false;
-    isKoppen = false;
-    heatingDesignlinepassed = false;
-    coolingDesignlinepassed = false;
-    desConditionlinepassed = false;
-    storeASHRAEHDD = "";
-    storeASHRAECDD = "";
     lineTypeinterim = StatLineType::Initialized;
     if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
         auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
@@ -5496,7 +5493,8 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             // reconcile line with different versions of stat file
             // v7.1 added version as first line.
             strip(lineIn);
-            parseStatLine(lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen);
+            parseStatLine(
+                lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen, insideLiquidPrecipitation);
 
             switch (lineType) {
             case StatLineType::StatisticsLine: { // Statistics for USA_CA_San.Francisco_TMY2
@@ -6317,8 +6315,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
             // AFN infiltration -- check that afn sim is being done.
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                  state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
+            if (!state.afn->multizone_always_simulated) {
                 ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNVentVolTotalStdDen = 0.0;
                 ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen = 0.0;
@@ -6329,10 +6326,9 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
 
             // air loop name
             std::string airLoopName = "";
-            int ctrlZoneNum = Zone(iZone).ZoneEqNum;
-            if (ctrlZoneNum > 0) {
-                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
-                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+            if (Zone(iZone).IsControlled) {
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(iZone).NumInletNodes; ++zoneInNode) {
+                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(iZone).InletNodeAirLoopNum(zoneInNode);
                     if (airLoopNumber > 0) {
                         if (airLoopName.empty()) {
                             airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
@@ -6374,15 +6370,14 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaoAvgMechVent,
                                      Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).MechVentVolTotalOcc /
-                                         (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                                     ZonePreDefRep(iZone).MechVentVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume * zoneMult),
                                      3);
                 }
                 if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaoMinMechVent,
                                      Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).MechVentVolMin / (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                                     ZonePreDefRep(iZone).MechVentVolMin / (Zone(iZone).Volume * zoneMult),
                                      3);
                 }
                 PreDefTableEntry(
@@ -6514,122 +6509,122 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlMechVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).MechVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlNatVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).NatVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTotVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).MechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).NatVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlSumDynTrgVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz);
+                         state.dataSysRpts->SysPreDefRep(iSys).TargetVentTotalVoz);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmBelow,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeBelowVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAt,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAbove,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAboveVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeVentUnoccTotal);
 
         // Air loop times at OA limiting factors
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNoLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNone]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorNone]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorLimits]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorLimits]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEcono,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEconomizer]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorEconomizer]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctExhaust,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorExhaust]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorExhaust]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctMixedLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorMixedAir]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorMixedAir]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctHiHumid,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorHighHum]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorHighHum]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDCV,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDCV]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorDCV]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNiteVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNightVent]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorNightVent]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDemand,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDemandLimit]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorDemandLimit]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEMS,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEMS]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorEMS]);
 
-        if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+        if (state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal > 0.0) {
             // Average Outdoor Air During Occupancy by Airloop
-            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal * SecInHour;
+            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal * SecInHour;
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlMechVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).MechVentTotalOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlNatVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).NatVentTotalOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTotVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             (state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc) /
+                             (state.dataSysRpts->SysPreDefRep(iSys).MechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).NatVentTotalOcc) /
                                  totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).TargetVentTotalVozOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmBelow,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeBelowVozDynTotalOcc);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmAt,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeAtVozDynTotalOcc);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmAbove,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeAboveVozDynTotalOcc);
 
             // Average Outdoor Air at OA Limiting Factors During Occupancy by Airloop
             // lambda to set avgFlow during occupancy for a given airloop and limiting factor type
             auto avgFlowRate = [&state](int sysNum, int limitingFactorType) {
                 Real64 avgFlow = 0.0;
-                int time = state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimitOcc[limitingFactorType];
+                int time = state.dataSysRpts->SysPreDefRep(sysNum).TimeAtOALimitOcc[limitingFactorType];
                 if (time > 0) {
-                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
+                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).MechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
                 } else {
                     avgFlow = 0.0;
                 }
@@ -8381,12 +8376,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody,
-                            rowHead,
-                            columnHead,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "Site and Source Energy");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
                     }
                 }
             }
@@ -8548,7 +8538,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Site to Source Energy Conversion Factors");
                     }
@@ -8611,7 +8601,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
                     }
                 }
             }
@@ -9005,7 +8995,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                     }
                 }
             }
@@ -9220,7 +9210,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Utility Use Per Conditioned Floor Area");
                     }
@@ -9257,7 +9247,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Utility Use Per Total Floor Area");
                     }
@@ -9355,12 +9345,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody,
-                            rowHead,
-                            columnHead,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "Electric Loads Satisfied");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
                     }
                 }
             }
@@ -9458,12 +9443,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody,
-                            rowHead,
-                            columnHead,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "On-Site Thermal Sources");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
                     }
                 }
             }
@@ -9566,7 +9546,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 if (produceTabular) {
                     if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                         state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
+                            tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                     }
                 }
             }
@@ -9621,7 +9601,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Setpoint Not Met Criteria");
                     }
@@ -9684,7 +9664,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Annual Building Utility Performance Summary",
+                            "AnnualBuildingUtilityPerformanceSummary",
                             "Entire Facility",
                             "Comfort and Setpoint Not Met Summary");
                     }
@@ -9936,7 +9916,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         if (produceTabular) {
             if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                 state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", subTableTitle);
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", subTableTitle);
             }
         }
         rowHeadTemp.deallocate();
@@ -10172,7 +10152,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                           rowHead,
                                                                                                           columnHead,
-                                                                                                          "Source Energy End Use Components Summary",
+                                                                                                          "SourceEnergyEndUseComponentsSummary",
                                                                                                           "Entire Facility",
                                                                                                           "Source Energy End Use Components Summary");
                 }
@@ -10256,7 +10236,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             columnHead,
                             "SourceEnergyEndUseComponentsSummary",
                             "Entire Facility",
-                            "Source Energy End Use Component Per Conditioned Floor Area");
+                            "Source Energy End Use Components Per Conditioned Floor Area");
                     }
                 }
                 if (produceTabular) {
@@ -10265,9 +10245,9 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Source Energy End Use Components Summary",
+                            "SourceEnergyEndUseComponentsSummary",
                             "Entire Facility",
-                            "Source Energy End Use Component Per Conditioned Floor Area");
+                            "Source Energy End Use Components Per Conditioned Floor Area");
                     }
                 }
             } // End of Normalized by Conditioned Area
@@ -10307,7 +10287,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Source Energy End Use Components Summary",
+                            "SourceEnergyEndUseComponentsSummary",
                             "Entire Facility",
                             "Source Energy End Use Components Per Total Floor Area");
                     }
@@ -10626,7 +10606,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
+                        tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
                 }
             }
 
@@ -10753,12 +10733,8 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
-                                                                                                          rowHeadTemp,
-                                                                                                          columnHeadTemp,
-                                                                                                          "Demand End Use Components Summary",
-                                                                                                          "Entire Facility",
-                                                                                                          "End Uses By Subcategory");
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
                 }
             }
             rowHeadTemp.deallocate();
@@ -11331,7 +11307,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
                 }
             }
 
@@ -11606,7 +11582,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
                 }
             }
 
@@ -11680,7 +11656,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
                 }
             }
 
@@ -11722,7 +11698,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
                 }
             }
 
@@ -12019,7 +11995,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             if (produceTabular) {
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
+                        tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
                 }
             }
 
@@ -12373,7 +12349,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     if (produceTabular) {
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                spaceTableBody, spaceRowHead, spaceColumnHead, "Input Verification and Results Summary", "Entire Facility", "Space Summary");
+                spaceTableBody, spaceRowHead, spaceColumnHead, "InputVerificationandResultsSummary", "Entire Facility", "Space Summary");
         }
     }
     if (produceTabular) {
@@ -12395,7 +12371,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(spaceTypeTableBody,
                                                                                                   spaceTypeRowHead,
                                                                                                   spaceTypeColumnHead,
-                                                                                                  "Input Verification and Results Summary",
+                                                                                                  "InputVerificationandResultsSummary",
                                                                                                   "Entire Facility",
                                                                                                   "Space Type Summary");
         }
@@ -12466,12 +12442,21 @@ void WriteAdaptiveComfortTable(EnergyPlusData &state)
 
         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                               rowHead,
+                                                                               columnHead,
+                                                                               "AdaptiveComfortSummary",
+                                                                               "Entire Facility",
+                                                                               "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
         }
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
+                tableBody,
+                rowHead,
+                columnHead,
+                "AdaptiveComfortSummary",
+                "Entire Facility",
+                "Time Not Meeting the Adaptive Comfort Models during Occupied Hours");
         }
     }
 }
@@ -12681,8 +12666,8 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             if (produceTabular) {
-                WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-                WriteSubtitle(state, "Heat Emission by Components");
+                WriteReportHeaders(state, "Annual Heat Emissions Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                WriteSubtitle(state, "Annual Heat Emissions Summary");
             }
 
             columnWidth.allocate(6);
@@ -12729,6 +12714,10 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
 
             if (produceTabular) {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
+                }
             }
             if (produceSQLite) {
                 if (state.dataSQLiteProcedures->sqlite) {
@@ -13236,7 +13225,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                             tableBody,
                             rowHead,
                             columnHead,
-                            "Component Sizing Summary",
+                            "ComponentSizingSummary",
                             "Entire Facility",
                             state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
                             "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
@@ -13369,7 +13358,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
                         tableBody,
                         rowHead,
                         columnHead,
-                        "Surface Shadowing Summary",
+                        "SurfaceShadowingSummary",
                         "Entire Facility",
                         "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                 }
@@ -13389,7 +13378,7 @@ void WriteSurfaceShadowing(EnergyPlusData &state)
                         tableBody,
                         rowHead,
                         columnHead,
-                        "Surface Shadowing Summary",
+                        "SurfaceShadowingSummary",
                         "Entire Facility",
                         "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                 }
@@ -13515,11 +13504,15 @@ void WriteEioTables(EnergyPlusData &state)
                     if (produceTabular) {
                         WriteSubtitle(state, tableName);
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, "InitializationSummary", "Entire Facility", tableName);
+                        }
                     }
                     if (produceSQLite) {
                         if (state.dataSQLiteProcedures->sqlite) {
                             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                                tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                                tableBody, rowHead, columnHead, "InitializationSummary", "Entire Facility", tableName);
                         }
                     }
                 }
@@ -13996,59 +13989,59 @@ void GatherComponentLoadsHVAC(EnergyPlusData &state)
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->infilInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiSenLossW); // air flow network
             }
             ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).InfilLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->infilLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneInfiLatLossW); // air flow network
             }
 
             ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentSenLossW); // air flow network
             }
             ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).VentilLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneVentLatLossW); // air flow network
             }
 
             ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixHeatLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->interZoneMixInstantSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixSenLossW); // air flow network
             }
             ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) =
                 ((state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentGain -
                   state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGCLH).MixLatentLoss) /
                  (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 ort->interZoneMixLatentSeq(
                     state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLH, state.dataOutRptTab->iZoneGCLH) +=
-                    (state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatGainW -
-                     state.dataAirflowNetwork->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatLossW); // air flow network
+                    (state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatGainW -
+                     state.afn->AirflowNetworkReportData(state.dataOutRptTab->iZoneGCLH).MultiZoneMixLatLossW); // air flow network
             }
         }
     }
@@ -14529,30 +14522,39 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                         CombineLoadCompResults(AirLoopHeatCompLoadTables(iAirLoop), AirLoopZonesHeatCompLoadTables(iZone), mult);
                     }
                 }
+                auto &airLoopCoolTable = AirLoopCoolCompLoadTables(iAirLoop);
+                auto &airLoopHeatTable = AirLoopHeatCompLoadTables(iAirLoop);
+                auto &finalSysSizing = FinalSysSizing(iAirLoop);
+                for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum != iAirLoop) continue;
+                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
+                        airLoopCoolTable.peakDesSensLoad = finalSysSizing.SysCoolCoinSpaceSens;
+                        airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
+                        airLoopHeatTable.peakDesSensLoad = -finalSysSizing.SysHeatCoinSpaceSens;
+                        airLoopHeatTable.designPeakLoad = -finalSysSizing.SysDesHeatLoad;
+                        airLoopCoolTable.diffPeakEst = airLoopCoolTable.peakDesSensLoad - airLoopCoolTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopCoolTable.designPeakLoad - airLoopCoolTable.peakDesSensLoad;
+                        airLoopHeatTable.diffPeakEst = airLoopHeatTable.peakDesSensLoad - airLoopHeatTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopHeatTable.designPeakLoad - airLoopHeatTable.peakDesSensLoad;
+                    }
+                }
+                ComputeEngineeringChecks(airLoopCoolTable);
+                ComputeEngineeringChecks(airLoopHeatTable);
 
-                ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
+                AddTotalRowsForLoadSummary(airLoopCoolTable);
+                AddTotalRowsForLoadSummary(airLoopHeatTable);
 
-                AddTotalRowsForLoadSummary(AirLoopCoolCompLoadTables(iAirLoop));
-                AddTotalRowsForLoadSummary(AirLoopHeatCompLoadTables(iAirLoop));
+                ComputePeakDifference(airLoopCoolTable);
+                ComputePeakDifference(airLoopHeatTable);
 
-                ComputePeakDifference(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputePeakDifference(AirLoopHeatCompLoadTables(iAirLoop));
+                CreateListOfZonesForAirLoop(state, airLoopCoolTable, zoneToAirLoopCool, iAirLoop);
+                CreateListOfZonesForAirLoop(state, airLoopHeatTable, zoneToAirLoopHeat, iAirLoop);
 
-                CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
-                CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
+                LoadSummaryUnitConversion(state, airLoopCoolTable, unitsStyle_cur);
+                LoadSummaryUnitConversion(state, airLoopHeatTable, unitsStyle_cur);
 
-                LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_cur);
-                LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
-
-                OutputCompLoadSummary(state,
-                                      OutputType::AirLoop,
-                                      AirLoopCoolCompLoadTables(iAirLoop),
-                                      AirLoopHeatCompLoadTables(iAirLoop),
-                                      iAirLoop,
-                                      unitsStyle_cur,
-                                      produceTabular,
-                                      produceSQLite);
+                OutputCompLoadSummary(
+                    state, OutputType::AirLoop, airLoopCoolTable, airLoopHeatTable, iAirLoop, unitsStyle_cur, produceTabular, produceSQLite);
             }
         }
 
@@ -14643,6 +14645,26 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
                 FacilityZonesHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
                 CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
+            }
+
+            auto &facilityCoolTable = FacilityCoolCompLoadTables;
+            auto &facilityHeatTable = FacilityHeatCompLoadTables;
+            facilityCoolTable.peakDesSensLoad = 0.0;
+            facilityCoolTable.designPeakLoad = 0.0;
+            facilityHeatTable.peakDesSensLoad = 0.0;
+            facilityHeatTable.designPeakLoad = 0.0;
+            facilityCoolTable.diffPeakEst = 0.0;
+            facilityHeatTable.diffPeakEst = 0.0;
+            facilityCoolTable.diffDesignPeak = 0.0;
+            for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
+                facilityCoolTable.peakDesSensLoad += AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityCoolTable.designPeakLoad += AirLoopCoolCompLoadTables(iAirLoop).designPeakLoad;
+                facilityHeatTable.peakDesSensLoad += AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityHeatTable.designPeakLoad += AirLoopHeatCompLoadTables(iAirLoop).designPeakLoad;
+                facilityCoolTable.diffPeakEst += AirLoopCoolCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopCoolCompLoadTables(iAirLoop).diffDesignPeak;
+                facilityHeatTable.diffPeakEst += AirLoopHeatCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopHeatCompLoadTables(iAirLoop).diffDesignPeak;
             }
 
             ComputeEngineeringChecks(FacilityCoolCompLoadTables);

@@ -1444,7 +1444,6 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataSize->PlantSizData(1).DeltaT = 12;
     int FanCoilNum(1);
     int ZoneNum(1);
-    int ControlledZoneNum(1);
     bool FirstHVACIteration(true);
     bool ErrorsFound(false);
     Real64 QZnReq(0.0);
@@ -1697,7 +1696,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     }
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataWaterCoils->WaterCoil(2).WaterPlantLoc.loopNum = 1;
     state->dataWaterCoils->WaterCoil(2).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
@@ -1778,7 +1777,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataWaterCoils->WaterCoil(2).MaxWaterVolFlowRate = DataSizing::AutoSize;
 
     // normal cooling simulation for constant fan variable flow fan coil
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
 
     // Expect final design air volume flow rate to equal the user-specified air volume flow rate from the ZoneHVAC:FourPipeFanCoil object
     EXPECT_EQ(state->dataWaterCoils->WaterCoil(2).DesAirVolFlowRate, 0.5);

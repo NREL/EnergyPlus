@@ -53,7 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -111,10 +111,6 @@ using BranchNodeConnections::SetUpCompSets;
 using BranchNodeConnections::TestCompSet;
 using DataHVACGlobals::ATMixer_InletSide;
 using DataHVACGlobals::ATMixer_SupplySide;
-using DataHVACGlobals::DualSetPointWithDeadBand;
-using DataHVACGlobals::SingleCoolingSetPoint;
-using DataHVACGlobals::SingleHeatCoolSetPoint;
-using DataHVACGlobals::SingleHeatingSetPoint;
 using DataHVACGlobals::SmallAirVolFlow;
 using DataHVACGlobals::SmallLoad;
 using DataHVACGlobals::SmallMassFlow;
@@ -655,13 +651,9 @@ void GetSysInput(EnergyPlusData &state)
 
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).FloorArea *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).Multiplier *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum)
-                                .ListMultiplier;
+                            state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
+                            state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
                     }
                 }
             }
@@ -999,13 +991,9 @@ void GetSysInput(EnergyPlusData &state)
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).FloorArea *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).Multiplier *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum)
-                                .ListMultiplier;
+                            state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
+                            state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
                     }
                 }
             }
@@ -1280,13 +1268,9 @@ void GetSysInput(EnergyPlusData &state)
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).FloorArea *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).Multiplier *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum)
-                                .ListMultiplier;
+                            state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
+                            state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
                     }
                 }
             }
@@ -1452,13 +1436,9 @@ void GetSysInput(EnergyPlusData &state)
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).FloorArea *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).Multiplier *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum)
-                                .ListMultiplier;
+                            state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
+                            state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
                     }
                 }
             }
@@ -1720,13 +1700,9 @@ void GetSysInput(EnergyPlusData &state)
 
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).FloorArea *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).Multiplier *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum)
-                                .ListMultiplier;
+                            state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
+                            state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
                     }
                 }
             }
@@ -1929,13 +1905,9 @@ void GetSysInput(EnergyPlusData &state)
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).FloorArea *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).Multiplier *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum)
-                                .ListMultiplier;
+                            state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
+                            state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
                     }
                 }
             }
@@ -2332,13 +2304,9 @@ void GetSysInput(EnergyPlusData &state)
                         }
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneNum = CtrlZone;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).CtrlZoneInNodeIndex = SupAirIn;
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum =
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneFloorArea =
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).FloorArea *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum).Multiplier *
-                            state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ActualZoneNum)
-                                .ListMultiplier;
+                            state.dataHeatBal->Zone(CtrlZone).FloorArea * state.dataHeatBal->Zone(CtrlZone).Multiplier *
+                            state.dataHeatBal->Zone(CtrlZone).ListMultiplier;
                     }
                 }
             }
@@ -2412,8 +2380,8 @@ void GetSysInput(EnergyPlusData &state)
              ++state.dataSingleDuct->SysIndexGSI) {
             for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex) {
                 if (state.dataGlobal->DoZoneSizing) {
-                    if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ActualZoneNum ==
-                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysIndexGSI).ActualZoneNum) {
+                    if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneNum ==
+                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysIndexGSI).CtrlZoneNum) {
                         if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
                             ShowWarningError(state,
                                              std::string{RoutineName} + "A zone secondary recirculation fraction is specified for zone served by ");
@@ -2686,16 +2654,14 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     if (FirstHVACIteration) {
         // The first time through set the mass flow rate to the Max
         if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                  state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+            if (!(state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated)) {
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
             }
         } else {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
         }
         if ((state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                  state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+            if (!(state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated)) {
                 if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
                     if (this->NoOAFlowInputFromUser) {
                         state.dataLoopNodes->Node(InletNode).MassFlowRate = this->AirMassFlowRateMax;
@@ -2717,8 +2683,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
         }
 
         if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
-            if (!(state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                  state.dataAirflowNetwork->AirflowNetworkFanActivated)) {
+            if (!(state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated)) {
                 state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail =
                     this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
             }
@@ -2801,7 +2766,6 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   September 2001
     //       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing Sys Components for which flow rates have not been
@@ -2839,8 +2803,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
     bool IsAutoSize;
-    bool IsMaxFlowAutoSize; // Indicate if the maximum terminal flow is autosize
-    int ZoneNum(0);
+    bool IsMaxFlowAutoSize;                   // Indicate if the maximum terminal flow is autosize
     int AirLoopNum;                           // Air loop number
     int SysSizNum;                            // System sizing number
     Real64 MinMinFlowRatio(0.0);              // the minimum minimum flow ratio
@@ -2886,7 +2849,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     AirLoopNum = 0;
     SysSizNum = 0;
 
-    ZoneNum = this->ActualZoneNum;
+    int ZoneNum = this->CtrlZoneNum;
 
     auto &TermUnitSizing(state.dataSize->TermUnitSizing);
 
@@ -3860,7 +3823,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // if the massflow is below the minimum or greater than the Max it is set to either the Min
     // or the Max as specified for the VAV model.
     if ((QTotLoad < 0.0) && (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) &&
+        (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
         // Calculate the flow required for cooling
 
         DeltaTemp = CpAirAvg * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSDAT);
@@ -3891,16 +3855,15 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
         MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-            state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
-            MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
+        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
+            MassFlow *= state.afn->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                 MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
             }
         }
 
     } else if ((this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) &&
-               (QTotLoad >= 0.0 || state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleHeatingSetPoint) &&
+               (QTotLoad >= 0.0 || state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleHeating) &&
                (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
         //     IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. this->sd_airterminalInlet%AirMassFlowRateMinAvail <=
         //     SmallMassFlow) THEN
@@ -3928,9 +3891,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         }
 
         // the AirflowNetwork model overrids the mass flow rate value
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-            state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
-            MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
+        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
+            MassFlow *= state.afn->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                 MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
             }
@@ -3989,7 +3951,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // do the reheat calculation if there's some air nass flow (or the damper action is "reverse action"), the flow is <= minimum ,
     // there's a heating requirement, and there's a thermostat with a heating setpoint
     // Reverse damper option is working only for water coils for now.
-    if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
+    if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
         // At this point we know that there is a heating requirement: i.e., the heating coil needs to
         // be activated (there's a zone heating load or there's a reheat requirement). There are 3 possible
         // situations: 1) the coil load can be met by variable temperature air (below the max heat temp) at
@@ -4032,9 +3995,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         MassFlow = min(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
         MassFlow = max(MassFlow, this->sd_airterminalInlet.AirMassFlowRateMinAvail);
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-            state.dataAirflowNetwork->AirflowNetworkFanActivated && state.dataAirflowNetwork->VAVTerminalRatio > 0.0) {
-            MassFlow *= state.dataAirflowNetwork->VAVTerminalRatio;
+        if (state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated && state.afn->VAVTerminalRatio > 0.0) {
+            MassFlow *= state.afn->VAVTerminalRatio;
             if (MassFlow > state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate) {
                 MassFlow = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
             }
@@ -4314,11 +4276,8 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
         if (this->NoOAFlowInputFromUser) return;
         // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
         if (AirLoopOAFrac > 0.0) {
-            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state,
-                                                                             this->OARequirementsPtr,
-                                                                             this->ActualZoneNum,
-                                                                             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
-                                                                             UseMinOASchFlag);
+            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+                state, this->OARequirementsPtr, this->CtrlZoneNum, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag, UseMinOASchFlag);
             OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
             // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -4451,7 +4410,8 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
 
     QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
 
-    if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
+    if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
         //   VAVHeatandCool boxes operate at varying mass flow rates when reheating, VAV boxes operate at min flow
         //      (MassFlow <= this->sd_airterminalInlet%AirMassFlowRateMinAvail) .AND. &
         //   Per Fred Buhl, don't use DeadBandOrSetback to determine if heaters operate
@@ -5236,7 +5196,8 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     QActualHeating = QToHeatSetPt - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCV); // reheat needed
     // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
     // system scheduled OFF then not operational and shut the system down.
-    if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
+    if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
 
         switch (this->ReheatComp_Num) {
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
@@ -5992,7 +5953,6 @@ void GetATMixers(EnergyPlusData &state)
     using DataZoneEquipment::SubEquipmentData;
     using NodeInputManager::GetOnlySingleNode;
     using namespace DataLoopNode;
-    using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
@@ -6185,8 +6145,7 @@ void GetATMixers(EnergyPlusData &state)
                             state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
                             ZoneNodeNotFound = false;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
-                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = CtrlZone;
-                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
                             // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet
                             // for inlet side mixers
                             if (!state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
@@ -6213,8 +6172,7 @@ void GetATMixers(EnergyPlusData &state)
                                 UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2),
                                                             state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
-                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = CtrlZone;
-                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
                                 // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet
                                 // for inlet side mixers
                                 if (!state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
@@ -6258,8 +6216,7 @@ void GetATMixers(EnergyPlusData &state)
                             state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             ZoneNodeNotFound = false;
                             state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
-                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = CtrlZone;
-                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
                             // Wait until InitATMixer to fill other zone equip config data
 
                             if (!state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {

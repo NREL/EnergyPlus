@@ -3003,11 +3003,9 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
             hitObs = false;
             if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-                for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                    if (state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) {
-                        PierceSurface(state, ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
-                        if (hitObs) break;
-                    }
+                for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
+                    PierceSurface(state, ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
+                    if (hitObs) break;
                 }
 
             } else { // Surface octree search
@@ -3374,8 +3372,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         if (state.dataSurface->CalcSolRefl) { // Coordinates of ground point hit by the ray
                             // Sun reaches ground point if vector from this point to the sun is unobstructed
                             hitObs = false;
-                            for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+                            for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                                 PierceSurface(state, ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt, hitObs);
                                 if (hitObs) break;
                             }
@@ -3650,8 +3647,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 }
                             } else {
                                 // Reflecting surface is a building shade
-                                for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                    if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+                                for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                                     if (ObsSurfNum == ReflSurfNum) continue;
                                     PierceSurface(state, ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs);
                                     if (hitObs) break;
@@ -4435,7 +4431,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataIPShortCut->rNumericArgs(2) > state.dataIPShortCut->rNumericArgs(3)) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state,
-                                  format("...{}[:.2R] must be <= {} [:.2R].",
+                                  format("...{} {:.2R} must be <= {} {:.2R}.",
                                          state.dataIPShortCut->cNumericFieldNames(2),
                                          state.dataIPShortCut->rNumericArgs(2),
                                          state.dataIPShortCut->cNumericFieldNames(3),
@@ -4456,7 +4452,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataIPShortCut->rNumericArgs(5) > state.dataIPShortCut->rNumericArgs(6)) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state,
-                                  format("...{}[:.2R] must be <= {} [:.2R].",
+                                  format("...{} {:.2R} must be <= {} {:.2R}.",
                                          state.dataIPShortCut->cNumericFieldNames(5),
                                          state.dataIPShortCut->rNumericArgs(5),
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -5735,9 +5731,8 @@ void DayltgHitObstruction(EnergyPlusData &state,
     // A shadowing surface is opaque unless its transmittance schedule value is non-zero
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-        for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
+        for (int ISurf : state.dataSurface->AllShadowPossObstrSurfaceList) {
             auto const &surface(state.dataSurface->Surface(ISurf));
-            if (!surface.IsShadowPossibleObstruction) continue;
             IType = surface.Class;
             if ((IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf)) {
                 PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
@@ -5986,15 +5981,9 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
     // For daylit zones, calculate interior daylight illuminance at reference points and
     // simulate lighting control system to get overhead electric lighting reduction
     // factor due to daylighting.
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-            if (state.dataSurface->Surface(SurfNum).ExtSolar) {
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-            }
-        }
+    for (int SurfNum : state.dataSurface->AllExtSolWindowSurfaceList) {
+        state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
+        state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
     }
 
     // Reset space power reduction factors
@@ -7312,29 +7301,15 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     // REFERENCES:
     // Based on DOE-2.1E subroutine DLTSYS.
 
-    using ScheduleManager::GetCurrentScheduleValue;
-
-    Real64 TotReduction; // Electric lighting power reduction factor for a zone
-    //  due to daylighting
-    int NREFPT;                          // Number of daylighting reference points in a zone
-    Real64 ZFTOT = 0.;                   // Fraction of zone's floor area that has daylighting controls
-    int IL;                              // Reference point index
-    DataDaylighting::LtgCtrlType LSYSTP; // Lighting control type: 1=continuous dimming, 2=stepped,
-    //  3=continuous dimming then off
-    Real64 ZFRAC; // Fraction of zone controlled by a reference point
-    Real64 FL;    // Fraction electric lighting output required to meet setpoint
-    Real64 FP;    // Fraction electric lighting power input required to meet setpoint
-    Real64 XRAN;  // Random number between 0 and 1
-    bool ScheduledAvailable;
-
-    if ((int)state.dataDaylightingData->daylightControl.size() == 0) return;
+    if (state.dataDaylightingData->daylightControl.empty()) {
+        return;
+    }
     // Reset space power reduction factors
     for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
         state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
     }
 
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
-        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+    for (auto &thisDaylightControl : state.dataDaylightingData->daylightControl) {
 
         if (thisDaylightControl.DaylightMethod != DataDaylighting::DaylightingMethod::SplitFlux) {
             // Set space power reduction factors
@@ -7352,67 +7327,68 @@ void DayltgElecLightingControl(EnergyPlusData &state)
             continue;
         }
 
+        // Electric lighting power reduction factor for a given daylighting control
+        Real64 &TotReduction = thisDaylightControl.PowerReductionFactor;
         TotReduction = 0.0;
-        ZFTOT = 0.0;
-        //  ScheduledAvailable = .TRUE.
+        Real64 ZFTOT = 0.0;
 
         // check if scheduled to be available
-        //  IF (ZoneDaylight(ZoneNum)%AvailSchedNum > 0) THEN
-        if (GetCurrentScheduleValue(state, thisDaylightControl.AvailSchedNum) > 0.0) {
-            ScheduledAvailable = true;
-        } else {
-            ScheduledAvailable = false;
-        }
-        //  ENDIF
-
-        if (ScheduledAvailable) {
-            NREFPT = thisDaylightControl.TotalDaylRefPoints;
+        if (ScheduleManager::GetCurrentScheduleValue(state, thisDaylightControl.AvailSchedNum) > 0.0) {
 
             // Loop over reference points
-            for (IL = 1; IL <= NREFPT; ++IL) {
+            for (int IL = 1; IL <= thisDaylightControl.TotalDaylRefPoints; ++IL) {
 
                 // Total fraction of zone that is daylit
                 ZFTOT += thisDaylightControl.FracZoneDaylit(IL);
 
                 state.dataDaylightingManager->DaylIllum(IL) = thisDaylightControl.DaylIllumAtRefPt(IL);
-                if (state.dataDaylightingManager->DaylIllum(IL) >= thisDaylightControl.IllumSetPoint(IL)) {
-                    FL = 0.0;
-                } else {
+                Real64 FL = 0.0;
+                if (state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL)) {
                     FL =
                         (thisDaylightControl.IllumSetPoint(IL) - state.dataDaylightingManager->DaylIllum(IL)) / thisDaylightControl.IllumSetPoint(IL);
                 }
 
                 // BRANCH ON LIGHTING SYSTEM TYPE
-                LSYSTP = thisDaylightControl.LightControlType;
+                auto LSYSTP = thisDaylightControl.LightControlType;
+                Real64 FP = 0.0;
                 if (LSYSTP != DataDaylighting::LtgCtrlType::Stepped) {
                     // Continuously dimmable system with linear power curve
                     // Fractional output power required to meet setpoint
                     FP = 1.0;
                     // LIGHT-CTRL-TYPE = CONTINUOUS (LSYSTP = 1)
-                    if (FL <= thisDaylightControl.MinLightFraction) FP = thisDaylightControl.MinPowerFraction;
+                    if (FL <= thisDaylightControl.MinLightFraction) {
+                        FP = thisDaylightControl.MinPowerFraction;
+                    }
                     // LIGHT-CTRL-TYPE = CONTINUOUS/OFF (LSYSTP = 3)
-                    if (FL <= thisDaylightControl.MinLightFraction && LSYSTP == DataDaylighting::LtgCtrlType::ContinuousOff) FP = 0.0;
-                    if (FL > thisDaylightControl.MinLightFraction && FL < 1.0)
+                    if (FL <= thisDaylightControl.MinLightFraction && LSYSTP == DataDaylighting::LtgCtrlType::ContinuousOff) {
+                        FP = 0.0;
+                    }
+                    if (FL > thisDaylightControl.MinLightFraction && FL < 1.0) {
                         FP = (FL + (1.0 - FL) * thisDaylightControl.MinPowerFraction - thisDaylightControl.MinLightFraction) /
                              (1.0 - thisDaylightControl.MinLightFraction);
+                    }
 
                 } else { // LSYSTP = 2
                     // Stepped system
                     FP = 0.0;
-                    if (state.dataDaylightingManager->DaylIllum(IL) > 0.0 &&
-                        state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL))
+                    // #9060: Use a tolerance, otherwise at very low (< 1e-12) daylighting conditions, you can get a multiplier > 1.0
+                    if (state.dataDaylightingManager->DaylIllum(IL) < 0.1) {
+                        FP = 1.0;
+                    } else if (state.dataDaylightingManager->DaylIllum(IL) < thisDaylightControl.IllumSetPoint(IL)) {
                         FP = double(int(thisDaylightControl.LightControlSteps * FL) + 1) / double(thisDaylightControl.LightControlSteps);
-
-                    if (state.dataDaylightingManager->DaylIllum(IL) == 0.0) FP = 1.0;
+                    }
 
                     if (thisDaylightControl.LightControlProbability < 1.0) {
                         // Manual operation.  Occupant sets lights one level too high a fraction of the time equal to
                         // 1. - ZoneDaylight(ZoneNum)%LightControlProbability.  RANDOM_NUMBER returns a random number
                         // between 0 and 1.
+                        Real64 XRAN;
                         RANDOM_NUMBER(XRAN);
                         if (XRAN >= thisDaylightControl.LightControlProbability) {
                             // Set level one higher
-                            if (FP < 1.0) FP += (1.0 / double(thisDaylightControl.LightControlSteps));
+                            if (FP < 1.0) {
+                                FP += (1.0 / double(thisDaylightControl.LightControlSteps));
+                            }
                         } // XRAN
                     }     // Light Control Probability < 1
                 }         // Lighting System Type
@@ -7420,8 +7396,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
                 thisDaylightControl.RefPtPowerReductionFactor(IL) = FP;
 
                 // Accumulate net ltg power reduction factor for entire zone
-                ZFRAC = thisDaylightControl.FracZoneDaylit(IL);
-                TotReduction += thisDaylightControl.RefPtPowerReductionFactor(IL) * ZFRAC;
+                TotReduction += thisDaylightControl.RefPtPowerReductionFactor(IL) * thisDaylightControl.FracZoneDaylit(IL);
 
             } // End of loop over reference points, IL
 
@@ -7433,7 +7408,6 @@ void DayltgElecLightingControl(EnergyPlusData &state)
         } else { // controls not currently available
             TotReduction = 1.0;
         }
-        thisDaylightControl.PowerReductionFactor = TotReduction;
 
         // Set space power reduction factors
         if (thisDaylightControl.spaceIndex > 0) {
@@ -7451,7 +7425,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     if ((int)state.dataDaylightingData->IllumMap.size() > 0 && !state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
         for (int mapNum = 1; mapNum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapNum) {
             if (state.dataGlobal->TimeStep == 1) state.dataDaylightingData->mapResultsToReport = false;
-            for (IL = 1; IL <= state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints; ++IL) {
+            for (int IL = 1; IL <= state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints; ++IL) {
                 state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPtHr(IL) +=
                     state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPt(IL) / double(state.dataGlobal->NumOfTimeStepInHour);
                 if (state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPtHr(IL) > 0.0) {
@@ -7688,7 +7662,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 Alfa;               // Direction angles for ray heading towards the ground (radians)
     Real64 Beta;
     Real64 HorDis;        // Distance between ground hit point and proj'n of window center onto ground (m)
-    int ObsSurfNum;       // Obstruction surface number
     bool hitObs;          // True iff obstruction is hit
     Real64 ObsVisRefl;    // Visible reflectance of obstruction
     Real64 SkyReflVisLum; // Reflected sky luminance at hit point divided by unobstructed sky
@@ -7874,8 +7847,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6) {
                     // Sun reaches ground point if vector from this point to the sun is unobstructed
                     hitObs = false;
-                    for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                        if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+                    for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                         PierceSurface(state, ObsSurfNum, DayltgInterReflectedIllumGroundHitPt, SUNCOS_IHR, DayltgInterReflectedIllumObsHitPt, hitObs);
                         if (hitObs) break;
                     }
@@ -8524,7 +8496,6 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
     Real64 ObstrTrans;         // product of all surface transmittances intersecting incoming beam
 
     Real64 BeamObstrMultiplier; // beam obstruction multiplier in case incoming beam is from the ground
-    int ObsSurfNum;             // Obstruction surface number
     bool hitObs;                // True iff obstruction is hit
     auto &ComplexFenestrationLuminancesObsHitPt =
         state.dataDaylightingManager->ComplexFenestrationLuminancesObsHitPt; // Coordinates of hit point on an obstruction (m)
@@ -8638,8 +8609,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
         if (state.dataSurface->CalcSolRefl) {
             // Sun reaches ground point if vector from this point to the sun is unobstructed
             hitObs = false;
-            for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+            for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                 if (CalledFrom == DataDaylighting::CalledFor::RefPoint) {
                     ComplexFenestrationLuminancesGroundHitPt(1) =
                         state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).x;
@@ -9242,29 +9212,27 @@ void DayltgClosestObstruction(EnergyPlusData &state,
     NearestHitPt = 0.0;
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-        for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-            if (state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) {
-                // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
-                PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt, hit);
-                if (hit) { // Ray pierces surface
-                    // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
-                    // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-                    if ((state.dataSurface->Surface(ObsSurfNum).Class == SurfaceClass::Window) &&
-                        (state.dataSurface->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+        for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
+            // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
+            PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt, hit);
+            if (hit) { // Ray pierces surface
+                // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
+                // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
+                if ((state.dataSurface->Surface(ObsSurfNum).Class == SurfaceClass::Window) &&
+                    (state.dataSurface->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+                    NearestHitSurfNum = ObsSurfNum;
+                } else {
+                    // Distance squared from receiving point to hit point
+                    Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
+                    // Reset NearestHitSurfNum and NearestHitDistance_sq if this hit point is closer than previous closest
+                    if (HitDistance_sq < NearestHitDistance_sq) {
+                        NearestHitDistance_sq = HitDistance_sq;
                         NearestHitSurfNum = ObsSurfNum;
-                    } else {
-                        // Distance squared from receiving point to hit point
-                        Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
-                        // Reset NearestHitSurfNum and NearestHitDistance_sq if this hit point is closer than previous closest
-                        if (HitDistance_sq < NearestHitDistance_sq) {
-                            NearestHitDistance_sq = HitDistance_sq;
-                            NearestHitSurfNum = ObsSurfNum;
-                            NearestHitPt = HitPt;
-                        }
+                        NearestHitPt = HitPt;
                     }
-                } // End of check if obstruction was hit
-            }
-        } // End of loop over possible obstructions for this ray
+                }
+            } // End of check if obstruction was hit
+        }     // End of loop over possible obstructions for this ray
 
     } else { // Surface octree search
 
@@ -9335,7 +9303,6 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &DayltgSurfaceLumFromSunReflNorm = state.dataDaylightingManager->DayltgSurfaceLumFromSunReflNorm; // Unit normal to reflecting surface (m)
     auto &DayltgSurfaceLumFromSunObsHitPt = state.dataDaylightingManager->DayltgSurfaceLumFromSunObsHitPt; // Hit point on obstruction (m)
-    int ObsSurfNum;                                                                                        // Obstruction surface number
     bool hitObs;                                                                                           // True iff obstruction is hit
     Real64 CosIncAngAtHitPt; // Cosine of angle of incidence of sun at HitPt
     Real64 DiffVisRefl;      // Diffuse visible reflectance of ReflSurfNum
@@ -9357,8 +9324,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     if (CosIncAngAtHitPt <= 0.0) return; // Sun is in back of reflecting surface
     // Sun reaches ReflHitPt if vector from ReflHitPt to sun is unobstructed
     hitObs = false;
-    for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-        if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
+    for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
         // Exclude as a possible obstructor ReflSurfNum and its base surface (if it has one)
         if (ObsSurfNum == ReflSurfNum || ObsSurfNum == state.dataSurface->Surface(ReflSurfNum).BaseSurf) continue;
         PierceSurface(state, ObsSurfNum, ReflHitPt, SUNCOS_IHR, DayltgSurfaceLumFromSunObsHitPt, hitObs);

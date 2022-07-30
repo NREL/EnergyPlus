@@ -65,6 +65,16 @@ struct EneryPlusData;
 
 namespace RefrigeratedCase {
 
+    // Walk In Cooler Stock Door Protection types
+    enum class WIStockDoor
+    {
+        Invalid = -1,
+        None,
+        AirCurtain,
+        StripCurtain,
+        Num,
+    };
+
     // Compressor suction pressure control
     enum class CompressorSuctionPressureCtrl
     {
@@ -80,16 +90,6 @@ namespace RefrigeratedCase {
         Invalid = -1,
         LiquidSuction,
         Mechanical,
-        Num,
-    };
-
-    // Walk In Cooler Stock Door Protection types
-    enum class WIStockDoor
-    {
-        Invalid = -1,
-        None,
-        AirCurtain,
-        StripCurtain,
         Num,
     };
 

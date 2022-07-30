@@ -734,8 +734,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     // init
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // heating mode tests
     CoolingLoad = false;
     HeatingLoad = true;

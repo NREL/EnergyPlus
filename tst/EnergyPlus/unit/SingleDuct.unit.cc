@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -1339,7 +1339,6 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
     state->dataSingleDuct->sd_airterminal(1).CtrlZoneNum = 1;
-    state->dataSingleDuct->sd_airterminal(1).ActualZoneNum = 1;
     state->dataSingleDuct->sd_airterminal(1).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->sd_airterminal(1).OARequirementsPtr = 1;
     state->dataSingleDuct->sd_airterminal(1).AirLoopNum = 1;
@@ -2543,7 +2542,6 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = 3;
     state->dataSingleDuct->SysATMixer(ATMixerNum).AirLoopNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = 1;
-    state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = 1;
 
@@ -2606,7 +2604,6 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = 3;
     state->dataSingleDuct->SysATMixer(ATMixerNum).AirLoopNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = 1;
-    state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = 1;
 
@@ -3003,8 +3000,8 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
     bool FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).SimConstVol(*state,
                                                               FirstHVACIteration,
-                                                              state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum,
-                                                              state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum);
+                                                              state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum,
+                                                              state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex);
     // TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
     //     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
     //         this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);

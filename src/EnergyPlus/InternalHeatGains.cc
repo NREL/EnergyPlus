@@ -249,10 +249,7 @@ namespace InternalHeatGains {
 
         // TODO MJW: Punt for now, sometimes unit test need these to be allocated in AllocateZoneHeatBalArrays, but simulations need them here
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
-            state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-            state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
-            state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
-            state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
+            DataHeatBalance::AllocateIntGains(state);
         }
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->spaceRpt.allocate(state.dataGlobal->numSpaces);
@@ -780,13 +777,90 @@ namespace InternalHeatGains {
                                 }
                             }
 
-                            if (!state.dataIPShortCut->lAlphaFieldBlanks(10) || AlphaName(10) != "") {
-                                {
-                                    auto const clothingType(AlphaName(10));
-                                    if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
-                                        thisPeople.ClothingType = 1;
+                            if (!state.dataIPShortCut->lAlphaFieldBlanks(10) || !AlphaName(10).empty()) {
+                                thisPeople.clothingType = static_cast<ClothingType>(getEnumerationValue(clothingTypeNamesUC, AlphaName(10)));
+                                if (thisPeople.clothingType == ClothingType::Invalid) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", invalid " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(10) + ", value  =" + AlphaName(10));
+                                    ShowContinueError(state,
+                                                      format(R"(...Valid values are "{}", "{}", "{}")",
+                                                             clothingTypeNamesUC[0],
+                                                             clothingTypeNamesUC[1],
+                                                             clothingTypeNamesUC[2]));
+                                    ErrorsFound = true;
+                                }
+                                switch (thisPeople.clothingType) {
+                                case ClothingType::InsulationSchedule:
+                                    thisPeople.clothingType = ClothingType::InsulationSchedule;
+                                    thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
+                                    if (thisPeople.ClothingPtr == 0 && ModelWithAdditionalInputs) {
+                                        if (Item1 == 1) {
+                                            ShowSevereError(state,
+                                                            std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                                state.dataIPShortCut->cAlphaFieldNames(12) + " entered=\"" + AlphaName(12) + "\".");
+                                            ErrorsFound = true;
+                                        }
+                                    } else { // check min/max on schedule
+                                        SchMin = GetScheduleMinValue(state, thisPeople.ClothingPtr);
+                                        SchMax = GetScheduleMaxValue(state, thisPeople.ClothingPtr);
+                                        if (SchMin < 0.0 || SchMax < 0.0) {
+                                            if (SchMin < 0.0) {
+                                                if (Item1 == 1) {
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                        state.dataIPShortCut->cAlphaFieldNames(12) + ", minimum is < 0.0");
+                                                    ShowContinueError(state,
+                                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.",
+                                                                             AlphaName(12),
+                                                                             SchMin));
+                                                    ErrorsFound = true;
+                                                }
+                                            }
+                                            if (SchMax < 0.0) {
+                                                if (Item1 == 1) {
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                        state.dataIPShortCut->cAlphaFieldNames(12) + ", maximum is < 0.0");
+                                                    ShowContinueError(state,
+                                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.",
+                                                                             AlphaName(12),
+                                                                             SchMax));
+                                                    ErrorsFound = true;
+                                                }
+                                            }
+                                        }
+                                        if (SchMax > 2.0) {
+                                            if (Item1 == 1) {
+                                                ShowWarningError(state,
+                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                                     state.dataIPShortCut->cAlphaFieldNames(12) + ", maximum is > 2.0");
+                                                ShowContinueError(state,
+                                                                  format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Clothing.",
+                                                                         AlphaName(12),
+                                                                         SchMin,
+                                                                         SchMax));
+                                            }
+                                        }
+                                    }
+                                    break;
+
+                                case ClothingType::DynamicAshrae55:
+                                    break; // nothing extra to do, at least for now
+
+                                case ClothingType::CalculationSchedule:
+                                    thisPeople.ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
+                                    if (thisPeople.ClothingMethodPtr == 0) {
+                                        if (Item1 == 1) {
+                                            ShowSevereError(state,
+                                                            std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                                state.dataIPShortCut->cAlphaFieldNames(11) + " entered=\"" + AlphaName(11) + "\".");
+                                            ErrorsFound = true;
+                                        }
+                                    }
+                                    if (CheckScheduleValue(state, thisPeople.ClothingMethodPtr, 1)) {
                                         thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                        if (thisPeople.ClothingPtr == 0 && ModelWithAdditionalInputs) {
+                                        if (thisPeople.ClothingPtr == 0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
@@ -794,88 +868,11 @@ namespace InternalHeatGains {
                                                                     AlphaName(12) + "\".");
                                                 ErrorsFound = true;
                                             }
-                                        } else { // check min/max on schedule
-                                            SchMin = GetScheduleMinValue(state, thisPeople.ClothingPtr);
-                                            SchMax = GetScheduleMaxValue(state, thisPeople.ClothingPtr);
-                                            if (SchMin < 0.0 || SchMax < 0.0) {
-                                                if (SchMin < 0.0) {
-                                                    if (Item1 == 1) {
-                                                        ShowSevereError(state,
-                                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                            "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
-                                                                            ", minimum is < 0.0");
-                                                        ShowContinueError(state,
-                                                                          format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.",
-                                                                                 AlphaName(12),
-                                                                                 SchMin));
-                                                        ErrorsFound = true;
-                                                    }
-                                                }
-                                                if (SchMax < 0.0) {
-                                                    if (Item1 == 1) {
-                                                        ShowSevereError(state,
-                                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                            "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
-                                                                            ", maximum is < 0.0");
-                                                        ShowContinueError(state,
-                                                                          format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.",
-                                                                                 AlphaName(12),
-                                                                                 SchMax));
-                                                        ErrorsFound = true;
-                                                    }
-                                                }
-                                            }
-                                            if (SchMax > 2.0) {
-                                                if (Item1 == 1) {
-                                                    ShowWarningError(state,
-                                                                     std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                                         state.dataIPShortCut->cAlphaFieldNames(12) + ", maximum is > 2.0");
-                                                    ShowContinueError(state,
-                                                                      format("Schedule=\"{}\"; Entered min/max range=[{:.1R},{:.1R}] Clothing.",
-                                                                             AlphaName(12),
-                                                                             SchMin,
-                                                                             SchMax));
-                                                }
-                                            }
                                         }
-
-                                    } else if (clothingType == "DYNAMICCLOTHINGMODELASHRAE55") {
-                                        thisPeople.ClothingType = 2;
-
-                                    } else if (clothingType == "CALCULATIONMETHODSCHEDULE") {
-                                        thisPeople.ClothingType = 3;
-                                        thisPeople.ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
-                                        if (thisPeople.ClothingMethodPtr == 0) {
-                                            if (Item1 == 1) {
-                                                ShowSevereError(state,
-                                                                std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                    "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + " entered=\"" +
-                                                                    AlphaName(11) + "\".");
-                                                ErrorsFound = true;
-                                            }
-                                        }
-                                        if (CheckScheduleValue(state, thisPeople.ClothingMethodPtr, 1)) {
-                                            thisPeople.ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                            if (thisPeople.ClothingPtr == 0) {
-                                                if (Item1 == 1) {
-                                                    ShowSevereError(state,
-                                                                    std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
-                                                                        "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + " entered=\"" +
-                                                                        AlphaName(12) + "\".");
-                                                    ErrorsFound = true;
-                                                }
-                                            }
-                                        }
-
-                                    } else {
-                                        ShowSevereError(state,
-                                                        std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", invalid " +
-                                                            state.dataIPShortCut->cAlphaFieldNames(10) + ", value  =" + AlphaName(10));
-                                        ShowContinueError(state,
-                                                          "...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", "
-                                                          "\"CalculationMethodSchedule\".");
-                                        ErrorsFound = true;
                                     }
+                                    break;
+                                default:
+                                    break; // nothing to do for the other cases
                                 }
                             }
 
@@ -929,7 +926,7 @@ namespace InternalHeatGains {
                             }
 
                             int indexAnkleAirVelPtr = 21;
-                            if (!state.dataIPShortCut->lAlphaFieldBlanks(indexAnkleAirVelPtr) || AlphaName(indexAnkleAirVelPtr) != "") {
+                            if (!state.dataIPShortCut->lAlphaFieldBlanks(indexAnkleAirVelPtr) || !AlphaName(indexAnkleAirVelPtr).empty()) {
                                 thisPeople.AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
                                 if (thisPeople.AnkleAirVelocityPtr == 0) {
                                     if (Item1 == 1) {
@@ -1221,7 +1218,7 @@ namespace InternalHeatGains {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"LightingLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                ShowContinueError(state, R"(...Valid values are "LightingLevel", "Watts/Area", "Watts/Person".)");
                                 ErrorsFound = true;
                             }
                         }
@@ -1292,8 +1289,7 @@ namespace InternalHeatGains {
                         }
                     }
                     if (thisLights.ZonePtr > 0) {
-                        thisLights.ZoneReturnNum =
-                            DataZoneEquipment::GetReturnNumForZone(state, state.dataHeatBal->Zone(zoneNum).Name, thisLights.RetNodeName);
+                        thisLights.ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(state, thisLights.ZonePtr, thisLights.RetNodeName);
                     }
 
                     if ((thisLights.ZoneReturnNum == 0) && (thisLights.FractionReturnAir > 0.0) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
@@ -1334,8 +1330,8 @@ namespace InternalHeatGains {
                                 ErrorsFound = true;
                             } else {
                                 if (thisLights.ZoneReturnNum > 0) {
-                                    state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(thisLights.ZonePtr).ZoneEqNum)
-                                        .ReturnNodeExhaustNodeNum(thisLights.ZoneReturnNum) = thisLights.ZoneExhaustNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(thisLights.ZonePtr).ReturnNodeExhaustNodeNum(thisLights.ZoneReturnNum) =
+                                        thisLights.ZoneExhaustNodeNum;
                                     CheckSharedExhaustFlag = true;
                                 } else {
                                     ShowSevereError(state,
@@ -3451,17 +3447,9 @@ namespace InternalHeatGains {
                 }
                 print(state.files.eio, "{},", GetScheduleName(state, state.dataHeatBal->People(Loop).WorkEffPtr));
 
-                if (state.dataHeatBal->People(Loop).ClothingType == 1) {
-                    print(state.files.eio, "Clothing Insulation Schedule,");
-                } else if (state.dataHeatBal->People(Loop).ClothingType == 2) {
-                    print(state.files.eio, "Dynamic Clothing Model ASHRAE55,");
-                } else if (state.dataHeatBal->People(Loop).ClothingType == 3) {
-                    print(state.files.eio, "Calculation Method Schedule,");
-                } else {
-                    print(state.files.eio, "N/A,");
-                }
+                print(state.files.eio, clothingTypeEIOStrings[static_cast<int>(state.dataHeatBal->People(Loop).clothingType)]);
 
-                if (state.dataHeatBal->People(Loop).ClothingType == 3) {
+                if (state.dataHeatBal->People(Loop).clothingType == ClothingType::CalculationSchedule) {
                     print(state.files.eio, "{},", GetScheduleName(state, state.dataHeatBal->People(Loop).ClothingMethodPtr));
                 } else {
                     print(state.files.eio, "N/A,");
@@ -7971,55 +7959,55 @@ namespace InternalHeatGains {
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             EnvClass = state.dataHeatBal->ZoneITEq(Loop).Class;
             if (EnvClass > 0) {
-                if (TAirIn > DBMax[EnvClass - 1]) {
+                if (TAirIn > DBMax[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TAirIn < DBMin[EnvClass - 1]) {
+                if (TAirIn < DBMin[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TDPAirIn > DPMax[EnvClass - 1]) {
+                if (TDPAirIn > DPMax[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TDPAirIn < DPMin[EnvClass - 1]) {
+                if (TDPAirIn < DPMin[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (RHAirIn > RHMax[EnvClass - 1]) {
+                if (RHAirIn > RHMax[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (RHAirIn < RHMin[EnvClass - 1]) {
+                if (RHAirIn < RHMin[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -65,7 +66,6 @@ namespace DataHeatBalFanSys {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr bool UseSimpleAirFlow = true;
     constexpr Real64 MaxRadHeatFlux = 4000.0; // [W/m2] max limit for radiant heat flux at a surface due to HVAC equipment
 
     // Controls for PredictorCorrector
@@ -248,8 +248,10 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
     Array1D<Real64> ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
     Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
-    Array1D_int TempControlType;
-    Array1D_int ComfortControlType;
+    EPVector<DataHVACGlobals::ThermostatType> TempControlType;
+    EPVector<int> TempControlTypeRpt;
+    EPVector<DataHVACGlobals::ThermostatType> ComfortControlType;
+    EPVector<int> ComfortControlTypeRpt;
 
     Array1D<Real64> ZoneHeatIndex;
     Array1D<Real64> ZoneHumidex;
