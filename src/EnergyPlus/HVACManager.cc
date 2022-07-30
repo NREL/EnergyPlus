@@ -2951,7 +2951,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
     bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
 
-    auto &Zone(state.dataHeatBal->Zone);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
     auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
 
@@ -3001,28 +3000,26 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
                 }
             }
             if (ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly || CyclingFan) {
-                if (Zone(ControlledZoneNum).RefrigCaseRA) {
+                auto const &thisZone = state.dataHeatBal->Zone(ControlledZoneNum);
+                if (thisZone.RefrigCaseRA) {
                     ShowWarningError(state,
-                                     "For zone=" + Zone(ControlledZoneNum).Name +
-                                         " return air cooling by refrigerated cases will be applied to the zone air.");
+                                     "For zone=" + thisZone.Name + " return air cooling by refrigerated cases will be applied to the zone air.");
                     ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                 }
                 for (int LightNum = 1; LightNum <= state.dataHeatBal->TotLights; ++LightNum) {
                     if (state.dataHeatBal->Lights(LightNum).ZonePtr != ControlledZoneNum) continue;
                     if (state.dataHeatBal->Lights(LightNum).FractionReturnAir > 0.0) {
-                        ShowWarningError(
-                            state, "For zone=" + Zone(ControlledZoneNum).Name + " return air heat gain from lights will be applied to the zone air.");
+                        ShowWarningError(state, "For zone=" + thisZone.Name + " return air heat gain from lights will be applied to the zone air.");
                         ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                         break;
                     }
                 }
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                for (int spaceNum : thisZone.spaceIndexes) {
                     auto &thisSpace = state.dataHeatBal->space(spaceNum);
                     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                         if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                            ShowWarningError(state,
-                                             "For zone=" + Zone(ZoneNum).Name +
-                                                 " return air heat gain from air flow windows will be applied to the zone air.");
+                            ShowWarningError(
+                                state, "For zone=" + thisZone.Name + " return air heat gain from air flow windows will be applied to the zone air.");
                             ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                         }
                     }
@@ -3045,14 +3042,15 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // set the zone level NoHeatToReturnAir flag
     // if any air loop in the zone is continuous fan, then set NoHeatToReturnAir = false and sort it out node-by-node
     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+        auto &thisZone = state.dataHeatBal->Zone(ControlledZoneNum);
         if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-        Zone(ControlledZoneNum).NoHeatToReturnAir = true;
+        thisZone.NoHeatToReturnAir = true;
         if (!ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly) {
             for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                 int AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
                     if (AirLoopControlInfo(AirLoopNum).FanOpMode == ContFanCycCoil) {
-                        Zone(ControlledZoneNum).NoHeatToReturnAir = false;
+                        thisZone.NoHeatToReturnAir = false;
                         break;
                     }
                 }

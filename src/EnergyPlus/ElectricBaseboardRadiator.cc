@@ -645,7 +645,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            ZeroSourceSumHATsurf(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
+            ZeroSourceSumHATsurf(ControlledZoneNum) = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
             QBBElecRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBElecRadSrc(BaseboardNum) = 0.0;
             LastSysTimeElapsed(BaseboardNum) = 0.0;
