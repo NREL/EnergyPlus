@@ -9235,23 +9235,23 @@ namespace SurfaceGeometry {
                     auto itnext = std::next(it);
                     if (itnext == std::end(vertices)) {
                         itnext = std::begin(vertices);
-                }
+                    }
 
                     // TODO: use isAlmostEqual3Pt for consistency? (which uses 0.0127 m / 1/2inch instead of 0.01 m)
                     DistanceCheck = distance(*it, *itnext);
-                if (DistanceCheck < 0.01) {
+                    if (DistanceCheck < 0.01) {
                         int curVertexIndex = std::distance(vertices.begin(), it) + 1;
                         int nextVertexIndex = std::distance(vertices.begin(), itnext) + 1;
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state,
+                        if (state.dataGlobal->DisplayExtraWarnings) {
+                            ShowWarningError(state,
                                              format("{}Distance between two vertices < .01, possibly coincident. for Surface={}, in Zone={}",
                                                     RoutineName,
                                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
                             ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", curVertexIndex, it->x, it->y, it->z));
                             ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", nextVertexIndex, itnext->x, itnext->y, it->z));
-                    }
-                    ++state.dataErrTracking->TotalCoincidentVertices;
+                        }
+                        ++state.dataErrTracking->TotalCoincidentVertices;
                         if (nSides > 3) {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowContinueError(state, format("Dropping Vertex [{}].", nextVertexIndex));
@@ -9265,16 +9265,16 @@ namespace SurfaceGeometry {
                                 ShowContinueError(state,
                                                   format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a "
                                                          "degenerate surface.",
-                                           curVertexIndex));
+                                                         curVertexIndex));
                             }
                             ++state.dataErrTracking->TotalDegenerateSurfaces;
                             // mark degenerate surface?
                         }
                     } else {
                         Perimeter += DistanceCheck;
-                            }
-                            }
-                            }
+                    }
+                }
+            }
 
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = Perimeter;
 
@@ -15285,7 +15285,7 @@ namespace SurfaceGeometry {
         auto &Z = state.dataSurfaceGeometry->Z;
         auto &A = state.dataSurfaceGeometry->A; // containers for convexity test
         auto &B = state.dataSurfaceGeometry->B;
-        auto &VertSize = state.dataSurfaceGeometry->VertSize;                     // size of X,Y,Z,A,B arrays
+        auto &VertSize = state.dataSurfaceGeometry->VertSize; // size of X,Y,Z,A,B arrays
 
         std::vector<int> surfCollinearVerts; // index of vertices to remove, 1-indexed
         surfCollinearVerts.reserve(NSides + 2);
@@ -15392,22 +15392,22 @@ namespace SurfaceGeometry {
             if (Theta > TurnThreshold) {
                 SignFlag = true;
             } else if (Theta < -TurnThreshold) {
-                    SignFlag = false;
+                SignFlag = false;
             } else { // std::abs(Theta) < TurnThreshold
                 // Store the index of the collinear vertex for removal
                 int colinearIndex = n + 1;
                 if (colinearIndex > NSides) {
                     colinearIndex -= NSides;
                 }
-                        if (state.dataGlobal->DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(
                         state,
                         format("CheckConvexity: Surface=\"{}\", vertex {} is colinear with previous and next.", surfaceTmp.Name, colinearIndex));
-                        }
-                    ++state.dataErrTracking->TotalCoincidentVertices;
-                surfCollinearVerts.push_back(colinearIndex);
-                    continue;
                 }
+                ++state.dataErrTracking->TotalCoincidentVertices;
+                surfCollinearVerts.push_back(colinearIndex);
+                continue;
+            }
 
             if (!PrevSignFlagInitialized) {
                 PrevSignFlag = SignFlag;
@@ -15474,7 +15474,7 @@ namespace SurfaceGeometry {
                 if (std::find(surfCollinearVerts.cbegin(), surfCollinearVerts.cend(), i) == surfCollinearVerts.cend()) {
                     newVertices(++n) = vertices(i);
                 }
-                }
+            }
             vertices = std::move(newVertices);
 
             if (state.dataGlobal->DisplayExtraWarnings) {

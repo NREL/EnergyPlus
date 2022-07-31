@@ -773,7 +773,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     using ZoneTempPredictorCorrector::VerifyThermostatInZone;
 
     int NumOfTimeStepInDay; // number of zone time steps in a day
-    int DesDayNum; // design day index
+    int DesDayNum;          // design day index
     // unused  INTEGER :: DesDayEnvrnNum   ! design day index
     int ZoneSizNum;           // zone sizing input index
     Real64 TotPeopleInZone;   // total (maximum) number of people in a zone
@@ -3689,7 +3689,7 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
 
     if (ResetSimOrder) {
         SetZoneEquipSimOrder(state, ZoneNum);
-            }
+    }
 
     // If one sequenced load is allocated, then all have been allocated in InitZoneEquipment
     if (allocated(energy.SequencedOutputRequired)) {
