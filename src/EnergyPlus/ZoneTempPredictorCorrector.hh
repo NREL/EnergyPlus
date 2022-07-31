@@ -157,10 +157,8 @@ namespace ZoneTempPredictorCorrector {
                                         Real64 ZoneMultiplierList);
 
     void CorrectZoneAirTemp(EnergyPlusData &state,
-                            Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
-                            bool ShortenTimeStepSys,
-                            bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-                            Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                            Real64 &ZoneTempChange,     // Temperature change in zone air between previous and current timestep
+                            bool UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
     );
 
     void PushZoneTimestepHistories(EnergyPlusData &state);
