@@ -1237,6 +1237,27 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         // CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, oaTempforCurve);
         CurveManager::CurveValue(state, this->capFuncTempCurveIndex, waterTempforCurve, oaTempforCurve);
 
+    if (capacityModifierFuncTemp < 0.0) {
+        if (this->capModFTErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state,
+                              format(" Capacity Modifier curve (function of Temperatures) output is negative ({:.3T}).", capacityModifierFuncTemp));
+            ShowContinueError(state,
+                              format(" Negative value occurs using a water temperature of {:.2T}C and an outdoor air temperature of {:.2T}C.",
+                                     waterTempforCurve,
+                                     oaTempforCurve));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": Capacity Modifier curve (function of Temperatures) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->capModFTErrorIndex,
+                                       capacityModifierFuncTemp,
+                                       capacityModifierFuncTemp);
+        capacityModifierFuncTemp = 0.0;
+    }
+
     Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
     Real64 partLoadRatio = 0.0;
     if (availableCapacity > 0) {
@@ -1998,7 +2019,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(state,
-                                     fmt::format("Invalid heat pump condenser type (name={}; entered type: {}",
+                                     fmt::format("Invalid heat pump condenser type (name={}; entered type: {}).",
                                                  thisPLHP.name,   // LCOV_EXCL_LINE
                                                  condenserType)); // LCOV_EXCL_LINE
                     errorsFound = true;                           // LCOV_EXCL_LINE
@@ -2045,7 +2066,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         // currently there are no straightforward unit tests possible to get here
         // all curves are required and inputs are validated by the input processor
         // obviously this will stay here but I don't feel like counting it against coverage
-        ShowFatalError(state, "Previous EIR PLFFHP errors cause program termination"); // LCOV_EXCL_LINE
+        ShowFatalError(state, "Previous EIR PLFFHP errors cause program termination."); // LCOV_EXCL_LINE
     }
 }
 
@@ -2234,7 +2255,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                        routineName,
                                        DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
                                        this->name));
-                ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
+                ShowContinueError(state, "Could not locate component's source side connections on a plant loop.");
                 errFlag = true;
             } else if (this->sourceSidePlantLoc.loopSideNum != DataPlant::LoopSideLocation::Demand) { // only check if !thisErrFlag
                 ShowSevereError(state,
@@ -2242,7 +2263,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                        routineName,
                                        DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
                                        this->name));
-                ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
+                ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop.");
                 errFlag = true;
             }
 
