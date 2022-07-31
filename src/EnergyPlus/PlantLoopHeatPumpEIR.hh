@@ -236,6 +236,9 @@ namespace EIRPlantLoopHeatPumps {
         Real64 fuelUsage = 0.0;
         Real64 fuelEnergy = 0.0;
         int capModFTErrorIndex = 0;
+        int eirModFTErrorIndex = 0;
+        int eirModFPLRErrorIndex = 0;
+        int eirDefrostFTErrorIndex = 0;
         int eirAuxElecFTErrorIndex = 0;
         int eirAuxElecFPLRErrorIndex = 0;
 
