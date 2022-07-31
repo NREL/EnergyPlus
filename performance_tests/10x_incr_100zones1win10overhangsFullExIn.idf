@@ -21460,11 +21460,11 @@ Output:Table:SummaryReports,
 
 Output:Variable,*,Surface Outside Face Sunlit Fraction,timestep;
 
-Output:Meter:MeterFileOnly,DistrictHeating:Facility,monthly;
+Output:Meter:MeterFileOnly,DistrictHeatingWater:Facility,monthly;
 
 Output:Meter:MeterFileOnly,DistrictCooling:Facility,monthly;
 
-Output:Meter:MeterFileOnly,DistrictHeating:Facility,runperiod;
+Output:Meter:MeterFileOnly,DistrictHeatingWater:Facility,runperiod;
 
 Output:Meter:MeterFileOnly,DistrictCooling:Facility,runperiod;
 
