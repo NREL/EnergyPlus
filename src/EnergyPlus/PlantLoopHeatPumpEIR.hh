@@ -235,6 +235,8 @@ namespace EIRPlantLoopHeatPumps {
         Real64 loadSideVolumeFlowRate = 0.0;
         Real64 fuelUsage = 0.0;
         Real64 fuelEnergy = 0.0;
+        int eirAuxElecFTErrorIndex = 0;
+        int eirAuxElecFPLRErrorIndex = 0;
 
         // Override parent methods to be declared
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);

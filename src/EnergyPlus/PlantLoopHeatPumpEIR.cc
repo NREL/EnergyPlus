@@ -1294,9 +1294,50 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     if (this->auxElecEIRFoTempCurveIndex > 0) {
         eirAuxElecFuncTemp = CurveManager::CurveValue(state, this->auxElecEIRFoTempCurveIndex, waterTempforCurve, oaTempforCurve);
     }
+
+    if (eirAuxElecFuncTemp < 0.0) {
+        if (this->eirAuxElecFTErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state,
+                              format(" Auxillary EIR Modifier curve (function of Temperatures) output is negative ({:.3T}).", eirAuxElecFuncTemp));
+            ShowContinueError(state,
+                              format(" Negative value occurs using a water temperature of {:.2T}C and an outdoor air temperature of {:.2T}C.",
+                                     waterTempforCurve,
+                                     oaTempforCurve));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(
+            state,
+            format("{} \"{}\": Auxillary EIR Modifier curve (function of Temperatures) output is negative warning continues...",
+                   DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                   this->name),
+            this->eirAuxElecFTErrorIndex,
+            eirAuxElecFuncTemp,
+            eirAuxElecFuncTemp);
+        eirAuxElecFuncTemp = 0.0;
+    }
+
     Real64 eirAuxElecFuncPLR = 0.0;
     if (this->auxElecEIRFoPLRCurveIndex > 0) {
         eirAuxElecFuncPLR = CurveManager::CurveValue(state, this->auxElecEIRFoPLRCurveIndex, partLoadRatio);
+    }
+
+    if (eirAuxElecFuncPLR < 0.0) {
+        if (this->eirAuxElecFPLRErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state,
+                              format(" Auxillary EIR Modifier curve (function of Temperatures) output is negative ({:.3T}).", eirAuxElecFuncPLR));
+            ShowContinueError(state, format(" Negative value occurs using a Part Load Ratio of {:.2T}.", partLoadRatio));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": Auxillary EIR Modifier curve (function of PLR) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->eirAuxElecFPLRErrorIndex,
+                                       eirAuxElecFuncPLR,
+                                       eirAuxElecFuncPLR);
+        eirAuxElecFuncPLR = 0.0;
     }
 
     if (partLoadRatio < this->minPLR) {
