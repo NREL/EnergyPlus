@@ -562,8 +562,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(5600.23, sizedValue, 0.01); // capacity includes system fan heat
-    sizer.autoSizedValue = 0.0;             // reset for next test
+    EXPECT_NEAR(5633.933, sizedValue, 0.01); // capacity includes system fan heat
+    sizer.autoSizedValue = 0.0;              // reset for next test
 }
 
 } // namespace EnergyPlus

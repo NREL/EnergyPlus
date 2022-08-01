@@ -275,8 +275,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     auto &thisAirloopDOAS = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum];
                     DesVolFlow = thisAirloopDOAS.SizingMassFlow / state.dataEnvrn->StdRhoAir;
                     CoilInTemp = thisAirloopDOAS.SizingCoolOATemp;
+                    CoilOutTemp = thisAirloopDOAS.PrecoolTemp;
                     Real64 DeltaT = 0.0;
-                    if (thisAirloopDOAS.m_FanIndex > -1 && thisAirloopDOAS.FanBeforeCoolingCoilFlag) {
+                    if (thisAirloopDOAS.m_FanIndex > -1) {
                         if (thisAirloopDOAS.m_FanTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) {
                             Fans::FanInputsForDesHeatGain(state,
                                                           thisAirloopDOAS.m_FanIndex,
@@ -299,10 +300,15 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         this->dataFanIndex = thisAirloopDOAS.m_FanIndex;
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(thisAirloopDOAS.m_FanInletNodeNum).HumRat);
                         DeltaT = FanCoolLoad / (thisAirloopDOAS.SizingMassFlow * CpAir);
-                        CoilInTemp += DeltaT;
+                        if (thisAirloopDOAS.FanBeforeCoolingCoilFlag) {
+                            CoilInTemp += DeltaT;
+                        } else {
+                            CoilOutTemp -= DeltaT;
+                            CoilOutTemp =
+                                max(CoilOutTemp, Psychrometrics::PsyTdpFnWPb(state, thisAirloopDOAS.PrecoolHumRat, state.dataEnvrn->StdBaroPress));
+                        }
                     }
                     CoilInHumRat = thisAirloopDOAS.SizingCoolOAHumRat;
-                    CoilOutTemp = thisAirloopDOAS.PrecoolTemp;
                     CoilOutHumRat = thisAirloopDOAS.PrecoolHumRat;
                     this->autoSizedValue =
                         DesVolFlow * state.dataEnvrn->StdRhoAir *
