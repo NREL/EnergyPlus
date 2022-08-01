@@ -86,7 +86,7 @@ namespace EnergyPlus {
             Real64 AuxiliaryVolFlowRate{0};
             Real64 AuxiliaryMassFlowRate{0};
             PlantLocation AHPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
-            Real64 QOilHeater{0};
+            Real64 QOilCooler{0};
             Real64 QAuxiliary{0};
 
             AmbientTempIndicator AmbientTempType{AmbientTempIndicator::Invalid};

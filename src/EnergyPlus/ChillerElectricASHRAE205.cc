@@ -651,6 +651,14 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
+                        "Minimum Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->MinPartLoadRat,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+
+    SetupOutputVariable(state,
                         "Chiller Electricity Rate",
                         OutputProcessor::Unit::W,
                         this->Power,
@@ -783,6 +791,38 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         this->AmbientZoneGain,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Oil Cooler Heat",
+                        OutputProcessor::Unit::W,
+                        this->QOilCooler,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Auxiliary Heat",
+                        OutputProcessor::Unit::W,
+                        this->QAuxiliary,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Oil Cooler Energy",
+                        OutputProcessor::Unit::J,
+                        this->QOilCooler,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Auxiliary Energy",
+                        OutputProcessor::Unit::J,
+                        this->QAuxiliary,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name);
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -927,6 +967,8 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     this->Power = 0.0;
     this->QCondenser = 0.0;
     this->QEvaporator = 0.0;
+    this->QOilCooler = 0.0;
+    this->QAuxiliary = 0.0;
     this->QHeatRecovery = 0.0;
     int PlantLoopNum = this->CWPlantLoc.loopNum;
     DataPlant::LoopSideLocation LoopSideNum = this->CWPlantLoc.loopSideNum;
@@ -1145,7 +1187,9 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     Real64 runtimeFactor{this->ChillerCyclingRatio / cyclingFactor};
     this->Power = lookupVariablesCooling.input_power * runtimeFactor + ((1 - this->ChillerCyclingRatio) * standbyPower);
     this->QCondenser = lookupVariablesCooling.net_condenser_capacity * this->ChillerCyclingRatio;
-    this->AmbientZoneGain = this->QEvaporator + this->Power - (this->QCondenser + this->QOilHeater + this->QAuxiliary);
+    this->QOilCooler = lookupVariablesCooling.oil_cooler_heat;
+    this->QAuxiliary = lookupVariablesCooling.auxiliary_heat;
+    this->AmbientZoneGain = this->QEvaporator + this->Power - (this->QCondenser + this->QOilCooler + this->QAuxiliary);
 
     if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
         // If Heat Recovery specified for this vapor compression chiller, then QCondenser will be adjusted by this subroutine
@@ -1167,7 +1211,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         PlantUtilities::SetComponentFlowRate(
             state, this->OilCoolerMassFlowRate, this->OilCoolerInletNode, this->OilCoolerOutletNode, this->OCPlantLoc);
         if (this->OilCoolerMassFlowRate != 0.0) {
-            oilCoolerDeltaTemp = lookupVariablesCooling.oil_cooler_heat / this->OilCoolerMassFlowRate / Cp;
+            oilCoolerDeltaTemp = this->QOilCooler / (this->OilCoolerMassFlowRate * Cp);
         } else {
             oilCoolerDeltaTemp = 0.0;
         }
@@ -1178,7 +1222,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         PlantUtilities::SetComponentFlowRate(
             state, this->AuxiliaryMassFlowRate, this->AuxiliaryHeatInletNode, this->AuxiliaryHeatOutletNode, this->AHPlantLoc);
         if (this->AuxiliaryMassFlowRate != 0.0) {
-            auxiliaryDeltaTemp = lookupVariablesCooling.auxiliary_heat / this->AuxiliaryMassFlowRate / Cp;
+            auxiliaryDeltaTemp = this->QAuxiliary / (this->AuxiliaryMassFlowRate * Cp);
         } else {
             auxiliaryDeltaTemp = 0.0;
         }
