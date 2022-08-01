@@ -753,7 +753,7 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
-                                "DISTRICTHEATING",
+                                "DISTRICTHEATINGWATER",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
                                 "Plant");
@@ -767,7 +767,7 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
-                                "DISTRICTHEATING",
+                                "DISTRICTHEATINGWATER",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
                                 "Plant");

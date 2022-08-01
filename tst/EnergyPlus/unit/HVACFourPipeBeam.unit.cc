@@ -1427,7 +1427,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
                           "  PlantEquipmentList,",
                           "    HeatSys1 Heating Plant,    !- Name",
-                          "    DistrictHeating,         !- Equipment 1 Object Type",
+                          "    DistrictHeatingWater,         !- Equipment 1 Object Type",
                           "    HeatSys1 Purchased Heating;!- Equipment 1 Name",
 
                           "  BranchList,",
@@ -1480,12 +1480,12 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
                           "  Branch,",
                           "    HeatSys1 Heating Branch,   !- Name",
                           "    ,                        !- Pressure Drop Curve Name",
-                          "    DistrictHeating,         !- Component 1 Object Type",
+                          "    DistrictHeatingWater,         !- Component 1 Object Type",
                           "    HeatSys1 Purchased Heating,!- Component 1 Name",
                           "    HeatSys1 Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
                           "    HeatSys1 Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
-                          "  DistrictHeating,",
+                          "  DistrictHeatingWater,",
                           "    HeatSys1 Purchased Heating,!- Name",
                           "    HeatSys1 Supply Heating Inlet Node,  !- Hot Water Inlet Node Name",
                           "    HeatSys1 Supply Heating Outlet Node,  !- Hot Water Outlet Node Name",
@@ -3006,7 +3006,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
 
                           "  PlantEquipmentList,",
                           "    HeatSys1 Heating Plant,    !- Name",
-                          "    DistrictHeating,         !- Equipment 1 Object Type",
+                          "    DistrictHeatingWater,         !- Equipment 1 Object Type",
                           "    HeatSys1 Purchased Heating;!- Equipment 1 Name",
 
                           "  BranchList,",
@@ -3059,12 +3059,12 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
                           "  Branch,",
                           "    HeatSys1 Heating Branch,   !- Name",
                           "    ,                        !- Pressure Drop Curve Name",
-                          "    DistrictHeating,         !- Component 1 Object Type",
+                          "    DistrictHeatingWater,         !- Component 1 Object Type",
                           "    HeatSys1 Purchased Heating,!- Component 1 Name",
                           "    HeatSys1 Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
                           "    HeatSys1 Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
-                          "  DistrictHeating,",
+                          "  DistrictHeatingWater,",
                           "    HeatSys1 Purchased Heating,!- Name",
                           "    HeatSys1 Supply Heating Inlet Node,  !- Hot Water Inlet Node Name",
                           "    HeatSys1 Supply Heating Outlet Node,  !- Hot Water Outlet Node Name",
@@ -4503,7 +4503,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
 
                           "  PlantEquipmentList,",
                           "    HeatSys1 Heating Plant,    !- Name",
-                          "    DistrictHeating,         !- Equipment 1 Object Type",
+                          "    DistrictHeatingWater,         !- Equipment 1 Object Type",
                           "    HeatSys1 Purchased Heating;!- Equipment 1 Name",
 
                           "  BranchList,",
@@ -4556,12 +4556,12 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
                           "  Branch,",
                           "    HeatSys1 Heating Branch,   !- Name",
                           "    ,                        !- Pressure Drop Curve Name",
-                          "    DistrictHeating,         !- Component 1 Object Type",
+                          "    DistrictHeatingWater,         !- Component 1 Object Type",
                           "    HeatSys1 Purchased Heating,!- Component 1 Name",
                           "    HeatSys1 Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
                           "    HeatSys1 Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
-                          "  DistrictHeating,",
+                          "  DistrictHeatingWater,",
                           "    HeatSys1 Purchased Heating,!- Name",
                           "    HeatSys1 Supply Heating Inlet Node,  !- Hot Water Inlet Node Name",
                           "    HeatSys1 Supply Heating Outlet Node,  !- Hot Water Outlet Node Name",

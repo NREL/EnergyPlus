@@ -1687,7 +1687,7 @@ namespace OutputProcessor {
             } else if (meterType == "DISTRICTCOOLING") {
                 OutResourceType = "DistrictCooling";
 
-            } else if (meterType == "DISTRICTHEATINGWater") {
+            } else if (meterType == "DISTRICTHEATINGWATER") {
                 OutResourceType = "DistrictHeatingWater";
 
             } else if (meterType == "DISTRICTHEATINGSTEAM") {

@@ -4110,7 +4110,8 @@ void LEEDtariffReporting(EnergyPlusData &state)
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity", elecTariffNames);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
         if (distCoolTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
-        if (distHeatWaterTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Water", distHeatWaterTariffNames);
+        if (distHeatWaterTotalEne != 0)
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Water", distHeatWaterTariffNames);
         if (distHeatSteamTotalEne != 0)
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Steam", distHeatSteamTariffNames);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Other", othrTariffNames);
@@ -4146,8 +4147,10 @@ void LEEDtariffReporting(EnergyPlusData &state)
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
         }
         if (distHeatWaterTotalEne != 0) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Water", distHeatWaterTotalCost / distHeatWaterTotalEne, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating Water", format("{}", convEneStrings(distHeatWaterUnits)));
+            PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Water", distHeatWaterTotalCost / distHeatWaterTotalEne, 3);
+            PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating Water", format("{}", convEneStrings(distHeatWaterUnits)));
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEtsDemUnt,
                              "District Heating Water",

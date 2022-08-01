@@ -233,7 +233,7 @@ namespace WaterThermalTanks {
                                                                                       "Steam",
                                                                                       "OtherFuel1",
                                                                                       "OtherFuel2",
-                                                                                      "DistrictHeating",
+                                                                                      "DistrictHeatingWater",
                                                                                       "DistrictHeatingSteam"};
 
     constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNamesUC{"ELECTRICITY",
@@ -247,7 +247,7 @@ namespace WaterThermalTanks {
                                                                                         "STEAM",
                                                                                         "OTHERFUEL1",
                                                                                         "OTHERFUEL2",
-                                                                                        "DISTRICTHEATING",
+                                                                                        "DISTRICTHEATINGWATER",
                                                                                         "DISTRICTHEATINGSTEAM"};
 
     enum class TankOperatingMode

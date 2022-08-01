@@ -138,7 +138,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   April 1998
     //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-    //                      June 2021, Dareum Nam, Add DistrictHeatingSteam
+    //                      June 2022, Dareum Nam, Add DistrictHeatingSteam
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -311,7 +311,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    October 1998
     //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-    //                      June 2021, Dareum Nam, Add DistrictHeatingSteam
+    //                      June 2022, Dareum Nam, Add DistrictHeatingSteam
     //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
 
     // PURPOSE OF THIS SUBROUTINE:
