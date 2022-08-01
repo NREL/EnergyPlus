@@ -261,3 +261,23 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_ProcessNumber)
     EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
     EXPECT_TRUE(expectedError);
 }
+
+TEST_F(EnergyPlusFixture, UtilityRoutines_isKeyRegexLike)
+{
+    std::vector<std::pair<std::string, bool>> test_cases{
+        {"*", false},
+        {"This is the first one", false},
+        {"This is another.*one", true},
+        {"This is (a|some) ones?", true},
+        {"Zone 1.1", true},   // The `.` could mean any character (though in this case it's not meant as a regex really)
+        {"Cafétéria", false}, // !std::isalnum, but not a regex
+    };
+
+    for (auto &[s, expectedIsRegexLike] : test_cases) {
+        EXPECT_EQ(expectedIsRegexLike, UtilityRoutines::isKeyRegexLike(s)) << "isKeyRegexLike: Failed for " << s;
+    }
+
+    for (auto &[s, expectedIsRegexLike] : test_cases) {
+        EXPECT_EQ(expectedIsRegexLike, UtilityRoutines::isKeyRegexLikeOri(s)) << "isKeyRegexLikeOri: Failed for " << s;
+    }
+}
