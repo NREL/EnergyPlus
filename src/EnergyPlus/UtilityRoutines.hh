@@ -626,7 +626,9 @@ namespace UtilityRoutines {
                                                    DataGlobalConstants::ResourceType &FuelTypeNum,
                                                    bool &FuelTypeErrorsFound);
 
+    // TODO: keep only one of these two
     bool isKeyRegexLike(std::string_view key);
+    bool isKeyRegexLikeOri(std::string_view key); // DataOutputs implementation
 
 } // namespace UtilityRoutines
 

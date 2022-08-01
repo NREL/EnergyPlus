@@ -136,17 +136,12 @@ Array1D_string const MonthlyNamedReports(NumMonthlyReports,
                                           "HEATEMISSIONSREPORTMONTHLY"});
 
 OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
-    : key(KeyValue), variableName(VariableName)
+    : key(KeyValue), variableName(VariableName), is_simple_string(!UtilityRoutines::isKeyRegexLikeOri(KeyValue))
 {
-    if (KeyValue == "*") return;
 
-    // TODO: use the new UtilityRoutines::isKeyRegexLike
-    for (auto const &c : KeyValue) {
-        if (c == ' ' || c == '_' || std::isalnum(c)) continue;
-        is_simple_string = false;
-        break;
+    if (is_simple_string) {
+        return;
     }
-    if (is_simple_string) return;
     pattern = std::make_shared<RE2>(KeyValue);
     case_insensitive_pattern = std::make_shared<RE2>("(?i)" + KeyValue);
     if (!pattern->ok()) {
