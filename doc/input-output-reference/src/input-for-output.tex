@@ -739,14 +739,6 @@ EnvironmentalImpactFactors,
 
 This is the name of the Fuel that is being described with this object. Source to Site conversion factors for each tool are entered with these objects. Allowable Fuel Types are:~ Electricity, NaturalGas, FuelOilNo1, FuelOilNo2, Coal, Gasoline, Propane, Diesel, OtherFuel1, OtherFuel2.
 
-\paragraph{Field: Units of Measure}\label{field-units-of-measure}
-
-Units in mass with kg or by volume in m3.
-
-\paragraph{Field: Energy per Unit Factor}\label{field-energy-per-unit-factor}
-
-The higher heating value of the fuel type.
-
 \paragraph{Field: Source Energy Factor}\label{field-source-energy-factor}
 
 Multiplied by the fuel consumption to compute the source energy contribution for the fuel. If a schedule is also specified in the next field, the value specified here, the schedule value, and the fuel consumption are multiplied together for each timestep to determine the source energy contribution for the fuel. If the multipliers in the schedule specified in the next field fully represent the source energy conversion factor, the value in this field should be set to one. If the TDV files (described in next field) are used the value should be 0.293 for electricity and 0.01 for natural gas to account for the units used in the files. Units of J/J.
@@ -894,8 +886,6 @@ An example of specifying in the IDF:
 \begin{lstlisting}
 FuelFactors,          !  USA national average based on eGRID, EIA 1605
   Electricity,        !- Existing Fuel Resource Name
-  kg,                 !- Units of Measure (kg or m3)
-  ,                   !- Energy per Unit Factor
   2.253,              !- Source Energy Factor {J/J}
   ,                   !- Source Energy Schedule Name
   168.33317,          !- CO2 Emission Factor {g/MJ}
