@@ -5281,9 +5281,12 @@ void WriteTabularReports(EnergyPlusData &state)
         WriteLoadComponentSummaryTables(state);
         WriteHeatEmissionTable(state);
 
-        if (ort->displayThermalResilienceSummary) WriteThermalResilienceTables(state);
-        if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
-        if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
+        if (ort->displayThermalResilienceSummary && !state.dataGlobal->DoPureLoadCalc) // code will crash if pure load calc
+            WriteThermalResilienceTables(state);                                       // code will crash if pure load calc
+        if (ort->displayCO2ResilienceSummary && !state.dataGlobal->DoPureLoadCalc)     // code will crash if pure load calc
+            WriteCO2ResilienceTables(state);                                           // code will crash if pure load calc
+        if (ort->displayVisualResilienceSummary && !state.dataGlobal->DoPureLoadCalc)  // code will crash if pure load calc
+            WriteVisualResilienceTables(state);                                        // code will crash if pure load calc
 
         state.dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(
             state);                   // call to write out the coil selection summary table data
@@ -6326,10 +6329,9 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
 
             // air loop name
             std::string airLoopName = "";
-            int ctrlZoneNum = Zone(iZone).ZoneEqNum;
-            if (ctrlZoneNum > 0) {
-                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
-                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+            if (Zone(iZone).IsControlled) {
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(iZone).NumInletNodes; ++zoneInNode) {
+                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(iZone).InletNodeAirLoopNum(zoneInNode);
                     if (airLoopNumber > 0) {
                         if (airLoopName.empty()) {
                             airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
@@ -14523,30 +14525,39 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                         CombineLoadCompResults(AirLoopHeatCompLoadTables(iAirLoop), AirLoopZonesHeatCompLoadTables(iZone), mult);
                     }
                 }
+                auto &airLoopCoolTable = AirLoopCoolCompLoadTables(iAirLoop);
+                auto &airLoopHeatTable = AirLoopHeatCompLoadTables(iAirLoop);
+                auto &finalSysSizing = FinalSysSizing(iAirLoop);
+                for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum != iAirLoop) continue;
+                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
+                        airLoopCoolTable.peakDesSensLoad = finalSysSizing.SysCoolCoinSpaceSens;
+                        airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
+                        airLoopHeatTable.peakDesSensLoad = -finalSysSizing.SysHeatCoinSpaceSens;
+                        airLoopHeatTable.designPeakLoad = -finalSysSizing.SysDesHeatLoad;
+                        airLoopCoolTable.diffPeakEst = airLoopCoolTable.peakDesSensLoad - airLoopCoolTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopCoolTable.designPeakLoad - airLoopCoolTable.peakDesSensLoad;
+                        airLoopHeatTable.diffPeakEst = airLoopHeatTable.peakDesSensLoad - airLoopHeatTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopHeatTable.designPeakLoad - airLoopHeatTable.peakDesSensLoad;
+                    }
+                }
+                ComputeEngineeringChecks(airLoopCoolTable);
+                ComputeEngineeringChecks(airLoopHeatTable);
 
-                ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
+                AddTotalRowsForLoadSummary(airLoopCoolTable);
+                AddTotalRowsForLoadSummary(airLoopHeatTable);
 
-                AddTotalRowsForLoadSummary(AirLoopCoolCompLoadTables(iAirLoop));
-                AddTotalRowsForLoadSummary(AirLoopHeatCompLoadTables(iAirLoop));
+                ComputePeakDifference(airLoopCoolTable);
+                ComputePeakDifference(airLoopHeatTable);
 
-                ComputePeakDifference(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputePeakDifference(AirLoopHeatCompLoadTables(iAirLoop));
+                CreateListOfZonesForAirLoop(state, airLoopCoolTable, zoneToAirLoopCool, iAirLoop);
+                CreateListOfZonesForAirLoop(state, airLoopHeatTable, zoneToAirLoopHeat, iAirLoop);
 
-                CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
-                CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
+                LoadSummaryUnitConversion(state, airLoopCoolTable, unitsStyle_cur);
+                LoadSummaryUnitConversion(state, airLoopHeatTable, unitsStyle_cur);
 
-                LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_cur);
-                LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
-
-                OutputCompLoadSummary(state,
-                                      OutputType::AirLoop,
-                                      AirLoopCoolCompLoadTables(iAirLoop),
-                                      AirLoopHeatCompLoadTables(iAirLoop),
-                                      iAirLoop,
-                                      unitsStyle_cur,
-                                      produceTabular,
-                                      produceSQLite);
+                OutputCompLoadSummary(
+                    state, OutputType::AirLoop, airLoopCoolTable, airLoopHeatTable, iAirLoop, unitsStyle_cur, produceTabular, produceSQLite);
             }
         }
 
@@ -14637,6 +14648,26 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
                 FacilityZonesHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
                 CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
+            }
+
+            auto &facilityCoolTable = FacilityCoolCompLoadTables;
+            auto &facilityHeatTable = FacilityHeatCompLoadTables;
+            facilityCoolTable.peakDesSensLoad = 0.0;
+            facilityCoolTable.designPeakLoad = 0.0;
+            facilityHeatTable.peakDesSensLoad = 0.0;
+            facilityHeatTable.designPeakLoad = 0.0;
+            facilityCoolTable.diffPeakEst = 0.0;
+            facilityHeatTable.diffPeakEst = 0.0;
+            facilityCoolTable.diffDesignPeak = 0.0;
+            for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
+                facilityCoolTable.peakDesSensLoad += AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityCoolTable.designPeakLoad += AirLoopCoolCompLoadTables(iAirLoop).designPeakLoad;
+                facilityHeatTable.peakDesSensLoad += AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityHeatTable.designPeakLoad += AirLoopHeatCompLoadTables(iAirLoop).designPeakLoad;
+                facilityCoolTable.diffPeakEst += AirLoopCoolCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopCoolCompLoadTables(iAirLoop).diffDesignPeak;
+                facilityHeatTable.diffPeakEst += AirLoopHeatCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopHeatCompLoadTables(iAirLoop).diffDesignPeak;
             }
 
             ComputeEngineeringChecks(FacilityCoolCompLoadTables);

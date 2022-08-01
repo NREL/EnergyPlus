@@ -1986,10 +1986,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
                 bool FoundInletNode = false;
                 bool FoundOutletNode = false;
-                int ZoneNum;
-                for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                    if (HPWH.AmbientTempZone == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum) break;
-                }
+                int ZoneNum = HPWH.AmbientTempZone;
                 if (ZoneNum <= state.dataGlobal->NumOfZones) {
                     for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++SupAirIn) {
                         if (HPWH.HeatPumpAirOutletNode != state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(SupAirIn)) continue;
@@ -4358,67 +4355,47 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataZoneEquip->ZoneEquipList)) {
                             bool FoundTankInList = false;
                             bool TankNotLowestPriority = false;
-                            for (int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                                if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != HPWH.AmbientTempZone) continue;
-                                if (ZoneEquipConfigNum <= state.dataGlobal->NumOfZones) {
-                                    for (int ZoneEquipListNum = 1; ZoneEquipListNum <= state.dataGlobal->NumOfZones; ++ZoneEquipListNum) {
-                                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).EquipListName !=
-                                            state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).Name)
-                                            continue;
-                                        int TankCoolingPriority = 0;
-                                        int TankHeatingPriority = 0;
-                                        if (ZoneEquipConfigNum <= state.dataGlobal->NumOfZones) {
-                                            for (int EquipmentTypeNum = 1;
-                                                 EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
-                                                 ++EquipmentTypeNum) {
-                                                if (state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipName(EquipmentTypeNum) != HPWH.Name)
-                                                    continue;
-                                                FoundTankInList = true;
-                                                TankCoolingPriority =
-                                                    state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum);
-                                                TankHeatingPriority =
-                                                    state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum);
-                                                break;
-                                            } // EquipmentTypeNum
-                                            if (!FoundTankInList) {
-                                                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                                                ShowContinueError(state,
-                                                                  "Heat pump water heater type and name must be listed in the correct "
-                                                                  "ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to "
-                                                                  "ZoneAirOnly or ZoneAndOutdoorAir.");
-                                                ErrorsFound = true;
-                                            }
-                                            //                     check that tank has lower priority than all other non-HPWH objects in Zone
-                                            //                     Equipment List
-                                            for (int EquipmentTypeNum = 1;
-                                                 EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
-                                                 ++EquipmentTypeNum) {
-                                                if (UtilityRoutines::SameString(
-                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipType(EquipmentTypeNum),
-                                                        state.dataIPShortCut->cCurrentModuleObject))
-                                                    continue;
-                                                if (TankCoolingPriority >
-                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum) ||
-                                                    TankHeatingPriority >
-                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum)) {
-                                                    TankNotLowestPriority = true;
-                                                }
-                                            } // EquipmentTypeNum
-                                            if (TankNotLowestPriority && FoundTankInList) {
-                                                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                                                ShowContinueError(state,
-                                                                  "Heat pump water heaters should be simulated first, before other space "
-                                                                  "conditioning equipment.");
-                                                ShowContinueError(state,
-                                                                  "Poor temperature control may result if the Heating/Cooling sequence number is "
-                                                                  "not 1 in the ZoneHVAC:EquipmentList.");
-                                            }
-                                            break;
-                                        } // ZoneEquipConfigNum .LE. NumOfZoneEquipLists
-                                    }     // ZoneEquipListNum
-                                    break;
-                                } // ZoneEquipConfigNum .LE. NumOfZones
-                            }     // ZoneEquipConfigNum
+                            int ZoneEquipConfigNum = HPWH.AmbientTempZone;
+                            int ZoneEquipListNum = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).EquipListIndex;
+                            int TankCoolingPriority = 0;
+                            int TankHeatingPriority = 0;
+                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
+                                 ++EquipmentTypeNum) {
+                                if (state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipName(EquipmentTypeNum) != HPWH.Name) continue;
+                                FoundTankInList = true;
+                                TankCoolingPriority = state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum);
+                                TankHeatingPriority = state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum);
+                                break;
+                            } // EquipmentTypeNum
+                            if (!FoundTankInList) {
+                                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                                ShowContinueError(state,
+                                                  "Heat pump water heater type and name must be listed in the correct "
+                                                  "ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to "
+                                                  "ZoneAirOnly or ZoneAndOutdoorAir.");
+                                ErrorsFound = true;
+                            }
+                            //                     check that tank has lower priority than all other non-HPWH objects in Zone
+                            //                     Equipment List
+                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
+                                 ++EquipmentTypeNum) {
+                                if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipType(EquipmentTypeNum),
+                                                                state.dataIPShortCut->cCurrentModuleObject))
+                                    continue;
+                                if (TankCoolingPriority > state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum) ||
+                                    TankHeatingPriority > state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum)) {
+                                    TankNotLowestPriority = true;
+                                }
+                            } // EquipmentTypeNum
+                            if (TankNotLowestPriority && FoundTankInList) {
+                                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
+                                ShowContinueError(state,
+                                                  "Heat pump water heaters should be simulated first, before other space "
+                                                  "conditioning equipment.");
+                                ShowContinueError(state,
+                                                  "Poor temperature control may result if the Heating/Cooling sequence number is "
+                                                  "not 1 in the ZoneHVAC:EquipmentList.");
+                            }
                         } else {
                             ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
                             ShowContinueError(state,

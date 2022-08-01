@@ -1137,6 +1137,25 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         } else {
             if (vrf.CoolEIRFPLR1 > 0) EIRFPLRModFac = CurveValue(state, vrf.CoolEIRFPLR1, max(vrf.MinPLR, CoolingPLR));
         }
+
+        if (EIRFPLRModFac < 0.0) {
+            if (vrf.CoolEIRFPLRErrorIndex == 0) {
+                ShowSevereMessage(state, fmt::format("{} \"{}\":", std::string(cVRFTypes(VRF_HeatPump)), vrf.Name));
+                ShowContinueError(state, format(" Cooling EIR Modifier curve (function of PLR) output is negative ({:.3T}).", EIRFPLRModFac));
+                ShowContinueError(state, format(" Negative value occurs using a cooling Part Load Ratio (PLR) of {:.2T}.", CoolingPLR));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            }
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                fmt::format("{} \"{}\": Cooling EIR Modifier curve (function of PLR) output is negative warning continues...",
+                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                            vrf.Name),
+                vrf.CoolEIRFPLRErrorIndex,
+                EIRFPLRModFac,
+                EIRFPLRModFac);
+            EIRFPLRModFac = 0.0;
+        }
+
         // find part load fraction to calculate RTF
         if (vrf.CoolPLFFPLR > 0) {
             PartLoadFraction = max(0.7, CurveValue(state, vrf.CoolPLFFPLR, CyclingRatio));
@@ -1154,6 +1173,25 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         } else {
             if (vrf.HeatEIRFPLR1 > 0) EIRFPLRModFac = CurveValue(state, vrf.HeatEIRFPLR1, max(vrf.MinPLR, HeatingPLR));
         }
+
+        if (EIRFPLRModFac < 0.0) {
+            if (vrf.HeatEIRFPLRErrorIndex == 0) {
+                ShowSevereMessage(state, fmt::format("{} \"{}\":", std::string(cVRFTypes(VRF_HeatPump)), vrf.Name));
+                ShowContinueError(state, format(" Heating EIR Modifier curve (function of PLR) output is negative ({:.3T}).", EIRFPLRModFac));
+                ShowContinueError(state, format(" Negative value occurs using a heating Part Load Ratio (PLR) of {:.2T}.", HeatingPLR));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            }
+            ShowRecurringWarningErrorAtEnd(
+                state,
+                fmt::format("{} \"{}\": Heating EIR Modifier curve (function of PLR) output is negative warning continues...",
+                            PlantEquipTypeNames[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                            vrf.Name),
+                vrf.HeatEIRFPLRErrorIndex,
+                EIRFPLRModFac,
+                EIRFPLRModFac);
+            EIRFPLRModFac = 0.0;
+        }
+
         // find part load fraction to calculate RTF
         if (vrf.HeatPLFFPLR > 0) {
             PartLoadFraction = max(0.7, CurveValue(state, vrf.HeatPLFFPLR, CyclingRatio));
@@ -6099,39 +6137,33 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode =
                                             state.dataZoneEquip->ZoneEquipConfig(state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum).ZoneNode;
-                                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum !=
+                                        int ControlledZoneNum = state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum;
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
                                                 state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                 continue;
-                                            for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
-                                                    state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
-                                                    continue;
-                                                state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
-                                                    TUIndex;
-                                                AirNodeFound = true;
-                                                ctrlZoneNum = ControlledZoneNum;
-                                                goto EquipList_exit;
-                                            }
-                                            for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones;
-                                                 ++TstatZoneNum) {
-                                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
-                                                    state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
-                                                    continue;
-                                                state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
-                                                    TUIndex;
-                                                AirNodeFound = true;
-                                                ctrlZoneNum = ControlledZoneNum;
-                                                goto EquipList_exit;
-                                            }
-                                            if (!AirNodeFound && state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
-                                                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                                ShowContinueError(state,
-                                                                  "Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
-                                                // ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " +
-                                                // loc_controlZoneName);
-                                                errorsFound = true;
-                                            }
+                                            state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
+                                                TUIndex;
+                                            AirNodeFound = true;
+                                            ctrlZoneNum = ControlledZoneNum;
+                                            goto EquipList_exit;
+                                        }
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                            if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
+                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
+                                                continue;
+                                            state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex =
+                                                TUIndex;
+                                            AirNodeFound = true;
+                                            ctrlZoneNum = ControlledZoneNum;
+                                            goto EquipList_exit;
+                                        }
+                                        if (!AirNodeFound && state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
+                                            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                                            ShowContinueError(state, "Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                                            // ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " +
+                                            // loc_controlZoneName);
+                                            errorsFound = true;
                                         }
                                     } else if (AirLoopFound) { // control zone name not entered in TU object input
                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).isSetPointControlled = true;
