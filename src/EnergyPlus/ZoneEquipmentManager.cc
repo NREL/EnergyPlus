@@ -1942,29 +1942,29 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 calcZoneSizing.LatentCoolFlowSeq = state.dataZoneEquipmentManager->AvgData;
             }
             state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.CoolLatentLoadNoDOASSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.CoolLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.HeatLatentLoadNoDOASSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.HeatLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.CoolLoadNoDOASSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.CoolLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.HeatLoadNoDOASSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.HeatLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
+            MovingAvg(calcZoneSizing.CoolLatentLoadNoDOASSeq,
+                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
+                      state.dataSize->NumTimeStepsInAvg,
+                      state.dataZoneEquipmentManager->AvgData);
+            calcZoneSizing.CoolLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
+            state.dataZoneEquipmentManager->AvgData = 0.0;
+            MovingAvg(calcZoneSizing.HeatLatentLoadNoDOASSeq,
+                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
+                      state.dataSize->NumTimeStepsInAvg,
+                      state.dataZoneEquipmentManager->AvgData);
+            calcZoneSizing.HeatLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
+            state.dataZoneEquipmentManager->AvgData = 0.0;
+            MovingAvg(calcZoneSizing.CoolLoadNoDOASSeq,
+                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
+                      state.dataSize->NumTimeStepsInAvg,
+                      state.dataZoneEquipmentManager->AvgData);
+            calcZoneSizing.CoolLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
+            state.dataZoneEquipmentManager->AvgData = 0.0;
+            MovingAvg(calcZoneSizing.HeatLoadNoDOASSeq,
+                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
+                      state.dataSize->NumTimeStepsInAvg,
+                      state.dataZoneEquipmentManager->AvgData);
+            calcZoneSizing.HeatLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
         }
 
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
@@ -2553,14 +2553,6 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                     }
                 }
             }
-            if (calcFinalZoneSizing.DesLatentHeatLoadNoDOAS == 0) {
-                // need to do similar as above
-                // also need design data specific to each peak time step (e.g., CoolLoad, CoolLoadNoDOAS, etc)
-                // or figure out a way to get design data specific to the user choice of sizing (e.g., sensible, latent, etc.)
-            }
-            if (calcFinalZoneSizing.DesLatentCoolLoadNoDOAS == 0) {
-            }
-            // where to correctly address the DOAS variables since those could peak at their own time
         }
     } break;
     case DataGlobalConstants::CallIndicator::EndZoneSizingCalc: {
