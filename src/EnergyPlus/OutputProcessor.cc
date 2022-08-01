@@ -589,10 +589,11 @@ namespace OutputProcessor {
                 reqRepVar.case_insensitive_pattern = std::make_shared<RE2>("(?i)" + reqRepVar.Key);
             }
 
-            // TODO: trim any resulting trailing whitespace?
             std::string::size_type const lbpos = index(cAlphaArgs(2), '['); // Remove Units designation if user put it in
             if (lbpos != std::string::npos) {
                 cAlphaArgs(2).erase(lbpos);
+                // right trim
+                cAlphaArgs(2) = cAlphaArgs(2).substr(0, std::min(cAlphaArgs(2).find_last_not_of(" \f\n\r\t\v") + 1, cAlphaArgs(2).size()));
             }
             reqRepVar.VarName = cAlphaArgs(2);
 
