@@ -131,6 +131,7 @@ namespace DXCoils {
         Array1D<Real64> RatedAirVolFlowRateEMSOverrideValue; // value to use for EMS override Air volume flow rate
         Array1D<Real64> FanPowerPerEvapAirFlowRate;          // Fan Power Per Air volume flow rate through the
         // Evaporator coil at rated conditions [W/(m3/s)]
+        Array1D<Real64> FanPowerPerEvapAirFlowRate_2023; 
         Array1D<Real64> RatedAirMassFlowRate; // Air mass flow rate through coil at rated conditions [kg/s]
         // This is adjusted for bypassed air if any (see BypassedFlowFrac)
         Array1D<Real64> BypassedFlowFrac; // Fraction of air flow bypassed around coil
@@ -375,6 +376,7 @@ namespace DXCoils {
         Array1D<Real64> MSMaxONOFFCyclesperHour;      // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
         Array1D<Real64> MSLatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
         Array1D<Real64> MSFanPowerPerEvapAirFlowRate;
+        Array1D<Real64> MSFanPowerPerEvapAirFlowRate_2023; 
         Real64 FuelUsed;         // Energy used, in addition to electricity [W]
         Real64 FuelConsumed;     // Energy consumed, in addition to electricity [J]
         Real64 MSFuelWasteHeat;  // Total waste heat [J]
@@ -452,7 +454,8 @@ namespace DXCoils {
               RatedTotCapEMSOverrideValue(MaxModes, 0.0), RatedSHR(MaxModes, 0.0), RatedSHREMSOverrideOn(MaxModes, false),
               RatedSHREMSOverrideValue(MaxModes, 0.0), RatedCOP(MaxModes, 0.0), RatedAirVolFlowRate(MaxModes, 0.0),
               RatedAirVolFlowRateEMSOverrideON(MaxModes, false), RatedAirVolFlowRateEMSOverrideValue(MaxModes, 0.0),
-              FanPowerPerEvapAirFlowRate(MaxModes, 0.0), RatedAirMassFlowRate(MaxModes, 0.0), BypassedFlowFrac(MaxModes, 0.0),
+              FanPowerPerEvapAirFlowRate(MaxModes, 0.0), FanPowerPerEvapAirFlowRate_2023(MaxModes, 0.0), RatedAirMassFlowRate(MaxModes, 0.0),
+              BypassedFlowFrac(MaxModes, 0.0),
               RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0), CCapFFlow(MaxModes, 0),
               CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0), EIRFFlow(MaxModes, 0), EIRFFlowErrorIndex(0),
               PLFFPLR(MaxModes, 0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
@@ -559,6 +562,7 @@ namespace DXCoils {
                             int const FanOpMode // allows parent object to control fan mode
     );
 
+    //TODO: Add New Property for AHRI 2023 Standard & Modify Numeric Fields (increment) 
     void GetDXCoils(EnergyPlusData &state);
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current DX coil unit being simulated

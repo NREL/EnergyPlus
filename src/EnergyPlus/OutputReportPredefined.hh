@@ -272,6 +272,17 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXCoolCoilSEERStandardIP = 0; // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     int pdchDXCoolCoilEERIP = 0;          // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     int pdchDXCoolCoilIEERIP = 0;         // IEER value in IP unit at AHRI std. 340/360 conditions
+ 
+    // DX Cooling Coil SEER2 subtable | AHRI std. 210/240 2023 conditions
+    int pdstDXCoolCoil_2023 = 0;
+    int pdchDXCoolCoilType_2023 = 0;        // DX cooling coil type
+    int pdchDXCoolCoilNetCapSI_2023 = 0;    // Standard Rated (Net) Cooling Capacity [W]
+    int pdchDXCoolCoilCOP_2023 = 0;         // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
+    int pdchDXCoolCoilSEER2UserIP_2023 = 0; // SEER2 value in IP unit at AHRI std. 210/240 2023 conditions and user PLF curve [Btu/W-hr]
+    int pdchDXCoolCoilSEER2StandardIP_2023 =
+        0;                             // SEER2 value in IP unit at AHRI std. 210/240 2023 conditions and default PLF curve and C_D value [Btu/W-hr]
+    int pdchDXCoolCoilEERIP_2023 = 0;  // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
+    int pdchDXCoolCoilIEERIP_2023 = 0; // IEER value in IP unit at AHRI std. 340/360 conditions
 
     // DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
     int pdstDXCoolCoil2 = 0;
@@ -303,6 +314,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchVAVDXCoolCoilEER_D_IP = 0;
     int pdchVAVDXCoolCoilMdotD = 0;
 
+    // TODO: As not inlcuded in clearState() , Confirm and update
     // DX Heating Coil subtable
     int pdstDXHeatCoil;
     int pdchDXHeatCoilType; // DX Heating coil type
@@ -311,6 +323,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilHSPFSI;    // HSPF value in SI unit at AHRI std. 340/360 conditions [W/W]
     int pdchDXHeatCoilHSPFIP;    // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
     int pdchDXHeatCoilRegionNum; // Region number for which HSPF is calculated
+
+    // TODO: As not inlcuded in clearState() , Confirm and update
+    // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
+    int pdstDXHeatCoil_2023;
+    int pdchDXHeatCoilType_2023; // DX Heating coil type
+    int pdchDXHeatCoilHighCap_2023;
+    int pdchDXHeatCoilLowCap_2023;
+    int pdchDXHeatCoilHSPF2SI_2023;   // HSPF2 value in SI unit at AHRI std. 340/360 conditions [W/W]
+    int pdchDXHeatCoilHSPF2IP_2023;   // HSPF2 value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
+    int pdchDXHeatCoilRegionNum_2023; // Region number for which HSPF is calculated
 
     // Heating Coil subtable
     int pdstHeatCoil = 0;
@@ -1287,6 +1309,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchDXCoolCoilSEERStandardIP = 0;
         this->pdchDXCoolCoilEERIP = 0;
         this->pdchDXCoolCoilIEERIP = 0;
+        // Start : SEER2 ANSI/AHRI 210/240 Standard 2023
+        this->pdstDXCoolCoil_2023 = 0;
+        this->pdchDXCoolCoilType_2023 = 0;
+        this->pdchDXCoolCoilNetCapSI_2023 = 0;
+        this->pdchDXCoolCoilCOP_2023 = 0;
+        this->pdchDXCoolCoilSEER2UserIP_2023 = 0;
+        this->pdchDXCoolCoilSEER2StandardIP_2023 = 0;
+        this->pdchDXCoolCoilEERIP_2023 = 0;
+        this->pdchDXCoolCoilIEERIP_2023 = 0;
+        // End
         this->pdstDXCoolCoil2 = 0;
         this->pdchDXCoolCoilNetCapSIA = 0;
         this->pdchDXCoolCoilElecPowerA = 0;
