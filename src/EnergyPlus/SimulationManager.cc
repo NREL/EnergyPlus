@@ -250,6 +250,12 @@ namespace SimulationManager {
         }
         bool Available = true; // an environment is available to process
 
+        if (state.dataGlobal->DoPureLoadCalc) {
+            state.dataGlobal->DoOutputReporting = true;
+            Available = false;
+            state.dataOutRptTab->WriteTabularFiles = true;
+        }
+
         if (state.dataBranchInputManager->InvalidBranchDefinitions) {
             ShowFatalError(state, "Preceding error(s) in Branch Input cause termination.");
         }
@@ -307,7 +313,7 @@ namespace SimulationManager {
             MixedAir::CheckControllerLists(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
-            if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) {
+            if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoPureLoadCalc) {
                 ReportLoopConnections(state);
                 SystemReports::ReportAirLoopConnections(state);
                 ReportNodeConnections(state);
@@ -343,9 +349,10 @@ namespace SimulationManager {
             ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
-        ShowMessage(state, "Beginning Simulation");
-        DisplayString(state, "Beginning Primary Simulation");
-
+        if (!state.dataGlobal->DoPureLoadCalc) {
+            ShowMessage(state, "Beginning Simulation");
+            DisplayString(state, "Beginning Primary Simulation");
+        }
         ResetEnvironmentCounter(state);
 
         int EnvCount = 0;
@@ -519,6 +526,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         state.dataGlobal->WarmupFlag = false;
+
         if (!SimsDone && state.dataGlobal->DoDesDaySim) {
             if ((state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
                 ShowWarningError(state,
@@ -1047,6 +1055,11 @@ namespace SimulationManager {
             state.dataGlobal->DoWeathSim = true;
         }
 
+        if ((!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim && !state.dataGlobal->DoHVACSizingSimulation) &&
+            (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing)) {
+            state.dataGlobal->DoPureLoadCalc = true;
+        }
+
         CurrentModuleObject = "PerformancePrecisionTradeoffs";
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -1544,7 +1557,7 @@ namespace SimulationManager {
                       state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
                       state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
 
-        if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
+        if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoPureLoadCalc) && SimPeriods) {
             ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
