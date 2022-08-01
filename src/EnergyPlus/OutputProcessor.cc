@@ -336,9 +336,6 @@ namespace OutputProcessor {
                 }
             }
 
-            // bool Dup = std::find_if(std::cbegin(op->ReportList), std::cend(op->ReportList), [&reqRepVar, &op](int idx) {
-            //                return (op->ReqRepVars(idx).frequency == reqRepVar.frequency) && (op->ReqRepVars(idx).SchedPtr == reqRepVar.SchedPtr);
-            //            }) == std::cend(op->ReportList);
             if (!Dup) {
                 ++op->NumExtraVars;
                 if (op->NumExtraVars == op->NumReportList) {
