@@ -580,7 +580,7 @@ namespace OutputProcessor {
                 reqRepVar.Key = std::string();
             }
 
-            bool is_simple_string = !UtilityRoutines::isKeyRegexLike(reqRepVar.Key);
+            bool is_simple_string = !DataOutputs::isKeyRegexLike(reqRepVar.Key);
             reqRepVar.is_simple_string = is_simple_string;
             if (!is_simple_string) {
                 reqRepVar.case_insensitive_pattern = std::make_shared<RE2>("(?i)" + reqRepVar.Key);

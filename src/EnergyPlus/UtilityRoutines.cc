@@ -611,33 +611,6 @@ namespace UtilityRoutines {
         return calctime;
     }
 
-    bool isKeyRegexLike(std::string_view key)
-    {
-        if (key == "*") {
-            return false;
-        }
-
-        return key.find_first_of("*+?()|[]\\.") != std::string_view::npos;
-    }
-
-    bool isKeyRegexLikeOri(std::string_view key)
-    {
-        // DataOutputs does it like this
-        if (key == "*") {
-            return false;
-        }
-
-        bool is_simple_string = true;
-        for (auto const &c : key) {
-            if (c == ' ' || c == '_' || (std::isalnum(c) != 0)) {
-                continue;
-            }
-            is_simple_string = false;
-            break;
-        }
-        return !is_simple_string;
-    }
-
 } // namespace UtilityRoutines
 
 int AbortEnergyPlus(EnergyPlusData &state)

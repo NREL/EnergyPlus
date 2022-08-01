@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -6067,6 +6068,27 @@ namespace OutputProcessor {
                                    "\"Output:Meter\". Will report to both bar.eso and bar.mtr"});
         compare_err_stream(errMsg);
     }
+
+    TEST_F(EnergyPlusFixture, DataOutputs_isKeyRegexLike)
+    {
+        std::vector<std::pair<std::string, bool>> test_cases{
+            {"*", false},
+            {"This is the first one", false},
+            {"This is another.*one", true},
+            {"This is (a|some) ones?", true},
+            {"Zone 1.1", true},   // The `.` could mean any character (though in this case it's not meant as a regex really)
+            {"Cafétéria", false}, // !std::isalnum, but not a regex
+        };
+
+        for (auto &[s, expectedIsRegexLike] : test_cases) {
+            EXPECT_EQ(expectedIsRegexLike, DataOutputs::isKeyRegexLike(s)) << "isKeyRegexLike: Failed for " << s;
+        }
+
+        for (auto &[s, expectedIsRegexLike] : test_cases) {
+            EXPECT_EQ(expectedIsRegexLike, DataOutputs::isKeyRegexLikeOri(s)) << "isKeyRegexLikeOri: Failed for " << s;
+        }
+    }
+
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus
