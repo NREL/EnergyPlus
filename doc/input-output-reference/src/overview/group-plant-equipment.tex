@@ -1408,6 +1408,172 @@ HeatRecovery:
 
 These chiller output variables are defined above under ``Generic Chiller Outputs.''
 
+\subsection{Chiller:Electric:ASHRAE205}\label{chillerelectricashrae205}
+
+This chiller model utilizes performance data as described in ASHRAE Standard 205. The standard defines many common data models and serialization formats for facility equipment performance data.
+
+\subsubsection{Inputs}\label{}
+
+\paragraph{Field: Name}\label{}
+
+This alpha field contains the identifying name for the electric EIR chiller.
+
+\paragraph{Field: Representation File Name}\label{field-chiller205-representation-file-name}
+
+This alpha field contains the filename of the ASHRAE205 chiller representation (.json or .cbor).
+
+\paragraph{Field: Rated Capacity}\label{field-chiller205-rated-capacity}
+
+This numeric field is not yet implemented or reserved for future use. Full load capacity at AHRI 550/590 test conditions.
+
+\paragraph{Field: Sizing Factor}\label{field-chiller205-sizing-factor}
+
+This numeric field is not yet implemented or reserved for future use. Multiplies the autosized capacity and flow rates.
+
+\paragraph{Field: Ambient Temperature Indicator}\label{field-chiller205-ambient-temperature-indicator}
+
+This alpha field is used to determine standby losses.
+
+\paragraph{Field: Ambient Temperature Schedule Name}\label{field-chiller205-ambient-temperature-schedule-name}
+
+\paragraph{Field: Ambient Temperature Zone Name}\label{field-chiller205-ambient-temperature-zone-name}
+
+Any energy imbalance on the chiller results in heat added to this zone.
+
+\paragraph{Field: Ambient Temperature Outdoor Air Node Name}\label{field-chiller205-ambient-temperature-outdoor-air-node-name}
+
+\paragraph{Field: Chilled Water Inlet Node Name}\label{field-chiller205-chilled-water-inlet-node-name}
+
+This required alpha field contains the identifying name for the chiller plant side (chilled water) inlet node.
+
+\paragraph{Field: Chilled Water Outlet Node Name}\label{field-chiller205-chilled-water-outlet-node-name}
+
+This required alpha field contains the identifying name for the chiller plant side (chilled water) outlet node.
+
+\paragraph{Field: Chilled Water Maximum Requested Flow Rate}\label{field-chiller205-chilled-water-maximum-requested-flow-rate}
+
+\paragraph{Field: Condenser Inlet Node Name}\label{field-chiller205-condenser-inlet-node-name}
+
+This alpha field contains the identifying name for the chiller condenser side inlet node.
+
+\paragraph{Field: Condenser Outlet Node Name}\label{field-chiller205-condenser-outlet-node-name}
+
+This alpha field contains the identifying name for the chiller condenser side outlet node.
+
+\paragraph{Field: Condenser Maximum Requested Flow Rate}\label{field-chiller205-condenser-maximum-requested-flow-rate}
+
+\paragraph{Field: Chiller Flow Mode}\label{field-chiller205-chiller-flow-mode}
+
+This choice field determines how the chiller operates with respect to the intended fluid flow through the device's evaporator.~ There are three different choices for specifying operating modes for the intended flow behavior:~ ``NotModulated,'' ``ConstantFlow,'' and ``LeavingSetpointModulated.''~ NotModulated is useful for either variable or constant speed pumping arrangements where the chiller is passive in the sense that although it makes a nominal request for its design flow rate it can operate at varying flow rates.~ ConstantFlow is useful for constant speed pumping arrangements where the chiller's request for flow is stricter and can increase the overall loop flow.~ LeavingSetpointModulated changes the chiller model to internally vary the flow rate so that the temperature leaving the chiller matches a setpoint.~ In all cases the operation of the external plant system can also impact the flow through the chiller -- for example if the relative sizes and operation are such that flow is restricted and the requests cannot be met.~ The default, if not specified, is NotModulated.
+
+\paragraph{Field: Oil Cooler Inlet Node Name}\label{field-chiller205-oil-cooler-inlet-node-name}
+
+This alpha field is used if the oil cooler uses an external cooling loop, otherwise the oil cooler will add heat to the ambient conditions (i.e., it is air cooled).
+
+\paragraph{Field: Oil Cooler Outlet Node Name}\label{field-chiller205-oil-cooler-outlet-node-name}
+
+This alpha field is used if the oil cooler uses an external cooling loop, otherwise the oil cooler will add heat to the ambient conditions (i.e., it is air cooled).
+
+\paragraph{Field: Oil Cooler Design Flow Rate}\label{field-chiller205-oil-cooler-design-flow-rate}
+
+\paragraph{Field: Auxiliary Inlet Node Name}\label{field-chiller205-auxiliary-inlet-node-name}
+
+Use if the auxiliary components of the chiller use an external cooling loop, otherwise the auxiliary components will add heat to the ambient conditions (i.e., they are air cooled).
+
+\paragraph{Field: Auxiliary Outlet Node Name}\label{field-chiller205-auxiliary-outlet-node-name}
+
+This alpha field is used if the auxiliary equipment uses an external cooling loop, otherwise the oil cooler will add heat to the ambient conditions (i.e., it is air cooled).
+
+\paragraph{Field: Auxiliary Cooling Design Flow Rate}\label{field-chiller205-auxiliary-cooling-design-flow-rate}
+
+This alpha field is used if the auxiliary equipment uses an external cooling loop, otherwise the oil cooler will add heat to the ambient conditions (i.e., it is air cooled).
+
+\paragraph{Field: Heat Recovery Inlet Node Name}\label{field-chiller205-heat-recover-inlet-node-name}
+
+This alpha field is not currently implemented. It contains the identifying name for the electric chiller heat recovery side inlet node. A heat recovery loop must be specified.
+
+\paragraph{Field: Heat Recovery Outlet Node Name}\label{field-chiller205-heat-recovery-outlet-node-name}
+
+This alpha field is not currently implemented. contains the identifying name for the electric chiller heat recovery side inlet node. A heat recovery loop must be specified.
+
+\paragraph{Field: End-Use Subcategory}\label{field-chiller205-end-use-subcategory}
+
+Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+   Chiller:Electric:ASHRAE205,
+   A205Chiller Trane CGWD 207kW/3.99COP/None,  !- Name
+   A205ExampleChiller.RS0001.a205.cbor,  !- Representation File Name
+   ,                        !- Reference Capacity
+   1.0,                     !- Sizing Factor
+   Zone,                    !- Ambient Temperature Indicator
+   ,                        !- Ambient Temperature Schedule Name
+   North Zone,              !- Ambient Temperature Zone Name
+   ,                        !- Ambient Temperature Outdoor Air Node Name
+   Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+   Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+   0.0755,                  !- Chilled Water Maximum Requested Flow Rate
+   Big Chiller Condenser Inlet Node,           !- Condenser Inlet Node Name
+   Big Chiller Condenser Outlet Node,          !- Condenser Outlet Node Name
+   0.0957,                  !- Condenser Maximum Requested Flow Rate
+   NotModulated;            !- Chiller Flow Mode Type
+
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{}
+
+\begin{itemize}
+\item
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Chiller Electricity Energy {[}J{]}
+\item
+  Zone,Meter,Electricity:Plant {[}J{]}
+\item
+  Zone,Meter,Cooling:Electricity {[}J{]}
+\item
+  HVAC,Average,Chiller Evaporator Cooling Rate {[}W{]}
+\item
+  HVAC,Sum,Chiller Evaporator Cooling Energy {[}J{]}
+\item
+  Zone,Meter,EnergyTransfer:Plant {[}J{]}
+\item
+  Zone,Meter,Chillers:EnergyTransfer {[}J{]}
+\item
+  HVAC,Average,Chiller Evaporator Inlet Temperature {[}C{]}
+\item
+  HVAC,Average,Chiller Evaporator Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Chiller Evaporator Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Chiller COP {[}W/W{]}
+\item
+  HVAC,Average,Chiller Condenser Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Sum,Chiller Condenser Heat Transfer Energy {[}J{]}
+\item
+  Zone,Meter,HeatRejection:EnergyTransfer {[}J{]}
+\item
+  HVAC,Average,Chiller Part Load Ratio {[]}
+\item
+  HVAC,Average,Chiller Cycling Ratio {[]}
+\end{itemize}
+
+Most of these chiller output variables are defined above under ``Generic Chiller Outputs.''~ Output variables not described above are discussed here.
+
+\paragraph{Chiller Condenser Inlet Temperature ~{[}C{]}}\label{chiller-condenser-inlet-temperature-c}
+
+\paragraph{Chiller Condenser Outlet Temperature ~{[}C{]}}\label{chiller-condenser-outlet-temperature-c}
+
+\paragraph{Chiller Condenser Mass Flow Rate {[}kg/s{]}}\label{chiller-condenser-mass-flow-rate}
+
+\paragraph{Chiller Heat Rejected to Zone {[}W{]}}\label{chiller-heat-rejected-to-zone}
+
+
+
 \subsection{Chiller:Electric:EIR}\label{chillerelectriceir}
 
 This chiller model is the empirical model used in the DOE-2.1 building energy simulation program. The model uses performance information at reference conditions along with three curve fits for cooling capacity and efficiency to determine chiller operation at off-reference conditions. Chiller performance curves can be generated by fitting manufacturer's catalog data or measured data. Performance curves for more than 160 chillers, including the default DOE-2.1E reciprocating and centrifugal chillers, are provided in the EnergyPlus Reference DataSets (Chillers.idf and AllDataSets.idf).
