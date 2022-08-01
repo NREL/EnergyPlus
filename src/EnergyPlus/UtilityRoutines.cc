@@ -613,8 +613,12 @@ namespace UtilityRoutines {
 
     bool isKeyRegexLike(std::string_view key)
     {
-        return key.find_first_of("*+?()|[]\\") != std::string_view::npos;
+        if (key == "*") {
+            return false;
+        }
 
+        return key.find_first_of("*+?()|[]\\.") != std::string_view::npos;
+    }
 
     bool isKeyRegexLikeOri(std::string_view key)
     {
