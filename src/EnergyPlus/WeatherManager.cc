@@ -2027,7 +2027,7 @@ namespace WeatherManager {
             }
 
             // at the end of each day find the min/max weather used for DOAS sizing
-            if (state.dataInputProcessing->AirLoopHVACDOASUsedInSim) {
+            if (state.dataGlobal->AirLoopHVACDOASUsedInSim) {
                 if (thisEnvrn.KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign ||
                     thisEnvrn.KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
                     for (size_t i = 0; i < state.dataWeatherManager->TodayOutDryBulbTemp.size(); ++i) {

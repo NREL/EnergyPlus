@@ -174,6 +174,7 @@ struct DataGlobal : BaseGlobalStruct
     bool printConsoleOutput = true;
     bool installRootOverride = false;
     int numThread = 1;
+    bool AirLoopHVACDOASUsedInSim = false;
 
     void clear_state() override
     {

@@ -112,12 +112,15 @@ extern "C" {
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
+#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -223,7 +226,7 @@ namespace SimulationManager {
         createFacilityElectricPowerServiceObject(state);
         createCoilSelectionReportObj(state);
         // read object information early in simulation
-        state.dataInputProcessing->inputProcessor->isInputObjectUsed(state);
+        isInputObjectUsed(state);
 
         BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
@@ -2846,6 +2849,24 @@ namespace SimulationManager {
         }
 
         state.dataInputProcessing->inputProcessor->preScanReportingVariables(state);
+    }
+
+    void isInputObjectUsed(EnergyPlusData &state)
+    {
+        // there is a need to know if certain object are used in the simulation
+        // this may not be the best place to do this but it's a start at early reading of input data
+        // this concept could grow to include reading all inputs prior to the start of the simulation so all data is available
+        // once inputs are processed, read in all getInputs. They will be read early and will not be read again so there is no duplication
+
+        // for example, AirLoopHVAC:DOAS systems autosize on weather data, and WeatherManager processes that data
+        // there is no need to process that data if there are no DOAS used in the simulation
+        state.dataGlobal->AirLoopHVACDOASUsedInSim =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") > 0;
+        EMSManager::CheckIfAnyEMS(state);
+        PlantManager::CheckIfAnyPlant(state);
+        PlantPipingSystemsManager::CheckIfAnySlabs(state);
+        PlantPipingSystemsManager::CheckIfAnyBasements(state);
+        SetPointManager::CheckIfAnyIdealCondEntSetPoint(state);
     }
 
 } // namespace SimulationManager
