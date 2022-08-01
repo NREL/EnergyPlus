@@ -6083,10 +6083,6 @@ namespace OutputProcessor {
         for (auto &[s, expectedIsRegexLike] : test_cases) {
             EXPECT_EQ(expectedIsRegexLike, DataOutputs::isKeyRegexLike(s)) << "isKeyRegexLike: Failed for " << s;
         }
-
-        for (auto &[s, expectedIsRegexLike] : test_cases) {
-            EXPECT_EQ(expectedIsRegexLike, DataOutputs::isKeyRegexLikeOri(s)) << "isKeyRegexLikeOri: Failed for " << s;
-        }
     }
 
 } // namespace OutputProcessor
