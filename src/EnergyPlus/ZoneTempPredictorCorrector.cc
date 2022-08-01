@@ -236,7 +236,7 @@ void ManageZoneAirUpdates(EnergyPlusData &state,
         PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep: {
-        CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        CorrectZoneAirTemp(state, ZoneTempChange, UseZoneTimeStepHistory);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories: {
         RevertZoneTimestepHistories(state);
@@ -3743,9 +3743,9 @@ void PredictSystemLoads(EnergyPlusData &state,
                         auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode));
                         DownInterpolate4HistoryValues(PriorTimeStep,
                                                       TimeStepSys,
-                                                      ThisRAFNNode.AirTemp,
                                                       ThisRAFNNode.AirTempX1,
                                                       ThisRAFNNode.AirTempX2,
+                                                      ThisRAFNNode.AirTempX3,
                                                       ThisRAFNNode.AirTemp,
                                                       ThisRAFNNode.AirTempDSX1,
                                                       ThisRAFNNode.AirTempDSX2,
@@ -3753,9 +3753,9 @@ void PredictSystemLoads(EnergyPlusData &state,
                                                       ThisRAFNNode.AirTempDSX4);
                         DownInterpolate4HistoryValues(PriorTimeStep,
                                                       TimeStepSys,
-                                                      ThisRAFNNode.HumRat,
                                                       ThisRAFNNode.HumRatX1,
                                                       ThisRAFNNode.HumRatX2,
+                                                      ThisRAFNNode.HumRatX3,
                                                       ThisRAFNNode.HumRat,
                                                       ThisRAFNNode.HumRatDSX1,
                                                       ThisRAFNNode.HumRatDSX2,
@@ -4884,10 +4884,8 @@ void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
 }
 
 void CorrectZoneAirTemp(EnergyPlusData &state,
-                        Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
-                        bool const ShortenTimeStepSys,
-                        bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-                        Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                        Real64 &ZoneTempChange,           // Temperature change in zone air between previous and current timestep
+                        bool const UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
 )
 {
 
@@ -4932,7 +4930,6 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
     Real64 TempSupplyAir;
     Real64 ZoneMult;
-    int LoopNode;
 
     // Initializations
     ZoneTempChange = DataPrecisionGlobals::constant_zero;
@@ -4954,93 +4951,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
         ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 
-        if (ShortenTimeStepSys) {
-            // time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
-            if (state.dataHVACGlobal->NumOfSysTimeSteps !=
-                state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
-                DownInterpolate4HistoryValues(PriorTimeStep,
-                                              TimeStepSys,
-                                              MAT(ZoneNum),
-                                              state.dataHeatBalFanSys->XMAT(ZoneNum),
-                                              state.dataHeatBalFanSys->XM2T(ZoneNum),
-                                              MAT(ZoneNum),
-                                              state.dataHeatBalFanSys->DSXMAT(ZoneNum),
-                                              state.dataHeatBalFanSys->DSXM2T(ZoneNum),
-                                              state.dataHeatBalFanSys->DSXM3T(ZoneNum),
-                                              state.dataHeatBalFanSys->DSXM4T(ZoneNum));
-                DownInterpolate4HistoryValues(PriorTimeStep,
-                                              TimeStepSys,
-                                              ZoneAirHumRat(ZoneNum),
-                                              state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum),
-                                              state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum),
-                                              ZoneAirHumRat(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus4(ZoneNum));
-                if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->MATFloor(ZoneNum),
-                                                  state.dataRoomAirMod->XMATFloor(ZoneNum),
-                                                  state.dataRoomAirMod->XM2TFloor(ZoneNum),
-                                                  state.dataRoomAirMod->MATFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXMATFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM2TFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM3TFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM4TFloor(ZoneNum));
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->MATOC(ZoneNum),
-                                                  state.dataRoomAirMod->XMATOC(ZoneNum),
-                                                  state.dataRoomAirMod->XM2TOC(ZoneNum),
-                                                  state.dataRoomAirMod->MATOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXMATOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM2TOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM3TOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM4TOC(ZoneNum));
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->MATMX(ZoneNum),
-                                                  state.dataRoomAirMod->XMATMX(ZoneNum),
-                                                  state.dataRoomAirMod->XM2TMX(ZoneNum),
-                                                  state.dataRoomAirMod->MATMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXMATMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM2TMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM3TMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM4TMX(ZoneNum));
-                }
-                if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-                    for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
-                        auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode));
-                        DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
-                                                      ThisRAFNNode.AirTemp,
-                                                      ThisRAFNNode.AirTempX1,
-                                                      ThisRAFNNode.AirTempX2,
-                                                      ThisRAFNNode.AirTemp,
-                                                      ThisRAFNNode.AirTempDSX1,
-                                                      ThisRAFNNode.AirTempDSX2,
-                                                      ThisRAFNNode.AirTempDSX3,
-                                                      ThisRAFNNode.AirTempDSX4);
-                        DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
-                                                      ThisRAFNNode.HumRat,
-                                                      ThisRAFNNode.HumRatX1,
-                                                      ThisRAFNNode.HumRatX2,
-                                                      ThisRAFNNode.HumRat,
-                                                      ThisRAFNNode.HumRatDSX1,
-                                                      ThisRAFNNode.HumRatDSX2,
-                                                      ThisRAFNNode.HumRatDSX3,
-                                                      ThisRAFNNode.HumRatDSX4);
-                    }
-                }
-            } else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
-                     // do nothing because DS history would have been pushed prior and should be ready?
-            }
-        }
-
-        // now update the variables actually used in the balance equations.
+        // update the variables actually used in the balance equations.
         if (!UseZoneTimeStepHistory) {
             state.dataHeatBalFanSys->ZTM1(ZoneNum) = state.dataHeatBalFanSys->DSXMAT(ZoneNum);
             state.dataHeatBalFanSys->ZTM2(ZoneNum) = state.dataHeatBalFanSys->DSXM2T(ZoneNum);
