@@ -1603,8 +1603,8 @@ namespace SurfaceGeometry {
                     // TODO: is this helpful to set it to -1?
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1; // Default has base surface = base surface
                     // Store list of moved surface numbers in reporting order. We use the old position, we'll reconcile later
-                    state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
                     // We don't do it for Air Door/Air Windows yet, we want them listed below each base surf they belong to
+                    state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
                 }
                 oldToNewSurfNums(SurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
@@ -1743,7 +1743,7 @@ namespace SurfaceGeometry {
             // TODO: Temp validity checking
             assert(state.dataSurface->TotSurfaces == MovedSurfs);
             assert(state.dataSurface->TotSurfaces == static_cast<int>(state.dataSurface->AllSurfaceListReportOrder.size()));
-            assert(state.dataSurface->TotSurfaces == static_cast<int>(state.dataSurface->AllSurfaceListReportOrder.size()));
+            assert(state.dataSurface->TotSurfaces == static_cast<int>(oldToNewSurfNums.size()));
 
             // Assert unicity
             std::set<int> AllSurfaceListReportOrderSet(state.dataSurface->AllSurfaceListReportOrder.begin(),
