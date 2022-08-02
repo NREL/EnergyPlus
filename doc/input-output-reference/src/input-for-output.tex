@@ -741,7 +741,47 @@ This is the name of the Fuel that is being described with this object. Source to
 
 \paragraph{Field: Source Energy Factor}\label{field-source-energy-factor}
 
-Multiplied by the fuel consumption to compute the source energy contribution for the fuel. If a schedule is also specified in the next field, the value specified here, the schedule value, and the fuel consumption are multiplied together for each timestep to determine the source energy contribution for the fuel. If the multipliers in the schedule specified in the next field fully represent the source energy conversion factor, the value in this field should be set to one. If the TDV files (described in next field) are used the value should be 0.293 for electricity and 0.01 for natural gas to account for the units used in the files. Units of J/J.
+Multiplied by the fuel consumption to compute the source energy contribution for the fuel. If a schedule is also specified in the next field, the value specified here, the schedule value, and the fuel consumption are multiplied together for each timestep to determine the source energy contribution for the fuel. If the multipliers in the schedule specified in the next field fully represent the source energy conversion factor, the value in this field should be set to one. If the TDV files (described in next field) are used the value should be 0.293 for electricity and 0.01 for natural gas to account for the units used in the files. Units of J/J.  Examples of historical values for this factor are shown in the table below (source: US EPA).
+
+% table X
+{\scriptsize
+\begin{longtable}[c]{p{4in}p{1.5in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
+% \begin{longtable}[c]{cccccccrr}
+\caption{US EPA Source-Site Ratios for Various Energy Sources (Adapted)\label{table:us_epa_source_site_ratios_for_various_energy_sources}} \tabularnewline
+\toprule
+Energy Type (Year) & US Source-Site Ratios \tabularnewline
+\midrule
+\endfirsthead
+
+Electricity (Grid Purchase, 2018) & 2.80 \tabularnewline
+Electricity (Grid Purchase, 2013) & 3.14 \tabularnewline
+Electricity (Grid Purchase, 2017) & 3.34 \tabularnewline
+Electricity (Onsite Solar or Wind, 2007) & 1.00 \tabularnewline
+\midrule
+Natural Gas (2007) & 1.05 \tabularnewline
+Fuel Oil (No. 1,2,4,5,6, Diesel, Kerosene, 2007) & 1.01 \tabularnewline
+Propane/Liquid Propane (2007) & 1.01 \tabularnewline
+\midrule
+Steam (2013) & 1.20 \tabularnewline
+Steam (2011) & 1.21 \tabularnewline
+Steam (2007) & 1.45 \tabularnewline
+\midrule
+Hot Water (2013) & 1.20 \tabularnewline
+Hot Water (2011) & 1.28 \tabularnewline
+Hot Water (2007) & 1.35 \tabularnewline
+\midrule
+Chilled Water (2013) & 0.91 \tabularnewline
+Chilled Water (2011) & 1.00 \tabularnewline
+Chilled Water (2007) & 1.05 \tabularnewline
+\midrule
+Wood (2007) & 1.00 \tabularnewline
+Coal/Coke (2007) & 1.00 \tabularnewline
+Other (2007) & 1.00 \tabularnewline
+
+\bottomrule
+\end{longtable}
+}
 
 \paragraph{Field: Source Energy Schedule Name}\label{field-source-energy-schedule-name}
 

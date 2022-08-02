@@ -82,8 +82,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      NaturalGas,              !- Existing Fuel Resource Name",
-        "      m3,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1.0,                     !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      50.23439,                !- CO2 Emission Factor {g/MJ}",
@@ -127,8 +125,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      Diesel,                  !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1,                       !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      70.50731,                !- CO2 Emission Factor {g/MJ}",
@@ -172,8 +168,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      Gasoline,                !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1,                       !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      66.20808,                !- CO2 Emission Factor {g/MJ}",
@@ -219,8 +213,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      Propane,                 !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1,                       !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      62.70851,                !- CO2 Emission Factor {g/MJ}",
@@ -264,8 +256,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      FuelOilNo1,                !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1,                       !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      66.02330,                !- CO2 Emission Factor {g/MJ}",
@@ -309,8 +299,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      FuelOilNo2,                !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1,                       !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      68.47998,                !- CO2 Emission Factor {g/MJ}",
@@ -356,8 +344,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      OtherFuel1,               !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1,                       !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      76.77128,                !- CO2 Emission Factor {g/MJ}",
@@ -401,8 +387,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      Coal,                    !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      1,                       !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      91.11052,                !- CO2 Emission Factor {g/MJ}",
@@ -448,8 +432,6 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "",
         "    FuelFactors,",
         "      Electricity,             !- Existing Fuel Resource Name",
-        "      kg,                      !- Units of Measure",
-        "      ,                        !- Energy per Unit Factor",
         "      2.253,                   !- Source Energy Factor {J/J}",
         "      ,                        !- Source Energy Schedule Name",
         "      168.33317,               !- CO2 Emission Factor {g/MJ}",
@@ -542,4 +524,65 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
               state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 4).VarName);
     EXPECT_EQ("Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass",
               state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 5).VarName);
+}
+
+TEST_F(EnergyPlusFixture, PollutionModule_TestEnvironmentalImpactFactors)
+{
+
+    std::string const idf_objects = delimited_string({
+        "    EnvironmentalImpactFactors,",
+        "      0.3,                     !- District Heating Efficiency",
+        "      3.0,                     !- District Cooling COP {W/W}",
+        "      0.3,                     !- Steam Conversion Efficiency",
+        "      80.7272,                 !- Total Carbon Equivalent Emission Factor From N2O {kg/kg}",
+        "      6.2727,                  !- Total Carbon Equivalent Emission Factor From CH4 {kg/kg}",
+        "      0.2727;                  !- Total Carbon Equivalent Emission Factor From CO2 {kg/kg}",
+        "",
+        "    FuelFactors,",
+        "      NaturalGas,              !- Existing Fuel Resource Name",
+        "      1.0,                     !- Source Energy Factor {J/J}",
+        "      ,                        !- Source Energy Schedule Name",
+        "      50.23439,                !- CO2 Emission Factor {g/MJ}",
+        "      ,                        !- CO2 Emission Factor Schedule Name",
+        "      3.51641E-02,             !- CO Emission Factor {g/MJ}",
+        "      ,                        !- CO Emission Factor Schedule Name",
+        "      9.62826E-04,             !- CH4 Emission Factor {g/MJ}",
+        "      ,                        !- CH4 Emission Factor Schedule Name",
+        "      4.18620E-02,             !- NOx Emission Factor {g/MJ}",
+        "      ,                        !- NOx Emission Factor Schedule Name",
+        "      9.20964E-04,             !- N2O Emission Factor {g/MJ}",
+        "      ,                        !- N2O Emission Factor Schedule Name",
+        "      2.51172E-04,             !- SO2 Emission Factor {g/MJ}",
+        "      ,                        !- SO2 Emission Factor Schedule Name",
+        "      3.18151E-03,             !- PM Emission Factor {g/MJ}",
+        "      ,                        !- PM Emission Factor Schedule Name",
+        "      2.38613E-03,             !- PM10 Emission Factor {g/MJ}",
+        "      ,                        !- PM10 Emission Factor Schedule Name",
+        "      7.95378E-04,             !- PM2.5 Emission Factor {g/MJ}",
+        "      ,                        !- PM2.5 Emission Factor Schedule Name",
+        "      0,                       !- NH3 Emission Factor {g/MJ}",
+        "      ,                        !- NH3 Emission Factor Schedule Name",
+        "      2.30241E-03,             !- NMVOC Emission Factor {g/MJ}",
+        "      ,                        !- NMVOC Emission Factor Schedule Name",
+        "      1.08841E-07,             !- Hg Emission Factor {g/MJ}",
+        "      ,                        !- Hg Emission Factor Schedule Name",
+        "      2.09310E-07,             !- Pb Emission Factor {g/MJ}",
+        "      ,                        !- Pb Emission Factor Schedule Name",
+        "      0,                       !- Water Emission Factor {L/MJ}",
+        "      ,                        !- Water Emission Factor Schedule Name",
+        "      0,                       !- Nuclear High Level Emission Factor {g/MJ}",
+        "      ,                        !- Nuclear High Level Emission Factor Schedule Name",
+        "      0;                       !- Nuclear Low Level Emission Factor {m3/MJ}",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    
+    Real64 ExpectedOutput(0.3);
+    Real64 AllowedTolerance(0.001);
+    
+    PollutionModule::GetPollutionFactorInput(*state);
+
+    // The get routine should rest the steam conversion efficiency to the default value of 0.25.
+    // Previously because of a typo, it would reset it to the input value of zero (or even a negative number).
+    ASSERT_NEAR(state->dataPollutionModule->Pollution.SteamConvEffic, ExpectedOutput, AllowedTolerance);
+    
 }
