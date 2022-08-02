@@ -2775,18 +2775,10 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBal->ZoneSNLoadCoolEnergy.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneSNLoadHeatRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneSNLoadCoolRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneLTLoadHeatEnergy.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneLTLoadCoolEnergy.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneSensibleHeatRatio.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneVaporPressureDifference.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneLTLoadHeatRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneLTLoadCoolRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneSNLoadPredictedRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneSNLoadPredictedHSPRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneSNLoadPredictedCSPRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneMoisturePredictedRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneMoisturePredictedHumSPRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->ZoneMoisturePredictedDehumSPRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->latentReports.allocate(NumOfZones);
         state.dataHeatBalFanSys->WZoneTimeMinus1.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus2.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus3.dimension(NumOfZones, 0.0);
@@ -2902,28 +2894,28 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Zone Air System Latent Heating Energy",
                                     OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneLTLoadHeatEnergy(Loop),
+                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadHeatEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air System Latent Cooling Energy",
                                     OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneLTLoadCoolEnergy(Loop),
+                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadCoolEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air System Latent Heating Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneLTLoadHeatRate(Loop),
+                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadHeatRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air System Latent Cooling Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneLTLoadCoolRate(Loop),
+                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadCoolRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     Zone(Loop).Name);
@@ -2931,14 +2923,14 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Zone Air System Sensible Heat Ratio",
                                     OutputProcessor::Unit::None,
-                                    state.dataHeatBal->ZoneSensibleHeatRatio(Loop),
+                                    state.dataHeatBal->latentReports(Loop).ZoneSensibleHeatRatio,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     Zone(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Vapor Pressure Difference",
                                     OutputProcessor::Unit::Pa,
-                                    state.dataHeatBal->ZoneVaporPressureDifference(Loop),
+                                    state.dataHeatBal->latentReports(Loop).ZoneVaporPressureDifference,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     Zone(Loop).Name);
@@ -3025,21 +3017,21 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->ZoneMoisturePredictedRate(Loop),
+                                state.dataHeatBal->latentReports(Loop).ZoneMoisturePredictedRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->ZoneMoisturePredictedHumSPRate(Loop),
+                                state.dataHeatBal->latentReports(Loop).ZoneMoisturePredictedHumSPRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->ZoneMoisturePredictedDehumSPRate(Loop),
+                                state.dataHeatBal->latentReports(Loop).ZoneMoisturePredictedDehumSPRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
@@ -3257,6 +3249,16 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                 ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP = 0.0;
             if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
                 ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP = 0.0;
+            // seems these don't need to be initialized since they are calculated each time step?
+            state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadHeatEnergy = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadCoolEnergy = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadHeatRate = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadCoolRate = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneSensibleHeatRatio = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneVaporPressureDifference = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedRate = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedHumSPRate = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedDehumSPRate = 0.0;
         }
 
         state.dataZoneEnergyDemand->DeadBandOrSetback = false;
@@ -3267,9 +3269,6 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBal->ZoneSNLoadPredictedRate = 0.0;
         state.dataHeatBal->ZoneSNLoadPredictedHSPRate = 0.0;
         state.dataHeatBal->ZoneSNLoadPredictedCSPRate = 0.0;
-        state.dataHeatBal->ZoneMoisturePredictedRate = 0.0;
-        state.dataHeatBal->ZoneMoisturePredictedHumSPRate = 0.0;
-        state.dataHeatBal->ZoneMoisturePredictedDehumSPRate = 0.0;
 
         state.dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
         state.dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
@@ -4927,9 +4926,9 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     ReportMoistLoadsZoneMultiplier(zoneSysMoistureDemand.TotalOutputRequired,
                                    zoneSysMoistureDemand.OutputRequiredToHumidifyingSP,
                                    zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP,
-                                   state.dataHeatBal->ZoneMoisturePredictedRate(ZoneNum),
-                                   state.dataHeatBal->ZoneMoisturePredictedHumSPRate(ZoneNum),
-                                   state.dataHeatBal->ZoneMoisturePredictedDehumSPRate(ZoneNum),
+                                   state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedRate,
+                                   state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedHumSPRate,
+                                   state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedDehumSPRate,
                                    zone.Multiplier,
                                    zone.ListMultiplier);
 
@@ -5704,23 +5703,23 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(ZT, zoneAirHumRatTemp);
     }
     if (state.dataHeatBal->DoLatentSizing) {
-        state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) = std::abs(min(LatentGain, 0.0));
-        state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) = max(LatentGain, 0.0);
-        state.dataHeatBal->ZoneLTLoadHeatEnergy(ZoneNum) =
-            state.dataHeatBal->ZoneLTLoadHeatRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataHeatBal->ZoneLTLoadCoolEnergy(ZoneNum) =
-            state.dataHeatBal->ZoneLTLoadCoolRate(ZoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadHeatRate = std::abs(min(LatentGain, 0.0));
+        state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadCoolRate = max(LatentGain, 0.0);
+        state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadHeatEnergy =
+            state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadHeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadCoolEnergy =
+            state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadCoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 sensibleLoad = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) + state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
         if ((sensibleLoad + LatentGain) != 0.0) {
-            state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = sensibleLoad / (sensibleLoad + LatentGain);
+            state.dataHeatBal->latentReports(ZoneNum).ZoneSensibleHeatRatio = sensibleLoad / (sensibleLoad + LatentGain);
         } else if (sensibleLoad != 0.0) {
-            state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 1.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneSensibleHeatRatio = 1.0;
         } else {
-            state.dataHeatBal->ZoneSensibleHeatRatio(ZoneNum) = 0.0;
+            state.dataHeatBal->latentReports(ZoneNum).ZoneSensibleHeatRatio = 0.0;
         }
         Real64 pSat = PsyPsatFnTemp(state, ZT, RoutineName);
         Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum), state.dataEnvrn->StdBaroPress);
-        state.dataHeatBal->ZoneVaporPressureDifference(ZoneNum) = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
+        state.dataHeatBal->latentReports(ZoneNum).ZoneVaporPressureDifference = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
     }
 }
 

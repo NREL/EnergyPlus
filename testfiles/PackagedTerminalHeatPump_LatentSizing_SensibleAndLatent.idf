@@ -2033,11 +2033,43 @@
 
   Output:Variable,*,Site Outdoor Air Relative Humidity,Hourly;
 
-  Output:Variable,*,Zone Air System Sensible Cooling Rate,Hourly;
-
-  Output:Variable,*,Zone Air System Sensible Heating Rate,Hourly;
-
   Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,Hourly;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+
+  Output:Variable,*,Zone Air System Latent Heating Energy,hourly;
+
+  Output:Variable,*,Zone Air System Latent Cooling Energy,hourly;
+
+  Output:Variable,*,Zone Air System Latent Heating Rate,hourly;
+
+  Output:Variable,*,Zone Air System Latent Cooling Rate,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Heating Energy,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Zone Air System Latent Heating Energy,hourly;
+
+  Output:Variable,*,Zone Air System Latent Cooling Energy,hourly;
+
+  Output:Variable,*,Zone Air System Latent Heating Rate,hourly;
+
+  Output:Variable,*,Zone Air System Latent Cooling Rate,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Heat Ratio,hourly;
+
+  Output:Variable,*,Zone Air Vapor Pressure Difference,hourly;
 
   Output:Variable,*,Zone Air Temperature,Hourly;
 

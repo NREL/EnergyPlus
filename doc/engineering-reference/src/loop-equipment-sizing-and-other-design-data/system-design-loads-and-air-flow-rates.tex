@@ -154,8 +154,6 @@ And save the corresponding mixed, return and outside conditions:
 
 \emph{CoolOutHumRat\(_{sys}\)} = \emph{W\(_{outside}\)}
 
-When latent sizing is requested the cooling outlet humidity ratio used during latent sizing is used for cooling coil sizing. The latent sizing cooling outlet humidity ratio value is a mass flow rate weighted average of each zone's latent cooling supply air humidity ratio. See \hyperref[sizingzone]{Sizing:Zone} field \hyperref[field-zone-latent-cooling-design-supply-air-humidity-ratio-input-method]{Zone Latent Cooling Design Supply Air Humidity Ratio Input Method}. This value is used only when one or more zone latent load is found to be greater than the zone's sensible load, or latent only sizing is requested.
-
 Here $\rho$\(_{air}\) is the density of dry air at 20\(^{\circ}\)C and standard elevation corrected pressure, {[}kg/m\(^{3}\){]};
 
 {\setlength\parindent{25pt} FracOA is the outside air fraction; }
@@ -165,6 +163,9 @@ Here $\rho$\(_{air}\) is the density of dry air at 20\(^{\circ}\)C and standard 
 {\setlength\parindent{25pt} W\(_{mix}\) is the current mixed air humidity ratio {[}kg water / kg dry air{]}; }
 {\setlength\parindent{25pt} \(T_{outside}\) is the current outside air temperature {[}C{]}; }
 {\setlength\parindent{25pt} \(W_{outside}\) is the current outside air humidity ratio {[}kg water / kg dry air{]}. }
+
+Note: When latent sizing is requested the zone design supply air humidity ratio used during zone latent sizing is used as the system cooling coil outlet air humidity ratio (\emph{w\(_{sup}\)}) for sytem cooling coil sizing. The system cooling coil outlet air humidity ratio is calculated as a mass flow rate weighted average of each zone's latent cooling supply air humidity ratio. See \emph{Sizing:Zone} field \emph{Zone Latent Cooling Design Supply Air Humidity Ratio Input Method}. This calculated value is used only when one or more zone latent load is found to be greater than that zone's sensible load, or latent only sizing is requested. A control method that enables the system cooling coil to dehumidify to the design latent supply air humidity ratio is suggested so that the system sensible load can be exceeded when additional dehumidification is required.
+
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
