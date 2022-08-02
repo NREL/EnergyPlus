@@ -1444,7 +1444,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel:: Detailed;
+    state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::Detailed;
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
@@ -1457,7 +1457,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
-    state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel:: BSDF;
+    state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::BSDF;
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
