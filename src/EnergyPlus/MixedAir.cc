@@ -4208,8 +4208,8 @@ void VentilationMechanicalProps::CalcMechVentController(
                     ZoneOAArea =
                         curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate(ZoneIndex) * curZoneOASchValue;
                     ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate(ZoneIndex) * curZoneOASchValue;
-                    ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier *
-                                (this->ZoneOAACHRate(ZoneIndex) * curZone.Volume) * curZoneOASchValue / 3600.0;
+                    ZoneOAACH =
+                        curZone.Multiplier * curZone.ListMultiplier * (this->ZoneOAACHRate(ZoneIndex) * curZone.Volume) * curZoneOASchValue / 3600.0;
 
                     // Calc the breathing-zone OA flow rate
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
