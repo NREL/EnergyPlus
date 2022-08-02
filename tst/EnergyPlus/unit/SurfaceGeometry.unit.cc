@@ -3622,7 +3622,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
     state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
     state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
-    state->dataSurface->WindowShadingControl(1).slatAngleControlForBlinds = SlatAngle::BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).slatAngleControl = SlatAngle::BlockBeamSolar;
     state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
     state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
@@ -3708,7 +3708,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).slatAngleControlForBlinds = SlatAngle::Fixed;
+    state->dataSurface->WindowShadingControl(2).slatAngleControl = SlatAngle::Fixed;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
@@ -3748,7 +3748,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
     state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
     state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
     state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
-    state->dataSurface->WindowShadingControl(1).slatAngleControlForBlinds = SlatAngle::BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).slatAngleControl = SlatAngle::BlockBeamSolar;
     state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
     state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;

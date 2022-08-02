@@ -2520,7 +2520,7 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
                     WinShadingControlPtr =
                         state.dataSurface->Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
-                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).slatAngleControlForBlinds != SlatAngle::Fixed) {
+                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).slatAngleControl != SlatAngle::Fixed) {
                         state.dataSurface->SurfWinMovableSlats(SurfNum) = true;
                         state.dataSurface->AnyMovableSlat = true;
                         state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
@@ -9885,11 +9885,11 @@ namespace SurfaceGeometry {
                                 cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(10) + "=\"" + state.dataIPShortCut->cAlphaArgs(10) + "\".");
             } else if (state.dataIPShortCut->cAlphaArgs(10) == "FIXEDSLATANGLE") {
-                state.dataSurface->WindowShadingControl(ControlNum).slatAngleControlForBlinds = SlatAngle::Fixed;
+                state.dataSurface->WindowShadingControl(ControlNum).slatAngleControl = SlatAngle::Fixed;
             } else if (state.dataIPShortCut->cAlphaArgs(10) == "SCHEDULEDSLATANGLE") {
-                state.dataSurface->WindowShadingControl(ControlNum).slatAngleControlForBlinds = SlatAngle::Scheduled;
+                state.dataSurface->WindowShadingControl(ControlNum).slatAngleControl = SlatAngle::Scheduled;
             } else if (state.dataIPShortCut->cAlphaArgs(10) == "BLOCKBEAMSOLAR") {
-                state.dataSurface->WindowShadingControl(ControlNum).slatAngleControlForBlinds = SlatAngle::BlockBeamSolar;
+                state.dataSurface->WindowShadingControl(ControlNum).slatAngleControl = SlatAngle::BlockBeamSolar;
             }
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
@@ -10251,7 +10251,7 @@ namespace SurfaceGeometry {
                 WindowShadingControl(a).SetPoint == WindowShadingControl(b).SetPoint &&
                 WindowShadingControl(a).ShadingControlIsScheduled == WindowShadingControl(b).ShadingControlIsScheduled &&
                 WindowShadingControl(a).GlareControlIsActive == WindowShadingControl(b).GlareControlIsActive &&
-                WindowShadingControl(a).slatAngleControlForBlinds == WindowShadingControl(b).slatAngleControlForBlinds &&
+                WindowShadingControl(a).slatAngleControl == WindowShadingControl(b).slatAngleControl &&
                 WindowShadingControl(a).SetPoint2 == WindowShadingControl(b).SetPoint2 &&
                 WindowShadingControl(a).DaylightingControlName == WindowShadingControl(b).DaylightingControlName &&
                 WindowShadingControl(a).DaylightControlIndex == WindowShadingControl(b).DaylightControlIndex &&

@@ -1072,7 +1072,7 @@ namespace DataSurfaces {
         bool ShadingControlIsScheduled; // True if shading control has a schedule
         bool GlareControlIsActive;      // True if shading control to reduce daylight glare is active
         int SlatAngleSchedule;          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
-        SlatAngle slatAngleControlForBlinds;  // Takes one of the following values that specifies
+        SlatAngle slatAngleControl;  // Takes one of the following values that specifies
                                         //  CHARACTER(len=32) :: slatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
                                         //  how slat angle is controled in a blind when ShadingType =
                                         //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
@@ -1094,7 +1094,7 @@ namespace DataSurfaces {
         WindowShadingControlData()
             : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0),
               ShadingControlType(WindowShadingControlType::UnControlled), Schedule(0), SetPoint(0.0), SetPoint2(0.0),
-              ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), slatAngleControlForBlinds(SlatAngle::Invalid),
+              ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), slatAngleControl(SlatAngle::Invalid),
               DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {
         }
