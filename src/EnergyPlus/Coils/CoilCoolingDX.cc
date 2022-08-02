@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -132,6 +133,11 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
+
+    // initialize reclaim heat parameters
+    this->reclaimHeat.Name = this->name;
+    this->reclaimHeat.SourceType = state.dataCoilCooingDX->coilCoolingDXObjectName;
+
     this->performance = CoilCoolingDXCurveFitPerformance(state, input_data.performance_object_name);
 
     if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
@@ -951,6 +957,9 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
             this->reportCoilFinalSizes = false;
         }
     }
+
+    // update available reclaim heat
+    this->reclaimHeat.AvailCapacity = this->totalCoolingEnergyRate + this->elecCoolingPower;
 }
 
 void CoilCoolingDX::setToHundredPercentDOAS()
