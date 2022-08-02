@@ -9881,19 +9881,8 @@ namespace SurfaceGeometry {
                                     state.dataIPShortCut->cAlphaFieldNames(5) + " = OnIfScheduleAllows");
             }
 
-            if (state.dataIPShortCut->cAlphaArgs(10) != "FIXEDSLATANGLE" && state.dataIPShortCut->cAlphaArgs(10) != "SCHEDULEDSLATANGLE" &&
-                state.dataIPShortCut->cAlphaArgs(10) != "BLOCKBEAMSOLAR") {
-                ErrorsFound = true;
-                ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(10) + "=\"" + state.dataIPShortCut->cAlphaArgs(10) + "\".");
-            } else if (state.dataIPShortCut->cAlphaArgs(10) == "FIXEDSLATANGLE") {
-                windowShadingControl.slatAngleControl = SlatAngle::Fixed;
-            } else if (state.dataIPShortCut->cAlphaArgs(10) == "SCHEDULEDSLATANGLE") {
-                windowShadingControl.slatAngleControl = SlatAngle::Scheduled;
-            } else if (state.dataIPShortCut->cAlphaArgs(10) == "BLOCKBEAMSOLAR") {
-                windowShadingControl.slatAngleControl = SlatAngle::BlockBeamSolar;
-            }
+            windowShadingControl.slatAngleControl = static_cast<SlatAngle>(
+                getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE

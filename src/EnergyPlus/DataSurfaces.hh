@@ -331,6 +331,9 @@ namespace DataSurfaces {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(SlatAngle::Num)> SlatAngleNamesUC{
+        "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};
+
     // Parameter for window screens beam reflectance accounting
     enum class ScreenBeamReflectanceModel
     {
