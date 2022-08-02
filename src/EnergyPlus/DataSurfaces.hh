@@ -344,6 +344,9 @@ namespace DataSurfaces {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(ScreenBeamReflectanceModel::Num)> ScreenBeamReflectanceModelNamesUC{
+        "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
+
     // Parameters for air flow window source
     enum class WindowAirFlowSource {
         Invalid = -1,
