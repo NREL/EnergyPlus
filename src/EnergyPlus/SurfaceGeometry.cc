@@ -1101,13 +1101,12 @@ namespace SurfaceGeometry {
 
         static constexpr std::string_view RoutineName("GetSurfaceData: ");
 
-        int ConstrNum;         // Construction number
-        int Found;             // For matching interzone surfaces
-        int ConstrNumFound;    // Construction number of matching interzone surface
-        bool NonMatch(false);  // Error for non-matching interzone surfaces
-        int MovedSurfs;        // Number of Moved Surfaces (when sorting into hierarchical structure)
-        bool SurfError(false); // General Surface Error, causes fatal error at end of routine
-        int BaseSurfNum;
+        int ConstrNum;            // Construction number
+        int Found;                // For matching interzone surfaces
+        int ConstrNumFound;       // Construction number of matching interzone surface
+        bool NonMatch(false);     // Error for non-matching interzone surfaces
+        int MovedSurfs;           // Number of Moved Surfaces (when sorting into hierarchical structure)
+        bool SurfError(false);    // General Surface Error, causes fatal error at end of routine
         int TotLay;               // Total layers in a construction
         int TotLayFound;          // Total layers in the construction of a matching interzone surface
         int TotDetachedFixed;     // Total Shading:Site:Detailed entries
