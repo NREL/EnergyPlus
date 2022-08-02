@@ -332,12 +332,12 @@ namespace DataSurfaces {
     };
 
     // Parameter for window screens beam reflectance accounting
-    enum class ScreenBeamReflectanceAccounting
+    enum class ScreenBeamReflectanceModel
     {
         Invalid = -1,
         DoNotModel,
-        ModelAsDirectBeam,
-        ModelAsDiffuse,
+        DirectBeam,
+        Diffuse,
         Num
     };
 

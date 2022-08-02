@@ -1164,7 +1164,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Tscattered = max(0.0, Tscattered);
     TscatteredVis = max(0.0, TscatteredVis);
 
-    if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceAccounting::DoNotModel) {
+    if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceModel::DoNotModel) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
@@ -1176,7 +1176,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceAccounting::ModelAsDirectBeam) {
+    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceModel::DirectBeam) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
@@ -1188,7 +1188,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceAccounting::ModelAsDiffuse) {
+    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceModel::Diffuse) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
             state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;

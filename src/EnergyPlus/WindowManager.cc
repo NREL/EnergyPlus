@@ -8055,11 +8055,11 @@ namespace WindowManager {
                         1.0 - std::sqrt(state.dataMaterial->Material(MatNum).Trans);
 
                     if (UtilityRoutines::SameString(state.dataMaterial->Material(MatNum).ReflectanceModeling, "DoNotModel")) {
-                        state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceAccounting = DataSurfaces::ScreenBeamReflectanceAccounting::DoNotModel;
+                        state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceAccounting = DataSurfaces::ScreenBeamReflectanceModel::DoNotModel;
                     } else if (UtilityRoutines::SameString(state.dataMaterial->Material(MatNum).ReflectanceModeling, "ModelAsDirectBeam")) {
-                        state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceAccounting = DataSurfaces::ScreenBeamReflectanceAccounting::ModelAsDirectBeam;
+                        state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceAccounting = DataSurfaces::ScreenBeamReflectanceModel::DirectBeam;
                     } else if (UtilityRoutines::SameString(state.dataMaterial->Material(MatNum).ReflectanceModeling, "ModelAsDiffuse")) {
-                        state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceAccounting = DataSurfaces::ScreenBeamReflectanceAccounting::ModelAsDiffuse;
+                        state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceAccounting = DataSurfaces::ScreenBeamReflectanceModel::Diffuse;
                     }
 
                     // Reflectance of screen material only
