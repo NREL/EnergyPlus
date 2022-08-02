@@ -10220,18 +10220,19 @@ namespace SurfaceGeometry {
     bool isWindowShadingControlSimilar(EnergyPlusData &state, int a, int b)
     {
         // Compares two window shading controls are the same except for the name, schedule name, construction, and material
-        auto &WindowShadingControl(state.dataSurface->WindowShadingControl);
-        return (WindowShadingControl(a).ZoneIndex == WindowShadingControl(b).ZoneIndex &&
-                WindowShadingControl(a).ShadingType == WindowShadingControl(b).ShadingType &&
-                WindowShadingControl(a).ShadingControlType == WindowShadingControl(b).ShadingControlType &&
-                WindowShadingControl(a).SetPoint == WindowShadingControl(b).SetPoint &&
-                WindowShadingControl(a).ShadingControlIsScheduled == WindowShadingControl(b).ShadingControlIsScheduled &&
-                WindowShadingControl(a).GlareControlIsActive == WindowShadingControl(b).GlareControlIsActive &&
-                WindowShadingControl(a).slatAngleControl == WindowShadingControl(b).slatAngleControl &&
-                WindowShadingControl(a).SetPoint2 == WindowShadingControl(b).SetPoint2 &&
-                WindowShadingControl(a).DaylightingControlName == WindowShadingControl(b).DaylightingControlName &&
-                WindowShadingControl(a).DaylightControlIndex == WindowShadingControl(b).DaylightControlIndex &&
-                WindowShadingControl(a).MultiSurfaceCtrlIsGroup == WindowShadingControl(b).MultiSurfaceCtrlIsGroup);
+        auto &WindowShadingControlA(state.dataSurface->WindowShadingControl(a));
+        auto &WindowShadingControlB(state.dataSurface->WindowShadingControl(b));
+        return (WindowShadingControlA.ZoneIndex == WindowShadingControlB.ZoneIndex &&
+                WindowShadingControlA.ShadingType == WindowShadingControlB.ShadingType &&
+                WindowShadingControlA.ShadingControlType == WindowShadingControlB.ShadingControlType &&
+                WindowShadingControlA.SetPoint == WindowShadingControlB.SetPoint &&
+                WindowShadingControlA.ShadingControlIsScheduled == WindowShadingControlB.ShadingControlIsScheduled &&
+                WindowShadingControlA.GlareControlIsActive == WindowShadingControlB.GlareControlIsActive &&
+                WindowShadingControlA.slatAngleControl == WindowShadingControlB.slatAngleControl &&
+                WindowShadingControlA.SetPoint2 == WindowShadingControlB.SetPoint2 &&
+                WindowShadingControlA.DaylightingControlName == WindowShadingControlB.DaylightingControlName &&
+                WindowShadingControlA.DaylightControlIndex == WindowShadingControlB.DaylightControlIndex &&
+                WindowShadingControlA.MultiSurfaceCtrlIsGroup == WindowShadingControlB.MultiSurfaceCtrlIsGroup);
     }
 
     void GetStormWindowData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
