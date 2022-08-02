@@ -4058,8 +4058,14 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             max(state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyEncl);
     }
 
+    // TODO: use AllHTWindowSurfaceList?
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) continue;
+        if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) {
+            continue;
+        }
+        if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) {
+            continue;
+        }
         int const surfEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
         int const numEnclRefPoints = state.dataViewFactor->EnclSolInfo(surfEnclNum).TotalEnclosureDaylRefPoints;
         if (numEnclRefPoints > 0) {

@@ -1057,7 +1057,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
                     } else {
                         // must calculate Summer SHGC
-                        if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
+                        if (!state.dataConstruction->Construct(curCons).WindowTypeEQL &&
+                            !state.dataConstruction->Construct(curCons).TypeIsAirBoundary) {
                             CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                         }
                     }
