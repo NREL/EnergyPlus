@@ -10213,7 +10213,7 @@ namespace SurfaceGeometry {
     void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool &ErrorsFound)
     {
         // For each window check if all window shading controls on list are the same except for name, schedule name, construction, and material
-        for (auto theSurf : state.dataSurface->Surface) {
+        for (auto &theSurf : state.dataSurface->Surface) {
             if (theSurf.HasShadeControl) {
                 if (theSurf.windowShadingControlList.size() > 1) {
                     int firstWindowShadingControl = theSurf.windowShadingControlList.front();
