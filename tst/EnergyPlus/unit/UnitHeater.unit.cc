@@ -1124,6 +1124,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
     createFacilityElectricPowerServiceObject(*state);
+
+    state->dataLoopNodes->MoreNodeInfo.allocate(20);
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+
     SizingManager::ManageSizing(*state);
 
     EXPECT_FALSE(ErrorsFound);
