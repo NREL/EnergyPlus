@@ -135,16 +135,22 @@ Array1D_string const MonthlyNamedReports(NumMonthlyReports,
                                           "MECHANICALVENTILATIONLOADSMONTHLY",
                                           "HEATEMISSIONSREPORTMONTHLY"});
 
-OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
-    : key(KeyValue), variableName(VariableName)
+bool isKeyRegexLike(std::string_view key)
 {
-    if (KeyValue == "*") return;
-    for (auto const &c : KeyValue) {
-        if (c == ' ' || c == '_' || std::isalnum(c)) continue;
-        is_simple_string = false;
-        break;
+    if (key == "*") {
+        return false;
     }
-    if (is_simple_string) return;
+
+    return key.find_first_of("*+?()|[]\\.") != std::string_view::npos;
+}
+
+OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
+    : key(KeyValue), variableName(VariableName), is_simple_string(!DataOutputs::isKeyRegexLike(KeyValue))
+{
+
+    if (is_simple_string) {
+        return;
+    }
     pattern = std::make_shared<RE2>(KeyValue);
     case_insensitive_pattern = std::make_shared<RE2>("(?i)" + KeyValue);
     if (!pattern->ok()) {
