@@ -93,6 +93,8 @@ namespace SimulationManager {
 
     void PostIPProcessing(EnergyPlusData &state);
 
+    void isInputObjectUsed(EnergyPlusData &state);
+
 } // namespace SimulationManager
 
 struct SimulationManagerData : BaseGlobalStruct
