@@ -2971,7 +2971,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                     WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
-                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: Detailed &&
+                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::Detailed &&
                         !state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                         int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
                         for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
@@ -3120,7 +3120,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         //     SurfWinQRadSWwinAbs( Lay, SurfNum ) = SurfWinA( Lay, SurfNum ) *
                         //       ( SurfQRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
                         //   }
-                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: BSDF) {
+                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
                         int TotSolidLay = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
                         // Number of solid layers in fenestration system (glass + shading)
                         int CurrentState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.CurrentState;
@@ -3158,7 +3158,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
                             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
-                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: EQL) {
+                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL) {
                         state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
                         // EQLNum = Construct(Surface(SurfNum)%Construction)%EQLConsPtr
                         int TotSolidLay =
@@ -3706,7 +3706,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             int const solEnclosureNum = Surface(SurfNum).SolarEnclIndex;
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
-            if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel:: EQL) {
+            if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel::EQL) {
                 int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
@@ -3902,7 +3902,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             if (Surface(SurfNum).ExtBoundCond > 0) { // Interzone surface
                 // Short-wave radiation absorbed in panes of corresponding window in adjacent zone
                 int SurfNumAdjZone = Surface(SurfNum).ExtBoundCond; // Surface number in adjacent zone for interzone surfaces
-                if (state.dataSurface->SurfWinWindowModelType(SurfNumAdjZone) != WindowModel:: EQL) {
+                if (state.dataSurface->SurfWinWindowModelType(SurfNumAdjZone) != WindowModel::EQL) {
                     int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNumAdjZone, IGlass) +=
@@ -3925,7 +3925,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 }
             }
 
-            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: Detailed) {
+            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::Detailed) {
                 int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -3948,12 +3948,12 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                         state.dataSurface->SurfWinIntSWAbsByShade(SurfNum) += state.dataSurface->SurfWinInitialDifSolAbsByShade(SurfNum);
                     }
                 } // End of shading flag check
-            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: BSDF) {
+            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                     state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass);
                 }
-            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: EQL) {
+            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL) {
 
                 // ConstrNum   = Surface(SurfNum)%Construction
                 int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
@@ -5822,9 +5822,9 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             int const constrNum = state.dataSurface->SurfActiveConstruction(surfNum);
             int const constrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(surfNum);
             WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(surfNum);
-            if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowModel:: EQL) {
+            if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowModel::EQL) {
                 TotGlassLayers = state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(constrNum).EQLConsPtr).NL;
-            } else if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowModel:: BSDF) {
+            } else if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowModel::BSDF) {
                 TotGlassLayers = state.dataConstruction->Construct(constrNum).TotSolidLayers;
             } else if (NOT_SHADED(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
                 TotGlassLayers = state.dataConstruction->Construct(constrNum).TotGlassLayers;

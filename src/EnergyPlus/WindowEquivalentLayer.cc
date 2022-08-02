@@ -164,7 +164,7 @@ void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
         if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
         if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue;
 
-        state.dataSurface->SurfWinWindowModelType(SurfNum) = WindowModel:: EQL;
+        state.dataSurface->SurfWinWindowModelType(SurfNum) = WindowModel::EQL;
 
     } //  end do for SurfNum
 }

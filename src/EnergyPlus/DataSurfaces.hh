@@ -348,18 +348,19 @@ namespace DataSurfaces {
         "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
 
     // Parameters for air flow window source
-    enum class WindowAirFlowSource {
+    enum class WindowAirFlowSource
+    {
         Invalid = -1,
         Indoor,
         Outdoor,
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowSource::Num)> WindowAirFlowSourceNamesUC{
-        "INDOORAIR", "OUTDOORAIR"};
+    constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowSource::Num)> WindowAirFlowSourceNamesUC{"INDOORAIR", "OUTDOORAIR"};
 
     // Parameters for air flow window destination
-    enum class WindowAirFlowDestination {
+    enum class WindowAirFlowDestination
+    {
         Invalid = -1,
         Indoor,
         Outdoor,
@@ -371,7 +372,8 @@ namespace DataSurfaces {
         "INDOORAIR", "OUTDOORAIR", "RETURNAIR"};
 
     // Parameters for air flow window control
-    enum class WindowAirFlowControlType {
+    enum class WindowAirFlowControlType
+    {
         Invalid = -1,
         MaxFlow,
         AlwaysOff,
@@ -380,7 +382,8 @@ namespace DataSurfaces {
     };
 
     // Parameters for window model selection
-    enum class WindowModel{
+    enum class WindowModel
+    {
         Invalid = -1,
         Detailed, // indicates original winkelmann window 5 implementation
         BSDF,     // indicates complex fenestration window 6 implementation
@@ -1084,7 +1087,7 @@ namespace DataSurfaces {
         bool ShadingControlIsScheduled; // True if shading control has a schedule
         bool GlareControlIsActive;      // True if shading control to reduce daylight glare is active
         int SlatAngleSchedule;          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
-        SlatAngle slatAngleControl;  // Takes one of the following values that specifies
+        SlatAngle slatAngleControl;     // Takes one of the following values that specifies
                                         //  CHARACTER(len=32) :: slatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
                                         //  how slat angle is controled in a blind when ShadingType =
                                         //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
@@ -1733,16 +1736,16 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinInsideRevealSolAbs;       // Solar absorptance of inside reveal
     Array1D<Real64> SurfWinOutsideRevealSolAbs;      // Solar absorptance of outside reveal
     Array1D<int> SurfWinScreenNumber;                // Screen number for a window with a screen (do not confuse with material number)
-    Array1D<DataSurfaces::WindowAirFlowSource> SurfWinAirflowSource;               // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
-    Array1D<DataSurfaces::WindowAirFlowDestination> SurfWinAirflowDestination;          // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
-    Array1D<int> SurfWinAirflowReturnNodePtr;        // Return node pointer for destination = ReturnAir
-    Array1D<Real64> SurfWinMaxAirflow;               // Maximum gap airflow (m3/s per m of glazing width)
-    Array1D<DataSurfaces::WindowAirFlowControlType> SurfWinAirflowControlType;          // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
-    Array1D<bool> SurfWinAirflowHasSchedule;         // True if gap airflow is scheduled
-    Array1D<int> SurfWinAirflowSchedulePtr;          // Gap airflow schedule pointer
-    Array1D<Real64> SurfWinAirflowThisTS;            // Gap airflow this timestep (m3/s per m of glazing width)
-    Array1D<Real64> SurfWinTAirflowGapOutlet;        // Temperature of air leaving airflow gap between glass panes (C)
-    Array1D<int> SurfWinWindowCalcIterationsRep;     // Number of iterations in window heat balance calculation
+    Array1D<DataSurfaces::WindowAirFlowSource> SurfWinAirflowSource;           // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+    Array1D<DataSurfaces::WindowAirFlowDestination> SurfWinAirflowDestination; // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+    Array1D<int> SurfWinAirflowReturnNodePtr;                                  // Return node pointer for destination = ReturnAir
+    Array1D<Real64> SurfWinMaxAirflow;                                         // Maximum gap airflow (m3/s per m of glazing width)
+    Array1D<DataSurfaces::WindowAirFlowControlType> SurfWinAirflowControlType; // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
+    Array1D<bool> SurfWinAirflowHasSchedule;                                   // True if gap airflow is scheduled
+    Array1D<int> SurfWinAirflowSchedulePtr;                                    // Gap airflow schedule pointer
+    Array1D<Real64> SurfWinAirflowThisTS;                                      // Gap airflow this timestep (m3/s per m of glazing width)
+    Array1D<Real64> SurfWinTAirflowGapOutlet;                                  // Temperature of air leaving airflow gap between glass panes (C)
+    Array1D<int> SurfWinWindowCalcIterationsRep;                               // Number of iterations in window heat balance calculation
     Array1D<Real64> SurfWinVentingOpenFactorMultRep; // Window/door opening modulation multiplier on venting open factor, for reporting
     Array1D<Real64> SurfWinInsideTempForVentingRep;  // Inside air temp used to control window/door venting, for reporting (C)
     Array1D<Real64> SurfWinVentingAvailabilityRep;   // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
@@ -1755,13 +1758,13 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrameHeatGain;
     Array1D<Real64> SurfWinFrameHeatLoss;
     Array1D<Real64> SurfWinDividerHeatLoss;
-    Array1D<Real64> SurfWinTCLayerTemp;           // The temperature of the thermochromic layer of the window
-    Array1D<Real64> SurfWinSpecTemp;              // The specification temperature of the TC layer glass Added for W6 integration June 2010
-    Array1D<DataSurfaces::WindowModel> SurfWinWindowModelType;       // if set to WindowModel:: BSDF, then uses BSDF methods
-    Array1D<Real64> SurfWinTDDPipeNum;            // Tubular daylighting device pipe number for TDD domes and diffusers
-    Array1D<int> SurfWinStormWinConstr;           // Construction with storm window (windows only)
-    Array1D<int> SurfActiveConstruction;          // The currently active construction with or without storm window
-    Array1D<int> SurfWinActiveShadedConstruction; // The currently active shaded construction with or without storm window (windows only)
+    Array1D<Real64> SurfWinTCLayerTemp; // The temperature of the thermochromic layer of the window
+    Array1D<Real64> SurfWinSpecTemp;    // The specification temperature of the TC layer glass Added for W6 integration June 2010
+    Array1D<DataSurfaces::WindowModel> SurfWinWindowModelType; // if set to WindowModel:: BSDF, then uses BSDF methods
+    Array1D<Real64> SurfWinTDDPipeNum;                         // Tubular daylighting device pipe number for TDD domes and diffusers
+    Array1D<int> SurfWinStormWinConstr;                        // Construction with storm window (windows only)
+    Array1D<int> SurfActiveConstruction;                       // The currently active construction with or without storm window
+    Array1D<int> SurfWinActiveShadedConstruction;              // The currently active shaded construction with or without storm window (windows only)
 
     EPVector<DataSurfaces::SurfaceData> Surface;
     EPVector<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;

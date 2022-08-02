@@ -240,7 +240,7 @@ namespace HeatBalanceIntRadExchange {
                             WinShadingType ShadeFlagPrev = state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum);
                             if (ShadeFlagPrev != ShadeFlag && (ANY_INTERIOR_SHADE_BLIND(ShadeFlagPrev) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)))
                                 IntShadeOrBlindStatusChanged = true;
-                            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: EQL &&
+                            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL &&
                                 state.dataWindowEquivLayer
                                     ->CFS(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr)
                                     .ISControlled) {
@@ -262,7 +262,7 @@ namespace HeatBalanceIntRadExchange {
                             ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                             zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         }
-                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel:: EQL &&
+                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL &&
                             state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
                             zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
                         }

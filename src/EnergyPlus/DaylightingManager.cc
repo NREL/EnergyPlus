@@ -1902,7 +1902,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     }
 
     // Initialize bsdf daylighting coefficients here.  Only one time initialization
-    if (state.dataSurface->SurfWinWindowModelType(IWin) == WindowModel:: BSDF) {
+    if (state.dataSurface->SurfWinWindowModelType(IWin) == WindowModel::BSDF) {
         if (!state.dataBSDFWindow->ComplexWind(IWin).DaylightingInitialized) {
             int NRefPts = 0;
             if (CalledFrom == DataDaylighting::CalledFor::MapPoint) {
@@ -2106,7 +2106,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                     state.dataSurface->SurfWinGlazedFrac(IWin);
 
         } else { // Regular window
-            if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel:: BSDF) {
+            if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF) {
                 // Vis trans of glass for COSB incidence angle
                 TVISB = General::POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
                         state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
@@ -2197,7 +2197,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             // Get product of transmittances of obstructions hit by ray.
             // ObTrans = 1.0 will be returned if no exterior obstructions are hit.
 
-            if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel:: BSDF) {
+            if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF) {
                 // the IHR (now HourOfDay) here is/was not correct, this is outside of hour loop
                 // the hour is used to query schedule for transmission , not sure what to do
                 // it will work for detailed and never did work correctly before.
@@ -3195,7 +3195,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex;
         enclNum = state.dataDaylightingData->IllumMapCalc(MapNum).enclIndex;
     }
-    if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel:: BSDF) {
+    if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF) {
         if (LSHCAL == 1) DayltgInterReflectedIllum(state, ISunPos, iHour, enclNum, IWin2);
     } else {
         if (LSHCAL == 1) DayltgInterReflectedIllumComplexFenestration(state, IWin2, WinEl, iHour, daylightCtrlNum, iRefPoint, CalledFrom, MapNum);
@@ -5496,7 +5496,7 @@ inline int findWinShadingStatus(EnergyPlusData &state, int const IWin)
     // Return the window shading status, 1=unshaded, 2=shaded
     int WinShadingIndex = 1;
     bool WinShadedNoGlareControl = IS_SHADED_NO_GLARE_CTRL(state.dataSurface->SurfWinShadingFlag(IWin));
-    if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel:: BSDF) &&
+    if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF) &&
         (WinShadedNoGlareControl || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
         WinShadingIndex = 2;
     }
@@ -6020,7 +6020,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                 for (int extWinNum = 1; extWinNum <= thisEnclDaylight.NumOfDayltgExtWins; ++extWinNum) {
                     int IWin = thisEnclDaylight.DayltgExtWinSurfNums(extWinNum);
                     int IS = 1;
-                    if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel:: BSDF &&
+                    if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF &&
                         (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
                         IS = 2;
                     }
@@ -6361,7 +6361,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             }
         }
 
-        bool ShadedOrDiffusingGlassWin = state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel:: BSDF &&
+        bool ShadedOrDiffusingGlassWin = state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF &&
                                          (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin));
 
         // Loop over reference points
@@ -9488,7 +9488,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                                                                      thisMap.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 1, ILB, loop)));
                     }
 
-                    if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel:: BSDF) &&
+                    if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF) &&
                         (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
 
                         //                                 ===Shaded window===
@@ -9585,7 +9585,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                                ((1.0 - SkyWeight) * DayltgInteriorMapIllumHorIllSky(ISky2) + SkyWeight * DayltgInteriorMapIllumHorIllSky(ISky1));
 
                 for (IS = 1; IS <= 2; ++IS) {
-                    if (IS == 2 && state.dataSurface->SurfWinWindowModelType(IWin) == WindowModel:: BSDF) break;
+                    if (IS == 2 && state.dataSurface->SurfWinWindowModelType(IWin) == WindowModel::BSDF) break;
                     if (IS == 2 && NOT_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) && !state.dataSurface->SurfWinSolarDiffusing(IWin)) break;
 
                     thisMap.IllumFromWinAtMapPt(loop, IS, ILB) =

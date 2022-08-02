@@ -1448,7 +1448,8 @@ namespace DataHeatBalance {
         Real64 ReflectCylinder = 0.0;              // Screen material solar reflectance (user input, does not account for holes in screen)
         Real64 ReflectCylinderVis = 0.0;           // Screen material visible reflectance (user input, does not account for holes in screen)
         Real64 ScreenDiameterToSpacingRatio = 0.0; // ratio of screen material diameter to screen material spacing
-        DataSurfaces::ScreenBeamReflectanceModel screenBeamReflectanceAccounting = DataSurfaces::ScreenBeamReflectanceModel::Invalid;   // user specified method of accounting for scattered solar beam
+        DataSurfaces::ScreenBeamReflectanceModel screenBeamReflectanceAccounting =
+            DataSurfaces::ScreenBeamReflectanceModel::Invalid; // user specified method of accounting for scattered solar beam
     };
 
     struct ScreenTransData

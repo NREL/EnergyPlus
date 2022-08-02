@@ -5712,7 +5712,7 @@ namespace HeatBalanceManager {
                 int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                     if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 &&
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::WindowModel:: Detailed) {
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::WindowModel::Detailed) {
                         state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
                     } else {
                         state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
@@ -5837,9 +5837,9 @@ namespace HeatBalanceManager {
                 int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
                 int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel:: BSDF &&
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel:: EQL) {
-                        state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::WindowModel:: Detailed;
+                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::BSDF &&
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::EQL) {
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::WindowModel::Detailed;
                     }
                 }
             }

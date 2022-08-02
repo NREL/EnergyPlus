@@ -268,7 +268,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinDividerHeatLoss.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinTCLayerTemp.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinSpecTemp.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, WindowModel:: Detailed);
+        state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, WindowModel::Detailed);
         state.dataSurface->SurfWinTDDPipeNum.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinStormWinConstr.dimension(NumSurfaces, 0);
         state.dataSurface->SurfActiveConstruction.dimension(NumSurfaces, 0);
@@ -2845,7 +2845,7 @@ namespace SurfaceGeometry {
                         surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) != DataSurfaces::WindowAirFlowSource::Invalid ||
                         state.dataConstruction->Construct(surface.Construction).SourceSinkPresent || surface.Class == SurfaceClass::TDD_Dome ||
                         (surface.Class == SurfaceClass::Window && (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
-                                                                   state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel:: Detailed ||
+                                                                   state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
                                                                    state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
                                                                    state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
                     if (!forceUniqueSurface) {
@@ -8964,7 +8964,7 @@ namespace SurfaceGeometry {
         for (Item = 1; Item <= state.dataSurface->TotSurfaces; ++Item) {
             if (state.dataSurface->Surface(Item).Class == SurfaceClass::Window || state.dataSurface->Surface(Item).Class == SurfaceClass::GlassDoor) {
                 // todo, add complex fenestration switch  HeatTransferModel_ComplexFenestration
-                if (state.dataSurface->SurfWinWindowModelType(Item) == WindowModel:: BSDF) {
+                if (state.dataSurface->SurfWinWindowModelType(Item) == WindowModel::BSDF) {
                     state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::ComplexFenestration;
                 } else {
                     state.dataSurface->Surface(Item).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::Window5;
@@ -9665,11 +9665,9 @@ namespace SurfaceGeometry {
 
             auto &windowShadingControl = state.dataSurface->WindowShadingControl(ControlNum);
 
-            windowShadingControl.Name =
-                state.dataIPShortCut->cAlphaArgs(1); // Set the Control Name in the Derived Type
+            windowShadingControl.Name = state.dataIPShortCut->cAlphaArgs(1); // Set the Control Name in the Derived Type
 
-            windowShadingControl.ZoneIndex =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+            windowShadingControl.ZoneIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (windowShadingControl.ZoneIndex == 0) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
@@ -9703,18 +9701,16 @@ namespace SurfaceGeometry {
             } else {
                 windowShadingControl.MultiSurfaceCtrlIsGroup = false;
                 ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name +
-                                     "\" should be either SEQUENTIAL or GROUP " + state.dataIPShortCut->cAlphaFieldNames(13) + "=\"" +
-                                     state.dataIPShortCut->cAlphaArgs(13) + "\", defaulting to \"SEQUENTIAL\"");
+                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" should be either SEQUENTIAL or GROUP " +
+                                     state.dataIPShortCut->cAlphaFieldNames(13) + "=\"" + state.dataIPShortCut->cAlphaArgs(13) +
+                                     "\", defaulting to \"SEQUENTIAL\"");
             }
             ControlType = state.dataIPShortCut->cAlphaArgs(5);
 
             if (ControlNumAlpha >= 14) {
                 windowShadingControl.FenestrationCount = ControlNumAlpha - 13;
-                windowShadingControl
-                    .FenestrationName.allocate(windowShadingControl.FenestrationCount);
-                windowShadingControl
-                    .FenestrationIndex.allocate(windowShadingControl.FenestrationCount);
+                windowShadingControl.FenestrationName.allocate(windowShadingControl.FenestrationCount);
+                windowShadingControl.FenestrationIndex.allocate(windowShadingControl.FenestrationCount);
                 for (int i = 1; i <= windowShadingControl.FenestrationCount; i++) {
                     windowShadingControl.FenestrationName(i) = state.dataIPShortCut->cAlphaArgs(i + 13);
                 }
@@ -9736,9 +9732,8 @@ namespace SurfaceGeometry {
                 if (windowShadingControl.Schedule <= 0) {
                     ErrorsFound = true;
                     ShowWarningError(state,
-                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + " has " +
-                                         state.dataIPShortCut->cAlphaFieldNames(5) + " \"" + ControlType +
-                                         "\" but a schedule has not been specified.");
+                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + " has " + state.dataIPShortCut->cAlphaFieldNames(5) +
+                                         " \"" + ControlType + "\" but a schedule has not been specified.");
                 }
             }
 
@@ -9754,9 +9749,8 @@ namespace SurfaceGeometry {
                 if (windowShadingControl.Schedule <= 0) {
                     ErrorsFound = true;
                     ShowWarningError(state,
-                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + " has " +
-                                         state.dataIPShortCut->cAlphaFieldNames(5) + " \"" + ControlType +
-                                         "\" but a schedule has not been specified.");
+                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + " has " + state.dataIPShortCut->cAlphaFieldNames(5) +
+                                         " \"" + ControlType + "\" but a schedule has not been specified.");
                 }
             }
 
@@ -9781,8 +9775,7 @@ namespace SurfaceGeometry {
             }
 
             if (windowShadingControl.ShadingDevice > 0) {
-                if (state.dataMaterial->Material(windowShadingControl.ShadingDevice).Group ==
-                        DataHeatBalance::MaterialGroup::Screen &&
+                if (state.dataMaterial->Material(windowShadingControl.ShadingDevice).Group == DataHeatBalance::MaterialGroup::Screen &&
                     !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9795,10 +9788,7 @@ namespace SurfaceGeometry {
             } else {
                 if (windowShadingControl.getInputShadedConstruction > 0) {
                     state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).IsUsed = true;
-                    if (state.dataMaterial
-                                ->Material(
-                                    state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction)
-                                        .LayerPoint(1))
+                    if (state.dataMaterial->Material(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))
                                 .Group == DataHeatBalance::MaterialGroup::Screen &&
                         !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                         ErrorsFound = true;
@@ -9811,14 +9801,14 @@ namespace SurfaceGeometry {
                     }
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", " +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + " is blank.");
+                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
+                                        " is blank.");
                     ShowContinueError(state, "A valid construction is required.");
                     ErrorsFound = true;
                 } else {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", " +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + " is invalid.");
+                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
+                                        " is invalid.");
                     ShowContinueError(state,
                                       "Construction=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" was used. A valid construction is required.");
                     ErrorsFound = true;
@@ -9829,9 +9819,7 @@ namespace SurfaceGeometry {
             if (windowShadingControl.SetPoint == 0 && ControlType != "ALWAYSON" && ControlType != "ALWAYSOFF" &&
                 ControlType != "ONIFSCHEDULEALLOWS" && ControlType != "SCHEDULE" && ControlType != "ONIFHIGHGLARE" && ControlType != "GLARE" &&
                 ControlType != "DAYLIGHTILLUMINANCE") {
-                ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name +
-                                     "\", The first SetPoint is zero.");
+                ShowWarningError(state, cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", The first SetPoint is zero.");
                 ShowContinueError(state, "..You may have forgotten to specify that setpoint.");
             }
 
@@ -9852,8 +9840,8 @@ namespace SurfaceGeometry {
             if (Found == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
+                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(5) +
+                                    "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
             } else {
                 windowShadingControl.ShadingControlType = WindowShadingControlType(Found);
             }
@@ -9862,14 +9850,14 @@ namespace SurfaceGeometry {
             if (state.dataIPShortCut->cAlphaArgs(7) != "YES" && state.dataIPShortCut->cAlphaArgs(7) != "NO") { // Shading Control is Schedule field
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(7) + "=\"" + state.dataIPShortCut->cAlphaArgs(7) + "\".");
+                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(7) +
+                                    "=\"" + state.dataIPShortCut->cAlphaArgs(7) + "\".");
             }
             if (state.dataIPShortCut->cAlphaArgs(8) != "YES" && state.dataIPShortCut->cAlphaArgs(8) != "NO") { // Glare Control is Active field
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\".");
+                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(8) +
+                                    "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\".");
             }
 
             if ((windowShadingControl.ShadingControlType == WindowShadingControlType::OnIfScheduled) &&
@@ -9881,8 +9869,8 @@ namespace SurfaceGeometry {
                                     state.dataIPShortCut->cAlphaFieldNames(5) + " = OnIfScheduleAllows");
             }
 
-            windowShadingControl.slatAngleControl = static_cast<SlatAngle>(
-                getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+            windowShadingControl.slatAngleControl =
+                static_cast<SlatAngle>(getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE
@@ -9908,8 +9896,8 @@ namespace SurfaceGeometry {
             if (ControlType == "MEETDAYLIGHTILLUMINANCESETPOINT" && state.dataIPShortCut->cAlphaArgs(3) != "SWITCHABLEGLAZING") {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                    "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                 ShowContinueError(state,
                                   "..." + state.dataIPShortCut->cAlphaFieldNames(3) +
                                       " must be SwitchableGlazing for this control, but entered type=\"" + state.dataIPShortCut->cAlphaArgs(3) +
@@ -9921,8 +9909,8 @@ namespace SurfaceGeometry {
             if (Found <= 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                    "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
             } else {
                 windowShadingControl.ShadingType = WinShadingType(Found);
             }
@@ -9932,22 +9920,20 @@ namespace SurfaceGeometry {
             IShadingDevice = windowShadingControl.ShadingDevice;
 
             if (IShadedConst == 0 && IShadingDevice == 0) {
-                ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name +
-                                    "\" has no matching shaded construction or shading device.");
+                ShowSevereError(
+                    state, cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has no matching shaded construction or shading device.");
                 ErrorsFound = true;
             } else if (IShadedConst == 0 && IShadingDevice > 0) {
                 if (ShTyp == WinShadingType::SwitchableGlazing) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " +
-                                        state.dataIPShortCut->cAlphaArgs(3) + "= SwitchableGlazing but no matching shaded construction");
+                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
+                                        "= SwitchableGlazing but no matching shaded construction");
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) &&
                     state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::Shade) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " +
-                                        state.dataIPShortCut->cAlphaArgs(3) +
+                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
                                         "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
                     ShowContinueError(state,
                                       state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice).Name +
@@ -9957,8 +9943,8 @@ namespace SurfaceGeometry {
                 if ((ShTyp == WinShadingType::ExtScreen) &&
                     state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::Screen) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " +
-                                        state.dataIPShortCut->cAlphaArgs(3) + "= ExteriorScreen but matching shading device is not a window screen");
+                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
+                                        "= ExteriorScreen but matching shading device is not a window screen");
                     ShowContinueError(state,
                                       state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice).Name +
                                           "\".");
@@ -9967,8 +9953,7 @@ namespace SurfaceGeometry {
                 if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
                     state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::WindowBlind) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " +
-                                        state.dataIPShortCut->cAlphaArgs(3) +
+                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
                                         "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind");
                     ShowContinueError(state,
                                       state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice).Name +
@@ -9977,8 +9962,8 @@ namespace SurfaceGeometry {
                 }
                 if (ShTyp == WinShadingType::BGShade || ShTyp == WinShadingType::BGBlind) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " +
-                                        state.dataIPShortCut->cAlphaArgs(3) + "= BetweenGlassShade or BetweenGlassBlind and");
+                                    cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
+                                        "= BetweenGlassShade or BetweenGlassBlind and");
                     ShowContinueError(
                         state, state.dataIPShortCut->cAlphaFieldNames(8) + " is specified. This is illegal. Specify shaded construction instead.");
                     ErrorsFound = true;
@@ -9986,9 +9971,8 @@ namespace SurfaceGeometry {
             } else if (IShadedConst > 0 && IShadingDevice > 0) {
                 IShadingDevice = 0;
                 ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" Both " +
-                                     state.dataIPShortCut->cAlphaFieldNames(4) + " and " + state.dataIPShortCut->cAlphaFieldNames(9) +
-                                     " are specified.");
+                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" Both " + state.dataIPShortCut->cAlphaFieldNames(4) +
+                                     " and " + state.dataIPShortCut->cAlphaFieldNames(9) + " are specified.");
                 ShowContinueError(state,
                                   "The " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataConstruction->Construct(IShadedConst).Name +
                                       "\" will be used.");
@@ -10423,7 +10407,11 @@ namespace SurfaceGeometry {
             // Error if base window has airflow control
             if (SurfNum > 0) {
                 if (state.dataSurface->SurfWinAirflowControlType(SurfNum) != DataSurfaces::WindowAirFlowControlType::Invalid) {
-                    ShowSevereError(state, format("{}=\"{} cannot be used because it is an airflow window (i.e., has WindowProperty:AirflowControl specified)", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowSevereError(
+                        state,
+                        format("{}=\"{} cannot be used because it is an airflow window (i.e., has WindowProperty:AirflowControl specified)",
+                               cCurrentModuleObject,
+                               state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
