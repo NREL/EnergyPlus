@@ -344,8 +344,8 @@ namespace DataSurfaces {
     // Parameters for air flow window source
     enum class WindowAirFlowSource {
         Invalid = -1,
-        IndoorAir,
-        OutdoorAir,
+        Indoor,
+        Outdoor,
         Num
     };
 

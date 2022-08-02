@@ -10608,9 +10608,9 @@ namespace SurfaceGeometry {
             if (SurfNum > 0) {
                 state.dataSurface->AirflowWindows = true;
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "IndoorAir")) {
-                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::IndoorAir;
+                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::Indoor;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "OutdoorAir")) {
-                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::OutdoorAir;
+                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::Outdoor;
                 }
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "IndoorAir")) {
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) = WindowAirFlowDestination::IndoorAir;

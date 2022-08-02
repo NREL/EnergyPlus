@@ -3315,7 +3315,7 @@ namespace WindowComplexManager {
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
                 if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::IndoorAir ||
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::ReturnAir) {
-                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::IndoorAir) {
+                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
                         InletAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;

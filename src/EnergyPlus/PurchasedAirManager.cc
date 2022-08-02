@@ -485,12 +485,12 @@ void GetPurchasedAir(EnergyPlusData &state)
                                           state.dataIPShortCut->cAlphaArgs(12) + "\".");
                     ErrorsFound = true;
                 } else {
-                    PurchAir(PurchAirNum).OutdoorAir = true;
+                    PurchAir(PurchAirNum).Outdoor = true;
                 }
             }
 
             // If outdoor air specified, then get Outdoor air inlet node and other outdoor air inputs
-            if (PurchAir(PurchAirNum).OutdoorAir) {
+            if (PurchAir(PurchAirNum).Outdoor) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     // If there is outdoor air and outdoor air inlet node is blank, then create one
                     if (len(state.dataIPShortCut->cAlphaArgs(1)) <
@@ -1284,7 +1284,7 @@ void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const Co
             }
         }
         // If there is OA and economizer is active, then there must be a limit on cooling flow rate
-        if (PurchAir(PurchAirNum).OutdoorAir && (PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer)) {
+        if (PurchAir(PurchAirNum).Outdoor && (PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer)) {
             if ((PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) || (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitCapacity)) {
                 ShowSevereError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                 ShowContinueError(state, "There is outdoor air with economizer active but there is no limit on cooling air flow rate.");
@@ -1630,7 +1630,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                                  "Design Size Maximum Sensible Heating Capacity [W]",
                                                  MaxHeatSensCapDes);
                     // If there is OA, check if sizing calcs have OA>0, throw warning if not
-                    if ((PurchAir(PurchAirNum).OutdoorAir) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
+                    if ((PurchAir(PurchAirNum).Outdoor) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
                         ShowWarningError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                         ShowContinueError(state, "There is outdoor air specified in this object, but the design outdoor air flow rate for this ");
                         ShowContinueError(state, "zone is zero. The Maximum Sensible Heating Capacity will be autosized for zero outdoor air flow. ");
@@ -1675,7 +1675,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                         if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
                             ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                              (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity) ||
-                             (PurchAir(PurchAirNum).OutdoorAir && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
+                             (PurchAir(PurchAirNum).Outdoor && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
                             TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                             CoolingAirFlowSizer sizingCoolingAirFlow;
                             sizingCoolingAirFlow.overrideSizingString(SizingString);
@@ -1707,7 +1707,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                         if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
                             ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                              (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity) ||
-                             (PurchAir(PurchAirNum).OutdoorAir && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
+                             (PurchAir(PurchAirNum).Outdoor && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
                             state.dataSize->DataFracOfAutosizedCoolingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                             TempSize = AutoSize;
                             state.dataSize->DataScalableSizingON = true;
@@ -1726,7 +1726,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                     if ((state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
                         ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                          (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity) ||
-                         (PurchAir(PurchAirNum).OutdoorAir && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
+                         (PurchAir(PurchAirNum).Outdoor && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
                         SizingMethod = CoolingCapacitySizing;
                         TempSize = AutoSize;
                         PrintFlag = false;
@@ -1798,7 +1798,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                                  "Design Size Maximum Total Cooling Capacity [W]",
                                                  MaxCoolTotCapDes);
                     // If there is OA, check if sizing calcs have OA>0, throw warning if not
-                    if ((PurchAir(PurchAirNum).OutdoorAir) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
+                    if ((PurchAir(PurchAirNum).Outdoor) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
                         ShowWarningError(state, "SizePurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                         ShowContinueError(state, "There is outdoor air specified in this object, but the design outdoor air flow rate for this ");
                         ShowContinueError(state, "zone is zero. The Maximum Total Cooling Capacity will be autosized for zero outdoor air flow. ");
@@ -1903,7 +1903,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                              "Design Size Maximum Sensible Heating Capacity [W]",
                                              MaxHeatSensCapDes);
                 // If there is OA, check if sizing calcs have OA>0, throw warning if not
-                if ((PurchAir(PurchAirNum).OutdoorAir) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
+                if ((PurchAir(PurchAirNum).Outdoor) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
                     ShowWarningError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state, "There is outdoor air specified in this object, but the design outdoor air flow rate for this ");
                     ShowContinueError(state, "zone is zero. The Maximum Sensible Heating Capacity will be autosized for zero outdoor air flow. ");
@@ -1941,7 +1941,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
             if ((PurchAir(PurchAirNum).MaxCoolVolFlowRate == AutoSize) &&
                 ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                  (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity) ||
-                 (PurchAir(PurchAirNum).OutdoorAir && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
+                 (PurchAir(PurchAirNum).Outdoor && PurchAir(PurchAirNum).EconomizerType != Econ::NoEconomizer))) {
                 IsAutoSize = true;
             }
             if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
@@ -2006,7 +2006,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                              "Design Size Maximum Total Cooling Capacity [W]",
                                              MaxCoolTotCapDes);
                 // If there is OA, check if sizing calcs have OA>0, throw warning if not
-                if ((PurchAir(PurchAirNum).OutdoorAir) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
+                if ((PurchAir(PurchAirNum).Outdoor) && (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA == 0.0)) {
                     ShowWarningError(state, "SizePurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state, "There is outdoor air specified in this object, but the design outdoor air flow rate for this ");
                     ShowContinueError(state, "zone is zero. The Maximum Total Cooling Capacity will be autosized for zero outdoor air flow. ");
@@ -2187,7 +2187,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         }
 
         // Calculate minimum outdoor air sensible and latent load
-        if (PurchAir(PurchAirNum).OutdoorAir) {
+        if (PurchAir(PurchAirNum).Outdoor) {
             CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(OANodeNum).HumRat);
             MinOASensOutput = OAMassFlowRate * CpAir * (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             MinOALatOutput = OAMassFlowRate * (state.dataLoopNodes->Node(OANodeNum).HumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
@@ -2832,7 +2832,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 SupplyMassFlowRate * (SupplyEnthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy) - PurchAir(PurchAirNum).SenOutputToZone;
 
             CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
-            if (PurchAir(PurchAirNum).OutdoorAir) {
+            if (PurchAir(PurchAirNum).Outdoor) {
                 PurchAir(PurchAirNum).OASenOutput =
                     OAMassFlowRate * CpAir * (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                 PurchAir(PurchAirNum).OALatOutput =
@@ -2843,7 +2843,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 PurchAir(PurchAirNum).OALatOutput = 0.0;
             }
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                if (PurchAir(PurchAirNum).OutdoorAir) {
+                if (PurchAir(PurchAirNum).Outdoor) {
                     state.dataLoopNodes->Node(InNodeNum).CO2 = ((SupplyMassFlowRate - OAMassFlowRate) * state.dataLoopNodes->Node(RecircNodeNum).CO2 +
                                                                 OAMassFlowRate * state.dataLoopNodes->Node(OANodeNum).CO2) /
                                                                SupplyMassFlowRate;
@@ -2852,7 +2852,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 }
             }
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                if (PurchAir(PurchAirNum).OutdoorAir) {
+                if (PurchAir(PurchAirNum).Outdoor) {
                     state.dataLoopNodes->Node(InNodeNum).GenContam =
                         ((SupplyMassFlowRate - OAMassFlowRate) * state.dataLoopNodes->Node(RecircNodeNum).GenContam +
                          OAMassFlowRate * state.dataLoopNodes->Node(OANodeNum).GenContam) /
@@ -2887,7 +2887,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         state.dataLoopNodes->Node(InNodeNum).HumRat = PurchAir(PurchAirNum).SupplyHumRat;
         state.dataLoopNodes->Node(InNodeNum).Enthalpy = SupplyEnthalpy;
         state.dataLoopNodes->Node(InNodeNum).MassFlowRate = SupplyMassFlowRate;
-        if (PurchAir(PurchAirNum).OutdoorAir) state.dataLoopNodes->Node(OANodeNum).MassFlowRate = OAMassFlowRate;
+        if (PurchAir(PurchAirNum).Outdoor) state.dataLoopNodes->Node(OANodeNum).MassFlowRate = OAMassFlowRate;
 
     } else { // purchased air OFF
 
@@ -2906,7 +2906,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         }
 
         state.dataLoopNodes->Node(InNodeNum).MassFlowRate = 0.0;
-        if (PurchAir(PurchAirNum).OutdoorAir) state.dataLoopNodes->Node(OANodeNum).MassFlowRate = 0.0;
+        if (PurchAir(PurchAirNum).Outdoor) state.dataLoopNodes->Node(OANodeNum).MassFlowRate = 0.0;
         PurchAir(PurchAirNum).SenHeatRate = 0.0;
         PurchAir(PurchAirNum).SenCoolRate = 0.0;
         PurchAir(PurchAirNum).TotCoolRate = 0.0;
@@ -2964,7 +2964,7 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
 
-    if (PurchAir(PurchAirNum).OutdoorAir) {
+    if (PurchAir(PurchAirNum).Outdoor) {
 
         if (PurchAir(PurchAirNum).DCVType == DCV::OccupancySchedule) {
             UseOccSchFlag = true;
@@ -3037,7 +3037,7 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
     RecircTemp = state.dataLoopNodes->Node(RecircNodeNum).Temp;
     RecircHumRat = state.dataLoopNodes->Node(RecircNodeNum).HumRat;
     RecircEnthalpy = state.dataLoopNodes->Node(RecircNodeNum).Enthalpy;
-    if (PurchAir(PurchAirNum).OutdoorAir) {
+    if (PurchAir(PurchAirNum).Outdoor) {
         OAInletTemp = state.dataLoopNodes->Node(OANodeNum).Temp;
         OAInletHumRat = state.dataLoopNodes->Node(OANodeNum).HumRat;
         OAInletEnthalpy = state.dataLoopNodes->Node(OANodeNum).Enthalpy;
@@ -3054,7 +3054,7 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
     }
     HeatRecOn = false;
 
-    if (PurchAir(PurchAirNum).OutdoorAir && (OAMassFlowRate > 0.0)) {
+    if (PurchAir(PurchAirNum).Outdoor && (OAMassFlowRate > 0.0)) {
         // Determine if heat recovery is beneficial
         if (PurchAir(PurchAirNum).HtRecType == HeatRecovery::Sensible) {
             if ((OperatingMode == OpMode::Heat) && (RecircTemp > OAInletTemp)) HeatRecOn = true;
