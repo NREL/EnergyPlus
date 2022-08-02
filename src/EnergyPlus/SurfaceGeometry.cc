@@ -1705,8 +1705,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
                 // TODO: needed?
                 state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
@@ -1722,8 +1720,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
                 // TODO: needed?
                 state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
@@ -1739,8 +1735,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
                 // TODO: needed?
                 state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
