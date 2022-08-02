@@ -3313,8 +3313,8 @@ namespace WindowComplexManager {
                     state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 // Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
-                if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::IndoorAir ||
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::ReturnAir) {
+                if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor ||
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
                     if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
                         InletAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
@@ -3324,7 +3324,7 @@ namespace WindowComplexManager {
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
                     CpAirZone = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
-                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::IndoorAir) {
+                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor) {
                         state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                         state.dataSurface->SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
                     } else {

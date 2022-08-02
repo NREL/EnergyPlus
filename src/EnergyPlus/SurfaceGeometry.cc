@@ -10423,8 +10423,7 @@ namespace SurfaceGeometry {
             // Error if base window has airflow control
             if (SurfNum > 0) {
                 if (state.dataSurface->SurfWinAirflowControlType(SurfNum) != DataSurfaces::WindowAirFlowControlType::Invalid) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
-                    ShowContinueError(state, " cannot be used because it is an airflow window (i.e., has WindowProperty:AirflowControl specified)");
+                    ShowSevereError(state, format("{}=\"{} cannot be used because it is an airflow window (i.e., has WindowProperty:AirflowControl specified)", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -10599,17 +10598,14 @@ namespace SurfaceGeometry {
 
             if (SurfNum > 0) {
                 state.dataSurface->AirflowWindows = true;
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "IndoorAir")) {
-                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::Indoor;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "OutdoorAir")) {
-                    state.dataSurface->SurfWinAirflowSource(SurfNum) = WindowAirFlowSource::Outdoor;
-                }
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "IndoorAir")) {
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = WindowAirFlowDestination::IndoorAir;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "OutdoorAir")) {
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = WindowAirFlowDestination::OutdoorAir;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ReturnAir")) {
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = WindowAirFlowDestination::ReturnAir;
+
+                state.dataSurface->SurfWinAirflowSource(SurfNum) =
+                    static_cast<WindowAirFlowSource>(getEnumerationValue(WindowAirFlowSourceNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+
+                state.dataSurface->SurfWinAirflowDestination(SurfNum) =
+                    static_cast<WindowAirFlowDestination>(getEnumerationValue(WindowAirFlowDestinationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+
+                if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
                     int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, state.dataSurface->Surface(SurfNum).ZoneName);
                     if (controlledZoneNum > 0) {
                         state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;

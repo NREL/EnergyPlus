@@ -352,14 +352,20 @@ namespace DataSurfaces {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowSource::Num)> WindowAirFlowSourceNamesUC{
+        "INDOORAIR", "OUTDOORAIR"};
+
     // Parameters for air flow window destination
     enum class WindowAirFlowDestination {
         Invalid = -1,
-        IndoorAir,
-        OutdoorAir,
-        ReturnAir,
+        Indoor,
+        Outdoor,
+        Return,
         Num
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowDestination::Num)> WindowAirFlowDestinationNamesUC{
+        "INDOORAIR", "OUTDOORAIR", "RETURNAIR"};
 
     // Parameters for air flow window control
     enum class WindowAirFlowControlType {
