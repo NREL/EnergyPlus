@@ -12866,6 +12866,10 @@ namespace SurfaceGeometry {
         Vector TVect;
         Vector CoordinateTransVector;
 
+        if (state.dataSurface->Surface(ThisSurf).VerticesProcessed) {
+            return;
+        }
+
         ErrorInSurface = false;
 
         if (state.dataSurfaceGeometry->ProcessSurfaceVerticesOneTimeFlag) {
@@ -13351,11 +13355,17 @@ namespace SurfaceGeometry {
             // SHIFT RELATIVE COORDINATES FROM LOWER LEFT CORNER TO ORIGIN DEFINED
             // BY CTRAN AND SET DIRECTION COSINES SAME AS BASE SURFACE.
             if (!state.dataSurface->Surface(ThisBaseSurface).VerticesProcessed) {
-                ShowSevereError(state, std::string{RoutineName} + "Developer error for Subsurface=" + state.dataSurface->Surface(ThisSurf).Name);
-                ShowContinueError(state,
-                                  "Base surface=" + state.dataSurface->Surface(ThisBaseSurface).Name +
-                                      " vertices must be processed before any subsurfaces.");
-                ShowFatalError(state, std::string{RoutineName});
+
+                if (state.dataSurface->Surface(ThisSurf).IsAirBoundarySurf) {
+                    ProcessSurfaceVertices(state, ThisBaseSurface, ErrorsFound);
+                } else {
+
+                    ShowSevereError(state, std::string{RoutineName} + "Developer error for Subsurface=" + state.dataSurface->Surface(ThisSurf).Name);
+                    ShowContinueError(state,
+                                      "Base surface=" + state.dataSurface->Surface(ThisBaseSurface).Name +
+                                          " vertices must be processed before any subsurfaces.");
+                    ShowFatalError(state, std::string{RoutineName});
+                }
             }
 
             for (n = 1; n <= state.dataSurface->Surface(ThisSurf).Sides; ++n) {
