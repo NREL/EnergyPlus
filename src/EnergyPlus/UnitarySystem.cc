@@ -2222,7 +2222,9 @@ namespace UnitarySystems {
             state.dataSize->DXCoolCap = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
                 state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
             EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
-            EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
+            if (this->m_DXHeatingCoil) {
+                EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
+            }
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 this->m_CoolVolumeFlowRate[Iter] = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(Iter);
@@ -8620,7 +8622,7 @@ namespace UnitarySystems {
                                                   HeatCoilLoad,
                                                   SupHeaterLoad,
                                                   CompressorONFlag);
-                    if (state.dataGlobal->DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                    if (state.dataGlobal->DoCoilDirectSolutions && this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         this->FullOutput[SpeedNum] = SensOutputOn;
                     }
                     if (this->m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit &&
@@ -16015,7 +16017,7 @@ namespace UnitarySystems {
             SpeedNum = int(Par[5]);
             FanOpMode = int(Par[6]);
 
-            HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, SuppHeat);
+            HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode);
 
             OutletAirTemp = state.dataLoopNodes->Node(heatingCoilOutletNode).Temp;
         } break;

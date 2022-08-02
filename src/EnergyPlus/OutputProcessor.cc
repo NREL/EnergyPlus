@@ -2467,6 +2467,10 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
 
+        if (!op->MeterValue.allocated()) {
+            return;
+        }
+
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             if (op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDec && op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDiff) {
                 op->EnergyMeters(Meter).TSValue += op->MeterValue(Meter);
@@ -5875,7 +5879,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 if (op->RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
                 auto &rVar(op->RVariableTypes(Loop).VarPtr);
                 // Update meters on the TimeStep  (Zone)
-                if (rVar.MeterArrayPtr != 0) {
+                if (rVar.MeterArrayPtr != 0 && !state.dataOutputProcessor->MeterValue.empty()) {
                     Real64 TimeStepValue = rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult;
                     for (int i = 1; i <= op->VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters; i++) {
                         int index = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(i);
