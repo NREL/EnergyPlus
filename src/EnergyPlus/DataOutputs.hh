@@ -67,6 +67,10 @@ namespace EnergyPlus {
 
 namespace DataOutputs {
 
+    // TODO: keep only one of these two
+    bool isKeyRegexLike(std::string_view key);
+    bool isKeyRegexLikeOri(std::string_view key); // DataOutputs implementation
+
     int constexpr NumMonthlyReports(63);
 
     extern Array1D_string const MonthlyNamedReports;

@@ -176,6 +176,8 @@ add_simulation_test(IDF_FILE CmplxGlz_SingleZone_DoubleClearAir.idf EPW_FILE USA
 add_simulation_test(IDF_FILE CmplxGlz_SingleZone_Vacuum.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE CmplxGlz_SmOff_IntExtShading.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE CoilWaterDesuperheating.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+add_simulation_test(IDF_FILE CoilWaterDesuperheatingUnitary.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+add_simulation_test(IDF_FILE CoilWaterDesuperheatingUnitaryCoilDX.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE CommonPipe_Pri-Sec.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE CompSetPtControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE CondFD1ZonePurchAirAutoSizeWithPCM.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
