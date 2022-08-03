@@ -320,7 +320,7 @@ namespace OutputProcessor {
             }
 
             if (!reqRepVar.Key.empty() && !(reqRepVar.is_simple_string && UtilityRoutines::SameString(reqRepVar.Key, KeyedValue)) &&
-                !(!reqRepVar.is_simple_string && RE2::FullMatch(KeyedValue, *(reqRepVar.case_insensitive_pattern)))) {
+                !(!reqRepVar.is_simple_string && RE2::FullMatch(std::string{KeyedValue}, *(reqRepVar.case_insensitive_pattern)))) {
                 continue;
             }
 
