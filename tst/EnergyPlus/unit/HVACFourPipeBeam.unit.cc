@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
                           "    YES,                     !- Do System Sizing Calculation",
                           "    YES,                     !- Do Plant Sizing Calculation",
                           "    Yes,                     !- Run Simulation for Sizing Periods",
-                          "    yes;                     !- Run Simulation for Weather File Run Periods",
+                          "    No;                      !- Run Simulation for Weather File Run Periods",
 
                           "    Building,",
                           "    Simple One Zone (Wireframe DXF),  !- Name",
@@ -3333,7 +3333,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
                           "    YES,                     !- Do System Sizing Calculation",
                           "    YES,                     !- Do Plant Sizing Calculation",
                           "    Yes,                     !- Run Simulation for Sizing Periods",
-                          "    yes;                     !- Run Simulation for Weather File Run Periods",
+                          "    No;                      !- Run Simulation for Weather File Run Periods",
 
                           "    Building,",
                           "    Simple One Zone (Wireframe DXF),  !- Name",

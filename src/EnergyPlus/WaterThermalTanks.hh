@@ -152,6 +152,7 @@ namespace WaterThermalTanks {
     enum class ReclaimHeatObjectType
     {
         Invalid = -1,
+        CoilCoolingDX,                  // reclaim heating source is new DX Cooling coil
         CompressorRackRefrigeratedCase, // reclaim heating source is refrigerated case compressor rack
         DXCooling,                      // reclaim heating source is DX cooling coil
         DXMultiSpeed,                   // reclaim heating source is DX multispeed coil

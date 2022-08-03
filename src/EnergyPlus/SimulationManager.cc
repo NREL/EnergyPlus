@@ -1516,15 +1516,17 @@ namespace SimulationManager {
                                  "file specified; but no weather file specified.");
             }
         }
+
         if (!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
-            ShowWarningError(state,
-                             "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
-                             "be performed, and most input will not be read.");
-        }
-        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing &&
-            !state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
-            ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
-            ErrorsFound = true;
+            // This amounts to checking: (!DoHVACSizingSimulation && !DoZoneSizing && !DoSystemSizing)
+            if (!state.dataGlobal->DoHVACSizingSimulation && !state.dataGlobal->DoPureLoadCalc) {
+                ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done. Program terminates.");
+                ErrorsFound = true;
+            } else {
+                ShowWarningError(state,
+                                 "\"Run Simulation for Sizing Periods\" and \"Run Simulation for Weather File Run Periods\" are both set to \"No\". "
+                                 "No simulations will be performed, and most input will not be read.");
+            }
         }
 
         if (ErrorsFound) {
