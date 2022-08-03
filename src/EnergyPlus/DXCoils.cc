@@ -15078,7 +15078,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
             }
 
-            FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
+            FanHeatCorrection = state.dataLoopNodes->Node(FanInletNode).MassFlowRate *
+                                (state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy);
 
             NetCoolingCapRated = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
         }
@@ -15232,7 +15233,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                     FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 }
 
-                FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
+                FanHeatCorrection =
+                    PartLoadAirMassFlowRate * (state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy);
 
             } else {
                 FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -15632,7 +15634,8 @@ Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
                                         FanStaticPressureRise);
         }
 
-        FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy;
+        FanHeatCorrection =
+            SupplyAirMassFlowRate * (state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy);
 
     } else {
 
@@ -15903,81 +15906,10 @@ int GetCoilTypeNum(EnergyPlusData &state,
 }
 
 Real64 GetMinOATCompressor(EnergyPlusData &state,
-                           std::string const &CoilType, // must match coil types in this module
-                           std::string const &CoilName, // must match coil names for the coil type
-                           bool &ErrorsFound            // set to true if problem
+                           int const CoilIndex, // index to cooling coil
+                           bool &ErrorsFound    // set to true if problem
 )
 {
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   February 2006
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function looks up the the min oat for the heating coil compressor and returns it.  If
-    // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
-    // as negative.
-
-    // Return value
-    Real64 MinOAT; // returned min oa temperature of matched coil
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
-
-    // Obtains and Allocates DXCoils
-    if (state.dataDXCoils->GetCoilsInputFlag) {
-        GetDXCoils(state);
-        state.dataDXCoils->GetCoilsInputFlag = false;
-    }
-
-    if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:SingleSpeed") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:TwoSpeed")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataDXCoils->DXCoil);
-        if (WhichCoil != 0) {
-            MinOAT = state.dataDXCoils->DXCoil(WhichCoil).MinOATCompressor;
-        }
-    } else if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:MultiSpeed") ||
-               UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataDXCoils->DXCoil);
-        if (WhichCoil != 0) {
-            MinOAT = state.dataDXCoils->DXCoil(WhichCoil).MinOATCompressor;
-        }
-    } else if (UtilityRoutines::SameString(CoilType, "Coil:Heating:DX:SingleSpeed") ||
-               UtilityRoutines::SameString(CoilType, "Coil:Heating:DX:MultiSpeed")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataDXCoils->DXCoil);
-        if (WhichCoil != 0) {
-            MinOAT = state.dataDXCoils->DXCoil(WhichCoil).MinOATCompressor;
-        }
-    } else {
-        WhichCoil = 0;
-    }
-
-    if (WhichCoil == 0) {
-        ShowSevereError(state, "GetMinOATCompressor: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
-        ShowContinueError(state, "... returning Min OAT as -1000.");
-        ErrorsFound = true;
-        MinOAT = -1000.0;
-    }
-
-    return MinOAT;
-}
-
-Real64 GetMinOATCompressorUsingIndex(EnergyPlusData &state,
-                                     int const CoilIndex, // index to cooling coil
-                                     bool &ErrorsFound    // set to true if problem
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         R. Raustad
-    //       DATE WRITTEN   June 2017
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function looks up the the min oat for the cooling coil compressor and returns it.  If
-    // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
-    // as negative.
-
-    // Return value
-    Real64 MinOAT; // returned min oa temperature of matched coil
 
     // Obtains and Allocates DXCoils
     if (state.dataDXCoils->GetCoilsInputFlag) {
@@ -15986,19 +15918,15 @@ Real64 GetMinOATCompressorUsingIndex(EnergyPlusData &state,
     }
 
     if (CoilIndex == 0) {
-
-        ShowSevereError(state, "GetMinOATCompressorUsingIndex: Index passed = 0");
+        ShowSevereError(state, "GetMinOATCompressor: Index passed = 0");
         ShowContinueError(state, "... returning Min OAT for compressor operation as -1000.");
         ErrorsFound = true;
-        MinOAT = -1000.0;
-
+        return -1000.0;
     } else {
-
-        MinOAT = state.dataDXCoils->DXCoil(CoilIndex).MinOATCompressor;
+        return state.dataDXCoils->DXCoil(CoilIndex).MinOATCompressor;
     }
-
-    return MinOAT;
 }
+
 int GetCoilInletNode(EnergyPlusData &state,
                      std::string const &CoilType, // must match coil types in this module
                      std::string const &CoilName, // must match coil names for the coil type

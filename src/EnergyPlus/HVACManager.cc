@@ -55,8 +55,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -147,7 +146,6 @@ void ManageHVAC(EnergyPlusData &state)
     //  manage variable time step and when zone air histories are updated.
 
     // Using/Aliasing
-    using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
     using DemandManager::ManageDemand;
     using DemandManager::UpdateDemandManagers;
     using EMSManager::ManageEMS;
@@ -162,7 +160,6 @@ void ManageHVAC(EnergyPlusData &state)
     using SizingManager::UpdateFacilitySizing;
     using SystemAvailabilityManager::ManageHybridVentilation;
     using SystemReports::InitEnergyReports;
-    using SystemReports::ReportMaxVentilationLoads;
     using SystemReports::ReportSystemEnergyUse;
     using WaterManager::ManageWater;
     using WaterManager::ManageWaterInits;
@@ -200,7 +197,7 @@ void ManageHVAC(EnergyPlusData &state)
     if (state.dataHVACMgr->TriggerGetAFN) {
         state.dataHVACMgr->TriggerGetAFN = false;
         DisplayString(state, "Initializing HVAC");
-        ManageAirflowNetworkBalance(state); // first call only gets input and returns.
+        state.afn->manage_balance(); // first call only gets input and returns.
     }
 
     state.dataHeatBalFanSys->ZT = state.dataHeatBalFanSys->MAT;
@@ -261,9 +258,9 @@ void ManageHVAC(EnergyPlusData &state)
     ManageHybridVentilation(state);
 
     CalcAirFlowSimple(state);
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-        state.dataAirflowNetwork->RollBackFlag = false;
-        ManageAirflowNetworkBalance(state, false);
+    if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
+        state.afn->RollBackFlag = false;
+        state.afn->manage_balance(false);
     }
 
     SetHeatToReturnAirFlag(state);
@@ -326,9 +323,9 @@ void ManageHVAC(EnergyPlusData &state)
 
             ManageHybridVentilation(state);
             CalcAirFlowSimple(state, SysTimestepLoop);
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                state.dataAirflowNetwork->RollBackFlag = false;
-                ManageAirflowNetworkBalance(state, false);
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
+                state.afn->RollBackFlag = false;
+                state.afn->manage_balance(false);
             }
 
             UpdateInternalGainValues(state, true, true);
@@ -419,7 +416,7 @@ void ManageHVAC(EnergyPlusData &state)
 
         // This is where output processor data is updated for System Timestep reporting
         if (!state.dataGlobal->WarmupFlag) {
-            if (state.dataGlobal->DoOutputReporting) {
+            if (state.dataGlobal->DoOutputReporting && !state.dataGlobal->ZoneSizingCalc) {
                 CalcMoreNodeInfo(state);
                 CalculatePollution(state);
                 InitEnergyReports(state);
@@ -430,7 +427,7 @@ void ManageHVAC(EnergyPlusData &state)
                 if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
             }
             if (state.dataGlobal->DoOutputReporting) {
-                ReportMaxVentilationLoads(state);
+                SystemReports::ReportVentilationLoads(state);
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                     state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
@@ -478,7 +475,9 @@ void ManageHVAC(EnergyPlusData &state)
                 }
                 state.dataHVACMgr->PrintedWarmup = true;
             }
-            CalcMoreNodeInfo(state);
+            if (!state.dataGlobal->DoingSizing) {
+                CalcMoreNodeInfo(state);
+            }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
@@ -1813,7 +1812,6 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // Each flag is checked and the appropriate manager is then called.
 
     // Using/Aliasing
-    using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
     using NonZoneEquipmentManager::ManageNonZoneEquipment;
     using PlantManager::ManagePlantLoops;
     using PlantUtilities::AnyPlantLoopSidesNeedSim;
@@ -1860,8 +1858,8 @@ void SimSelectedEquipment(EnergyPlusData &state,
     if (FirstHVACIteration) {
         state.dataHVACMgr->RepIterAir = 0;
         // Call AirflowNetwork simulation to calculate air flows and pressures
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-            ManageAirflowNetworkBalance(state, FirstHVACIteration);
+        if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
+            state.afn->manage_balance(FirstHVACIteration);
         }
         ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
         state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
@@ -1886,8 +1884,8 @@ void SimSelectedEquipment(EnergyPlusData &state,
             ++IterAir; // Increment the iteration counter
             // Call AirflowNetwork simulation to calculate air flows and pressures
             ResimulateAirZone = false;
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
+                state.afn->manage_balance(FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
                 ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
@@ -1912,7 +1910,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
             state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
 
             //      IterAir = IterAir + 1   ! Increment the iteration counter
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
+            if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 if (ResimulateAirZone) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
                     SimAirLoops = true;  // at min three times using ONOFF fan with the AirflowNetwork model
                     SimZoneEquipment = true;
@@ -2308,10 +2306,10 @@ void ReportInfiltrations(EnergyPlusData &state)
 
         NZ = state.dataHeatBal->Infiltration(j).ZonePtr;
         ADSCorrectionFactor = 1.0;
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(NZ)) ADSCorrectionFactor=0
             if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) &&
-                state.dataAirflowNetwork->AirflowNetworkZoneFlag(NZ))
+                state.afn->AirflowNetworkZoneFlag(NZ))
                 ADSCorrectionFactor = 0.0;
         }
 
@@ -2382,7 +2380,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     // This subroutine updates the report variables for the AirHeatBalance.
 
     // Using/Aliasing
-    using AirflowNetworkBalanceManager::ReportAirflowNetwork;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::CycleOnZoneFansOnly;
     using DataHVACGlobals::FanType_ZoneExhaust;
@@ -2425,19 +2422,18 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     auto &Fan(state.dataFans->Fan);
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
 
-    // Ensure no airflownetwork and simple calculations
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork == 0) return;
-
-    if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork(state);
+    if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
+        state.afn->report();
+    }
 
     // Reports zone exhaust loss by exhaust fans
     for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
-                state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop)) {
+                state.afn->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
             }
         }
@@ -2464,9 +2460,10 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     }
 
     // Report results for SIMPLE option only
-    if (!(state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
-          state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS))
+    if (!(state.afn->simulation_control.type == AirflowNetwork::ControlType::NoMultizoneOrDistribution ||
+          state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation)) {
         return;
+    }
 
     if (state.dataHVACMgr->ReportAirHeatBalanceFirstTimeFlag) {
         MixSenLoad.allocate(state.dataGlobal->NumOfZones);
@@ -2481,10 +2478,10 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         // Break the infiltration load into heat gain and loss components
         ADSCorrectionFactor = 1.0;
 
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
             if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
-                state.dataAirflowNetwork->AirflowNetworkZoneFlag(ZoneLoop))
+                state.afn->AirflowNetworkZoneFlag(ZoneLoop))
                 ADSCorrectionFactor = 0.0;
         }
 
@@ -2935,8 +2932,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   February 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This sets some flags at the air loop and zone level: these flags indicate
@@ -2956,13 +2951,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleMaxValue;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirLoopNum(0);      // the air loop index
-    int ZoneNum(0);         // zone index
-    int ControlledZoneNum;  // controlled zone index
     bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
-    int LightNum;           // Lights object index
-    int SurfNum;            // Surface index
 
     auto &Zone(state.dataHeatBal->Zone);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2972,7 +2961,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
     if (state.dataHVACMgr->MyOneTimeFlag) {
         // set the air loop Any Continuous Fan flag
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             if (AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
                 if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
                     Real64 CycFanMaxVal = GetScheduleMaxValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
@@ -2989,8 +2978,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
             }
         }
         // check to see if a controlled zone is served exclusively by a zonal system
-        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            ZoneNum = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             bool airLoopFound = false;
             for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                 if (ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) > 0) {
@@ -3003,12 +2991,11 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         }
         // issue warning messages if zone is served by a zonal system or a cycling system and the input calls for
         // heat gain to return air
-        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-            ZoneNum = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
             CyclingFan = false;
             for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                int AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
                     if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
                         CyclingFan = CheckScheduleValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
@@ -3016,24 +3003,26 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
                 }
             }
             if (ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly || CyclingFan) {
-                if (Zone(ZoneNum).RefrigCaseRA) {
+                if (Zone(ControlledZoneNum).RefrigCaseRA) {
                     ShowWarningError(state,
-                                     "For zone=" + Zone(ZoneNum).Name + " return air cooling by refrigerated cases will be applied to the zone air.");
+                                     "For zone=" + Zone(ControlledZoneNum).Name +
+                                         " return air cooling by refrigerated cases will be applied to the zone air.");
                     ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                 }
-                for (LightNum = 1; LightNum <= state.dataHeatBal->TotLights; ++LightNum) {
-                    if (state.dataHeatBal->Lights(LightNum).ZonePtr != ZoneNum) continue;
+                for (int LightNum = 1; LightNum <= state.dataHeatBal->TotLights; ++LightNum) {
+                    if (state.dataHeatBal->Lights(LightNum).ZonePtr != ControlledZoneNum) continue;
                     if (state.dataHeatBal->Lights(LightNum).FractionReturnAir > 0.0) {
-                        ShowWarningError(state,
-                                         "For zone=" + Zone(ZoneNum).Name + " return air heat gain from lights will be applied to the zone air.");
+                        ShowWarningError(
+                            state, "For zone=" + Zone(ControlledZoneNum).Name + " return air heat gain from lights will be applied to the zone air.");
                         ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                         break;
                     }
                 }
-                for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+                for (int SurfNum = Zone(ControlledZoneNum).HTSurfaceFirst; SurfNum <= Zone(ControlledZoneNum).HTSurfaceLast; ++SurfNum) {
                     if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        ShowWarningError(
-                            state, "For zone=" + Zone(ZoneNum).Name + " return air heat gain from air flow windows will be applied to the zone air.");
+                        ShowWarningError(state,
+                                         "For zone=" + Zone(ControlledZoneNum).Name +
+                                             " return air heat gain from air flow windows will be applied to the zone air.");
                         ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                     }
                 }
@@ -3043,7 +3032,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     }
 
     // set the air loop fan operation mode
-    for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+    for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
             if (GetCurrentScheduleValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
                 AirLoopControlInfo(AirLoopNum).FanOpMode = CycFanCycCoil;
@@ -3054,16 +3043,15 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     }
     // set the zone level NoHeatToReturnAir flag
     // if any air loop in the zone is continuous fan, then set NoHeatToReturnAir = false and sort it out node-by-node
-    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
         if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-        ZoneNum = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
-        Zone(ZoneNum).NoHeatToReturnAir = true;
+        Zone(ControlledZoneNum).NoHeatToReturnAir = true;
         if (!ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly) {
             for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                int AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
                     if (AirLoopControlInfo(AirLoopNum).FanOpMode == ContFanCycCoil) {
-                        Zone(ZoneNum).NoHeatToReturnAir = false;
+                        Zone(ControlledZoneNum).NoHeatToReturnAir = false;
                         break;
                     }
                 }

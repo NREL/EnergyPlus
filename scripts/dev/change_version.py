@@ -57,8 +57,6 @@
 # Attempt to automatically change the version number of all idf and imf files in a repo
 # Two arguments: old version number and new version number
 
-# TODO: Change EPJSON files as well
-
 import codecs
 import fnmatch
 import json

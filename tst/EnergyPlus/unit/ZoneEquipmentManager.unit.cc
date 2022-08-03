@@ -1919,7 +1919,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    SetZoneEquipSimOrder(*state, ZoneNum, ZoneNum);
+    SetZoneEquipSimOrder(*state, ZoneNum);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
@@ -2204,7 +2204,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType.CoolAirDesMethod = 1;
             thisSizingType.HeatAirDesMethod = 1;
             thisSizingType.DOASControlStrategy = 1;
-            thisSizingType.ActualZoneNum = 1;
+            thisSizingType.ZoneNum = 1;
             thisSizingType.TimeStepNumAtHeatMax = 1;
             thisSizingType.TimeStepNumAtCoolMax = 1;
             thisSizingType.HeatDDNum = 1;
@@ -2399,7 +2399,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType2.CoolAirDesMethod = 1;
             thisSizingType2.HeatAirDesMethod = 1;
             thisSizingType2.DOASControlStrategy = 1;
-            thisSizingType2.ActualZoneNum = 1;
+            thisSizingType2.ZoneNum = 1;
             thisSizingType2.TimeStepNumAtHeatMax = 1;
             thisSizingType2.TimeStepNumAtCoolMax = 1;
             thisSizingType2.HeatDDNum = 1;
@@ -4466,7 +4466,6 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
     state->dataContaminantBalance->ZoneAirGC(2) = 20.0;
 
     state->dataEarthTube->GetInputFlag = false;
-    state->dataEarthTube->TotEarthTube = 0;
     state->dataCoolTower->GetInputFlag = false;
     state->dataThermalChimneys->ThermalChimneyGetInputFlag = false;
     state->dataThermalChimneys->TotThermalChimney = 0;
@@ -4492,7 +4491,6 @@ TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
     state->dataHeatBal->space(1).Name = "LIVING ZONE";
     state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
@@ -4588,7 +4586,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 24.;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataSize->CalcZoneSizing(1, 1).ActualZoneNum = 1;
+    state->dataSize->CalcZoneSizing(1, 1).ZoneNum = 1;
     state->dataSize->CurOverallSimDay = 1;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -3600;
@@ -4605,7 +4603,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataEnvrn->StdBaroPress = 101325.;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
     state->dataSize->CalcFinalZoneSizing(1).OutTempAtHeatPeak = 28;

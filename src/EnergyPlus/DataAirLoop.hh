@@ -177,7 +177,7 @@ namespace DataAirLoop {
         Real64 ExcessZoneExhFlow = 0.0;     // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
         Real64 FanPLR = 1.0;                // Operating PLR of air loop fan
         Real64 OAFrac = 0.0;                // fraction of outside air to mixed air mass flow rate
-        Real64 OAFlow = 0.0;                // oa flow rate this time step
+        Real64 OAFlow = 0.0;                // oa flow rate this time step [kg/s]
         bool FlowError = false;             // error flag for flow error message
         Real64 BypassMassFlow = 0.0;        // air loop bypass mass flow NOT entering splitter but included in mixer or plenum
     };
@@ -207,7 +207,6 @@ namespace DataAirLoop {
         Array1D_int OutletNodeNum;      // component outlet node number
         bool HeatExchangerFlag = false; // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum = -1;        // AirLoopHVAC:DedicatedOutdoorAirSystem number
-        bool DXCoolingCoilFlag = false; // True with DX cooling coil, not used
     };
 
     struct AirLoopAFNData

@@ -130,15 +130,6 @@ namespace DataHeatBalance {
     constexpr int DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
     constexpr int DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
-    // Parameters for Sky Radiance Distribution
-    enum class SkyRadDistribution
-    {
-        Invalid = -1,
-        Isotropic,
-        Anisotropic,
-        Num
-    };
-
     // Parameters for ZoneAirSolutionAlgo
     enum class SolutionAlgo
     {
@@ -579,7 +570,6 @@ namespace DataHeatBalance {
         bool IsControlled = false;                      // True when this is a controlled zone.
         bool IsSupplyPlenum = false;                    // True when this zone is a supply plenum
         bool IsReturnPlenum = false;                    // True when this zone is a return plenum
-        int ZoneEqNum = 0;                              // Controlled zone equip config number
         int PlenumCondNum = 0;                          // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex = 0;                // this is the index number for TempControlledZone structure for lookup
         // Pointers to Surface Data Structure
@@ -622,7 +612,6 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
-        std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
         int zoneRadEnclosureFirst = -1;              // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
         int zoneRadEnclosureLast = -1;               // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
 
@@ -640,7 +629,7 @@ namespace DataHeatBalance {
         Real64 WindDirEMSOverrideValue = 0.0;        // value to use for EMS override of the surface's outside wind speed
 
         bool HasLinkedOutAirNode = false; // true if an OutdoorAir::Node is linked to the surface
-        int LinkedOutAirNode = 0.0;       // Index of the an OutdoorAir:Node
+        int LinkedOutAirNode = 0;         // Index of the an OutdoorAir:Node
 
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified
@@ -1622,15 +1611,17 @@ namespace DataHeatBalance {
 
         // OA Reports - accumulated values
         // All Vol variables are in m3
-        Real64 MechVentVolTotalOcc = 0.0;       // volume for mechanical ventilation of outside air for entire simulation during occupied at current
-        Real64 MechVentVolMin = 9.9e9;          // a large number since finding minimum volume at current zone air density
-        Real64 InfilVolTotalOcc = 0.0;          // volume for infiltration of outside air for entire simulation during occupied at current density
-        Real64 InfilVolMin = 9.9e9;             // a large number since finding minimum volume at current zone air density
-        Real64 AFNInfilVolTotalOcc = 0.0;       // volume for infiltration of outside air for entire simulation during occupied at zone air density
-        Real64 AFNInfilVolMin = 9.9e9;          // a large number since finding minimum volume at current zone air density
-        Real64 SimpVentVolTotalOcc = 0.0;       // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied current
-        Real64 SimpVentVolMin = 9.9e9;          // a large number since finding minimum volumeat current zone air density
-        Real64 MechVentVolTotalStdDen = 0.0;    // volume for mechanical ventilation of outside air for entire simulation at standard density
+        Real64 MechVentVolTotalOcc = 0.0;    // volume for mechanical ventilation of outside air for entire simulation during occupied at current
+        Real64 MechVentVolMin = 9.9e9;       // a large number since finding minimum volume at current zone air density
+        Real64 InfilVolTotalOcc = 0.0;       // volume for infiltration of outside air for entire simulation during occupied at current density
+        Real64 InfilVolMin = 9.9e9;          // a large number since finding minimum volume at current zone air density
+        Real64 AFNInfilVolTotalOcc = 0.0;    // volume for AFN infiltration of outside air for entire simulation during occupied at zone air density
+        Real64 AFNInfilVolMin = 9.9e9;       // a large number since finding minimum volume at current zone air density
+        Real64 SimpVentVolTotalOcc = 0.0;    // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied current
+        Real64 SimpVentVolMin = 9.9e9;       // a large number since finding minimum volumeat current zone air density
+        Real64 AFNVentVolTotalOcc = 0.0;     // volume for AFN ventilation of outside air for entire simulation during occupied at zone air density
+        Real64 AFNVentVolMin = 9.9e9;        // a large number since finding minimum volume at current zone air density
+        Real64 MechVentVolTotalStdDen = 0.0; // volume for mechanical ventilation of outside air for entire simulation at standard density
         Real64 MechVentVolTotalOccStdDen = 0.0; // volume for mechanical ventilation of outside air for entire simulation during occupied at std
         Real64 InfilVolTotalStdDen = 0.0;       // volume for infiltration of outside air for entire simulation at standard density
         Real64 InfilVolTotalOccStdDen = 0.0;    // volume for infiltration of outside air for entire simulation during occupied standard density
@@ -1921,6 +1912,8 @@ namespace DataHeatBalance {
     );
 
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
+
+    void AllocateIntGains(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
 

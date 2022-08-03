@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -2220,32 +2221,32 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  DOAS DX Cooling Coil;    !- Cooling Coil Name",
 
         "Coil:Cooling:DX:SingleSpeed,",
-        "	DOAS DX Cooling Coil,   !- Name",
-        " 	AvailSched,            !- Availability Schedule Name",
-        "	autosize,              !- Gross Rated Total Cooling Capacity { W }",
-        "	autosize,              !- Gross Rated Sensible Heat Ratio",
-        "	4.40,                  !- Gross Rated Cooling COP { W / W }",
-        "	autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
-        "	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
-        "	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
-        "	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
-        "	Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
-        "	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
-        "	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
-        "	Cubic,                 !- Part Load Fraction Correlation Curve Name",
-        "	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
-        "	0.0,                   !- Nominal Time for Condensate Removal to Begin",
-        "	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
-        "	0.0,                   !- Maximum Cycling Rate",
-        "	0.0,                   !- Latent Capacity Time Constant",
-        "	Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
-        "	EvaporativelyCooled,   !- Condenser Type",
-        "	0.0,                   !- Evaporative Condenser Effectiveness",
-        "	,                      !- Evaporative Condenser Air Flow Rate",
-        "	autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
-        "	0.0,                   !- Crankcase Heater Capacity",
-        "	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+        "   DOAS DX Cooling Coil,   !- Name",
+        "   AvailSched,            !- Availability Schedule Name",
+        "   autosize,              !- Gross Rated Total Cooling Capacity { W }",
+        "   autosize,              !- Gross Rated Sensible Heat Ratio",
+        "   4.40,                  !- Gross Rated Cooling COP { W / W }",
+        "   autosize,              !- Rated Air Flow Rate { m3 / s }",
+        "   ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "   DOAS Mixed Air Outlet, !- Air Inlet Node Name",
+        "   DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
+        "   Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+        "   Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "   Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+        "   Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "   Cubic,                 !- Part Load Fraction Correlation Curve Name",
+        "   ,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "   0.0,                   !- Nominal Time for Condensate Removal to Begin",
+        "   0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+        "   0.0,                   !- Maximum Cycling Rate",
+        "   0.0,                   !- Latent Capacity Time Constant",
+        "   Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+        "   EvaporativelyCooled,   !- Condenser Type",
+        "   0.0,                   !- Evaporative Condenser Effectiveness",
+        "   ,                      !- Evaporative Condenser Air Flow Rate",
+        "   autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
+        "   0.0,                   !- Crankcase Heater Capacity",
+        "   10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "Coil:Heating:Fuel,",
         "  DOAS Heating Coil,       !- Name",
@@ -3195,32 +3196,32 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"  DOAS DX Cooling Coil;    !- Cooling Coil Name",
 
 //"Coil:Cooling:DX:SingleSpeed,",
-//"	DOAS DX Cooling Coil,   !- Name",
-//" 	AvailSched,            !- Availability Schedule Name",
-//"	autosize,              !- Gross Rated Total Cooling Capacity { W }",
-//"	autosize,              !- Gross Rated Sensible Heat Ratio",
-//"	4.40,                  !- Gross Rated Cooling COP { W / W }",
-//"	autosize,              !- Rated Air Flow Rate { m3 / s }",
-//"	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
-//"	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
-//"	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
-//"	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
-//"	Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
-//"	Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
-//"	Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
-//"	Cubic,                 !- Part Load Fraction Correlation Curve Name",
-//"	,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
-//"	0.0,                   !- Nominal Time for Condensate Removal to Begin",
-//"	0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
-//"	0.0,                   !- Maximum Cycling Rate",
-//"	0.0,                   !- Latent Capacity Time Constant",
-//"	Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
-//"	EvaporativelyCooled,   !- Condenser Type",
-//"	0.0,                   !- Evaporative Condenser Effectiveness",
-//"	,                      !- Evaporative Condenser Air Flow Rate",
-//"	autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
-//"	0.0,                   !- Crankcase Heater Capacity",
-//"	10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+//" DOAS DX Cooling Coil,   !- Name",
+//"     AvailSched,            !- Availability Schedule Name",
+//" autosize,              !- Gross Rated Total Cooling Capacity { W }",
+//" autosize,              !- Gross Rated Sensible Heat Ratio",
+//" 4.40,                  !- Gross Rated Cooling COP { W / W }",
+//" autosize,              !- Rated Air Flow Rate { m3 / s }",
+//" ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+//" DOAS Mixed Air Outlet, !- Air Inlet Node Name",
+//" DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
+//" Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+//" Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+//" Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+//" Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+//" Cubic,                 !- Part Load Fraction Correlation Curve Name",
+//" ,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+//" 0.0,                   !- Nominal Time for Condensate Removal to Begin",
+//" 0.0,                   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+//" 0.0,                   !- Maximum Cycling Rate",
+//" 0.0,                   !- Latent Capacity Time Constant",
+//" Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+//" EvaporativelyCooled,   !- Condenser Type",
+//" 0.0,                   !- Evaporative Condenser Effectiveness",
+//" ,                      !- Evaporative Condenser Air Flow Rate",
+//" autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
+//" 0.0,                   !- Crankcase Heater Capacity",
+//" 10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
 //"Coil:Heating:Fuel,",
 //"  DOAS Heating Coil,       !- Name",
@@ -4966,7 +4967,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 ////state->dataGlobal->DDOnlySimulation = true;
 
 // ManageSimulation();
-////	compare_err_stream( "" );
+////    compare_err_stream( "" );
 
 // EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntTot, "Overhang" ) );
 // EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntExt, "Overhang" ) );
@@ -7893,7 +7894,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
         {"Source Energy End Use Components Summary", eleckWh},
-        {"Source Energy End Use Component Per Conditioned Floor Area", 10000.0 / expectedBuildingConditionedFloorArea},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / expectedBuildingConditionedFloorArea},
         {"Source Energy End Use Components Per Total Floor Area", 10000.0 / expectedBuildingGrossFloorArea},
     });
 
@@ -8229,41 +8230,29 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
 TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
 {
-    StatLineType lineTypeReturn = StatLineType::Initialized;
-    bool desCondLinePassed = false;
-    bool htgDesignLinePassed = false;
-    bool clgDesignLinePassed = false;
-    bool isKoppen = false;
+
+    auto getLineType = [](const std::string statLine) -> StatLineType {
+        StatLineType lineTypeReturn = StatLineType::Initialized;
+        bool desCondLinePassed = false;
+        bool htgDesignLinePassed = false;
+        bool clgDesignLinePassed = false;
+        bool isKoppen = false;
+        bool insideLiquidPrecipitation = false;
+        parseStatLine(statLine, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen, insideLiquidPrecipitation);
+        return lineTypeReturn;
+    };
+
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
-    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
-    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, getLineType(coolingLineGoodDegrees)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
-    parseStatLine(koppenLineWithDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineWithDots)));
 
-    lineTypeReturn = StatLineType::Initialized;
-    desCondLinePassed = false;
-    htgDesignLinePassed = false;
-    clgDesignLinePassed = false;
-    isKoppen = false;
     std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
-    parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, getLineType(koppenLineNoDots)));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
@@ -9056,7 +9045,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
         {"Source Energy End Use Components Summary", eleckWh / largeConv},
-        {"Source Energy End Use Component Per Conditioned Floor Area", 10000.0 / largeConv / (expectedBuildingConditionedFloorArea / areaConv)},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / largeConv / (expectedBuildingConditionedFloorArea / areaConv)},
         {"Source Energy End Use Components Per Total Floor Area", 10000.0 / largeConv / (expectedBuildingGrossFloorArea / areaConv)},
     });
 
@@ -10127,4 +10116,54 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
     }
+}
+
+TEST_F(SQLiteFixture, StatFile_TMYx)
+{
+    // Test for #9400 and #9420
+    state->files.inStatFilePath.filePath =
+        configured_source_directory() / "tst/EnergyPlus/unit/Resources/USA_IL_Chicago.OHare.Intl.AP.725300_TMYx.stat";
+
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
+
+    SetPredefinedTables(*state);
+
+    FillWeatherPredefinedEntries(*state);
+
+    // Enable the ClimaticDataSummary report, in a future-proof way
+    auto &predefReports = state->dataOutRptPredefined->reportName;
+    auto it = std::find_if(predefReports.begin(), predefReports.end(), [](const auto &s) { return s.name == "ClimaticDataSummary"; });
+    ASSERT_NE(it, predefReports.end());
+    it->show = true;
+    // EXPECT_EQ("ClimaticDataSummary", state->dataOutRptPredefined->reportName(1).name);
+    // EXPECT_TRUE(state->dataOutRptPredefined->reportName(1).show);
+
+    WritePredefinedTables(*state);
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // - Monthly Statistics for Liquid Precipitation [mm]
+    //              Jan     Feb     Mar     Apr     May     Jun     Jul     Aug     Sep     Oct     Nov     Dec
+    //    Total     41      18      65      48      110     106     75      53      24      143     63      61
+    //  Max Hourly  5       5       7       6       7       7       5       6       5       7       6       6
+    //  => Total: 807
+    //     Max hourly: 7, occurs in Mar
+
+    constexpr static auto queryStr = R"sqlite(SELECT Value FROM TabularDataWithStrings
+        WHERE ReportName = "ClimaticDataSummary"
+          AND TableName = "Weather Statistics File"
+          AND RowName = "{}";
+    )sqlite";
+    EXPECT_EQ(807.0, execAndReturnFirstDouble(fmt::format(queryStr, "Annual Total Precipitation")));
+    EXPECT_EQ(7.0, execAndReturnFirstDouble(fmt::format(queryStr, "Max Hourly Precipitation")));
+    auto result = queryResult(fmt::format(queryStr, "Max Hourly Precipitation Occurs in"), "TabularDataWithStrings");
+    ASSERT_EQ(1, result.size());
+    ASSERT_FALSE(result[0].empty());
+    EXPECT_EQ("Mar", result[0][0]);
 }

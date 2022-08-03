@@ -70,34 +70,6 @@ struct EnergyPlusData;
 
 namespace ZoneTempPredictorCorrector {
 
-    // ZoneControlTypes
-
-    enum class ZoneControlTypes
-    {
-        Invalid = -1,
-        TStat = 1,
-        TCTStat = 2,
-        OTTStat = 3,
-        HStat = 4,
-        TandHStat = 5,
-        StagedDual = 6,
-        Num
-    };
-
-    enum class AdaptiveComfortModel
-    {
-        Invalid = -1,
-        ADAP_NONE = 1,
-        ASH55_CENTRAL = 2,
-        ASH55_UPPER_90 = 3,
-        ASH55_UPPER_80 = 4,
-        CEN15251_CENTRAL = 5,
-        CEN15251_UPPER_I = 6,
-        CEN15251_UPPER_II = 7,
-        CEN15251_UPPER_III = 8,
-        Num
-    };
-
     struct ZoneTempControl
     {
         std::string Name;          // Name of the zone
@@ -185,10 +157,8 @@ namespace ZoneTempPredictorCorrector {
                                         Real64 ZoneMultiplierList);
 
     void CorrectZoneAirTemp(EnergyPlusData &state,
-                            Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
-                            bool ShortenTimeStepSys,
-                            bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-                            Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                            Real64 &ZoneTempChange,     // Temperature change in zone air between previous and current timestep
+                            bool UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
     );
 
     void PushZoneTimestepHistories(EnergyPlusData &state);
@@ -204,8 +174,6 @@ namespace ZoneTempPredictorCorrector {
                                        Real64 &oldVal0,
                                        Real64 &oldVal1,
                                        Real64 &oldVal2,
-                                       Real64 &oldVal3,
-                                       Real64 &oldVal4,
                                        Real64 &newVal0,
                                        Real64 &newVal1,
                                        Real64 &newVal2,

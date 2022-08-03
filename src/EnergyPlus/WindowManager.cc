@@ -2266,8 +2266,6 @@ namespace WindowManager {
         Real64 Tleft;           // For airflow windows, temperature of the glass faces adjacent
         Real64 Tright;
 
-        int SrdSurfsNum;       // Surrounding surfaces list number
-        int SrdSurfNum;        // Surrounding surface number DO loop counter
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;       // LWR from surrouding srfs
@@ -2629,22 +2627,13 @@ namespace WindowManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            surface.ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                        }
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            surface.ViewFactorGroundIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                        }
-                        for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                             SrdSurfNum++) {
-                            SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(
-                                    state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                DataGlobalConstants::KelvinConv;
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                             DataGlobalConstants::KelvinConv;
                             OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
@@ -2804,9 +2793,9 @@ namespace WindowManager {
         Real64 rad_out_lw_srd_per_area = 0;
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-            if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+            if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+                for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                     SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs = GetCurrentScheduleValue(
                                          state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
@@ -3832,11 +3821,9 @@ namespace WindowManager {
             ++iter;
 
             // Calculations based on number of glass layers
-            auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-
             GetHeatBalanceEqCoefMatrix(state,
                                        SurfNum,
-                                       SELECT_CASE_var,
+                                       state.dataWindowManager->ngllayer,
                                        ShadeFlag,
                                        sconsh,
                                        TauShIR,
@@ -6990,17 +6977,18 @@ namespace WindowManager {
         Real64 rIn = 1.0 / (hInRad + state.dataWindowManager->hcin);
         Real64 Rbare = 0;
 
-        auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-
-        if (SELECT_CASE_var == 1) {
+        switch (state.dataWindowManager->ngllayer) {
+        // the switch cases here are just the integer number of layers, not exactly "magic" numbers 1, 2, 3. and 4.
+        case 1:
             Rbare = 1.0 / state.dataWindowManager->scon[0];
             state.dataWindowManager->Rtot = rOut + Rbare + rIn;
             SHGC = AbsBeamNorm(1) * (rOut + (0.5 / state.dataWindowManager->scon[0])) /
                    state.dataWindowManager->Rtot; // BG changed for CR7682 (solar absorbed in middle of layer)
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
 
-        } else if (SELECT_CASE_var == 2) {
+        case 2:
             hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
                                        pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
             Rbare = 1.0 / state.dataWindowManager->scon[0] + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon[1];
@@ -7010,8 +6998,9 @@ namespace WindowManager {
                        state.dataWindowManager->Rtot; // CR7682
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
 
-        } else if (SELECT_CASE_var == 3) {
+        case 3:
             hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
                                        pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
             hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
@@ -7028,8 +7017,9 @@ namespace WindowManager {
                        state.dataWindowManager->Rtot;
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
 
-        } else if (SELECT_CASE_var == 4) {
+        case 4:
             hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
                                        pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
             hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
@@ -7052,6 +7042,9 @@ namespace WindowManager {
                        state.dataWindowManager->Rtot; // CR7682
             SHGC += AbsBeamShadeNorm;
             SHGC += TSolNorm;
+            break;
+        default:
+            break;
         }
         NominalConductance = 1.0 / (rOut + Rbare + rIn);
     }
@@ -7188,8 +7181,7 @@ namespace WindowManager {
 
             ++iter;
 
-            auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-            GetHeatBalanceEqCoefMatrixSimple(state, SELECT_CASE_var, hr, hgap, Aface, Bface);
+            GetHeatBalanceEqCoefMatrixSimple(state, state.dataWindowManager->ngllayer, hr, hgap, Aface, Bface);
 
             LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx,
                             d); // Note that these routines change Aface;

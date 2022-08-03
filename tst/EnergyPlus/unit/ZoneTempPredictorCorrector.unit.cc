@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -105,7 +105,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -124,7 +123,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -155,11 +153,10 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->EAMFLxHumRat.allocate(1);
     state->dataHeatBalFanSys->CTMFL.allocate(1);
 
-    state->dataHeatBalFanSys->SumHmARaW.allocate(1);
-    state->dataHeatBalFanSys->SumHmARa.allocate(1);
+    state->dataHeatBalFanSys->SumHmARaW.dimension(1, 0.0);
+    state->dataHeatBalFanSys->SumHmARa.dimension(1, 0.0);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-    state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataHeatBalFanSys->MDotOA.allocate(1);
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
@@ -1003,7 +1000,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -1019,7 +1015,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
@@ -1769,4 +1764,35 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     EXPECT_NEAR(OutReqToHeatSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 10800.0;
     EXPECT_NEAR(OutReqToCoolSP, ExpectedResult, AcceptableTolerance);
+}
+
+TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
+{
+    Real64 PriorTimeStep = 0.25;
+    state->dataHVACGlobal->TimeStepSys = 0.125;
+    Real64 myVarValue = 5.0;
+    Real64 HistoryValue1 = 1.0;
+    Real64 HistoryValue2 = 2.0;
+    Real64 HistoryValue3 = 3.0;
+    Real64 DSHistoryValue1 = 0.0;
+    Real64 DSHistoryValue2 = 0.0;
+    Real64 DSHistoryValue3 = 0.0;
+    Real64 DSHistoryValue4 = 0.0;
+
+    EXPECT_NEAR(myVarValue, 5.0, 0.000001); // value after corrector and before simulation down-shifts
+    DownInterpolate4HistoryValues(PriorTimeStep,
+                                  state->dataHVACGlobal->TimeStepSys,
+                                  HistoryValue1,
+                                  HistoryValue2,
+                                  HistoryValue3,
+                                  myVarValue,
+                                  DSHistoryValue1,
+                                  DSHistoryValue2,
+                                  DSHistoryValue3,
+                                  DSHistoryValue4);
+    EXPECT_NEAR(myVarValue, HistoryValue1, 0.000001); // setting up history terms for shortened time step simulation
+    EXPECT_NEAR(DSHistoryValue1, 1.5, 0.000001);      // values are interpolated to provide history terms at the new time step
+    EXPECT_NEAR(DSHistoryValue2, 2.0, 0.000001);
+    EXPECT_NEAR(DSHistoryValue3, 2.5, 0.000001);
+    EXPECT_NEAR(DSHistoryValue4, 3.0, 0.000001);
 }

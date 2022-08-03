@@ -1153,6 +1153,8 @@ This alpha field defines the source of superheated refrigerant gas from which th
 
 \begin{itemize}
 \item
+  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+\item
   \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
   \hyperref[coilcoolingdxtwospeed]{Coil:Cooling:DX:TwoSpeed}
@@ -4062,6 +4064,7 @@ This alpha field defines the name of a bi-quadratic performance curve (ref: Perf
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
+This numeric field defines the minimum outdoor air dry-bulb temperature where the heating coil compressor turns off. If this input field is left blank, the default value is -8 °C.
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature to Turn On Compressor}\label{field-outdoor-dry-bulb-temperature-to-turn-on-compressor}
 
@@ -5743,7 +5746,7 @@ The output variable is the total source energy output of the integrated heat pum
 
 \subsection{Coil:WaterHeating:AirToWaterHeatPump:Pumped}\label{coilwaterheatingairtowaterheatpumppumped}
 
-EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \lstinline!WaterHeater:Mixed!), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. From the air-side heat transfer perspective, the water-heater receives heating energy from air. Thus it is considered as a cooling coil, and the output variable names are using "Cooling Coil".
+EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \lstinline!WaterHeater:Mixed!), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. From the air-side heat transfer perspective, the water-heater receives heating energy from air. Thus it is considered as a cooling coil, and the output variable names are using ``Cooling Coil''.
 
 The \hyperref[waterheaterheatpumppumpedcondenser]{\lstinline!WaterHeater:HeatPump:PumpedCondenser!} compound object, water heater tank object (e.g., \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}), and fan object (e.g., \hyperref[fanonoff]{\lstinline!Fan:OnOff!}) are defined elsewhere in this reference document. \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
 
@@ -5933,65 +5936,65 @@ Coil:WaterHeating:AirToWaterHeatPump:Pumped,
 
 \begin{itemize}
 \item
-  HVAC,Average,Heating Coil Total Heating Rate {[}W{]}
+  HVAC,Average,Cooling Coil Total Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Total Heating Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Total Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Runtime Fraction {[]}
+  HVAC,Average,Cooling Coil Runtime Fraction {[]}
 \item
-  HVAC,Average,Heating Coil Crankcase Heater Electricity Rate {[}W{]}
+  HVAC,Average,Cooling Coil Crankcase Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Crankcase Heater Electricity Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Crankcase Heater Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Total Water Heating Rate {[}W{]}
+  HVAC,Average,Cooling Coil Total Water Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Total Water Heating Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Total Water Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Water Heating Electricity Rate {[}W{]}
+  HVAC,Average,Cooling Coil Water Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Water Heating Electricity Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Water Heating Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-6}
+\paragraph{Cooling Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-6}
 
 This output field is the average total heating rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-6}
+\paragraph{Cooling Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-6}
 
 This output field is the total heating output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-4}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-4}
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
-\paragraph{Heating Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-1}
+\paragraph{Cooling Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-1}
 
 This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
-\paragraph{Heating Coil Crankcase Heater Electricity Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-2}
+\paragraph{Cooling Coil Crankcase Heater Electricity Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-2}
 
 This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Total Water Heating Rate {[}W{]}}\label{heating-coil-total-water-heating-rate-w}
+\paragraph{Cooling Coil Total Water Heating Rate {[}W{]}}\label{heating-coil-total-water-heating-rate-w}
 
 This output field is the average water heating rate output of the DX coil (condenser coil plus condenser water pump) in Watts for the timestep being reported. This is determined using the inlet and outlet water temperatures and the water mass flow rate through the condenser coil.
 
-\paragraph{Heating Coil Total Water Heating Energy {[}J{]}}\label{heating-coil-total-water-heating-energy-j}
+\paragraph{Cooling Coil Total Water Heating Energy {[}J{]}}\label{heating-coil-total-water-heating-energy-j}
 
 This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported. This is determined using the inlet and outlet water temperatures and the water mass flow rate through the condenser coil.
 
-\paragraph{Heating Coil Water Heating Electricity Rate {[}W{]}}\label{heating-coil-water-heating-electric-powerw}
+\paragraph{Cooling Coil Water Heating Electricity Rate {[}W{]}}\label{heating-coil-water-heating-electric-powerw}
 
 This output field is the average electricity consumption rate of the DX coil compressor and condenser pump in Watts for the timestep being reported.
 
-\paragraph{Heating Coil Water Heating Electricity Energy {[}J{]}}\label{heating-coil-water-heating-electric-energy-j}
+\paragraph{Cooling Coil Water Heating Electricity Energy {[}J{]}}\label{heating-coil-water-heating-electric-energy-j}
 
 This output field is the electricity consumption of the DX coil compressor and condenser pump in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
 
 \subsection{Coil:WaterHeating:AirToWaterHeatPump:Wrapped}\label{coilwaterheatingairtowaterheatpumpwrapped}
 
-EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \lstinline!WaterHeater:Stratified!), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. From the air-side heat transfer perspective, the water-heater receives heating energy from the air. Thus it is considered as a cooling coil, and the output variable names are using "Cooling Coil".
+EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \lstinline!WaterHeater:Stratified!), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. From the air-side heat transfer perspective, the water-heater receives heating energy from the air. Thus it is considered as a cooling coil, and the output variable names are using ``Cooling Coil''.
 
 The \hyperref[waterheaterheatpumpwrappedcondenser]{\lstinline!WaterHeater:HeatPump:WrappedCondenser!} compound object, water heater tank object (e.g., \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}), and fan object (e.g., \hyperref[fanonoff]{\lstinline!Fan:OnOff!}) are defined elsewhere in this reference document. \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped! object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
 
@@ -6134,58 +6137,58 @@ Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
 
 \begin{itemize}
 \item
-  HVAC,Average,Heating Coil Total Heating Rate {[}W{]}
+  HVAC,Average,Cooling Coil Total Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Total Heating Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Total Heating Energy {[}J{]}
 \item
-  HVAC,Average, Heating Coil Runtime Fraction {[]}
+  HVAC,Average,Cooling Coil Runtime Fraction {[]}
 \item
-  HVAC,Average,Heating Coil Crankcase Heater Electricity Rate {[}W{]}
+  HVAC,Average,Cooling Coil Crankcase Heater Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Heating Coil Crankcase Heater Electricity Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Crankcase Heater Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Total Water Heating Rate {[}W{]}
+  HVAC,Average,Cooling Coil Total Water Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Total Water Heating Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Total Water Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Water Heating Electricity Rate {[}W{]}
+  HVAC,Average,Cooling Coil Water Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Water Heating Electricity Energy {[}J{]}
+  HVAC,Sum,Cooling Coil Water Heating Electricity Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-7}
+\paragraph{Cooling Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-7}
 
 This output field is the average total heating rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-7}
+\paragraph{Cooling Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-7}
 
 This output field is the total heating output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-5}
+\paragraph{Cooling Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-5}
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
-\paragraph{Heating Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-2}
+\paragraph{Cooling Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-2}
 
 This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
-\paragraph{Heating Coil Crankcase Heater Electricity Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-3}
+\paragraph{Cooling Coil Crankcase Heater Electricity Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-3}
 
 This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Total Water Heating Rate {[}W{]}}\label{heating-coil-total-water-heating-rate-w-1}
+\paragraph{Cooling Coil Total Water Heating Rate {[}W{]}}\label{heating-coil-total-water-heating-rate-w-1}
 
 This output field is the average water heating rate output of the DX coil (condenser coil plus condenser water pump) in Watts for the timestep being reported.
 
-\paragraph{Heating Coil Total Water Heating Energy {[}J{]}}\label{heating-coil-total-water-heating-energy-j-1}
+\paragraph{Cooling Coil Total Water Heating Energy {[}J{]}}\label{heating-coil-total-water-heating-energy-j-1}
 
 This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported.
 
-\paragraph{Heating Coil Water Heating Electricity Rate {[}W{]}}\label{heating-coil-water-heating-electric-powerw-1}
+\paragraph{Cooling Coil Water Heating Electricity Rate {[}W{]}}\label{heating-coil-water-heating-electric-powerw-1}
 
 This output field is the average electricity consumption rate of the DX coil compressor in Watts for the timestep being reported.
 
-\paragraph{Heating Coil Water Heating Electricity Energy {[}J{]}}\label{heating-coil-water-heating-electric-energy-j-1}
+\paragraph{Cooling Coil Water Heating Electricity Energy {[}J{]}}\label{heating-coil-water-heating-electric-energy-j-1}
 
 This output field is the electricity consumption of the DX coil compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
