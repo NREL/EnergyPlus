@@ -93,6 +93,8 @@ using PlantUtilities::InitComponentNodes;
 using PlantUtilities::ScanPlantLoopsForObject;
 using PlantUtilities::SetComponentFlowRate;
 
+constexpr std::array<std::string_view, static_cast<int>(PlantLoopFluidType::Num)> PlantLoopFluidTypeNamesUC{"Water", "Steam"};
+
 PlantComponent *PlantProfileData::factory(EnergyPlusData &state, std::string const &objectName)
 {
     if (state.dataPlantLoadProfile->GetPlantLoadProfileInputFlag) {
@@ -413,9 +415,9 @@ void GetPlantProfileInput(EnergyPlusData &state)
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).Type =
                 DataPlant::PlantEquipmentType::PlantLoadProfile; // parameter assigned in DataPlant
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "Steam")) {
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType = PlantLoopFluidType::Steam;
-            } else {
+            state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType = static_cast<PlantLoopFluidType>(
+                getEnumerationValue(PlantLoopFluidTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
+            if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType == PlantLoopFluidType::Invalid) {
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType = PlantLoopFluidType::Water;
             }
 

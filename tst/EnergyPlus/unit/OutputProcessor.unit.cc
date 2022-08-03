@@ -1189,7 +1189,7 @@ namespace OutputProcessor {
                                                                  {"ENERGYTRANSFER", "EnergyTransfer"},
                                                                  {"ENERGYXFER", "EnergyTransfer"},
                                                                  {"XFER", "EnergyTransfer"},
-                                                                 {"STEAM", "Steam"},
+                                                                 {"DISTRICTHEATINGSTEAM", "DistrictHeatingSteam"},
                                                                  {"DISTRICTCOOLING", "DistrictCooling"},
                                                                  {"DISTRICTHEATINGWATER", "DistrictHeatingWater"},
                                                                  {"ELECTRICITYPRODUCED", "ElectricityProduced"},
@@ -1253,7 +1253,7 @@ namespace OutputProcessor {
     {
         std::map<std::string, int> const resource_map = {{"Electricity:Facility", 100},
                                                          {"NaturalGas:Facility", 101},
-                                                         {"DistricHeating:Facility", 102},
+                                                         {"DistricHeatingWater:Facility", 102},
                                                          {"DistricCooling:Facility", 103},
                                                          {"ElectricityNet:Facility", 104},
                                                          {"Electricity:Building", 201},

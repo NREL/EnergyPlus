@@ -4627,7 +4627,7 @@ namespace OutputProcessor {
             state.dataOutputProcessor->indexGroupKey = 100;
         } else if (has(meterName, "NaturalGas:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 101;
-        } else if (has(meterName, "DistricHeating:Facility")) {
+        } else if (has(meterName, "DistricHeatingWater:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 102;
         } else if (has(meterName, "DistricCooling:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 103;
