@@ -5008,7 +5008,8 @@ namespace WeatherManager {
         if (!state.dataWeatherManager->WeatherFileExists) { // No weather file exists but the user requested one--print error message
 
             if (state.dataGlobal->DoWeathSim) {
-                ShowWarningError(state, "Weather Environment(s) requested, but no weather file found");
+                ShowSevereError(state, "GetNextEnvironment: Weather Environment(s) requested, but no weather file found");
+                ShowFatalError(state, "Due to previous error condition, simulation terminated");
             }
 
         } // ... end of WeatherFileExists IF-THEN
