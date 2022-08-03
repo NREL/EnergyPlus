@@ -302,100 +302,38 @@ namespace OutputProcessor {
         // of those extra things from input that satisfy this condition.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Item;
-        int Loop;
-        int Pos;
-        int MinLook;
-        int MaxLook;
 
         // Make sure that input has been read
         GetReportVariableInput(state);
 
         auto &op(state.dataOutputProcessor);
 
-        if (op->NumOfReqVariables > 0) {
-            // Do a quick check
-            Item = UtilityRoutines::FindItem(VarName, op->ReqRepVars, &ReqReportVariables::VarName);
+        // Zero out the array / counter we use to determine if there are duplicates
+        op->NumExtraVars = 0;
+        op->ReportList = 0;
 
-            op->NumExtraVars = 0;
-            op->ReportList = 0;
-            MinLook = 999999999;
-            MaxLook = -999999999;
+        for (int i = 1; i <= op->NumOfReqVariables; ++i) {
+            auto &reqRepVar = op->ReqRepVars(i);
 
-            if (Item != 0) {
-                Loop = Item;
-                Pos = Item;
-                MinLook = min(MinLook, Pos);
-                MaxLook = max(MaxLook, Pos);
-                while (Loop <= op->NumOfReqVariables && Pos != 0) {
-                    //  Mark all with blank keys as used
-                    if (op->ReqRepVars(Loop).Key.empty()) {
-                        op->ReqRepVars(Loop).Used = true;
-                    }
-                    if (Loop < op->NumOfReqVariables) {
-                        Pos = UtilityRoutines::FindItem(VarName, op->ReqRepVars({Loop + 1, op->NumOfReqVariables}), &ReqReportVariables::VarName);
-                        if (Pos != 0) {
-                            MinLook = min(MinLook, Loop + Pos);
-                            MaxLook = max(MaxLook, Loop + Pos);
-                        }
-                    } else {
-                        Pos = 1;
-                    }
-                    Loop += Pos;
-                }
-                BuildKeyVarList(state, KeyedValue, VarName, MinLook, MaxLook);
-                AddBlankKeys(state, VarName, MinLook, MaxLook);
-            }
-        }
-    }
-
-    void BuildKeyVarList(EnergyPlusData &state,
-                         std::string_view const KeyedValue,   // Associated Key for this variable
-                         std::string_view const VariableName, // String Name of variable
-                         int const MinIndx,                   // Min number (from previous routine) for this variable
-                         int const MaxIndx                    // Max number (from previous routine) for this variable
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine builds an initial list (from ReqRepVars) of
-        // pointers to that data structure for this KeyedValue and VariableName.
-
-        // METHODOLOGY EMPLOYED:
-        // Go through the ReqRepVars list and add those
-        // that match (and dont duplicate ones already in the list).
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        bool Dup;
-        auto &op(state.dataOutputProcessor);
-
-        for (Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
-            if (op->ReqRepVars(Loop).Key.empty()) continue;
-            if (!UtilityRoutines::SameString(op->ReqRepVars(Loop).VarName, VariableName)) continue;
-            if (!(UtilityRoutines::SameString(op->ReqRepVars(Loop).Key, KeyedValue) ||
-                  RE2::FullMatch(std::string{KeyedValue}, "(?i)" + op->ReqRepVars(Loop).Key)))
+            if (!UtilityRoutines::SameString(reqRepVar.VarName, VarName)) {
                 continue;
+            }
 
-            //   A match.  Make sure doesn't duplicate
+            if (!reqRepVar.Key.empty() && !(reqRepVar.is_simple_string && UtilityRoutines::SameString(reqRepVar.Key, KeyedValue)) &&
+                !(!reqRepVar.is_simple_string && RE2::FullMatch(KeyedValue, *(reqRepVar.case_insensitive_pattern)))) {
+                continue;
+            }
 
-            op->ReqRepVars(Loop).Used = true;
-            Dup = false;
-            for (Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
-                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == op->ReqRepVars(Loop).frequency) {
+            // A match. Make sure doesn't duplicate
+            reqRepVar.Used = true;
+            bool Dup = false;
+            // op->ReportList is allocated to a large value, so we can't use a std::find_if on it
+            for (int Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
+                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == reqRepVar.frequency &&
+                    op->ReqRepVars(op->ReportList(Loop1)).SchedPtr == reqRepVar.SchedPtr) {
                     Dup = true;
-                } else {
-                    continue;
+                    break;
                 }
-                //  So Same Report Frequency
-                if (op->ReqRepVars(op->ReportList(Loop1)).SchedPtr != op->ReqRepVars(Loop).SchedPtr) Dup = false;
             }
 
             if (!Dup) {
@@ -403,63 +341,7 @@ namespace OutputProcessor {
                 if (op->NumExtraVars == op->NumReportList) {
                     op->ReportList.redimension(op->NumReportList += 100, 0);
                 }
-                op->ReportList(op->NumExtraVars) = Loop;
-            }
-        }
-    }
-
-    void AddBlankKeys(EnergyPlusData &state,
-                      std::string_view const VariableName, // String Name of variable
-                      int const MinIndx,                   // Min number (from previous routine) for this variable
-                      int const MaxIndx                    // Max number (from previous routine) for this variable
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine adds to the ReportList any report variables that have
-        // been requested for all keys of that report variable (if it doesnt duplicate
-        // a frequency already on the list).
-
-        // METHODOLOGY EMPLOYED:
-        // Go through the ReqRepVars list and add those
-        // that match (and dont duplicate ones already in the list).
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        bool Dup;
-        auto &op(state.dataOutputProcessor);
-
-        for (Loop = MinIndx; Loop <= MaxIndx; ++Loop) {
-            if (!op->ReqRepVars(Loop).Key.empty()) continue;
-            if (!UtilityRoutines::SameString(op->ReqRepVars(Loop).VarName, VariableName)) continue;
-
-            //   A match.  Make sure doesnt duplicate
-
-            Dup = false;
-            for (Loop1 = 1; Loop1 <= op->NumExtraVars; ++Loop1) {
-                // IF (ReqRepVars(ReportList(Loop1))%ReportFreq == ReqRepVars(Loop)%ReportFreq) Dup=.TRUE.
-                if (op->ReqRepVars(op->ReportList(Loop1)).frequency == op->ReqRepVars(Loop).frequency) {
-                    Dup = true;
-                } else {
-                    continue;
-                }
-                //  So Same Report Frequency
-                if (op->ReqRepVars(op->ReportList(Loop1)).SchedPtr != op->ReqRepVars(Loop).SchedPtr) Dup = false;
-            }
-
-            if (!Dup) {
-                ++op->NumExtraVars;
-                if (op->NumExtraVars == op->NumReportList) {
-                    op->ReportList.redimension(op->NumReportList += 100, 0);
-                }
-                op->ReportList(op->NumExtraVars) = Loop;
+                op->ReportList(op->NumExtraVars) = i;
             }
         }
     }
@@ -559,10 +441,12 @@ namespace OutputProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::vector<std::string> const PossibleFreq({"deta", "time", "hour", "dail", "mont", "runp", "envi", "annu"});
+        static std::vector<std::string> const PossibleFreqs({"DETA", "TIME", "HOUR", "DAIL", "MONT", "RUNP", "ENVI", "ANNU"});
         //=(/'detail','Timestep','Hourly','Daily','Monthly','RunPeriod','Environment','Annual'/)
-        static std::vector<std::string> const ExactFreqString(
+        static std::vector<std::string> const ExactFreqStrings(
             {"Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Environment", "Annual"});
+        static std::vector<std::string> const ExactFreqStringsUpper(
+            {"DETAILED", "TIMESTEP", "HOURLY", "DAILY", "MONTHLY", "RUNPERIOD", "ENVIRONMENT", "ANNUAL"});
         // Vector of the result, was { -1, 0, 1, 2, 3, 4, 4, 4 } before the addition of Yearly;
         static std::vector<ReportingFrequency> const FreqValues({ReportingFrequency::EachCall,
                                                                  ReportingFrequency::TimeStep,
@@ -583,18 +467,20 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         ReportingFrequency ReportFreq(ReportingFrequency::Hourly); // Default
+        // TODO: I think it's supposed to be upper case already, but tests aren't doing that at least...
+        const std::string FreqStringUpper = UtilityRoutines::MakeUPPERCase(FreqString);
         std::string::size_type const LenString = min(len(FreqString), static_cast<std::string::size_type>(4u));
 
         if (LenString < 4u) {
             return ReportFreq;
         }
 
-        std::string const FreqStringTrim(FreqString.substr(0, LenString));
+        std::string const FreqStringTrim(FreqStringUpper.substr(0, LenString));
         for (unsigned Loop = 0; Loop < FreqValues.size(); ++Loop) {
-            if (UtilityRoutines::SameString(FreqStringTrim, PossibleFreq[Loop])) {
-                if (!UtilityRoutines::SameString(FreqString, ExactFreqString[Loop])) {
-                    ShowWarningError(state, "DetermineFrequency: Entered frequency=\"" + FreqString + "\" is not an exact match to key strings.");
-                    ShowContinueError(state, "Frequency=" + ExactFreqString[Loop] + " will be used.");
+            if (FreqStringTrim == PossibleFreqs[Loop]) {
+                if (FreqStringUpper != ExactFreqStringsUpper[Loop]) {
+                    ShowWarningError(state, format("DetermineFrequency: Entered frequency=\"{}\" is not an exact match to key strings.", FreqString));
+                    ShowContinueError(state, format("Frequency={} will be used.", ExactFreqStrings[Loop]));
                 }
                 ReportFreq = std::max(FreqValues[Loop], state.dataOutputProcessor->minimumReportFrequency);
                 break;
@@ -688,35 +574,43 @@ namespace OutputProcessor {
                                                                      cNumericFieldNames);
 
             // Check for duplicates?
+            auto &reqRepVar = op->ReqRepVars(Loop);
+            reqRepVar.Key = cAlphaArgs(1);
+            if (reqRepVar.Key == "*") {
+                reqRepVar.Key = std::string();
+            }
 
-            op->ReqRepVars(Loop).Key = cAlphaArgs(1);
-            if (op->ReqRepVars(Loop).Key == "*") {
-                op->ReqRepVars(Loop).Key = std::string();
+            bool is_simple_string = !DataOutputs::isKeyRegexLike(reqRepVar.Key);
+            reqRepVar.is_simple_string = is_simple_string;
+            if (!is_simple_string) {
+                reqRepVar.case_insensitive_pattern = std::make_shared<RE2>("(?i)" + reqRepVar.Key);
             }
 
             std::string::size_type const lbpos = index(cAlphaArgs(2), '['); // Remove Units designation if user put it in
             if (lbpos != std::string::npos) {
                 cAlphaArgs(2).erase(lbpos);
+                // right trim
+                cAlphaArgs(2) = cAlphaArgs(2).substr(0, std::min(cAlphaArgs(2).find_last_not_of(" \f\n\r\t\v") + 1, cAlphaArgs(2).size()));
             }
-            op->ReqRepVars(Loop).VarName = cAlphaArgs(2);
+            reqRepVar.VarName = cAlphaArgs(2);
 
-            op->ReqRepVars(Loop).frequency = determineFrequency(state, cAlphaArgs(3));
+            reqRepVar.frequency = determineFrequency(state, cAlphaArgs(3));
 
             // Schedule information
-            op->ReqRepVars(Loop).SchedName = cAlphaArgs(4);
-            if (not_blank(op->ReqRepVars(Loop).SchedName)) {
-                op->ReqRepVars(Loop).SchedPtr = GetScheduleIndex(state, op->ReqRepVars(Loop).SchedName);
-                if (op->ReqRepVars(Loop).SchedPtr == 0) {
+            reqRepVar.SchedName = cAlphaArgs(4);
+            if (not_blank(reqRepVar.SchedName)) {
+                reqRepVar.SchedPtr = GetScheduleIndex(state, reqRepVar.SchedName);
+                if (reqRepVar.SchedPtr == 0) {
                     ShowSevereError(state,
-                                    "GetReportVariableInput: " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ':' + op->ReqRepVars(Loop).VarName +
-                                        "\" invalid " + cAlphaFieldNames(4) + "=\"" + op->ReqRepVars(Loop).SchedName + "\" - not found.");
+                                    "GetReportVariableInput: " + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ':' + reqRepVar.VarName +
+                                        "\" invalid " + cAlphaFieldNames(4) + "=\"" + reqRepVar.SchedName + "\" - not found.");
                     ErrorsFound = true;
                 }
             } else {
-                op->ReqRepVars(Loop).SchedPtr = 0;
+                reqRepVar.SchedPtr = 0;
             }
 
-            op->ReqRepVars(Loop).Used = false;
+            reqRepVar.Used = false;
         }
 
         if (ErrorsFound) {
@@ -2467,6 +2361,10 @@ namespace OutputProcessor {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
+
+        if (!op->MeterValue.allocated()) {
+            return;
+        }
 
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             if (op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDec && op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDiff) {
@@ -5876,7 +5774,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 if (op->RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
                 auto &rVar(op->RVariableTypes(Loop).VarPtr);
                 // Update meters on the TimeStep  (Zone)
-                if (rVar.MeterArrayPtr != 0) {
+                if (rVar.MeterArrayPtr != 0 && !state.dataOutputProcessor->MeterValue.empty()) {
                     Real64 TimeStepValue = rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult;
                     for (int i = 1; i <= op->VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters; i++) {
                         int index = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(i);

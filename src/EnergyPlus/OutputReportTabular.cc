@@ -5283,9 +5283,12 @@ void WriteTabularReports(EnergyPlusData &state)
         WriteLoadComponentSummaryTables(state);
         WriteHeatEmissionTable(state);
 
-        if (ort->displayThermalResilienceSummary) WriteThermalResilienceTables(state);
-        if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
-        if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
+        if (ort->displayThermalResilienceSummary && !state.dataGlobal->DoPureLoadCalc) // code will crash if pure load calc
+            WriteThermalResilienceTables(state);                                       // code will crash if pure load calc
+        if (ort->displayCO2ResilienceSummary && !state.dataGlobal->DoPureLoadCalc)     // code will crash if pure load calc
+            WriteCO2ResilienceTables(state);                                           // code will crash if pure load calc
+        if (ort->displayVisualResilienceSummary && !state.dataGlobal->DoPureLoadCalc)  // code will crash if pure load calc
+            WriteVisualResilienceTables(state);                                        // code will crash if pure load calc
 
         state.dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(
             state);                   // call to write out the coil selection summary table data

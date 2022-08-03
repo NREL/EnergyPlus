@@ -66,6 +66,9 @@
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+// Third party Headers
+#include "re2/re2.h"
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -430,8 +433,12 @@ namespace OutputProcessor {
         std::string SchedName;        // Schedule Name
         bool Used;                    // True when this combination (key, varname, frequency) has been set
 
+        bool is_simple_string; // Whether the Key potentially includes a Regular Expression pattern
+        std::shared_ptr<RE2> case_insensitive_pattern;
+
         // Default Constructor
-        ReqReportVariables() : frequency(ReportingFrequency::Hourly), SchedPtr(0), Used(false)
+        ReqReportVariables()
+            : frequency(ReportingFrequency::Hourly), SchedPtr(0), Used(false), is_simple_string(true), case_insensitive_pattern(nullptr)
         {
         }
     };
@@ -586,19 +593,6 @@ namespace OutputProcessor {
     void CheckReportVariable(EnergyPlusData &state,
                              std::string_view const KeyedValue, // Associated Key for this variable
                              std::string_view const VarName     // String Name of variable (without units)
-    );
-
-    void BuildKeyVarList(EnergyPlusData &state,
-                         std::string_view const KeyedValue,   // Associated Key for this variable
-                         std::string_view const VariableName, // String Name of variable
-                         int MinIndx,                         // Min number (from previous routine) for this variable
-                         int MaxIndx                          // Max number (from previous routine) for this variable
-    );
-
-    void AddBlankKeys(EnergyPlusData &state,
-                      std::string_view const VariableName, // String Name of variable
-                      int MinIndx,                         // Min number (from previous routine) for this variable
-                      int MaxIndx                          // Max number (from previous routine) for this variable
     );
 
     void GetReportVariableInput(EnergyPlusData &state);
