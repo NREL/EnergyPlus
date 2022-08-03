@@ -60,104 +60,92 @@
 
 namespace EnergyPlus {
 
-struct EnergyPlusData;
+    struct EnergyPlusData;
 
-namespace ChillerElectricASHRAE205 {
+    namespace ChillerElectricASHRAE205 {
 
-    enum class AmbientTempIndicator
-    {
-        Invalid = -1,
-        Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
-        TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
-        OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
-        ZoneAndOA,  // applicable to HPWH only, inlet air is mixture of OA and zone air
-        Num,
+        enum class AmbientTempIndicator {
+            Invalid = -1,
+            Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
+            TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
+            OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
+            ZoneAndOA,  // applicable to HPWH only, inlet air is mixture of OA and zone air
+            Num,
+        };
+
+        struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs {
+            std::shared_ptr<tk205::rs_instance_base> Representation; // ASHRAE205 representation instance
+
+            int OilCoolerInletNode{0};
+            int OilCoolerOutletNode{0};
+            Real64 OilCoolerVolFlowRate{0};
+            Real64 OilCoolerMassFlowRate{0};
+            PlantLocation OCPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
+            int AuxiliaryHeatInletNode{0};
+            int AuxiliaryHeatOutletNode{0};
+            Real64 AuxiliaryVolFlowRate{0};
+            Real64 AuxiliaryMassFlowRate{0};
+            PlantLocation AHPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
+            Real64 QOilCooler{0};
+            Real64 QAuxiliary{0};
+
+            AmbientTempIndicator AmbientTempType{AmbientTempIndicator::Invalid};
+            int AmbientTempSchedule{0};       // Schedule index pointer
+            int AmbientTempZone{0};           // Number of ambient zone around tank
+            int AmbientTempOutsideAirNode{0}; // Number of outside air node
+            Real64 AmbientTemp{0};
+            Real64 AmbientZoneGain{0};         // Internal gain to zone from tank losses (W)
+            std::string EndUseSubcategory{""}; // identifier use for the end use subcategory
+
+            // Default Constructor
+            ASHRAE205ChillerSpecs() = default;
+
+            void setOutputVariables(EnergyPlusData &state);
+
+            static ASHRAE205ChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
+
+            void simulate([[maybe_unused]] EnergyPlusData &state,
+                          const PlantLocation &calledFromLocation,
+                          bool FirstHVACIteration,
+                          Real64 &CurLoad,
+                          bool RunFlag) override;
+
+            void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
+
+            void size(EnergyPlusData &state) override;
+
+            void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
+
+            Real64
+            findCapacityResidual(EnergyPlusData &, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
+
+            // void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
+
+            void calculate(EnergyPlusData &state,
+                           Real64 &MyLoad, // operating load
+                           bool RunFlag    // TRUE when chiller operating
+            );
+
+            void update(EnergyPlusData &state,
+                        Real64 MyLoad, // current load
+                        bool RunFlag   // TRUE if chiller operating
+            ) override;
+
+            void oneTimeInit(EnergyPlusData &state) override;
+        };
+
+        void getChillerASHRAE205Input(EnergyPlusData &state);
+
+    } // namespace ChillerElectricASHRAE205
+
+    struct ChillerElectricASHRAE205Data : BaseGlobalStruct {
+        bool getInputFlag = true;
+        Array1D<ChillerElectricASHRAE205::ASHRAE205ChillerSpecs> Electric205Chiller;
+
+        void clear_state() override {
+            *this = ChillerElectricASHRAE205Data();
+        }
     };
-
-    //        constexpr std::array<std::string_view, static_cast<int>(AmbientTemp::Num)> AmbientTempNamesUC{
-    //                "SCHEDULE", "ZONEAIRONLY", "OUTDOORAIRONLY", "ZONEANDOUTDOORAIR"};
-
-    constexpr std::array<std::string_view, static_cast<int>(AmbientTempIndicator::Num) - 1> AmbientTempNamesUC{
-        "SCHEDULE",
-        "ZONE",
-        "OUTDOORS",
-    };
-
-    struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs
-    {
-        std::shared_ptr<tk205::rs_instance_base> Representation; // ASHRAE205 representation instance
-
-        int OilCoolerInletNode{0};
-        int OilCoolerOutletNode{0};
-        Real64 OilCoolerVolFlowRate{0};
-        Real64 OilCoolerMassFlowRate{0};
-        PlantLocation OCPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
-        int AuxiliaryHeatInletNode{0};
-        int AuxiliaryHeatOutletNode{0};
-        Real64 AuxiliaryVolFlowRate{0};
-        Real64 AuxiliaryMassFlowRate{0};
-        PlantLocation AHPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
-        Real64 QOilHeater{0};
-        Real64 QAuxiliary{0};
-
-        AmbientTempIndicator AmbientTempType{AmbientTempIndicator::Invalid};
-        int AmbientTempSchedule{0};       // Schedule index pointer
-        int AmbientTempZone{0};           // Number of ambient zone around tank
-        int AmbientTempOutsideAirNode{0}; // Number of outside air node
-        Real64 AmbientTemp{0};
-        Real64 AmbientZoneGain{0};         // Internal gain to zone from tank losses (W)
-        std::string EndUseSubcategory{""}; // identifier use for the end use subcategory
-
-        // Default Constructor
-        ASHRAE205ChillerSpecs() = default;
-
-        void setOutputVariables(EnergyPlusData &state);
-
-        static ASHRAE205ChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
-
-        void simulate([[maybe_unused]] EnergyPlusData &state,
-                      const PlantLocation &calledFromLocation,
-                      bool FirstHVACIteration,
-                      Real64 &CurLoad,
-                      bool RunFlag) override;
-
-        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
-
-        void size(EnergyPlusData &state) override;
-
-        void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
-
-        Real64 findCapacityResidual(EnergyPlusData &, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
-
-        // void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
-
-        void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad, // operating load
-                       bool RunFlag    // TRUE when chiller operating
-        );
-
-        void update(EnergyPlusData &state,
-                    Real64 MyLoad, // current load
-                    bool RunFlag   // TRUE if chiller operating
-                    ) override;
-
-        void oneTimeInit(EnergyPlusData &state) override;
-    };
-
-    void getChillerASHRAE205Input(EnergyPlusData &state);
-
-} // namespace ChillerElectricASHRAE205
-
-struct ChillerElectricASHRAE205Data : BaseGlobalStruct
-{
-    bool getInputFlag = true;
-    Array1D<ChillerElectricASHRAE205::ASHRAE205ChillerSpecs> Electric205Chiller;
-
-    void clear_state() override
-    {
-        *this = ChillerElectricASHRAE205Data();
-    }
-};
 
 } // namespace EnergyPlus
 #endif // ChillerElectricASHRAE205_hh_INCLUDED
