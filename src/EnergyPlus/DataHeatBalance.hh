@@ -570,7 +570,6 @@ namespace DataHeatBalance {
         bool IsControlled = false;                      // True when this is a controlled zone.
         bool IsSupplyPlenum = false;                    // True when this zone is a supply plenum
         bool IsReturnPlenum = false;                    // True when this zone is a return plenum
-        int ZoneEqNum = 0;                              // Controlled zone equip config number
         int PlenumCondNum = 0;                          // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex = 0;                // this is the index number for TempControlledZone structure for lookup
         // Pointers to Surface Data Structure
@@ -1640,15 +1639,17 @@ namespace DataHeatBalance {
 
         // OA Reports - accumulated values
         // All Vol variables are in m3
-        Real64 MechVentVolTotalOcc = 0.0;       // volume for mechanical ventilation of outside air for entire simulation during occupied at current
-        Real64 MechVentVolMin = 9.9e9;          // a large number since finding minimum volume at current zone air density
-        Real64 InfilVolTotalOcc = 0.0;          // volume for infiltration of outside air for entire simulation during occupied at current density
-        Real64 InfilVolMin = 9.9e9;             // a large number since finding minimum volume at current zone air density
-        Real64 AFNInfilVolTotalOcc = 0.0;       // volume for infiltration of outside air for entire simulation during occupied at zone air density
-        Real64 AFNInfilVolMin = 9.9e9;          // a large number since finding minimum volume at current zone air density
-        Real64 SimpVentVolTotalOcc = 0.0;       // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied current
-        Real64 SimpVentVolMin = 9.9e9;          // a large number since finding minimum volumeat current zone air density
-        Real64 MechVentVolTotalStdDen = 0.0;    // volume for mechanical ventilation of outside air for entire simulation at standard density
+        Real64 MechVentVolTotalOcc = 0.0;    // volume for mechanical ventilation of outside air for entire simulation during occupied at current
+        Real64 MechVentVolMin = 9.9e9;       // a large number since finding minimum volume at current zone air density
+        Real64 InfilVolTotalOcc = 0.0;       // volume for infiltration of outside air for entire simulation during occupied at current density
+        Real64 InfilVolMin = 9.9e9;          // a large number since finding minimum volume at current zone air density
+        Real64 AFNInfilVolTotalOcc = 0.0;    // volume for AFN infiltration of outside air for entire simulation during occupied at zone air density
+        Real64 AFNInfilVolMin = 9.9e9;       // a large number since finding minimum volume at current zone air density
+        Real64 SimpVentVolTotalOcc = 0.0;    // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied current
+        Real64 SimpVentVolMin = 9.9e9;       // a large number since finding minimum volumeat current zone air density
+        Real64 AFNVentVolTotalOcc = 0.0;     // volume for AFN ventilation of outside air for entire simulation during occupied at zone air density
+        Real64 AFNVentVolMin = 9.9e9;        // a large number since finding minimum volume at current zone air density
+        Real64 MechVentVolTotalStdDen = 0.0; // volume for mechanical ventilation of outside air for entire simulation at standard density
         Real64 MechVentVolTotalOccStdDen = 0.0; // volume for mechanical ventilation of outside air for entire simulation during occupied at std
         Real64 InfilVolTotalStdDen = 0.0;       // volume for infiltration of outside air for entire simulation at standard density
         Real64 InfilVolTotalOccStdDen = 0.0;    // volume for infiltration of outside air for entire simulation during occupied standard density
@@ -1925,6 +1926,8 @@ namespace DataHeatBalance {
     );
 
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
+
+    void AllocateIntGains(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
 

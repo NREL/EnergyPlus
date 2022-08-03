@@ -122,7 +122,6 @@ namespace DualDuct {
         int ADUNum = 0;                                            // index of corresponding air distribution unit ZoneHVAC:AirdistributionUnit
         int CtrlZoneNum = 0;                                       // Pointer to CtrlZone data structure
         int CtrlZoneInNodeIndex = 0;                               // which controlled zone inlet node number corresponds with this unit
-        int ActualZoneNum = 0;                                     // Pointer to Zone data Structure
         Real64 OutdoorAirFlowRate = 0.0;                           // report variable for TU outdoor air flow rate
         bool NoOAFlowInputFromUser = true;                         // avoids OA calculation if no input specified by user
         int OARequirementsPtr = 0;                                 // - Index to DesignSpecification:OutdoorAir object

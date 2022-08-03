@@ -236,10 +236,7 @@ namespace InternalHeatGains {
 
         // TODO MJW: Punt for now, sometimes unit test need these to be allocated in AllocateZoneHeatBalArrays, but simulations need them here
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
-            state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
-            state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
-            state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
-            state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
+            DataHeatBalance::AllocateIntGains(state);
         }
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->spaceRpt.allocate(state.dataGlobal->numSpaces);
@@ -1279,8 +1276,7 @@ namespace InternalHeatGains {
                         }
                     }
                     if (thisLights.ZonePtr > 0) {
-                        thisLights.ZoneReturnNum =
-                            DataZoneEquipment::GetReturnNumForZone(state, state.dataHeatBal->Zone(zoneNum).Name, thisLights.RetNodeName);
+                        thisLights.ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(state, thisLights.ZonePtr, thisLights.RetNodeName);
                     }
 
                     if ((thisLights.ZoneReturnNum == 0) && (thisLights.FractionReturnAir > 0.0) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
@@ -1321,8 +1317,8 @@ namespace InternalHeatGains {
                                 ErrorsFound = true;
                             } else {
                                 if (thisLights.ZoneReturnNum > 0) {
-                                    state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(thisLights.ZonePtr).ZoneEqNum)
-                                        .ReturnNodeExhaustNodeNum(thisLights.ZoneReturnNum) = thisLights.ZoneExhaustNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(thisLights.ZonePtr).ReturnNodeExhaustNodeNum(thisLights.ZoneReturnNum) =
+                                        thisLights.ZoneExhaustNodeNum;
                                     CheckSharedExhaustFlag = true;
                                 } else {
                                     ShowSevereError(state,
@@ -7720,55 +7716,55 @@ namespace InternalHeatGains {
             // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
             int EnvClass = static_cast<int>(state.dataHeatBal->ZoneITEq(Loop).Class);
             if (EnvClass > 0) {
-                if (TAirIn > DBMax[EnvClass - 1]) {
+                if (TAirIn > DBMax[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TAirIn < DBMin[EnvClass - 1]) {
+                if (TAirIn < DBMin[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TDPAirIn > DPMax[EnvClass - 1]) {
+                if (TDPAirIn > DPMax[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (TDPAirIn < DPMin[EnvClass - 1]) {
+                if (TDPAirIn < DPMin[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (RHAirIn > RHMax[EnvClass - 1]) {
+                if (RHAirIn > RHMax[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
-                if (RHAirIn < RHMin[EnvClass - 1]) {
+                if (RHAirIn < RHMin[EnvClass]) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange = state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin[EnvClass - 1];
+                    state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin[EnvClass];
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;

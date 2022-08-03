@@ -15078,7 +15078,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
             }
 
-            FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
+            FanHeatCorrection = state.dataLoopNodes->Node(FanInletNode).MassFlowRate *
+                                (state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy);
 
             NetCoolingCapRated = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
         }
@@ -15232,7 +15233,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                     FanPowerCorrection = Fans::GetFanPower(state, state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
                 }
 
-                FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy;
+                FanHeatCorrection =
+                    PartLoadAirMassFlowRate * (state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy);
 
             } else {
                 FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -15632,7 +15634,8 @@ Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
                                         FanStaticPressureRise);
         }
 
-        FanHeatCorrection = state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy;
+        FanHeatCorrection =
+            SupplyAirMassFlowRate * (state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy);
 
     } else {
 

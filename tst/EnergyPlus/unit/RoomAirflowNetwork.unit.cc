@@ -248,7 +248,6 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName(1) = "ZoneHVAC";
 
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum = ZoneNum;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(1) = 1;
     state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
