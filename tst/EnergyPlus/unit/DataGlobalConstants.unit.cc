@@ -79,8 +79,10 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Condensate, DataGlobalConstants::AssignResourceTypeNum("Condensate")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::EnergyTransfer, DataGlobalConstants::AssignResourceTypeNum("EnergyTransfer")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictCooling, DataGlobalConstants::AssignResourceTypeNum("DistrictCooling")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeatingWater, DataGlobalConstants::AssignResourceTypeNum("DistrictHeatingWater")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeatingSteam, DataGlobalConstants::AssignResourceTypeNum("DistrictHeatingSteam")));
+    EXPECT_TRUE(
+        compare_enums(DataGlobalConstants::ResourceType::DistrictHeatingWater, DataGlobalConstants::AssignResourceTypeNum("DistrictHeatingWater")));
+    EXPECT_TRUE(
+        compare_enums(DataGlobalConstants::ResourceType::DistrictHeatingSteam, DataGlobalConstants::AssignResourceTypeNum("DistrictHeatingSteam")));
     EXPECT_TRUE(
         compare_enums(DataGlobalConstants::ResourceType::ElectricityProduced, DataGlobalConstants::AssignResourceTypeNum("ElectricityProduced")));
     EXPECT_TRUE(
