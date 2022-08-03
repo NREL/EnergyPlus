@@ -1600,8 +1600,6 @@ namespace SurfaceGeometry {
                 if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(1)) ||
                     (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(2)) ||
                     (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(3))) {
-                    // TODO: is this helpful to set it to -1?
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1; // Default has base surface = base surface
                     // Store list of moved surface numbers in reporting order. We use the old position, we'll reconcile later
                     // We don't do it for Air Door/Air Windows yet, we want them listed below each base surf they belong to
                     state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
@@ -1626,13 +1624,14 @@ namespace SurfaceGeometry {
                     ++MovedSurfs;
                     state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
                     oldToNewSurfNums(SurfNum) = MovedSurfs;
-                    SurfaceTmpClassMoved(SurfNum) = true;                         // 'Moved'
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1; // Default has base surface = base surface
+                    SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                     // Store list of moved surface numbers in order reporting order (subsurfaces follow their base surface)
                     state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
 
                     //  Find all subsurfaces to this surface - just to update Report them in order
                     for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
+                        // Gotta avoid pushing myself again!
+                        if (SubSurfNum == SurfNum) continue;
                         // We don't check if already moved, because we didn't add them to AllSurfaceListReportOrder above!
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone == 0) continue;
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf != SurfNum) continue;
@@ -1668,8 +1667,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // TODO: needed?
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
 
             // The exterior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
@@ -1686,8 +1683,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // TODO: needed?
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
 
             // The interior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
@@ -1704,8 +1699,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // TODO: needed?
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
 
             // The SurfaceClass::TDD_Diffuser (OriginalClass = Window) goes next
@@ -1719,8 +1712,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // TODO: needed?
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
 
             // Last but not least, SurfaceClass::TDD_Dome
@@ -1734,8 +1725,6 @@ namespace SurfaceGeometry {
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
                 oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // TODO: needed?
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
         }
 
