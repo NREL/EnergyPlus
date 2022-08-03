@@ -1797,10 +1797,10 @@ namespace SurfaceGeometry {
                 }
             }
             auto &reportOrderNum = state.dataSurface->AllSurfaceListReportOrder[SurfNum - 1];
-            if (reportOrderNum < 1) {
+            if (reportOrderNum > 0) {
+                int newReportOrderNum = oldToNewSurfNums(reportOrderNum);
+                reportOrderNum = newReportOrderNum;
             }
-            int newReportOrderNum = oldToNewSurfNums(reportOrderNum);
-            reportOrderNum = newReportOrderNum;
         }
 
         state.dataSurfaceGeometry->SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
