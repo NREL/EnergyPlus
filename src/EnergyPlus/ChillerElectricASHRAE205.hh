@@ -50,13 +50,11 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
+#include "EnergyPlus/ChillerReformulatedEIR.hh"
+#include "rs_instance_base.h" // unique_ptr will need a complete type
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-//#include <EnergyPlus/PlantChillers.hh>
-//#include <EnergyPlus/Plant/DataPlant.hh>
-#include "EnergyPlus/ChillerReformulatedEIR.hh"
-#include "rs_instance_base.h" // unique_ptr will need a complete type
 
 namespace EnergyPlus {
 
@@ -74,9 +72,18 @@ namespace ChillerElectricASHRAE205 {
         Num,
     };
 
+    enum class PerformanceInterpolationType
+    {
+        Invalid = -1,
+        Linear,
+        Cubic,
+        Num
+    };
+
     struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs
     {
-        std::shared_ptr<tk205::rs_instance_base> Representation; // ASHRAE205 representation instance
+        std::shared_ptr<tk205::RSInstanceBase> Representation; // ASHRAE205 representation instance
+        PerformanceInterpolationType InterpolationType{PerformanceInterpolationType::Linear};
 
         int OilCoolerInletNode{0};
         int OilCoolerOutletNode{0};
