@@ -592,7 +592,7 @@ namespace ExteriorEnergyUse {
             FuelTypeString = "DistrictCooling";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeatingWater")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatWaterUse;
-            FuelTypeString = "DistrictHeating";
+            FuelTypeString = "DistrictHeatingWater";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeatingSteam")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatSteamUse;
             FuelTypeString = "DistrictHeatingSteam";
