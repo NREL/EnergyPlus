@@ -5555,8 +5555,9 @@ void ReportThermalResilience(EnergyPlusData &state)
         }
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBal->Zone(ZoneNum).resilience.ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                          GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Zone(ZoneNum).resilience.ZoneNumOcc =
+                state.dataHeatBal->People(iPeople).NumberOfPeople *
+                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
             state.dataHeatBal->Zone(ZoneNum).resilience.ZonePierceSETLastStep = state.dataHeatBal->Zone(ZoneNum).resilience.ZonePierceSET;
             if (state.dataHeatBal->People(iPeople).Pierce) {
                 state.dataHeatBal->Zone(ZoneNum).resilience.ZonePierceSET = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
@@ -5815,14 +5816,16 @@ void ReportThermalResilience(EnergyPlusData &state)
             Real64 HeatingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
 
             if ((CoolingSetpoint > 0) && (Temperature > CoolingSetpoint)) {
-                state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[0] += (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[0] +=
+                    (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[1] +=
                     NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[2] +=
                     (NumOcc > 0) * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
             }
             if ((HeatingSetpoint > 0) && (Temperature < HeatingSetpoint)) {
-                state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[3] += (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[3] +=
+                    (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[4] +=
                     NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Zone(ZoneNum).resilience.ZoneUnmetDegreeHourBins[5] +=
@@ -5837,7 +5840,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                 if (PierceSET <= 12.2) {
                     state.dataHeatBal->Zone(ZoneNum).resilience.ZoneLowSETHours[0] += (12.2 - PierceSET) * state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->Zone(ZoneNum).resilience.ZoneLowSETHours[1] += (12.2 - PierceSET) * NumOcc * state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->Zone(ZoneNum).resilience.ZoneLowSETHours[2] += (12.2 - PierceSET) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->Zone(ZoneNum).resilience.ZoneLowSETHours[2] +=
+                        (12.2 - PierceSET) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
                     // Reset duration when last step is out of range.
                     if (PierceSETLast == -1 || PierceSETLast > 12.2) {
                         General::EncodeMonDayHrMin(encodedMonDayHrMin,
@@ -5858,7 +5862,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                 } else if (PierceSET > 30) {
                     state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[0] += (PierceSET - 30) * state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[1] += (PierceSET - 30) * NumOcc * state.dataGlobal->TimeStepZone;
-                    state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[2] += (PierceSET - 30) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[2] +=
+                        (PierceSET - 30) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
                     if (PierceSETLast == -1 || PierceSETLast <= 30) {
                         General::EncodeMonDayHrMin(encodedMonDayHrMin,
                                                    state.dataEnvrn->Month,
@@ -5869,7 +5874,8 @@ void ReportThermalResilience(EnergyPlusData &state)
                         state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
                     }
                     state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[3] &&
+                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] >
+                            state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[3] &&
                         state.dataHeatBal->Zone(ZoneNum).resilience.ZoneNumOcc > 0) {
                         state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[3] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
                         state.dataHeatBal->Zone(ZoneNum).resilience.ZoneHighSETHours[4] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
@@ -6083,8 +6089,9 @@ void ReportCO2Resilience(EnergyPlusData &state)
     if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBal->Zone(ZoneNum).resilience.ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                          GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Zone(ZoneNum).resilience.ZoneNumOcc =
+                state.dataHeatBal->People(iPeople).NumberOfPeople *
+                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
 
         Array1D_bool reportPeriodFlags;
@@ -6174,8 +6181,9 @@ void ReportVisualResilience(EnergyPlusData &state)
     if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBal->Zone(ZoneNum).resilience.ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                          GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Zone(ZoneNum).resilience.ZoneNumOcc =
+                state.dataHeatBal->People(iPeople).NumberOfPeople *
+                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
         // Accumulate across daylighting controls first
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
