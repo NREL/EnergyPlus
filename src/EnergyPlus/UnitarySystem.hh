@@ -390,6 +390,8 @@ namespace UnitarySystems {
 
         bool m_EMSOverrideCoilSpeedNumOn = false;
         Real64 m_EMSOverrideCoilSpeedNumValue = 0.0;
+        bool m_EMSOverrideSuppCoilSpeedNumOn = false;
+        Real64 m_EMSOverrideSuppCoilSpeedNumValue = 0.0;
         int m_CoilSpeedErrIdx = 0;
 
         Real64 m_DehumidInducedHeatingDemandRate = 0.0;
@@ -448,7 +450,7 @@ namespace UnitarySystems {
         int m_FaultyCoilSATIndex = 0;       // Index of the fault object corresponding to the coil
         Real64 m_FaultyCoilSATOffset = 0.0; // Coil SAT sensor offset
 
-        PackagedThermalStorageCoil::PTSCOperatingMode m_TESOpMode; // operating mode of TES DX cooling coil
+        PackagedThermalStorageCoil::PTSCOperatingMode m_TESOpMode = PackagedThermalStorageCoil::PTSCOperatingMode::Invalid;
         bool m_initLoadBasedControlAirLoopPass = false;
         int m_airLoopPassCounter = 0;
         int m_airLoopReturnCounter = 0;
@@ -842,9 +844,10 @@ namespace UnitarySystems {
 
         void calcUnitarySuppHeatingSystem(EnergyPlusData &state,
                                           bool const FirstHVACIteration, // True when first HVAC iteration
-                                          Real64 const PartLoadRatio,    // coil operating part-load ratio
                                           Real64 const SuppCoilLoad      // adjusted supp coil load when outlet temp exceeds max (W)
         );
+
+        void setEMSSuppCoilStagePLR(EnergyPlusData &state);
 
         void calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
         );

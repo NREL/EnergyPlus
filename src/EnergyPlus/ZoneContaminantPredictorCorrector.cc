@@ -134,7 +134,7 @@ void ManageZoneContaminanUpdates(EnergyPlusData &state,
         PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep: {
-        CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        CorrectZoneContaminants(state, UseZoneTimeStepHistory);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories: {
         RevertZoneTimestepHistories(state);
@@ -2335,9 +2335,7 @@ void InverseModelCO2(EnergyPlusData &state,
 }
 
 void CorrectZoneContaminants(EnergyPlusData &state,
-                             bool const ShortenTimeStepSys,
-                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                             bool const UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
 )
 {
 
@@ -2374,42 +2372,8 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             state.dataContaminantBalance->BZGC(ZoneNum) = 0.0;
             state.dataContaminantBalance->CZGC(ZoneNum) = 0.0;
         }
-        // Update variables
-        if (ShortenTimeStepSys) {
-            // time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
-            if (state.dataHVACGlobal->NumOfSysTimeSteps !=
-                state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    ZoneTempPredictorCorrector::DownInterpolate4HistoryValues(PriorTimeStep,
-                                                                              state.dataHVACGlobal->TimeStepSys,
-                                                                              state.dataContaminantBalance->ZoneAirCO2(ZoneNum),
-                                                                              state.dataContaminantBalance->CO2ZoneTimeMinus1(ZoneNum),
-                                                                              state.dataContaminantBalance->CO2ZoneTimeMinus2(ZoneNum),
-                                                                              state.dataContaminantBalance->ZoneAirCO2(ZoneNum),
-                                                                              state.dataContaminantBalance->DSCO2ZoneTimeMinus1(ZoneNum),
-                                                                              state.dataContaminantBalance->DSCO2ZoneTimeMinus2(ZoneNum),
-                                                                              state.dataContaminantBalance->DSCO2ZoneTimeMinus3(ZoneNum),
-                                                                              state.dataContaminantBalance->DSCO2ZoneTimeMinus4(ZoneNum));
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    ZoneTempPredictorCorrector::DownInterpolate4HistoryValues(PriorTimeStep,
-                                                                              state.dataHVACGlobal->TimeStepSys,
-                                                                              state.dataContaminantBalance->ZoneAirGC(ZoneNum),
-                                                                              state.dataContaminantBalance->GCZoneTimeMinus1(ZoneNum),
-                                                                              state.dataContaminantBalance->GCZoneTimeMinus2(ZoneNum),
-                                                                              state.dataContaminantBalance->ZoneAirGC(ZoneNum),
-                                                                              state.dataContaminantBalance->DSGCZoneTimeMinus1(ZoneNum),
-                                                                              state.dataContaminantBalance->DSGCZoneTimeMinus2(ZoneNum),
-                                                                              state.dataContaminantBalance->DSGCZoneTimeMinus3(ZoneNum),
-                                                                              state.dataContaminantBalance->DSGCZoneTimeMinus4(ZoneNum));
-                }
 
-            } else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
-                     // do nothing because DS history would have been pushed prior and should be ready?
-            }
-        }
-
-        // now update the variables actually used in the balance equations.
+        // update the variables actually used in the balance equations.
         if (!UseZoneTimeStepHistory) {
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) = state.dataContaminantBalance->DSCO2ZoneTimeMinus1(ZoneNum);
