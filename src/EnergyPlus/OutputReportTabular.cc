@@ -12983,7 +12983,7 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
         columnMin[j] = (state.dataHeatBal->Zone(1).resilience.*memberPtr)[j] * unitConvMultiplier;
     }
     for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
-        std::string ZoneName = state.dataHeatBal->Zone(i).Name;
+        const std::string &ZoneName = state.dataHeatBal->Zone(i).Name;
         for (int j = 0; j < columnNum; j++) {
             Real64 curValue = (state.dataHeatBal->Zone(i).resilience.*memberPtr)[j] * unitConvMultiplier;
             if (curValue > columnMax[j]) columnMax[j] = curValue;
@@ -13003,9 +13003,9 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
 template <typename T>
 void WriteResilienceBinsTableNonPreDefUseZoneData(EnergyPlusData &state,
                                                   int const columnNum,
-                                                  const std::string tableName,
+                                                  const std::string &tableName,
                                                   Array1D_string const &columnHead,
-                                                  Array1D_int columnWidth,
+                                                  Array1D_int &columnWidth,
                                                   const T DataHeatBalance::ZoneResilience::*memberPtr,
                                                   Array1D_string &rowHead,
                                                   Array2D_string &tableBody,
@@ -13056,13 +13056,13 @@ void WriteResilienceBinsTableNonPreDefUseZoneData(EnergyPlusData &state,
 }
 
 void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
-                                             const std::string tableType,
+                                             const std::string &tableType,
                                              int const columnNum,
                                              int const periodIdx,
-                                             const std::string periodTitle,
-                                             const std::string tableName,
+                                             const std::string &periodTitle,
+                                             const std::string &tableName,
                                              Array1D_string const &columnHead,
-                                             Array1D_int columnWidth,
+                                             Array1D_int &columnWidth,
                                              Array2D<std::vector<Real64>> const &ZoneBins,
                                              Array1D_string &rowHead,
                                              Array2D_string &tableBody,
@@ -13114,9 +13114,9 @@ void WriteResilienceBinsTableReportingPeriod(EnergyPlusData &state,
 
 void WriteSETHoursTableNonPreDefUseZoneData(EnergyPlusData &state,
                                             int const columnNum,
-                                            const std::string tableName,
+                                            const std::string &tableName,
                                             Array1D_string const &columnHead,
-                                            Array1D_int columnWidth,
+                                            Array1D_int &columnWidth,
                                             const std::array<Real64, 5> DataHeatBalance::ZoneResilience::*memberPtr,
                                             Array1D_string &rowHead,
                                             Array2D_string &tableBody,
@@ -13174,10 +13174,10 @@ void WriteSETHoursTableNonPreDefUseZoneData(EnergyPlusData &state,
 void WriteSETHoursTableReportingPeriod(EnergyPlusData &state,
                                        int const columnNum,
                                        int const periodIdx,
-                                       const std::string periodTitle,
-                                       const std::string tableName,
+                                       const std::string &periodTitle,
+                                       const std::string &tableName,
                                        Array1D_string const &columnHead,
-                                       Array1D_int columnWidth,
+                                       Array1D_int &columnWidth,
                                        Array2D<std::vector<Real64>> const &ZoneBins,
                                        Array1D_string &rowHead,
                                        Array2D_string &tableBody,
@@ -13239,9 +13239,9 @@ std::string RetrieveEntryFromTableBody(Array2D_string &tableBody, int const rowI
 
 void WriteHourOfSafetyTableNonPreDefUseZoneData(EnergyPlusData &state,
                                                 int const columnNum,
-                                                const std::string tableName,
+                                                const std::string &tableName,
                                                 Array1D_string const &columnHead,
-                                                Array1D_int columnWidth,
+                                                Array1D_int &columnWidth,
                                                 const std::array<Real64, 5> DataHeatBalance::ZoneResilience::*memberPtr,
                                                 Array1D_string &rowHead,
                                                 Array2D_string &tableBody,
@@ -13304,10 +13304,10 @@ void WriteHourOfSafetyTableNonPreDefUseZoneData(EnergyPlusData &state,
 void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
                                            int const columnNum,
                                            int const periodIdx,
-                                           const std::string periodTitle,
-                                           const std::string tableName,
+                                           const std::string &periodTitle,
+                                           const std::string &tableName,
                                            Array1D_string const &columnHead,
-                                           Array1D_int columnWidth,
+                                           Array1D_int &columnWidth,
                                            Array2D<std::vector<Real64>> const &ZoneBins,
                                            Array1D_string &rowHead,
                                            Array2D_string &tableBody,
@@ -13331,7 +13331,6 @@ void WriteHourOfSafetyTableReportingPeriod(EnergyPlusData &state,
         columnMin.at(j) = ZoneBins(1, periodIdx).at(j);
     }
     for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
-        std::string ZoneName = state.dataHeatBal->Zone(i).Name;
         for (int j = 0; j < columnNum; j++) {
             Real64 curValue = ZoneBins(i, periodIdx).at(j);
             if (curValue > columnMax.at(j)) columnMax.at(j) = curValue;
