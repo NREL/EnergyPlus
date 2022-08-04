@@ -671,7 +671,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
-            state.dataHeatBal->Zone(zoneNum).zoneOAQuadratureSum = true;
+            state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).zoneOAQuadratureSum = true;
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
