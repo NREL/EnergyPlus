@@ -1072,8 +1072,10 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         IncidentAngle = 0.0;
     }
 
+    auto &thisScreen = state.dataHeatBal->SurfaceScreens(ScNum);
+
     // ratio of screen material diameter to screen material spacing
-    Gamma = state.dataHeatBal->SurfaceScreens(ScNum).ScreenDiameterToSpacingRatio;
+    Gamma = thisScreen.ScreenDiameterToSpacingRatio;
 
     // ************************************************************************************************
     // * calculate transmittance of totally absorbing screen material (beam passing through open area)*
@@ -1122,8 +1124,8 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // * calculate transmittance of scattered beam due to reflecting screen material *
     // *******************************************************************************
 
-    ReflectCyl = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinder;
-    ReflectCylVis = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinderVis;
+    ReflectCyl = thisScreen.ReflectCylinder;
+    ReflectCylVis = thisScreen.ReflectCylinderVis;
 
     if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2) < Small ||
         std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) < Small) {
@@ -1164,62 +1166,62 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Tscattered = max(0.0, Tscattered);
     TscatteredVis = max(0.0, TscatteredVis);
 
-    if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceModel::DoNotModel) {
+    if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DoNotModel) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+            thisScreen.BmBmTrans = Tdirect;
+            thisScreen.BmBmTransVis = Tdirect;
+            thisScreen.BmBmTransBack = 0.0;
         } else {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+            thisScreen.BmBmTrans = 0.0;
+            thisScreen.BmBmTransVis = 0.0;
+            thisScreen.BmBmTransBack = Tdirect;
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceModel::DirectBeam) {
+    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DirectBeam) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+            thisScreen.BmBmTrans = Tdirect + Tscattered;
+            thisScreen.BmBmTransVis = Tdirect + TscatteredVis;
+            thisScreen.BmBmTransBack = 0.0;
         } else {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect + Tscattered;
+            thisScreen.BmBmTrans = 0.0;
+            thisScreen.BmBmTransVis = 0.0;
+            thisScreen.BmBmTransBack = Tdirect + Tscattered;
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).screenBeamReflectanceAccounting == DataSurfaces::ScreenBeamReflectanceModel::Diffuse) {
+    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::Diffuse) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+            thisScreen.BmBmTrans = Tdirect;
+            thisScreen.BmBmTransVis = Tdirect;
+            thisScreen.BmBmTransBack = 0.0;
         } else {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+            thisScreen.BmBmTrans = 0.0;
+            thisScreen.BmBmTransVis = 0.0;
+            thisScreen.BmBmTransBack = Tdirect;
         }
     }
 
     if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = Tscattered;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = 0.0;
+        thisScreen.BmDifTrans = Tscattered;
+        thisScreen.BmDifTransVis = TscatteredVis;
+        thisScreen.BmDifTransBack = 0.0;
+        thisScreen.ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+        thisScreen.ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+        thisScreen.AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+        thisScreen.ReflectSolBeamBack = 0.0;
+        thisScreen.ReflectVisBeamBack = 0.0;
+        thisScreen.AbsorpSolarBeamBack = 0.0;
     } else {
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = Tscattered;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = 0.0;
+        thisScreen.BmDifTrans = 0.0;
+        thisScreen.BmDifTransVis = 0.0;
+        thisScreen.BmDifTransBack = Tscattered;
+        thisScreen.ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+        thisScreen.ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+        thisScreen.AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+        thisScreen.ReflectSolBeamFront = 0.0;
+        thisScreen.ReflectVisBeamFront = 0.0;
+        thisScreen.AbsorpSolarBeamFront = 0.0;
     }
 }
 
