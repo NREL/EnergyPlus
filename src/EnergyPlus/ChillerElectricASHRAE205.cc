@@ -1581,4 +1581,26 @@ void ASHRAE205ChillerSpecs::simulate(
     }
 }
 
+void ASHRAE205ChillerSpecs::getDesignCapacities(
+    [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+{
+    if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {
+        static auto rep = dynamic_cast<tk205::rs0001_ns::RS0001 *>(this->Representation.get());
+
+        MinLoad = rep->performance.performance_map_cooling
+                          .calculate_performance(this->EvapVolFlowRate,
+                                                 this->TempRefEvapOut + DataGlobalConstants::KelvinConv,
+                                                 this->CondVolFlowRate,
+                                                 this->TempRefCondIn + DataGlobalConstants::KelvinConv,
+                                                 this->MaxSequenceNumber)
+                          .net_evaporator_capacity;
+        MaxLoad = this->RefCap;
+        OptLoad = MaxLoad;
+    } else {
+        MinLoad = 0.0;
+        MaxLoad = 0.0;
+        OptLoad = 0.0;
+    }
+}
+
 } // namespace EnergyPlus::ChillerElectricASHRAE205

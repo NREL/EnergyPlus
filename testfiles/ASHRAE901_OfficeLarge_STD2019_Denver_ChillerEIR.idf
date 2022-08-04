@@ -17111,3 +17111,21 @@
     InteriorEquipment:Electricity,  !- Source Meter Name
     ,                        !- Key Name 1
     DataCenterPlugLoads:InteriorEquipment:Electricity;  !- Output Variable or Meter Name 1
+
+  Output:VariableDictionary,IDF,Unsorted;
+
+  Output:Variable,*,Chiller Part Load Ratio,Detailed;
+
+  Output:Variable,*,Chiller Cycling Ratio,Detailed;
+
+  Output:Variable,*,Chiller Electricity Rate,Detailed;
+
+  Output:Variable,*,Chiller Evaporator Cooling Rate,Detailed;
+
+  Output:Variable,*,Chiller COP,Detailed;
+
+  Output:Variable,*,Chiller Evaporator Mass Flow Rate,Detailed;
+
+  Output:Variable,*,Chiller Evaporator Outlet Temperature,Detailed;
+
+  Output:Variable,*,Chiller Condenser Mass Flow Rate,Detailed;
