@@ -2563,8 +2563,6 @@
     0.55,                    !- Sensible Heat Fraction
     ActSchd,                 !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
-    ,                        !- Cold Stress Temperature Threshold [C],
-    ,                        !- Heat Stress Temperature Threshold [C],
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -2839,8 +2837,6 @@
     0.55,                    !- Sensible Heat Fraction
     ActSchd,                 !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
-    ,                        !- Cold Stress Temperature Threshold [C],
-    ,                        !- Heat Stress Temperature Threshold [C],
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -3080,8 +3076,6 @@
     0.55,                    !- Sensible Heat Fraction
     ActSchd,                 !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
-    ,                        !- Cold Stress Temperature Threshold [C],
-    ,                        !- Heat Stress Temperature Threshold [C],
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -3323,8 +3317,6 @@
     0.55,                    !- Sensible Heat Fraction
     ActSchd,                 !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
-    ,                        !- Cold Stress Temperature Threshold [C],
-    ,                        !- Heat Stress Temperature Threshold [C],
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -3542,8 +3534,6 @@
     0.55,                    !- Sensible Heat Fraction
     ActSchd,                 !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
-    ,                        !- Cold Stress Temperature Threshold [C],
-    ,                        !- Heat Stress Temperature Threshold [C],
     ,                        !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name

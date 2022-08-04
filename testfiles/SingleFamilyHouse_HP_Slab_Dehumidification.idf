@@ -2804,8 +2804,6 @@
     autocalculate,           !- Sensible Heat Fraction
     activity_sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
-    ,                        !- Cold Stress Temperature Threshold [C],
-    ,                        !- Heat Stress Temperature Threshold [C],
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
 

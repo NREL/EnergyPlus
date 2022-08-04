@@ -495,8 +495,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_setupKivaInstances_ThermalComfort)
         "  0.1,                     !- Sensible Heat Fraction",
         "  Core_bottom Activity,    !- Activity Level Schedule Name",
         "  3.82e-08,                !- Carbon Dioxide Generation Rate",
-        "    ,                      !- Cold Stress Temperature Threshold [C]",
-        "    ,                      !- Heat Stress Temperature Threshold [C]",
+
         "  Yes,                     !- Enable ASHRAE 55 Comfort Warnings",
         "  ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
         "  ,                        !- Surface NameAngle Factor List Name",

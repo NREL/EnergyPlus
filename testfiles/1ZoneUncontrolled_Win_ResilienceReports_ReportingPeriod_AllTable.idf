@@ -454,8 +454,6 @@
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
-    10.5,                    !- Cold Stress Temperature Threshold [C]
-    32.5,                    !- Heat Stress Temperature Threshold [C]
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -464,7 +462,16 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    PIERCE;                  !- Thermal Comfort Model 1 Type
+    PIERCE,                  !- Thermal Comfort Model 1 Type
+    ,                        !- Thermal Comfort Model 2 Type
+    ,                        !- Thermal Comfort Model 3 Type
+    ,                        !- Thermal Comfort Model 4 Type
+    ,                        !- Thermal Comfort Model 5 Type
+    ,                        !- Thermal Comfort Model 6 Type
+    ,                        !- Thermal Comfort Model 7 Type
+    ,                        !- Ankle Level Air Velocity Schedule Name
+    10.5,                    !- Cold Stress Temperature Threshold [C]
+    32.5;                    !- Heat Stress Temperature Threshold [C]
 
   People,
     ZONE ONE People 2,       !- Name
@@ -478,8 +485,6 @@
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
-    10.5,                    !- Cold Stress Temperature Threshold [C]
-    32.5,                    !- Heat Stress Temperature Threshold [C]
     No,                      !- Enable ASHRAE 55 Comfort Warnings
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
@@ -488,7 +493,16 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    PIERCE;                  !- Thermal Comfort Model 1 Type
+    PIERCE,                  !- Thermal Comfort Model 1 Type
+    ,                        !- Thermal Comfort Model 2 Type
+    ,                        !- Thermal Comfort Model 3 Type
+    ,                        !- Thermal Comfort Model 4 Type
+    ,                        !- Thermal Comfort Model 5 Type
+    ,                        !- Thermal Comfort Model 6 Type
+    ,                        !- Thermal Comfort Model 7 Type
+    ,                        !- Ankle Level Air Velocity Schedule Name
+    10.5,                    !- Cold Stress Temperature Threshold [C]
+    32.5;                    !- Heat Stress Temperature Threshold [C]
 
   ScheduleTypeLimits,
     Any Number;              !- Name
