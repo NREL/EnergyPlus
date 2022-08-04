@@ -573,8 +573,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataHeatBal->ZoneAirBalance(Loop).Name = cAlphaArgs(1);
         state.dataHeatBal->ZoneAirBalance(Loop).ZoneName = cAlphaArgs(2);
-        int zoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        if (zoneNum == 0) {
+        state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+        if (state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr == 0) {
             ShowSevereError(state,
                             format(R"({}{}="{}", invalid (not found) {}="{}".)",
                                    RoutineName,
@@ -584,8 +584,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                    cAlphaArgs(2)));
             ErrorsFound = true;
         } else {
-            state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr = zoneNum;
-            state.dataHeatBal->Zone(zoneNum).zoneOABalanceIndex = Loop;
+            state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).zoneOABalanceIndex = Loop;
         }
         GlobalNames::IntraObjUniquenessCheck(
             state, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataHeatBalAirMgr->UniqueZoneNames, IsNotOK);

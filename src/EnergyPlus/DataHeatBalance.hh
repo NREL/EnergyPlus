@@ -1128,11 +1128,9 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;
-        int spaceIndex = 0; // Space index for this mixing instance
         int SchedPtr = 0;
         Real64 DesignLevel = 0.0;
         int FromZone = 0;
-        int fromSpaceIndex = 0; // Source space index for this mixing instance
         Real64 DeltaTemperature = 0.0;
         Real64 DesiredAirFlowRate = 0.0;
         Real64 DesiredAirFlowRateSaved = 0.0;
