@@ -106,7 +106,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
     bool ErrorsFound{false};
 
-    state.dataIPShortCut->cCurrentModuleObject = "Chiller:Electric:ASHRAE205";
+    state.dataIPShortCut->cCurrentModuleObject = ChillerElectricASHRAE205::ASHRAE205ChillerSpecs::ObjectType;
     auto &ip = state.dataInputProcessing->inputProcessor;
     int numElectric205Chillers = ip->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
@@ -134,6 +134,31 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         auto rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
         fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(RoutineName));
         thisChiller.Representation = rs_instance_factory::Create("RS0001", rep_file_path.string().c_str());
+
+        auto rep = dynamic_cast<tk205::RS0001_NS::RS0001 *>(thisChiller.Representation.get());
+        const auto compressorSequence = rep->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
+        // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
+        const auto minmaxSequenceNum = std::minmax_element(compressorSequence.begin(), compressorSequence.end());
+        thisChiller.MinSequenceNumber = *(minmaxSequenceNum.first);
+        thisChiller.MaxSequenceNumber = *(minmaxSequenceNum.second);
+
+        if (fields.count("rated_capacity")) {
+            ShowWarningError(state, format("{}{}=\"{}\"", std::string{RoutineName}, state.dataIPShortCut->cCurrentModuleObject, thisChiller.Name));
+            ShowContinueError(state, "Rated Capacity field is not yet supported for ASHRAE 205 representations.");
+        }
+
+        thisChiller.RefCap = 0.0;               // ip->getRealFieldValue(fields, objectSchemaProps, "rated_capacity");
+        thisChiller.RefCapWasAutoSized = false; // for now
+
+        //        if (thisChiller.RefCap == DataSizing::AutoSize) {
+        //            thisChiller.RefCapWasAutoSized = true;
+        //        }
+        //        if (thisChiller.RefCap == 0.0) {
+        //            ShowSevereError(
+        //                state, format("{}{}=\"{}\"",std::string{RoutineName},state.dataIPShortCut->cCurrentModuleObject,thisChiller.Name);
+        //            ShowContinueError(state, format("Invalid {}={:.2R}", "Rated Capacity", thisChiller.RefCap));
+        //            ErrorsFound = true;
+        //        }
 
         auto const evap_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_inlet_node_name");
         auto const evap_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "chilled_water_outlet_node_name");
@@ -361,6 +386,10 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         } else {
             thisChiller.EndUseSubcategory = "General";
         }
+        // Set reference conditions
+        thisChiller.TempRefCondIn = 29.44;
+        thisChiller.TempRefCondOut = 34.61;
+        thisChiller.TempRefEvapOut = 6.67;
     }
 
     if (ErrorsFound) {
@@ -630,6 +659,262 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
 
 void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
 {
+    static constexpr std::string_view RoutineName("SizeElectricASHRAE205Chiller");
+
+    bool ErrorsFound = false;
+    Real64 tmpNomCap{0.0};
+    Real64 tmpEvapVolFlowRate = this->EvapVolFlowRate;
+    Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
+
+    // Size evaporator flow rate
+    // find the appropriate Plant Sizing object
+    int PltSizNum = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum;
+
+    if (PltSizNum > 0) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+        } else {
+            if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
+        }
+        if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+            if (this->EvapVolFlowRateWasAutoSized) {
+                this->EvapVolFlowRate = tmpEvapVolFlowRate;
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                    BaseSizer::reportSizerOutput(
+                        state, this->ObjectType, this->Name, "Design Size Chilled Water Maximum Requested Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                }
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+                    BaseSizer::reportSizerOutput(state,
+                                                 this->ObjectType,
+                                                 this->Name,
+                                                 "Initial Design Size Chilled Water Maximum Requested Flow Rate [m3/s]",
+                                                 tmpEvapVolFlowRate);
+                }
+            } else { // Hard-size with sizing data
+                if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
+                    Real64 EvapVolFlowRateUser = this->EvapVolFlowRate;
+                    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                        BaseSizer::reportSizerOutput(state,
+                                                     this->ObjectType,
+                                                     this->Name,
+                                                     "Design Size Chilled Water Maximum Requested Flow Rate [m3/s]",
+                                                     tmpEvapVolFlowRate,
+                                                     "User-Specified Chilled Water Maximum Requested Flow Rate [m3/s]",
+                                                     EvapVolFlowRateUser);
+                        if (state.dataGlobal->DisplayExtraWarnings) {
+                            if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
+                                state.dataSize->AutoVsHardSizingThreshold) {
+                                ShowMessage(state, format("{}: Potential issue with equipment sizing for {}", RoutineName, this->Name));
+                                ShowContinueError(
+                                    state, format("User-Specified Chilled Water Maximum Requested Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Chilled Water Maximum Requested Flow Rate of {:.5R} [m3/s]",
+                                                         tmpEvapVolFlowRate));
+                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
+                            }
+                        }
+                    }
+                    tmpEvapVolFlowRate = EvapVolFlowRateUser;
+                }
+            }
+        }
+    } else {
+        if (this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+            ShowSevereError(state, "Autosizing of Electric Chiller evap flow rate requires a loop Sizing:Plant object");
+            ShowContinueError(state, "Occurs in Electric Chiller object=" + this->Name);
+            ErrorsFound = true;
+        }
+        if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
+            BaseSizer::reportSizerOutput(
+                state, this->ObjectType, this->Name, "User-Specified Chilled Water Maximum Requested Flow Rate [m3/s]", this->EvapVolFlowRate);
+        }
+    }
+
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
+
+    // Size condenser flow rate
+    int PltSizCondNum = state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).PlantSizNum; // Change for air-cooled when it's supported
+    if (PltSizCondNum > 0 && PltSizNum > 0) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                               this->TempRefCondIn,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
+                                                               RoutineName);
+            tmpCondVolFlowRate = tmpNomCap * (1.0 + (1.0 / this->RefCOP) * this->CompPowerToCondenserFrac) /
+                                 (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+
+        } else {
+            if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
+        }
+        if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+            if (this->CondVolFlowRateWasAutoSized) {
+                this->CondVolFlowRate = tmpCondVolFlowRate;
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                    BaseSizer::reportSizerOutput(
+                        state, this->ObjectType, this->Name, "Design Size Condenser Maximum Requested Flow Rate [m3/s]", tmpCondVolFlowRate);
+                }
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+                    BaseSizer::reportSizerOutput(
+                        state, this->ObjectType, this->Name, "Initial Design Size Condenser Maximum Requested Flow Rate [m3/s]", tmpCondVolFlowRate);
+                }
+            } else {
+                if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
+                    Real64 CondVolFlowRateUser = this->CondVolFlowRate;
+                    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                        BaseSizer::reportSizerOutput(state,
+                                                     this->ObjectType,
+                                                     this->Name,
+                                                     "Design Size Condenser Maximum Requested Flow Rate [m3/s]",
+                                                     tmpCondVolFlowRate,
+                                                     "User-Specified Condenser Maximum Requested Flow Rate [m3/s]",
+                                                     CondVolFlowRateUser);
+                        if (state.dataGlobal->DisplayExtraWarnings) {
+                            if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
+                                state.dataSize->AutoVsHardSizingThreshold) {
+                                ShowMessage(state, format("{}: Potential issue with equipment sizing for {}", RoutineName, this->Name));
+                                ShowContinueError(
+                                    state, format("User-Specified Condenser Maximum Requested Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                ShowContinueError(
+                                    state,
+                                    format("differs from Design Size Condenser Maximum Requested Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
+                            }
+                        }
+                    }
+                    tmpCondVolFlowRate = CondVolFlowRateUser;
+                }
+            }
+        }
+    } else {
+        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+
+            if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+                ShowSevereError(state, "Autosizing of Electric ASHRAE 205 Chiller condenser fluid flow rate requires a condenser");
+                ShowContinueError(state, "loop Sizing:Plant object");
+                ShowContinueError(state, "Occurs in Electric ASHRAE 205 Chiller object=" + this->Name);
+                ErrorsFound = true;
+            }
+            if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
+                BaseSizer::reportSizerOutput(
+                    state, this->ObjectType, this->Name, "User-Specified Condenser Maximum Requested Flow Rate [m3/s]", this->CondVolFlowRate);
+            }
+
+        } else {
+
+            // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                std::string_view CompType =
+                    DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205)];
+                state.dataSize->DataConstantUsedForSizing = this->RefCap;
+                state.dataSize->DataFractionUsedForSizing = 0.000114;
+                Real64 TempSize = this->CondVolFlowRate;
+                bool bPRINT = true; // TRUE if sizing is reported to output (eio)
+                AutoCalculateSizer sizerCondAirFlow;
+                std::string stringOverride = "Condenser Maximum Requested Flow Rate  [m3/s]";
+                if (state.dataGlobal->isEpJSON) stringOverride = "condenser_maximum_requested_flow_rate [m3/s]";
+                sizerCondAirFlow.overrideSizingString(stringOverride);
+                sizerCondAirFlow.initializeWithinEP(state, CompType, this->Name, bPRINT, RoutineName);
+                this->CondVolFlowRate = sizerCondAirFlow.size(state, TempSize, ErrorsFound);
+            }
+        }
+    }
+
+    // save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
+
+    // Calculate design evaporator capacity (eventually add autosize here too)
+    static auto rep = dynamic_cast<tk205::RS0001_NS::RS0001 *>(this->Representation.get());
+
+    // TODO: Determine actual rated flow rates instead of design flow rates
+    this->RefCap = rep->performance.performance_map_cooling
+                       .Calculate_performance(this->EvapVolFlowRate,
+                                              this->TempRefEvapOut + DataGlobalConstants::KelvinConv,
+                                              this->CondVolFlowRate,
+                                              this->TempRefCondIn + DataGlobalConstants::KelvinConv,
+                                              this->MaxSequenceNumber)
+                       .net_evaporator_capacity;
+
+    if (PltSizNum > 0) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                               RoutineName);
+
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
+            tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
+        } else {
+            tmpNomCap = 0.0;
+        }
+        if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+            if (this->RefCapWasAutoSized) {
+                this->RefCap = tmpNomCap;
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                    BaseSizer::reportSizerOutput(state, this->ObjectType, this->Name, "Design Size Rated Capacity [W]", tmpNomCap);
+                }
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+                    BaseSizer::reportSizerOutput(state, this->ObjectType, this->Name, "Initial Design Size Rated Capacity [W]", tmpNomCap);
+                }
+            } else { // Hard-sized with sizing data
+                if (this->RefCap > 0.0 && tmpNomCap > 0.0) {
+                    Real64 RefCapUser = this->RefCap;
+                    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                        BaseSizer::reportSizerOutput(state,
+                                                     this->ObjectType,
+                                                     this->Name,
+                                                     "Design Size Rated Capacity [W]",
+                                                     tmpNomCap,
+                                                     "User-Specified Rated Capacity [W]",
+                                                     RefCapUser);
+                        if (state.dataGlobal->DisplayExtraWarnings) {
+                            if ((std::abs(tmpNomCap - RefCapUser) / RefCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
+                                ShowMessage(state, format("{}: Potential issue with equipment sizing for {}", RoutineName, this->Name));
+                                ShowContinueError(state, format("User-Specified Rated Capacity of {:.2R} [W]", RefCapUser));
+                                ShowContinueError(state, format("differs from Design Size Rated Capacity of {:.2R} [W]", tmpNomCap));
+                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
+                            }
+                        }
+                    }
+                    tmpNomCap = RefCapUser;
+                }
+            }
+        }
+    } else {
+        if (this->RefCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+            ShowSevereError(state, "Autosizing of Electric Chiller reference capacity requires a loop Sizing:Plant object");
+            ShowContinueError(state, "Occurs in Electric Chiller object=" + this->Name);
+            ErrorsFound = true;
+        }
+        if (!this->RefCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->RefCap > 0.0)) { // Hard-sized with no sizing data
+            BaseSizer::reportSizerOutput(state, this->ObjectType, this->Name, "User-Specified Reference Capacity [W]", this->RefCap);
+        }
+    }
+
+    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+        // create predefined report
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, this->ObjectType);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->RefCOP);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->RefCap);
+    }
+
+    if (ErrorsFound) {
+        ShowFatalError(state, "Preceding sizing errors cause program termination");
+    }
 }
 
 void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
@@ -914,8 +1199,7 @@ void ASHRAE205ChillerSpecs::findEvaporatorMassFlowRate(EnergyPlusData &state, Re
                     ++this->ChillerCapFTError;
                     ShowRecurringWarningErrorAtEnd(
                         state,
-                        format("CHILLER:ELECTRIC:ASHRAE205 \"{}\": Evaporator DeltaTemp = 0 in mass flow calculation warning continues...",
-                               this->Name),
+                        format("{} \"{}\": Evaporator DeltaTemp = 0 in mass flow calculation warning continues...", this->ObjectType, this->Name),
                         this->DeltaTErrCountIndex,
                         evapDeltaTemp,
                         evapDeltaTemp);
@@ -1089,12 +1373,6 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
-    const auto compressorSequence = rep->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
-    // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
-    const auto minmaxSequenceNum = std::minmax_element(compressorSequence.begin(), compressorSequence.end());
-    const auto minSequenceNum = *(minmaxSequenceNum.first);
-    const auto maxSequenceNum = *(minmaxSequenceNum.second);
-
     // Calculate mass flow rate based on MyLoad (TODO: then adjust it after determining if chiller can meet the load)
     this->findEvaporatorMassFlowRate(state, MyLoad, Cp);
 
@@ -1104,7 +1382,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
                                                                 this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
                                                                 this->CondVolFlowRate,
                                                                 this->CondInletTemp + DataGlobalConstants::KelvinConv,
-                                                                maxSequenceNum)
+                                                                this->MaxSequenceNumber)
                                          .net_evaporator_capacity;
     if (maximumChillerCap <= 0) {
         // TODO: Issue a warning
@@ -1114,7 +1392,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
                                                                 this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
                                                                 this->CondVolFlowRate,
                                                                 this->CondInletTemp + DataGlobalConstants::KelvinConv,
-                                                                minSequenceNum)
+                                                                this->MinSequenceNumber)
                                          .net_evaporator_capacity;
     // Part load ratio based on load and available chiller capacity; cap at max P.L.R. (can be >1)
     this->ChillerPartLoadRatio = (maximumChillerCap > 0) ? max(0.0, std::abs(MyLoad) / maximumChillerCap) : 0.0;
@@ -1126,7 +1404,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     if (this->ChillerPartLoadRatio < this->MinPartLoadRat) // Cycling
     {
         this->ChillerCyclingRatio = this->ChillerPartLoadRatio / this->MinPartLoadRat;
-        partLoadSeqNum = minSequenceNum;
+        partLoadSeqNum = this->MinSequenceNumber;
     } else if (this->ChillerPartLoadRatio < 1.0) // Modulating
     {
         // Use performance map to find the fractional sequence number (which most closely matches our part load)
@@ -1136,11 +1414,11 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         int solFla{0};
         std::array<Real64, 4> par{{MyLoad, RunFlag ? 1.0 : 0.0, 1.0}}; // Initialize iteration parameters for RegulaFalsi function
         // Iteratively calculate this->QEvaporator by modulating partLoadSeqNum, ending at Q_Evaporator(partLoadSeqNum)
-        General::SolveRoot(state, accuracy, maxIter, solFla, partLoadSeqNum, f, minSequenceNum, maxSequenceNum, par);
+        General::SolveRoot(state, accuracy, maxIter, solFla, partLoadSeqNum, f, this->MinSequenceNumber, this->MaxSequenceNumber, par);
     } else // Full capacity: std::abs(MyLoad) > this->QEvaporator
     {
         this->QEvaporator = maximumChillerCap;
-        partLoadSeqNum = maxSequenceNum;
+        partLoadSeqNum = this->MaxSequenceNumber;
         // SolveRoot stuff for eventual flow rate (can always calculate Ts if you have MFR and capacity)
         // recursion? Revisit.
         findEvaporatorMassFlowRate(state, this->QEvaporator, Cp);
@@ -1191,19 +1469,12 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     this->QAuxiliary = lookupVariablesCooling.auxiliary_heat;
     this->AmbientZoneGain = this->QEvaporator + this->Power - (this->QCondenser + this->QOilCooler + this->QAuxiliary);
 
-    if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-        // If Heat Recovery specified for this vapor compression chiller, then QCondenser will be adjusted by this subroutine
-        // if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovery);
-        Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                    condInletTemp,
-                                                    state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
-                                                    RoutineName);
-        this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
-    } else {
-        ShowSevereError(state, format("ControlReformEIRChillerModel: Condenser flow = 0, for ElecReformEIRChiller={}", this->Name));
-        ShowContinueErrorTimeStamp(state, "");
-    }
+    Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                condInletTemp,
+                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
+                                                RoutineName);
+    this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
 
     // Oil cooler and Auxiliary Heat delta-T calculations
     if (this->OilCoolerInletNode) {
@@ -1286,7 +1557,7 @@ void ASHRAE205ChillerSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             LoopSide,
-                                                            DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
+                                                            DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
                                                             this->QCondenser,

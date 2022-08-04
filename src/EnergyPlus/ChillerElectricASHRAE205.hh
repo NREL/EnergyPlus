@@ -76,7 +76,10 @@ namespace ChillerElectricASHRAE205 {
 
     struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs
     {
+        static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
         std::shared_ptr<tk205::rs_instance_base> Representation; // ASHRAE205 representation instance
+        int MinSequenceNumber{1};
+        int MaxSequenceNumber{1};
 
         int OilCoolerInletNode{0};
         int OilCoolerOutletNode{0};
