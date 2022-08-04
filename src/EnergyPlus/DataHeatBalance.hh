@@ -1872,6 +1872,19 @@ namespace DataHeatBalance {
         Real64 SumToutMinusTSup = 0.0; // Denominator for zone-level sensible heat index (SHI)
     };
 
+    struct latentReportVariables
+    {
+        Real64 ZoneLTLoadHeatEnergy = 0.0;        // latent heating energy [J]
+        Real64 ZoneLTLoadCoolEnergy = 0.0;        // latent cooling energy [J]
+        Real64 ZoneLTLoadHeatRate = 0.0;          // latent heating rate [W]
+        Real64 ZoneLTLoadCoolRate = 0.0;          // latent cooling rate [W]
+        Real64 ZoneSensibleHeatRatio = 0.0;       // zone load SHR []
+        Real64 ZoneVaporPressureDifference = 0.0; // vapor pressure depression [Pa]
+        Real64 ZoneMoisturePredictedRate = 0.0;
+        Real64 ZoneMoisturePredictedHumSPRate = 0.0;   // Predicted latent load to humidification setpoint (unmultiplied)
+        Real64 ZoneMoisturePredictedDehumSPRate = 0.0; // Predicted latent load to dehumidification setpoint (unmultiplied)
+    };
+
     // Functions
 
     void SetZoneOutBulbTempAt(EnergyPlusData &state);
@@ -2051,6 +2064,8 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoFfactorConstructionsUsed = true;
     bool NoCfactorConstructionsUsed = true;
     bool NoRegularMaterialsUsed = true;
+    bool DoLatentSizing = false; // true when latent sizing is performed during zone sizing
+    bool isAnyLatentLoad = false;
 
     Array1D<Real64> ZoneSNLoadHeatEnergy;
     Array1D<Real64> ZoneSNLoadCoolEnergy;
@@ -2059,9 +2074,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneSNLoadPredictedRate;
     Array1D<Real64> ZoneSNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
     Array1D<Real64> ZoneSNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-    Array1D<Real64> ZoneMoisturePredictedRate;
-    Array1D<Real64> ZoneMoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
-    Array1D<Real64> ZoneMoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
+    EPVector<DataHeatBalance::latentReportVariables> latentReports;
     Array1D<Real64> ZoneListSNLoadHeatEnergy;
     Array1D<Real64> ZoneListSNLoadCoolEnergy;
     Array1D<Real64> ZoneListSNLoadHeatRate;
