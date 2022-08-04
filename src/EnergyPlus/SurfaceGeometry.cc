@@ -9692,17 +9692,19 @@ namespace SurfaceGeometry {
             // store the string for now and associate it after daylighting control objects are read
             windowShadingControl.DaylightingControlName = state.dataIPShortCut->cAlphaArgs(12);
 
-            if (state.dataIPShortCut->cAlphaArgs(13) == "SEQUENTIAL") {
+            windowShadingControl.multiSurfaceControl = static_cast<MultiSurfaceControl>(
+                getEnumerationValue(MultiSurfaceControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(13))));
+
+            if (windowShadingControl.multiSurfaceControl == MultiSurfaceControl::Invalid) {
                 windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Sequential;
-            } else if (state.dataIPShortCut->cAlphaArgs(13) == "GROUP") {
-                windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Group;
-            } else {
-                windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Invalid;
                 ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" should be either SEQUENTIAL or GROUP " +
-                                     state.dataIPShortCut->cAlphaFieldNames(13) + "=\"" + state.dataIPShortCut->cAlphaArgs(13) +
-                                     "\", defaulting to \"SEQUENTIAL\"");
+                                 format("{}=\"{}\" should be either SEQUENTIAL or GROUP {}=\"{}\", defaulting to \"SEQUENTIAL\"",
+                                        cCurrentModuleObject,
+                                        windowShadingControl.Name,
+                                        state.dataIPShortCut->cAlphaFieldNames(13),
+                                        state.dataIPShortCut->cAlphaArgs(13)));
             }
+
             ControlType = state.dataIPShortCut->cAlphaArgs(5);
 
             if (ControlNumAlpha >= 14) {

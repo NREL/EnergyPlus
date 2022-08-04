@@ -950,6 +950,11 @@ namespace DataSurfaces {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(MultiSurfaceControl::Num)> MultiSurfaceControlNamesUC = {
+        "SEQUENTIAL",
+        "GROUP"
+    };
+
     struct FrameDividerProperties
     {
         // Members
