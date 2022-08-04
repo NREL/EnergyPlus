@@ -1794,3 +1794,125 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     WeatherManager::SetCurrentWeather(*state);
     ASSERT_FALSE(state->dataEnvrn->IsRain);
 }
+
+TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_OK)
+{
+
+    // Test for #9157
+    std::string const idf_objects = delimited_string({
+        "Timestep,4;"
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  No,                      !- Run Simulation for Sizing Periods",
+        "  Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  1,                       !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes;                     !- Use Weather File Snow Indicators",
+
+        "Site:Location,",
+        "  CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "  41.78,                   !- Latitude {deg}",
+        "  -87.75,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  190.00;                  !- Elevation {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // We do have an EPW
+    state->dataWeatherManager->WeatherFileExists = true;
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+
+    state->dataGlobal->BeginSimFlag = false;
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->LocationGathered = false;
+    state->dataGlobal->DoWeathSim = true;
+
+    bool Available{false};
+    bool ErrorsFound{false};
+    WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound); // Does not throw
+
+    EXPECT_TRUE(compare_err_stream("", true));
+    EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::RunPeriodWeather));
+}
+
+TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
+{
+
+    // Test for #9157
+    std::string const idf_objects = delimited_string({
+        "Timestep,4;"
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  No,                      !- Run Simulation for Sizing Periods",
+        "  Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  1,                       !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes;                     !- Use Weather File Snow Indicators",
+
+        "Site:Location,",
+        "  CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "  41.78,                   !- Latitude {deg}",
+        "  -87.75,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  190.00;                  !- Elevation {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // We don't have an EPW
+    state->dataWeatherManager->WeatherFileExists = false;
+    state->files.inputWeatherFilePath.filePath = "in.epw";
+
+    state->dataGlobal->BeginSimFlag = false;
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->LocationGathered = false;
+    state->dataGlobal->DoWeathSim = true;
+
+    bool Available{false};
+    bool ErrorsFound{false};
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** GetNextEnvironment: Weather Environment(s) requested, but no weather file found",
+        "   **  Fatal  ** Due to previous error condition, simulation terminated",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=GetNextEnvironment: Weather Environment(s) requested, but no weather file found",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::RunPeriodWeather));
+}
