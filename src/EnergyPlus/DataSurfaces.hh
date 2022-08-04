@@ -322,7 +322,7 @@ namespace DataSurfaces {
     }
 
     // WindowShadingControl Slat Angle Control for Blinds
-    enum class SlatAngle
+    enum class SlatAngleControl
     {
         Invalid = -1,
         Fixed,
@@ -331,7 +331,7 @@ namespace DataSurfaces {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SlatAngle::Num)> SlatAngleNamesUC{
+    constexpr std::array<std::string_view, static_cast<int>(SlatAngleControl::Num)> SlatAngleNamesUC{
         "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};
 
     // Parameter for window screens beam reflectance accounting
@@ -1087,7 +1087,7 @@ namespace DataSurfaces {
         bool ShadingControlIsScheduled; // True if shading control has a schedule
         bool GlareControlIsActive;      // True if shading control to reduce daylight glare is active
         int SlatAngleSchedule;          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
-        SlatAngle slatAngleControl;     // Takes one of the following values that specifies
+        SlatAngleControl slatAngleControl;     // Takes one of the following values that specifies
                                         //  CHARACTER(len=32) :: slatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
                                         //  how slat angle is controled in a blind when ShadingType =
                                         //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
@@ -1109,7 +1109,7 @@ namespace DataSurfaces {
         WindowShadingControlData()
             : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0),
               ShadingControlType(WindowShadingControlType::UnControlled), Schedule(0), SetPoint(0.0), SetPoint2(0.0),
-              ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), slatAngleControl(SlatAngle::Invalid),
+              ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), slatAngleControl(SlatAngleControl::Invalid),
               DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {
         }

@@ -2520,7 +2520,7 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
                     WinShadingControlPtr =
                         state.dataSurface->Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
-                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).slatAngleControl != SlatAngle::Fixed) {
+                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).slatAngleControl != SlatAngleControl::Fixed) {
                         state.dataSurface->SurfWinMovableSlats(SurfNum) = true;
                         state.dataSurface->AnyMovableSlat = true;
                         state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
@@ -9870,7 +9870,7 @@ namespace SurfaceGeometry {
             }
 
             windowShadingControl.slatAngleControl =
-                static_cast<SlatAngle>(getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+                static_cast<SlatAngleControl>(getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE

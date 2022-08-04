@@ -530,7 +530,7 @@ namespace WindowManager {
 
         auto slatWidth = blind.SlatWidth;
         auto slatSpacing = blind.SlatSeparation;
-        auto slatTiltAngle = 90 - blind.SlatAngle; // Need to convert to WCE system
+        auto slatTiltAngle = 90 - blind.SlatAngleControl; // Need to convert to WCE system
         auto curvatureRadius = 0.0;                // No curvature radius in current IDF definition
         size_t numOfSlatSegments = 5;              // Number of segments to use in venetian calculations
         return std::make_shared<CVenetianCellDescription>(slatWidth, slatSpacing, slatTiltAngle, curvatureRadius, numOfSlatSegments);
