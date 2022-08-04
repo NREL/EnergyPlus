@@ -212,9 +212,9 @@ namespace ChillerElectricEIR {
 
         void initEachEnvironment(EnergyPlusData &state);
 
-        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
+        virtual void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void size(EnergyPlusData &state);
+        virtual void size(EnergyPlusData &state);
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
@@ -225,7 +225,7 @@ namespace ChillerElectricEIR {
                               Real64 &QHeatRec      // Amount of heat recovered [W]
         );
 
-        void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
+        virtual void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetElectricEIRChillerInput(EnergyPlusData &state);

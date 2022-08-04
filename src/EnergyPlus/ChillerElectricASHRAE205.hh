@@ -50,7 +50,7 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
-#include "EnergyPlus/ChillerReformulatedEIR.hh"
+#include "EnergyPlus/ChillerElectricEIR.hh"
 #include "rs_instance_base.h" // unique_ptr will need a complete type
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -80,7 +80,7 @@ namespace ChillerElectricASHRAE205 {
         Num
     };
 
-    struct ASHRAE205ChillerSpecs : ChillerReformulatedEIR::ReformulatedEIRChillerSpecs
+    struct ASHRAE205ChillerSpecs : ChillerElectricEIR::ElectricEIRChillerSpecs
     {
         static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
         std::shared_ptr<tk205::RSInstanceBase> Representation; // ASHRAE205 representation instance
@@ -100,13 +100,16 @@ namespace ChillerElectricASHRAE205 {
         PlantLocation AHPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
         Real64 QOilCooler{0};
         Real64 QAuxiliary{0};
+        Real64 OilCoolerEnergy{0};
+        Real64 AuxiliaryEnergy{0};
 
         AmbientTempIndicator AmbientTempType{AmbientTempIndicator::Invalid};
         int AmbientTempSchedule{0};       // Schedule index pointer
         int AmbientTempZone{0};           // Number of ambient zone around tank
         int AmbientTempOutsideAirNode{0}; // Number of outside air node
         Real64 AmbientTemp{0};
-        Real64 AmbientZoneGain{0};         // Internal gain to zone from tank losses (W)
+        Real64 AmbientZoneGain{0};         // Internal gain to zone from losses (W)
+        Real64 AmbientZoneGainEnergy{0};   // Internal gain to zone from losses (J)
         std::string EndUseSubcategory{""}; // identifier use for the end use subcategory
 
         // Default Constructor
@@ -129,8 +132,6 @@ namespace ChillerElectricASHRAE205 {
         void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
 
         Real64 findCapacityResidual(EnergyPlusData &, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
-
-        // void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad, // operating load

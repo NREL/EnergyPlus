@@ -196,8 +196,6 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
 
-        const auto is_water_cooled = thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled;
-
         auto const cond_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "condenser_inlet_node_name");
         auto const cond_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "condenser_outlet_node_name");
         if (cond_inlet_node_name.empty() || cond_outlet_node_name.empty()) {
@@ -205,34 +203,32 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             ShowContinueError(state, "Condenser Inlet or Outlet Node Name is blank.");
             ErrorsFound = true;
         }
-        thisChiller.CondInletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                cond_inlet_node_name,
-                                                ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::ChillerElectricASHRAE205,
-                                                thisChiller.Name,
-                                                is_water_cooled ? DataLoopNode::NodeFluidType::Water : DataLoopNode::NodeFluidType::Blank,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Secondary,
-                                                DataLoopNode::ObjectIsNotParent);
+        thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                           cond_inlet_node_name,
+                                                                           ErrorsFound,
+                                                                           DataLoopNode::ConnectionObjectType::ChillerElectricASHRAE205,
+                                                                           thisChiller.Name,
+                                                                           DataLoopNode::NodeFluidType::Water,
+                                                                           DataLoopNode::ConnectionType::Inlet,
+                                                                           NodeInputManager::CompFluidStream::Secondary,
+                                                                           DataLoopNode::ObjectIsNotParent);
 
-        thisChiller.CondOutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                cond_outlet_node_name,
-                                                ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::ChillerElectricASHRAE205,
-                                                thisChiller.Name,
-                                                is_water_cooled ? DataLoopNode::NodeFluidType::Water : DataLoopNode::NodeFluidType::Blank,
-                                                DataLoopNode::ConnectionType::Outlet,
-                                                NodeInputManager::CompFluidStream::Secondary,
-                                                DataLoopNode::ObjectIsNotParent);
+        thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                            cond_outlet_node_name,
+                                                                            ErrorsFound,
+                                                                            DataLoopNode::ConnectionObjectType::ChillerElectricASHRAE205,
+                                                                            thisChiller.Name,
+                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                            DataLoopNode::ConnectionType::Outlet,
+                                                                            NodeInputManager::CompFluidStream::Secondary,
+                                                                            DataLoopNode::ObjectIsNotParent);
 
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            thisChiller.Name,
                                            cond_inlet_node_name,
                                            cond_outlet_node_name,
-                                           is_water_cooled ? "Condenser Water Nodes" : "Condenser (unknown fluid) Nodes");
+                                           "Condenser Water Nodes");
 
         thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(
             getEnumerationValue(DataPlant::FlowModeNamesUC, ip->getAlphaFieldValue(fields, objectSchemaProps, "chiller_flow_mode")));
@@ -394,7 +390,6 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
         // Set reference conditions
         thisChiller.TempRefCondIn = 29.44;
-        thisChiller.TempRefCondOut = 34.61;
         thisChiller.TempRefEvapOut = 6.67;
     }
 
@@ -539,7 +534,7 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
 {
     static constexpr std::string_view RoutineName("ASHRAE205ChillerSpecs::initialize");
 
-    if (this->MyInitFlag) {
+    if (this->oneTimeFlag) {
         this->oneTimeInit(state);
         this->setOutputVariables(state);
         // TODO: Need this?
@@ -547,7 +542,7 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->OilCoolerInletNode, this->OilCoolerVolFlowRate);
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->AuxiliaryHeatInletNode, this->AuxiliaryVolFlowRate);
         }
-        this->MyInitFlag = false;
+        this->oneTimeFlag = false;
     }
 
     switch (this->AmbientTempType) {
@@ -1077,7 +1072,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Chiller Heat Rejected to Zone",
+                        "Chiller Zone Heat Gain Rate",
                         OutputProcessor::Unit::W,
                         this->AmbientZoneGain,
                         OutputProcessor::SOVTimeStepType::System,
@@ -1085,7 +1080,15 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Oil Cooler Heat",
+                        "Chiller Zone Heat Gain Energy",
+                        OutputProcessor::Unit::J,
+                        this->AmbientZoneGainEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Oil Cooler Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->QOilCooler,
                         OutputProcessor::SOVTimeStepType::System,
@@ -1093,7 +1096,15 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Auxiliary Heat",
+                        "Oil Cooler Heat Transfer Energy",
+                        OutputProcessor::Unit::J,
+                        this->OilCoolerEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        "Auxiliary Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->QAuxiliary,
                         OutputProcessor::SOVTimeStepType::System,
@@ -1101,24 +1112,12 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Oil Cooler Energy",
+                        "Auxiliary Heat Transfer Energy",
                         OutputProcessor::Unit::J,
-                        this->QOilCooler,
+                        this->AuxiliaryEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name);
-
-    SetupOutputVariable(state,
-                        "Auxiliary Energy",
-                        OutputProcessor::Unit::J,
-                        this->QAuxiliary,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        this->Name);
-
-    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-        SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->RefCap);
-    }
 }
 
 void ASHRAE205ChillerSpecs::findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp)
@@ -1259,7 +1258,6 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     this->QEvaporator = 0.0;
     this->QOilCooler = 0.0;
     this->QAuxiliary = 0.0;
-    this->QHeatRecovery = 0.0;
     int PlantLoopNum = this->CWPlantLoc.loopNum;
     DataPlant::LoopSideLocation LoopSideNum = this->CWPlantLoc.loopSideNum;
     int BranchNum = this->CWPlantLoc.branchNum;
@@ -1525,6 +1523,12 @@ void ASHRAE205ChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad, b
         this->Energy = 0.0;
         this->EvapEnergy = 0.0;
         this->CondEnergy = 0.0;
+        this->QOilCooler = 0.0;
+        this->QAuxiliary = 0.0;
+        this->OilCoolerEnergy = 0.0;
+        this->AuxiliaryEnergy = 0.0;
+        this->AmbientZoneGain = 0.0;
+        this->AmbientZoneGainEnergy = 0.0;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
@@ -1540,6 +1544,9 @@ void ASHRAE205ChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad, b
         this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->OilCoolerEnergy = this->QOilCooler * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->AuxiliaryEnergy = this->QAuxiliary * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->AmbientZoneGainEnergy = this->AmbientZoneGain * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
