@@ -6259,8 +6259,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.694,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     175.64105,               !- CO2 Emission Factor {g/MJ}
@@ -6304,8 +6302,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}

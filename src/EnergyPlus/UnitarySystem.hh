@@ -378,6 +378,8 @@ namespace UnitarySystems {
 
         bool m_EMSOverrideCoilSpeedNumOn;
         Real64 m_EMSOverrideCoilSpeedNumValue;
+        bool m_EMSOverrideSuppCoilSpeedNumOn;
+        Real64 m_EMSOverrideSuppCoilSpeedNumValue;
         int m_CoilSpeedErrIdx;
 
         Real64 m_DehumidInducedHeatingDemandRate;
@@ -807,9 +809,10 @@ namespace UnitarySystems {
 
         void calcUnitarySuppHeatingSystem(EnergyPlusData &state,
                                           bool const FirstHVACIteration, // True when first HVAC iteration
-                                          Real64 const PartLoadRatio,    // coil operating part-load ratio
                                           Real64 const SuppCoilLoad      // adjusted supp coil load when outlet temp exceeds max (W)
         );
+
+        void setEMSSuppCoilStagePLR(EnergyPlusData &state);
 
         void calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
         );

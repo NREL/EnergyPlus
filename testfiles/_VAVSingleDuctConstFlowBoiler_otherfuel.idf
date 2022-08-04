@@ -164,8 +164,6 @@
 
   FuelFactors,
     OtherFuel1,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
