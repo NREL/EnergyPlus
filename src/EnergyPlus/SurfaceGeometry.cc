@@ -9685,10 +9685,8 @@ namespace SurfaceGeometry {
             windowShadingControl.Schedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             windowShadingControl.SetPoint = state.dataIPShortCut->rNumericArgs(2);
             windowShadingControl.SetPoint2 = state.dataIPShortCut->rNumericArgs(3);
-            windowShadingControl.ShadingControlIsScheduled = false;
-            if (state.dataIPShortCut->cAlphaArgs(7) == "YES") windowShadingControl.ShadingControlIsScheduled = true;
-            windowShadingControl.GlareControlIsActive = false;
-            if (state.dataIPShortCut->cAlphaArgs(8) == "YES") windowShadingControl.GlareControlIsActive = true;
+            windowShadingControl.ShadingControlIsScheduled = getYesNoValue(state.dataIPShortCut->cAlphaArgs(7)) == BooleanSwitch::Yes;
+            windowShadingControl.GlareControlIsActive = getYesNoValue(state.dataIPShortCut->cAlphaArgs(8)) == BooleanSwitch::Yes;
             windowShadingControl.SlatAngleSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
 
             // store the string for now and associate it after daylighting control objects are read
