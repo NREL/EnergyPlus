@@ -138,7 +138,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(RoutineName));
         thisChiller.Representation = RSInstanceFactory::create("RS0001", rep_file_path.string().c_str());
         thisChiller.InterpolationType = static_cast<PerformanceInterpolationType>(getEnumerationValue(
-            InterpolationMethods, UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "interpolation_method"))));
+            InterpolationMethods,
+            UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))));
 
         auto rep = dynamic_cast<tk205::rs0001_ns::RS0001 *>(thisChiller.Representation.get());
         const auto compressorSequence = rep->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
