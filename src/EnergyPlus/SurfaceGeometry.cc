@@ -9693,11 +9693,11 @@ namespace SurfaceGeometry {
             windowShadingControl.DaylightingControlName = state.dataIPShortCut->cAlphaArgs(12);
 
             if (state.dataIPShortCut->cAlphaArgs(13) == "SEQUENTIAL") {
-                windowShadingControl.MultiSurfaceCtrlIsGroup = false;
+                windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Sequential;
             } else if (state.dataIPShortCut->cAlphaArgs(13) == "GROUP") {
-                windowShadingControl.MultiSurfaceCtrlIsGroup = true;
+                windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Group;
             } else {
-                windowShadingControl.MultiSurfaceCtrlIsGroup = false;
+                windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Invalid;
                 ShowWarningError(state,
                                  cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" should be either SEQUENTIAL or GROUP " +
                                      state.dataIPShortCut->cAlphaFieldNames(13) + "=\"" + state.dataIPShortCut->cAlphaArgs(13) +
@@ -10230,7 +10230,7 @@ namespace SurfaceGeometry {
                 WindowShadingControlA.SetPoint2 == WindowShadingControlB.SetPoint2 &&
                 WindowShadingControlA.DaylightingControlName == WindowShadingControlB.DaylightingControlName &&
                 WindowShadingControlA.DaylightControlIndex == WindowShadingControlB.DaylightControlIndex &&
-                WindowShadingControlA.MultiSurfaceCtrlIsGroup == WindowShadingControlB.MultiSurfaceCtrlIsGroup);
+                WindowShadingControlA.multiSurfaceControl == WindowShadingControlB.multiSurfaceControl);
     }
 
     void GetStormWindowData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input

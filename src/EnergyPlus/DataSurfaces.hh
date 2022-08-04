@@ -942,6 +942,14 @@ namespace DataSurfaces {
         "SUSPENDED"    // 1
     };
 
+    // Type of control order when multiple surfaces are referenced
+    enum class MultiSurfaceControl{
+        Invalid = -1,
+        Sequential,
+        Group,
+        Num
+    };
+
     struct FrameDividerProperties
     {
         // Members
@@ -1100,7 +1108,7 @@ namespace DataSurfaces {
                                         //    slat angle is set to the value given in the associated Material:WindowBlind.
         std::string DaylightingControlName;    // string holding the Daylighting Control Object Name string
         int DaylightControlIndex;              // Pointer to the array of Daylighting Controls
-        bool MultiSurfaceCtrlIsGroup;          // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
+        MultiSurfaceControl multiSurfaceControl;          // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
         int FenestrationCount;                 // count of fenestration references
         Array1D<std::string> FenestrationName; // string holding list of fenestration surfaces
         Array1D_int FenestrationIndex;         // Pointers to fenestration surfaces
@@ -1110,7 +1118,7 @@ namespace DataSurfaces {
             : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0),
               ShadingControlType(WindowShadingControlType::UnControlled), Schedule(0), SetPoint(0.0), SetPoint2(0.0),
               ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), slatAngleControl(SlatAngleControl::Invalid),
-              DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
+              DaylightControlIndex(0), multiSurfaceControl(MultiSurfaceControl::Invalid), FenestrationCount(0)
         {
         }
     };

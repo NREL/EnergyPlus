@@ -10338,7 +10338,7 @@ std::size_t CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
         auto &thisDaylightCtrl = state.dataDaylightingData->daylightControl(controlNum);
         for (auto sequence : shadeControlSequence) {
             int curShadeControl = sequence.second;
-            if (state.dataSurface->WindowShadingControl(curShadeControl).MultiSurfaceCtrlIsGroup) {
+            if (state.dataSurface->WindowShadingControl(curShadeControl).multiSurfaceControl == MultiSurfaceControl::Group) {
                 // add a group of surfaces since they should be deployed as a group
                 std::vector<int> group;
                 for (int i = 1; i <= state.dataSurface->WindowShadingControl(curShadeControl).FenestrationCount; i++) {
