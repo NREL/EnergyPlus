@@ -12622,6 +12622,26 @@
     CAV_bas_CoolCDemand Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
+    CoolSys1 Auxiliary Cooling Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Chiller:Electric:ASHRAE205,      !- Component 1 Object Type
+    CoolSys1 Chiller1,           !- Component 1 Name
+    CoolSys1 Chiller1 Oil Cooler Inlet Node,  !- Component 1 Inlet Node Name
+    CoolSys1 Chiller1 Oil Cooler Aux Node,  !- Component 1 Outlet Node Name
+    Chiller:Electric:ASHRAE205,      !- Component 2 Object Type
+    CoolSys1 Chiller1,           !- Component 2 Name
+    CoolSys1 Chiller1 Oil Cooler Aux Node,  !- Component 2 Inlet Node Name
+    CoolSys1 Chiller2 Oil Cooler Inlet Node,  !- Component 2 Outlet Node Name
+    Chiller:Electric:ASHRAE205,      !- Component 3 Object Type
+    CoolSys1 Chiller2,           !- Component 3 Name
+    CoolSys1 Chiller2 Oil Cooler Inlet Node,  !- Component 3 Inlet Node Name
+    CoolSys1 Chiller2 Oil Cooler Aux Node,  !- Component 3 Outlet Node Name
+    Chiller:Electric:ASHRAE205,      !- Component 4 Object Type
+    CoolSys1 Chiller2,           !- Component 4 Name
+    CoolSys1 Chiller2 Oil Cooler Aux Node,  !- Component 4 Inlet Node Name
+    CoolSys1 Chiller2 Auxiliary Outlet Node;  !- Component 4 Outlet Node Name
+
+  Branch,
     CoolSys1 Demand Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -13043,7 +13063,8 @@
     CoolSys1 Demand Load Branch 2,  !- Branch 3 Name
     CoolSys1 Demand Load Branch 3,  !- Branch 4 Name
     CoolSys1 Demand Load Branch 4,  !- Branch 5 Name
-    CoolSys1 Demand Outlet Branch;  !- Branch 6 Name
+    CoolSys1 Auxiliary Cooling Branch,  !- Branch 6 Name
+    CoolSys1 Demand Outlet Branch;  !- Branch 7 Name
 
   BranchList,
     TowerWaterSys Supply Branches,  !- Name
@@ -13173,7 +13194,8 @@
     CoolSys1 Demand Load Branch 1,  !- Outlet Branch 1 Name
     CoolSys1 Demand Load Branch 2,  !- Outlet Branch 2 Name
     CoolSys1 Demand Load Branch 3,  !- Outlet Branch 3 Name
-    CoolSys1 Demand Load Branch 4;  !- Outlet Branch 4 Name
+    CoolSys1 Demand Load Branch 4,  !- Outlet Branch 4 Name
+    CoolSys1 Auxiliary Cooling Branch;  !- Outlet Branch 5 Name
 
   Connector:Splitter,
     TowerWaterSys Supply Splitter,  !- Name
@@ -13281,7 +13303,8 @@
     CoolSys1 Demand Load Branch 1,  !- Inlet Branch 1 Name
     CoolSys1 Demand Load Branch 2,  !- Inlet Branch 2 Name
     CoolSys1 Demand Load Branch 3,  !- Inlet Branch 3 Name
-    CoolSys1 Demand Load Branch 4;  !- Inlet Branch 4 Name
+    CoolSys1 Demand Load Branch 4,  !- Inlet Branch 4 Name
+    CoolSys1 Auxiliary Cooling Branch;  !- Inlet Branch 5 Name
 
   Connector:Mixer,
     TowerWaterSys Supply Mixer,  !- Name
@@ -13835,7 +13858,7 @@
 
   Chiller:Electric:ASHRAE205,
     CoolSys1 Chiller1,       !- Name
-    CoolSys1-Chiller.RS0001.a205.cbor,  !- Representation File Name
+    CoolSys1-Chiller-Detailed.RS0001.a205.cbor,  !- Representation File Name
     Cubic,                   !- Interpolation Method
     ,                        !- Reference Capacity
     1.0,                     !- Sizing Factor
@@ -13849,11 +13872,17 @@
     CoolSys1 Chiller1 Water Inlet Node,  !- Condenser Inlet Node Name
     CoolSys1 Chiller1 Water Outlet Node,  !- Condenser Outlet Node Name
     0.05517136253079016,     !- Condenser Maximum Requested Flow Rate
-    ConstantFlow;            !- Chiller Flow Mode Type
+    ConstantFlow,            !- Chiller Flow Mode Type
+    CoolSys1 Chiller1 Oil Cooler Inlet Node,  !- Oil Cooler Inlet Node Name
+    CoolSys1 Chiller1 Oil Cooler Aux Node,  !- Oil Cooler Outlet Node Name
+    0.001,                   !- Oil Cooler Design Flow Rate
+    CoolSys1 Chiller1 Oil Cooler Aux Node,  !- Auxiliary Inlet Node Name
+    CoolSys1 Chiller2 Oil Cooler Inlet Node,  !- Auxiliary Outlet Node Name
+    0.001;                   !- Auxiliary Cooling Design Flow Rate
 
   Chiller:Electric:ASHRAE205,
     CoolSys1 Chiller2,       !- Name
-    CoolSys1-Chiller.RS0001.a205.cbor,  !- Representation File Name
+    CoolSys1-Chiller-Detailed.RS0001.a205.cbor,  !- Representation File Name
     Cubic,                   !- Interpolation Method
     ,                        !- Reference Capacity
     1.0,                     !- Sizing Factor
@@ -13867,7 +13896,13 @@
     CoolSys1 Chiller2 Water Inlet Node,  !- Condenser Inlet Node Name
     CoolSys1 Chiller2 Water Outlet Node,  !- Condenser Outlet Node Name
     0.05517136253079016,     !- Condenser Maximum Requested Flow Rate
-    ConstantFlow;            !- Chiller Flow Mode Type
+    ConstantFlow,            !- Chiller Flow Mode Type
+    CoolSys1 Chiller2 Oil Cooler Inlet Node,  !- Oil Cooler Inlet Node Name
+    CoolSys1 Chiller2 Oil Cooler Aux Node,  !- Oil Cooler Outlet Node Name
+    0.001,                   !- Oil Cooler Design Flow Rate
+    CoolSys1 Chiller2 Oil Cooler Aux Node,  !- Auxiliary Inlet Node Name
+    CoolSys1 Chiller2 Auxiliary Outlet Node,  !- Auxiliary Outlet Node Name
+    0.001;                   !- Auxiliary Cooling Design Flow Rate
 
 !-   ===========  ALL OBJECTS IN CLASS: COOLINGTOWER:VARIABLESPEED ===========
 
@@ -17079,8 +17114,10 @@
 
   Output:Variable,*,Chiller Condenser Mass Flow Rate,Detailed;
 
-  !Output:Variable,*,Chiller Zone Heat Gain Rate,Detailed;
+  Output:Variable,*,Chiller Condenser Outlet Temperature,Detailed;
 
-  !Output:Variable,*,Oil Cooler Heat Transfer Rate,Detailed;
+  Output:Variable,*,Chiller Zone Heat Gain Rate,Detailed;
 
-  !Output:Variable,*,Auxiliary Heat Transfer Rate,Detailed;
+  Output:Variable,*,Oil Cooler Heat Transfer Rate,Detailed;
+
+  Output:Variable,*,Auxiliary Heat Transfer Rate,Detailed;

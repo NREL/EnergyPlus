@@ -17129,3 +17129,5 @@
   Output:Variable,*,Chiller Evaporator Outlet Temperature,Detailed;
 
   Output:Variable,*,Chiller Condenser Mass Flow Rate,Detailed;
+
+  Output:Variable,*,Chiller Condenser Outlet Temperature,Detailed;

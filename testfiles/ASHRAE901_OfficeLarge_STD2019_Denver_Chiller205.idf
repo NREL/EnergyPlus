@@ -17079,8 +17079,10 @@
 
   Output:Variable,*,Chiller Condenser Mass Flow Rate,Detailed;
 
-  !Output:Variable,*,Chiller Zone Heat Gain Rate,Detailed;
+  Output:Variable,*,Chiller Condenser Outlet Temperature,Detailed;
 
-  !Output:Variable,*,Oil Cooler Heat Transfer Rate,Detailed;
+  Output:Variable,*,Chiller Zone Heat Gain Rate,Detailed;
 
-  !Output:Variable,*,Auxiliary Heat Transfer Rate,Detailed;
+  Output:Variable,*,Oil Cooler Heat Transfer Rate,Detailed;
+
+  Output:Variable,*,Auxiliary Heat Transfer Rate,Detailed;
