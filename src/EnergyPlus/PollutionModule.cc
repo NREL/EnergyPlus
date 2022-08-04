@@ -984,7 +984,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
                                     Pollution.CoalCoef.NucHiSched,
                                     ErrorsFound);
                 }
-               Pollution.CoalCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+                Pollution.CoalCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                     CheckFFSchedule(state,
                                     cCurrentModuleObject,

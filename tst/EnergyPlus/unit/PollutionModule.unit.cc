@@ -575,14 +575,13 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestEnvironmentalImpactFactors)
         "      0;                       !- Nuclear Low Level Emission Factor {m3/MJ}",
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    
+
     Real64 ExpectedOutput(0.3);
     Real64 AllowedTolerance(0.001);
-    
+
     PollutionModule::GetPollutionFactorInput(*state);
 
     // The get routine should rest the steam conversion efficiency to the default value of 0.25.
     // Previously because of a typo, it would reset it to the input value of zero (or even a negative number).
     ASSERT_NEAR(state->dataPollutionModule->Pollution.SteamConvEffic, ExpectedOutput, AllowedTolerance);
-    
 }
