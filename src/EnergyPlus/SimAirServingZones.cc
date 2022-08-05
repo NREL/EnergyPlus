@@ -4346,7 +4346,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
 
             FinalSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
             FinalSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-            FinalSysSizing(AirLoopNum).SysOAMethod = SysSizInput(SysSizNum).SysOAMethod;
+            FinalSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
             FinalSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
             FinalSysSizing(AirLoopNum).OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
 
@@ -4390,7 +4390,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
 
             CalcSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
             CalcSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-            CalcSysSizing(AirLoopNum).SysOAMethod = SysSizInput(SysSizNum).SysOAMethod;
+            CalcSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
             CalcSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
             CalcSysSizing(AirLoopNum).OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
             CalcSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
@@ -4437,7 +4437,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
 
             FinalSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
             FinalSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-            FinalSysSizing(AirLoopNum).SysOAMethod = SysSizInput(1).SysOAMethod;
+            FinalSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(1).SystemOAMethod;
             FinalSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
             FinalSysSizing(AirLoopNum).OAAutoSized = SysSizInput(1).OAAutoSized;
 
@@ -4480,7 +4480,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             CalcSysSizing(AirLoopNum).ScaledHeatingCapacity = SysSizInput(1).ScaledHeatingCapacity;
             CalcSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
             CalcSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-            CalcSysSizing(AirLoopNum).SysOAMethod = SysSizInput(1).SysOAMethod;
+            CalcSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(1).SystemOAMethod;
             CalcSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
             CalcSysSizing(AirLoopNum).OAAutoSized = SysSizInput(1).OAAutoSized;
 
@@ -4824,10 +4824,10 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
                                 TermUnitFinalZoneSizing(TermUnitSizingIndex)
                                     .TotalOAFromArea; // should not have diversity at this point (no should have diversity in Vou if VRP)
-                    if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::ZoneSum) { // ZoneSum Method
+                    if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::ZoneSum) { // ZoneSum Method
                         SysOAUnc += ZoneOAUnc;
-                    } else if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::VRP ||
-                               SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::SP) { // Ventilation Rate Procedure
+                    } else if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::VRP ||
+                               SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::SP) { // Ventilation Rate Procedure
                         SysOAUnc += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople * state.dataSize->DBySys(AirLoopNum) +
                                     TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // apply D to people term
                     }
@@ -4844,7 +4844,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                         TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone = ZoneOAUnc;
                     }
 
-                    if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::ZoneSum) { // ZoneSum Method
+                    if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::ZoneSum) { // ZoneSum Method
                         MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA;
                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow > 0.0) {
                             ZoneOAFracCooling = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone /
@@ -4853,8 +4853,8 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                         } else {
                             ZoneOAFracCooling = 0.0;
                         }
-                    } else if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::VRP ||
-                               SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::SP) { // Ventilation Rate Procedure
+                    } else if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::VRP ||
+                               SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::SP) { // Ventilation Rate Procedure
                         // CR 8872 - check to see if uncorrected OA is calculated to be greater than 0
                         if (!(ZoneOAUnc > 0.0)) {
                             ShowSevereError(
@@ -4998,10 +4998,10 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                         if (SysSizNum > 0) {
                             ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
                                         TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // should not have diversity at this point
-                            if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::ZoneSum) {      // ZoneSum Method
+                            if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::ZoneSum) {   // ZoneSum Method
                                 SysOAUnc += ZoneOAUnc;
-                            } else if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::VRP ||
-                                       SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
+                            } else if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::VRP ||
+                                       SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
                                 SysOAUnc += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople * state.dataSize->DBySys(AirLoopNum) +
                                             TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // apply D to people term
                             }
@@ -5017,7 +5017,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                                 TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone = ZoneOAUnc;
                             }
 
-                            if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::ZoneSum) { // ZoneSum Method
+                            if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::ZoneSum) { // ZoneSum Method
                                 MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA;
                                 if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow > 0.0) {
                                     ZoneOAFracHeating = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone /
@@ -5027,8 +5027,8 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                                     ZoneOAFracHeating = 0.0;
                                 }
 
-                            } else if (SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::VRP ||
-                                       SysSizInput(SysSizNum).SysOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
+                            } else if (SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::VRP ||
+                                       SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
                                 // CR 8872 - check to see if uncorrected OA is calculated to be greater than 0
                                 if (!(ZoneOAUnc > 0.0)) {
                                     ShowSevereError(state,
@@ -5869,7 +5869,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
             switch (SysSizing(CurOverallSimDay, AirLoopNum).SizingOption) {
             case Coincident: {
-                if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::ZoneSum) {
+                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::ZoneSum) {
                     SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
                         SysSizing(CurOverallSimDay, AirLoopNum).CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
                     SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow =
@@ -5902,8 +5902,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     } else {
                         state.dataSize->XsBySysHeat(AirLoopNum) = 0.0;
                     }
-                } else if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::VRP ||
-                           FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
+                } else if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::VRP ||
+                           FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
                     // cooling
                     SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
                         SysSizing(CurOverallSimDay, AirLoopNum).CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
@@ -5933,7 +5933,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                             state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
                             state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
                             VozClg = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
-                            if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                            if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
                                 if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                     state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                 } else {
@@ -6057,7 +6057,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                     state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
                                     state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
                                     state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                    if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                                    if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
                                         if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                         } else {
@@ -6110,7 +6110,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                 state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
                                 state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
                                 state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
                                     if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                     } else {
@@ -6192,7 +6192,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 // this should also be as least as big as is needed for Vot
             } break;
             case NonCoincident: {
-                if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::ZoneSum) {
+                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::ZoneSum) {
                     SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
                         SysSizing(CurOverallSimDay, AirLoopNum).NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
                     SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow =
@@ -6225,8 +6225,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     } else {
                         state.dataSize->XsBySysHeat(AirLoopNum) = 0.0;
                     }
-                } else if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::VRP ||
-                           FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
+                } else if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::VRP ||
+                           FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // Ventilation Rate and Simplified Procedure
                     // cooling
                     SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
                         SysSizing(CurOverallSimDay, AirLoopNum).NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
@@ -6257,7 +6257,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                             state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
                             state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
                             VozClg = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
-                            if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                            if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
                                 if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                     state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                 } else {
@@ -6357,7 +6357,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                     state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
                                     state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
                                     state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                    if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                                    if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
                                         if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                         } else {
@@ -6391,7 +6391,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                         }
                                     }
                                 }
-                                if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
                                     state.dataSize->VozSumHtgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
                                 } else {
                                     if (SysHeatingEv < state.dataSimAirServingZones->MinHeatingEvz)
@@ -6411,7 +6411,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                 state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
                                 state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
                                 state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                if (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
                                     if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                         state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                     } else {
@@ -6495,8 +6495,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
             // If the ventilation was autosized using the ASHRAE VRP method, then the design zone and system ventilation values
             // must be based on the larger of the cooling or heating OA
-            if (FinalSysSizing(AirLoopNum).OAAutoSized &&
-                (FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::VRP || FinalSysSizing(AirLoopNum).SysOAMethod == SystemOAMethod::SP)) {
+            if (FinalSysSizing(AirLoopNum).OAAutoSized && (FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::VRP ||
+                                                           FinalSysSizing(AirLoopNum).SystemOAMethod == SystemOAMethod::SP)) {
                 Real64 VotMax = max(state.dataSize->VotClgBySys(AirLoopNum), state.dataSize->VotHtgBySys(AirLoopNum));
 
                 // Reset the system level ventilation to the larger of the system-level cooling or heating Vot
