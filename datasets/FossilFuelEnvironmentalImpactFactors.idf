@@ -26,8 +26,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -71,8 +69,6 @@
 
   FuelFactors,
     Diesel,                  !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     70.50731,                !- CO2 Emission Factor {g/MJ}
@@ -116,8 +112,6 @@
 
   FuelFactors,
     Gasoline,                !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     66.20808,                !- CO2 Emission Factor {g/MJ}
@@ -163,8 +157,6 @@
 
   FuelFactors,
     Propane,                 !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     62.70851,                !- CO2 Emission Factor {g/MJ}
@@ -208,8 +200,6 @@
 
   FuelFactors,
     Propane,                 !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     49.17240,                !- CO2 Emission Factor {g/MJ}
@@ -253,8 +243,6 @@
 
   FuelFactors,
     FuelOilNo1,                !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     66.02330,                !- CO2 Emission Factor {g/MJ}
@@ -298,8 +286,6 @@
 
   FuelFactors,
     FuelOilNo2,                !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     68.47998,                !- CO2 Emission Factor {g/MJ}
@@ -345,8 +331,6 @@
 
   FuelFactors,
     OtherFuel1,               !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     76.77128,                !- CO2 Emission Factor {g/MJ}
@@ -392,8 +376,6 @@
 
   FuelFactors,
     OtherFuel1,               !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     76.77128,                !- CO2 Emission Factor {g/MJ}
@@ -437,8 +419,6 @@
 
   FuelFactors,
     Coal,                    !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     91.11052,                !- CO2 Emission Factor {g/MJ}
@@ -482,8 +462,6 @@
 
   FuelFactors,
     Coal,                    !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     99.26669,                !- CO2 Emission Factor {g/MJ}
@@ -527,8 +505,6 @@
 
   FuelFactors,
     Coal,                    !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     152.12646,               !- CO2 Emission Factor {g/MJ}

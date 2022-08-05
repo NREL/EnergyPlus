@@ -5514,6 +5514,100 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
                 ExpectedOAMassFlow); // Expect that the system OA is greater than the desing OA air flow, OAMassFlow without the cap is ~0.86 m3/s
 }
 
+TEST_F(EnergyPlusFixture, MechVentController_ACHflow)
+{
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "    Zone 1;                  !- Name",
+        "Zone,",
+        "    Zone 2;                  !- Name",
+        "DesignSpecification:OutdoorAir,",
+        "    SZ DSOA,                 !- Name",
+        "    AirChanges/Hour,         !- Outdoor Air Method",
+        "    ,                        !- Outdoor Air Flow per Person {m3/s-person}",
+        "    ,                        !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+        "    ,                        !- Outdoor Air Flow per Zone {m3/s}",
+        "    0.2;                     !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+        "ZoneHVAC:AirDistributionUnit,",
+        "    Zone1TermReheat,         !- Name",
+        "    Zone 1 PIU Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type",
+        "    Zone 1 SPIU ATU;         !- Air Terminal Name",
+        "ZoneHVAC:AirDistributionUnit,",
+        "    Zone2TermReheat,         !- Name",
+        "    Zone 2 Reheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type",
+        "    Zone 2 VAV System;       !- Air Terminal Name",
+        "ZoneHVAC:EquipmentList,",
+        "    Zone1Equipment,          !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone1TermReheat,         !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "ZoneHVAC:EquipmentList,",
+        "    Zone2Equipment,          !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone2TermReheat,         !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "ZoneHVAC:EquipmentConnections,",
+        "    Zone 1,                  !- Zone Name",
+        "    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
+        "    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 1 Node,             !- Zone Air Node Name",
+        "    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name",
+        "ZoneHVAC:EquipmentConnections,",
+        "    Zone 2,                  !- Zone Name",
+        "    Zone2Equipment,          !- Zone Conditioning Equipment List Name",
+        "    Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 2 Node,             !- Zone Air Node Name",
+        "    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name",
+        "Controller:MechanicalVentilation,",
+        "    CM 1,                    !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    No,                      !- Demand Controlled Ventilation",
+        "    Standard62.1VentilationRateProcedure,  !- System Outdoor Air Method",
+        "    1,                       !- Zone Maximum Outdoor Air Fraction {dimensionless}",
+        "    Zone 2,                  !- Zone or ZoneList 1 Name",
+        "    SZ DSOA;                 !- Design Specification Outdoor Air Object Name 1",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 SysMassFlow(0.0);              // System supply mass flow rate [kg/s]
+    Real64 OAMassFlow(0.0);               // OA mass flow rate [kg/s]
+    Real64 ExpectedOAMassFlow(0.0027778); // System design OA flow rate
+    Real64 AllowableTolerance(0.000001);  // Tolerance for comparison result
+    bool ErrorsFound(false);
+
+    GetZoneData(*state, ErrorsFound);
+    GetOARequirements(*state);
+    GetZoneEquipment(*state);
+    GetOAControllerInputs(*state);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(SOAM_VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);                // Necessary for CalcMechVentController
+    state->dataSize->SysSizingRunDone = true;                                    // Indicate that a system sizing run has been performed
+    state->dataHeatBal->Zone(1).Volume = 100.0;                                  // Zone 1 total floor area
+    state->dataHeatBal->Zone(2).Volume = 50.0;                                   // Zone 2 total floor area
+    state->dataSize->FinalSysSizing.allocate(1);                                 // Create instance of system sizing info
+    state->dataMixedAir->VentilationMechanical(1).SysDesOA = ExpectedOAMassFlow; // Set design outdoor air flow rate
+    state->dataSize->CurSysNum = 1;                                              // Only one system in this instance
+    state->dataEnvrn->StdRhoAir = 1;                                             // Standard air density assumed to be 1 kg/m3 (simplification)
+    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+
+    EXPECT_NEAR(OAMassFlow, ExpectedOAMassFlow, AllowableTolerance);
+}
+
 TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
 {
     state->dataContaminantBalance->Contaminant.CO2Simulation = true;

@@ -277,6 +277,19 @@ In addition to the canned Surface reports (view the Reports section later in thi
   HVAC,Average,Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}
 \item
   HVAC,Average,Zone Air Relative Humidity{[}\%{]}
+\item
+  HVAC,Sum,Zone Air System Latent Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Zone Air System Latent Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air System Latent Heating Rate {[}W{]}
+\item
+  HVAC,Average,Zone Air System Latent Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Zone Air System Sensible Heat Ratio {[}{]}
+\item
+  HVAC,Average,Zone Air Vapor Pressure Difference {[}Pa{]}
+
 \end{itemize}
 
 Two of these are of particular interest:
@@ -394,6 +407,28 @@ This output variable represents the air humidity ratio after the correct step fo
 \subsubsection{Zone Air Relative Humidity {[}\%{]}}\label{zone-air-relative-humidity}
 
 This output variable represents the air relative humidity after the correct step for each zone. The relative humidity is in percent and uses the Zone Air Temperature, the Zone Air Humidity Ratio and the Outside Barometric Pressure for calculation.
+
+\subsubsection{Zone Air System Latent Heating Energy {[}J{]}}\label{zone-air-system-latent-heating-energy-j}
+
+\subsubsection{Zone Air System Latent Cooling Energy {[}J{]}}\label{zone-air-system-latent-cooling-energy-j}
+
+These output variables represent the latent heating/cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating/cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+
+\subsubsection{Zone Air System Latent Heating Rate {[}W{]}}\label{zone-air-system-latent-heating-rate-w}
+
+This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
+
+\subsubsection{Zone Air System Latent Cooling Rate {[}W{]}}\label{zone-air-system-latent-cooling-rate-w}
+
+This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
+
+\subsubsection{Zone Air System Sensible Heat Ratio {[}{]}}\label{zone-air-system-sensible-heat-ratio}
+
+This output variable represents the zone sensible heat transfer divided by the total heat transfer for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.
+
+\subsubsection{Zone Air Vapor Pressure Difference {[}Pa{]}}\label{zone-air-vapor-pressure-difference-pa}
+
+This output variable represents the zone vapor pressure difference, or depression, in pascals for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This value represents the saturated air vapor pressure minus the actual zone air vapor pressure and is indicative of the dryness of the zone air when latent loads are of interest.
 
 \subsubsection{Space or Zone Total Internal Radiant Heating Rate {[}W{]}}\label{zone-total-internal-radiant-heating-rate-w}
 

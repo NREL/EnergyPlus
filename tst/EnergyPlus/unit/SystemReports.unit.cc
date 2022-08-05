@@ -71,7 +71,6 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UnitVentilator.hh>
@@ -259,10 +258,11 @@ TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
     ++nodeNumOA;
     state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum(equipNum) = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
-    state->dataPTHP->GetPTUnitInputFlag = false;
-    state->dataPTHP->NumPTUs = 1;
-    state->dataPTHP->PTUnit.allocate(1);
-    state->dataPTHP->PTUnit(1).OutsideAirNode = nodeNumOA;
+    UnitarySystems::UnitarySys thisSys;
+    thisSys.m_OAMixerNodes[0] = nodeNumOA;
+    for (int numSys = 0; numSys <= equipNum; ++numSys) {
+        state->dataZoneEquip->ZoneEquipList(1).compPointer.emplace_back(&thisSys);
+    }
     state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 30.0;
 
     // 4: FanCoil

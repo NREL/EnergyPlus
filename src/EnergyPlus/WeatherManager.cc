@@ -1806,14 +1806,14 @@ namespace WeatherManager {
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.
 
+        auto &thisEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn);
         if (state.dataGlobal->BeginEnvrnFlag) {
 
             // Call and setup the Design Day environment
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn !=
-                DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum > 0) {
-                    SetUpDesignDay(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
-                    state.dataEnvrn->EnvironmentName = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title;
+            if (thisEnvrn.KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                if (thisEnvrn.DesignDayNum > 0) {
+                    SetUpDesignDay(state, thisEnvrn.DesignDayNum);
+                    state.dataEnvrn->EnvironmentName = thisEnvrn.Title;
                 }
             }
 
@@ -1878,8 +1878,7 @@ namespace WeatherManager {
                 (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
                 ReadWeatherForDay(state, 1, state.dataWeatherManager->Envrn, false); // Read first day's weather
             } else {
-                state.dataWeatherManager->TomorrowVariables =
-                    state.dataWeatherManager->DesignDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
+                state.dataWeatherManager->TomorrowVariables = state.dataWeatherManager->DesignDay(thisEnvrn.DesignDayNum);
             }
 
         } // ... end of DataGlobals::BeginEnvrnFlag IF-THEN block.
@@ -1899,29 +1898,24 @@ namespace WeatherManager {
             // In a multi year simulation with run period less than 365, we need to position the weather line
             // appropriately.
 
-            if ((!state.dataGlobal->WarmupFlag) &&
-                ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
-                 (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn !=
-                  DataGlobalConstants::KindOfSim::HVACSizeDesignDay))) {
+            if ((!state.dataGlobal->WarmupFlag) && ((thisEnvrn.KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
+                                                    (thisEnvrn.KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay))) {
                 if (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
                     if (state.dataGlobal->DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
-                        state.dataWeatherManager->curSimDayForEndOfRunPeriod +=
-                            state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays;
+                        state.dataWeatherManager->curSimDayForEndOfRunPeriod += thisEnvrn.RawSimDays;
                         if (state.dataWeatherManager->StartDatesCycleShouldBeReset) {
                             ResetWeekDaysByMonth(state,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
+                                                 thisEnvrn.MonWeekDay,
                                                  state.dataWeatherManager->LeapYearAdd,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RollDayTypeOnRepeat);
+                                                 thisEnvrn.StartMonth,
+                                                 thisEnvrn.StartDay,
+                                                 thisEnvrn.EndMonth,
+                                                 thisEnvrn.EndDay,
+                                                 thisEnvrn.RollDayTypeOnRepeat);
                             if (state.dataWeatherManager->DaylightSavingIsActive) {
-                                SetDSTDateRanges(state,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
-                                                 state.dataWeatherManager->DSTIndex);
+                                SetDSTDateRanges(state, thisEnvrn.MonWeekDay, state.dataWeatherManager->DSTIndex);
                             }
-                            SetSpecialDayDates(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay);
+                            SetSpecialDayDates(state, thisEnvrn.MonWeekDay);
                         }
                         ++state.dataWeatherManager->YearOfSim;
                         ReadWeatherForDay(state, 1, state.dataWeatherManager->Envrn, false); // Read tomorrow's weather
@@ -1944,17 +1938,13 @@ namespace WeatherManager {
             state.dataEnvrn->HolidayIndexTomorrow = state.dataWeatherManager->TomorrowVariables.HolidayIndex;
             state.dataEnvrn->YearTomorrow = state.dataWeatherManager->TomorrowVariables.Year;
 
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn ==
-                DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 &&
-                    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather) {
+            if (thisEnvrn.KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && thisEnvrn.ActualWeather) {
                     if (state.dataWeatherManager->DatesShouldBeReset) {
-                        if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TreatYearsAsConsecutive) {
-                            ++state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear;
-                            state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear =
-                                isLeapYear(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear);
-                            state.dataEnvrn->CurrentYearIsLeapYear =
-                                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
+                        if (thisEnvrn.TreatYearsAsConsecutive) {
+                            ++thisEnvrn.CurrentYear;
+                            thisEnvrn.IsLeapYear = isLeapYear(thisEnvrn.CurrentYear);
+                            state.dataEnvrn->CurrentYearIsLeapYear = thisEnvrn.IsLeapYear;
                             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                                 if (state.dataWeatherManager->WFAllowsLeapYears) {
                                     state.dataWeatherManager->LeapYearAdd = 1;
@@ -1965,16 +1955,11 @@ namespace WeatherManager {
                                 state.dataWeatherManager->LeapYearAdd = 0;
                             }
                             // need to reset MonWeekDay and WeekDayTypes
-                            int JDay5Start = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth,
-                                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay,
-                                                                 state.dataWeatherManager->LeapYearAdd);
-                            int JDay5End = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth,
-                                                               state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay,
-                                                               state.dataWeatherManager->LeapYearAdd);
-                            if (!state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather)
+                            int JDay5Start = General::OrdinalDay(thisEnvrn.StartMonth, thisEnvrn.StartDay, state.dataWeatherManager->LeapYearAdd);
+                            int JDay5End = General::OrdinalDay(thisEnvrn.EndMonth, thisEnvrn.EndDay, state.dataWeatherManager->LeapYearAdd);
+                            if (!thisEnvrn.ActualWeather)
                                 state.dataWeatherManager->curSimDayForEndOfRunPeriod =
-                                    state.dataGlobal->DayOfSim + state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays +
-                                    state.dataWeatherManager->LeapYearAdd - 1;
+                                    state.dataGlobal->DayOfSim + thisEnvrn.RawSimDays + state.dataWeatherManager->LeapYearAdd - 1;
 
                             {
                                 int i = JDay5Start;
@@ -1988,28 +1973,25 @@ namespace WeatherManager {
                                 }
                             }
                             ResetWeekDaysByMonth(state,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
+                                                 thisEnvrn.MonWeekDay,
                                                  state.dataWeatherManager->LeapYearAdd,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RollDayTypeOnRepeat);
+                                                 thisEnvrn.StartMonth,
+                                                 thisEnvrn.StartDay,
+                                                 thisEnvrn.EndMonth,
+                                                 thisEnvrn.EndDay,
+                                                 thisEnvrn.RollDayTypeOnRepeat);
                             if (state.dataWeatherManager->DaylightSavingIsActive) {
-                                SetDSTDateRanges(state,
-                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
-                                                 state.dataWeatherManager->DSTIndex);
+                                SetDSTDateRanges(state, thisEnvrn.MonWeekDay, state.dataWeatherManager->DSTIndex);
                             }
-                            SetSpecialDayDates(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay);
+                            SetSpecialDayDates(state, thisEnvrn.MonWeekDay);
                         }
                     }
                 } else if ((state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1) && state.dataWeatherManager->DatesShouldBeReset &&
                            (state.dataWeatherManager->Jan1DatesShouldBeReset)) {
-                    if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TreatYearsAsConsecutive) {
-                        ++state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear;
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear =
-                            isLeapYear(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear);
-                        state.dataEnvrn->CurrentYearIsLeapYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
+                    if (thisEnvrn.TreatYearsAsConsecutive) {
+                        ++thisEnvrn.CurrentYear;
+                        thisEnvrn.IsLeapYear = isLeapYear(thisEnvrn.CurrentYear);
+                        state.dataEnvrn->CurrentYearIsLeapYear = thisEnvrn.IsLeapYear;
                         if (state.dataEnvrn->CurrentYearIsLeapYear && !state.dataWeatherManager->WFAllowsLeapYears)
                             state.dataEnvrn->CurrentYearIsLeapYear = false;
                         if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod &&
@@ -2028,24 +2010,39 @@ namespace WeatherManager {
 
                     if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
                         ResetWeekDaysByMonth(state,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
+                                             thisEnvrn.MonWeekDay,
                                              state.dataWeatherManager->LeapYearAdd,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RollDayTypeOnRepeat,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RollDayTypeOnRepeat ||
-                                                 state.dataEnvrn->CurrentYearIsLeapYear);
+                                             thisEnvrn.StartMonth,
+                                             thisEnvrn.StartDay,
+                                             thisEnvrn.EndMonth,
+                                             thisEnvrn.EndDay,
+                                             thisEnvrn.RollDayTypeOnRepeat,
+                                             thisEnvrn.RollDayTypeOnRepeat || state.dataEnvrn->CurrentYearIsLeapYear);
                         if (state.dataWeatherManager->DaylightSavingIsActive) {
-                            SetDSTDateRanges(state,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
-                                             state.dataWeatherManager->DSTIndex);
+                            SetDSTDateRanges(state, thisEnvrn.MonWeekDay, state.dataWeatherManager->DSTIndex);
                         }
-                        SetSpecialDayDates(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay);
+                        SetSpecialDayDates(state, thisEnvrn.MonWeekDay);
                     }
                 }
             }
+
+            // at the end of each day find the min/max weather used for DOAS sizing
+            if (state.dataGlobal->AirLoopHVACDOASUsedInSim) {
+                if (thisEnvrn.KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign ||
+                    thisEnvrn.KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
+                    for (size_t i = 0; i < state.dataWeatherManager->TodayOutDryBulbTemp.size(); ++i) {
+                        if (state.dataWeatherManager->TodayOutDryBulbTemp[i] > thisEnvrn.maxCoolingOATSizing) {
+                            thisEnvrn.maxCoolingOATSizing = state.dataWeatherManager->TodayOutDryBulbTemp[i];
+                            thisEnvrn.maxCoolingOADPSizing = state.dataWeatherManager->TodayOutDewPointTemp[i];
+                        }
+                        if (state.dataWeatherManager->TodayOutDryBulbTemp[i] < thisEnvrn.minHeatingOATSizing) {
+                            thisEnvrn.minHeatingOATSizing = state.dataWeatherManager->TodayOutDryBulbTemp[i];
+                            thisEnvrn.minHeatingOADPSizing = state.dataWeatherManager->TodayOutDewPointTemp[i];
+                        }
+                    }
+                }
+            }
+
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
         if (!state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&
@@ -5011,7 +5008,8 @@ namespace WeatherManager {
         if (!state.dataWeatherManager->WeatherFileExists) { // No weather file exists but the user requested one--print error message
 
             if (state.dataGlobal->DoWeathSim) {
-                ShowWarningError(state, "Weather Environment(s) requested, but no weather file found");
+                ShowSevereError(state, "GetNextEnvironment: Weather Environment(s) requested, but no weather file found");
+                ShowFatalError(state, "Due to previous error condition, simulation terminated");
             }
 
         } // ... end of WeatherFileExists IF-THEN

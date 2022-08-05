@@ -53,6 +53,7 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -168,6 +169,7 @@ struct CoilCoolingDX
     bool isSecondaryDXCoilInZone = false;
     Real64 secCoilSensHeatRejEnergyRate = 0.0;
     Real64 secCoilSensHeatRejEnergy = 0.0;
+    EnergyPlus::DataHeatBalance::HeatReclaimDataBase reclaimHeat;
 
     void setToHundredPercentDOAS();
     bool isHundredPercentDOAS = false;

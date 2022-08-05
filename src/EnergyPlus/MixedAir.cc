@@ -4110,8 +4110,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerZone)] =
                         curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate(ZoneIndex) * curZoneOASchValue;
                     ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::ACH)] =
-                        curZone.Multiplier * curZone.ListMultiplier * (this->ZoneOAACHRate(ZoneIndex) * state.dataHeatBal->Zone(ZoneIndex).Volume) *
-                        curZoneOASchValue / 3600.0;
+                        curZone.Multiplier * curZone.ListMultiplier * (this->ZoneOAACHRate(ZoneIndex) * curZone.Volume) * curZoneOASchValue / 3600.0;
 
                     // Calc the breathing-zone OA flow rate
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
