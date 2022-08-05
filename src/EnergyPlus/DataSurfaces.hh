@@ -238,7 +238,7 @@ namespace DataSurfaces {
         Num                  // count, always the final element
     };
 
-    static constexpr std::array<std::string_view, (int)DataSurfaces::HeatTransferModel::Num> HeatTransAlgoStrs = {
+    constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::HeatTransferModel::Num)> HeatTransAlgoStrs = {
         "None",
         "CTF - ConductionTransferFunction",
         "EMPD - MoisturePenetrationDepthConductionTransferFunction",
@@ -331,9 +331,6 @@ namespace DataSurfaces {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SlatAngleControl::Num)> SlatAngleNamesUC{
-        "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};
-
     // Parameter for window screens beam reflectance accounting
     enum class ScreenBeamReflectanceModel
     {
@@ -344,9 +341,6 @@ namespace DataSurfaces {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(ScreenBeamReflectanceModel::Num)> ScreenBeamReflectanceModelNamesUC{
-        "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
-
     // Parameters for air flow window source
     enum class WindowAirFlowSource
     {
@@ -355,8 +349,6 @@ namespace DataSurfaces {
         Outdoor,
         Num
     };
-
-    constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowSource::Num)> WindowAirFlowSourceNamesUC{"INDOORAIR", "OUTDOORAIR"};
 
     // Parameters for air flow window destination
     enum class WindowAirFlowDestination
@@ -367,9 +359,6 @@ namespace DataSurfaces {
         Return,
         Num
     };
-
-    constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowDestination::Num)> WindowAirFlowDestinationNamesUC{
-        "INDOORAIR", "OUTDOORAIR", "RETURNAIR"};
 
     // Parameters for air flow window control
     enum class WindowAirFlowControlType
@@ -858,50 +847,6 @@ namespace DataSurfaces {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNames = {
-        "CasementDouble", "CasementSingle",   "DualAction",
-        "Fixed",          "Garage",           "Greenhouse",
-        "HingedEscape",   "HorizontalSlider", "Jal",
-        "Pivoted",        "ProjectingSingle", "ProjectingDual",
-        "DoorSidelite",   "Skylight",         "SlidingPatioDoor",
-        "CurtainWall",    "SpandrelPanel",    "SideHingedDoor",
-        "DoorTransom",    "TropicalAwning",   "TubularDaylightingDevice",
-        "VerticalSlider"};
-
-    constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNamesUC = {
-        "CASEMENTDOUBLE", "CASEMENTSINGLE",   "DUALACTION",
-        "FIXED",          "GARAGE",           "GREENHOUSE",
-        "HINGEDESCAPE",   "HORIZONTALSLIDER", "JAL",
-        "PIVOTED",        "PROJECTINGSINGLE", "PROJECTINGDUAL",
-        "DOORSIDELITE",   "SKYLIGHT",         "SLIDINGPATIODOOR",
-        "CURTAINWALL",    "SPANDRELPANEL",    "SIDEHINGEDDOOR",
-        "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
-        "VERTICALSLIDER"};
-
-    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
-        // width in meters from Table 4-3 of NFRC 100-2020
-        1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
-        1.200, 2.134, 1.500, //  Fixed,           Garage,            Greenhouse,
-        1.500, 1.500, 1.200, //  HingedEscape,    HorizontalSlider,  Jal,
-        1.200, 1.500, 1.500, //  Pivoted,         ProjectingSingle,  ProjectingDual,
-        0.600, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
-        2.000, 2.000, 1.920, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
-        2.000, 1.500, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
-        1.200                //  VerticalSlider,
-    };
-
-    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
-        // height in meters from Table 4-3 of NFRC 100-2020
-        1.500, 1.500, 1.500, //  CasementDouble,  CasementSingle,    DualAction,
-        1.500, 2.134, 1.200, //  Fixed,           Garage,            Greenhouse,
-        1.200, 1.200, 1.500, //  HingedEscape,    HorizontalSlider,  Jal,
-        1.500, 1.200, 0.600, //  Pivoted,         ProjectingSingle,  ProjectingDual,
-        2.090, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
-        2.000, 1.200, 2.090, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
-        0.600, 1.200, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
-        1.500                //  VerticalSlider,
-    };
-
     enum class NfrcVisionType : int
     {
         Invalid = -1,
@@ -909,24 +854,6 @@ namespace DataSurfaces {
         DualVertical,
         DualHorizontal,
         Num
-    };
-
-    constexpr std::array<NfrcVisionType, static_cast<int>(NfrcProductOptions::Num)> NfrcVision = {
-        NfrcVisionType::DualHorizontal, NfrcVisionType::Single,
-        NfrcVisionType::DualVertical, //  CasementDouble,  CasementSingle,    DualAction,
-        NfrcVisionType::Single,         NfrcVisionType::Single,
-        NfrcVisionType::Single, //  Fixed,           Garage,            Greenhouse,
-        NfrcVisionType::Single,         NfrcVisionType::DualHorizontal,
-        NfrcVisionType::Single, //  HingedEscape,    HorizontalSlider,  Jal,
-        NfrcVisionType::Single,         NfrcVisionType::Single,
-        NfrcVisionType::DualHorizontal, //  Pivoted,         ProjectingSingle,  ProjectingDual,
-        NfrcVisionType::Single,         NfrcVisionType::Single,
-        NfrcVisionType::DualHorizontal, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
-        NfrcVisionType::Single,         NfrcVisionType::Single,
-        NfrcVisionType::Single, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
-        NfrcVisionType::Single,         NfrcVisionType::Single,
-        NfrcVisionType::Single,      //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
-        NfrcVisionType::DualVertical //  VerticalSlider
     };
 
     enum class FrameDividerType : int
@@ -937,22 +864,12 @@ namespace DataSurfaces {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(FrameDividerType::Num)> FrameDividerTypeNamesUC = {
-        "DIVIDEDLITE", // 0
-        "SUSPENDED"    // 1
-    };
-
     // Type of control order when multiple surfaces are referenced
     enum class MultiSurfaceControl{
         Invalid = -1,
         Sequential,
         Group,
         Num
-    };
-
-    constexpr std::array<std::string_view, static_cast<int>(MultiSurfaceControl::Num)> MultiSurfaceControlNamesUC = {
-        "SEQUENTIAL",
-        "GROUP"
     };
 
     struct FrameDividerProperties

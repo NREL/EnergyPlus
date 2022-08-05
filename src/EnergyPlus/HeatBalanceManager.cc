@@ -6608,6 +6608,22 @@ namespace HeatBalanceManager {
         Array1D<Real64> FrameDividerProps(23); // Temporary array to transfer frame/divider properties
         int Loop;
 
+        constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::NfrcProductOptions::Num)> NfrcProductNamesUC = {
+            "CASEMENTDOUBLE", "CASEMENTSINGLE",   "DUALACTION",
+            "FIXED",          "GARAGE",           "GREENHOUSE",
+            "HINGEDESCAPE",   "HORIZONTALSLIDER", "JAL",
+            "PIVOTED",        "PROJECTINGSINGLE", "PROJECTINGDUAL",
+            "DOORSIDELITE",   "SKYLIGHT",         "SLIDINGPATIODOOR",
+            "CURTAINWALL",    "SPANDRELPANEL",    "SIDEHINGEDDOOR",
+            "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
+            "VERTICALSLIDER"};
+
+
+        constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::FrameDividerType::Num)> FrameDividerTypeNamesUC = {
+            "DIVIDEDLITE", // 0
+            "SUSPENDED"    // 1
+        };
+
         state.dataHeatBalMgr->CurrentModuleObject = "WindowProperty:FrameAndDivider";
         state.dataHeatBal->TotFrameDivider =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
@@ -6651,7 +6667,7 @@ namespace HeatBalanceManager {
             frameDivider.FrameEmis = FrameDividerProps(8);
 
             DataSurfaces::FrameDividerType currentDividerType =
-                DataSurfaces::FrameDividerType(getEnumerationValue(DataSurfaces::FrameDividerTypeNamesUC, FrameDividerAlphas(2)));
+                DataSurfaces::FrameDividerType(getEnumerationValue(FrameDividerTypeNamesUC, FrameDividerAlphas(2)));
             if (currentDividerType == DataSurfaces::FrameDividerType::Invalid) {
                 ShowWarningError(state,
                                  fmt::format("{}={}, Invalid {}",
@@ -6683,7 +6699,7 @@ namespace HeatBalanceManager {
 
             // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductName
             frameDivider.NfrcProductType =
-                DataSurfaces::NfrcProductOptions(getEnumerationValue(DataSurfaces::NfrcProductNamesUC, FrameDividerAlphas(3)));
+                DataSurfaces::NfrcProductOptions(getEnumerationValue(NfrcProductNamesUC, FrameDividerAlphas(3)));
             if (frameDivider.NfrcProductType == DataSurfaces::NfrcProductOptions::Invalid) {
                 frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
             }

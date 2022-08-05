@@ -7989,6 +7989,9 @@ namespace WindowManager {
         // is used on multiple surfaces
         bool PrintTransMap; // Flag used to print transmittance map
 
+        constexpr std::array<std::string_view, static_cast<int>(ScreenBeamReflectanceModel::Num)> ScreenBeamReflectanceModelNamesUC{
+            "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
+
         state.dataHeatBal->SurfaceScreens.allocate(state.dataHeatBal->NumSurfaceScreens);
         state.dataHeatBal->ScreenTrans.allocate(state.dataHeatBal->NumSurfaceScreens);
         ScreenNum = 0;

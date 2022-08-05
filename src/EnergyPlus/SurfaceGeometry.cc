@@ -8379,6 +8379,7 @@ namespace SurfaceGeometry {
         int NumHAMTMat6;
         int SumHAMTMat;
         bool msgneeded;
+
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:HeatBalanceSourceTerm";
         int CountAddHeatSourceSurf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -8935,23 +8936,23 @@ namespace SurfaceGeometry {
                         ShowContinueError(
                             state,
                             "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(Item).Name + ", is " +
-                                std::string(DataSurfaces::HeatTransAlgoStrs[(int)state.dataSurface->Surface(Item).HeatTransferAlgorithm]));
+                                std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]));
                         ShowContinueError(
                             state,
                             "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(ExtSurfNum).Name + ", is " +
-                                std::string(DataSurfaces::HeatTransAlgoStrs[(int)state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm]));
+                                std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]));
                         if (state.dataSurface->Surface(Item).HeatTransferAlgorithm > state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm) {
                             ShowContinueError(
                                 state,
                                 "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(ExtSurfNum).Name + ", is assigned to " +
-                                    std::string(DataSurfaces::HeatTransAlgoStrs[(int)state.dataSurface->Surface(Item).HeatTransferAlgorithm]) +
+                                    std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]) +
                                     ". Simulation continues.");
                             state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm = state.dataSurface->Surface(Item).HeatTransferAlgorithm;
                         } else {
                             ShowContinueError(
                                 state,
                                 "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(Item).Name + ", is assigned to " +
-                                    std::string(DataSurfaces::HeatTransAlgoStrs[(int)state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm]) +
+                                    std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]) +
                                     ". Simulation continues.");
                             state.dataSurface->Surface(Item).HeatTransferAlgorithm = state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm;
                         }
@@ -9607,6 +9608,14 @@ namespace SurfaceGeometry {
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
 
+        constexpr std::array<std::string_view, static_cast<int>(SlatAngleControl::Num)> SlatAngleNamesUC{
+            "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};
+
+        constexpr std::array<std::string_view, static_cast<int>(MultiSurfaceControl::Num)> MultiSurfaceControlNamesUC = {
+            "SEQUENTIAL",
+            "GROUP"
+        };
+
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine
         int ControlNumAlpha; // Number of control alpha names being passed
@@ -9868,7 +9877,6 @@ namespace SurfaceGeometry {
                                     state.dataIPShortCut->cAlphaFieldNames(7) + " must be set to \"Yes\" for " +
                                     state.dataIPShortCut->cAlphaFieldNames(5) + " = OnIfScheduleAllows");
             }
-
             windowShadingControl.slatAngleControl =
                 static_cast<SlatAngleControl>(getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
 
@@ -10466,6 +10474,11 @@ namespace SurfaceGeometry {
         int MatGapFlow;   // Material number of gas in airflow gap of window's construction
         int MatGapFlow1;  // Material number of gas on either side of a between-glass shade/blind
         int MatGapFlow2;
+
+        constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowSource::Num)> WindowAirFlowSourceNamesUC{"INDOORAIR", "OUTDOORAIR"};
+        constexpr std::array<std::string_view, static_cast<int>(WindowAirFlowDestination::Num)> WindowAirFlowDestinationNamesUC{
+            "INDOORAIR", "OUTDOORAIR", "RETURNAIR"};
+
         // of the shaded construction of airflow window
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         // Get the total number of window airflow control statements
