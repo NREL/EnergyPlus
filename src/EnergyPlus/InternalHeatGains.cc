@@ -6081,13 +6081,14 @@ namespace InternalHeatGains {
             addZoneOutputs(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex) = true;
 
-            std::array<std::string, (int)PERptVars::Num> PowerOutputVariableStrings = {"ITE CPU Electricity Rate",
-                                                                                       "ITE Fan Electricity Rate",
-                                                                                       "ITE UPS Electricity Rate",
-                                                                                       "ITE CPU Electricity Rate at Design Inlet Conditions",
-                                                                                       "ITE Fan Electricity Rate at Design Inlet Conditions",
-                                                                                       "ITE UPS Heat Gain to Zone Rate",
-                                                                                       "ITE Total Heat Gain to Zone Rate"};
+            constexpr std::array<std::string_view, (int)PERptVars::Num> PowerOutputVariableStrings = {
+                "ITE CPU Electricity Rate",
+                "ITE Fan Electricity Rate",
+                "ITE UPS Electricity Rate",
+                "ITE CPU Electricity Rate at Design Inlet Conditions",
+                "ITE Fan Electricity Rate at Design Inlet Conditions",
+                "ITE UPS Heat Gain to Zone Rate",
+                "ITE Total Heat Gain to Zone Rate"};
 
             for (int i = 0; i < (int)PERptVars::Num; ++i) {
                 SetupOutputVariable(state,
@@ -6338,13 +6339,14 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             if (addZoneOutputs(zoneNum)) {
 
-                std::array<std::string, (int)PERptVars::Num> PowerOutputVariableStrings = {"Zone ITE CPU Electricity Rate",
-                                                                                           "Zone ITE Fan Electricity Rate",
-                                                                                           "Zone ITE UPS Electricity Rate",
-                                                                                           "Zone ITE CPU Electricity Rate at Design Inlet Conditions",
-                                                                                           "Zone ITE Fan Electricity Rate at Design Inlet Conditions",
-                                                                                           "Zone ITE UPS Heat Gain to Zone Rate",
-                                                                                           "Zone ITE Total Heat Gain to Zone Rate"};
+                constexpr std::array<std::string_view, (int)PERptVars::Num> PowerOutputVariableStrings = {
+                    "Zone ITE CPU Electricity Rate",
+                    "Zone ITE Fan Electricity Rate",
+                    "Zone ITE UPS Electricity Rate",
+                    "Zone ITE CPU Electricity Rate at Design Inlet Conditions",
+                    "Zone ITE Fan Electricity Rate at Design Inlet Conditions",
+                    "Zone ITE UPS Heat Gain to Zone Rate",
+                    "Zone ITE Total Heat Gain to Zone Rate"};
 
                 for (int i = 0; i < (int)PERptVars::Num; ++i) {
                     SetupOutputVariable(state,
@@ -6364,7 +6366,7 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(zoneNum).Name);
 
-                std::array<std::string, (int)PERptVars::Num> EnergyOutputVariableStrings = {
+                constexpr std::array<std::string_view, (int)PERptVars::Num> EnergyOutputVariableStrings = {
                     "Zone ITE CPU Electricity Energy",
                     "Zone ITE Fan Electricity Energy",
                     "Zone ITE UPS Electricity Energy",
@@ -6461,7 +6463,7 @@ namespace InternalHeatGains {
         // Space total report variables
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             if (addSpaceOutputs(spaceNum)) {
-                std::array<std::string, (int)PERptVars::Num> PowerOutputVariableStrings = {
+                constexpr std::array<std::string_view, (int)PERptVars::Num> PowerOutputVariableStrings = {
                     "Space ITE CPU Electricity Rate",
                     "Space ITE Fan Electricity Rate",
                     "Space ITE UPS Electricity Rate",
@@ -6489,7 +6491,7 @@ namespace InternalHeatGains {
                 //                    OutputProcessor::SOVStoreType::Average,
                 //                    state.dataHeatBal->space(spaceNum).Name);
 
-                std::array<std::string, (int)PERptVars::Num> EnergyOutputVariableStrings = {
+                constexpr std::array<std::string_view, (int)PERptVars::Num> EnergyOutputVariableStrings = {
                     "Space ITE CPU Electricity Energy",
                     "Space ITE Fan Electricity Energy",
                     "Space ITE UPS Electricity Energy",
