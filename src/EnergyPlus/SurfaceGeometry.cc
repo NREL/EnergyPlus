@@ -9827,6 +9827,17 @@ namespace SurfaceGeometry {
                 state.dataIPShortCut->cAlphaArgs(3) = "EXTERIORSHADE";
             }
 
+            if (shadingControlType == WindowShadingControlType::MeetDaylIlumSetp && state.dataIPShortCut->cAlphaArgs(3) != "SWITCHABLEGLAZING") {
+                ErrorsFound = true;
+                ShowSevereError(state,
+                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                    "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                ShowContinueError(state,
+                                  "..." + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                      " must be SwitchableGlazing for this control, but entered type=\"" + state.dataIPShortCut->cAlphaArgs(3) +
+                                      "\".");
+            }
+
             // Check for illegal shading type name
             Found = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), cValidShadingTypes, NumValidShadingTypes);
             if (Found <= 1) {
