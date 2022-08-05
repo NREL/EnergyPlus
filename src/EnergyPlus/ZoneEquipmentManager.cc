@@ -97,7 +97,6 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -3411,21 +3410,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                       LatOutputProvided,
                                       zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::PkgTermHPAirToAir:
-            case ZoneEquip::PkgTermACAirToAir:
-            case ZoneEquip::PkgTermHPWaterToAir: { // 'ZoneHVAC:PackagedTerminalHeatPump'
-                // 'ZoneHVAC:PackagedTerminalAirConditioner'
-                // 'ZoneHVAC:WaterToAirHeatPump'
-                PackagedTerminalHeatPump::SimPackagedTerminalUnit(state,
-                                                                  state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                                                                  ControlledZoneNum,
-                                                                  FirstHVACIteration,
-                                                                  SysOutputProvided,
-                                                                  LatOutputProvided,
-                                                                  ZoneEquipTypeNum,
-                                                                  zoneEquipList.EquipIndex(EquipPtr));
-            } break;
-            case ZoneEquip::ZoneUnitarySys: { // 'AirloopHVAC:UnitarySystem'
+            case ZoneEquip::PkgTermHPAirToAir:   // 'ZoneHVAC:PackagedTerminalHeatPump'
+            case ZoneEquip::PkgTermACAirToAir:   // 'ZoneHVAC:PackagedTerminalAirConditioner'
+            case ZoneEquip::PkgTermHPWaterToAir: // 'ZoneHVAC:WaterToAirHeatPump'
+            case ZoneEquip::ZoneUnitarySys: {    // 'AirloopHVAC:UnitarySystem'
                 int AirLoopNum = 0;
                 bool HeatingActive = false;
                 bool CoolingActive = false;
