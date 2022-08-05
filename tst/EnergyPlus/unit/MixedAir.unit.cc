@@ -794,7 +794,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     GetOAControllerInputs(*state);
 
-    EXPECT_EQ(SystemOAMethod::ProportionalControlDesOcc, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SysOAMethod::ProportionalControlDesOcc, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, state->dataMixedAir->OAController(1).OANode));
     EXPECT_NEAR(0.00314899, state->dataMixedAir->VentilationMechanical(1).ZoneOAPeopleRate(1), 0.00001);
     EXPECT_NEAR(0.000407, state->dataMixedAir->VentilationMechanical(1).ZoneOAAreaRate(1), 0.00001);
@@ -5399,7 +5399,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPCap)
     GetZoneEquipment(*state);
     GetOAControllerInputs(*state);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SystemOAMethod::VRPL, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SysOAMethod::VRPL, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);                // Necessary for CalcMechVentController
     state->dataSize->SysSizingRunDone = true;                                    // Indicate that a system sizing run has been performed
@@ -5496,7 +5496,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
     GetZoneEquipment(*state);
     GetOAControllerInputs(*state);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SystemOAMethod::VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SysOAMethod::VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);                // Necessary for CalcMechVentController
     state->dataSize->SysSizingRunDone = true;                                    // Indicate that a system sizing run has been performed
@@ -5593,7 +5593,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ACHflow)
     GetZoneEquipment(*state);
     GetOAControllerInputs(*state);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SystemOAMethod::VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SysOAMethod::VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);                // Necessary for CalcMechVentController
     state->dataSize->SysSizingRunDone = true;                                    // Indicate that a system sizing run has been performed
@@ -5647,20 +5647,20 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
 
     // Case 1 - System OA method = IndoorAirQualityProcedure, SOAM_IAQP, controls to OutputRequiredToCO2SP
     OAMassFlow = 0.0;
-    EXPECT_EQ(SystemOAMethod::IAQP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SysOAMethod::IAQP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_EQ(0.5, OAMassFlow);
 
     // Case 2 - System OA method = IndoorAirQualityProcedureGenericContaminant, SOAM_IAQPGC, controls to OutputRequiredToGCSP
     OAMassFlow = 0.0;
-    state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SystemOAMethod::IAQPGC;
+    state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SysOAMethod::IAQPGC;
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_EQ(1.5, OAMassFlow);
 
     // Case 3 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, controls to greater of total OutputRequiredToCO2SP and
     // OutputRequiredToGCSP
     OAMassFlow = 0.0;
-    state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SystemOAMethod::IAQPCOM;
+    state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SysOAMethod::IAQPCOM;
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_EQ(1.5, OAMassFlow);
 
@@ -5671,7 +5671,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(2) = 1;
 
     OAMassFlow = 0.0;
-    state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SystemOAMethod::IAQPCOM;
+    state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SysOAMethod::IAQPCOM;
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_EQ(0.0, OAMassFlow);
 
@@ -5852,7 +5852,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
 
     SizingManager::GetOARequirements(*state);
     GetOAControllerInputs(*state);
-    EXPECT_EQ(SystemOAMethod::ZoneSum, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SysOAMethod::ZoneSum, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
     // Summary of inputs and expected OA flow rate for each zone, StdRho = 1, so mass flow = volume flow for these tests
     // Zone 1 - flow/person, 0.1 m3/s/person, 10 persons, OA=1 m3/s
@@ -6001,7 +6001,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     GetOAControllerInputs(*state);
 
-    EXPECT_EQ(SystemOAMethod::ProportionalControlDesOARate, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SysOAMethod::ProportionalControlDesOARate, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, state->dataMixedAir->OAController(1).OANode));
     EXPECT_NEAR(0.00314899, state->dataMixedAir->VentilationMechanical(1).ZoneOAPeopleRate(1), 0.00001);
     EXPECT_NEAR(0.000407, state->dataMixedAir->VentilationMechanical(1).ZoneOAAreaRate(1), 0.00001);

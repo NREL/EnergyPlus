@@ -291,29 +291,29 @@ namespace MixedAir {
     struct VentilationMechanicalProps // Derived type for Ventilation:Mechanical data
     {
         // Members
-        std::string Name;                          // Name of Ventilation:Mechanical object
-        std::string SchName;                       // Name of the mechanical ventilation schedule
-        int SchPtr;                                // Index to the mechanical ventilation schedule
-        bool DCVFlag;                              // if true, implement OA based on demand controlled ventilation
-        int NumofVentMechZones;                    // Number of zones with mechanical ventilation
-        Real64 TotAreaOAFlow;                      // Total outdoor air flow rate for all zones per area (m3/s/m2)
-        Real64 TotPeopleOAFlow;                    // Total outdoor air flow rate for all PEOPLE objects in zones (m3/s)
-        Real64 TotZoneOAFlow;                      // Total outdoor air flow rate for all zones (m3/s)
-        Real64 TotZoneOAACH;                       // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
-        DataSizing::SystemOAMethod SystemOAMethod; // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP, SOAM_VRPL
-        Real64 ZoneMaxOAFraction;                  // Zone maximum outdoor air fraction
-        Array1D<Real64> ZoneOAAreaRate;            // Mechanical ventilation rate (m3/s/m2) for each zone
-        Array1D<Real64> ZoneOAPeopleRate;          // Mechanical ventilation rate (m3/s/person) for each zone
-        Array1D<Real64> ZoneOAFlowRate;            // OA Flow Rate (m3/s/zone) for each zone
-        Array1D<Real64> ZoneOAACHRate;             // OA ACH (m3/s/volume) for each zone
-        Array1D_int VentMechZone;                  // Zones requiring mechanical ventilation
-        Array1D_string VentMechZoneName;           // name of mech vent zone
-        Array1D_int ZoneDesignSpecOAObjIndex;      // index of the design specification outdoor air object for each zone
-        Array1D_string ZoneDesignSpecOAObjName;    // name of the design specification outdoor air object for each zone
-        int CO2MaxMinLimitErrorCount;              // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
-        int CO2MaxMinLimitErrorIndex;              // Index for max CO2 concentration < min CO2 concentration recurring error message for
-                                                   // SOAM_ProportionalControlSchOcc
-        int CO2GainErrorCount;                     // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+        std::string Name;                       // Name of Ventilation:Mechanical object
+        std::string SchName;                    // Name of the mechanical ventilation schedule
+        int SchPtr;                             // Index to the mechanical ventilation schedule
+        bool DCVFlag;                           // if true, implement OA based on demand controlled ventilation
+        int NumofVentMechZones;                 // Number of zones with mechanical ventilation
+        Real64 TotAreaOAFlow;                   // Total outdoor air flow rate for all zones per area (m3/s/m2)
+        Real64 TotPeopleOAFlow;                 // Total outdoor air flow rate for all PEOPLE objects in zones (m3/s)
+        Real64 TotZoneOAFlow;                   // Total outdoor air flow rate for all zones (m3/s)
+        Real64 TotZoneOAACH;                    // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
+        DataSizing::SysOAMethod SystemOAMethod; // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP, SOAM_VRPL
+        Real64 ZoneMaxOAFraction;               // Zone maximum outdoor air fraction
+        Array1D<Real64> ZoneOAAreaRate;         // Mechanical ventilation rate (m3/s/m2) for each zone
+        Array1D<Real64> ZoneOAPeopleRate;       // Mechanical ventilation rate (m3/s/person) for each zone
+        Array1D<Real64> ZoneOAFlowRate;         // OA Flow Rate (m3/s/zone) for each zone
+        Array1D<Real64> ZoneOAACHRate;          // OA ACH (m3/s/volume) for each zone
+        Array1D_int VentMechZone;               // Zones requiring mechanical ventilation
+        Array1D_string VentMechZoneName;        // name of mech vent zone
+        Array1D_int ZoneDesignSpecOAObjIndex;   // index of the design specification outdoor air object for each zone
+        Array1D_string ZoneDesignSpecOAObjName; // name of the design specification outdoor air object for each zone
+        int CO2MaxMinLimitErrorCount;           // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
+        int CO2MaxMinLimitErrorIndex;           // Index for max CO2 concentration < min CO2 concentration recurring error message for
+                                                // SOAM_ProportionalControlSchOcc
+        int CO2GainErrorCount;                  // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int CO2GainErrorIndex;       // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int OAMaxMinLimitErrorCount; // Counter when max OA < min OA for SOAM_ProportionalControlDesOARate
         int OAMaxMinLimitErrorIndex; // Index for max OA < min OA recurring error message for SOAM_ProportionalControlDesOARate
@@ -338,7 +338,7 @@ namespace MixedAir {
         // Default Constructor
         VentilationMechanicalProps()
             : SchPtr(0), DCVFlag(false), NumofVentMechZones(0), TotAreaOAFlow(0.0), TotPeopleOAFlow(0.0), TotZoneOAFlow(0.0), TotZoneOAACH(0.0),
-              SystemOAMethod(DataSizing::SystemOAMethod::Invalid), ZoneMaxOAFraction(1.0), CO2MaxMinLimitErrorCount(0), CO2MaxMinLimitErrorIndex(0),
+              SystemOAMethod(DataSizing::SysOAMethod::Invalid), ZoneMaxOAFraction(1.0), CO2MaxMinLimitErrorCount(0), CO2MaxMinLimitErrorIndex(0),
               CO2GainErrorCount(0), CO2GainErrorIndex(0), OAMaxMinLimitErrorCount(0), OAMaxMinLimitErrorIndex(0)
         {
         }

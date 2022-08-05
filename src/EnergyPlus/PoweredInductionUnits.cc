@@ -1333,7 +1333,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                 MinPriAirFlowFracDes = 0.0;
             }
             if (SizingDesRunThisAirSys) {
-                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::SP) { // 62.1 simplified procedure
+                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) { // 62.1 simplified procedure
                     if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
                         MinPriAirFlowFracDes = 1.5 *
                                                max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
@@ -1369,7 +1369,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
             }
             if (IsAutoSize) {
                 if (SizingDesRunThisAirSys) {
-                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SystemOAMethod::SP) {
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) {
                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
                     }
                 }
