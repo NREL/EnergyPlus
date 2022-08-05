@@ -9627,7 +9627,6 @@ namespace SurfaceGeometry {
         bool ErrorInName;
         bool IsBlank;
         int Loop;
-        std::string ControlType; // Shading control type
         bool BGShadeBlindError;  // True if problem with construction that is supposed to have between-glass
         // shade or blind
         int Found;
@@ -9728,65 +9727,13 @@ namespace SurfaceGeometry {
                                     "\" invalid. Must reference at least one Fenestration Surface object name.");
             }
 
-            ControlType = state.dataIPShortCut->cAlphaArgs(5);
-
-            if (ControlType == "SCHEDULE") {
-                ControlType = "ONIFSCHEDULEALLOWS";
-                windowShadingControl.ShadingControlIsScheduled = true;
-                windowShadingControl.GlareControlIsActive = false;
-                ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" is using obsolete " +
-                                     state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\", changing to \"" +
-                                     ControlType + "\"");
-                // Error if schedule has not been specified
-                if (windowShadingControl.Schedule <= 0) {
-                    ErrorsFound = true;
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + " has " + state.dataIPShortCut->cAlphaFieldNames(5) +
-                                         " \"" + ControlType + "\" but a schedule has not been specified.");
-                }
-            }
-
-            if (has_prefix(ControlType, "SCHEDULEAND")) {
-                ControlType = "ONIFHIGH" + ControlType.substr(11);
-                windowShadingControl.ShadingControlIsScheduled = true;
-                windowShadingControl.GlareControlIsActive = false;
-                ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" is using obsolete " +
-                                     state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\", changing to \"" +
-                                     ControlType + "\"");
-                // Error if schedule has not been specified
-                if (windowShadingControl.Schedule <= 0) {
-                    ErrorsFound = true;
-                    ShowWarningError(state,
-                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + " has " + state.dataIPShortCut->cAlphaFieldNames(5) +
-                                         " \"" + ControlType + "\" but a schedule has not been specified.");
-                }
-            }
-
-            if (has_prefix(ControlType, "GLAREOR")) {
-                ControlType = "ONIFHIGH" + ControlType.substr(7);
-                windowShadingControl.ShadingControlIsScheduled = false;
-                windowShadingControl.GlareControlIsActive = true;
-                ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" is using obsolete " +
-                                     state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\", changing to \"" +
-                                     ControlType + "\"");
-            }
-
-            if (ControlType == "GLARE") {
-                ControlType = "ONIFHIGHGLARE";
-                windowShadingControl.ShadingControlIsScheduled = false;
-                windowShadingControl.GlareControlIsActive = true;
-                ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" is using obsolete " +
-                                     state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\", changing to \"" +
-                                     ControlType + "\"");
-            }
+            WindowShadingControlType shadingControlType = static_cast<WindowShadingControlType>(
+                getEnumerationValue(WindowShadingControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
 
             if (windowShadingControl.ShadingDevice > 0) {
                 if (state.dataMaterial->Material(windowShadingControl.ShadingDevice).Group == DataHeatBalance::MaterialGroup::Screen &&
-                    !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
+                    !(shadingControlType == WindowShadingControlType::AlwaysOn || shadingControlType == WindowShadingControlType::AlwaysOff ||
+                      shadingControlType == WindowShadingControlType::OnIfScheduled)) {
                     ErrorsFound = true;
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
@@ -9800,7 +9747,8 @@ namespace SurfaceGeometry {
                     state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).IsUsed = true;
                     if (state.dataMaterial->Material(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))
                                 .Group == DataHeatBalance::MaterialGroup::Screen &&
-                        !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
+                        !(shadingControlType == WindowShadingControlType::AlwaysOn || shadingControlType == WindowShadingControlType::AlwaysOff ||
+                          shadingControlType == WindowShadingControlType::OnIfScheduled)) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
@@ -9826,23 +9774,11 @@ namespace SurfaceGeometry {
             }
 
             // Warning if setpoint is unintentionally zero
-            if (windowShadingControl.SetPoint == 0 && ControlType != "ALWAYSON" && ControlType != "ALWAYSOFF" &&
-                ControlType != "ONIFSCHEDULEALLOWS" && ControlType != "SCHEDULE" && ControlType != "ONIFHIGHGLARE" && ControlType != "GLARE" &&
-                ControlType != "DAYLIGHTILLUMINANCE") {
+            if (windowShadingControl.SetPoint == 0 && shadingControlType != WindowShadingControlType::AlwaysOn &&
+                shadingControlType != WindowShadingControlType::AlwaysOff && shadingControlType != WindowShadingControlType::OnIfScheduled &&
+                shadingControlType != WindowShadingControlType::HiGlare ) {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", The first SetPoint is zero.");
                 ShowContinueError(state, "..You may have forgotten to specify that setpoint.");
-            }
-
-            // Upward compatibility for old Shading Control Type names
-            if (ControlType == "SOLARONWINDOW" || ControlType == "HORIZONTALSOLAR" || ControlType == "OUTSIDEAIRTEMP" ||
-                ControlType == "ZONEAIRTEMP" || ControlType == "ZONECOOLING") {
-                ControlType = "ONIFHIGH" + ControlType;
-                windowShadingControl.ShadingControlIsScheduled = false;
-                windowShadingControl.GlareControlIsActive = false;
-                ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" is using obsolete " +
-                                     state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\", changing to \"" +
-                                     ControlType + "\"");
             }
 
             // Error checks
@@ -9889,17 +9825,6 @@ namespace SurfaceGeometry {
                                      "\", changing to \"ExteriorShade\"");
                 windowShadingControl.ShadingType = WinShadingType::ExtShade;
                 state.dataIPShortCut->cAlphaArgs(3) = "EXTERIORSHADE";
-            }
-
-            if (ControlType == "MEETDAYLIGHTILLUMINANCESETPOINT" && state.dataIPShortCut->cAlphaArgs(3) != "SWITCHABLEGLAZING") {
-                ErrorsFound = true;
-                ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
-                ShowContinueError(state,
-                                  "..." + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                      " must be SwitchableGlazing for this control, but entered type=\"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                      "\".");
             }
 
             // Check for illegal shading type name
