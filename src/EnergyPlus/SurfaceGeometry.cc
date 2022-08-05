@@ -8936,23 +8936,27 @@ namespace SurfaceGeometry {
                         ShowContinueError(
                             state,
                             "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(Item).Name + ", is " +
-                                std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]));
+                                std::string(
+                                    DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]));
                         ShowContinueError(
                             state,
                             "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(ExtSurfNum).Name + ", is " +
-                                std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]));
+                                std::string(
+                                    DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]));
                         if (state.dataSurface->Surface(Item).HeatTransferAlgorithm > state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm) {
                             ShowContinueError(
                                 state,
                                 "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(ExtSurfNum).Name + ", is assigned to " +
-                                    std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]) +
+                                    std::string(
+                                        DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]) +
                                     ". Simulation continues.");
                             state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm = state.dataSurface->Surface(Item).HeatTransferAlgorithm;
                         } else {
                             ShowContinueError(
                                 state,
                                 "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(Item).Name + ", is assigned to " +
-                                    std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]) +
+                                    std::string(
+                                        DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]) +
                                     ". Simulation continues.");
                             state.dataSurface->Surface(Item).HeatTransferAlgorithm = state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm;
                         }
@@ -9611,10 +9615,7 @@ namespace SurfaceGeometry {
         constexpr std::array<std::string_view, static_cast<int>(SlatAngleControl::Num)> SlatAngleNamesUC{
             "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};
 
-        constexpr std::array<std::string_view, static_cast<int>(MultiSurfaceControl::Num)> MultiSurfaceControlNamesUC = {
-            "SEQUENTIAL",
-            "GROUP"
-        };
+        constexpr std::array<std::string_view, static_cast<int>(MultiSurfaceControl::Num)> MultiSurfaceControlNamesUC = {"SEQUENTIAL", "GROUP"};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine
@@ -9627,7 +9628,7 @@ namespace SurfaceGeometry {
         bool ErrorInName;
         bool IsBlank;
         int Loop;
-        bool BGShadeBlindError;  // True if problem with construction that is supposed to have between-glass
+        bool BGShadeBlindError; // True if problem with construction that is supposed to have between-glass
         // shade or blind
         int Found;
 
@@ -9713,7 +9714,6 @@ namespace SurfaceGeometry {
                                         state.dataIPShortCut->cAlphaArgs(13)));
             }
 
-
             if (ControlNumAlpha >= 14) {
                 windowShadingControl.FenestrationCount = ControlNumAlpha - 13;
                 windowShadingControl.FenestrationName.allocate(windowShadingControl.FenestrationCount);
@@ -9776,7 +9776,7 @@ namespace SurfaceGeometry {
             // Warning if setpoint is unintentionally zero
             if (windowShadingControl.SetPoint == 0 && shadingControlType != WindowShadingControlType::AlwaysOn &&
                 shadingControlType != WindowShadingControlType::AlwaysOff && shadingControlType != WindowShadingControlType::OnIfScheduled &&
-                shadingControlType != WindowShadingControlType::HiGlare ) {
+                shadingControlType != WindowShadingControlType::HiGlare) {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", The first SetPoint is zero.");
                 ShowContinueError(state, "..You may have forgotten to specify that setpoint.");
             }
@@ -9803,8 +9803,8 @@ namespace SurfaceGeometry {
                                     state.dataIPShortCut->cAlphaFieldNames(7) + " must be set to \"Yes\" for " +
                                     state.dataIPShortCut->cAlphaFieldNames(5) + " = OnIfScheduleAllows");
             }
-            windowShadingControl.slatAngleControl =
-                static_cast<SlatAngleControl>(getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+            windowShadingControl.slatAngleControl = static_cast<SlatAngleControl>(
+                getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE

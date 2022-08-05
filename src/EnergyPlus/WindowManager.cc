@@ -8057,10 +8057,9 @@ namespace WindowManager {
                     state.dataHeatBal->SurfaceScreens(ScreenNum).ScreenDiameterToSpacingRatio =
                         1.0 - std::sqrt(state.dataMaterial->Material(MatNum).Trans);
 
-                    state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceModel =
-                        static_cast<DataSurfaces::ScreenBeamReflectanceModel>(
-                            getEnumerationValue(ScreenBeamReflectanceModelNamesUC,
-                                                UtilityRoutines::MakeUPPERCase(state.dataMaterial->Material(MatNum).ReflectanceModeling)));
+                    state.dataHeatBal->SurfaceScreens(ScreenNum).screenBeamReflectanceModel = static_cast<DataSurfaces::ScreenBeamReflectanceModel>(
+                        getEnumerationValue(ScreenBeamReflectanceModelNamesUC,
+                                            UtilityRoutines::MakeUPPERCase(state.dataMaterial->Material(MatNum).ReflectanceModeling)));
 
                     // Reflectance of screen material only
                     state.dataHeatBal->SurfaceScreens(ScreenNum).ReflectCylinder =

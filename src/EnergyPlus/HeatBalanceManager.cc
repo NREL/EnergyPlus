@@ -6618,7 +6618,6 @@ namespace HeatBalanceManager {
             "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
             "VERTICALSLIDER"};
 
-
         constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::FrameDividerType::Num)> FrameDividerTypeNamesUC = {
             "DIVIDEDLITE", // 0
             "SUSPENDED"    // 1
@@ -6698,8 +6697,7 @@ namespace HeatBalanceManager {
             frameDivider.DividerEmis = FrameDividerProps(18);
 
             // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductName
-            frameDivider.NfrcProductType =
-                DataSurfaces::NfrcProductOptions(getEnumerationValue(NfrcProductNamesUC, FrameDividerAlphas(3)));
+            frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions(getEnumerationValue(NfrcProductNamesUC, FrameDividerAlphas(3)));
             if (frameDivider.NfrcProductType == DataSurfaces::NfrcProductOptions::Invalid) {
                 frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
             }

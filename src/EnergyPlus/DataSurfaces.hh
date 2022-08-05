@@ -865,7 +865,8 @@ namespace DataSurfaces {
     };
 
     // Type of control order when multiple surfaces are referenced
-    enum class MultiSurfaceControl{
+    enum class MultiSurfaceControl
+    {
         Invalid = -1,
         Sequential,
         Group,
@@ -948,9 +949,9 @@ namespace DataSurfaces {
     struct WindowShadingControlData
     {
         // Members
-        std::string Name;           // User supplied name of this set of shading control data
-        int ZoneIndex{0};              // number of the zone referenced
-        int SequenceNumber{0};         // Shading control sequence number
+        std::string Name;                                    // User supplied name of this set of shading control data
+        int ZoneIndex{0};                                    // number of the zone referenced
+        int SequenceNumber{0};                               // Shading control sequence number
         WinShadingType ShadingType{WinShadingType::NoShade}; // Shading type (InteriorShade, SwitchableGlazing,
         //  CHARACTER(len=32) :: ShadingType    = ' ' ! Shading type (InteriorShade, SwitchableGlazing,
         //  ExteriorShade,InteriorBlind,ExteriorBlind,BetweenGlassShade,
@@ -963,7 +964,8 @@ namespace DataSurfaces {
         //  ExteriorShade,BetweenGlassShade,InteriorBlind,ExteriorBlind,BetweenGlassBlind,
         //  ExteriorScreen;
         //  this must be a Material:WindowShade, Material:WindowScreen, or Material:WindowBlind
-        WindowShadingControlType ShadingControlType{WindowShadingControlType::UnControlled}; // Takes one of the following values that specifies type of shading control
+        WindowShadingControlType ShadingControlType{
+            WindowShadingControlType::UnControlled}; // Takes one of the following values that specifies type of shading control
         //  CHARACTER(len=60) :: ShadingControlType =' ' ! Takes one of the following values that specifies type of shading control
         // (control is active only when schedule value = 1; if no schedule
         // specified, schedule value defaults to 1)
@@ -1016,8 +1018,9 @@ namespace DataSurfaces {
         //   Dimension is deg C or W/m2.
         bool ShadingControlIsScheduled{false}; // True if shading control has a schedule
         bool GlareControlIsActive{false};      // True if shading control to reduce daylight glare is active
-        int SlatAngleSchedule{0};          // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
-        SlatAngleControl slatAngleControl{SlatAngleControl::Invalid};     // Takes one of the following values that specifies
+        int SlatAngleSchedule{0};              // Pointer to schedule of slat angle values between 0.0 and 180.0 degrees
+        SlatAngleControl slatAngleControl{
+            SlatAngleControl::Invalid}; // Takes one of the following values that specifies
                                         //  CHARACTER(len=32) :: slatAngleControlForBlinds = ' ' ! Takes one of the following values that specifies
                                         //  how slat angle is controled in a blind when ShadingType =
                                         //  InteriorBlind, ExteriorBlind or BetweenGlassBlind.
@@ -1028,10 +1031,11 @@ namespace DataSurfaces {
                                         //  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
                                         //    window, the slat angle is adjusted to just block beam solar; otherwise the
                                         //    slat angle is set to the value given in the associated Material:WindowBlind.
-        std::string DaylightingControlName;    // string holding the Daylighting Control Object Name string
-        int DaylightControlIndex{0};              // Pointer to the array of Daylighting Controls
-        MultiSurfaceControl multiSurfaceControl{MultiSurfaceControl::Invalid};          // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
-        int FenestrationCount{0};                 // count of fenestration references
+        std::string DaylightingControlName; // string holding the Daylighting Control Object Name string
+        int DaylightControlIndex{0};        // Pointer to the array of Daylighting Controls
+        MultiSurfaceControl multiSurfaceControl{
+            MultiSurfaceControl::Invalid};     // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
+        int FenestrationCount{0};              // count of fenestration references
         Array1D<std::string> FenestrationName; // string holding list of fenestration surfaces
         Array1D_int FenestrationIndex;         // Pointers to fenestration surfaces
     };
