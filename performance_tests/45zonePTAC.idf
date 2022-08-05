@@ -24949,8 +24949,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     3.546,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     3.417E+02,               !- CO2 Emission Factor {g/MJ}
@@ -25272,8 +25270,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    37631000,                !- Energy per Unit Factor
     1.092,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     5.21E+01,                !- CO2 Emission Factor {g/MJ}
@@ -25312,8 +25308,6 @@
 
   FuelFactors,
     FuelOilNo1,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    38.656E+09,              !- Energy per Unit Factor
     1.158,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     7.06E+01,                !- CO2 Emission Factor {g/MJ}
@@ -25350,8 +25344,6 @@
 
   FuelFactors,
     Propane,                 !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    25.362E+09,              !- Energy per Unit Factor
     1.151,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     6.27E+01,                !- CO2 Emission Factor {g/MJ}
