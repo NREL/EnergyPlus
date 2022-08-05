@@ -3163,7 +3163,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
 
     EXPECT_NEAR(state->dataGlobal->TimeStepZone, 1.0, 1e-6);
 
-    auto &thisZnRpt = state->dataHeatBal->ZnRpt(NZ);
+    auto &thisZnRpt = state->dataHeatBal->ZoneRpt(NZ);
     auto &thisspaceRpt = state->dataHeatBal->spaceRpt(spaceNum);
     // Test: The following test should pass
     // if (TAirIn > DBMax[EnvClass])
