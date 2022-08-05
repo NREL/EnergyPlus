@@ -849,21 +849,16 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisInfiltration.ZonePtr = zoneNum;
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
-                thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (lAlphaFieldBlanks(3)) {
+                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
                 if (thisInfiltration.SchedPtr == 0) {
-                    if (Item1 == 1) {
-                        if (lAlphaFieldBlanks(3)) {
-                            ShowSevereError(state,
-                                            format("{}{}=\"{}\",{} is required but field is blank.",
-                                                   RoutineName,
-                                                   cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   cAlphaFieldNames(3)));
-                        } else {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                                cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                        }
+                    if (Item1 == 1) { // avoid repeated error messages from the same input object
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -1098,24 +1093,19 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::ShermanGrimsrud;
 
-                thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (lAlphaFieldBlanks(3)) {
+                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
                 if (thisInfiltration.SchedPtr == 0) {
-                    if (lAlphaFieldBlanks(3)) {
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\",{} is required but field is blank.",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               cAlphaFieldNames(3)));
-                    } else {
-                        ShowSevereError(state,
-                                        format(R"({}{}="{}", invalid (not found) {}="{}".)",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               cAlphaFieldNames(3),
-                                               cAlphaArgs(3)));
-                    }
+                    ShowSevereError(state,
+                                    format(R"({}{}="{}", invalid (not found) {}="{}".)",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cAlphaFieldNames(3),
+                                           cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
                 thisInfiltration.BasicStackCoefficient = rNumericArgs(2);
@@ -1192,17 +1182,15 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::AIM2;
 
-                thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (lAlphaFieldBlanks(3)) {
+                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
                 if (thisInfiltration.SchedPtr == 0) {
-                    if (lAlphaFieldBlanks(3)) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                            " is required but field is blank.");
-                    } else {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                    }
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                        cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
                 thisInfiltration.AIM2StackCoefficient = rNumericArgs(2);
@@ -1513,18 +1501,16 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 thisVentilation.ZonePtr = zoneNum;
 
                 thisVentilation.ModelType = DataHeatBalance::VentilationModelType::DesignFlowRate;
-                thisVentilation.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (lAlphaFieldBlanks(3)) {
+                    thisVentilation.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisVentilation.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
                 if (thisVentilation.SchedPtr == 0) {
                     if (Item1 == 1) {
-                        if (lAlphaFieldBlanks(3)) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                                " is required but field is blank.");
-                        } else {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                                cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                        }
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     }
                     ErrorsFound = true;
                 }
@@ -2137,17 +2123,15 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     ErrorsFound = true;
                 }
 
-                thisVentilation.OpenAreaSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (lAlphaFieldBlanks(3)) {
+                    thisVentilation.OpenAreaSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisVentilation.OpenAreaSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
                 if (thisVentilation.OpenAreaSchedPtr == 0) {
-                    if (lAlphaFieldBlanks(3)) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(3) +
-                                            " is required but field is blank.");
-                    } else {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                    }
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                        cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
 
