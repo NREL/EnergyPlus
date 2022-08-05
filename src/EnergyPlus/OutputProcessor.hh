@@ -591,8 +591,8 @@ namespace OutputProcessor {
     );
 
     void CheckReportVariable(EnergyPlusData &state,
-                             std::string const &KeyedValue, // Associated Key for this variable
-                             std::string const &VarName     // String Name of variable (without units)
+                             std::string_view const KeyedValue, // Associated Key for this variable
+                             std::string_view const VarName     // String Name of variable (without units)
     );
 
     void GetReportVariableInput(EnergyPlusData &state);
@@ -750,12 +750,12 @@ namespace OutputProcessor {
     void WriteReportVariableDictionaryItem(EnergyPlusData &state,
                                            ReportingFrequency reportingInterval, // The reporting interval (e.g., hourly, daily)
                                            StoreType storeType,
-                                           int reportID,                    // The reporting ID for the data
-                                           int indexGroupKey,               // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,   // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &reportIDChr,  // The reporting ID for the data
-                                           std::string const &keyedValue,   // The key name for the data
-                                           std::string const &variableName, // The variable's actual name
+                                           int reportID,                        // The reporting ID for the data
+                                           int indexGroupKey,                   // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           std::string const &indexGroup,       // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           std::string const &reportIDChr,      // The reporting ID for the data
+                                           std::string_view const keyedValue,   // The key name for the data
+                                           std::string_view const variableName, // The variable's actual name
                                            TimeStepType timeStepType,
                                            OutputProcessor::Unit unitsForVar, // The variables units
                                            Optional_string_const customUnitName = _,
@@ -877,12 +877,12 @@ namespace OutputProcessor {
 // *****************************************************************************
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,                  // String Name of variable (with units)
+                         std::string_view const VariableName,              // String Name of variable (with units)
                          OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                    // Associated Key for this variable
+                         std::string_view const KeyedValue,                // Associated Key for this variable
                          Optional_string_const ReportFreq = _,             // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey = _,        // Meter Resource Type (Electricity, Gas, etc)
                          Optional_string_const EndUseKey = _,              // Meter End Use Key (Lights, Heating, Cooling, etc)
@@ -897,12 +897,12 @@ void SetupOutputVariable(EnergyPlusData &state,
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,                  // String Name of variable
+                         std::string_view const VariableName,              // String Name of variable
                          OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
                          int &ActualVariable,                              // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                    // Associated Key for this variable
+                         std::string_view const KeyedValue,                // Associated Key for this variable
                          Optional_string_const ReportFreq = _,             // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey = _              // Group identifier for SQL output
 );
@@ -1001,7 +1001,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
 void ProduceRDDMDD(EnergyPlusData &state);
 
 void AddToOutputVariableList(EnergyPlusData &state,
-                             std::string const &VarName, // Variable Name
+                             std::string_view const VarName, // Variable Name
                              OutputProcessor::TimeStepType TimeStepType,
                              OutputProcessor::StoreType StateType,
                              OutputProcessor::VariableType VariableType,

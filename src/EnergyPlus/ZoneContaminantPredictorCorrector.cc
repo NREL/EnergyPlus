@@ -338,7 +338,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
+                                state.dataHeatBal->ZoneRpt(ZonePtr).GCRate,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
@@ -478,7 +478,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
+                                state.dataHeatBal->ZoneRpt(ZonePtr).GCRate,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
@@ -596,7 +596,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
+                                state.dataHeatBal->ZoneRpt(ZonePtr).GCRate,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
@@ -720,7 +720,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
+                                state.dataHeatBal->ZoneRpt(ZonePtr).GCRate,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
@@ -845,7 +845,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
+                                state.dataHeatBal->ZoneRpt(ZonePtr).GCRate,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
@@ -952,7 +952,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
+                                state.dataHeatBal->ZoneRpt(ZonePtr).GCRate,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);
@@ -1061,7 +1061,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
+                                state.dataHeatBal->ZoneRpt(ZonePtr).GCRate,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->Zone(ZonePtr).Name);

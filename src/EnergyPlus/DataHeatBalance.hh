@@ -2252,7 +2252,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneBBHeatObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
-    EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
+    EPVector<DataHeatBalance::ZoneReportVars> ZoneRpt;
     EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;
     EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
