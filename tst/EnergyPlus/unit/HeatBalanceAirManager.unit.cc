@@ -52,12 +52,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 #include <nlohmann/json_literals.hpp>
 
@@ -111,44 +113,29 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
-TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltration)
+TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
 {
     // Test input processing of Infiltration objects with spaces
-
-    // GetZoneData uses GetObjectItem with ipshortcuts so these need to be allocated
-    int NumAlphas = 4;
-    int NumNumbers = 9;
-    state->dataIPShortCut->lNumericFieldBlanks.allocate(NumNumbers);
-    state->dataIPShortCut->lAlphaFieldBlanks.allocate(NumAlphas);
-    state->dataIPShortCut->cAlphaFieldNames.allocate(NumAlphas);
-    state->dataIPShortCut->cNumericFieldNames.allocate(NumNumbers);
-    state->dataIPShortCut->cAlphaArgs.allocate(NumAlphas);
-    state->dataIPShortCut->rNumericArgs.allocate(NumNumbers);
-    state->dataIPShortCut->lNumericFieldBlanks = false;
-    state->dataIPShortCut->lAlphaFieldBlanks = false;
-    state->dataIPShortCut->cAlphaFieldNames = " ";
-    state->dataIPShortCut->cNumericFieldNames = " ";
-    state->dataIPShortCut->cAlphaArgs = " ";
-    state->dataIPShortCut->rNumericArgs = 0.0;
 
     state->dataInputProcessing->inputProcessor->epJSON = R"(
     {
         "Zone": {
             "Zone 1" : {
+                "volume": 100.0
             },
             "Zone 2" : {
-                 "floor_area": 1000.0,
+                "volume": 2000.0,
+                 "floor_area": 1000.0
             }
         },
         "Space": {
             "Space 1a" : {
-                 "zone_name": "Zone 1"
-                 "floor_area": 10.0,
+                 "zone_name": "Zone 1",
+                 "floor_area": 10.0
             },
             "Space 1b" : {
                  "zone_name": "Zone 1",
-                 "floor_area": 100.0,
-                 "space_type": "Office",
+                 "floor_area": 100.0
             }
         },
         "SpaceList": {
@@ -162,7 +149,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltration)
                     }
                 ]
             }
-        }
+        },
         "ZoneList": {
             "AllZones" : {
                  "zones": [
@@ -174,28 +161,233 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltration)
                     }
                 ]
             }
-        }
+        },
+        "Building": {
+            "Some building somewhere": {
+            }
+        },
+        "GlobalGeometryRules": {
+            "GlobalGeometryRules 1": {
+                "coordinate_system": "Relative",
+                "starting_vertex_position": "UpperLeftCorner",
+                "vertex_entry_direction": "Counterclockwise"
+            }
+        },
+        "Construction": {
+            "ext-slab": {
+                "outside_layer": "HW CONCRETE"
+            }
+        },
+        "Material": {
+            "HW CONCRETE": {
+                "conductivity": 1.311,
+                "density": 2240.0,
+                "roughness": "Rough",
+                "solar_absorptance": 0.7,
+                "specific_heat": 836.8,
+                "thermal_absorptance": 0.9,
+                "thickness": 0.1016,
+                "visible_absorptance": 0.7
+            }
+        },
+        "BuildingSurface:Detailed": {
+            "Dummy Space 1a Floor": {
+                "zone_name": "Zone 1",
+                "space_name": "Space 1a",
+                "surface_type": "Floor",
+                "construction_name": "ext-slab",
+                "number_of_vertices": 4,
+                "outside_boundary_condition": "adiabatic",
+                "sun_exposure": "nosun",
+                "vertices": [
+                    {
+                        "vertex_x_coordinate": 45.3375,
+                        "vertex_y_coordinate": 28.7006,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 45.3375,
+                        "vertex_y_coordinate": 4.5732,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 4.5732,
+                        "vertex_y_coordinate": 4.5732,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 4.5732,
+                        "vertex_y_coordinate": 28.7006,
+                        "vertex_z_coordinate": 0.0
+                    }
+                ]
+            },
+            "Dummy Space 1b Floor": {
+                "zone_name": "Zone 1",
+                "space_name": "Space 1b",
+                "surface_type": "Floor",
+                "construction_name": "ext-slab",
+                "number_of_vertices": 4,
+                "outside_boundary_condition": "adiabatic",
+                "sun_exposure": "nosun",
+                "vertices": [
+                    {
+                        "vertex_x_coordinate": 45.3375,
+                        "vertex_y_coordinate": 28.7006,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 45.3375,
+                        "vertex_y_coordinate": 4.5732,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 4.5732,
+                        "vertex_y_coordinate": 4.5732,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 4.5732,
+                        "vertex_y_coordinate": 28.7006,
+                        "vertex_z_coordinate": 0.0
+                    }
+                ]
+            },
+            "Dummy Zone 2 Floor": {
+                "zone_name": "Zone 2",
+                "surface_type": "Floor",
+                "construction_name": "ext-slab",
+                "number_of_vertices": 4,
+                "outside_boundary_condition": "adiabatic",
+                "sun_exposure": "nosun",
+                "vertices": [
+                    {
+                        "vertex_x_coordinate": 45.3375,
+                        "vertex_y_coordinate": 28.7006,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 45.3375,
+                        "vertex_y_coordinate": 4.5732,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 4.5732,
+                        "vertex_y_coordinate": 4.5732,
+                        "vertex_z_coordinate": 0.0
+                    },
+                    {
+                        "vertex_x_coordinate": 4.5732,
+                        "vertex_y_coordinate": 28.7006,
+                        "vertex_z_coordinate": 0.0
+                    }
+                ]
+            }
+        },
         "ZoneInfiltration:DesignFlowRate": {
-            "FirstFloor_Plenum_Infiltration": {
-                "constant_term_coefficient": 1.0,
+            "Zone1Infiltration": {
                 "design_flow_rate_calculation_method": "Flow/Area",
                 "flow_per_floor_area": 1.0,
-                "schedule_name": "INFIL_QUARTER_ON_SCH",
-                "temperature_term_coefficient": 0.0,
-                "velocity_squared_term_coefficient": 0.0,
-                "velocity_term_coefficient": 0.0,
-                "zone_or_zonelist_or_space_or_spacelist_name": "FirstFloor_Plenum"
+                "zone_or_zonelist_or_space_or_spacelist_name": "Zone 1"
             },
+            "Zone2Infiltration": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 2.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "Zone 2"
+            },
+            "Space1aInfiltration": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 3.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "Space 1a"
+            },
+            "Space1bInfiltration": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 4.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "Space 1b"
+            },
+            "SomeSpacesInfiltration": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 5.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "SomeSpaces"
+            },
+            "AllZonesInfiltration": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 6.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "AllZones"
+            }
+        },
+        "ZoneVentilation:DesignFlowRate": {
+            "Zone1Ventilation": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 1.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "Zone 1"
+            },
+            "Zone2Ventilation": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 2.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "Zone 2"
+            },
+            "Space1aVentilation": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 3.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "Space 1a"
+            },
+            "Space1bVentilation": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 4.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "Space 1b"
+            },
+            "SomeSpacesVentilation": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 5.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "SomeSpaces"
+            },
+            "AllZonesVentilation": {
+                "design_flow_rate_calculation_method": "Flow/Area",
+                "flow_per_floor_area": 6.0,
+                "zone_or_zonelist_or_space_or_spacelist_name": "AllZones"
+            }
         }
+    }
     )"_json;
 
     state->dataGlobal->isEpJSON = true;
     state->dataInputProcessing->inputProcessor->initializeMaps();
 
+    // GetZoneData and others use GetObjectItem with ipshortcuts so these need to be allocated
+    // copied from InputProcessor::processInput (which expects an input file to be present)
+    int MaxArgs = 0;
+    int MaxAlpha = 0;
+    int MaxNumeric = 0;
+    state->dataInputProcessing->inputProcessor->getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
+
+    state->dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
+    state->dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
+    state->dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    state->dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
+    state->dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
+    state->dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
+
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    compare_err_stream("");
+    HeatBalanceManager::GetHeatBalanceInput(*state);
+    std::string const error_string = delimited_string(
+        {"   ** Warning ** GetSurfaceData: Entered Space Floor Area(s) differ more than 5% from calculated Space Floor Area(s).",
+         "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.",
+         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; "});
+
+    compare_err_stream(error_string, true);
     EXPECT_FALSE(ErrorsFound);
+
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
+    ErrorsFound = false;
+    HeatBalanceAirManager::GetSimpleAirModelInputs(*state, ErrorsFound);
+    compare_err_stream("", true);
+    EXPECT_FALSE(ErrorsFound);
+
+    // Expected floor areas
+    Real64 const Space1aFloorArea = 10.0;
+    Real64 const Space1bFloorArea = 100.0;
+    Real64 const Zone2FloorArea = 1000.0;
 
     int zoneNum = 1;
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(zoneNum).Name);
@@ -209,21 +401,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltration)
 
     int spaceNum = 1;
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
-    EXPECT_EQ("GENERAL", state->dataHeatBal->space(spaceNum).spaceType);
-    EXPECT_EQ("GENERAL", state->dataHeatBal->spaceTypes(state->dataHeatBal->space(spaceNum).spaceTypeNum));
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
-    // Defaults
-    EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_TRUE(state->dataHeatBal->space(spaceNum).tags.empty());
+    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
+    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
 
     spaceNum = 2;
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
-    EXPECT_EQ("OFFICE", state->dataHeatBal->space(spaceNum).spaceType);
-    EXPECT_EQ("OFFICE", state->dataHeatBal->spaceTypes(state->dataHeatBal->space(spaceNum).spaceTypeNum));
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
-    EXPECT_EQ(100, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ("TAG1", state->dataHeatBal->space(spaceNum).tags(1));
-    EXPECT_EQ("TAG2", state->dataHeatBal->space(spaceNum).tags(2));
+    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
+    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
 
     EXPECT_EQ("SOMESPACES", state->dataHeatBal->spaceList(1).Name);
     EXPECT_EQ(2, state->dataHeatBal->spaceList(1).spaces.size());
@@ -233,12 +419,71 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltration)
     // This space is auto-generated
     spaceNum = 3;
     EXPECT_EQ("ZONE 2", state->dataHeatBal->space(spaceNum).Name);
-    EXPECT_EQ("GENERAL", state->dataHeatBal->space(spaceNum).spaceType);
-    EXPECT_EQ("GENERAL", state->dataHeatBal->spaceTypes(state->dataHeatBal->space(spaceNum).spaceTypeNum));
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     // Defaults
     EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_TRUE(state->dataHeatBal->space(spaceNum).tags.empty());
+    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+
+    // Now get to the point and check the infiltration setup
+    // Expected number of infiltration objects:
+    // AllZonesInfiltration - 3, 3 spaces total in the zones in the zonelist, flow/area =
+    // SomeSpacesInfiltration - 2, 2 spaces in the spacelist
+    // Space1aInfiltration - 1
+    // Space1bInfiltration - 1
+    // Zone1Infiltration - 2, 2 spaces in the zone
+    // Zone2Infiltration - 1, 1 space in the zone
+    int const numInfiltration = 10;
+    int const numVentilation = 10;
+
+    const Real64 AllZonesFlowPerArea = 6.0;
+    const Real64 SomeSpacesFlowPerArea = 5.0;
+    const Real64 Space1aFlowPerArea = 3.0;
+    const Real64 Space1bFlowPerArea = 4.0;
+    const Real64 Zone1FlowPerArea = 1.0;
+    const Real64 Zone2FlowPerArea = 2.0;
+
+    // Note that the epJSON input will sort the objects alphabetically, so AllZoneInfiltration comes first
+    constexpr std::array<std::string_view, numInfiltration> infilNames = {"Space 1a AllZonesInfiltration",
+                                                                          "Space 1b AllZonesInfiltration",
+                                                                          "Zone 2 AllZonesInfiltration",
+                                                                          "Space 1a SomeSpacesInfiltration",
+                                                                          "Space 1b SomeSpacesInfiltration",
+                                                                          "Space1aInfiltration",
+                                                                          "Space1bInfiltration",
+                                                                          "Space 1a Zone1Infiltration",
+                                                                          "Space 1b Zone1Infiltration",
+                                                                          "Zone2Infiltration"};
+
+    constexpr std::array<std::string_view, numVentilation> ventNames = {"Space 1a AllZonesVentilation",
+                                                                        "Space 1b AllZonesVentilation",
+                                                                        "Zone 2 AllZonesVentilation",
+                                                                        "Space 1a SomeSpacesVentilation",
+                                                                        "Space 1b SomeSpacesVentilation",
+                                                                        "Space1aVentilation",
+                                                                        "Space1bVentilation",
+                                                                        "Space 1a Zone1Ventilation",
+                                                                        "Space 1b Zone1Ventilation",
+                                                                        "Zone2Ventilation"};
+
+    // Same flow rates for both infiltration and ventilation
+    const std::array<Real64, numInfiltration> flows = {Space1aFloorArea * AllZonesFlowPerArea,
+                                                       Space1bFloorArea * AllZonesFlowPerArea,
+                                                       Zone2FloorArea * AllZonesFlowPerArea,
+                                                       Space1aFloorArea * SomeSpacesFlowPerArea,
+                                                       Space1bFloorArea * SomeSpacesFlowPerArea,
+                                                       Space1aFloorArea * Space1aFlowPerArea,
+                                                       Space1bFloorArea * Space1bFlowPerArea,
+                                                       Space1aFloorArea * Zone1FlowPerArea,
+                                                       Space1bFloorArea * Zone1FlowPerArea,
+                                                       Zone2FloorArea * Zone2FlowPerArea};
+    for (int infilNum = 0; infilNum <= numInfiltration - 1; ++infilNum) {
+        auto &thisInfiltration = state->dataHeatBal->Infiltration[infilNum];
+        auto &thisVentilation = state->dataHeatBal->Ventilation[infilNum];
+        EXPECT_TRUE(UtilityRoutines::SameString(infilNames[infilNum], thisInfiltration.Name));
+        EXPECT_EQ(thisInfiltration.DesignLevel, flows[infilNum]);
+        EXPECT_TRUE(UtilityRoutines::SameString(ventNames[infilNum], thisVentilation.Name));
+        EXPECT_EQ(thisVentilation.DesignLevel, flows[infilNum]);
+    }
 }
 
 } // namespace EnergyPlus
