@@ -760,7 +760,7 @@ namespace DataSizing {
                                          // FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
         int ScaleHeatSAFMethod;          // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea,
                                          // FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-        SysOAMethod SystemOAMethod;   // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
+        SysOAMethod SystemOAMethod;      // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
         Real64 MaxZoneOAFraction;        // maximum value of min OA for zones served by system
         bool OAAutoSized;                // Set to true if design OA vol flow is set to 'autosize' in Sizing:System
         int CoolingCapMethod;            // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea,
@@ -899,7 +899,7 @@ namespace DataSizing {
         //   [kg water/kg dry air] [zone time step]
         Array1D<Real64> SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
         Array1D<Real64> SysDOASLatAddSeq;  // daily sequence of latent heat addition rate from DOAS supply air [W]
-        SysOAMethod SystemOAMethod;     // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
+        SysOAMethod SystemOAMethod;        // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
         Real64 MaxZoneOAFraction;          // maximum value of min OA for zones served by system
         Real64 SysUncOA;                   // uncorrected system outdoor air flow based on zone people and zone area
         bool OAAutoSized;                  // Set to true if design OA vol flow is set to 'autosize'
