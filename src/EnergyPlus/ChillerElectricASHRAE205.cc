@@ -1484,7 +1484,15 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     this->QCondenser = lookupVariablesCooling.net_condenser_capacity * this->ChillerCyclingRatio;
     this->QOilCooler = lookupVariablesCooling.oil_cooler_heat;
     this->QAuxiliary = lookupVariablesCooling.auxiliary_heat;
-    this->AmbientZoneGain = this->QEvaporator + this->Power - (this->QCondenser + this->QOilCooler + this->QAuxiliary);
+    Real64 QExternallyCooled{0.0};
+    if (this->OilCoolerInletNode) {
+        QExternallyCooled += this->QOilCooler;
+    }
+    if (this->AuxiliaryHeatInletNode) {
+        QExternallyCooled += this->QAuxiliary;
+    }
+    // Energy balance on the chiller system gives the amount of heat lost to the ambient zone
+    this->AmbientZoneGain = this->QEvaporator + this->Power - (this->QCondenser + QExternallyCooled);
 
     Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
