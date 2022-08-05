@@ -549,11 +549,6 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
     if (this->oneTimeFlag) {
         this->oneTimeInit(state);
         this->setOutputVariables(state);
-        // TODO: Need this?
-        if (!state.dataGlobal->SysSizingCalc) {
-            PlantUtilities::RegisterPlantCompDesignFlow(state, this->OilCoolerInletNode, this->OilCoolerVolFlowRate);
-            PlantUtilities::RegisterPlantCompDesignFlow(state, this->AuxiliaryHeatInletNode, this->AuxiliaryVolFlowRate);
-        }
         this->oneTimeFlag = false;
     }
 
@@ -914,8 +909,16 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (!this->RefCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->RefCap > 0.0)) { // Hard-sized with no sizing data
-            BaseSizer::reportSizerOutput(state, this->ObjectType, this->Name, "User-Specified Reference Capacity [W]", this->RefCap);
+            BaseSizer::reportSizerOutput(state, this->ObjectType, this->Name, "User-Specified Rated Capacity [W]", this->RefCap);
         }
+    }
+
+    if (this->OilCoolerInletNode) {
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->OilCoolerInletNode, this->OilCoolerVolFlowRate);
+    }
+
+    if (this->AuxiliaryHeatInletNode) {
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->AuxiliaryHeatInletNode, this->AuxiliaryVolFlowRate);
     }
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -1536,8 +1539,12 @@ void ASHRAE205ChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad, b
         // Set node temperatures
         state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-        state.dataLoopNodes->Node(this->OilCoolerOutletNode).Temp = state.dataLoopNodes->Node(this->OilCoolerInletNode).Temp;
-        state.dataLoopNodes->Node(this->AuxiliaryHeatOutletNode).Temp = state.dataLoopNodes->Node(this->AuxiliaryHeatInletNode).Temp;
+        if (this->OilCoolerInletNode) {
+            state.dataLoopNodes->Node(this->OilCoolerOutletNode).Temp = state.dataLoopNodes->Node(this->OilCoolerInletNode).Temp;
+        }
+        if (this->AuxiliaryHeatInletNode) {
+            state.dataLoopNodes->Node(this->AuxiliaryHeatOutletNode).Temp = state.dataLoopNodes->Node(this->AuxiliaryHeatInletNode).Temp;
+        }
 
         this->ChillerPartLoadRatio = 0.0;
         this->ChillerCyclingRatio = 0.0;

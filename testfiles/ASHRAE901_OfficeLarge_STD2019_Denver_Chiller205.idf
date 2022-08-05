@@ -13836,7 +13836,7 @@
   Chiller:Electric:ASHRAE205,
     CoolSys1 Chiller1,       !- Name
     CoolSys1-Chiller.RS0001.a205.cbor,  !- Representation File Name
-    Cubic,                   !- Interpolation Method
+    Cubic,                   !- Performance Interpolation Method
     ,                        !- Reference Capacity
     1.0,                     !- Sizing Factor
     Zone,                    !- Ambient Temperature Indicator
@@ -13854,7 +13854,7 @@
   Chiller:Electric:ASHRAE205,
     CoolSys1 Chiller2,       !- Name
     CoolSys1-Chiller.RS0001.a205.cbor,  !- Representation File Name
-    Cubic,                   !- Interpolation Method
+    Cubic,                   !- Performance Interpolation Method
     ,                        !- Reference Capacity
     1.0,                     !- Sizing Factor
     Zone,                    !- Ambient Temperature Indicator

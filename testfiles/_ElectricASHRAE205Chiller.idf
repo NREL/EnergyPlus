@@ -1446,6 +1446,7 @@
   Chiller:Electric:ASHRAE205,
     A205Chiller Trane CGWD 207kW/3.99COP/None,  !- Name
     A205ExampleChiller.RS0001.a205.cbor,  !- Representation File Name
+    Cubic,                   !- Performance Interpolation Method
     ,                        !- Reference Capacity
     1.0,                     !- Sizing Factor
     Zone,                    !- Ambient Temperature Indicator
