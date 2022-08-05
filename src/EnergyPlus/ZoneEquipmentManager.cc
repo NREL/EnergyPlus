@@ -3366,15 +3366,14 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                     TurnFansOff = true;
                 }
 
-                ZoneAirLoopEquipmentManager::ManageZoneAirLoopEquipment(
-                    state,
-                    state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                    FirstHVACIteration,
-                    AirSysOutput,
-                    NonAirSysOutput,
-                    LatOutputProvided,
-                    ControlledZoneNum,
-                    zoneEquipList.EquipIndex(EquipPtr));
+                ZoneAirLoopEquipmentManager::ManageZoneAirLoopEquipment(state,
+                                                                        state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                                                                        FirstHVACIteration,
+                                                                        AirSysOutput,
+                                                                        NonAirSysOutput,
+                                                                        LatOutputProvided,
+                                                                        ControlledZoneNum,
+                                                                        zoneEquipList.EquipIndex(EquipPtr));
 
                 //            reset status flags for other zone equipment
                 TurnFansOn = false;
@@ -3417,15 +3416,14 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             case ZoneEquip::PkgTermHPWaterToAir: { // 'ZoneHVAC:PackagedTerminalHeatPump'
                 // 'ZoneHVAC:PackagedTerminalAirConditioner'
                 // 'ZoneHVAC:WaterToAirHeatPump'
-                PackagedTerminalHeatPump::SimPackagedTerminalUnit(
-                    state,
-                    state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                    ControlledZoneNum,
-                    FirstHVACIteration,
-                    SysOutputProvided,
-                    LatOutputProvided,
-                    ZoneEquipTypeNum,
-                    zoneEquipList.EquipIndex(EquipPtr));
+                PackagedTerminalHeatPump::SimPackagedTerminalUnit(state,
+                                                                  state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                                                                  ControlledZoneNum,
+                                                                  FirstHVACIteration,
+                                                                  SysOutputProvided,
+                                                                  LatOutputProvided,
+                                                                  ZoneEquipTypeNum,
+                                                                  zoneEquipList.EquipIndex(EquipPtr));
             } break;
             case ZoneEquip::ZoneUnitarySys: { // 'AirloopHVAC:UnitarySystem'
                 int AirLoopNum = 0;
@@ -3434,20 +3432,18 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 int OAUnitNum = 0;
                 Real64 OAUCoilOutTemp = 0.0;
                 bool ZoneEquipFlag = true;
-                zoneEquipList
-                    .compPointer[EquipPtr]
-                    ->simulate(state,
-                               state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                               FirstHVACIteration,
-                               AirLoopNum,
-                               zoneEquipList.EquipIndex(EquipPtr),
-                               HeatingActive,
-                               CoolingActive,
-                               OAUnitNum,
-                               OAUCoilOutTemp,
-                               ZoneEquipFlag,
-                               SysOutputProvided,
-                               LatOutputProvided);
+                zoneEquipList.compPointer[EquipPtr]->simulate(state,
+                                                              state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                                                              FirstHVACIteration,
+                                                              AirLoopNum,
+                                                              zoneEquipList.EquipIndex(EquipPtr),
+                                                              HeatingActive,
+                                                              CoolingActive,
+                                                              OAUnitNum,
+                                                              OAUCoilOutTemp,
+                                                              ZoneEquipFlag,
+                                                              SysOutputProvided,
+                                                              LatOutputProvided);
             } break;
             case ZoneEquip::ZoneDXDehumidifier: { // 'ZoneHVAC:Dehumidifier:DX'
                 ZoneDehumidifier::SimZoneDehumidifier(state,
@@ -3555,12 +3551,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
             } break;
             case ZoneEquip::HiTempRadiant: { // 'ZoneHVAC:HighTemperatureRadiant'
-                HighTempRadiantSystem::SimHighTempRadiantSystem(
-                    state,
-                    state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                    FirstHVACIteration,
-                    SysOutputProvided,
-                    zoneEquipList.EquipIndex(EquipPtr));
+                HighTempRadiantSystem::SimHighTempRadiantSystem(state,
+                                                                state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                                                                FirstHVACIteration,
+                                                                SysOutputProvided,
+                                                                zoneEquipList.EquipIndex(EquipPtr));
                 LatOutputProvided = 0.0; // This baseboard currently sends its latent heat gain directly to predictor/corrector
                                          // via SumLatentHTRadSys... so setting LatOutputProvided = 0.0
             } break;
@@ -3668,13 +3663,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                              zoneEquipList.EquipIndex(EquipPtr));
             } break;
             case ZoneEquip::ZoneEvaporativeCoolerUnit: {
-                EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
-                    state,
-                    state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                    ControlledZoneNum,
-                    SysOutputProvided,
-                    LatOutputProvided,
-                    zoneEquipList.EquipIndex(EquipPtr));
+                EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state,
+                                                                 state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                                                                 ControlledZoneNum,
+                                                                 SysOutputProvided,
+                                                                 LatOutputProvided,
+                                                                 zoneEquipList.EquipIndex(EquipPtr));
             } break;
             case ZoneEquip::ZoneHybridEvaporativeCooler: {
                 HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners(
@@ -3696,8 +3690,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             zoneEquipConfig.PlenumMassFlow += state.dataHVACGlobal->PlenumInducedMassFlow;
 
             // Store available capacities for load distribution calculations
-            if (FirstHVACIteration &&
-                (zoneEquipList.LoadDistScheme != DataZoneEquipment::LoadDist::Sequential)) {
+            if (FirstHVACIteration && (zoneEquipList.LoadDistScheme != DataZoneEquipment::LoadDist::Sequential)) {
                 if (SysOutputProvided > 0.0) {
                     zoneEquipList.HeatingCapacity(EquipPtr) = SysOutputProvided;
                 } else {
