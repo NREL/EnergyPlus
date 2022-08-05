@@ -97,7 +97,6 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -3688,7 +3687,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     using HWBaseboardRadiator::SimHWBaseboard;
     using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
     using LowTempRadiantSystem::SimLowTempRadiantSystem;
-    using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
     using PurchasedAirManager::SimPurchasedAir;
     using RefrigeratedCase::SimAirChillerSet;
     using ReturnAirPathManager::SimReturnAirPath;
@@ -3925,21 +3923,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                             LatOutputProvided,
                             state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::PkgTermHPAirToAir:
-            case ZoneEquip::PkgTermACAirToAir:
-            case ZoneEquip::PkgTermHPWaterToAir: { // 'ZoneHVAC:PackagedTerminalHeatPump'
-                // 'ZoneHVAC:PackagedTerminalAirConditioner'
-                // 'ZoneHVAC:WaterToAirHeatPump'
-                SimPackagedTerminalUnit(state,
-                                        state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                                        ControlledZoneNum,
-                                        FirstHVACIteration,
-                                        SysOutputProvided,
-                                        LatOutputProvided,
-                                        ZoneEquipTypeNum,
-                                        state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
-            } break;
-            case ZoneEquip::ZoneUnitarySys: { // 'AirloopHVAC:UnitarySystem'
+            case ZoneEquip::PkgTermHPAirToAir:   // 'ZoneHVAC:PackagedTerminalHeatPump'
+            case ZoneEquip::PkgTermACAirToAir:   // 'ZoneHVAC:PackagedTerminalAirConditioner'
+            case ZoneEquip::PkgTermHPWaterToAir: // 'ZoneHVAC:WaterToAirHeatPump'
+            case ZoneEquip::ZoneUnitarySys: {    // 'AirloopHVAC:UnitarySystem'
                 int AirLoopNum = 0;
                 bool HeatingActive = false;
                 bool CoolingActive = false;
