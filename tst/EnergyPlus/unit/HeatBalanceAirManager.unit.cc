@@ -385,9 +385,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     EXPECT_FALSE(ErrorsFound);
 
     // Expected floor areas
-    Real64 const Space1aFloorArea = 10.0;
-    Real64 const Space1bFloorArea = 100.0;
-    Real64 const Zone2FloorArea = 1000.0;
+    Real64 constexpr Space1aFloorArea = 10.0;
+    Real64 constexpr Space1bFloorArea = 100.0;
+    Real64 constexpr Zone2FloorArea = 1000.0;
 
     int zoneNum = 1;
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(zoneNum).Name);
@@ -425,64 +425,64 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
 
     // Now get to the point and check the infiltration setup
-    // Expected number of infiltration objects:
+    // Expected number of infiltration and ventilation instances:
     // AllZonesInfiltration - 3, 3 spaces total in the zones in the zonelist, flow/area =
     // SomeSpacesInfiltration - 2, 2 spaces in the spacelist
     // Space1aInfiltration - 1
     // Space1bInfiltration - 1
     // Zone1Infiltration - 2, 2 spaces in the zone
     // Zone2Infiltration - 1, 1 space in the zone
-    int const numInfiltration = 10;
-    int const numVentilation = 10;
+    constexpr int numInstances = 10;
 
-    const Real64 AllZonesFlowPerArea = 6.0;
-    const Real64 SomeSpacesFlowPerArea = 5.0;
-    const Real64 Space1aFlowPerArea = 3.0;
-    const Real64 Space1bFlowPerArea = 4.0;
-    const Real64 Zone1FlowPerArea = 1.0;
-    const Real64 Zone2FlowPerArea = 2.0;
+    constexpr Real64 AllZonesFlowPerArea = 6.0;
+    constexpr Real64 SomeSpacesFlowPerArea = 5.0;
+    constexpr Real64 Space1aFlowPerArea = 3.0;
+    constexpr Real64 Space1bFlowPerArea = 4.0;
+    constexpr Real64 Zone1FlowPerArea = 1.0;
+    constexpr Real64 Zone2FlowPerArea = 2.0;
 
     // Note that the epJSON input will sort the objects alphabetically, so AllZoneInfiltration comes first
-    constexpr std::array<std::string_view, numInfiltration> infilNames = {"Space 1a AllZonesInfiltration",
-                                                                          "Space 1b AllZonesInfiltration",
-                                                                          "Zone 2 AllZonesInfiltration",
-                                                                          "Space 1a SomeSpacesInfiltration",
-                                                                          "Space 1b SomeSpacesInfiltration",
-                                                                          "Space1aInfiltration",
-                                                                          "Space1bInfiltration",
-                                                                          "Space 1a Zone1Infiltration",
-                                                                          "Space 1b Zone1Infiltration",
-                                                                          "Zone2Infiltration"};
+    constexpr std::array<std::string_view, numInstances> infilNames = {"Space 1a AllZonesInfiltration",
+                                                                       "Space 1b AllZonesInfiltration",
+                                                                       "Zone 2 AllZonesInfiltration",
+                                                                       "Space 1a SomeSpacesInfiltration",
+                                                                       "Space 1b SomeSpacesInfiltration",
+                                                                       "Space1aInfiltration",
+                                                                       "Space1bInfiltration",
+                                                                       "Space 1a Zone1Infiltration",
+                                                                       "Space 1b Zone1Infiltration",
+                                                                       "Zone2Infiltration"};
 
-    constexpr std::array<std::string_view, numVentilation> ventNames = {"Space 1a AllZonesVentilation",
-                                                                        "Space 1b AllZonesVentilation",
-                                                                        "Zone 2 AllZonesVentilation",
-                                                                        "Space 1a SomeSpacesVentilation",
-                                                                        "Space 1b SomeSpacesVentilation",
-                                                                        "Space1aVentilation",
-                                                                        "Space1bVentilation",
-                                                                        "Space 1a Zone1Ventilation",
-                                                                        "Space 1b Zone1Ventilation",
-                                                                        "Zone2Ventilation"};
+    constexpr std::array<std::string_view, numInstances> ventNames = {"Space 1a AllZonesVentilation",
+                                                                      "Space 1b AllZonesVentilation",
+                                                                      "Zone 2 AllZonesVentilation",
+                                                                      "Space 1a SomeSpacesVentilation",
+                                                                      "Space 1b SomeSpacesVentilation",
+                                                                      "Space1aVentilation",
+                                                                      "Space1bVentilation",
+                                                                      "Space 1a Zone1Ventilation",
+                                                                      "Space 1b Zone1Ventilation",
+                                                                      "Zone2Ventilation"};
 
     // Same flow rates for both infiltration and ventilation
-    const std::array<Real64, numInfiltration> flows = {Space1aFloorArea * AllZonesFlowPerArea,
-                                                       Space1bFloorArea * AllZonesFlowPerArea,
-                                                       Zone2FloorArea * AllZonesFlowPerArea,
-                                                       Space1aFloorArea * SomeSpacesFlowPerArea,
-                                                       Space1bFloorArea * SomeSpacesFlowPerArea,
-                                                       Space1aFloorArea * Space1aFlowPerArea,
-                                                       Space1bFloorArea * Space1bFlowPerArea,
-                                                       Space1aFloorArea * Zone1FlowPerArea,
-                                                       Space1bFloorArea * Zone1FlowPerArea,
-                                                       Zone2FloorArea * Zone2FlowPerArea};
-    for (int infilNum = 0; infilNum <= numInfiltration - 1; ++infilNum) {
-        auto &thisInfiltration = state->dataHeatBal->Infiltration[infilNum];
-        auto &thisVentilation = state->dataHeatBal->Ventilation[infilNum];
-        EXPECT_TRUE(UtilityRoutines::SameString(infilNames[infilNum], thisInfiltration.Name));
-        EXPECT_EQ(thisInfiltration.DesignLevel, flows[infilNum]);
-        EXPECT_TRUE(UtilityRoutines::SameString(ventNames[infilNum], thisVentilation.Name));
-        EXPECT_EQ(thisVentilation.DesignLevel, flows[infilNum]);
+    constexpr std::array<Real64, numInstances> flows = {Space1aFloorArea * AllZonesFlowPerArea,
+                                                        Space1bFloorArea * AllZonesFlowPerArea,
+                                                        Zone2FloorArea * AllZonesFlowPerArea,
+                                                        Space1aFloorArea * SomeSpacesFlowPerArea,
+                                                        Space1bFloorArea * SomeSpacesFlowPerArea,
+                                                        Space1aFloorArea * Space1aFlowPerArea,
+                                                        Space1bFloorArea * Space1bFlowPerArea,
+                                                        Space1aFloorArea * Zone1FlowPerArea,
+                                                        Space1bFloorArea * Zone1FlowPerArea,
+                                                        Zone2FloorArea * Zone2FlowPerArea};
+
+    for (int itemNum = 0; itemNum <= numInstances - 1; ++itemNum) {
+        auto &thisInfiltration = state->dataHeatBal->Infiltration[itemNum];
+        auto &thisVentilation = state->dataHeatBal->Ventilation[itemNum];
+        EXPECT_TRUE(UtilityRoutines::SameString(infilNames[itemNum], thisInfiltration.Name));
+        EXPECT_EQ(thisInfiltration.DesignLevel, flows[itemNum]);
+        EXPECT_TRUE(UtilityRoutines::SameString(ventNames[itemNum], thisVentilation.Name));
+        EXPECT_EQ(thisVentilation.DesignLevel, flows[itemNum]);
     }
 }
 
