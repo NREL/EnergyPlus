@@ -51,7 +51,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 #include "EnergyPlus/ChillerElectricEIR.hh"
-#include "rs_instance_base.h" // unique_ptr will need a complete type
+#include "rs0001.h"
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -83,7 +83,7 @@ namespace ChillerElectricASHRAE205 {
     struct ASHRAE205ChillerSpecs : ChillerElectricEIR::ElectricEIRChillerSpecs
     {
         static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
-        std::shared_ptr<tk205::RSInstanceBase> Representation; // ASHRAE205 representation instance
+        std::shared_ptr<tk205::rs0001_ns::RS0001> Representation; // ASHRAE205 representation instance
         PerformanceInterpolationType InterpolationType{PerformanceInterpolationType::Linear};
         int MinSequenceNumber{1};
         int MaxSequenceNumber{1};

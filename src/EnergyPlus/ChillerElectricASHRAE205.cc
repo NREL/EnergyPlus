@@ -136,13 +136,17 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         auto rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
         fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(RoutineName));
-        thisChiller.Representation = RSInstanceFactory::create("RS0001", rep_file_path.string().c_str());
+        thisChiller.Representation =
+            std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
+        if (nullptr == thisChiller.Representation) {
+            ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path));
+            ErrorsFound = true;
+        }
         thisChiller.InterpolationType = static_cast<PerformanceInterpolationType>(getEnumerationValue(
             InterpolationMethods,
             UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))));
 
-        auto rep = dynamic_cast<tk205::rs0001_ns::RS0001 *>(thisChiller.Representation.get());
-        const auto compressorSequence = rep->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
+        const auto compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
         // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
         const auto minmaxSequenceNum = std::minmax_element(compressorSequence.begin(), compressorSequence.end());
         thisChiller.MinSequenceNumber = *(minmaxSequenceNum.first);
@@ -840,10 +844,9 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
 
     // Calculate design evaporator capacity (eventually add autosize here too)
-    static auto rep = dynamic_cast<tk205::rs0001_ns::RS0001 *>(this->Representation.get());
 
     // TODO: Determine actual rated flow rates instead of design flow rates
-    this->RefCap = rep->performance.performance_map_cooling
+    this->RefCap = this->Representation->performance.performance_map_cooling
                        .calculate_performance(this->EvapVolFlowRate,
                                               this->TempRefEvapOut + DataGlobalConstants::KelvinConv,
                                               this->CondVolFlowRate,
@@ -1247,9 +1250,7 @@ void ASHRAE205ChillerSpecs::findEvaporatorMassFlowRate(EnergyPlusData &state, Re
 
 Real64 ASHRAE205ChillerSpecs::findCapacityResidual(EnergyPlusData &, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par)
 {
-    static auto rep = dynamic_cast<tk205::rs0001_ns::RS0001 *>(this->Representation.get());
-
-    this->QEvaporator = rep->performance.performance_map_cooling
+    this->QEvaporator = this->Representation->performance.performance_map_cooling
                             .calculate_performance(this->EvapVolFlowRate,
                                                    this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
                                                    this->CondVolFlowRate,
@@ -1289,8 +1290,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     //  flow resolver will not shut down the branch
 
     // Calculate performance for standby (only used when off or cycling)
-    auto rep = dynamic_cast<tk205::rs0001_ns::RS0001 *>(this->Representation.get());
-    Real64 standbyPower = rep->performance.performance_map_standby.calculate_performance(this->AmbientTemp).input_power;
+    Real64 standbyPower = this->Representation->performance.performance_map_standby.calculate_performance(this->AmbientTemp).input_power;
     if (MyLoad >= 0 || !RunFlag) {
         if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
             state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
@@ -1396,7 +1396,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     this->findEvaporatorMassFlowRate(state, MyLoad, CpEvap);
 
     // Available chiller capacity is capacity at the highest sequence number; i.e. max chiller capacity
-    const Real64 maximumChillerCap = rep->performance.performance_map_cooling
+    const Real64 maximumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
                                                                 this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
                                                                 this->CondVolFlowRate,
@@ -1406,7 +1406,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     if (maximumChillerCap <= 0) {
         // TODO: Issue a warning
     }
-    const Real64 minimumChillerCap = rep->performance.performance_map_cooling
+    const Real64 minimumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
                                                                 this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
                                                                 this->CondVolFlowRate,
@@ -1447,11 +1447,11 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
 
     // Use performance map to get the rest of results at new sequence number
     auto lookupVariablesCooling =
-        rep->performance.performance_map_cooling.calculate_performance(this->EvapVolFlowRate,
-                                                                       this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
-                                                                       this->CondVolFlowRate,
-                                                                       this->CondInletTemp + DataGlobalConstants::KelvinConv,
-                                                                       partLoadSeqNum);
+        this->Representation->performance.performance_map_cooling.calculate_performance(this->EvapVolFlowRate,
+                                                                                        this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
+                                                                                        this->CondVolFlowRate,
+                                                                                        this->CondInletTemp + DataGlobalConstants::KelvinConv,
+                                                                                        partLoadSeqNum);
     this->QEvaporator = lookupVariablesCooling.net_evaporator_capacity * this->ChillerCyclingRatio;
 
     auto evapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpEvap;
@@ -1477,7 +1477,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         }
 #endif // 0
 
-    auto cd = rep->performance.cycling_degradation_coefficient;
+    auto cd = this->Representation->performance.cycling_degradation_coefficient;
     Real64 cyclingFactor{(1.0 - cd) + (cd * this->ChillerCyclingRatio)};
     Real64 runtimeFactor{this->ChillerCyclingRatio / cyclingFactor};
     this->Power = lookupVariablesCooling.input_power * runtimeFactor + ((1 - this->ChillerCyclingRatio) * standbyPower);
@@ -1625,9 +1625,7 @@ void ASHRAE205ChillerSpecs::getDesignCapacities(
     [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
 {
     if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {
-        static auto rep = dynamic_cast<tk205::rs0001_ns::RS0001 *>(this->Representation.get());
-
-        MinLoad = rep->performance.performance_map_cooling
+        MinLoad = this->Representation->performance.performance_map_cooling
                       .calculate_performance(this->EvapVolFlowRate,
                                              this->TempRefEvapOut + DataGlobalConstants::KelvinConv,
                                              this->CondVolFlowRate,
