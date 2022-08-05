@@ -163,12 +163,15 @@ set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-Ca
 # Btwxt
 include_directories(${gtest_SOURCE_DIR}/include/ SYSTEM)
 set(BUILD_BTWXT_TESTING
-    ${BUILD_TESTING}
+    OFF
     CACHE BOOL "" FORCE)
 add_subdirectory(btwxt)
 set_target_properties(btwxt PROPERTIES FOLDER ThirdParty/Btwxt)
 
 if(OPENGL_FOUND)
+  set(BUILD_PENUMBRA_TESTING
+      OFF
+      CACHE BOOL "" FORCE)
   add_subdirectory(penumbra)
   set_target_properties(awning PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(glfw PROPERTIES FOLDER ThirdParty/Penumbra/GLFW)
@@ -179,6 +182,6 @@ endif()
 
 # libtk205
 set(LIBTK205_BUILD_TESTING
-        ${BUILD_TESTING}
+        OFF
         CACHE BOOL "" FORCE)
 add_subdirectory(libtk205)
