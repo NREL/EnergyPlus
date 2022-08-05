@@ -9584,29 +9584,29 @@ namespace SurfaceGeometry {
                                                            "BETWEENGLASSBLIND"  // 9
                                                        });
 
-        int constexpr NumValidWindowShadingControlTypes(21);
-        static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
-                                                                    {"ALWAYSON",
-                                                                     "ALWAYSOFF",
-                                                                     "ONIFSCHEDULEALLOWS",
-                                                                     "ONIFHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONEAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONECOOLING",
-                                                                     "ONIFHIGHGLARE",
-                                                                     "MEETDAYLIGHTILLUMINANCESETPOINT",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
-                                                                     "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
-                                                                     "ONNIGHTIFHEATINGANDOFFDAY",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
-                                                                     "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
-                                                                     "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
+        constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNamesUC{
+            "UNCONTROLLED",
+            "ALWAYSON",
+            "ALWAYSOFF",
+            "ONIFSCHEDULEALLOWS",
+            "ONIFHIGHSOLARONWINDOW",
+            "ONIFHIGHHORIZONTALSOLAR",
+            "ONIFHIGHOUTDOORAIRTEMPERATURE",
+            "ONIFHIGHZONEAIRTEMPERATURE",
+            "ONIFHIGHZONECOOLING",
+            "ONIFHIGHGLARE",
+            "MEETDAYLIGHTILLUMINANCESETPOINT",
+            "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
+            "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
+            "ONNIGHTIFHEATINGANDOFFDAY",
+            "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
+            "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
+            "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+            "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+            "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
+            "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
+            "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
+            "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"};
 
         constexpr std::array<std::string_view, static_cast<int>(SlatAngleControl::Num)> SlatAngleNamesUC{
             "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};
@@ -9714,7 +9714,6 @@ namespace SurfaceGeometry {
                                         state.dataIPShortCut->cAlphaArgs(13)));
             }
 
-            ControlType = state.dataIPShortCut->cAlphaArgs(5);
 
             if (ControlNumAlpha >= 14) {
                 windowShadingControl.FenestrationCount = ControlNumAlpha - 13;
@@ -9728,6 +9727,8 @@ namespace SurfaceGeometry {
                                 cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\" invalid. Must reference at least one Fenestration Surface object name.");
             }
+
+            ControlType = state.dataIPShortCut->cAlphaArgs(5);
 
             if (ControlType == "SCHEDULE") {
                 ControlType = "ONIFSCHEDULEALLOWS";
@@ -9842,17 +9843,6 @@ namespace SurfaceGeometry {
                                  cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" is using obsolete " +
                                      state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\", changing to \"" +
                                      ControlType + "\"");
-            }
-
-            // Error if illegal control type
-            Found = UtilityRoutines::FindItemInList(ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes);
-            if (Found == 0) {
-                ErrorsFound = true;
-                ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(5) +
-                                    "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
-            } else {
-                windowShadingControl.ShadingControlType = WindowShadingControlType(Found);
             }
 
             // Error checks
