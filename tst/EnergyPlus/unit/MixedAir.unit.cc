@@ -5593,7 +5593,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ACHflow)
     GetZoneEquipment(*state);
     GetOAControllerInputs(*state);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SOAM_VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
+    EXPECT_EQ(SystemOAMethod::VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);                // Necessary for CalcMechVentController
     state->dataSize->SysSizingRunDone = true;                                    // Indicate that a system sizing run has been performed
