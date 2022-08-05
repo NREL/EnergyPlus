@@ -3177,7 +3177,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
 
     EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, 1.0);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
-    EXPECT_GE(thisZoneITEq.DryBulbTAboveDeltaT, 0.0);
+    EXPECT_EQ(thisZoneITEq.DryBulbTAboveDeltaT, TAirIn - DBMax[EnvClass]);
     EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, 1.0);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, 1.0);
@@ -3258,7 +3258,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
 
     EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, 1.0);
     EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
-    EXPECT_GE(thisZoneITEq.DryBulbTAboveDeltaT, 0.0);
+    EXPECT_EQ(thisZoneITEq.DryBulbTAboveDeltaT, TAirIn - DBMax[EnvClass]);
     EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, 1.0);
     EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
     EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, 1.0);
