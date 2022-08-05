@@ -937,7 +937,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExteriorTotalSurfArea;
-                            if (thisZone.ExteriorTotalSurfArea <= 0.0) {
+                            if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Exterior Surface Area = 0.  0 Infiltration will result.",
                                                         RoutineName,
@@ -971,7 +971,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExtGrossWallArea;
-                            if (thisZone.ExtGrossWallArea <= 0.0) {
+                            if (thisSpace.ExtGrossWallArea <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Exterior Wall Area = 0.  0 Infiltration will result.",
                                                         RoutineName,
@@ -1005,9 +1005,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     if (thisInfiltration.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
-                            if (thisZone.Volume <= 0.0) {
+                            if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
-                                                 format("{}{}=\"{}\", {} specifies {}, but Zone Volume = 0.  0 Infiltration will result.",
+                                                 format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Infiltration will result.",
                                                         RoutineName,
                                                         cCurrentModuleObject,
                                                         thisInfiltration.Name,
@@ -1530,14 +1530,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpec::FlowPerArea:
-                    if (thisVentilation.ZonePtr != 0) {
+                    if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(2) * thisZone.FloorArea;
-                            if (thisZone.FloorArea <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
+                            if (thisSpace.floorArea <= 0.0) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                                      cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
-                                                     ", but Zone Floor Area = 0.  0 Ventilation will result.");
+                                                     ", but Space Floor Area = 0.  0 Ventilation will result.");
                             }
                         } else {
                             ShowSevereError(state,
@@ -1558,10 +1558,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpec::FlowPerPerson:
-                    if (thisVentilation.ZonePtr != 0) {
+                    if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(3) * thisZone.TotOccupants;
-                            if (thisZone.TotOccupants <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(3) * thisSpace.totOccupants;
+                            if (thisSpace.totOccupants <= 0.0) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                                      cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
@@ -1586,14 +1586,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpec::AirChanges:
-                    if (thisVentilation.ZonePtr != 0) {
+                    if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(4) * thisZone.Volume / DataGlobalConstants::SecInHour;
-                            if (thisZone.Volume <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                                      cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
-                                                     ", but Zone Volume = 0.  0 Ventilation will result.");
+                                                     ", but Space Volume = 0.  0 Ventilation will result.");
                             }
                         } else {
                             ShowSevereError(state,
