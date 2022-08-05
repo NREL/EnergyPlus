@@ -2215,7 +2215,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
     EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
-    EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
+    EPVector<DataHeatBalance::ZoneReportVars> ZoneRpt;
     EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;
     EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;

@@ -272,7 +272,7 @@ namespace OutputProcessor {
         }
     }
 
-    void CheckReportVariable(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VarName)
+    void CheckReportVariable(EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VarName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -320,7 +320,7 @@ namespace OutputProcessor {
             }
 
             if (!reqRepVar.Key.empty() && !(reqRepVar.is_simple_string && UtilityRoutines::SameString(reqRepVar.Key, KeyedValue)) &&
-                !(!reqRepVar.is_simple_string && RE2::FullMatch(KeyedValue, *(reqRepVar.case_insensitive_pattern)))) {
+                !(!reqRepVar.is_simple_string && RE2::FullMatch(std::string{KeyedValue}, *(reqRepVar.case_insensitive_pattern)))) {
                 continue;
             }
 
@@ -3837,8 +3837,8 @@ namespace OutputProcessor {
                                            [[maybe_unused]] int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &reportIDChr,           // The reporting ID for the data
-                                           std::string const &keyedValue,            // The key name for the data
-                                           std::string const &variableName,          // The variable's actual name
+                                           std::string_view const keyedValue,        // The key name for the data
+                                           std::string_view const variableName,      // The variable's actual name
                                            TimeStepType const timeStepType,
                                            OutputProcessor::Unit const unitsForVar, // The variables units
                                            Optional_string_const customUnitName,
@@ -5060,12 +5060,12 @@ namespace OutputProcessor {
 // *****************************************************************************
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,                        // String Name of variable (with units)
+                         std::string_view const VariableName,                    // String Name of variable (with units)
                          OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                                 // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                          // Associated Key for this variable
+                         std::string_view const KeyedValue,                      // Associated Key for this variable
                          Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this frequency
                          Optional_string_const ResourceTypeKey,                  // Meter Resource Type (Electricity, Gas, etc)
                          Optional_string_const EndUseKey,                        // Meter End Use Key (Lights, Heating, Cooling, etc)
@@ -5115,7 +5115,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     if (!op->OutputInitialized) InitializeOutput(state);
 
     // Variable name without units
-    const std::string &VarName = VariableName;
+    const std::string_view VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(state, KeyedValue, VarName);
@@ -5212,7 +5212,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisRvar = op->RVariableTypes(CV);
         thisRvar.timeStepType = TimeStepType;
         thisRvar.storeType = VariableType;
-        thisRvar.VarName = KeyedValue + ':' + VarName;
+        thisRvar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisRvar.VarNameOnly = VarName;
         thisRvar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisRvar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisRvar.VarName);
@@ -5253,14 +5253,14 @@ void SetupOutputVariable(EnergyPlusData &state,
             if (OnMeter) {
                 if (VariableType == StoreType::Averaged) {
                     ShowSevereError(state, "Meters can only be \"Summed\" variables");
-                    ShowContinueError(state, "..reference variable=" + KeyedValue + ':' + VariableName);
+                    ShowContinueError(state, fmt::format("..reference variable={}:{}", KeyedValue, VariableName));
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
                     bool ErrorsFound = false;
                     AttachMeters(
                         state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, zoneName, spaceType, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
-                        ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
+                        ShowContinueError(state, fmt::format("Invalid Meter spec for variable={}:{}", KeyedValue, VariableName));
                         op->ErrorsLogged = true;
                     }
                 }
@@ -5319,12 +5319,12 @@ void SetupOutputVariable(EnergyPlusData &state,
 }
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,                        // String Name of variable
+                         std::string_view const VariableName,                    // String Name of variable
                          OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
                          int &ActualVariable,                                    // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                          // Associated Key for this variable
+                         std::string_view const KeyedValue,                      // Associated Key for this variable
                          Optional_string_const ReportFreq,                       // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey                        // Group identifier for SQL output
 )
@@ -5358,7 +5358,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     if (!op->OutputInitialized) InitializeOutput(state);
 
     // Variable name without units
-    const std::string &VarName = VariableName;
+    const std::string_view VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(state, KeyedValue, VarName);
@@ -5402,7 +5402,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisIVar = op->IVariableTypes(CV);
         thisIVar.timeStepType = TimeStepType;
         thisIVar.storeType = VariableType;
-        thisIVar.VarName = KeyedValue + ':' + VarName;
+        thisIVar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisIVar.VarNameOnly = VarName;
         thisIVar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
@@ -8374,7 +8374,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 }
 
 void AddToOutputVariableList(EnergyPlusData &state,
-                             std::string const &VarName, // Variable Name
+                             std::string_view const VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
                              OutputProcessor::StoreType const StateType,
                              OutputProcessor::VariableType const VariableType,
