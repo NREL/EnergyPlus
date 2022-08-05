@@ -390,6 +390,8 @@ namespace DataZoneEquipment {
         Array1D<DataZoneEquipment::ZoneEquip> EquipTypeEnum;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
+        // SystemAvailManagers need to know the index of specific equipment (e.g., PTAC as 1,2,3)
+        // if UnitarySystem models PTAC, PTHP, UnitarySystems, then the index to a specific UnitarySystem is not the index to the PTAC
         std::vector<HVACSystemData *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
