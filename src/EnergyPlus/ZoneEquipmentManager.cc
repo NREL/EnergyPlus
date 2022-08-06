@@ -1589,7 +1589,6 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
 
-            auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             auto &zoneSizing = state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
             auto &calcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
             auto &zoneThermostatHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(CtrlZoneNum);
@@ -4497,10 +4496,7 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
 
             Real64 ZoneMixingAirMassFlowRate = 0.0;
             Real64 ZoneMixingNetAirMassFlowRate = 0.0;
-            Real64 ZoneMixMassFlowRate = 0.0;
             Real64 ZoneReturnAirMassFlowRate = 0.0;
-            Real64 ZoneInfiltrationMassFlowRate = 0.0;
-            Real64 ZoneMixingAirMassFlowRatePrevious = 0.0;
 
             for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumInletNodes; ++NodeNum) {
                 {
@@ -5302,7 +5298,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     state.dataHeatBalFanSys->MCPThermChim = 0.0;
     state.dataHeatBalFanSys->ThermChimAMFL = 0.0;
     state.dataHeatBalFanSys->MCPTThermChim = 0.0;
-    Real64 MassFlowRate = 0.0;
 
     if (!state.dataHeatBal->AirFlowFlag) return;
     // AirflowNetwork Multizone field /= SIMPLE
