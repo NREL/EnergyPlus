@@ -1051,8 +1051,8 @@
     InternalMass_LivingZone, !- Name
     FURNITURE,               !- Construction Name
     LIVING ZONE,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -1407,12 +1407,12 @@
 
   People,
     LIVING ZONE People,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Occupancy Sch,           !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.0,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1429,7 +1429,7 @@
 
   Lights,
     LIVING ZONE Lights,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Lighting Sch,            !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     656.3,                   !- Lighting Level {W}
@@ -1443,7 +1443,7 @@
 
   ElectricEquipment,
     Res Refrigerator,        !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Refrigerator Sch,        !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     91.09,                   !- Design Level {W}
@@ -1456,7 +1456,7 @@
 
   ElectricEquipment,
     Res Clothes Washer,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Clothes Washer Sch,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     24.74,                   !- Design Level {W}
@@ -1469,7 +1469,7 @@
 
   ElectricEquipment,
     Res Clothes Dryer Electric,  !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Clothes Dryer Sch,       !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     185.76,                  !- Design Level {W}
@@ -1482,7 +1482,7 @@
 
   ElectricEquipment,
     Res Dish Washers,        !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Dish Washer Sch,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     62.57,                   !- Design Level {W}
@@ -1495,7 +1495,7 @@
 
   ElectricEquipment,
     Res Range Electric,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Range Sch,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     248.1,                   !- Design Level {W}
@@ -1508,7 +1508,7 @@
 
   ElectricEquipment,
     Res Other appliances & Plug Loads,  !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     Other Plug Loads Sch,    !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     567.31,                  !- Design Level {W}
@@ -1624,7 +1624,11 @@
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
-    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    1.0,                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    ,                        !- Height Dependence of External Node Temperature
+    ,                        !- Solver
+    ,                        !- Allow Unsupported Zone Equipment
+    ;                        !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     LIVING ZONE,             !- Zone Name
