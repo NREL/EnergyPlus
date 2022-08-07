@@ -5223,36 +5223,36 @@ namespace HeatBalanceManager {
                                   state.dataIPShortCut->cAlphaFieldNames(1) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(1) +
                                       "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
                 ErrorsFound = true;
-            } else {
-                if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window &&
-                    state.dataSurface->Surface(SurfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
-                    int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                    int MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-                    bool withNoncompatibleShades =
-                        (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Shade ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Screen ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
-                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer ||
-                         state.dataSurface->Surface(SurfNum).HasShadeControl);
-                    if (withNoncompatibleShades) {
-                        ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
-                        ErrorsFound = true;
-                    } else {
-                        state.dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
-                        state.dataSurface->SurfIncSolMultiplier(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                        state.dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
-                        state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = state.dataIPShortCut->rNumericArgs(1);
-                        state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-                    }
-                } else { // not defined for exterior window
-                    ShowSevereError(state, "IncidentSolarMultiplier should be defined for exterior windows");
+                continue;
+            }
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window &&
+                state.dataSurface->Surface(SurfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
+                int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                int MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
+                bool withNoncompatibleShades =
+                    (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Shade ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Screen ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
+                     state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer ||
+                     state.dataSurface->Surface(SurfNum).HasShadeControl);
+                if (withNoncompatibleShades) {
+                    ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                     ErrorsFound = true;
+                } else {
+                    state.dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
+                    state.dataSurface->SurfIncSolMultiplier(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                    state.dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
+                    state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = state.dataIPShortCut->rNumericArgs(1);
+                    state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 }
+            } else { // not defined for exterior window
+                ShowSevereError(state, "IncidentSolarMultiplier should be defined for exterior windows");
+                ErrorsFound = true;
             }
         }
     }
