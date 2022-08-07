@@ -1288,14 +1288,9 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;
-        int SurfaceIdx; // surface index
-        Real64 Scaler;
-        int SchedPtr; // schedule pointer
-
-        // Default Constructor
-        SurfaceIncidentSolarMultiplier() : SurfaceIdx(0), Scaler(1.0), SchedPtr(0)
-        {
-        }
+        int SurfaceIdx = 0; // surface index
+        Real64 Scaler = 1.0;
+        int SchedPtr = 0; // schedule pointer
     };
 
     struct FenestrationSolarAbsorbed
