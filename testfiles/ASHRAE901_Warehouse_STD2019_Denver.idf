@@ -48,8 +48,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    15,                       !- Minimum System Timestep {minutes}
-    5;                      !- Maximum HVAC Iterations
+    15,                      !- Minimum System Timestep {minutes}
+    5;                       !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -124,7 +124,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -135,34 +135,34 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 2,              !- Name
-    4,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    4,                        !- End Month
-    30,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 2,             !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    4,                       !- End Month
+    30,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 3,              !- Name
-    7,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    7,                        !- End Month
-    31,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 3,             !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -2692,7 +2692,6 @@
     0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,4.26699190227003;  !- X,Y,Z ==> Vertex 4 {m}
 
-
   BuildingSurface:Detailed,
     Fine Storage Front Wall, !- Name
     Wall,                    !- Surface Type
@@ -2744,7 +2743,6 @@
     45.7177703814647,30.4785135876431,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,30.4785135876431,0;  !- X,Y,Z ==> Vertex 4 {m}
 
-
   BuildingSurface:Detailed,
     Fine Storage Left Wall,  !- Name
     Wall,                    !- Surface Type
@@ -2761,7 +2759,6 @@
     0,30.4785135876431,0,  !- X,Y,Z ==> Vertex 2 {m}
     0,9.14355407629293,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,9.14355407629293,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
-
 
   BuildingSurface:Detailed,
     Bulk Storage Right Wall, !- Name
@@ -4302,7 +4299,13 @@
     1,                       !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
     ,                        !- Divider Solar Absorptance
     ,                        !- Divider Visible Absorptance
-    0.9;                     !- Divider Thermal Hemispherical Emissivity
+    0.9,                     !- Divider Thermal Hemispherical Emissivity
+    ,                        !- Outside Reveal Solar Absorptance
+    ,                        !- Inside Sill Depth {m}
+    ,                        !- Inside Sill Solar Absorptance
+    ,                        !- Inside Reveal Depth {m}
+    ,                        !- Inside Reveal Solar Absorptance
+    ;                        !- NFRC Product Type for Assembly Calculations
 
   WindowProperty:FrameAndDivider,
     Skylight_Frame_Semiheated,  !- Name
@@ -4324,7 +4327,13 @@
     1,                       !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
     ,                        !- Divider Solar Absorptance
     ,                        !- Divider Visible Absorptance
-    0.9;                     !- Divider Thermal Hemispherical Emissivity
+    0.9,                     !- Divider Thermal Hemispherical Emissivity
+    ,                        !- Outside Reveal Solar Absorptance
+    ,                        !- Inside Sill Depth {m}
+    ,                        !- Inside Sill Solar Absorptance
+    ,                        !- Inside Reveal Depth {m}
+    ,                        !- Inside Reveal Solar Absorptance
+    ;                        !- NFRC Product Type for Assembly Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: INTERNALMASS ===========
 
@@ -4339,12 +4348,12 @@
 
   People,
     Office People,           !- Name
-    Zone1 Office,            !- Zone or ZoneList Name
+    Zone1 Office,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Office Activity Schedule,!- Activity Level Schedule Name
@@ -4356,7 +4365,7 @@
 
   Lights,
     Office Lights,           !- Name
-    Zone1 Office,            !- Zone or ZoneList Name
+    Zone1 Office,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4371,7 +4380,7 @@
 
   Lights,
     Fine Storage Area Lights,!- Name
-    Zone2 Fine Storage,      !- Zone or ZoneList Name
+    Zone2 Fine Storage,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4386,7 +4395,7 @@
 
   Lights,
     Bulk Storage Area Lights,!- Name
-    Zone3 Bulk Storage,      !- Zone or ZoneList Name
+    Zone3 Bulk Storage,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4403,7 +4412,7 @@
 
   ElectricEquipment,
     Office Plug Load,        !- Name
-    Zone1 Office,            !- Zone or ZoneList Name
+    Zone1 Office,            !- Zone or ZoneList or Space or SpaceList Name
     Office_Plug_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1912.5,                  !- Design Level {W}
@@ -4416,7 +4425,7 @@
 
   ElectricEquipment,
     Bulk Storage  Plug Load, !- Name
-    Zone3 Bulk Storage,      !- Zone or ZoneList Name
+    Zone3 Bulk Storage,      !- Zone or ZoneList or Space or SpaceList Name
     Bulk Storage Plug Schedule,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     8200.12,                 !- Design Level {W}
@@ -4431,7 +4440,7 @@
 
   Daylighting:Controls,
     Zone2 Fine Storage_DaylCtrl,  !- Name
-    Zone2 Fine Storage,      !- Zone Name
+    Zone2 Fine Storage,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -4444,15 +4453,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Zone2 Fine Storage_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.25,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.25,                    !- Fraction of Lights Controlled by Reference Point 1
     323.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Zone2 Fine Storage_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.25,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.25,                    !- Fraction of Lights Controlled by Reference Point 2
     323.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Zone3 Bulk Storage_DaylCtrl,  !- Name
-    Zone3 Bulk Storage,      !- Zone Name
+    Zone3 Bulk Storage,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -4465,15 +4474,15 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Zone3 Bulk Storage_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.25,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.25,                    !- Fraction of Lights Controlled by Reference Point 1
     215,                     !- Illuminance Setpoint at Reference Point 1 {lux}
     Zone3 Bulk Storage_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.25,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.25,                    !- Fraction of Lights Controlled by Reference Point 2
     215;                     !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Zone1 Office_DaylCtrl,   !- Name
-    Zone1 Office,            !- Zone Name
+    Zone1 Office,            !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -4486,52 +4495,52 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Zone1 Office_DaylRefPt1, !- Daylighting Reference Point 1 Name
-    0.29,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.29,                    !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Zone1 Office_DaylRefPt2, !- Daylighting Reference Point 2 Name
-    0.1,                     !- Fraction of Zone Controlled by Reference Point 2
+    0.1,                     !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
 !-   ===========  ALL OBJECTS IN CLASS: DAYLIGHTING:REFERENCEPOINT ===========
 
   Daylighting:ReferencePoint,
     Zone2 Fine Storage_DaylRefPt1,  !- Name
-    Zone2 Fine Storage,      !- Zone Name
+    Zone2 Fine Storage,      !- Zone or Space Name
     27.889200,               !- X-Coordinate of Reference Point {m}
     24.993600,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Zone2 Fine Storage_DaylRefPt2,  !- Name
-    Zone2 Fine Storage,      !- Zone Name
+    Zone2 Fine Storage,      !- Zone or Space Name
     3.810000,                !- X-Coordinate of Reference Point {m}
     24.993600,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Zone3 Bulk Storage_DaylRefPt1,  !- Name
-    Zone3 Bulk Storage,      !- Zone Name
+    Zone3 Bulk Storage,      !- Zone or Space Name
     22.9,                    !- X-Coordinate of Reference Point {m}
     48,                      !- Y-Coordinate of Reference Point {m}
     0;                       !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Zone3 Bulk Storage_DaylRefPt2,  !- Name
-    Zone3 Bulk Storage,      !- Zone Name
+    Zone3 Bulk Storage,      !- Zone or Space Name
     22.9,                    !- X-Coordinate of Reference Point {m}
     34.7,                    !- Y-Coordinate of Reference Point {m}
     0;                       !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Zone1 Office_DaylRefPt1, !- Name
-    Zone1 Office,            !- Zone Name
+    Zone1 Office,            !- Zone or Space Name
     3.267500,                !- X-Coordinate of Reference Point {m}
     4.571800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Zone1 Office_DaylRefPt2, !- Name
-    Zone1 Office,            !- Zone Name
+    Zone1 Office,            !- Zone or Space Name
     20.421600,               !- X-Coordinate of Reference Point {m}
     4.571800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
@@ -4540,7 +4549,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office Infiltration,     !- Name
-    Zone1 Office,            !- Zone or ZoneList Name
+    Zone1 Office,            !- Zone or ZoneList or Space or SpaceList Name
     Office Infil Schedule,   !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4554,7 +4563,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office Door Infiltration,!- Name
-    Zone1 Office,            !- Zone or ZoneList Name
+    Zone1 Office,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.176508178,             !- Design Flow Rate {m3/s}
@@ -4568,7 +4577,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Fine Storage Infiltration,  !- Name
-    Zone2 Fine Storage,      !- Zone or ZoneList Name
+    Zone2 Fine Storage,      !- Zone or ZoneList or Space or SpaceList Name
     Fine Sorage Infil Schedule,  !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4582,7 +4591,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Bulk Storage Infiltration,  !- Name
-    Zone3 Bulk Storage,      !- Zone or ZoneList Name
+    Zone3 Bulk Storage,      !- Zone or ZoneList or Space or SpaceList Name
     Bulk Storage Infil_Base Schedule,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     2.330231241,             !- Design Flow Rate {m3/s}
@@ -4598,7 +4607,7 @@
 
   ZoneVentilation:DesignFlowRate,
     Bulk Storage Ventilation-1,  !- Name
-    Zone3 Bulk Storage,      !- Zone or ZoneList Name
+    Zone3 Bulk Storage,      !- Zone or ZoneList or Space or SpaceList Name
     Always On Schedule,      !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     37.7600047937506,        !- Design Flow Rate {m3/s}
@@ -4626,7 +4635,7 @@
 
   ZoneVentilation:DesignFlowRate,
     Bulk Storage Ventilation-2,  !- Name
-    Zone3 Bulk Storage,      !- Zone or ZoneList Name
+    Zone3 Bulk Storage,      !- Zone or ZoneList or Space or SpaceList Name
     Always On Schedule,      !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.943841435,             !- Design Flow Rate {m3/s}
@@ -6084,3 +6093,4 @@
   Output:Meter:MeterFileOnly,ElectricityNet:Facility,Hourly;
 
   Output:Meter:MeterFileOnly,NaturalGas:Facility,Hourly;
+

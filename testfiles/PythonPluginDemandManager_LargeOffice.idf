@@ -1477,17 +1477,17 @@
     Basement_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Basement,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    7126.2120;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    7126.2120;               !- Surface Area {m2}
 
   People,
     Basement,                !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     95.8476,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -1519,7 +1519,7 @@
 
   Lights,
     Basement_Lights,         !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     38339.0208,              !- Lighting Level {W}
@@ -1549,7 +1549,7 @@
 
   ElectricEquipment,
     Basement_PlugMisc_Equip, !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     17245.4332,              !- Design Level {W}
@@ -1811,17 +1811,17 @@
     Core_bottom_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_bottom,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    5064.6464;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    5064.6464;               !- Surface Area {m2}
 
   People,
     Core_bottom,             !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     136.2390,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -1853,7 +1853,7 @@
 
   Lights,
     Core_bottom_Lights,      !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     27247.7976,              !- Lighting Level {W}
@@ -1883,7 +1883,7 @@
 
   ElectricEquipment,
     Core_bottom_PlugMisc_Equip,  !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     20435.8482,              !- Design Level {W}
@@ -2200,17 +2200,17 @@
     Core_mid_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_mid,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    5064.6464;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    5064.6464;               !- Surface Area {m2}
 
   People,
     Core_mid,                !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     136.2390,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2242,7 +2242,7 @@
 
   Lights,
     Core_mid_Lights,         !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     27247.7976,              !- Lighting Level {W}
@@ -2272,7 +2272,7 @@
 
   ElectricEquipment,
     Core_mid_PlugMisc_Equip, !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     20435.8482,              !- Design Level {W}
@@ -2589,12 +2589,12 @@
     Core_top_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_top,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    5064.6464;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    5064.6464;               !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Core_top_Infiltration,   !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.7721,                  !- Design Flow Rate {m3/s}
@@ -2623,12 +2623,12 @@
 
   People,
     Core_top,                !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     136.2390,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2660,7 +2660,7 @@
 
   Lights,
     Core_top_Lights,         !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     27247.7976,              !- Lighting Level {W}
@@ -2690,7 +2690,7 @@
 
   ElectricEquipment,
     Core_top_Elevators_Equip,!- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_ELEVATORS,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     240740.2597,             !- Design Level {W}
@@ -3022,12 +3022,12 @@
     Perimeter_bot_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8257;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8257;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_3_Infiltration,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0597,                  !- Design Flow Rate {m3/s}
@@ -3056,12 +3056,12 @@
 
   People,
     Perimeter_bot_ZN_3,      !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     16.8616,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3093,7 +3093,7 @@
 
   Lights,
     Perimeter_bot_ZN_3_Lights,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3372.3221,               !- Lighting Level {W}
@@ -3123,7 +3123,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_3_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2416,               !- Design Level {W}
@@ -3400,12 +3400,12 @@
     Perimeter_bot_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_2_Infiltration,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0400,                  !- Design Flow Rate {m3/s}
@@ -3434,12 +3434,12 @@
 
   People,
     Perimeter_bot_ZN_2,      !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     10.8663,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3471,7 +3471,7 @@
 
   Lights,
     Perimeter_bot_ZN_2_Lights,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2173.2526,               !- Lighting Level {W}
@@ -3501,7 +3501,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_2_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9395,               !- Design Level {W}
@@ -3778,12 +3778,12 @@
     Perimeter_bot_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8394;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8394;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_1_Infiltration,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0597,                  !- Design Flow Rate {m3/s}
@@ -3812,12 +3812,12 @@
 
   People,
     Perimeter_bot_ZN_1,      !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     16.8620,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3849,7 +3849,7 @@
 
   Lights,
     Perimeter_bot_ZN_1_Lights,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3372.3959,               !- Lighting Level {W}
@@ -3879,7 +3879,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_1_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2969,               !- Design Level {W}
@@ -4156,12 +4156,12 @@
     Perimeter_bot_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_4_Infiltration,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0400,                  !- Design Flow Rate {m3/s}
@@ -4190,12 +4190,12 @@
 
   People,
     Perimeter_bot_ZN_4,      !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     10.8663,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4227,7 +4227,7 @@
 
   Lights,
     Perimeter_bot_ZN_4_Lights,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2173.2526,               !- Lighting Level {W}
@@ -4257,7 +4257,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_4_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9395,               !- Design Level {W}
@@ -4534,12 +4534,12 @@
     Perimeter_mid_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8257;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8257;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_3_Infiltration,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0597,                  !- Design Flow Rate {m3/s}
@@ -4568,12 +4568,12 @@
 
   People,
     Perimeter_mid_ZN_3,      !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     16.8616,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4605,7 +4605,7 @@
 
   Lights,
     Perimeter_mid_ZN_3_Lights,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3372.3221,               !- Lighting Level {W}
@@ -4635,7 +4635,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_3_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2416,               !- Design Level {W}
@@ -4912,12 +4912,12 @@
     Perimeter_mid_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_2_Infiltration,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0400,                  !- Design Flow Rate {m3/s}
@@ -4946,12 +4946,12 @@
 
   People,
     Perimeter_mid_ZN_2,      !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     10.8663,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4983,7 +4983,7 @@
 
   Lights,
     Perimeter_mid_ZN_2_Lights,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2173.2526,               !- Lighting Level {W}
@@ -5013,7 +5013,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_2_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9395,               !- Design Level {W}
@@ -5290,12 +5290,12 @@
     Perimeter_mid_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8394;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8394;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_1_Infiltration,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0597,                  !- Design Flow Rate {m3/s}
@@ -5324,12 +5324,12 @@
 
   People,
     Perimeter_mid_ZN_1,      !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     16.8620,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5361,7 +5361,7 @@
 
   Lights,
     Perimeter_mid_ZN_1_Lights,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3372.3959,               !- Lighting Level {W}
@@ -5391,7 +5391,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_1_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2969,               !- Design Level {W}
@@ -5668,12 +5668,12 @@
     Perimeter_mid_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_4_Infiltration,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0400,                  !- Design Flow Rate {m3/s}
@@ -5702,12 +5702,12 @@
 
   People,
     Perimeter_mid_ZN_4,      !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     10.8663,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5739,7 +5739,7 @@
 
   Lights,
     Perimeter_mid_ZN_4_Lights,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2173.2526,               !- Lighting Level {W}
@@ -5769,7 +5769,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_4_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9395,               !- Design Level {W}
@@ -6046,12 +6046,12 @@
     Perimeter_top_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_3,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8257;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8257;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_3_Infiltration,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.1553,                  !- Design Flow Rate {m3/s}
@@ -6080,12 +6080,12 @@
 
   People,
     Perimeter_top_ZN_3,      !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     16.8616,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6117,7 +6117,7 @@
 
   Lights,
     Perimeter_top_ZN_3_Lights,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3372.3221,               !- Lighting Level {W}
@@ -6147,7 +6147,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_3_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2416,               !- Design Level {W}
@@ -6424,12 +6424,12 @@
     Perimeter_top_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_2,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_2_Infiltration,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.1016,                  !- Design Flow Rate {m3/s}
@@ -6458,12 +6458,12 @@
 
   People,
     Perimeter_top_ZN_2,      !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     10.8663,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6495,7 +6495,7 @@
 
   Lights,
     Perimeter_top_ZN_2_Lights,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2173.2526,               !- Lighting Level {W}
@@ -6525,7 +6525,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_2_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9395,               !- Design Level {W}
@@ -6802,12 +6802,12 @@
     Perimeter_top_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8394;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8394;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_1_Infiltration,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.1553,                  !- Design Flow Rate {m3/s}
@@ -6836,12 +6836,12 @@
 
   People,
     Perimeter_top_ZN_1,      !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     16.8620,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6873,7 +6873,7 @@
 
   Lights,
     Perimeter_top_ZN_1_Lights,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3372.3959,               !- Lighting Level {W}
@@ -6903,7 +6903,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_1_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2969,               !- Design Level {W}
@@ -7180,12 +7180,12 @@
     Perimeter_top_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_4,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_4_Infiltration,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.1016,                  !- Design Flow Rate {m3/s}
@@ -7214,12 +7214,12 @@
 
   People,
     Perimeter_top_ZN_4,      !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     10.8663,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -7251,7 +7251,7 @@
 
   Lights,
     Perimeter_top_ZN_4_Lights,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2173.2526,               !- Lighting Level {W}
@@ -7281,7 +7281,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_4_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9395,               !- Design Level {W}
@@ -7609,7 +7609,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GroundFloor_Plenum_Infiltration,  !- Name
-    GroundFloor_Plenum,      !- Zone or ZoneList Name
+    GroundFloor_Plenum,      !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0845,                  !- Design Flow Rate {m3/s}
@@ -7823,7 +7823,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     MidFloor_Plenum_Infiltration,  !- Name
-    MidFloor_Plenum,         !- Zone or ZoneList Name
+    MidFloor_Plenum,         !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0845,                  !- Design Flow Rate {m3/s}
@@ -8037,7 +8037,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     TopFloor_Plenum_Infiltration,  !- Name
-    TopFloor_Plenum,         !- Zone or ZoneList Name
+    TopFloor_Plenum,         !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     1.1705,                  !- Design Flow Rate {m3/s}

@@ -972,7 +972,7 @@
 
   Lights,
     ZONA Lights 1,           !- Name
-    ZONA,                    !- Zone or ZoneList Name
+    ZONA,                    !- Zone or ZoneList or Space or SpaceList Name
     ON,                      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     300,                     !- Lighting Level {W}
@@ -985,7 +985,7 @@
 
   ElectricEquipment,
     ZONA ElecEq 1,           !- Name
-    ZONA,                    !- Zone or ZoneList Name
+    ZONA,                    !- Zone or ZoneList or Space or SpaceList Name
     ON,                      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     100,                     !- Design Level {W}
@@ -1007,7 +1007,11 @@
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     90.0,                    !- Azimuth Angle of Long Axis of Building {deg}
-    0.833;                   !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    0.833,                   !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    ,                        !- Height Dependence of External Node Temperature
+    ,                        !- Solver
+    ,                        !- Allow Unsupported Zone Equipment
+    ;                        !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     ZONA,                    !- Zone Name

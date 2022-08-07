@@ -35,7 +35,7 @@
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
     30,                      !- Shading Calculation Update Frequency
-    200;                   !- Maximum Figures in Shadow Overlap Calculations
+    200;                     !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -56,8 +56,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    15,                       !- Minimum System Timestep {minutes}
-    5;                        !- Maximum HVAC Iterations
+    15,                      !- Minimum System Timestep {minutes}
+    5;                       !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -132,7 +132,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -143,34 +143,34 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 2,              !- Name
-    4,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    4,                        !- End Month
-    30,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 2,             !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    4,                       !- End Month
+    30,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 3,              !- Name
-    7,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    7,                        !- End Month
-    31,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 3,             !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -3124,7 +3124,13 @@
     1,                       !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
     ,                        !- Divider Solar Absorptance
     ,                        !- Divider Visible Absorptance
-    0.9;                     !- Divider Thermal Hemispherical Emissivity
+    0.9,                     !- Divider Thermal Hemispherical Emissivity
+    ,                        !- Outside Reveal Solar Absorptance
+    ,                        !- Inside Sill Depth {m}
+    ,                        !- Inside Sill Solar Absorptance
+    ,                        !- Inside Reveal Depth {m}
+    ,                        !- Inside Reveal Solar Absorptance
+    ;                        !- NFRC Product Type for Assembly Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: INTERNALMASS ===========
 
@@ -3167,12 +3173,12 @@
 
   People,
     Back_Space,              !- Name
-    Back_Space,              !- Zone or ZoneList Name
+    Back_Space,              !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    6.193,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    6.193,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3189,12 +3195,12 @@
 
   People,
     Core_Retail,             !- Name
-    Core_Retail,             !- Zone or ZoneList Name
+    Core_Retail,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    6.193,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    6.193,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3211,12 +3217,12 @@
 
   People,
     Point_Of_Sale,           !- Name
-    Point_Of_Sale,           !- Zone or ZoneList Name
+    Point_Of_Sale,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    6.193,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    6.193,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3233,12 +3239,12 @@
 
   People,
     Front_Retail,            !- Name
-    Front_Retail,            !- Zone or ZoneList Name
+    Front_Retail,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    6.193,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    6.193,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3255,12 +3261,12 @@
 
   People,
     Front_Entry,             !- Name
-    Front_Entry,             !- Zone or ZoneList Name
+    Front_Entry,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     0,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3279,7 +3285,7 @@
 
   Lights,
     Back_Space_Lights,       !- Name
-    Back_Space,              !- Zone or ZoneList Name
+    Back_Space,              !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_BACK_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3294,7 +3300,7 @@
 
   Lights,
     Core_Retail_Lights,      !- Name
-    Core_Retail,             !- Zone or ZoneList Name
+    Core_Retail,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_Core_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3309,7 +3315,7 @@
 
   Lights,
     Point_Of_Sale_Lights,    !- Name
-    Point_Of_Sale,           !- Zone or ZoneList Name
+    Point_Of_Sale,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3324,7 +3330,7 @@
 
   Lights,
     Front_Retail_Lights,     !- Name
-    Front_Retail,            !- Zone or ZoneList Name
+    Front_Retail,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_FRONT_SCH,    !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3339,7 +3345,7 @@
 
   Lights,
     Front_Entry_Lights,      !- Name
-    Front_Entry,             !- Zone or ZoneList Name
+    Front_Entry,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_ENTRY_SCH,    !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3356,7 +3362,7 @@
 
   ElectricEquipment,
     Back_Space_MiscPlug_Equip,  !- Name
-    Back_Space,              !- Zone or ZoneList Name
+    Back_Space,              !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3065.7123,               !- Design Level {W}
@@ -3369,7 +3375,7 @@
 
   ElectricEquipment,
     Core_Retail_MiscPlug_Equip,  !- Name
-    Core_Retail,             !- Zone or ZoneList Name
+    Core_Retail,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5169.5598,               !- Design Level {W}
@@ -3382,7 +3388,7 @@
 
   ElectricEquipment,
     Point_Of_Sale_MiscPlug_Equip,  !- Name
-    Point_Of_Sale,           !- Zone or ZoneList Name
+    Point_Of_Sale,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3245.4312,               !- Design Level {W}
@@ -3395,7 +3401,7 @@
 
   ElectricEquipment,
     Front_Retail_MiscPlug_Equip,  !- Name
-    Front_Retail,            !- Zone or ZoneList Name
+    Front_Retail,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     487.1163,                !- Design Level {W}
@@ -3410,7 +3416,7 @@
 
   Daylighting:Controls,
     Core_Retail_DaylCtrl,    !- Name
-    Core_Retail,             !- Zone Name
+    Core_Retail,             !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -3423,24 +3429,24 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Core_Retail_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.25,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.25,                    !- Fraction of Lights Controlled by Reference Point 1
     538,                     !- Illuminance Setpoint at Reference Point 1 {lux}
     Core_Retail_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.25,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.25,                    !- Fraction of Lights Controlled by Reference Point 2
     538;                     !- Illuminance Setpoint at Reference Point 2 {lux}
 
 !-   ===========  ALL OBJECTS IN CLASS: DAYLIGHTING:REFERENCEPOINT ===========
 
   Daylighting:ReferencePoint,
     Core_Retail_DaylRefPt1,  !- Name
-    Core_Retail,             !- Zone Name
+    Core_Retail,             !- Zone or Space Name
     14.2,                    !- X-Coordinate of Reference Point {m}
     14.2,                    !- Y-Coordinate of Reference Point {m}
     0;                       !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Core_Retail_DaylRefPt2,  !- Name
-    Core_Retail,             !- Zone Name
+    Core_Retail,             !- Zone or Space Name
     3.4,                     !- X-Coordinate of Reference Point {m}
     14.2,                    !- Y-Coordinate of Reference Point {m}
     0;                       !- Z-Coordinate of Reference Point {m}
@@ -3449,7 +3455,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Back_Space_Infiltration, !- Name
-    Back_Space,              !- Zone or ZoneList Name
+    Back_Space,              !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3463,7 +3469,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Core_Retail_Infiltration,!- Name
-    Core_Retail,             !- Zone or ZoneList Name
+    Core_Retail,             !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3477,7 +3483,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Point_Of_Sale_Infiltration,  !- Name
-    Point_Of_Sale,           !- Zone or ZoneList Name
+    Point_Of_Sale,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3491,7 +3497,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Front_Retail_Infiltration,  !- Name
-    Front_Retail,            !- Zone or ZoneList Name
+    Front_Retail,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3505,7 +3511,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Front_Entry_Infiltration,!- Name
-    Front_Entry,             !- Zone or ZoneList Name
+    Front_Entry,             !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3519,7 +3525,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Front_Entry_Door_Infiltration,  !- Name
-    Front_Entry,             !- Zone or ZoneList Name
+    Front_Entry,             !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.937286742,             !- Design Flow Rate {m3/s}
@@ -5895,3 +5901,4 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,hourly;
 
   Output:Meter:MeterFileOnly,NaturalGas:Facility,hourly;
+
