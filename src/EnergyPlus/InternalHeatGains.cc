@@ -277,17 +277,14 @@ namespace InternalHeatGains {
         auto &AlphaName = state.dataIPShortCut->cAlphaArgs;
 
         // PEOPLE: Includes both information related to the heat balance and thermal comfort
-        setupIHGZonesAndSpaces(state,
-                               peopleModuleObject,
-                               state.dataHeatBal->PeopleObjects,
-                               state.dataHeatBal->NumPeopleStatements,
-                               state.dataHeatBal->TotPeople,
-                               ErrorsFound);
+        EPVector<InternalHeatGains::GlobalInternalGainMiscObject> peopleObjects;
+        int numPeopleStatements = 0;
+        setupIHGZonesAndSpaces(state, peopleModuleObject, peopleObjects, numPeopleStatements, state.dataHeatBal->TotPeople, ErrorsFound);
 
         if (state.dataHeatBal->TotPeople > 0) {
             state.dataHeatBal->People.allocate(state.dataHeatBal->TotPeople);
             int peopleNum = 0;
-            for (int peopleInputNum = 1; peopleInputNum <= state.dataHeatBal->NumPeopleStatements; ++peopleInputNum) {
+            for (int peopleInputNum = 1; peopleInputNum <= numPeopleStatements; ++peopleInputNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          peopleModuleObject,
                                                                          peopleInputNum,
@@ -302,7 +299,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 // Create one People instance for every space associated with this People input object
-                auto &thisPeopleInput = state.dataHeatBal->PeopleObjects(peopleInputNum);
+                auto &thisPeopleInput = peopleObjects(peopleInputNum);
                 for (int Item1 = 1; Item1 <= thisPeopleInput.numOfSpaces; ++Item1) {
                     ++peopleNum;
                     auto &thisPeople = state.dataHeatBal->People(peopleNum);
@@ -1052,18 +1049,17 @@ namespace InternalHeatGains {
             }
         } // TotPeople > 0
 
-        setupIHGZonesAndSpaces(state,
-                               lightsModuleObject,
-                               state.dataHeatBal->LightsObjects,
-                               state.dataHeatBal->NumLightsStatements,
-                               state.dataHeatBal->TotLights,
-                               ErrorsFound);
+        // Lights
+        // Declared in state because the lights inputs are needed for demand manager
+        int numLightsStatements = 0;
+        setupIHGZonesAndSpaces(
+            state, lightsModuleObject, state.dataInternalHeatGains->lightsObjects, numLightsStatements, state.dataHeatBal->TotLights, ErrorsFound);
 
         if (state.dataHeatBal->TotLights > 0) {
             state.dataHeatBal->Lights.allocate(state.dataHeatBal->TotLights);
             bool CheckSharedExhaustFlag = false;
             int lightsNum = 0;
-            for (int lightsInputNum = 1; lightsInputNum <= state.dataHeatBal->NumLightsStatements; ++lightsInputNum) {
+            for (int lightsInputNum = 1; lightsInputNum <= numLightsStatements; ++lightsInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          lightsModuleObject,
@@ -1078,7 +1074,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisLightsInput = state.dataHeatBal->LightsObjects(lightsInputNum);
+                auto &thisLightsInput = state.dataInternalHeatGains->lightsObjects(lightsInputNum);
                 // Create one Lights instance for every space associated with this Lights input object
                 for (int Item1 = 1; Item1 <= thisLightsInput.numOfSpaces; ++Item1) {
                     ++lightsNum;
@@ -1456,17 +1452,20 @@ namespace InternalHeatGains {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", state.dataInternalHeatGains->sumArea);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", state.dataInternalHeatGains->sumPower);
 
+        // ElectricEquipment
+        // Declared in state because the lights inputs are needed for demand manager
+        int numZoneElectricStatements = 0;
         setupIHGZonesAndSpaces(state,
                                elecEqModuleObject,
-                               state.dataHeatBal->ZoneElectricObjects,
-                               state.dataHeatBal->NumZoneElectricStatements,
+                               state.dataInternalHeatGains->zoneElectricObjects,
+                               numZoneElectricStatements,
                                state.dataHeatBal->TotElecEquip,
                                ErrorsFound);
 
         if (state.dataHeatBal->TotElecEquip > 0) {
             state.dataHeatBal->ZoneElectric.allocate(state.dataHeatBal->TotElecEquip);
             int elecEqNum = 0;
-            for (int elecEqInputNum = 1; elecEqInputNum <= state.dataHeatBal->NumZoneElectricStatements; ++elecEqInputNum) {
+            for (int elecEqInputNum = 1; elecEqInputNum <= numZoneElectricStatements; ++elecEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          elecEqModuleObject,
@@ -1481,7 +1480,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisElecEqInput = state.dataHeatBal->ZoneElectricObjects(elecEqInputNum);
+                auto &thisElecEqInput = state.dataInternalHeatGains->zoneElectricObjects(elecEqInputNum);
                 for (int Item1 = 1; Item1 <= thisElecEqInput.numOfSpaces; ++Item1) {
                     ++elecEqNum;
                     auto &thisZoneElectric = state.dataHeatBal->ZoneElectric(elecEqNum);
@@ -1670,17 +1669,15 @@ namespace InternalHeatGains {
             }     // for elecEqInputNum
         }         // TotElecEquip > 0
 
-        setupIHGZonesAndSpaces(state,
-                               gasEqModuleObject,
-                               state.dataHeatBal->ZoneGasObjects,
-                               state.dataHeatBal->NumZoneGasStatements,
-                               state.dataHeatBal->TotGasEquip,
-                               ErrorsFound);
+        // GasEquipment
+        EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneGasObjects;
+        int numZoneGasStatements = 0;
+        setupIHGZonesAndSpaces(state, gasEqModuleObject, zoneGasObjects, numZoneGasStatements, state.dataHeatBal->TotGasEquip, ErrorsFound);
 
         if (state.dataHeatBal->TotGasEquip > 0) {
             state.dataHeatBal->ZoneGas.allocate(state.dataHeatBal->TotGasEquip);
             int gasEqNum = 0;
-            for (int gasEqInputNum = 1; gasEqInputNum <= state.dataHeatBal->NumZoneGasStatements; ++gasEqInputNum) {
+            for (int gasEqInputNum = 1; gasEqInputNum <= numZoneGasStatements; ++gasEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          gasEqModuleObject,
@@ -1695,7 +1692,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisGasEqInput = state.dataHeatBal->ZoneGasObjects(gasEqInputNum);
+                auto &thisGasEqInput = zoneGasObjects(gasEqInputNum);
                 for (int Item1 = 1; Item1 <= thisGasEqInput.numOfSpaces; ++Item1) {
                     ++gasEqNum;
                     auto &thisZoneGas = state.dataHeatBal->ZoneGas(gasEqNum);
@@ -1917,17 +1914,15 @@ namespace InternalHeatGains {
             }     // for gasEqInputNum
         }         // TotGasEquip > 0
 
-        setupIHGZonesAndSpaces(state,
-                               hwEqModuleObject,
-                               state.dataHeatBal->HotWaterEqObjects,
-                               state.dataHeatBal->NumHotWaterEqStatements,
-                               state.dataHeatBal->TotHWEquip,
-                               ErrorsFound);
+        // HotWaterEquipment
+        EPVector<InternalHeatGains::GlobalInternalGainMiscObject> hotWaterEqObjects;
+        int numHotWaterEqStatements = 0;
+        setupIHGZonesAndSpaces(state, hwEqModuleObject, hotWaterEqObjects, numHotWaterEqStatements, state.dataHeatBal->TotHWEquip, ErrorsFound);
 
         if (state.dataHeatBal->TotHWEquip > 0) {
             state.dataHeatBal->ZoneHWEq.allocate(state.dataHeatBal->TotHWEquip);
             int hwEqNum = 0;
-            for (int hwEqInputNum = 1; hwEqInputNum <= state.dataHeatBal->NumHotWaterEqStatements; ++hwEqInputNum) {
+            for (int hwEqInputNum = 1; hwEqInputNum <= numHotWaterEqStatements; ++hwEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          hwEqModuleObject,
@@ -1942,7 +1937,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisHWEqInput = state.dataHeatBal->HotWaterEqObjects(hwEqInputNum);
+                auto &thisHWEqInput = hotWaterEqObjects(hwEqInputNum);
                 for (int Item1 = 1; Item1 <= thisHWEqInput.numOfSpaces; ++Item1) {
                     ++hwEqNum;
                     auto &thisZoneHWEq = state.dataHeatBal->ZoneHWEq(hwEqNum);
@@ -2131,17 +2126,15 @@ namespace InternalHeatGains {
             }     // for hwEqInputNum
         }         // TotHWEquip > 0
 
-        setupIHGZonesAndSpaces(state,
-                               stmEqModuleObject,
-                               state.dataHeatBal->SteamEqObjects,
-                               state.dataHeatBal->NumSteamEqStatements,
-                               state.dataHeatBal->TotStmEquip,
-                               ErrorsFound);
+        // SteamEquipment
+        EPVector<InternalHeatGains::GlobalInternalGainMiscObject> steamEqObjects;
+        int numSteamEqStatements = 0;
+        setupIHGZonesAndSpaces(state, stmEqModuleObject, steamEqObjects, numSteamEqStatements, state.dataHeatBal->TotStmEquip, ErrorsFound);
 
         if (state.dataHeatBal->TotStmEquip > 0) {
             state.dataHeatBal->ZoneSteamEq.allocate(state.dataHeatBal->TotStmEquip);
             int stmEqNum = 0;
-            for (int stmEqInputNum = 1; stmEqInputNum <= state.dataHeatBal->NumSteamEqStatements; ++stmEqInputNum) {
+            for (int stmEqInputNum = 1; stmEqInputNum <= numSteamEqStatements; ++stmEqInputNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          stmEqModuleObject,
                                                                          stmEqInputNum,
@@ -2155,7 +2148,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisStmEqInput = state.dataHeatBal->SteamEqObjects(stmEqInputNum);
+                auto &thisStmEqInput = steamEqObjects(stmEqInputNum);
                 for (int Item1 = 1; Item1 <= thisStmEqInput.numOfSpaces; ++Item1) {
                     ++stmEqNum;
                     auto &thisZoneStmEq = state.dataHeatBal->ZoneSteamEq(stmEqNum);
@@ -2346,17 +2339,15 @@ namespace InternalHeatGains {
             }     // for stmEqInputNum
         }         // TotStmEquip > 0
 
-        setupIHGZonesAndSpaces(state,
-                               othEqModuleObject,
-                               state.dataHeatBal->OtherEqObjects,
-                               state.dataHeatBal->NumOtherEqStatements,
-                               state.dataHeatBal->TotOthEquip,
-                               ErrorsFound);
+        // OtherEquipment
+        EPVector<InternalHeatGains::GlobalInternalGainMiscObject> otherEqObjects;
+        int numOtherEqStatements = 0;
+        setupIHGZonesAndSpaces(state, othEqModuleObject, otherEqObjects, numOtherEqStatements, state.dataHeatBal->TotOthEquip, ErrorsFound);
 
         if (state.dataHeatBal->TotOthEquip > 0) {
             state.dataHeatBal->ZoneOtherEq.allocate(state.dataHeatBal->TotOthEquip);
             int othEqNum = 0;
-            for (int othEqInputNum = 1; othEqInputNum <= state.dataHeatBal->NumOtherEqStatements; ++othEqInputNum) {
+            for (int othEqInputNum = 1; othEqInputNum <= numOtherEqStatements; ++othEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          othEqModuleObject,
@@ -2371,7 +2362,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisOthEqInput = state.dataHeatBal->OtherEqObjects(othEqInputNum);
+                auto &thisOthEqInput = otherEqObjects(othEqInputNum);
                 for (int Item1 = 1; Item1 <= thisOthEqInput.numOfSpaces; ++Item1) {
                     ++othEqNum;
                     auto &thisZoneOthEq = state.dataHeatBal->ZoneOtherEq(othEqNum);
@@ -2604,20 +2595,18 @@ namespace InternalHeatGains {
             }     // for othEqInputNum
         }         // TotOtherEquip > 0
 
+        // ElectricEquipment:ITE:AirCooled
+        EPVector<InternalHeatGains::GlobalInternalGainMiscObject> iTEqObjects;
+        int numZoneITEqStatements = 0;
         // Note that this object type does not support ZoneList due to node names in input fields
         bool zoneListNotAllowed = true;
-        setupIHGZonesAndSpaces(state,
-                               itEqModuleObject,
-                               state.dataHeatBal->ITEqObjects,
-                               state.dataHeatBal->NumZoneITEqStatements,
-                               state.dataHeatBal->TotITEquip,
-                               ErrorsFound,
-                               zoneListNotAllowed);
+        setupIHGZonesAndSpaces(
+            state, itEqModuleObject, iTEqObjects, numZoneITEqStatements, state.dataHeatBal->TotITEquip, ErrorsFound, zoneListNotAllowed);
 
         if (state.dataHeatBal->TotITEquip > 0) {
             state.dataHeatBal->ZoneITEq.allocate(state.dataHeatBal->TotITEquip);
             int itEqNum = 0;
-            for (int itEqInputNum = 1; itEqInputNum <= state.dataHeatBal->NumZoneITEqStatements; ++itEqInputNum) {
+            for (int itEqInputNum = 1; itEqInputNum <= numZoneITEqStatements; ++itEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          itEqModuleObject,
@@ -2632,7 +2621,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisITEqInput = state.dataHeatBal->ITEqObjects(itEqInputNum);
+                auto &thisITEqInput = iTEqObjects(itEqInputNum);
                 for (int Item1 = 1; Item1 <= thisITEqInput.numOfSpaces; ++Item1) {
                     ++itEqNum;
                     auto &thisZoneITEq = state.dataHeatBal->ZoneITEq(itEqNum);
@@ -3065,17 +3054,15 @@ namespace InternalHeatGains {
             }
         } // TotITEquip > 0
 
-        setupIHGZonesAndSpaces(state,
-                               bbModuleObject,
-                               state.dataHeatBal->ZoneBBHeatObjects,
-                               state.dataHeatBal->NumZoneBBHeatStatements,
-                               state.dataHeatBal->TotBBHeat,
-                               ErrorsFound);
+        // ZoneBaseboard:OutdoorTemperatureControlled
+        EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneBBHeatObjects;
+        int numZoneBBHeatStatements = 0;
+        setupIHGZonesAndSpaces(state, bbModuleObject, zoneBBHeatObjects, numZoneBBHeatStatements, state.dataHeatBal->TotBBHeat, ErrorsFound);
 
         if (state.dataHeatBal->TotBBHeat > 0) {
             state.dataHeatBal->ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
             int bbHeatNum = 0;
-            for (int bbHeatInputNum = 1; bbHeatInputNum <= state.dataHeatBal->NumZoneBBHeatStatements; ++bbHeatInputNum) {
+            for (int bbHeatInputNum = 1; bbHeatInputNum <= numZoneBBHeatStatements; ++bbHeatInputNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          bbModuleObject,
                                                                          bbHeatInputNum,
@@ -3089,7 +3076,7 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                auto &thisBBHeatInput = state.dataHeatBal->ZoneBBHeatObjects(bbHeatInputNum);
+                auto &thisBBHeatInput = zoneBBHeatObjects(bbHeatInputNum);
                 for (int Item1 = 1; Item1 <= thisBBHeatInput.numOfSpaces; ++Item1) {
                     ++bbHeatNum;
                     auto &thisZoneBBHeat = state.dataHeatBal->ZoneBBHeat(bbHeatNum);
@@ -3798,12 +3785,16 @@ namespace InternalHeatGains {
 
     void setupIHGZonesAndSpaces(EnergyPlusData &state,
                                 const std::string objectType,
-                                EPVector<DataHeatBalance::GlobalInternalGainMiscObject> &inputObjects,
+                                EPVector<InternalHeatGains::GlobalInternalGainMiscObject> &inputObjects,
                                 int &numInputObjects,
                                 int &numGainInstances,
                                 bool &errors,
                                 const bool zoneListNotAllowed)
     {
+        // This function pre-processes the input objects for objectType and determines the ultimate number
+        // of simulation instances for each input object after expansion for SpaceList, Zone, or ZoneList.
+        // inputObjects is allocated here and filled with data for further input processing.
+
         constexpr std::string_view routineName = "setupIHGZonesAndSpaces: ";
         bool localErrFlag = false;
 
@@ -3836,13 +3827,11 @@ namespace InternalHeatGains {
 
                 int zoneNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
-                    inputObjects(objNum).StartPtr = numGainInstances + 1;
+                    inputObjects(objNum).spaceStartPtr = numGainInstances + 1;
                     int numSpaces = state.dataHeatBal->Zone(zoneNum).numSpaces;
                     numGainInstances += numSpaces;
                     inputObjects(objNum).numOfSpaces = numSpaces;
-                    inputObjects(objNum).NumOfZones = 1;
                     inputObjects(objNum).ZoneListActive = false;
-                    inputObjects(objNum).ZoneOrZoneListPtr = zoneNum;
                     if (numSpaces == 1) {
                         inputObjects(objNum).spaceNums.emplace_back(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1));
                         inputObjects(objNum).names.emplace_back(inputObjects(objNum).Name);
@@ -3856,7 +3845,7 @@ namespace InternalHeatGains {
                 }
                 int spaceNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->space);
                 if (spaceNum > 0) {
-                    inputObjects(objNum).StartPtr = numGainInstances + 1;
+                    inputObjects(objNum).spaceStartPtr = numGainInstances + 1;
                     ++numGainInstances;
                     inputObjects(objNum).numOfSpaces = 1;
                     inputObjects(objNum).spaceListActive = false;
@@ -3874,7 +3863,7 @@ namespace InternalHeatGains {
                         localErrFlag = true;
                     } else {
 
-                        inputObjects(objNum).StartPtr = numGainInstances + 1;
+                        inputObjects(objNum).spaceStartPtr = numGainInstances + 1;
                         int numSpaces = 0;
                         for (int const listZoneIdx : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
                             numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
@@ -3885,9 +3874,7 @@ namespace InternalHeatGains {
                         }
                         numGainInstances += numSpaces;
                         inputObjects(objNum).numOfSpaces = numSpaces;
-                        inputObjects(objNum).NumOfZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                         inputObjects(objNum).ZoneListActive = true;
-                        inputObjects(objNum).ZoneOrZoneListPtr = zoneListNum;
                     }
                     continue;
                 }
@@ -3900,7 +3887,7 @@ namespace InternalHeatGains {
                         errors = true;
                         localErrFlag = true;
                     } else {
-                        inputObjects(objNum).StartPtr = numGainInstances + 1;
+                        inputObjects(objNum).spaceStartPtr = numGainInstances + 1;
                         int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numListSpaces;
                         numGainInstances += numSpaces;
                         inputObjects(objNum).numOfSpaces = numSpaces;

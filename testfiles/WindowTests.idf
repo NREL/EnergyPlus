@@ -707,7 +707,7 @@
 
   Daylighting:Controls,
     DPW Daylighting Ctrl,    !- Name
-    DPW,                     !- Zone Name
+    DPW,                     !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -720,19 +720,19 @@
     ,                        !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     DPW Zone DaylRefPt1,     !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     DPW Zone DaylRefPt1,     !- Name
-    DPW,                     !- Zone Name
+    DPW,                     !- Zone or Space Name
     3.0,                     !- X-Coordinate of Reference Point {m}
     3.0,                     !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Daylighting:Controls,
     DPSG Daylighting Ctrl,   !- Name
-    DPSG,                    !- Zone Name
+    DPSG,                    !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -745,12 +745,12 @@
     ,                        !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     DPSG Zone DaylRefPt1,    !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     DPSG Zone DaylRefPt1,    !- Name
-    DPSG,                    !- Zone Name
+    DPSG,                    !- Zone or Space Name
     3.0,                     !- X-Coordinate of Reference Point {m}
     3.0,                     !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
@@ -2507,7 +2507,7 @@
 
   Lights,
     DPW Lights,              !- Name
-    DPW,                     !- Zone or ZoneList Name
+    DPW,                     !- Zone or ZoneList or Space or SpaceList Name
     On,                      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     100,                     !- Lighting Level {W}
@@ -2520,7 +2520,7 @@
 
   Lights,
     DPSG Lights,             !- Name
-    DPSG,                    !- Zone or ZoneList Name
+    DPSG,                    !- Zone or ZoneList or Space or SpaceList Name
     On,                      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     100,                     !- Lighting Level {W}

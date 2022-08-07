@@ -796,7 +796,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -810,19 +810,19 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -836,7 +836,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1011,7 +1011,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1025,19 +1025,19 @@
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1051,7 +1051,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1191,7 +1191,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -1205,19 +1205,19 @@
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1231,7 +1231,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1386,7 +1386,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1400,19 +1400,19 @@
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1426,7 +1426,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1566,7 +1566,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.031089,                !- Design Flow Rate {m3/s}
@@ -1580,19 +1580,19 @@
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1606,7 +1606,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -1788,10 +1788,10 @@
     1.2;                     !- Cooling Sizing Factor
 
   OutputControl:Files,
-    Yes,
-    No,
-    No,
-    No;
+    Yes,                     !- Output CSV
+    No,                      !- Output MTR
+    No,                      !- Output ESO
+    No;                      !- Output EIO
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Detailed;
 
@@ -1805,9 +1805,9 @@
 
   Output:Variable,SYS 1 FURNACE DX COOL UNITARY SYSTEM,Unitary System DX Coil Speed Ratio,Detailed;
 
-  Output:Variable,SYS 1 FURNACE DX COOL UNITARY SYSTEM,Unitary System Part Load Ratio,Detailed; !- HVAC Average []
+  Output:Variable,SYS 1 FURNACE DX COOL UNITARY SYSTEM,Unitary System Part Load Ratio,Detailed;
 
-  Output:Variable,SYS 1 FURNACE DX COOL UNITARY SYSTEM,Unitary System Total Cooling Rate,Detailed; !- HVAC Average [W]
+  Output:Variable,SYS 1 FURNACE DX COOL UNITARY SYSTEM,Unitary System Total Cooling Rate,Detailed;
 
   Output:VariableDictionary,IDF;
 
@@ -5019,8 +5019,8 @@
     Verbose;                 !- EMS Runtime Language Debug Output Level
 
   EnergyManagementSystem:Sensor,
-    CoolingSetpoint,                               !- Name
-    SPACE1-1,                                      !- Output:Variable or Output:Meter Index Key Name
+    CoolingSetpoint,         !- Name
+    SPACE1-1,                !- Output:Variable or Output:Meter Index Key Name
     Zone Thermostat Cooling Setpoint Temperature;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
@@ -5029,38 +5029,39 @@
     Zone Air Temperature;    !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:GlobalVariable,
-    CoilSpeedLevelOverrideReport;      !- Erl Variable 1 Name
+    CoilSpeedLevelOverrideReport;  !- Erl Variable 1 Name
 
   EnergyManagementSystem:OutputVariable,
-    EMS Coil Speed Override On,        !- Name
-    CoilSpeedLevelOverrideReport,      !- EMS Variable Name
-    Averaged,                          !- Type of Data in Variable
-    SystemTimeStep,                    !- Update Frequency
-    ,                                  !- EMS Program or Subroutine Name
-    On/Off;                            !- Units
+    EMS Coil Speed Override On,  !- Name
+    CoilSpeedLevelOverrideReport,  !- EMS Variable Name
+    Averaged,                !- Type of Data in Variable
+    SystemTimeStep,          !- Update Frequency
+    ,                        !- EMS Program or Subroutine Name
+    On/Off;                  !- Units
 
   EnergyManagementSystem:Actuator,
-    CoilSpeedOverride,                           !- Name
-    Sys 1 Furnace DX Cool Unitary System,        !- Actuated Component Unique Name
-    Coil Speed Control,                          !- Actuated Component Type
-    Unitary System DX Coil Speed Value;          !- Actuated Component Control Type
+    CoilSpeedOverride,       !- Name
+    Sys 1 Furnace DX Cool Unitary System,  !- Actuated Component Unique Name
+    Coil Speed Control,      !- Actuated Component Type
+    Unitary System DX Coil Speed Value;  !- Actuated Component Control Type
 
   EnergyManagementSystem:ProgramCallingManager,
-    Coil Speed  Management,                      !- Name
-    InsideHVACSystemIterationLoop,               !- EnergyPlus Model Calling Point
-    CoilSpeedControl;                            !- Program Name 1
+    Coil Speed  Management,  !- Name
+    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
+    CoilSpeedControl;        !- Program Name 1
 
   EnergyManagementSystem:Program,
-    CoilSpeedControl,                                                                            !- Name
-    IF (ZoneAirTemperature > CoolingSetpoint + 0.5),                                             !- Program Line 7
-    SET CoilSpeedOverride = 1.5,                                                                 !- Program Line 8
-    SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 9
-    ELSEIF (ZoneAirTemperature > CoolingSetpoint - 0.5),                                         !- Program Line 10
-    SET CoilSpeedOverride = 1,                                                                   !- Program Line 11
-    SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 12
-    ELSE,                                                                                        !- Program Line 13
-    SET CoilSpeedOverride = Null,                                                                !- Program Line 14
-    SET CoilSpeedLevelOverrideReport = 0,                                                        !- Program Line 15
-    ENDIF;                                                                                       !- <none>
+    CoilSpeedControl,        !- Name
+    IF (ZoneAirTemperature > CoolingSetpoint + 0.5),  !- Program Line 1
+    SET CoilSpeedOverride = 1.5,  !- Program Line 2
+    SET CoilSpeedLevelOverrideReport = 1,  !- <none>
+    ELSEIF (ZoneAirTemperature > CoolingSetpoint - 0.5),  !- <none>
+    SET CoilSpeedOverride = 1,  !- <none>
+    SET CoilSpeedLevelOverrideReport = 1,  !- <none>
+    ELSE,                    !- <none>
+    SET CoilSpeedOverride = Null,  !- <none>
+    SET CoilSpeedLevelOverrideReport = 0,  !- <none>
+    ENDIF;                   !- <none>
 
   Output:Variable,*,EMS Coil Speed Override On,Detailed;
+
