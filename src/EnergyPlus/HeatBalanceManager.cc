@@ -5180,79 +5180,78 @@ namespace HeatBalanceManager {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "SurfaceProperty:IncidentSolarMultiplier";
 
-        constexpr const char *RoutineName("GetIncidentSolarMultiplier: ");
+        static constexpr std::string_view RoutineName("GetIncidentSolarMultiplier: ");
 
         state.dataSurface->TotSurfIncSolMultiplier = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (state.dataSurface->TotSurfIncSolMultiplier > 0) {
-            if (!allocated(state.dataSurface->SurfIncSolMultiplier)) {
-                // could be extended to interior surfaces later
-                state.dataSurface->SurfIncSolMultiplier.allocate(state.dataSurface->TotSurfaces);
+
+        if (state.dataSurface->TotSurfIncSolMultiplier <= 0) return;
+
+        if (!allocated(state.dataSurface->SurfIncSolMultiplier)) {
+            // could be extended to interior surfaces later
+            state.dataSurface->SurfIncSolMultiplier.allocate(state.dataSurface->TotSurfaces);
+        }
+
+        int NumAlpha;
+        int NumNumeric;
+        int IOStat;
+        for (int Loop = 1; Loop <= state.dataSurface->TotSurfIncSolMultiplier; ++Loop) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumeric,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                ShowContinueError(
+                    state, "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name");
+                continue;
             }
 
-            int NumAlpha;
-            int NumNumeric;
-            int IOStat;
-            for (int Loop = 1; Loop <= state.dataSurface->TotSurfIncSolMultiplier; ++Loop) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         Loop,
-                                                                         state.dataIPShortCut->cAlphaArgs,
-                                                                         NumAlpha,
-                                                                         state.dataIPShortCut->rNumericArgs,
-                                                                         NumNumeric,
-                                                                         IOStat,
-                                                                         state.dataIPShortCut->lNumericFieldBlanks,
-                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                         state.dataIPShortCut->cAlphaFieldNames,
-                                                                         state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                    ShowContinueError(
-                        state, "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name");
-                    continue;
-                }
-
-                // Assign surface number
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
-                if (SurfNum == 0) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
-                    ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(1) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                          "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
-                    ErrorsFound = true;
-                } else {
-                    if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window &&
-                        state.dataSurface->Surface(SurfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
-                        int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                        int MaterNum =
-                            state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-                        bool withNoncompatibleShades =
-                            (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Shade ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Screen ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
-                             state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer ||
-                             state.dataSurface->Surface(SurfNum).HasShadeControl);
-                        if (withNoncompatibleShades) {
-                            ShowSevereError(state,
-                                            "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
-                            ErrorsFound = true;
-                        } else {
-                            state.dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
-                            state.dataSurface->SurfIncSolMultiplier(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                            state.dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
-                            state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = state.dataIPShortCut->rNumericArgs(1);
-                            state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-                        }
-                    } else { // not defined for exterior window
-                        ShowSevereError(state, "IncidentSolarMultiplier should be defined for exterior windows");
+            // Assign surface number
+            int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
+            if (SurfNum == 0) {
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
+                ShowContinueError(state,
+                                  state.dataIPShortCut->cAlphaFieldNames(1) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                      "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                ErrorsFound = true;
+            } else {
+                if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window &&
+                    state.dataSurface->Surface(SurfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
+                    int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                    int MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
+                    bool withNoncompatibleShades =
+                        (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Shade ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Screen ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
+                         state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer ||
+                         state.dataSurface->Surface(SurfNum).HasShadeControl);
+                    if (withNoncompatibleShades) {
+                        ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                         ErrorsFound = true;
+                    } else {
+                        state.dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = state.dataIPShortCut->rNumericArgs(1);
+                        state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     }
+                } else { // not defined for exterior window
+                    ShowSevereError(state, "IncidentSolarMultiplier should be defined for exterior windows");
+                    ErrorsFound = true;
                 }
             }
         }
