@@ -605,11 +605,13 @@ namespace UtilityRoutines {
     // For map, you'd only need the comparator
     struct case_insensitive_hasher
     {
+        using is_transparent = void;
         size_t operator()(std::string_view key) const noexcept;
     };
 
     struct case_insensitive_comparator
     {
+        using is_transparent = void;
         bool operator()(std::string_view a, std::string_view b) const noexcept;
     };
 

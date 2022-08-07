@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -78,7 +79,6 @@
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -4200,25 +4200,20 @@ void ReportVentilationLoads(EnergyPlusData &state)
             case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir:
             case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir:
             case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
-                int OutAirNode =
-                    PackagedTerminalHeatPump::GetPTUnitOutAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
+                // loop index accesses correct pointer to equipment on this equipment list, DataZoneEquipment::GetZoneEquipmentData
+                // thisEquipIndex (EquipIndex) is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
+                int OutAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerOANode();
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-
-                int ZoneInletAirNode =
-                    PackagedTerminalHeatPump::GetPTUnitZoneInletAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
+                int ZoneInletAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getAirOutletNode();
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                int MixedAirNode =
-                    PackagedTerminalHeatPump::GetPTUnitMixedAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
-                int ReturnAirNode =
-                    PackagedTerminalHeatPump::GetPTUnitReturnAirNode(state, thisEquipIndex, thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum));
+                int MixedAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerMixNode();
+                int ReturnAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerRetNode();
                 if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                     ZFAUEnthMixedAir = Psychrometrics::PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                     ZFAUEnthReturnAir = Psychrometrics::PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad +=
                         (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
-                } else {
-                    ZFAUZoneVentLoad += 0.0;
                 }
 
                 break;
