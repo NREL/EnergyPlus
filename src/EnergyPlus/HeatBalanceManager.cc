@@ -5227,8 +5227,8 @@ namespace HeatBalanceManager {
             }
             if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window &&
                 state.dataSurface->Surface(SurfNum).ExtBoundCond == DataSurfaces::ExternalEnvironment) {
-                int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                int MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
+                auto const &ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                auto const &MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
                 bool withNoncompatibleShades =
                     (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Shade ||
                      state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
