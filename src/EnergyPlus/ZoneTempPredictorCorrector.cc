@@ -2892,7 +2892,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Average,
                                 thisZone.Name);
             if (state.dataHeatBal->DoLatentSizing) {
-            SetupOutputVariable(state,
+                SetupOutputVariable(state,
                                     "Zone Air System Latent Heating Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHeatBal->latentReports(zoneNum).ZoneLTLoadHeatEnergy,
