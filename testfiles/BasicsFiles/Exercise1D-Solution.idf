@@ -60,7 +60,7 @@
 
   Lights,
     ZONE ONE Lights,         !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1000,                    !- Lighting Level {W}

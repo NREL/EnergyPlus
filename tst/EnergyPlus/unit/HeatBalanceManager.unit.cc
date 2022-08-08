@@ -484,7 +484,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
@@ -511,7 +510,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeInletNum(1) = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
@@ -1230,7 +1228,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;

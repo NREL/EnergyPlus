@@ -1014,7 +1014,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    Yes,                     !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
         "    No,                      !- Do Plant Sizing Calculation",
-        "    No,                      !- Run Simulation for Sizing Periods",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
         "    No;                      !- Run Simulation for Weather File Run Periods",
 
         "    Site:Location,",
@@ -1468,6 +1468,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
 
         "    ScheduleTypeLimits,",
         "      Any Number;              !- Name",
+
+        "  Output:Table:SummaryReports,",
+        "      AllSummary,                             !- Report Name 1",
+        "      AllSummaryAndSizingPeriod;              !- Report Name 2",
 
     });
 
