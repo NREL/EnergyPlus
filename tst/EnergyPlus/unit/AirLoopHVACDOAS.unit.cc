@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -4316,44 +4317,57 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
 {
     AirLoopHVACDOAS::AirLoopDOAS thisDOAS;
 
-    int constexpr summerDesignDayTypeIndex(9);
-    int constexpr winterDesignDayTypeIndex(10);
+    state->dataWeatherManager->DesDayInput.allocate(2);
+    state->dataWeatherManager->Environment.allocate(4);
 
-    // set up design days that are incrementally a larger peak such that the latter ones should be chosen
-    state->dataWeatherManager->DesDayInput.allocate(4);
-    state->dataWeatherManager->DesDayInput(1).DayType = summerDesignDayTypeIndex;
-    state->dataWeatherManager->DesDayInput(1).MaxDryBulb = 27.0;
-    state->dataWeatherManager->DesDayInput(1).HumIndType = WeatherManager::DDHumIndType::HumRatio;
-    state->dataWeatherManager->DesDayInput(1).HumIndValue = 0.008;
-    state->dataWeatherManager->DesDayInput(2).DayType = summerDesignDayTypeIndex;
-    state->dataWeatherManager->DesDayInput(2).MaxDryBulb = 31.0;
-    state->dataWeatherManager->DesDayInput(2).HumIndType = WeatherManager::DDHumIndType::HumRatio;
-    state->dataWeatherManager->DesDayInput(2).HumIndValue = 0.01;
-    state->dataWeatherManager->DesDayInput(3).DayType = winterDesignDayTypeIndex;
-    state->dataWeatherManager->DesDayInput(3).MaxDryBulb = 9.0;
-    state->dataWeatherManager->DesDayInput(3).HumIndType = WeatherManager::DDHumIndType::HumRatio;
-    state->dataWeatherManager->DesDayInput(3).HumIndValue = 0.006;
-    state->dataWeatherManager->DesDayInput(4).DayType = winterDesignDayTypeIndex;
-    state->dataWeatherManager->DesDayInput(4).MaxDryBulb = 6.0;
-    state->dataWeatherManager->DesDayInput(4).HumIndType = WeatherManager::DDHumIndType::HumRatio;
-    state->dataWeatherManager->DesDayInput(4).HumIndValue = 0.004;
+    state->dataWeatherManager->Environment(1).DesignDayNum = 1; // Environment(3) & (4) will be = 0
+    state->dataWeatherManager->Environment(2).DesignDayNum = 2;
+
+    state->dataWeatherManager->Environment(1).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataWeatherManager->Environment(2).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataWeatherManager->Environment(3).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataWeatherManager->Environment(4).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
+
+    // set up environments such that day 2 is cooling peak and day 4 is heating peak
+    state->dataWeatherManager->Environment(1).maxCoolingOATSizing = 27.0;
+    state->dataWeatherManager->Environment(1).maxCoolingOADPSizing = 21.0;
+    state->dataWeatherManager->Environment(2).maxCoolingOATSizing = 31.0;
+    state->dataWeatherManager->Environment(2).maxCoolingOADPSizing = 22.0;
+    state->dataWeatherManager->Environment(3).maxCoolingOATSizing = 29.0;
+    state->dataWeatherManager->Environment(3).maxCoolingOADPSizing = 8.0;
+    state->dataWeatherManager->Environment(4).maxCoolingOATSizing = 26.0;
+    state->dataWeatherManager->Environment(4).maxCoolingOADPSizing = 5.0;
+
+    state->dataWeatherManager->Environment(1).minHeatingOATSizing = 17.0;
+    state->dataWeatherManager->Environment(1).minHeatingOADPSizing = 16.0;
+    state->dataWeatherManager->Environment(2).minHeatingOATSizing = 16.0;
+    state->dataWeatherManager->Environment(2).minHeatingOADPSizing = 14.0;
+    state->dataWeatherManager->Environment(3).minHeatingOATSizing = 19.0;
+    state->dataWeatherManager->Environment(3).minHeatingOADPSizing = 18.0;
+    state->dataWeatherManager->Environment(4).minHeatingOATSizing = 4.0;
+    state->dataWeatherManager->Environment(4).minHeatingOADPSizing = 3.0;
+    state->dataEnvrn->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+    Real64 envrnCoolingHumRat =
+        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeatherManager->Environment(2).maxCoolingOADPSizing, state->dataEnvrn->StdBaroPress);
+    Real64 envrnHeatingHumRat =
+        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeatherManager->Environment(4).minHeatingOADPSizing, DataEnvironment::StdPressureSeaLevel);
 
     // test peak conditions used for sizing
     thisDOAS.GetDesignDayConditions(*state);
 
-    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, state->dataWeatherManager->DesDayInput(2).HumIndValue, 0.000001);
-    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->DesDayInput(4).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.HeatOutHumRat, state->dataWeatherManager->DesDayInput(4).HumIndValue, 0.000001);
+    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
+    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->Environment(4).minHeatingOATSizing, 0.000001);
+    EXPECT_NEAR(thisDOAS.HeatOutHumRat, envrnHeatingHumRat, 0.000001);
 
     AirLoopHVACDOAS::AirLoopDOAS anotherDOAS;
     // a second DOAS system should find the same sizing conditions
     anotherDOAS.GetDesignDayConditions(*state);
 
-    EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(anotherDOAS.SizingCoolOAHumRat, state->dataWeatherManager->DesDayInput(2).HumIndValue, 0.000001);
-    EXPECT_NEAR(anotherDOAS.HeatOutTemp, state->dataWeatherManager->DesDayInput(4).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(anotherDOAS.HeatOutHumRat, state->dataWeatherManager->DesDayInput(4).HumIndValue, 0.000001);
+    EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
+    EXPECT_NEAR(anotherDOAS.HeatOutTemp, state->dataWeatherManager->Environment(4).minHeatingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.HeatOutHumRat, envrnHeatingHumRat, 0.000001);
 
     // reset for next test
     thisDOAS.SizingCoolOATemp = -999.0;
@@ -4362,18 +4376,22 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
     thisDOAS.HeatOutHumRat = 999.0;
 
     // note in these descriptions that DOAS systems do not use time of peak to select weather data used for sizing
-    // test higher summer humidity ratio for non-peak summer day (non-peak summer design day has lower OAT than peak summer day)
-    state->dataWeatherManager->DesDayInput(1).HumIndValue = 0.012;
-    // lower winter humidity ratio for non-peak winter day (non-peak winter design day has higher OAT then winter peak day)
-    state->dataWeatherManager->DesDayInput(3).HumIndValue = 0.002;
+    // test higher summer dew point for non-peak summer day (non-peak summer design day has lower OAT than peak summer day)
+    state->dataWeatherManager->Environment(1).maxCoolingOADPSizing = 24.0;
+    state->dataWeatherManager->Environment(3).maxCoolingOADPSizing = 24.0;
+    state->dataWeatherManager->Environment(4).maxCoolingOADPSizing = 24.0;
+    // test lower winter dew point for non-peak winter day (non-peak winter design day has higher OAT then winter peak day)
+    state->dataWeatherManager->Environment(1).minHeatingOADPSizing = 2.0;
+    state->dataWeatherManager->Environment(2).minHeatingOADPSizing = 2.0;
+    state->dataWeatherManager->Environment(3).minHeatingOADPSizing = 2.0;
 
     thisDOAS.GetDesignDayConditions(*state);
 
-    // humidity ratios are still from same design day as peak temperature (i.e., peak T and w are from same design day object)
-    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, state->dataWeatherManager->DesDayInput(2).HumIndValue, 0.000001);
-    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->DesDayInput(4).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.HeatOutHumRat, state->dataWeatherManager->DesDayInput(4).HumIndValue, 0.000001);
+    // design conditions should only be selected based on outdoor temperature so same conditions as before
+    EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
+    EXPECT_NEAR(anotherDOAS.HeatOutTemp, state->dataWeatherManager->Environment(4).minHeatingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.HeatOutHumRat, envrnHeatingHumRat, 0.000001);
 
     // reset for next test
     thisDOAS.SizingCoolOATemp = -999.0;
@@ -4381,92 +4399,17 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
     thisDOAS.HeatOutTemp = 999.0;
     thisDOAS.HeatOutHumRat = 999.0;
 
-    // test wet-bulb humidity indicating type
-    state->dataWeatherManager->DesDayInput(1).HumIndType = WeatherManager::DDHumIndType::WetBulb;
-    state->dataWeatherManager->DesDayInput(2).HumIndType = WeatherManager::DDHumIndType::WetBulb;
-    state->dataWeatherManager->DesDayInput(3).HumIndType = WeatherManager::DDHumIndType::WetBulb;
-    state->dataWeatherManager->DesDayInput(4).HumIndType = WeatherManager::DDHumIndType::WetBulb;
-
-    Real64 outdoorWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state,
-                                                           state->dataWeatherManager->DesDayInput(1).MaxDryBulb,
-                                                           state->dataWeatherManager->DesDayInput(1).HumIndValue,
-                                                           DataEnvironment::StdPressureSeaLevel,
-                                                           "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(1).HumIndValue = outdoorWetBulb;
-    Real64 outdoorw2 = state->dataWeatherManager->DesDayInput(2).HumIndValue;
-    outdoorWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state,
-                                                    state->dataWeatherManager->DesDayInput(2).MaxDryBulb,
-                                                    state->dataWeatherManager->DesDayInput(2).HumIndValue,
-                                                    DataEnvironment::StdPressureSeaLevel,
-                                                    "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(2).HumIndValue = outdoorWetBulb;
-    outdoorWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state,
-                                                    state->dataWeatherManager->DesDayInput(3).MaxDryBulb,
-                                                    state->dataWeatherManager->DesDayInput(3).HumIndValue,
-                                                    DataEnvironment::StdPressureSeaLevel,
-                                                    "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(3).HumIndValue = outdoorWetBulb;
-    Real64 outdoorw4 = state->dataWeatherManager->DesDayInput(4).HumIndValue;
-    outdoorWetBulb = Psychrometrics::PsyTwbFnTdbWPb(*state,
-                                                    state->dataWeatherManager->DesDayInput(4).MaxDryBulb,
-                                                    state->dataWeatherManager->DesDayInput(4).HumIndValue,
-                                                    DataEnvironment::StdPressureSeaLevel,
-                                                    "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(4).HumIndValue = outdoorWetBulb;
+    // test results using user entered design day pressure
+    state->dataWeatherManager->DesDayInput(2).PressureEntered = true;
+    state->dataWeatherManager->DesDayInput(2).PressBarom = 0.9 * DataEnvironment::StdPressureSeaLevel;
+    envrnCoolingHumRat = Psychrometrics::PsyWFnTdpPb(
+        *state, state->dataWeatherManager->Environment(2).maxCoolingOADPSizing, state->dataWeatherManager->DesDayInput(2).PressBarom);
 
     thisDOAS.GetDesignDayConditions(*state);
 
-    // humidity ratios are close to what they were before within psycrometric conversion
-    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, outdoorw2, 0.0001);
-    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->DesDayInput(4).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.HeatOutHumRat, outdoorw4, 0.0001);
-
-    // reset for next test
-    thisDOAS.SizingCoolOATemp = -999.0;
-    thisDOAS.SizingCoolOAHumRat = -999.0;
-    thisDOAS.HeatOutTemp = 999.0;
-    thisDOAS.HeatOutHumRat = 999.0;
-
-    // test dew point humidity indicating type
-    state->dataWeatherManager->DesDayInput(1).HumIndType = WeatherManager::DDHumIndType::DewPoint;
-    state->dataWeatherManager->DesDayInput(2).HumIndType = WeatherManager::DDHumIndType::DewPoint;
-    state->dataWeatherManager->DesDayInput(3).HumIndType = WeatherManager::DDHumIndType::DewPoint;
-    state->dataWeatherManager->DesDayInput(4).HumIndType = WeatherManager::DDHumIndType::DewPoint;
-
-    // each state->dataWeatherManager->DesDayInput(i).HumIndValue holds wet-bulb temperature from previous test
-    Real64 outdoorDP = Psychrometrics::PsyTdpFnTdbTwbPb(*state,
-                                                        state->dataWeatherManager->DesDayInput(1).MaxDryBulb,
-                                                        state->dataWeatherManager->DesDayInput(1).HumIndValue,
-                                                        DataEnvironment::StdPressureSeaLevel,
-                                                        "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(1).HumIndValue = outdoorDP;
-    outdoorDP = Psychrometrics::PsyTdpFnTdbTwbPb(*state,
-                                                 state->dataWeatherManager->DesDayInput(2).MaxDryBulb,
-                                                 state->dataWeatherManager->DesDayInput(2).HumIndValue,
-                                                 DataEnvironment::StdPressureSeaLevel,
-                                                 "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(2).HumIndValue = outdoorDP;
-    outdoorDP = Psychrometrics::PsyTdpFnTdbTwbPb(*state,
-                                                 state->dataWeatherManager->DesDayInput(3).MaxDryBulb,
-                                                 state->dataWeatherManager->DesDayInput(3).HumIndValue,
-                                                 DataEnvironment::StdPressureSeaLevel,
-                                                 "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(3).HumIndValue = outdoorDP;
-    outdoorDP = Psychrometrics::PsyTdpFnTdbTwbPb(*state,
-                                                 state->dataWeatherManager->DesDayInput(4).MaxDryBulb,
-                                                 state->dataWeatherManager->DesDayInput(4).HumIndValue,
-                                                 DataEnvironment::StdPressureSeaLevel,
-                                                 "AirLoopHVACDOAS_TestGetDesignDayConditions");
-    state->dataWeatherManager->DesDayInput(4).HumIndValue = outdoorDP;
-
-    thisDOAS.GetDesignDayConditions(*state);
-
-    // humidity ratios are close to what they were before within psycrometric conversion
-    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->DesDayInput(2).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, outdoorw2, 0.0001);
-    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->DesDayInput(4).MaxDryBulb, 0.000001);
-    EXPECT_NEAR(thisDOAS.HeatOutHumRat, outdoorw4, 0.0001);
+    // design conditions should only be selected based on outdoor temperature so same temperature as before but different humrat
+    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
 }
 
 TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)

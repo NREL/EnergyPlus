@@ -1,5 +1,5 @@
 ! 5ZoneAirCooledWithCoupledInGradeSlab_HorizInsThickness.idf
-! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum. 
+! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !                          The case is the same as 5ZoneAirCooledWithCoupledInGradeSlab_HorizInsThickness.idf but with a
 !                          different Horizontal Insulation Thickness value in the Site:GroundDomain:Slab object.
 !
@@ -271,7 +271,7 @@
     Full,                    !- Horizontal Insulation Extents
     ,                        !- Perimeter Insulation Width {m}
     Yes,                     !- Vertical Insulation
-    VertiSlab Insulation,         !- Vertical Insulation Material Name
+    VertiSlab Insulation,    !- Vertical Insulation Material Name
     2,                       !- Vertical Insulation Depth {m}
     Timestep,                !- Simulation Timestep
     ,                        !- Geometric Mesh Coefficient
@@ -408,7 +408,7 @@
     0.6500000;               !- Visible Absorptance
 
   Material,
-    HorizSlab Insulation,         !- Name
+    HorizSlab Insulation,    !- Name
     Smooth,                  !- Roughness
     0.0508,                  !- Thickness {m}
     0.035,                   !- Conductivity {W/m-K}
@@ -419,7 +419,7 @@
     0.65;                    !- Visible Absorptance
 
   Material,
-    VertiSlab Insulation,         !- Name
+    VertiSlab Insulation,    !- Name
     Smooth,                  !- Roughness
     0.0254,                  !- Thickness {m}
     0.035,                   !- Conductivity {W/m-K}
@@ -864,7 +864,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.032,                   !- Design Flow Rate {m3/s}
@@ -878,19 +878,19 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -904,7 +904,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1079,7 +1079,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.014,                   !- Design Flow Rate {m3/s}
@@ -1093,19 +1093,19 @@
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1119,7 +1119,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1259,7 +1259,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.032,                   !- Design Flow Rate {m3/s}
@@ -1273,19 +1273,19 @@
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1299,7 +1299,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1454,7 +1454,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.014,                   !- Design Flow Rate {m3/s}
@@ -1468,19 +1468,19 @@
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1494,7 +1494,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1634,7 +1634,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.062,                   !- Design Flow Rate {m3/s}
@@ -1648,19 +1648,19 @@
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1674,7 +1674,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}

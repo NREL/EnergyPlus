@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -127,7 +128,7 @@ namespace ZoneEquipmentManager {
                            bool AdjustZoneInfiltrationFlowFlag = false // flags to djust zone infiltration air flow rate
     );
 
-    void GetStandAloneERVNodes(EnergyPlusData &state, int OutdoorNum); // Zone Air Balance Outdoor index
+    void GetStandAloneERVNodes(EnergyPlusData &state, DataHeatBalance::ZoneAirBalanceData &thisZoneAirBalance);
 
     void CalcZoneMixingFlowRateOfReceivingZone(EnergyPlusData &state, int ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
 
