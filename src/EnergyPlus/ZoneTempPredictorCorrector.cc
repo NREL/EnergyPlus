@@ -2895,46 +2895,46 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                     "Zone Air System Latent Heating Energy",
                                     OutputProcessor::Unit::J,
-                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadHeatEnergy,
+                                    state.dataHeatBal->latentReports(zoneNum).ZoneLTLoadHeatEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    Zone(Loop).Name);
+                                    thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Air System Latent Cooling Energy",
                                     OutputProcessor::Unit::J,
-                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadCoolEnergy,
+                                    state.dataHeatBal->latentReports(zoneNum).ZoneLTLoadCoolEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    Zone(Loop).Name);
+                                    thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Air System Latent Heating Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadHeatRate,
+                                    state.dataHeatBal->latentReports(zoneNum).ZoneLTLoadHeatRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    Zone(Loop).Name);
+                                    thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Air System Latent Cooling Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataHeatBal->latentReports(Loop).ZoneLTLoadCoolRate,
+                                    state.dataHeatBal->latentReports(zoneNum).ZoneLTLoadCoolRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    Zone(Loop).Name);
+                                    thisZone.Name);
                 // temporarily hide these behind DoLatentSizing flag
                 SetupOutputVariable(state,
                                     "Zone Air System Sensible Heat Ratio",
                                     OutputProcessor::Unit::None,
-                                    state.dataHeatBal->latentReports(Loop).ZoneSensibleHeatRatio,
+                                    state.dataHeatBal->latentReports(zoneNum).ZoneSensibleHeatRatio,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    Zone(Loop).Name);
+                                    thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Vapor Pressure Difference",
                                     OutputProcessor::Unit::Pa,
-                                    state.dataHeatBal->latentReports(Loop).ZoneVaporPressureDifference,
+                                    state.dataHeatBal->latentReports(zoneNum).ZoneVaporPressureDifference,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    Zone(Loop).Name);
+                                    thisZone.Name);
             }
             SetupOutputVariable(state,
                                 "Zone Air Temperature",
@@ -5736,7 +5736,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         } else {
             state.dataHeatBal->latentReports(ZoneNum).ZoneSensibleHeatRatio = 0.0;
         }
-        Real64 pSat = PsyPsatFnTemp(state, ZT, RoutineName);
+        Real64 pSat = PsyPsatFnTemp(state, thisZT, RoutineName);
         Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum), state.dataEnvrn->StdBaroPress);
         state.dataHeatBal->latentReports(ZoneNum).ZoneVaporPressureDifference = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
     }
