@@ -706,7 +706,7 @@ namespace DataSurfaces {
         bool ExtSolar;                 // True if the "outside" of the surface is exposed to solar
         bool ExtWind;                  // True if the "outside" of the surface is exposed to wind Heat transfer coefficients
         bool hasIncSolMultiplier;      // Whether the surface has a incident solar multiplier
-        Real64 IncSolMultiplier = 1.0; // Incident solar multiplier, overwritten by user input in SurfaceProperty:IncidentSolarMultiplier
+        Real64 IncSolMultiplier;       // Incident solar multiplier, overwritten by user input in SurfaceProperty:IncidentSolarMultiplier
         Real64 ViewFactorGround;       // View factor to the ground from the exterior of the surface for diffuse solar radiation
         Real64 ViewFactorSky;          // View factor to the sky from the exterior of the surface for diffuse solar radiation
         Real64 ViewFactorGroundIR;     // View factor to the ground and shadowing surfaces from the exterior of the surface for IR radiation
