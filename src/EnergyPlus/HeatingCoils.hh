@@ -76,6 +76,7 @@ namespace HeatingCoils {
         COIL_DX_MULTIMODE,
         CONDENSER_REFRIGERATION,
         COIL_DX_VARIABLE_COOLING,
+        COIL_COOLING_DX_NEW, // Coil:Cooling:DX main one-for-all coil
         Num
     };
 
@@ -85,93 +86,71 @@ namespace HeatingCoils {
         std::string Name;             // Name of the HeatingCoil
         std::string HeatingCoilType;  // Type of HeatingCoil ie. Heating or Cooling
         std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
-        int HCoilType_Num;
-        DataGlobalConstants::ResourceType FuelType_Num; // Type of fuel used, reference resource type integers
-        std::string Schedule;                           // HeatingCoil Operation Schedule
-        int SchedPtr;                                   // Pointer to the correct schedule
-        int InsuffTemperatureWarn;                      // Used for recurring error message
-        Real64 InletAirMassFlowRate;                    // MassFlow through the HeatingCoil being Simulated [kg/Sec]
-        Real64 OutletAirMassFlowRate;
-        Real64 InletAirTemp;
-        Real64 OutletAirTemp;
-        Real64 InletAirHumRat;
-        Real64 OutletAirHumRat;
-        Real64 InletAirEnthalpy;
-        Real64 OutletAirEnthalpy;
-        Real64 HeatingCoilLoad; // Total Load on the Coil [J]
-        Real64 HeatingCoilRate; // Total Coil Rate on the Coil [W]
-        Real64 FuelUseLoad;     // Fuel Usage of Coil [J]
-        Real64 ElecUseLoad;     // Electric Usage of Coil [J]
-        Real64 FuelUseRate;     // Fuel Usage of Coil [W]
-        Real64 ElecUseRate;     // Electric Usage of Coil [W]
-        Real64 Efficiency;      // HeatingCoil Efficiency Value
-        Real64 NominalCapacity; // Nominal Capacity of Coil [W]
-        Real64 DesiredOutletTemp;
-        Real64 DesiredOutletHumRat;
-        Real64 AvailTemperature; // Used in heat recovery test [C]
-        int AirInletNodeNum;
-        int AirOutletNodeNum;
-        int TempSetPointNodeNum; // If applicable this is the node number that the temp setpoint exists.
-        int Control;
-        int PLFCurveIndex;        // Index for part-load factor curve index for gas heating coil
-        Real64 ParasiticElecLoad; // parasitic electric load associated with the gas heating coil
-        Real64 ParasiticFuelLoad; // parasitic fuel load associated with the gas heating coil
+        int HCoilType_Num = 0;
+        DataGlobalConstants::ResourceType FuelType_Num =
+            DataGlobalConstants::ResourceType::None; // Type of fuel used, reference resource type integers
+        std::string Schedule;                        // HeatingCoil Operation Schedule
+        int SchedPtr = 0;                            // Pointer to the correct schedule
+        int InsuffTemperatureWarn = 0;               // Used for recurring error message
+        Real64 InletAirMassFlowRate = 0.0;           // MassFlow through the HeatingCoil being Simulated [kg/Sec]
+        Real64 OutletAirMassFlowRate = 0.0;
+        Real64 InletAirTemp = 0.0;
+        Real64 OutletAirTemp = 0.0;
+        Real64 InletAirHumRat = 0.0;
+        Real64 OutletAirHumRat = 0.0;
+        Real64 InletAirEnthalpy = 0.0;
+        Real64 OutletAirEnthalpy = 0.0;
+        Real64 HeatingCoilLoad = 0.0; // Total Load on the Coil [J]
+        Real64 HeatingCoilRate = 0.0; // Total Coil Rate on the Coil [W]
+        Real64 FuelUseLoad = 0.0;     // Fuel Usage of Coil [J]
+        Real64 ElecUseLoad = 0.0;     // Electric Usage of Coil [J]
+        Real64 FuelUseRate = 0.0;     // Fuel Usage of Coil [W]
+        Real64 ElecUseRate = 0.0;     // Electric Usage of Coil [W]
+        Real64 Efficiency = 0.0;      // HeatingCoil Efficiency Value
+        Real64 NominalCapacity = 0.0; // Nominal Capacity of Coil [W]
+        Real64 DesiredOutletTemp = 0.0;
+        Real64 DesiredOutletHumRat = 0.0;
+        Real64 AvailTemperature = 0.0; // Used in heat recovery test [C]
+        int AirInletNodeNum = 0;
+        int AirOutletNodeNum = 0;
+        int TempSetPointNodeNum = 0; // If applicable this is the node number that the temp setpoint exists.
+        int Control = 0;
+        int PLFCurveIndex = 0;          // Index for part-load factor curve index for gas heating coil
+        Real64 ParasiticElecLoad = 0.0; // parasitic electric load associated with the gas heating coil
+        Real64 ParasiticFuelLoad = 0.0; // parasitic fuel load associated with the gas heating coil
         // (standing pilot light) [J]
-        Real64 ParasiticFuelRate; // avg. parasitic fuel consumption rate with the gas heating coil
+        Real64 ParasiticFuelRate = 0.0; // avg. parasitic fuel consumption rate with the gas heating coil
         // (standing pilot light) [J]
-        Real64 ParasiticFuelCapacity;       // capacity of parasitic fuel consumption rate, input by user [W]
-        Real64 RTF;                         // Heater runtime fraction, including PLF curve impacts
-        int RTFErrorIndex;                  // used in recurring error warnings
-        int RTFErrorCount;                  // used in recurring error warnings
-        int PLFErrorIndex;                  // used in recurring error warnings
-        int PLFErrorCount;                  // used in recurring error warnings
-        std::string ReclaimHeatingCoilName; // Name of reclaim heating coil
-        int ReclaimHeatingSourceIndexNum;   // Index to reclaim heating source (condenser) of a specific type
-        HeatObjTypes ReclaimHeatingSource;  // The source for the Reclaim Heating Coil
-        //                                                            COMPRESSOR RACK:REFRIGERATED CASE    = 1
-        //                                                            COIL:DX:COOLINGBYPASSFACTOREMPIRICAL = 2
-        //                                                            COIL:DX:MULTISPEED:COOLINGEMPIRICAL  = 3
-        //                                                            COIL:DX:MultiMode:CoolingEmpirical   = 4
-        //                                                            Refrigeration:Condenser              = 5
-        int NumOfStages;                     // Number of speeds
-        Array1D<Real64> MSNominalCapacity;   // Nominal Capacity MS AC Furnace [W]
-        Array1D<Real64> MSEfficiency;        // Efficiency for MS AC Furnace [dimensionless]
-        Array1D<Real64> MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
-        bool DesiccantRegenerationCoil;      // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
-        int DesiccantDehumNum;               // index to desiccant dehumidifier object
-        bool FaultyCoilSATFlag;              // True if the coil has SAT sensor fault
-        int FaultyCoilSATIndex;              // Index of the fault object corresponding to the coil
-        Real64 FaultyCoilSATOffset;          // Coil SAT sensor offset
-        bool reportCoilFinalSizes;           // one time report of sizes to coil report
-        int AirLoopNum;                      // Airloop number
-        // Default Constructor
-        HeatingCoilEquipConditions()
-            : HCoilType_Num(0), FuelType_Num(DataGlobalConstants::ResourceType::None), SchedPtr(0), InsuffTemperatureWarn(0),
-              InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0), InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0),
-              InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0), HeatingCoilLoad(0.0), HeatingCoilRate(0.0), FuelUseLoad(0.0), ElecUseLoad(0.0),
-              FuelUseRate(0.0), ElecUseRate(0.0), Efficiency(0.0), NominalCapacity(0.0), DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0),
-              AvailTemperature(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), TempSetPointNodeNum(0), Control(0), PLFCurveIndex(0),
-              ParasiticElecLoad(0.0), ParasiticFuelLoad(0.0), ParasiticFuelRate(0.0), ParasiticFuelCapacity(0.0), RTF(0.0), RTFErrorIndex(0),
-              RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0), ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(HeatObjTypes::Invalid),
-              NumOfStages(0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
-              FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), AirLoopNum(0)
-        {
-        }
+        Real64 ParasiticFuelCapacity = 0.0;                        // capacity of parasitic fuel consumption rate, input by user [W]
+        Real64 RTF = 0.0;                                          // Heater runtime fraction, including PLF curve impacts
+        int RTFErrorIndex = 0;                                     // used in recurring error warnings
+        int RTFErrorCount = 0;                                     // used in recurring error warnings
+        int PLFErrorIndex = 0;                                     // used in recurring error warnings
+        int PLFErrorCount = 0;                                     // used in recurring error warnings
+        std::string ReclaimHeatingCoilName;                        // Name of reclaim heating coil
+        int ReclaimHeatingSourceIndexNum = 0;                      // Index to reclaim heating source (condenser) of a specific type
+        HeatObjTypes ReclaimHeatingSource = HeatObjTypes::Invalid; // The source for the Reclaim Heating Coil
+        int NumOfStages = 0;                                       // Number of speeds
+        Array1D<Real64> MSNominalCapacity;                         // Nominal Capacity MS AC Furnace [W]
+        Array1D<Real64> MSEfficiency;                              // Efficiency for MS AC Furnace [dimensionless]
+        Array1D<Real64> MSParasiticElecLoad;                       // Parasitic elec load MS AC Furnace (gas only) [W]
+        bool DesiccantRegenerationCoil = false; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
+        int DesiccantDehumNum = 0;              // index to desiccant dehumidifier object
+        bool FaultyCoilSATFlag = false;         // True if the coil has SAT sensor fault
+        int FaultyCoilSATIndex = 0;             // Index of the fault object corresponding to the coil
+        Real64 FaultyCoilSATOffset = 0.0;       // Coil SAT sensor offset
+        bool reportCoilFinalSizes = true;       // one time report of sizes to coil report
+        int AirLoopNum = 0;                     // Airloop number
     };
+
     struct HeatingCoilNumericFieldData
     {
-        // Members
         Array1D_string FieldNames;
-
-        // Default Constructor
-        HeatingCoilNumericFieldData()
-        {
-        }
     };
 
     void SimulateHeatingCoilComponents(EnergyPlusData &state,
                                        std::string_view CompName,
-                                       bool const FirstHVACIteration,
+                                       bool FirstHVACIteration,
                                        Optional<Real64 const> QCoilReq = _, // coil load to be met
                                        Optional_int CompIndex = _,
                                        Optional<Real64> QCoilActual = _,         // coil load actually delivered returned to calling component
@@ -182,33 +161,18 @@ namespace HeatingCoils {
                                        Optional<Real64 const> SpeedRatio = _ // Speed ratio of MultiStage heating coil
     );
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetHeatingCoilInput(EnergyPlusData &state);
 
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
+    void InitHeatingCoil(EnergyPlusData &state, int CoilNum, bool FirstHVACIteration, Real64 QCoilRequired);
 
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
-    void InitHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration, Real64 const QCoilRequired);
-
-    void SizeHeatingCoil(EnergyPlusData &state, int const CoilNum);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
+    void SizeHeatingCoil(EnergyPlusData &state, int CoilNum);
 
     void CalcElectricHeatingCoil(EnergyPlusData &state,
-                                 int const CoilNum, // index to heating coil
+                                 int CoilNum, // index to heating coil
                                  Real64 &QCoilReq,
-                                 Real64 &QCoilActual,       // coil load actually delivered (W)
-                                 int const FanOpMode,       // fan operating mode
-                                 Real64 const PartLoadRatio // part-load ratio of heating coil
+                                 Real64 &QCoilActual, // coil load actually delivered (W)
+                                 int FanOpMode,       // fan operating mode
+                                 Real64 PartLoadRatio // part-load ratio of heating coil
     );
 
     void CalcMultiStageElectricHeatingCoil(EnergyPlusData &state,
@@ -221,11 +185,11 @@ namespace HeatingCoils {
                                            bool const SuppHeat);
 
     void CalcFuelHeatingCoil(EnergyPlusData &state,
-                             int const CoilNum, // index to heating coil
-                             Real64 const QCoilReq,
-                             Real64 &QCoilActual,       // coil load actually delivered (W)
-                             int const FanOpMode,       // fan operating mode
-                             Real64 const PartLoadRatio // part-load ratio of heating coil
+                             int CoilNum, // index to heating coil
+                             Real64 QCoilReq,
+                             Real64 &QCoilActual, // coil load actually delivered (W)
+                             int FanOpMode,       // fan operating mode
+                             Real64 PartLoadRatio // part-load ratio of heating coil
     );
 
     void CalcMultiStageGasHeatingCoil(EnergyPlusData &state,
@@ -237,28 +201,14 @@ namespace HeatingCoils {
     );
 
     void CalcDesuperheaterHeatingCoil(EnergyPlusData &state,
-                                      int const CoilNum,     // index to desuperheater heating coil
-                                      Real64 const QCoilReq, // load requested by the simulation for load based control [W]
-                                      Real64 &QCoilActual    // coil load actually delivered
+                                      int CoilNum,        // index to desuperheater heating coil
+                                      Real64 QCoilReq,    // load requested by the simulation for load based control [W]
+                                      Real64 &QCoilActual // coil load actually delivered
     );
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
+    void UpdateHeatingCoil(EnergyPlusData &state, int CoilNum);
 
-    // Beginning of Update subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
-    void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum);
-
-    //        End of Update subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
-    void ReportHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const coilIsSuppHeater);
-
-    //        End of Reporting subroutines for the HeatingCoil Module
+    void ReportHeatingCoil(EnergyPlusData &state, int CoilNum, bool coilIsSuppHeater);
 
     void GetCoilIndex(EnergyPlusData &state, std::string const &HeatingCoilName, int &HeatingCoilIndex, bool &ErrorsFound);
 
@@ -331,15 +281,13 @@ namespace HeatingCoils {
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
     void SetHeatingCoilData(EnergyPlusData &state,
-                            int const CoilNum,                           // Number of electric or gas heating Coil
+                            int CoilNum,                                 // Number of electric or gas heating Coil
                             bool &ErrorsFound,                           // Set to true if certain errors found
                             Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
                             Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
     );
 
     void SetHeatingCoilAirLoopNumber(EnergyPlusData &state, std::string const &HeatingCoilName, int AirLoopNum, bool &ErrorsFound);
-
-    //        End of Utility subroutines for the HeatingCoil Module
 
 } // namespace HeatingCoils
 

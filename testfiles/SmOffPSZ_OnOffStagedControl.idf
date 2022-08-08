@@ -1136,29 +1136,29 @@
     ZSF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZSF1,                    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   InternalMass,
     ZNF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZNF1,                    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   InternalMass,
     ZSF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZSF2,                    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   InternalMass,
     ZNF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZNF2,                    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -1335,55 +1335,55 @@
 
   People,
     ZSF1 People 1,           !- Name
-    ZSF1,                    !- Zone or ZoneList Name
+    ZSF1,                    !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.27,                    !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ZSF1-ActSchd;            !- Activity Level Schedule Name
 
   People,
     ZNF1 People 1,           !- Name
-    ZNF1,                    !- Zone or ZoneList Name
+    ZNF1,                    !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.27,                    !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ZSF1-ActSchd;            !- Activity Level Schedule Name
 
   People,
     ZSF2 People 1,           !- Name
-    ZSF2,                    !- Zone or ZoneList Name
+    ZSF2,                    !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.27,                    !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ZSF1-ActSchd;            !- Activity Level Schedule Name
 
   People,
     ZNF2 People 1,           !- Name
-    ZNF2,                    !- Zone or ZoneList Name
+    ZNF2,                    !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.27,                    !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ZSF1-ActSchd;            !- Activity Level Schedule Name
 
   Lights,
     ZSF1 Lights 1,           !- Name
-    ZSF1,                    !- Zone or ZoneList Name
+    ZSF1,                    !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -1397,7 +1397,7 @@
 
   Lights,
     ZNF1 Lights 1,           !- Name
-    ZNF1,                    !- Zone or ZoneList Name
+    ZNF1,                    !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -1411,7 +1411,7 @@
 
   Lights,
     ZSF2 Lights 1,           !- Name
-    ZSF2,                    !- Zone or ZoneList Name
+    ZSF2,                    !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -1425,7 +1425,7 @@
 
   Lights,
     ZNF2 Lights 1,           !- Name
-    ZNF2,                    !- Zone or ZoneList Name
+    ZNF2,                    !- Zone or ZoneList or Space or SpaceList Name
     LIT-SCHED,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -1439,7 +1439,7 @@
 
   ElectricEquipment,
     ZSF1 ElecEq 1,           !- Name
-    ZSF1,                    !- Zone or ZoneList Name
+    ZSF1,                    !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -1451,7 +1451,7 @@
 
   ElectricEquipment,
     ZNF1 ElecEq 1,           !- Name
-    ZNF1,                    !- Zone or ZoneList Name
+    ZNF1,                    !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -1463,7 +1463,7 @@
 
   ElectricEquipment,
     ZSF2 ElecEq 1,           !- Name
-    ZSF2,                    !- Zone or ZoneList Name
+    ZSF2,                    !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -1475,7 +1475,7 @@
 
   ElectricEquipment,
     ZNF2 ElecEq 1,           !- Name
-    ZNF2,                    !- Zone or ZoneList Name
+    ZNF2,                    !- Zone or ZoneList or Space or SpaceList Name
     EQP-SCHED,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -1488,7 +1488,7 @@
   OtherEquipment,
     BASE-1 OthEq 1,          !- Name
     None,                    !- Fuel Type
-    BASE-1,                  !- Zone or ZoneList Name
+    BASE-1,                  !- Zone or ZoneList or Space or SpaceList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     726,                     !- Design Level {W}
@@ -1500,7 +1500,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZSF1 Infil 1,            !- Name
-    ZSF1,                    !- Zone or ZoneList Name
+    ZSF1,                    !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.043,                   !- Design Flow Rate {m3/s}
@@ -1514,7 +1514,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZNF1 Infil 1,            !- Name
-    ZNF1,                    !- Zone or ZoneList Name
+    ZNF1,                    !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.043,                   !- Design Flow Rate {m3/s}
@@ -1528,7 +1528,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZSF2 Infil 1,            !- Name
-    ZSF2,                    !- Zone or ZoneList Name
+    ZSF2,                    !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.043,                   !- Design Flow Rate {m3/s}
@@ -1542,7 +1542,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZNF2 Infil 1,            !- Name
-    ZNF2,                    !- Zone or ZoneList Name
+    ZNF2,                    !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.043,                   !- Design Flow Rate {m3/s}
@@ -1556,7 +1556,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     BASE-1 Infil 1,          !- Name
-    BASE-1,                  !- Zone or ZoneList Name
+    BASE-1,                  !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.402,                   !- Design Flow Rate {m3/s}

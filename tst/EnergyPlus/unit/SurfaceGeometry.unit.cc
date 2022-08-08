@@ -8885,6 +8885,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
         "Space,",
         "Space 3,            !- Name",
         "Zone 3,             !- Zone Name",
+        ",                   !- Ceiling Height {m}",
+        ",                   !- Volume {m3}",
         "5.0;                !- Floor Area {m2}",
 
         "Material,",
