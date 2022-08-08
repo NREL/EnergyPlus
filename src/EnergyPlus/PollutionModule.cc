@@ -246,13 +246,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
         }
 
         // If Steam Conversion Efficiency defined by the User is negative or zero then a default of 25% will be assigned.
-<<<<<<< HEAD
-        if (state.dataIPShortCut->rNumericArgs(1) > 0.0) {
-            Pollution.PurchHeatSteamConvEffic = state.dataIPShortCut->rNumericArgs(3);
-=======
         if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
-            Pollution.SteamConvEffic = state.dataIPShortCut->rNumericArgs(3);
->>>>>>> 4c390679561e18b1d1cd69f20ad9a39156867c45
+            Pollution.PurchHeatSteamConvEffic = state.dataIPShortCut->rNumericArgs(3);
         }
 
         // Load the Total Carbon Equivalent Pollution Factor coefficients

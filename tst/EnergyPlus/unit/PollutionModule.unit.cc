@@ -583,5 +583,5 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestEnvironmentalImpactFactors)
 
     // The get routine should rest the steam conversion efficiency to the default value of 0.25.
     // Previously because of a typo, it would reset it to the input value of zero (or even a negative number).
-    ASSERT_NEAR(state->dataPollutionModule->Pollution.SteamConvEffic, ExpectedOutput, AllowedTolerance);
+    ASSERT_NEAR(state->dataPollutionModule->Pollution.PurchHeatSteamConvEffic, ExpectedOutput, AllowedTolerance);
 }
