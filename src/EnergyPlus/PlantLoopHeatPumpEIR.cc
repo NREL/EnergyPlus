@@ -1212,7 +1212,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // Determine which air variable to use for GAHP:
     // Source (air) side variable to use
     Real64 oaTempforCurve = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
-    if (this->oaTempCurveInputVar == 1) {
+    if (this->oaTempCurveInputVar == OATempCurveVar::DryBulb) {
         oaTempforCurve = Psychrometrics::PsyTwbFnTdbWPb(state,
                                                         state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
                                                         state.dataLoopNodes->Node(this->loadSideNodes.inlet).HumRat,
@@ -1787,11 +1787,11 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string oaTempCurveInputVar =
                     UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
                 if (oaTempCurveInputVar == "DRYBULB") {
-                    thisPLHP.oaTempCurveInputVar = 0;
+                    thisPLHP.oaTempCurveInputVar = OATempCurveVar::DryBulb;
                 } else if (oaTempCurveInputVar == "WETBULB") {
-                    thisPLHP.oaTempCurveInputVar = 1;
+                    thisPLHP.oaTempCurveInputVar = OATempCurveVar::WetBulb;
                 } else {
-                    thisPLHP.oaTempCurveInputVar = 0;
+                    thisPLHP.oaTempCurveInputVar = OATempCurveVar::DryBulb;
                 }
 
                 // A10 water_temperature_curve_input_variable

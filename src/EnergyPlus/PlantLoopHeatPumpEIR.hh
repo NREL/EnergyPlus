@@ -204,6 +204,15 @@ namespace EIRPlantLoopHeatPumps {
         // logic flags
         // a couple worker functions to easily allow merging of cooling and heating operations
 
+        // enum definitions for Fuel Fired only
+        enum class OATempCurveVar
+        {
+            Invalid = -1, 
+            DryBulb = 0, 
+            WetBulb = 1, 
+            Num
+        };
+
         // New additions for GAHP only
         std::string fuelTypeStr = "";
         DataGlobalConstants::ResourceType fuelType = DataGlobalConstants::ResourceType::None; // resource type assignment
@@ -211,7 +220,7 @@ namespace EIRPlantLoopHeatPumps {
         DataPlant::FlowMode flowMode = DataPlant::FlowMode::Invalid;
         Real64 desSupplyTemp = 60.0;
         Real64 desTempLift = 11.1;
-        int oaTempCurveInputVar = 0;
+        OATempCurveVar oaTempCurveInputVar = OATempCurveVar::DryBulb;
         int waterTempCurveInputVar = 0;
         // int capFuncTempCurveIndex = 0;
         // int powerRatioFuncTempCurveIndex = 0;
