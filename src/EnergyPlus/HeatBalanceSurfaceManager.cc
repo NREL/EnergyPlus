@@ -2621,8 +2621,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 state.dataSurface->SurfReflFacBmToDiffSolGnd)); // For linear indexing
         Real64 GndReflSolarRad = 0.0;
         Real64 GndSolarRadInc = max(state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad, 0.0);
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+            state.dataSurface->Surface(SurfNum).IncSolMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+        }
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             state.dataSurface->SurfSkySolarInc(SurfNum) =
                 state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
@@ -2642,7 +2646,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             Array1D<Real64>::size_type lSP = state.dataSurface->SurfReflFacBmToBmSolObs.index(state.dataGlobal->PreviousHour, 1) - 1;
             // For Complex Fenestrations:
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+                auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
 
                 Real64 GndSurfReflectance = 0.0;
                 if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
@@ -2784,7 +2788,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 // Cosine of incidence angle and solar incident on outside of surface, for reporting
                 Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
                 state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = CosInc;
-                Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+                auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                 // Incident direct (unreflected) beam
                 state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) =
                     state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
@@ -2812,7 +2816,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
         Array1D<Real64> currBeamSolar(state.dataSurface->TotSurfaces); // Local variable for BeamSolarRad
 
         for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
-            Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+            auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             // Regular surface
             currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
             // Cosine of incidence angle and solar incident on outside of surface, for reporting
@@ -2879,7 +2883,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             Real64 ConInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
 
             state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = ConInc;
-            Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+            auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                                      TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarBeam) /
                                      state.dataConstruction->Construct(ConstrNum).TransDiff;
@@ -2911,7 +2915,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             int OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
             state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) =
                 state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
-            Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+            auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
             // Shelf diffuse solar radiation
             Real64 ShelfSolarRad = (state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
@@ -2936,7 +2940,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+                auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                 if (Surface(SurfNum).ExtSolar) {
                     Real64 AbsExt =
                         state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum); // Absorptivity of outer most layer (or movable insulation if present)
@@ -3240,7 +3244,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         Real64 FracSunLit = 0.0;        // Fraction of window sunlit this time step
                         Real64 BeamFaceInc;             // Beam solar incident window plane this time step (W/m2)
                         Real64 DifSolarFaceInc;         // Diffuse solar incident on window plane this time step (W/m2)
-                        Real64 SurfIncSolarMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+                        auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                         if (FrArea > 0.0 || DivArea > 0.0) {
                             FracSunLit = state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
                             BeamFaceInc = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *

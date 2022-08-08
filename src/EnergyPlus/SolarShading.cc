@@ -8350,7 +8350,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
         // Variables for reporting
         for (int const SurfNum : thisEnclosure.SurfacePtr) {
-            Real64 SurfIncSolarMultiplier = HeatBalanceSurfaceManager::GetSurfIncidentSolarMultiplier(state, SurfNum);
+            auto const &SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             if (state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::FullInteriorExterior) {
                 state.dataHeatBal->SurfBmIncInsSurfAmountRep(SurfNum) *= state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
                 state.dataHeatBal->SurfBmIncInsSurfAmountRepEnergy(SurfNum) =
