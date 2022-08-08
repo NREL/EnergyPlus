@@ -207,9 +207,9 @@ namespace EIRPlantLoopHeatPumps {
         // enum definitions for Fuel Fired only
         enum class OATempCurveVar
         {
-            Invalid = -1, 
-            DryBulb = 0, 
-            WetBulb = 1, 
+            Invalid = -1,
+            DryBulb = 0,
+            WetBulb = 1,
             Num
         };
 
@@ -219,6 +219,13 @@ namespace EIRPlantLoopHeatPumps {
             EnteringCondenser = 0,
             LeavingCondenser = 1,
             Num
+        };
+
+        enum class DefrostType
+        {
+            Invalid = -1,
+            Timed = 0,
+            OnDemand = 1
         };
 
         // New additions for GAHP only
@@ -237,7 +244,7 @@ namespace EIRPlantLoopHeatPumps {
         Real64 maxPLR = 1.0;
 
         int defrostEIRCurveIndex = 0;
-        int defrostType = 0;
+        DefrostType defrostType = DefrostType::OnDemand;
         Real64 defrostOpTimeFrac = 0.0;
         Real64 defrostMaxOADBT = 5.0;
 

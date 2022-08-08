@@ -1897,15 +1897,15 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
                 // A15 defrost_control_type
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostType = 0;
+                    thisPLHP.defrostType = DefrostType::OnDemand;
                 } else {
                     std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
                     if (defrostControlType == "TIMED") {
-                        thisPLHP.defrostType = 0;
+                        thisPLHP.defrostType = DefrostType::Timed;
                     } else if (defrostControlType == "ONDEMAND") {
-                        thisPLHP.defrostType = 1;
+                        thisPLHP.defrostType = DefrostType::OnDemand;
                     } else {
-                        thisPLHP.defrostType = 0; // default Timed
+                        thisPLHP.defrostType = DefrostType::OnDemand; // default OnDemand
                     }
                 }
                 // N8 defrost_operation_time_fraction
