@@ -5209,7 +5209,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                 ShowContinueError(
-                    state, "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name");
+                    state, "...each SurfaceProperty:IncidentSolarMultiplier name must not duplicate other SurfaceProperty:IncidentSolarMultiplier name");
                 continue;
             }
 
@@ -5257,6 +5257,10 @@ namespace HeatBalanceManager {
             state.dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
             state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = state.dataIPShortCut->rNumericArgs(1);
             state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+            // SchedPtr == 0 but schedule field is not empty
+            if (state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr == 0 && !(state.dataIPShortCut->cAlphaArgs(2).empty())) {
+                ShowSevereError(state, "Invalid Incident Solar Multiplier Schedule Name in SurfaceProperty:IncidentSolarMultiplier");
+            }
         }
     }
 
