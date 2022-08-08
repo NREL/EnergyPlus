@@ -4059,11 +4059,6 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     }
 
     for (int SurfNum : state.dataSurface->AllHTWindowSurfaceList) {
-        if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) {
-            continue;
-        }
-        // No need to skip state.dataSurface->Surface(SurfNum).IsAirBoundarySurf, AllHTWindowSurfaceList doesn't include them
-
         int const surfEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
         int const numEnclRefPoints = state.dataViewFactor->EnclSolInfo(surfEnclNum).TotalEnclosureDaylRefPoints;
         if (numEnclRefPoints > 0) {

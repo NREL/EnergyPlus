@@ -1738,28 +1738,17 @@ namespace SurfaceGeometry {
             }
         }
 
-        if constexpr (true) {
-            // TODO: Temp validity checking
-            assert(state.dataSurface->TotSurfaces == MovedSurfs);
-            assert(state.dataSurface->TotSurfaces == static_cast<int>(state.dataSurface->AllSurfaceListReportOrder.size()));
-            assert(state.dataSurface->TotSurfaces == static_cast<int>(oldToNewSurfNums.size()));
+        // Validity checking
+        assert(state.dataSurface->TotSurfaces == MovedSurfs);
+        assert(state.dataSurface->TotSurfaces == static_cast<int>(state.dataSurface->AllSurfaceListReportOrder.size()));
+        assert(state.dataSurface->TotSurfaces == static_cast<int>(oldToNewSurfNums.size()));
 
-            // Assert unicity
-            std::set<int> AllSurfaceListReportOrderSet(state.dataSurface->AllSurfaceListReportOrder.begin(),
-                                                       state.dataSurface->AllSurfaceListReportOrder.end());
-            assert(state.dataSurface->TotSurfaces == static_cast<int>(AllSurfaceListReportOrderSet.size()));
+        // Assert validity of indices
+        assert(std::find_if(state.dataSurface->AllSurfaceListReportOrder.cbegin(), state.dataSurface->AllSurfaceListReportOrder.cend(), [](int i) {
+                   return i < 1;
+               }) == state.dataSurface->AllSurfaceListReportOrder.cend());
 
-            std::set<int> oldToNewSurfNumsSet(oldToNewSurfNums.begin(), oldToNewSurfNums.end());
-            assert(state.dataSurface->TotSurfaces == static_cast<int>(oldToNewSurfNumsSet.size()));
-
-            // Assert validity of indices
-            assert(std::find_if(state.dataSurface->AllSurfaceListReportOrder.cbegin(),
-                                state.dataSurface->AllSurfaceListReportOrder.cend(),
-                                [](int i) { return i < 1; }) == state.dataSurface->AllSurfaceListReportOrder.cend());
-
-            assert(std::find_if(oldToNewSurfNums.cbegin(), oldToNewSurfNums.cend(), [](int i) { return i < 1; }) == oldToNewSurfNums.cend());
-
-        } // IS DEBUG
+        assert(std::find_if(oldToNewSurfNums.cbegin(), oldToNewSurfNums.cend(), [](int i) { return i < 1; }) == oldToNewSurfNums.cend());
 
         if (MovedSurfs != state.dataSurface->TotSurfaces) {
             ShowSevereError(
