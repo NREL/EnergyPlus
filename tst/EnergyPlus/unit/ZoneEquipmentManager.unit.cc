@@ -1323,6 +1323,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
     auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
+    auto &moisture(state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
     state->dataSize->FinalZoneSizing.allocate(1);
@@ -1433,6 +1434,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(energy.RemainingOutputRequired, energy.SequencedOutputRequired(1));
     EXPECT_EQ(energy.RemainingOutputReqToHeatSP, energy.SequencedOutputRequiredToHeatingSP(1));
     EXPECT_EQ(energy.RemainingOutputReqToCoolSP, energy.SequencedOutputRequiredToCoolingSP(1));
+    // expect moisture loads to be 0 since humidity is not controlled
+    EXPECT_EQ(moisture.RemainingOutputRequired, 0.0);
+    EXPECT_EQ(moisture.RemainingOutputReqToHumidSP, 0.0);
+    EXPECT_EQ(moisture.RemainingOutputReqToDehumidSP, 0.0);
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
@@ -1919,7 +1924,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    SetZoneEquipSimOrder(*state, ZoneNum, ZoneNum);
+    SetZoneEquipSimOrder(*state, ZoneNum);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
@@ -2204,7 +2209,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType.CoolAirDesMethod = 1;
             thisSizingType.HeatAirDesMethod = 1;
             thisSizingType.DOASControlStrategy = 1;
-            thisSizingType.ActualZoneNum = 1;
+            thisSizingType.ZoneNum = 1;
             thisSizingType.TimeStepNumAtHeatMax = 1;
             thisSizingType.TimeStepNumAtCoolMax = 1;
             thisSizingType.HeatDDNum = 1;
@@ -2399,7 +2404,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType2.CoolAirDesMethod = 1;
             thisSizingType2.HeatAirDesMethod = 1;
             thisSizingType2.DOASControlStrategy = 1;
-            thisSizingType2.ActualZoneNum = 1;
+            thisSizingType2.ZoneNum = 1;
             thisSizingType2.TimeStepNumAtHeatMax = 1;
             thisSizingType2.TimeStepNumAtCoolMax = 1;
             thisSizingType2.HeatDDNum = 1;
@@ -4491,7 +4496,6 @@ TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
     state->dataHeatBal->space(1).Name = "LIVING ZONE";
     state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
@@ -4566,6 +4570,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataSize->CalcZoneSizing.allocate(1, state->dataGlobal->NumOfZones);
     state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->NonAirSystemResponse.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->SysDepZoneLoads.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
@@ -4575,6 +4580,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(state->dataGlobal->NumOfZones);
+    auto &zoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -4587,14 +4593,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 24.;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataSize->CalcZoneSizing(1, 1).ActualZoneNum = 1;
+    state->dataSize->CalcZoneSizing(1, 1).ZoneNum = 1;
     state->dataSize->CurOverallSimDay = 1;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -3600;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 22000.;
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).TotalOutputRequired = 0.0;
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).OutputRequiredToHumidifyingSP = 0.0;
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).OutputRequiredToDehumidifyingSP = 0.0;
+    zoneSysMoistureDemand.TotalOutputRequired = 0.0;
+    zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 0.0;
+    zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.0;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
@@ -4604,7 +4610,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataEnvrn->StdBaroPress = 101325.;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
     state->dataSize->CalcFinalZoneSizing(1).OutTempAtHeatPeak = 28;
@@ -4660,4 +4665,70 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     // Final design values that get passed to the equipment, same as before
     EXPECT_DOUBLE_EQ(22.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak);
     EXPECT_DOUBLE_EQ(24.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtCoolPeak);
+
+    // test latent sizing results when no sensible load exists
+    auto &calcZoneSizing = state->dataSize->CalcZoneSizing(1, 1);
+    auto &zoneNode = state->dataLoopNodes->Node(4);
+    auto &supplyNode = state->dataLoopNodes->Node(1);
+
+    // no load condition (sensible and latent loads = 0) will place zone conditions on the supply air node with 0 mass flow rate
+    EXPECT_NEAR(zoneNode.Temp, 23.0, 0.000001);
+    EXPECT_NEAR(supplyNode.Temp, 23.0, 0.000001);
+    EXPECT_NEAR(zoneNode.HumRat, 0.008, 0.000001);
+    EXPECT_NEAR(supplyNode.HumRat, 0.008, 0.000001);
+    EXPECT_NEAR(supplyNode.MassFlowRate, 0.0, 0.000001);
+
+    // turn on latent sizing
+    calcZoneSizing.zoneLatentSizing = true;
+
+    // set a humidification load
+    zoneSysMoistureDemand.TotalOutputRequired = 0.001;
+    zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 0.001;
+    zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.002;
+    SizeZoneEquipment(*state);
+    Real64 latentMassFlowRate = zoneSysMoistureDemand.TotalOutputRequired / calcZoneSizing.CoolDesHumRatDiff;
+    EXPECT_EQ(calcZoneSizing.CoolDesHumRatDiff, 0.005);
+    EXPECT_EQ(calcZoneSizing.HeatDesHumRatDiff, 0.005);
+    // when latent load and no sensible load exists, use zone temp as supply air temp and calculated humrat based on SA humrat difference (0.005)
+    EXPECT_NEAR(zoneNode.Temp, 23.0, 0.000001);
+    EXPECT_NEAR(supplyNode.Temp, 23.0, 0.000001);
+    EXPECT_NEAR(zoneNode.HumRat, 0.008, 0.000001);
+    EXPECT_NEAR(supplyNode.HumRat, 0.013, 0.000001);
+    EXPECT_NEAR(supplyNode.MassFlowRate, 0.2, 0.000001);
+    EXPECT_NEAR(supplyNode.MassFlowRate, latentMassFlowRate, 0.000001);
+    // humidification variables get populated
+    EXPECT_NEAR(calcZoneSizing.HeatLatentLoad, 2543.7, 0.1);
+    EXPECT_NEAR(calcZoneSizing.ZoneHeatLatentMassFlow, 0.2, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.CoolLatentLoad, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.ZoneCoolLatentMassFlow, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.HeatLoadNoDOAS, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.CoolLoadNoDOAS, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.HeatLatentLoadNoDOAS, 2543.7, 0.1);
+    EXPECT_NEAR(calcZoneSizing.CoolLatentLoadNoDOAS, 0.0, 0.000001);
+
+    // set a dehumidification load
+    zoneSysMoistureDemand.TotalOutputRequired = -0.001;
+    zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = -0.002;
+    zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = -0.001;
+    SizeZoneEquipment(*state);
+    latentMassFlowRate = zoneSysMoistureDemand.TotalOutputRequired / -calcZoneSizing.CoolDesHumRatDiff;
+    EXPECT_EQ(calcZoneSizing.CoolDesHumRatDiff, 0.005);
+    EXPECT_EQ(calcZoneSizing.HeatDesHumRatDiff, 0.005);
+    // when latent load and no sensible load exists, use zone temp as supply air temp and calculated humrat based on SA humrat difference (0.005)
+    EXPECT_NEAR(zoneNode.Temp, 23.0, 0.000001);
+    EXPECT_NEAR(supplyNode.Temp, 23.0, 0.000001);
+    EXPECT_NEAR(zoneNode.HumRat, 0.008, 0.000001);
+    EXPECT_NEAR(supplyNode.HumRat, 0.003, 0.000001);
+    EXPECT_NEAR(supplyNode.MassFlowRate, 0.2, 0.000001);
+    EXPECT_NEAR(supplyNode.MassFlowRate, latentMassFlowRate, 0.000001);
+
+    // dehumidification variables get populated
+    EXPECT_NEAR(calcZoneSizing.HeatLatentLoad, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.ZoneHeatLatentMassFlow, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.CoolLatentLoad, 2543.7, 0.1);
+    EXPECT_NEAR(calcZoneSizing.ZoneCoolLatentMassFlow, 0.2, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.HeatLoadNoDOAS, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.CoolLoadNoDOAS, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.HeatLatentLoadNoDOAS, 0.0, 0.000001);
+    EXPECT_NEAR(calcZoneSizing.CoolLatentLoadNoDOAS, 2543.7, 0.1);
 }

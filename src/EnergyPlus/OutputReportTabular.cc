@@ -4536,31 +4536,31 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     // HVAC Input Cooled Surface Cooling    Zone Ventilated Slab Radiant Cooling Energy    -VentSlab()%RadCoolingEnergy HVAC     Energy
     //                                      Hydronic Low Temp Radiant Cooling Energy       -HydrRadSys()%CoolEnergy     HVAC     Energy
     //                                      Constant Flow Low Temp Radiant Cooling Energy  -CFloRadSys()%CoolEnergy     HVAC     Energy
-    // People Sensible Heat Addition        Zone People Sensible Heating Energy            ZnRpt()%PeopleSenGain        Zone     Energy
-    // Lights Sensible Heat Addition        Zone Lights Total Heating Energy               ZnRpt()%LtsTotGain           Zone     Energy
-    // Equipment Sensible Heat Addition     Zone Electric Equipment Radiant Heating Energy ZnRpt()%ElecRadGain          Zone     Energy
-    //                                      Zone Gas Equipment Radiant Heating Energy      ZnRpt()%GasRadGain           Zone     Energy
-    //                                      Zone Steam Equipment Radiant Heating Energy    ZnRpt()%SteamRadGain         Zone     Energy
-    //                                      Zone Hot Water Equipment Radiant Heating Energy ZnRpt()%HWRadGain           Zone     Energy
-    //                                      Zone Other Equipment Radiant Heating Energy    ZnRpt()%OtherRadGain         Zone     Energy
-    //                                   Zone Electric Equipment Convective Heating Energy ZnRpt()%ElecConGain          Zone     Energy
-    //                                      Zone Gas Equipment Convective Heating Energy   ZnRpt()%GasConGain           Zone     Energy
-    //                                      Zone Steam Equipment Convective Heating Energy ZnRpt()%SteamConGain         Zone     Energy
-    //                                    Zone Hot Water Equipment Convective Heating Energy ZnRpt()%HWConGain          Zone     Energy
-    //                                      Zone Other Equipment Convective Heating Energy ZnRpt()%OtherConGain         Zone     Energy
+    // People Sensible Heat Addition        Zone People Sensible Heating Energy            ZoneRpt()%PeopleSenGain        Zone     Energy
+    // Lights Sensible Heat Addition        Zone Lights Total Heating Energy               ZoneRpt()%LtsTotGain           Zone     Energy
+    // Equipment Sensible Heat Addition     Zone Electric Equipment Radiant Heating Energy ZoneRpt()%ElecRadGain          Zone     Energy
+    //                                      Zone Gas Equipment Radiant Heating Energy      ZoneRpt()%GasRadGain           Zone     Energy
+    //                                      Zone Steam Equipment Radiant Heating Energy    ZoneRpt()%SteamRadGain         Zone     Energy
+    //                                      Zone Hot Water Equipment Radiant Heating Energy ZoneRpt()%HWRadGain           Zone     Energy
+    //                                      Zone Other Equipment Radiant Heating Energy    ZoneRpt()%OtherRadGain         Zone     Energy
+    //                                   Zone Electric Equipment Convective Heating Energy ZoneRpt()%ElecConGain          Zone     Energy
+    //                                      Zone Gas Equipment Convective Heating Energy   ZoneRpt()%GasConGain           Zone     Energy
+    //                                      Zone Steam Equipment Convective Heating Energy ZoneRpt()%SteamConGain         Zone     Energy
+    //                                    Zone Hot Water Equipment Convective Heating Energy ZoneRpt()%HWConGain          Zone     Energy
+    //                                      Zone Other Equipment Convective Heating Energy ZoneRpt()%OtherConGain         Zone     Energy
     // Window Heat Addition                 Zone Windows Total Heat Gain Energy            ZoneWinHeatGainRepEnergy()   Zone     Energy
     // Interzone Air Transfer Heat Addition Zone Air Heat Balance Interzone Air Transfer Rate  ZnAirRpt()%SumMCpDTzones HVAC     Rate
     // Infiltration Heat Addition           Zone Air Heat Balance Outdoor Air Transfer Rate ZnAirRpt()%SumMCpDtInfil     HVAC     Rate
-    // Equipment Sensible Heat Removal      Zone Electric Equipment Radiant Heating Energy ZnRpt()%ElecRadGain          Zone     Energy
-    //                                      Zone Gas Equipment Radiant Heating Energy      ZnRpt()%GasRadGain           Zone     Energy
-    //                                      Zone Steam Equipment Radiant Heating Energy    ZnRpt()%SteamRadGain         Zone     Energy
-    //                                      Zone Hot Water Equipment Radiant Heating Energy ZnRpt()%HWRadGain           Zone     Energy
-    //                                      Zone Other Equipment Radiant Heating Energy    ZnRpt()%OtherRadGain         Zone     Energy
-    //                                   Zone Electric Equipment Convective Heating Energy ZnRpt()%ElecConGain          Zone     Energy
-    //                                      Zone Gas Equipment Convective Heating Energy   ZnRpt()%GasConGain           Zone     Energy
-    //                                      Zone Steam Equipment Convective Heating Energy ZnRpt()%SteamConGain         Zone     Energy
-    //                                     Zone Hot Water Equipment Convective Heating Energy ZnRpt()%HWConGain         Zone     Energy
-    //                                      Zone Other Equipment Convective Heating Energy ZnRpt()%OtherConGain         Zone     Energy
+    // Equipment Sensible Heat Removal      Zone Electric Equipment Radiant Heating Energy ZoneRpt()%ElecRadGain          Zone     Energy
+    //                                      Zone Gas Equipment Radiant Heating Energy      ZoneRpt()%GasRadGain           Zone     Energy
+    //                                      Zone Steam Equipment Radiant Heating Energy    ZoneRpt()%SteamRadGain         Zone     Energy
+    //                                      Zone Hot Water Equipment Radiant Heating Energy ZoneRpt()%HWRadGain           Zone     Energy
+    //                                      Zone Other Equipment Radiant Heating Energy    ZoneRpt()%OtherRadGain         Zone     Energy
+    //                                   Zone Electric Equipment Convective Heating Energy ZoneRpt()%ElecConGain          Zone     Energy
+    //                                      Zone Gas Equipment Convective Heating Energy   ZoneRpt()%GasConGain           Zone     Energy
+    //                                      Zone Steam Equipment Convective Heating Energy ZoneRpt()%SteamConGain         Zone     Energy
+    //                                     Zone Hot Water Equipment Convective Heating Energy ZoneRpt()%HWConGain         Zone     Energy
+    //                                      Zone Other Equipment Convective Heating Energy ZoneRpt()%OtherConGain         Zone     Energy
     // Window Heat Removal                  Zone Windows Total Heat Loss Energy            -ZoneWinHeatLossRepEnergy()  Zone     Energy
     // Interzone Air Transfer Heat Removal  Zone Air Heat Balance Interzone Air Transfer Rate ZnAirRpt()%SumMCpDTzones  HVAC     Rate
     // Infiltration Heat Removal            Zone Air Heat Balance Outdoor Air Transfer Rate ZnAirRpt()%SumMCpDtInfil     HVAC     Rate
@@ -4631,10 +4631,10 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
         mult = Zone(state.dataOutRptTab->iZoneGHGR).Multiplier * Zone(state.dataOutRptTab->iZoneGHGR).ListMultiplier;
         // People Sensible Heat Addition
         ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnPeoplAdd +=
-            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGain * mult * state.dataOutRptTab->timeStepRatio;
+            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGain * mult * state.dataOutRptTab->timeStepRatio;
         // Lights Sensible Heat Addition
         ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnLiteAdd +=
-            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGain * mult * state.dataOutRptTab->timeStepRatio;
+            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGain * mult * state.dataOutRptTab->timeStepRatio;
         // HVAC Input Sensible Air Heating
         // HVAC Input Sensible Air Cooling
         Real64 ZoneEqHeatorCool = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem +
@@ -4673,16 +4673,16 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
         // Equipment Sensible Heat Addition
         // Equipment Sensible Heat Removal
         // the following variables are already gains so they do not need to be converted by multiplying by time.
-        state.dataOutRptTab->eqpSensGHGR = (state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGain) *
+        state.dataOutRptTab->eqpSensGHGR = (state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGain) *
                                            state.dataOutRptTab->timeStepRatio;
         if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
@@ -4821,23 +4821,23 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
                     state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR); // multipliers included above
                 // People Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtPeoplAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtLiteAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
                 // non-HVAC ZnAirRpt variables DO NOT include zone multipliers
-                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
                 if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipAdd = state.dataOutRptTab->eqpSensGHGR * mult;
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipRem = 0.0;
@@ -4929,22 +4929,22 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacATUCl = state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
                 // People Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClPeoplAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClLiteAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
-                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
                 if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipAdd = state.dataOutRptTab->eqpSensGHGR * mult;
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipRem = 0.0;
@@ -5068,21 +5068,22 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
             state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt += state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR);
             state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl += state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
             // People Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd +=
+                state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
             // Lights Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd += state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
             // Equipment Sensible Heat Addition
             // Equipment Sensible Heat Removal
-            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
             if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                 state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
             } else {
@@ -5173,21 +5174,22 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
             state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt += state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR);
             state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl += state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
             // People Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd +=
+                state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
             // Lights Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd += state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
             // Equipment Sensible Heat Addition
             // Equipment Sensible Heat Removal
-            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
             if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                 state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
             } else {
@@ -5281,9 +5283,12 @@ void WriteTabularReports(EnergyPlusData &state)
         WriteLoadComponentSummaryTables(state);
         WriteHeatEmissionTable(state);
 
-        if (ort->displayThermalResilienceSummary) WriteThermalResilienceTables(state);
-        if (ort->displayCO2ResilienceSummary) WriteCO2ResilienceTables(state);
-        if (ort->displayVisualResilienceSummary) WriteVisualResilienceTables(state);
+        if (ort->displayThermalResilienceSummary && !state.dataGlobal->DoPureLoadCalc) // code will crash if pure load calc
+            WriteThermalResilienceTables(state);                                       // code will crash if pure load calc
+        if (ort->displayCO2ResilienceSummary && !state.dataGlobal->DoPureLoadCalc)     // code will crash if pure load calc
+            WriteCO2ResilienceTables(state);                                           // code will crash if pure load calc
+        if (ort->displayVisualResilienceSummary && !state.dataGlobal->DoPureLoadCalc)  // code will crash if pure load calc
+            WriteVisualResilienceTables(state);                                        // code will crash if pure load calc
 
         state.dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(
             state);                   // call to write out the coil selection summary table data
@@ -6326,10 +6331,9 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
 
             // air loop name
             std::string airLoopName = "";
-            int ctrlZoneNum = Zone(iZone).ZoneEqNum;
-            if (ctrlZoneNum > 0) {
-                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
-                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+            if (Zone(iZone).IsControlled) {
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(iZone).NumInletNodes; ++zoneInNode) {
+                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(iZone).InletNodeAirLoopNum(zoneInNode);
                     if (airLoopNumber > 0) {
                         if (airLoopName.empty()) {
                             airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
@@ -6371,15 +6375,14 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaoAvgMechVent,
                                      Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).MechVentVolTotalOcc /
-                                         (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                                     ZonePreDefRep(iZone).MechVentVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume * zoneMult),
                                      3);
                 }
                 if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchOaoMinMechVent,
                                      Zone(iZone).Name,
-                                     ZonePreDefRep(iZone).MechVentVolMin / (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                                     ZonePreDefRep(iZone).MechVentVolMin / (Zone(iZone).Volume * zoneMult),
                                      3);
                 }
                 PreDefTableEntry(
@@ -6511,122 +6514,122 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlMechVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).MechVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlNatVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).NatVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTotVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).MechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).NatVentTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlSumDynTrgVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz);
+                         state.dataSysRpts->SysPreDefRep(iSys).TargetVentTotalVoz);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmBelow,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeBelowVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAt,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAbove,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAboveVozDynTotal);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeVentUnoccTotal);
 
         // Air loop times at OA limiting factors
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNoLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNone]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorNone]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorLimits]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorLimits]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEcono,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEconomizer]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorEconomizer]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctExhaust,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorExhaust]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorExhaust]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctMixedLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorMixedAir]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorMixedAir]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctHiHumid,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorHighHum]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorHighHum]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDCV,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDCV]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorDCV]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNiteVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNightVent]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorNightVent]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDemand,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDemandLimit]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorDemandLimit]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEMS,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEMS]);
+                         state.dataSysRpts->SysPreDefRep(iSys).TimeAtOALimit[MixedAir::limitFactorEMS]);
 
-        if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+        if (state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal > 0.0) {
             // Average Outdoor Air During Occupancy by Airloop
-            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal * SecInHour;
+            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal * SecInHour;
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlMechVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).MechVentTotalOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlNatVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).NatVentTotalOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTotVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             (state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc) /
+                             (state.dataSysRpts->SysPreDefRep(iSys).MechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).NatVentTotalOcc) /
                                  totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc / totTimeOccSec,
+                             state.dataSysRpts->SysPreDefRep(iSys).TargetVentTotalVozOcc / totTimeOccSec,
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmBelow,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeBelowVozDynTotalOcc);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmAt,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeAtVozDynTotalOcc);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlTmAbove,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc);
+                             state.dataSysRpts->SysPreDefRep(iSys).TimeAboveVozDynTotalOcc);
 
             // Average Outdoor Air at OA Limiting Factors During Occupancy by Airloop
             // lambda to set avgFlow during occupancy for a given airloop and limiting factor type
             auto avgFlowRate = [&state](int sysNum, int limitingFactorType) {
                 Real64 avgFlow = 0.0;
-                int time = state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimitOcc[limitingFactorType];
+                int time = state.dataSysRpts->SysPreDefRep(sysNum).TimeAtOALimitOcc[limitingFactorType];
                 if (time > 0) {
-                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
+                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).MechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
                 } else {
                     avgFlow = 0.0;
                 }
@@ -14524,30 +14527,39 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                         CombineLoadCompResults(AirLoopHeatCompLoadTables(iAirLoop), AirLoopZonesHeatCompLoadTables(iZone), mult);
                     }
                 }
+                auto &airLoopCoolTable = AirLoopCoolCompLoadTables(iAirLoop);
+                auto &airLoopHeatTable = AirLoopHeatCompLoadTables(iAirLoop);
+                auto &finalSysSizing = FinalSysSizing(iAirLoop);
+                for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum != iAirLoop) continue;
+                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Coincident) {
+                        airLoopCoolTable.peakDesSensLoad = finalSysSizing.SysCoolCoinSpaceSens;
+                        airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
+                        airLoopHeatTable.peakDesSensLoad = -finalSysSizing.SysHeatCoinSpaceSens;
+                        airLoopHeatTable.designPeakLoad = -finalSysSizing.SysDesHeatLoad;
+                        airLoopCoolTable.diffPeakEst = airLoopCoolTable.peakDesSensLoad - airLoopCoolTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopCoolTable.designPeakLoad - airLoopCoolTable.peakDesSensLoad;
+                        airLoopHeatTable.diffPeakEst = airLoopHeatTable.peakDesSensLoad - airLoopHeatTable.estInstDelSensLoad;
+                        airLoopCoolTable.diffDesignPeak = airLoopHeatTable.designPeakLoad - airLoopHeatTable.peakDesSensLoad;
+                    }
+                }
+                ComputeEngineeringChecks(airLoopCoolTable);
+                ComputeEngineeringChecks(airLoopHeatTable);
 
-                ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
+                AddTotalRowsForLoadSummary(airLoopCoolTable);
+                AddTotalRowsForLoadSummary(airLoopHeatTable);
 
-                AddTotalRowsForLoadSummary(AirLoopCoolCompLoadTables(iAirLoop));
-                AddTotalRowsForLoadSummary(AirLoopHeatCompLoadTables(iAirLoop));
+                ComputePeakDifference(airLoopCoolTable);
+                ComputePeakDifference(airLoopHeatTable);
 
-                ComputePeakDifference(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputePeakDifference(AirLoopHeatCompLoadTables(iAirLoop));
+                CreateListOfZonesForAirLoop(state, airLoopCoolTable, zoneToAirLoopCool, iAirLoop);
+                CreateListOfZonesForAirLoop(state, airLoopHeatTable, zoneToAirLoopHeat, iAirLoop);
 
-                CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
-                CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
+                LoadSummaryUnitConversion(state, airLoopCoolTable, unitsStyle_cur);
+                LoadSummaryUnitConversion(state, airLoopHeatTable, unitsStyle_cur);
 
-                LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_cur);
-                LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
-
-                OutputCompLoadSummary(state,
-                                      OutputType::AirLoop,
-                                      AirLoopCoolCompLoadTables(iAirLoop),
-                                      AirLoopHeatCompLoadTables(iAirLoop),
-                                      iAirLoop,
-                                      unitsStyle_cur,
-                                      produceTabular,
-                                      produceSQLite);
+                OutputCompLoadSummary(
+                    state, OutputType::AirLoop, airLoopCoolTable, airLoopHeatTable, iAirLoop, unitsStyle_cur, produceTabular, produceSQLite);
             }
         }
 
@@ -14638,6 +14650,26 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
                 FacilityZonesHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
                 CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
+            }
+
+            auto &facilityCoolTable = FacilityCoolCompLoadTables;
+            auto &facilityHeatTable = FacilityHeatCompLoadTables;
+            facilityCoolTable.peakDesSensLoad = 0.0;
+            facilityCoolTable.designPeakLoad = 0.0;
+            facilityHeatTable.peakDesSensLoad = 0.0;
+            facilityHeatTable.designPeakLoad = 0.0;
+            facilityCoolTable.diffPeakEst = 0.0;
+            facilityHeatTable.diffPeakEst = 0.0;
+            facilityCoolTable.diffDesignPeak = 0.0;
+            for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
+                facilityCoolTable.peakDesSensLoad += AirLoopCoolCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityCoolTable.designPeakLoad += AirLoopCoolCompLoadTables(iAirLoop).designPeakLoad;
+                facilityHeatTable.peakDesSensLoad += AirLoopHeatCompLoadTables(iAirLoop).peakDesSensLoad;
+                facilityHeatTable.designPeakLoad += AirLoopHeatCompLoadTables(iAirLoop).designPeakLoad;
+                facilityCoolTable.diffPeakEst += AirLoopCoolCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopCoolCompLoadTables(iAirLoop).diffDesignPeak;
+                facilityHeatTable.diffPeakEst += AirLoopHeatCompLoadTables(iAirLoop).diffPeakEst;
+                facilityCoolTable.diffDesignPeak += AirLoopHeatCompLoadTables(iAirLoop).diffDesignPeak;
             }
 
             ComputeEngineeringChecks(FacilityCoolCompLoadTables);
