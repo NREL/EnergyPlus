@@ -907,10 +907,6 @@ namespace AirLoopHVACDOAS {
             state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = this->SumMassFlowRate;
-            if (!this->FanBeforeCoolingCoilFlag) {
-                state.dataLoopNodes->Node(state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).InletNodeNum(1)).MassFlowRateMaxAvail =
-                    this->SumMassFlowRate;
-            }
         }
         ManageOutsideAirSystem(state, this->OASystemName, FirstHVACIteration, 0, this->m_OASystemNum);
         Real64 Temp = state.dataLoopNodes->Node(this->m_OutletNodeNum).Temp;
