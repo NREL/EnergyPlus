@@ -10,7 +10,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with Boiler:Steam.
 
-  Version,22.1;
+  Version,22.2;
 
   Building,
     Plant Load Profile Steam Example,  !- Name
@@ -123,7 +123,7 @@
     Main Loop Operation,     !- Plant Equipment Operation Scheme Name
     Supply Outlet Node,      !- Loop Temperature Setpoint Node Name
     110,                     !- Maximum Loop Temperature {C}
-    10,                       !- Minimum Loop Temperature {C}
+    10,                      !- Minimum Loop Temperature {C}
     autosize,                !- Maximum Loop Flow Rate {m3/s}
     0,                       !- Minimum Loop Flow Rate {m3/s}
     autocalculate,           !- Plant Loop Volume {m3}
@@ -329,7 +329,7 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 24:00,107.0;       !- Field 3
+    UNTIL: 24:00,107.0;      !- Field 3
 
   Schedule:Compact,
     AlwaysOnSchedule,        !- Name
@@ -355,7 +355,7 @@
   Sizing:Plant,
     Main Loop,               !- Plant or Condenser Loop Name
     Steam,                   !- Loop Type
-    110.,                    !- Design Loop Exit Temperature {C}
+    110,                    !- Design Loop Exit Temperature {C}
     25;                      !- Loop Design Temperature Difference {deltaC}
 
   Output:VariableDictionary,Regular;
