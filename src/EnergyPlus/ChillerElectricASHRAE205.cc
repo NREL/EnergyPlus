@@ -100,6 +100,24 @@ constexpr std::array<std::string_view, static_cast<int>(PerformanceInterpolation
     "CUBIC",
 };
 
+void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr)
+{
+    std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)context_ptr;
+    std::string fullMessage = contextPair.second + ": " + message;
+    if (message_type == tk205::MsgSeverity::ERR_205) {
+        ShowSevereError(*contextPair.first, fullMessage);
+        ShowFatalError(*contextPair.first, "libtk205: Errors discovered, program terminates.");
+    } else {
+        if (message_type == tk205::MsgSeverity::WARN_205) {
+            ShowWarningError(*contextPair.first, fullMessage);
+        } else if (message_type == tk205::MsgSeverity::INFO_205) {
+            ShowMessage(*contextPair.first, fullMessage);
+        } else {
+            ShowMessage(*contextPair.first, fullMessage);
+        }
+    }
+}
+
 void getChillerASHRAE205Input(EnergyPlusData &state)
 {
     static constexpr std::string_view RoutineName("getChillerASHRAE205Input: "); // include trailing blank space
@@ -136,6 +154,9 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         auto rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
         fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(RoutineName));
+        std::pair<EnergyPlusData *, std::string> callbackPair{&state,
+                                                              format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
+        tk205::set_error_handler(tk205ErrCallback, &callbackPair);
         thisChiller.Representation =
             std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
         if (nullptr == thisChiller.Representation) {

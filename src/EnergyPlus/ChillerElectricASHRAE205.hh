@@ -80,6 +80,10 @@ namespace ChillerElectricASHRAE205 {
         Num
     };
 
+    void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr);
+
+    void getChillerASHRAE205Input(EnergyPlusData &state);
+
     struct ASHRAE205ChillerSpecs : ChillerElectricEIR::ElectricEIRChillerSpecs
     {
         static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
@@ -148,8 +152,6 @@ namespace ChillerElectricASHRAE205 {
 
         void oneTimeInit(EnergyPlusData &state) override;
     };
-
-    void getChillerASHRAE205Input(EnergyPlusData &state);
 
 } // namespace ChillerElectricASHRAE205
 
