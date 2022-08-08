@@ -1521,12 +1521,12 @@
     Corner_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    198.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    198.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Corner_Class_1_Pod_1_Infiltration,  !- Name
-    Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_1_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1540,12 +1540,12 @@
 
   People,
     Corner_Class_1_Pod_1 People,  !- Name
-    Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_1_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Occ_Sch,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     34.6500,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -1562,7 +1562,7 @@
 
   Lights,
     Corner_Class_1_Pod_1_Lights,  !- Name
-    Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_1_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     852.3900,                !- Lighting Level {W}
@@ -1577,7 +1577,7 @@
 
   ElectricEquipment,
     Corner_Class_1_Pod_1_PlugMisc_Equip,  !- Name
-    Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_1_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Equip_Sch,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     894.9600,                !- Design Level {W}
@@ -2398,12 +2398,12 @@
     Mult_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    954.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    954.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Mult_Class_1_Pod_1_Infiltration,  !- Name
-    Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_1_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -2417,12 +2417,12 @@
 
   People,
     Mult_Class_1_Pod_1 People,  !- Name
-    Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_1_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Occ_Sch,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     166.9500,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2439,7 +2439,7 @@
 
   Lights,
     Mult_Class_1_Pod_1_Lights,  !- Name
-    Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_1_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     4106.9700,               !- Lighting Level {W}
@@ -2454,7 +2454,7 @@
 
   ElectricEquipment,
     Mult_Class_1_Pod_1_PlugMisc_Equip,  !- Name
-    Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_1_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Equip_Sch,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     4312.0800,               !- Design Level {W}
@@ -2824,12 +2824,12 @@
     Corridor_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_1,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    384.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    384.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_Pod_1_Infiltration,  !- Name
-    Corridor_Pod_1,          !- Zone or ZoneList Name
+    Corridor_Pod_1,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -2843,7 +2843,7 @@
 
   Lights,
     Corridor_Pod_1_Lights,   !- Name
-    Corridor_Pod_1,          !- Zone or ZoneList Name
+    Corridor_Pod_1,          !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     827.5200,                !- Lighting Level {W}
@@ -3286,12 +3286,12 @@
     Corner_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    198.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    198.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Corner_Class_2_Pod_1_Infiltration,  !- Name
-    Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_2_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3305,12 +3305,12 @@
 
   People,
     Corner_Class_2_Pod_1 People,  !- Name
-    Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_2_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Occ_Sch,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     34.6500,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3327,7 +3327,7 @@
 
   Lights,
     Corner_Class_2_Pod_1_Lights,  !- Name
-    Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_2_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     852.3900,                !- Lighting Level {W}
@@ -3342,7 +3342,7 @@
 
   ElectricEquipment,
     Corner_Class_2_Pod_1_PlugMisc_Equip,  !- Name
-    Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
+    Corner_Class_2_Pod_1,    !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Equip_Sch,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     894.9600,                !- Design Level {W}
@@ -3963,12 +3963,12 @@
     Mult_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    954.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    954.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Mult_Class_2_Pod_1_Infiltration,  !- Name
-    Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_2_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3982,12 +3982,12 @@
 
   People,
     Mult_Class_2_Pod_1 People,  !- Name
-    Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_2_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Occ_Sch,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     166.9500,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4004,7 +4004,7 @@
 
   Lights,
     Mult_Class_2_Pod_1_Lights,  !- Name
-    Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_2_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     4106.9700,               !- Lighting Level {W}
@@ -4019,7 +4019,7 @@
 
   ElectricEquipment,
     Mult_Class_2_Pod_1_PlugMisc_Equip,  !- Name
-    Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
+    Mult_Class_2_Pod_1,      !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Equip_Sch,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     4312.0800,               !- Design Level {W}
@@ -4556,12 +4556,12 @@
     Main_Corridor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Main_Corridor,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1092.0000;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1092.0000;               !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Main_Corridor_Infiltration,  !- Name
-    Main_Corridor,           !- Zone or ZoneList Name
+    Main_Corridor,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4575,7 +4575,7 @@
 
   Lights,
     Main_Corridor_Lights,    !- Name
-    Main_Corridor,           !- Zone or ZoneList Name
+    Main_Corridor,           !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2353.2600,               !- Lighting Level {W}
@@ -5041,12 +5041,12 @@
     Lobby Internal Mass,     !- Name
     InteriorFurnishings,     !- Construction Name
     Lobby,                   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    342.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    342.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Lobby_Infiltration,      !- Name
-    Lobby,                   !- Zone or ZoneList Name
+    Lobby,                   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -5060,7 +5060,7 @@
 
   Lights,
     Lobby_Lights,            !- Name
-    Lobby,                   !- Zone or ZoneList Name
+    Lobby,                   !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1287.6300,               !- Lighting Level {W}
@@ -5491,12 +5491,12 @@
     Mech Internal Mass,      !- Name
     InteriorFurnishings,     !- Construction Name
     Mech,                    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    504.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    504.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Mech_Infiltration,       !- Name
-    Mech,                    !- Zone or ZoneList Name
+    Mech,                    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -5510,7 +5510,7 @@
 
   Lights,
     Mech_Lights,             !- Name
-    Mech,                    !- Zone or ZoneList Name
+    Mech,                    !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1086.1200,               !- Lighting Level {W}
@@ -5896,12 +5896,12 @@
     Bathrooms Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     Bathrooms,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    380.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    380.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Bathrooms_Infiltration,  !- Name
-    Bathrooms,               !- Zone or ZoneList Name
+    Bathrooms,               !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -5915,7 +5915,7 @@
 
   Lights,
     Bathrooms_Lights,        !- Name
-    Bathrooms,               !- Zone or ZoneList Name
+    Bathrooms,               !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1022.2000,               !- Lighting Level {W}
@@ -6736,12 +6736,12 @@
     Offices Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
     Offices,                 !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    882.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    882.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Offices_Infiltration,    !- Name
-    Offices,                 !- Zone or ZoneList Name
+    Offices,                 !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6755,12 +6755,12 @@
 
   People,
     Offices People,          !- Name
-    Offices,                 !- Zone or ZoneList Name
+    Offices,                 !- Zone or ZoneList or Space or SpaceList Name
     Off_Occ_Sch,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     22.0500,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6777,7 +6777,7 @@
 
   Lights,
     Offices_Lights,          !- Name
-    Offices,                 !- Zone or ZoneList Name
+    Offices,                 !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2848.8600,               !- Lighting Level {W}
@@ -6792,7 +6792,7 @@
 
   ElectricEquipment,
     Offices_PlugMisc_Equip,  !- Name
-    Offices,                 !- Zone or ZoneList Name
+    Offices,                 !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Equip_Sch,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1424.4300,               !- Design Level {W}
@@ -7400,12 +7400,12 @@
     Media_Center Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Media_Center,            !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    798.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    798.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     Media_Center_Infiltration,  !- Name
-    Media_Center,            !- Zone or ZoneList Name
+    Media_Center,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7419,12 +7419,12 @@
 
   People,
     Media_Center People,     !- Name
-    Media_Center,            !- Zone or ZoneList Name
+    Media_Center,            !- Zone or ZoneList or Space or SpaceList Name
     Lib_Occ_Sch,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     99.7500,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -7441,7 +7441,7 @@
 
   Lights,
     Media_Center_Lights,     !- Name
-    Media_Center,            !- Zone or ZoneList Name
+    Media_Center,            !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Light_Sch,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3435.3900,               !- Lighting Level {W}
@@ -7456,7 +7456,7 @@
 
   ElectricEquipment,
     Media_Center_PlugMisc_Equip,  !- Name
-    Media_Center,            !- Zone or ZoneList Name
+    Media_Center,            !- Zone or ZoneList or Space or SpaceList Name
     Bldg_Equip_Sch,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1288.7700,               !- Design Level {W}

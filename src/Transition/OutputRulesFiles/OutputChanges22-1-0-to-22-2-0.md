@@ -66,3 +66,29 @@ The Adaptive Comfort Summary/Report was renamed to match the HTML:
 ```
 
 See pull request [#9461](https://github.com/NREL/EnergyPlus/pull/9461) for more details.
+
+### Latent Sizing
+
+New report variables were added to identify results associated with latent heat energy transfer. These reports include the zone air system sensible heat ratio (i.e., sensible heat transfer divided by total heat transfer) and zone air vapor pressure difference (i.e., difference of zone air vapor pressure from saturated air vapor pressure at the current temperature). 
+
+    Zone Air System Latent Heating Energy
+    Zone Air System Latent Cooling Energy
+    Zone Air System Latent Heating Rate
+    Zone Air System Latent Cooling Rate
+    Zone Air System Sensible Heat Ratio
+    Zone Air Vapor Pressure Difference
+    
+New results were added to the zone sizing results file eplusout.zsz
+
+    Des Latent Heat Load [W]
+    Des Latent Cool Load [W]
+    Des Latent Heat Mass Flow [kg/s]
+    Des Latent Cool Mass Flow [kg/s]
+    Des Heat Load No DOAS [W]
+    Des Cool Load No DOAS [W]
+    Des Latent Heat Load No DOAS [W]
+    Des Latent Cool Load No DOAS [W]
+    Heating Zone Temperature [C]
+    Heating Zone Relative Humidity [%]
+    Cooling Zone Temperature [C]
+    Cooling Zone Relative Humidity [%]

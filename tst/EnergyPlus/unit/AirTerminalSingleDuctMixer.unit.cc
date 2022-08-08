@@ -71,7 +71,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -80,6 +79,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -102,7 +102,6 @@ using namespace EnergyPlus::General;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
 using namespace EnergyPlus::OutputReportPredefined;
-using namespace EnergyPlus::PackagedTerminalHeatPump;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SingleDuct;
@@ -355,13 +354,17 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
 
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
-    GetPTUnit(*state);
+    UnitarySystems::UnitarySys thisSys;
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", false, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
 
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
-    EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);                 // single duct air terminal mixer name
-    EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType);      // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
-    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", state->dataPTHP->PTUnit(1).UnitType);          // zoneHVAC equipment type
+    EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);                      // single duct air terminal mixer name
+    EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType);           // air terminal mixer connection type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));      // Air distribution unit equipment type
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", state->dataUnitarySystems->unitarySys[0].UnitType); // zoneHVAC equipment type
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
@@ -372,11 +375,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     Real64 HVACInletMassFlowRate(0.0);
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
@@ -605,15 +605,20 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
 
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
-    GetPTUnit(*state);
-    state->dataPTHP->GetPTUnitInputFlag = false;
+    HVACSystemData *mySys;
+    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    UnitarySystems::UnitarySys thisSys;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    thisSys = state->dataUnitarySystems->unitarySys[0];
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", false, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
-    EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);                 // single duct air terminal mixer name
-    EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType);      // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
-    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", state->dataPTHP->PTUnit(1).UnitType);          // zoneHVAC equipment type
+    EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);                      // single duct air terminal mixer name
+    EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType);           // air terminal mixer connection type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));      // Air distribution unit equipment type
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", state->dataUnitarySystems->unitarySys[0].UnitType); // zoneHVAC equipment type
 
     state->dataGlobal->BeginEnvrnFlag = false;
 
@@ -633,20 +638,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
         Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    state->dataPTHP->HeatingLoad = false;
-    state->dataPTHP->CoolingLoad = true;
-    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
     state->dataHVACGlobal->ZoneCompTurnFansOff = false;
     state->dataHVACGlobal->ZoneCompTurnFansOn = true;
 
-    PTUnitNum = 1;
-    state->dataPTHP->PTUnit(PTUnitNum).OpMode = CycFanCycCoil;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
     // initialize mass flow rates
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
     state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
@@ -660,9 +660,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Temp =
@@ -672,25 +672,44 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Enthalpy =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
-    state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
+    state->dataUnitarySystems->unitarySys[0].ControlZoneNum = 1;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTAC zoneHVAC equipment
-    SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    bool HeatActive = false;
+    bool CoolActive = false;
+    Real64 latOut = 0.0;
+    mySys->simulate(*state,
+                    state->dataUnitarySystems->unitarySys[0].Name,
+                    FirstHVACIteration,
+                    0,
+                    PTUnitNum,
+                    HeatActive,
+                    CoolActive,
+                    0,
+                    0,
+                    true,
+                    QUnitOut,
+                    latOut);
     // apply mass conservation to determine secondary air mass flow rate
-    SecondaryAirMassFlowRate = state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
+    SecondaryAirMassFlowRate = state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
     ASSERT_EQ(SecondaryAirMassFlowRate, state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate);
     // check the cooling output delivered is within 2.0 Watt of zone cooling load
@@ -706,11 +725,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
     Real64 ATMixerOutletMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
@@ -940,15 +956,20 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
 
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
-    GetPTUnit(*state);
-    state->dataPTHP->GetPTUnitInputFlag = false;
+    HVACSystemData *mySys;
+    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    UnitarySystems::UnitarySys thisSys;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    thisSys = state->dataUnitarySystems->unitarySys[0];
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", false, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTAC
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);                 // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(1).MixerType);     // air terminal mixer connection type
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
-    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", state->dataPTHP->PTUnit(1).UnitType);          // zoneHVAC equipment type
+    EXPECT_EQ(UnitarySystems::UnitarySys::SysType::PackagedAC, state->dataUnitarySystems->unitarySys[0].m_sysType); // zoneHVAC equipment type
 
     // set input variables
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -968,20 +989,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
         Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    state->dataPTHP->HeatingLoad = false;
-    state->dataPTHP->CoolingLoad = true;
-    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
     state->dataHVACGlobal->ZoneCompTurnFansOff = false;
     state->dataHVACGlobal->ZoneCompTurnFansOn = true;
 
-    PTUnitNum = 1;
-    state->dataPTHP->PTUnit(PTUnitNum).OpMode = CycFanCycCoil;
+    PTUnitNum = 0;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
     // initialize mass flow rates
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
     state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
@@ -995,35 +1012,54 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition at outside air condition
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set PTUnit inlet condition to zone air node
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).Temp =
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).Temp =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).HumRat =
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).HumRat =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).Enthalpy =
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).Enthalpy =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
-    state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
+    state->dataUnitarySystems->unitarySys[0].ControlZoneNum = 1;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTAC zoneHVAC equipment
-    SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    bool HeatActive = false;
+    bool CoolActive = false;
+    Real64 latOut = 0.0;
+    mySys->simulate(*state,
+                    state->dataUnitarySystems->unitarySys[0].Name,
+                    FirstHVACIteration,
+                    0,
+                    PTUnitNum,
+                    HeatActive,
+                    CoolActive,
+                    0,
+                    0,
+                    true,
+                    QUnitOut,
+                    latOut);
     // apply mass conservation to determine secondary mass flow rate
     SecondaryAirMassFlowRate = state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
@@ -1043,11 +1079,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     Real64 HVACInletMassFlowRate(0.0);
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
@@ -1358,15 +1391,20 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
 
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
-    GetPTUnit(*state);
-    state->dataPTHP->GetPTUnitInputFlag = false;
+    HVACSystemData *mySys;
+    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 Heat Pump", true, 0);
+    UnitarySystems::UnitarySys thisSys;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    thisSys = state->dataUnitarySystems->unitarySys[0];
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 Heat Pump", true, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTHP
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);                 // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType);      // air terminal mixer connection type
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
-    EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", state->dataPTHP->PTUnit(1).UnitType);                // zoneHVAC equipment type
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", state->dataUnitarySystems->unitarySys[0].UnitType);  // zoneHVAC equipment type
 
     state->dataGlobal->BeginEnvrnFlag = false;
 
@@ -1386,20 +1424,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
         Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    state->dataPTHP->HeatingLoad = false;
-    state->dataPTHP->CoolingLoad = true;
-    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
     state->dataHVACGlobal->ZoneCompTurnFansOff = false;
     state->dataHVACGlobal->ZoneCompTurnFansOn = true;
 
-    PTUnitNum = 1;
-    state->dataPTHP->PTUnit(PTUnitNum).OpMode = CycFanCycCoil;
+    PTUnitNum = 0;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
     // initialize mass flow rates
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
     state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
@@ -1413,9 +1447,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Temp =
@@ -1425,25 +1459,44 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Enthalpy =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
-    state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
+    state->dataUnitarySystems->unitarySys[0].ControlZoneNum = 1;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTHP zoneHVAC equipment
-    SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    bool HeatActive = false;
+    bool CoolActive = false;
+    Real64 latOut = 0.0;
+    mySys->simulate(*state,
+                    state->dataUnitarySystems->unitarySys[0].Name,
+                    FirstHVACIteration,
+                    0,
+                    PTUnitNum,
+                    HeatActive,
+                    CoolActive,
+                    0,
+                    0,
+                    true,
+                    QUnitOut,
+                    latOut);
     // apply mass conservation to determine secondary air mass flow rate
-    SecondaryAirMassFlowRate = state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
+    SecondaryAirMassFlowRate = state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate - PrimaryAirMassFlowRate;
     // check the terminal air mixer secondary air mass flow rate
     ASSERT_EQ(SecondaryAirMassFlowRate, state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate);
     // check the cooling output delivered is within 2.0 Watt of zone cooling load
@@ -1459,11 +1512,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     Real64 PrimaryAirMassFlowRate(0.0);
     Real64 SecondaryAirMassFlowRate(0.0);
     Real64 ATMixerOutletMassFlowRate(0.0);
-    Real64 OnOffAirFlowRatio(1.0);
-    Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
     Real64 QZnReq(0.0);
-    int ZoneNum(1);
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
@@ -1775,15 +1825,20 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
 
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
-    GetPTUnit(*state);
-    state->dataPTHP->GetPTUnitInputFlag = false;
+    HVACSystemData *mySys;
+    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 Heat Pump", true, 0);
+    UnitarySystems::UnitarySys thisSys;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    thisSys = state->dataUnitarySystems->unitarySys[0];
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 Heat Pump", false, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTHP
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);                 // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(1).MixerType);     // air terminal mixer connection type
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
-    EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", state->dataPTHP->PTUnit(1).UnitType);                // zoneHVAC equipment type
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", state->dataUnitarySystems->unitarySys[0].UnitType);  // zoneHVAC equipment type
 
     // set input variables
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -1803,20 +1858,16 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
         Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    state->dataPTHP->HeatingLoad = false;
-    state->dataPTHP->CoolingLoad = true;
-    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
     state->dataHVACGlobal->ZoneCompTurnFansOff = false;
     state->dataHVACGlobal->ZoneCompTurnFansOn = true;
 
     PTUnitNum = 1;
-    state->dataPTHP->PTUnit(PTUnitNum).OpMode = CycFanCycCoil;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
     // initialize mass flow rates
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
     state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
@@ -1830,35 +1881,54 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition at outside air condition
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set PTUnit inlet condition to zone air node
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).Temp =
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).Temp =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).HumRat =
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).HumRat =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
-    state->dataLoopNodes->Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).Enthalpy =
+    state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).Enthalpy =
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
-    state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
+    state->dataUnitarySystems->unitarySys[0].ControlZoneNum = 1;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
     // simulate PTHP zoneHVAC equipment
-    SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
+    bool HeatActive = false;
+    bool CoolActive = false;
+    Real64 latOut = 0.0;
+    mySys->simulate(*state,
+                    state->dataUnitarySystems->unitarySys[0].Name,
+                    FirstHVACIteration,
+                    0,
+                    PTUnitNum,
+                    HeatActive,
+                    CoolActive,
+                    0,
+                    0,
+                    true,
+                    QUnitOut,
+                    latOut);
     // apply mass conservation to determine secondary mass flow rate
     SecondaryAirMassFlowRate = state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate;
     // check the terminal air mixer secondary air mass flow rate

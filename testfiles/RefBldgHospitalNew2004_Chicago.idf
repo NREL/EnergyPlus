@@ -9058,12 +9058,12 @@
 
   People,
     Basement People,         !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    37.1747,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    37.1747,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9080,12 +9080,12 @@
 
   People,
     Corridor_Flr_1 People,   !- Name
-    Corridor_Flr_1,          !- Zone or ZoneList Name
+    Corridor_Flr_1,          !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    92.5926,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    92.5926,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9102,12 +9102,12 @@
 
   People,
     Corridor_Flr_2 People,   !- Name
-    Corridor_Flr_2,          !- Zone or ZoneList Name
+    Corridor_Flr_2,          !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    92.5926,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    92.5926,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9124,12 +9124,12 @@
 
   People,
     Corridor_Flr_5 People,   !- Name
-    Corridor_Flr_5,          !- Zone or ZoneList Name
+    Corridor_Flr_5,          !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    92.5926,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    92.5926,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9146,12 +9146,12 @@
 
   People,
     Corridor_NW_Flr_3 People,!- Name
-    Corridor_NW_Flr_3,       !- Zone or ZoneList Name
+    Corridor_NW_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    92.5926,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    92.5926,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9168,12 +9168,12 @@
 
   People,
     Corridor_NW_Flr_4 People,!- Name
-    Corridor_NW_Flr_4,       !- Zone or ZoneList Name
+    Corridor_NW_Flr_4,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    92.5926,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    92.5926,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9190,12 +9190,12 @@
 
   People,
     Corridor_SE_Flr_3 People,!- Name
-    Corridor_SE_Flr_3,       !- Zone or ZoneList Name
+    Corridor_SE_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    92.5926,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    92.5926,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9212,12 +9212,12 @@
 
   People,
     Corridor_SE_Flr_4 People,!- Name
-    Corridor_SE_Flr_4,       !- Zone or ZoneList Name
+    Corridor_SE_Flr_4,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    92.5926,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    92.5926,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9234,12 +9234,12 @@
 
   People,
     Dining_Flr_5 People,     !- Name
-    Dining_Flr_5,            !- Zone or ZoneList Name
+    Dining_Flr_5,            !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    9.2937,                  !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    9.2937,                  !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9256,12 +9256,12 @@
 
   People,
     ER_Exam1_Mult4_Flr_1 People,  !- Name
-    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    4.6512,                  !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    4.6512,                  !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9278,12 +9278,12 @@
 
   People,
     ER_Exam3_Mult4_Flr_1 People,  !- Name
-    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    4.6512,                  !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    4.6512,                  !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9300,12 +9300,12 @@
 
   People,
     ER_NurseStn_Lobby_Flr_1 People,  !- Name
-    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList Name
+    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    69.9301,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    69.9301,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9322,12 +9322,12 @@
 
   People,
     ER_Trauma1_Flr_1 People, !- Name
-    ER_Trauma1_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma1_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    4.6512,                  !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    4.6512,                  !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9344,12 +9344,12 @@
 
   People,
     ER_Trauma2_Flr_1 People, !- Name
-    ER_Trauma2_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma2_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    4.6512,                  !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    4.6512,                  !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9366,12 +9366,12 @@
 
   People,
     ER_Triage_Mult4_Flr_1 People,  !- Name
-    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList Name
+    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    4.6512,                  !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    4.6512,                  !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9388,12 +9388,12 @@
 
   People,
     ICU_Flr_2 People,        !- Name
-    ICU_Flr_2,               !- Zone or ZoneList Name
+    ICU_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9410,12 +9410,12 @@
 
   People,
     ICU_NurseStn_Lobby_Flr_2 People,  !- Name
-    ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList Name
+    ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    69.9301,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    69.9301,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9432,12 +9432,12 @@
 
   People,
     IC_PatRoom1_Mult5_Flr_2 People,  !- Name
-    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9454,12 +9454,12 @@
 
   People,
     IC_PatRoom2_Flr_2 People,!- Name
-    IC_PatRoom2_Flr_2,       !- Zone or ZoneList Name
+    IC_PatRoom2_Flr_2,       !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9476,12 +9476,12 @@
 
   People,
     IC_PatRoom3_Mult6_Flr_2 People,  !- Name
-    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9498,12 +9498,12 @@
 
   People,
     Kitchen_Flr_5 People,    !- Name
-    Kitchen_Flr_5,           !- Zone or ZoneList Name
+    Kitchen_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9520,12 +9520,12 @@
 
   People,
     Lab_Flr_3 People,        !- Name
-    Lab_Flr_3,               !- Zone or ZoneList Name
+    Lab_Flr_3,               !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9542,12 +9542,12 @@
 
   People,
     Lab_Flr_4 People,        !- Name
-    Lab_Flr_4,               !- Zone or ZoneList Name
+    Lab_Flr_4,               !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9564,12 +9564,12 @@
 
   People,
     Lobby_Records_Flr_1 People,  !- Name
-    Lobby_Records_Flr_1,     !- Zone or ZoneList Name
+    Lobby_Records_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    69.9301,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    69.9301,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9586,12 +9586,12 @@
 
   People,
     NurseStn_Lobby_Flr_3 People,  !- Name
-    NurseStn_Lobby_Flr_3,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_3,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    69.9301,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    69.9301,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9608,12 +9608,12 @@
 
   People,
     NurseStn_Lobby_Flr_4 People,  !- Name
-    NurseStn_Lobby_Flr_4,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_4,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    69.9301,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    69.9301,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9630,12 +9630,12 @@
 
   People,
     NurseStn_Lobby_Flr_5 People,  !- Name
-    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    69.9301,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    69.9301,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9652,12 +9652,12 @@
 
   People,
     OR1_Flr_2 People,        !- Name
-    OR1_Flr_2,               !- Zone or ZoneList Name
+    OR1_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9674,12 +9674,12 @@
 
   People,
     OR2_Mult5_Flr_2 People,  !- Name
-    OR2_Mult5_Flr_2,         !- Zone or ZoneList Name
+    OR2_Mult5_Flr_2,         !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9696,12 +9696,12 @@
 
   People,
     OR3_Flr_2 People,        !- Name
-    OR3_Flr_2,               !- Zone or ZoneList Name
+    OR3_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9718,12 +9718,12 @@
 
   People,
     OR4_Flr_2 People,        !- Name
-    OR4_Flr_2,               !- Zone or ZoneList Name
+    OR4_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9740,12 +9740,12 @@
 
   People,
     OR_NurseStn_Lobby_Flr_2 People,  !- Name
-    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList Name
+    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    69.9301,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    69.9301,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9762,12 +9762,12 @@
 
   People,
     Office1_Flr_5 People,    !- Name
-    Office1_Flr_5,           !- Zone or ZoneList Name
+    Office1_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    13.2802,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    13.2802,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9784,12 +9784,12 @@
 
   People,
     Office1_Mult4_Flr_1 People,  !- Name
-    Office1_Mult4_Flr_1,     !- Zone or ZoneList Name
+    Office1_Mult4_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    13.2802,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    13.2802,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9806,12 +9806,12 @@
 
   People,
     Office2_Mult5_Flr_5 People,  !- Name
-    Office2_Mult5_Flr_5,     !- Zone or ZoneList Name
+    Office2_Mult5_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    13.2802,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    13.2802,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9828,12 +9828,12 @@
 
   People,
     Office3_Flr_5 People,    !- Name
-    Office3_Flr_5,           !- Zone or ZoneList Name
+    Office3_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    13.2802,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    13.2802,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9850,12 +9850,12 @@
 
   People,
     Office4_Mult6_Flr_5 People,  !- Name
-    Office4_Mult6_Flr_5,     !- Zone or ZoneList Name
+    Office4_Mult6_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    13.2802,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    13.2802,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9872,12 +9872,12 @@
 
   People,
     PatRoom1_Mult10_Flr_3 People,  !- Name
-    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9894,12 +9894,12 @@
 
   People,
     PatRoom1_Mult10_Flr_4 People,  !- Name
-    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9916,12 +9916,12 @@
 
   People,
     PatRoom2_Flr_3 People,   !- Name
-    PatRoom2_Flr_3,          !- Zone or ZoneList Name
+    PatRoom2_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9938,12 +9938,12 @@
 
   People,
     PatRoom2_Flr_4 People,   !- Name
-    PatRoom2_Flr_4,          !- Zone or ZoneList Name
+    PatRoom2_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9960,12 +9960,12 @@
 
   People,
     PatRoom3_Mult10_Flr_3 People,  !- Name
-    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -9982,12 +9982,12 @@
 
   People,
     PatRoom3_Mult10_Flr_4 People,  !- Name
-    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10004,12 +10004,12 @@
 
   People,
     PatRoom4_Flr_3 People,   !- Name
-    PatRoom4_Flr_3,          !- Zone or ZoneList Name
+    PatRoom4_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10026,12 +10026,12 @@
 
   People,
     PatRoom4_Flr_4 People,   !- Name
-    PatRoom4_Flr_4,          !- Zone or ZoneList Name
+    PatRoom4_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10048,12 +10048,12 @@
 
   People,
     PatRoom5_Mult10_Flr_3 People,  !- Name
-    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10070,12 +10070,12 @@
 
   People,
     PatRoom5_Mult10_Flr_4 People,  !- Name
-    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10092,12 +10092,12 @@
 
   People,
     PatRoom6_Flr_3 People,   !- Name
-    PatRoom6_Flr_3,          !- Zone or ZoneList Name
+    PatRoom6_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10114,12 +10114,12 @@
 
   People,
     PatRoom6_Flr_4 People,   !- Name
-    PatRoom6_Flr_4,          !- Zone or ZoneList Name
+    PatRoom6_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10136,12 +10136,12 @@
 
   People,
     PatRoom7_Mult10_Flr_3 People,  !- Name
-    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10158,12 +10158,12 @@
 
   People,
     PatRoom7_Mult10_Flr_4 People,  !- Name
-    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10180,12 +10180,12 @@
 
   People,
     PatRoom8_Flr_3 People,   !- Name
-    PatRoom8_Flr_3,          !- Zone or ZoneList Name
+    PatRoom8_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10202,12 +10202,12 @@
 
   People,
     PatRoom8_Flr_4 People,   !- Name
-    PatRoom8_Flr_4,          !- Zone or ZoneList Name
+    PatRoom8_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_OCC_SCH,        !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10224,12 +10224,12 @@
 
   People,
     PhysTherapy_Flr_3 People,!- Name
-    PhysTherapy_Flr_3,       !- Zone or ZoneList Name
+    PhysTherapy_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10246,12 +10246,12 @@
 
   People,
     Radiology_Flr_4 People,  !- Name
-    Radiology_Flr_4,         !- Zone or ZoneList Name
+    Radiology_Flr_4,         !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_OCC_SCH,           !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5874,                 !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5874,                 !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -10270,7 +10270,7 @@
 
   Lights,
     Basement_Lights,         !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10285,7 +10285,7 @@
 
   Lights,
     Corridor_Flr_1_Lights,   !- Name
-    Corridor_Flr_1,          !- Zone or ZoneList Name
+    Corridor_Flr_1,          !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10300,7 +10300,7 @@
 
   Lights,
     Corridor_Flr_2_Lights,   !- Name
-    Corridor_Flr_2,          !- Zone or ZoneList Name
+    Corridor_Flr_2,          !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10315,7 +10315,7 @@
 
   Lights,
     Corridor_Flr_5_Lights,   !- Name
-    Corridor_Flr_5,          !- Zone or ZoneList Name
+    Corridor_Flr_5,          !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10330,7 +10330,7 @@
 
   Lights,
     Corridor_NW_Flr_3_Lights,!- Name
-    Corridor_NW_Flr_3,       !- Zone or ZoneList Name
+    Corridor_NW_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10345,7 +10345,7 @@
 
   Lights,
     Corridor_NW_Flr_4_Lights,!- Name
-    Corridor_NW_Flr_4,       !- Zone or ZoneList Name
+    Corridor_NW_Flr_4,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10360,7 +10360,7 @@
 
   Lights,
     Corridor_SE_Flr_3_Lights,!- Name
-    Corridor_SE_Flr_3,       !- Zone or ZoneList Name
+    Corridor_SE_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10375,7 +10375,7 @@
 
   Lights,
     Corridor_SE_Flr_4_Lights,!- Name
-    Corridor_SE_Flr_4,       !- Zone or ZoneList Name
+    Corridor_SE_Flr_4,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10390,7 +10390,7 @@
 
   Lights,
     Dining_Flr_5_Lights,     !- Name
-    Dining_Flr_5,            !- Zone or ZoneList Name
+    Dining_Flr_5,            !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10405,7 +10405,7 @@
 
   Lights,
     ER_Exam1_Mult4_Flr_1_Lights,  !- Name
-    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10420,7 +10420,7 @@
 
   Lights,
     ER_Exam3_Mult4_Flr_1_Lights,  !- Name
-    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10435,7 +10435,7 @@
 
   Lights,
     ER_NurseStn_Lobby_Flr_1_Lights,  !- Name
-    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList Name
+    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10450,7 +10450,7 @@
 
   Lights,
     ER_Trauma1_Flr_1_Lights, !- Name
-    ER_Trauma1_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma1_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10465,7 +10465,7 @@
 
   Lights,
     ER_Trauma2_Flr_1_Lights, !- Name
-    ER_Trauma2_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma2_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10480,7 +10480,7 @@
 
   Lights,
     ER_Triage_Mult4_Flr_1_Lights,  !- Name
-    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList Name
+    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10495,7 +10495,7 @@
 
   Lights,
     ICU_Flr_2_Lights,        !- Name
-    ICU_Flr_2,               !- Zone or ZoneList Name
+    ICU_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10510,7 +10510,7 @@
 
   Lights,
     ICU_NurseStn_Lobby_Flr_2_Lights,  !- Name
-    ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList Name
+    ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10525,7 +10525,7 @@
 
   Lights,
     IC_PatRoom1_Mult5_Flr_2_Lights,  !- Name
-    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10540,7 +10540,7 @@
 
   Lights,
     IC_PatRoom2_Flr_2_Lights,!- Name
-    IC_PatRoom2_Flr_2,       !- Zone or ZoneList Name
+    IC_PatRoom2_Flr_2,       !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10555,7 +10555,7 @@
 
   Lights,
     IC_PatRoom3_Mult6_Flr_2_Lights,  !- Name
-    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10570,7 +10570,7 @@
 
   Lights,
     Kitchen_Flr_5_Lights,    !- Name
-    Kitchen_Flr_5,           !- Zone or ZoneList Name
+    Kitchen_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10585,7 +10585,7 @@
 
   Lights,
     Lab_Flr_3_Lights,        !- Name
-    Lab_Flr_3,               !- Zone or ZoneList Name
+    Lab_Flr_3,               !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10600,7 +10600,7 @@
 
   Lights,
     Lab_Flr_4_Lights,        !- Name
-    Lab_Flr_4,               !- Zone or ZoneList Name
+    Lab_Flr_4,               !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10615,7 +10615,7 @@
 
   Lights,
     Lobby_Records_Flr_1_Lights,  !- Name
-    Lobby_Records_Flr_1,     !- Zone or ZoneList Name
+    Lobby_Records_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10630,7 +10630,7 @@
 
   Lights,
     NurseStn_Lobby_Flr_3_Lights,  !- Name
-    NurseStn_Lobby_Flr_3,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_3,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10645,7 +10645,7 @@
 
   Lights,
     NurseStn_Lobby_Flr_4_Lights,  !- Name
-    NurseStn_Lobby_Flr_4,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_4,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10660,7 +10660,7 @@
 
   Lights,
     NurseStn_Lobby_Flr_5_Lights,  !- Name
-    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10675,7 +10675,7 @@
 
   Lights,
     OR1_Flr_2_Lights,        !- Name
-    OR1_Flr_2,               !- Zone or ZoneList Name
+    OR1_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10690,7 +10690,7 @@
 
   Lights,
     OR2_Mult5_Flr_2_Lights,  !- Name
-    OR2_Mult5_Flr_2,         !- Zone or ZoneList Name
+    OR2_Mult5_Flr_2,         !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10705,7 +10705,7 @@
 
   Lights,
     OR3_Flr_2_Lights,        !- Name
-    OR3_Flr_2,               !- Zone or ZoneList Name
+    OR3_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10720,7 +10720,7 @@
 
   Lights,
     OR4_Flr_2_Lights,        !- Name
-    OR4_Flr_2,               !- Zone or ZoneList Name
+    OR4_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10735,7 +10735,7 @@
 
   Lights,
     OR_NurseStn_Lobby_Flr_2_Lights,  !- Name
-    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList Name
+    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10750,7 +10750,7 @@
 
   Lights,
     Office1_Flr_5_Lights,    !- Name
-    Office1_Flr_5,           !- Zone or ZoneList Name
+    Office1_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10765,7 +10765,7 @@
 
   Lights,
     Office1_Mult4_Flr_1_Lights,  !- Name
-    Office1_Mult4_Flr_1,     !- Zone or ZoneList Name
+    Office1_Mult4_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10780,7 +10780,7 @@
 
   Lights,
     Office2_Mult5_Flr_5_Lights,  !- Name
-    Office2_Mult5_Flr_5,     !- Zone or ZoneList Name
+    Office2_Mult5_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10795,7 +10795,7 @@
 
   Lights,
     Office3_Flr_5_Lights,    !- Name
-    Office3_Flr_5,           !- Zone or ZoneList Name
+    Office3_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10810,7 +10810,7 @@
 
   Lights,
     Office4_Mult6_Flr_5_Lights,  !- Name
-    Office4_Mult6_Flr_5,     !- Zone or ZoneList Name
+    Office4_Mult6_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10825,7 +10825,7 @@
 
   Lights,
     PatRoom1_Mult10_Flr_3_Lights,  !- Name
-    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10840,7 +10840,7 @@
 
   Lights,
     PatRoom1_Mult10_Flr_4_Lights,  !- Name
-    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10855,7 +10855,7 @@
 
   Lights,
     PatRoom2_Flr_3_Lights,   !- Name
-    PatRoom2_Flr_3,          !- Zone or ZoneList Name
+    PatRoom2_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10870,7 +10870,7 @@
 
   Lights,
     PatRoom2_Flr_4_Lights,   !- Name
-    PatRoom2_Flr_4,          !- Zone or ZoneList Name
+    PatRoom2_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10885,7 +10885,7 @@
 
   Lights,
     PatRoom3_Mult10_Flr_3_Lights,  !- Name
-    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10900,7 +10900,7 @@
 
   Lights,
     PatRoom3_Mult10_Flr_4_Lights,  !- Name
-    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10915,7 +10915,7 @@
 
   Lights,
     PatRoom4_Flr_3_Lights,   !- Name
-    PatRoom4_Flr_3,          !- Zone or ZoneList Name
+    PatRoom4_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10930,7 +10930,7 @@
 
   Lights,
     PatRoom4_Flr_4_Lights,   !- Name
-    PatRoom4_Flr_4,          !- Zone or ZoneList Name
+    PatRoom4_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10945,7 +10945,7 @@
 
   Lights,
     PatRoom5_Mult10_Flr_3_Lights,  !- Name
-    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10960,7 +10960,7 @@
 
   Lights,
     PatRoom5_Mult10_Flr_4_Lights,  !- Name
-    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10975,7 +10975,7 @@
 
   Lights,
     PatRoom6_Flr_3_Lights,   !- Name
-    PatRoom6_Flr_3,          !- Zone or ZoneList Name
+    PatRoom6_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -10990,7 +10990,7 @@
 
   Lights,
     PatRoom6_Flr_4_Lights,   !- Name
-    PatRoom6_Flr_4,          !- Zone or ZoneList Name
+    PatRoom6_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -11005,7 +11005,7 @@
 
   Lights,
     PatRoom7_Mult10_Flr_3_Lights,  !- Name
-    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -11020,7 +11020,7 @@
 
   Lights,
     PatRoom7_Mult10_Flr_4_Lights,  !- Name
-    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -11035,7 +11035,7 @@
 
   Lights,
     PatRoom8_Flr_3_Lights,   !- Name
-    PatRoom8_Flr_3,          !- Zone or ZoneList Name
+    PatRoom8_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -11050,7 +11050,7 @@
 
   Lights,
     PatRoom8_Flr_4_Lights,   !- Name
-    PatRoom8_Flr_4,          !- Zone or ZoneList Name
+    PatRoom8_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_LIGHT_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -11065,7 +11065,7 @@
 
   Lights,
     PhysTherapy_Flr_3_Lights,!- Name
-    PhysTherapy_Flr_3,       !- Zone or ZoneList Name
+    PhysTherapy_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -11080,7 +11080,7 @@
 
   Lights,
     Radiology_Flr_4_Lights,  !- Name
-    Radiology_Flr_4,         !- Zone or ZoneList Name
+    Radiology_Flr_4,         !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -11097,7 +11097,7 @@
 
   ElectricEquipment,
     Basement_MiscPlug_Equip, !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11110,7 +11110,7 @@
 
   ElectricEquipment,
     Dining_Flr_5_MiscPlug_Equip,  !- Name
-    Dining_Flr_5,            !- Zone or ZoneList Name
+    Dining_Flr_5,            !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11123,7 +11123,7 @@
 
   ElectricEquipment,
     ER_Exam1_Mult4_Flr_1_MiscPlug_Equip,  !- Name
-    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11136,7 +11136,7 @@
 
   ElectricEquipment,
     ER_Exam3_Mult4_Flr_1_MiscPlug_Equip,  !- Name
-    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11149,7 +11149,7 @@
 
   ElectricEquipment,
     ER_NurseStn_Lobby_Flr_1_MiscPlug_Equip,  !- Name
-    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList Name
+    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11162,7 +11162,7 @@
 
   ElectricEquipment,
     ER_Trauma1_Flr_1_MiscPlug_Equip,  !- Name
-    ER_Trauma1_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma1_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11175,7 +11175,7 @@
 
   ElectricEquipment,
     ER_Trauma2_Flr_1_MiscPlug_Equip,  !- Name
-    ER_Trauma2_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma2_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11188,7 +11188,7 @@
 
   ElectricEquipment,
     ER_Triage_Mult4_Flr_1_MiscPlug_Equip,  !- Name
-    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList Name
+    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11201,7 +11201,7 @@
 
   ElectricEquipment,
     ICU_Flr_2_MiscPlug_Equip,!- Name
-    ICU_Flr_2,               !- Zone or ZoneList Name
+    ICU_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11214,7 +11214,7 @@
 
   ElectricEquipment,
     ICU_NurseStn_Lobby_Flr_2_MiscPlug_Equip,  !- Name
-    ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList Name
+    ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11227,7 +11227,7 @@
 
   ElectricEquipment,
     IC_PatRoom1_Mult5_Flr_2_MiscPlug_Equip,  !- Name
-    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11240,7 +11240,7 @@
 
   ElectricEquipment,
     IC_PatRoom2_Flr_2_MiscPlug_Equip,  !- Name
-    IC_PatRoom2_Flr_2,       !- Zone or ZoneList Name
+    IC_PatRoom2_Flr_2,       !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11253,7 +11253,7 @@
 
   ElectricEquipment,
     IC_PatRoom3_Mult6_Flr_2_MiscPlug_Equip,  !- Name
-    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11266,7 +11266,7 @@
 
   ElectricEquipment,
     Kitchen_Flr_5_ExhFan_Equip,  !- Name
-    Kitchen_Flr_5,           !- Zone or ZoneList Name
+    Kitchen_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     Kitchen_Exhaust_SCH,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     925,                     !- Design Level {W}
@@ -11279,7 +11279,7 @@
 
   ElectricEquipment,
     Kitchen_Flr_5_MiscElec_Equip,  !- Name
-    Kitchen_Flr_5,           !- Zone or ZoneList Name
+    Kitchen_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     Kitchen_Elec_Equip_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11292,7 +11292,7 @@
 
   ElectricEquipment,
     Lab_Flr_3_MiscPlug_Equip,!- Name
-    Lab_Flr_3,               !- Zone or ZoneList Name
+    Lab_Flr_3,               !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11305,7 +11305,7 @@
 
   ElectricEquipment,
     Lab_Flr_4_MiscPlug_Equip,!- Name
-    Lab_Flr_4,               !- Zone or ZoneList Name
+    Lab_Flr_4,               !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11318,7 +11318,7 @@
 
   ElectricEquipment,
     Lobby_Records_Flr_1_MiscPlug_Equip,  !- Name
-    Lobby_Records_Flr_1,     !- Zone or ZoneList Name
+    Lobby_Records_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11331,7 +11331,7 @@
 
   ElectricEquipment,
     NurseStn_Lobby_Flr_3_MiscPlug_Equip,  !- Name
-    NurseStn_Lobby_Flr_3,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_3,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11344,7 +11344,7 @@
 
   ElectricEquipment,
     NurseStn_Lobby_Flr_4_MiscPlug_Equip,  !- Name
-    NurseStn_Lobby_Flr_4,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_4,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11357,7 +11357,7 @@
 
   ElectricEquipment,
     NurseStn_Lobby_Flr_5_MiscPlug_Equip,  !- Name
-    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11370,7 +11370,7 @@
 
   ElectricEquipment,
     OR1_Flr_2_MiscPlug_Equip,!- Name
-    OR1_Flr_2,               !- Zone or ZoneList Name
+    OR1_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11383,7 +11383,7 @@
 
   ElectricEquipment,
     OR2_Mult5_Flr_2_MiscPlug_Equip,  !- Name
-    OR2_Mult5_Flr_2,         !- Zone or ZoneList Name
+    OR2_Mult5_Flr_2,         !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11396,7 +11396,7 @@
 
   ElectricEquipment,
     OR3_Flr_2_MiscPlug_Equip,!- Name
-    OR3_Flr_2,               !- Zone or ZoneList Name
+    OR3_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11409,7 +11409,7 @@
 
   ElectricEquipment,
     OR4_Flr_2_MiscPlug_Equip,!- Name
-    OR4_Flr_2,               !- Zone or ZoneList Name
+    OR4_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11422,7 +11422,7 @@
 
   ElectricEquipment,
     OR_NurseStn_Lobby_Flr_2_MiscPlug_Equip,  !- Name
-    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList Name
+    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11435,7 +11435,7 @@
 
   ElectricEquipment,
     Office1_Flr_5_MiscPlug_Equip,  !- Name
-    Office1_Flr_5,           !- Zone or ZoneList Name
+    Office1_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11448,7 +11448,7 @@
 
   ElectricEquipment,
     Office1_Mult4_Flr_1_MiscPlug_Equip,  !- Name
-    Office1_Mult4_Flr_1,     !- Zone or ZoneList Name
+    Office1_Mult4_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11461,7 +11461,7 @@
 
   ElectricEquipment,
     Office2_Mult5_Flr_5_MiscPlug_Equip,  !- Name
-    Office2_Mult5_Flr_5,     !- Zone or ZoneList Name
+    Office2_Mult5_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11474,7 +11474,7 @@
 
   ElectricEquipment,
     Office3_Flr_5_MiscPlug_Equip,  !- Name
-    Office3_Flr_5,           !- Zone or ZoneList Name
+    Office3_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11487,7 +11487,7 @@
 
   ElectricEquipment,
     Office4_Mult6_Flr_5_MiscPlug_Equip,  !- Name
-    Office4_Mult6_Flr_5,     !- Zone or ZoneList Name
+    Office4_Mult6_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11500,7 +11500,7 @@
 
   ElectricEquipment,
     PatRoom1_Mult10_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11513,7 +11513,7 @@
 
   ElectricEquipment,
     PatRoom1_Mult10_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11526,7 +11526,7 @@
 
   ElectricEquipment,
     PatRoom2_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom2_Flr_3,          !- Zone or ZoneList Name
+    PatRoom2_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11539,7 +11539,7 @@
 
   ElectricEquipment,
     PatRoom2_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom2_Flr_4,          !- Zone or ZoneList Name
+    PatRoom2_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11552,7 +11552,7 @@
 
   ElectricEquipment,
     PatRoom3_Mult10_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11565,7 +11565,7 @@
 
   ElectricEquipment,
     PatRoom3_Mult10_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11578,7 +11578,7 @@
 
   ElectricEquipment,
     PatRoom4_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom4_Flr_3,          !- Zone or ZoneList Name
+    PatRoom4_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11591,7 +11591,7 @@
 
   ElectricEquipment,
     PatRoom4_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom4_Flr_4,          !- Zone or ZoneList Name
+    PatRoom4_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11604,7 +11604,7 @@
 
   ElectricEquipment,
     PatRoom5_Mult10_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11617,7 +11617,7 @@
 
   ElectricEquipment,
     PatRoom5_Mult10_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11630,7 +11630,7 @@
 
   ElectricEquipment,
     PatRoom6_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom6_Flr_3,          !- Zone or ZoneList Name
+    PatRoom6_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11643,7 +11643,7 @@
 
   ElectricEquipment,
     PatRoom6_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom6_Flr_4,          !- Zone or ZoneList Name
+    PatRoom6_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11656,7 +11656,7 @@
 
   ElectricEquipment,
     PatRoom7_Mult10_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11669,7 +11669,7 @@
 
   ElectricEquipment,
     PatRoom7_Mult10_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11682,7 +11682,7 @@
 
   ElectricEquipment,
     PatRoom8_Flr_3_MiscPlug_Equip,  !- Name
-    PatRoom8_Flr_3,          !- Zone or ZoneList Name
+    PatRoom8_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11695,7 +11695,7 @@
 
   ElectricEquipment,
     PatRoom8_Flr_4_MiscPlug_Equip,  !- Name
-    PatRoom8_Flr_4,          !- Zone or ZoneList Name
+    PatRoom8_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     CRITICAL_EQUIP_SCH,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11708,7 +11708,7 @@
 
   ElectricEquipment,
     PhysTherapy_Flr_3_MiscPlug_Equip,  !- Name
-    PhysTherapy_Flr_3,       !- Zone or ZoneList Name
+    PhysTherapy_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11721,7 +11721,7 @@
 
   ElectricEquipment,
     Radiology_Flr_4_MiscPlug_Equip,  !- Name
-    Radiology_Flr_4,         !- Zone or ZoneList Name
+    Radiology_Flr_4,         !- Zone or ZoneList or Space or SpaceList Name
     ADMIN_EQUIP_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11734,7 +11734,7 @@
 
   GasEquipment,
     Kitchen_Flr_5_MiscGas_Equip,  !- Name
-    Kitchen_Flr_5,           !- Zone or ZoneList Name
+    Kitchen_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     Kitchen_Gas_Equip_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -11766,7 +11766,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_Flr_1_Infiltration,  !- Name
-    Corridor_Flr_1,          !- Zone or ZoneList Name
+    Corridor_Flr_1,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11780,7 +11780,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_Flr_2_Infiltration,  !- Name
-    Corridor_Flr_2,          !- Zone or ZoneList Name
+    Corridor_Flr_2,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11794,7 +11794,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_Flr_5_Infiltration,  !- Name
-    Corridor_Flr_5,          !- Zone or ZoneList Name
+    Corridor_Flr_5,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11808,7 +11808,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_NW_Flr_3_Infiltration,  !- Name
-    Corridor_NW_Flr_3,       !- Zone or ZoneList Name
+    Corridor_NW_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11822,7 +11822,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_NW_Flr_4_Infiltration,  !- Name
-    Corridor_NW_Flr_4,       !- Zone or ZoneList Name
+    Corridor_NW_Flr_4,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11836,7 +11836,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_SE_Flr_3_Infiltration,  !- Name
-    Corridor_SE_Flr_3,       !- Zone or ZoneList Name
+    Corridor_SE_Flr_3,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11850,7 +11850,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_SE_Flr_4_Infiltration,  !- Name
-    Corridor_SE_Flr_4,       !- Zone or ZoneList Name
+    Corridor_SE_Flr_4,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11864,7 +11864,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Dining_Flr_5_Infiltration,  !- Name
-    Dining_Flr_5,            !- Zone or ZoneList Name
+    Dining_Flr_5,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11878,7 +11878,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ER_Exam1_Mult4_Flr_1_Infiltration,  !- Name
-    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11892,7 +11892,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ER_Exam3_Mult4_Flr_1_Infiltration,  !- Name
-    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList Name
+    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11906,7 +11906,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ER_NurseStn_Lobby_Flr_1_Infiltration,  !- Name
-    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList Name
+    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11920,7 +11920,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ER_Trauma1_Flr_1_Infiltration,  !- Name
-    ER_Trauma1_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma1_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11934,7 +11934,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ER_Trauma2_Flr_1_Infiltration,  !- Name
-    ER_Trauma2_Flr_1,        !- Zone or ZoneList Name
+    ER_Trauma2_Flr_1,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11948,7 +11948,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ER_Triage_Mult4_Flr_1_Infiltration,  !- Name
-    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList Name
+    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11962,7 +11962,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ICU_Flr_2_Infiltration,  !- Name
-    ICU_Flr_2,               !- Zone or ZoneList Name
+    ICU_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11976,7 +11976,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     IC_PatRoom1_Mult5_Flr_2_Infiltration,  !- Name
-    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11990,7 +11990,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     IC_PatRoom2_Flr_2_Infiltration,  !- Name
-    IC_PatRoom2_Flr_2,       !- Zone or ZoneList Name
+    IC_PatRoom2_Flr_2,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12004,7 +12004,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     IC_PatRoom3_Mult6_Flr_2_Infiltration,  !- Name
-    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList Name
+    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12018,7 +12018,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Kitchen_Flr_5_Infiltration,  !- Name
-    Kitchen_Flr_5,           !- Zone or ZoneList Name
+    Kitchen_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12032,7 +12032,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Lobby_Records_Flr_1_Infiltration,  !- Name
-    Lobby_Records_Flr_1,     !- Zone or ZoneList Name
+    Lobby_Records_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12046,7 +12046,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NurseStn_Lobby_Flr_5_Infiltration,  !- Name
-    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList Name
+    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12060,7 +12060,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     OR1_Flr_2_Infiltration,  !- Name
-    OR1_Flr_2,               !- Zone or ZoneList Name
+    OR1_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12074,7 +12074,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     OR2_Mult5_Flr_2_Infiltration,  !- Name
-    OR2_Mult5_Flr_2,         !- Zone or ZoneList Name
+    OR2_Mult5_Flr_2,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12088,7 +12088,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     OR3_Flr_2_Infiltration,  !- Name
-    OR3_Flr_2,               !- Zone or ZoneList Name
+    OR3_Flr_2,               !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12102,7 +12102,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     OR_NurseStn_Lobby_Flr_2_Infiltration,  !- Name
-    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList Name
+    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12116,7 +12116,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office1_Flr_5_Infiltration,  !- Name
-    Office1_Flr_5,           !- Zone or ZoneList Name
+    Office1_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12130,7 +12130,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office1_Mult4_Flr_1_Infiltration,  !- Name
-    Office1_Mult4_Flr_1,     !- Zone or ZoneList Name
+    Office1_Mult4_Flr_1,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12144,7 +12144,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office2_Mult5_Flr_5_Infiltration,  !- Name
-    Office2_Mult5_Flr_5,     !- Zone or ZoneList Name
+    Office2_Mult5_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12158,7 +12158,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office3_Flr_5_Infiltration,  !- Name
-    Office3_Flr_5,           !- Zone or ZoneList Name
+    Office3_Flr_5,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12172,7 +12172,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office4_Mult6_Flr_5_Infiltration,  !- Name
-    Office4_Mult6_Flr_5,     !- Zone or ZoneList Name
+    Office4_Mult6_Flr_5,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12186,7 +12186,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom1_Mult10_Flr_3_Infiltration,  !- Name
-    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12200,7 +12200,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom1_Mult10_Flr_4_Infiltration,  !- Name
-    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12214,7 +12214,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom2_Flr_3_Infiltration,  !- Name
-    PatRoom2_Flr_3,          !- Zone or ZoneList Name
+    PatRoom2_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12228,7 +12228,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom2_Flr_4_Infiltration,  !- Name
-    PatRoom2_Flr_4,          !- Zone or ZoneList Name
+    PatRoom2_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12242,7 +12242,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom3_Mult10_Flr_3_Infiltration,  !- Name
-    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12256,7 +12256,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom3_Mult10_Flr_4_Infiltration,  !- Name
-    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12270,7 +12270,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom4_Flr_3_Infiltration,  !- Name
-    PatRoom4_Flr_3,          !- Zone or ZoneList Name
+    PatRoom4_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12284,7 +12284,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom4_Flr_4_Infiltration,  !- Name
-    PatRoom4_Flr_4,          !- Zone or ZoneList Name
+    PatRoom4_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12298,7 +12298,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom5_Mult10_Flr_3_Infiltration,  !- Name
-    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12312,7 +12312,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom5_Mult10_Flr_4_Infiltration,  !- Name
-    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12326,7 +12326,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom6_Flr_3_Infiltration,  !- Name
-    PatRoom6_Flr_3,          !- Zone or ZoneList Name
+    PatRoom6_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12340,7 +12340,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom6_Flr_4_Infiltration,  !- Name
-    PatRoom6_Flr_4,          !- Zone or ZoneList Name
+    PatRoom6_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12354,7 +12354,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom7_Mult10_Flr_3_Infiltration,  !- Name
-    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12368,7 +12368,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom7_Mult10_Flr_4_Infiltration,  !- Name
-    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList Name
+    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12382,7 +12382,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom8_Flr_3_Infiltration,  !- Name
-    PatRoom8_Flr_3,          !- Zone or ZoneList Name
+    PatRoom8_Flr_3,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12396,7 +12396,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PatRoom8_Flr_4_Infiltration,  !- Name
-    PatRoom8_Flr_4,          !- Zone or ZoneList Name
+    PatRoom8_Flr_4,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -12414,386 +12414,386 @@
     Basement Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Basement,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    7478.6947;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    7478.6947;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Flr_1,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1138.0622;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1138.0622;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_Flr_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Flr_2,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1138.0622;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1138.0622;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Flr_5,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1003.3528;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1003.3528;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_NW_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_NW_Flr_3,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1133.4171;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_NW_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_NW_Flr_4,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1133.4171;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_SE_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_SE_Flr_3,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1133.4171;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_SE_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_SE_Flr_4,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1133.4171;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     Dining_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Dining_Flr_5,            !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1393.5456;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1393.5456;               !- Surface Area {m2}
 
   InternalMass,
     ER_Exam1_Mult4_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_Exam3_Mult4_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_NurseStn_Lobby_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    2471.2209;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    2471.2209;               !- Surface Area {m2}
 
   InternalMass,
     ER_Trauma1_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     ER_Trauma1_Flr_1,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_Trauma2_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     ER_Trauma2_Flr_1,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_Triage_Mult4_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ICU_Flr_2 Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     ICU_Flr_2,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1235.9289;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1235.9289;               !- Surface Area {m2}
 
   InternalMass,
     ICU_NurseStn_Lobby_Flr_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1337.5356;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1337.5356;               !- Surface Area {m2}
 
   InternalMass,
     IC_PatRoom1_Mult5_Flr_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    41.8064;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     IC_PatRoom2_Flr_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     IC_PatRoom2_Flr_2,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     IC_PatRoom3_Mult6_Flr_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    41.8064;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     Kitchen_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Kitchen_Flr_5,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1858.0608;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1858.0608;               !- Surface Area {m2}
 
   InternalMass,
     Lab_Flr_3 Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     Lab_Flr_3,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    529.5473;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    529.5473;                !- Surface Area {m2}
 
   InternalMass,
     Lab_Flr_4 Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     Lab_Flr_4,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    529.5473;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    529.5473;                !- Surface Area {m2}
 
   InternalMass,
     Lobby_Records_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Lobby_Records_Flr_1,     !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    2949.6212;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    2949.6212;               !- Surface Area {m2}
 
   InternalMass,
     NurseStn_Lobby_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     NurseStn_Lobby_Flr_3,    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1811.6093;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1811.6093;               !- Surface Area {m2}
 
   InternalMass,
     NurseStn_Lobby_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     NurseStn_Lobby_Flr_4,    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1811.6093;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1811.6093;               !- Surface Area {m2}
 
   InternalMass,
     NurseStn_Lobby_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     NurseStn_Lobby_Flr_5,    !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    2081.0281;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    2081.0281;               !- Surface Area {m2}
 
   InternalMass,
     OR1_Flr_2 Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     OR1_Flr_2,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    111.4836;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    111.4836;                !- Surface Area {m2}
 
   InternalMass,
     OR2_Mult5_Flr_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     OR2_Mult5_Flr_2,         !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    111.4836;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    111.4836;                !- Surface Area {m2}
 
   InternalMass,
     OR3_Flr_2 Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     OR3_Flr_2,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    111.4836;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    111.4836;                !- Surface Area {m2}
 
   InternalMass,
     OR4_Flr_2 Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     OR4_Flr_2,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    445.9346;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    445.9346;                !- Surface Area {m2}
 
   InternalMass,
     OR_NurseStn_Lobby_Flr_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    2025.2863;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    2025.2863;               !- Surface Area {m2}
 
   InternalMass,
     Office1_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Office1_Flr_5,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    139.3911;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    139.3911;                !- Surface Area {m2}
 
   InternalMass,
     Office1_Mult4_Flr_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Office1_Mult4_Flr_1,     !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    27.8709;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    27.8709;                 !- Surface Area {m2}
 
   InternalMass,
     Office2_Mult5_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Office2_Mult5_Flr_5,     !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    139.3546;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    139.3546;                !- Surface Area {m2}
 
   InternalMass,
     Office3_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Office3_Flr_5,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    139.3546;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    139.3546;                !- Surface Area {m2}
 
   InternalMass,
     Office4_Mult6_Flr_5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Office4_Mult6_Flr_5,     !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    27.8709;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    27.8709;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom1_Mult10_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    41.8064;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom1_Mult10_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    41.8064;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom2_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom2_Flr_3,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    69.6773;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom2_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom2_Flr_4,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    69.6773;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom3_Mult10_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    40.4165;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom3_Mult10_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    40.4165;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom4_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom4_Flr_3,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    69.6773;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom4_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom4_Flr_4,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    69.6773;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom5_Mult10_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    41.8064;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom5_Mult10_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    41.8064;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom6_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom6_Flr_3,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom6_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom6_Flr_4,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom7_Mult10_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    40.4165;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom7_Mult10_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    40.4165;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom8_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom8_Flr_3,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom8_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PatRoom8_Flr_4,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.7418;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     PhysTherapy_Flr_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     PhysTherapy_Flr_3,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    975.4819;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    975.4819;                !- Surface Area {m2}
 
   InternalMass,
     Radiology_Flr_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Radiology_Flr_4,         !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    975.4819;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    975.4819;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
 
@@ -24689,8 +24689,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     3.546,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     3.417E+02,               !- CO2 Emission Factor {g/MJ}
@@ -24733,8 +24731,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    37631000,                !- Energy per Unit Factor
     1.092,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     5.21E+01,                !- CO2 Emission Factor {g/MJ}
