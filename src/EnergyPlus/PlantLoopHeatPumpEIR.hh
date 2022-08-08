@@ -212,6 +212,7 @@ namespace EIRPlantLoopHeatPumps {
             WetBulb = 1,
             Num
         };
+        const std::array<std::string_view, static_cast<int>(OATempCurveVar::Num)> OATempCurveVarNamesUC = {"DRYBULB", "WETBULB"};
 
         enum class WaterTempCurveVar
         {
@@ -220,13 +221,17 @@ namespace EIRPlantLoopHeatPumps {
             LeavingCondenser = 1,
             Num
         };
+        const std::array<std::string_view, static_cast<int>(WaterTempCurveVar::Num)> WaterTempCurveVarNamesUC = {"ENTERINGCONDENSER",
+                                                                                                                "LEAVINGCONDENSER"};
 
         enum class DefrostType
         {
             Invalid = -1,
             Timed = 0,
-            OnDemand = 1
+            OnDemand = 1,
+            Num
         };
+        const std::array<std::string_view, static_cast<int>(DefrostType::Num)> DefrostTypeNamesUC = {"TIMED", "ONDEMAND"};
 
         // New additions for GAHP only
         std::string fuelTypeStr = "";
