@@ -213,6 +213,14 @@ namespace EIRPlantLoopHeatPumps {
             Num
         };
 
+        enum class WaterTempCurveVar
+        {
+            Invalid = -1,
+            EnteringCondenser = 0,
+            LeavingCondenser = 1,
+            Num
+        };
+
         // New additions for GAHP only
         std::string fuelTypeStr = "";
         DataGlobalConstants::ResourceType fuelType = DataGlobalConstants::ResourceType::None; // resource type assignment
@@ -221,7 +229,7 @@ namespace EIRPlantLoopHeatPumps {
         Real64 desSupplyTemp = 60.0;
         Real64 desTempLift = 11.1;
         OATempCurveVar oaTempCurveInputVar = OATempCurveVar::DryBulb;
-        int waterTempCurveInputVar = 0;
+        WaterTempCurveVar waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
         // int capFuncTempCurveIndex = 0;
         // int powerRatioFuncTempCurveIndex = 0;
         //  int powerRatioFuncPLRCurveIndex = 0;

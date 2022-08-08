@@ -1223,7 +1223,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
     // Load (water) side temperature variable
     Real64 waterTempforCurve = this->loadSideInletTemp;
-    if (this->waterTempCurveInputVar == 1) {
+    if (this->waterTempCurveInputVar == WaterTempCurveVar::LeavingCondenser) {
         waterTempforCurve = this->loadSideOutletTemp;
     } else {
         //
@@ -1798,11 +1798,11 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string waterTempCurveInputVar =
                     UtilityRoutines::MakeUPPERCase(fields.at("water_temperature_curve_input_variable").get<std::string>());
                 if (waterTempCurveInputVar == "ENTERINGCONDENSER") {
-                    thisPLHP.waterTempCurveInputVar = 0;
+                    thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
                 } else if (waterTempCurveInputVar == "LEAVINGCONDENSER") {
-                    thisPLHP.waterTempCurveInputVar = 1;
+                    thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::LeavingCondenser;
                 } else {
-                    thisPLHP.waterTempCurveInputVar = 0;
+                    thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
                 }
 
                 // A11 normalized_capacity_function_of_temperature_curve_name
