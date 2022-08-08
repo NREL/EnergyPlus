@@ -2465,12 +2465,13 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
 
     state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Door;
     GetIncidentSolarMultiplier(*state, ErrorsFound);
-    std::string error_string = delimited_string({"   ** Severe  ** IncidentSolarMultiplier should be defined for exterior windows"});
+    std::string error_string = delimited_string({"   ** Severe  ** IncidentSolarMultiplier defined for non-window surfaces"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->Surface(2).ExtBoundCond = 1;
+    state->dataSurface->Surface(2).ExtBoundCond = 1; // internal
     GetIncidentSolarMultiplier(*state, ErrorsFound);
+    error_string = delimited_string({"   ** Severe  ** IncidentSolarMultiplier defined for interior surfaces"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     state->dataSurface->Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
