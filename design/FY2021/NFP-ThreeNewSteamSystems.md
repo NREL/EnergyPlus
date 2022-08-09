@@ -4,8 +4,7 @@ Implement steam features
 **Dareum Nam, NREL**
 
  - Initial NFP Original Date: 12/3/2020
- - Final NFP Revision Date: 7/21/2022
- 
+ - Final NFP Revision Date: 8/8/2022
 
 ## Justification for New Feature ##
 
@@ -63,10 +62,10 @@ The fluid with the smaller heat capacity rate will experience a larger temperatu
 The heat exchanger model correlations determine a heat transfer effectiveness value, ε. The effectiveness relations for each heat exchanger type are shown below.
 ![table1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_table1.png)
 
-Steam to water heat excahnger is used to couple a steam loop and a hot water loop. Figure 1 describes the loop structure with steam to water heat exchanger.
+Steam to water heat exchanger is used to couple a steam loop and a hot water loop. Figure 1 describes the loop structure with a steam to water heat exchanger.
 ![figure1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_figure1.png)
-In `HeatExchanger:FluidToFluid`, `Loop Supply Side` indicates that the heat exchanger is situated on the supply side of a loop. `Loop Demand Side` indicates that it is on the demand side of a loop. So from the point of view of the heat exchanger component itself, the `Loop Demand Side` acts like a supply source for the `Loop Supply Side` which acts like a demand to the component. Therefore, in the case of a steam to water heat exchanger, water is the `Loop Supply Side`  and steam is the `Loop Demand Side`.
-If one of the fluid in a heat exchanger undergoes a phase-change process, like steam in a steam to water heat exchanger, the following effectiveness relation reduces to
+In `HeatExchanger:FluidToFluid`, `Loop Supply Side` indicates that the heat exchanger is situated on the supply side of a loop. `Loop Demand Side` indicates that it is on the demand side of a loop. So from the point of view of the heat exchanger component itself, the `Loop Demand Side` acts like a supply source for the `Loop Supply Side` which acts like a demand to the component. Therefore, in the case of steam to water heat exchanger, water is the `Loop Supply Side`  and steam is the `Loop Demand Side`.
+If one of the fluids in a heat exchanger undergoes a phase-change process, like steam in a steam to water heat exchanger, the following effectiveness relation reduces to
 ![eqn3](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqn3.png)
 regardless of the type of heat exchanger. According to the Fundamentals of thermal-fluid sciences by Yunus A Çengel,
 > The heat capacity rate of a fluid during a phase-change process must approach infinity 
@@ -74,8 +73,6 @@ regardless of the type of heat exchanger. According to the Fundamentals of therm
 > deltaT goes 0, so that the heat transfer rate (m_dot * Cp * delta T) is a finite quantity. 
 > Therefore, in heat exchanger analysis, a phase-change fluid is conveniently modeled as a
 > fluid whose heat capacity rate is infinity.
-
-
 
 ## Testing/Validation/Data Sources ##
 
@@ -257,14 +254,12 @@ HeatExchanger:SteamToWater,
         \units C
 ```
 
-
 ## Engineering Reference ##
-
 
 
 ## Example File and Transition Changes ##
 
-New example files will be included.
+New example files for each module will be included.
 Transition is needed: The current object name and meter names of DistrictHeating are changed to DistrictHeatingWater. Also, the current meter names of Steam are changed to DistrictHeatingSteam.
 
 ## References ##
