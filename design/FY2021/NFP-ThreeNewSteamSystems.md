@@ -34,12 +34,17 @@ EnergyPlus Technicalities Call on 2/9/2022
 
 The current steam loop in EnergyPlus has five objects: steam boiler, steam pipe, steam to air coil, steam baseboard radiator, and condensate pump. The steam loop has several assumptions that help simplify loop complexity and increase usability.
 
-Steam side of the loop operates on constant saturation pressure of steam
-Water side (condensate) of the loop operates at atmospheric pressure
-Steam loop is to operate in saturated conditions, and no superheated condition
-Steam loop is assumed to have no transportation losses by friction and heat transfer with surroundings so that it maintains the quality of steam throughout the system constant value of 0 or 1
-Boiler operation is assumed to generate steam at a quality equal to 1 every time and steam enters the coils at boiler outlet conditions
-Steam coils are designed with steam traps, which only allow condensed steam to leave the coil; hence the steam always condenses and leaves the coil at a quality of 0
+1. Steam side of the loop operates on constant saturation pressure of steam
+
+2. Water side (condensate) of the loop operates at atmospheric pressure
+
+3. Steam loop is to operate in saturated conditions, and no superheated condition
+
+4. Steam loop is assumed to have no transportation losses by friction and heat transfer with surroundings so that it maintains the quality of steam throughout the system constant value of 0 or 1
+
+5. Boiler operation is assumed to generate steam at a quality equal to 1 every time and steam enters the coils at boiler outlet conditions
+
+6. Steam coils are designed with steam traps, which only allow condensed steam to leave the coil; hence the steam always condenses and leaves the coil at a quality of 0
 
 These assumptions are applied to the new objects: `LoadProfile:Plant` in a steam loop, `DistrictHeatingSteam`, and `HeatExchanger:SteamToWater`. If CoolProp is implemented in the future, the steam systems can be renewed with an enthalpy-based system.
 
