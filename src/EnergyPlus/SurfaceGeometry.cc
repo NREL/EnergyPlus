@@ -1568,6 +1568,7 @@ namespace SurfaceGeometry {
         MovedSurfs = 0;
         Array1D<bool> SurfaceTmpClassMoved; // Tmp class is moved
         SurfaceTmpClassMoved.dimension(state.dataSurface->TotSurfaces, false);
+        state.dataSurface->AllSurfaceListReportOrder.reserve(state.dataSurface->TotSurfaces);
 
         // Old SurfNum to New SurfNum
         // Old = order in state.dataSurfaceGeometry->SurfaceTmp
@@ -2286,7 +2287,10 @@ namespace SurfaceGeometry {
                     if (state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst == 0) {
                         state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst = SurfNum;
                     }
-                    if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
+                    if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) {
+                        state.dataSurface->Surface(SurfNum).HeatTransSurf = false;
+                        continue;
+                    }
                     if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) {
                         state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = SurfNum;
                         // Non window surfaces are grouped next within each zone
@@ -2658,7 +2662,6 @@ namespace SurfaceGeometry {
         state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
-        state.dataSurface->AllSurfaceListReportOrder.reserve(state.dataSurface->TotSurfaces);
 
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
