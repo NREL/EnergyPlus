@@ -10644,7 +10644,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDe
         (state->dataHeatBal->Resilience(zone_i).ZoneColdHourOfSafetyBins).at(timeColumnIdx - 1) = encodedMonDayHrMin;
     }
 
-    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins = &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins =
+        &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;
     WriteHourOfSafetyTableNonPreDefUseZoneData(
         *state, numColumnThermalTbl, tableName, columnHead, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, timeColumnIdx);
 

@@ -13661,17 +13661,17 @@ void WriteCO2ResilienceTables(EnergyPlusData &state)
         &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccuHourBins;
     std::array<Real64, numColumnCO2Tbl> DataHeatBalance::ZoneResilience::*ptrCO2LevelOccupiedHourBins =
         &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccupiedHourBins;
-    WriteResilienceBinsTable<numColumnCO2Tbl> (state, columnHead, ptrCO2LevelHourBins);
+    WriteResilienceBinsTable<numColumnCO2Tbl>(state, columnHead, ptrCO2LevelHourBins);
 
     columnHead = {state.dataOutRptPredefined->pdchCO2OccuHourSafe,
                   state.dataOutRptPredefined->pdchCO2OccuHourCaution,
                   state.dataOutRptPredefined->pdchCO2OccuHourHazard};
-    WriteResilienceBinsTable<numColumnCO2Tbl> (state, columnHead, ptrCO2LevelOccuHourBins);
+    WriteResilienceBinsTable<numColumnCO2Tbl>(state, columnHead, ptrCO2LevelOccuHourBins);
 
     columnHead = {state.dataOutRptPredefined->pdchCO2OccupiedHourSafe,
                   state.dataOutRptPredefined->pdchCO2OccupiedHourCaution,
                   state.dataOutRptPredefined->pdchCO2OccupiedHourHazard};
-    WriteResilienceBinsTable<numColumnCO2Tbl> (state, columnHead, ptrCO2LevelOccupiedHourBins);
+    WriteResilienceBinsTable<numColumnCO2Tbl>(state, columnHead, ptrCO2LevelOccupiedHourBins);
 }
 
 void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx)
