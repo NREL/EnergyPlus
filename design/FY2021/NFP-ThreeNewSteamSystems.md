@@ -46,23 +46,34 @@ These assumptions are applied to the new objects: `LoadProfile:Plant` in a steam
 
 ## Approach ##
 
-1. `LoadProfile:Plant` in a steam loop:
+1. `LoadProfile:Plant` in a steam loop :
 The current LoadProfile:Plant calculates the outlet water temperature based on the inlet water temperature from the plant loop and user inputs for the scheduled plant load and the requested flow rate. 
 In the new LoadProfile:Plant, there are three additional input fields: Plant Loop Fluid Type (Water or steam); Degree of SubCooling (optional input for steam loop); and Degree of Loop SubCooling (optional input for steam loop). The new LoadProfile:Plant in a steam loop calculates the steam outlet mass flow rate based on the scheduled plant load and user inputs of degree of subcooling, because the inlet steam temperature and the outlet steam temperature before the steam trap are fixed to saturation temperature according to the assumption.
 
-2. `DistrictHeatingSteam`:
+2. `DistrictHeatingSteam` :
 The current DistrictHeating or DistrictCooling calculates the output capacity required from the inlet temperature to the setpoint temperature for the loop with the given mass flow rate in Watts.
 The DistrictHeatingSteam calculates the required output capacity based on the latent heat at the given saturation temperature.
 The current object name and meter names of DistrictHeating are changed to DistrictHeatingWater. Also, the current meter names of Steam are changed to DistrictHeatingSteam.
 
-3. `HeatExchanger:SteamToWater`:
-The current HeatExchanger:FluidToFluid is a hydronic heat exchanger that can be used to couple two hydronic plant or condenser loops. Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model correlations determine a heat transfer effectiveness value, ε, which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams.
+3. `HeatExchanger:SteamToWater` :
+The current `HeatExchanger:FluidToFluid` is a hydronic heat exchanger that can be used to couple two hydronic plant or condenser loops. Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model correlations determine a heat transfer effectiveness value, ε, which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams. The effectiveness-NTU Method can be described following equations.
+![eqns1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns1.png)
+The fluid with the smaller heat capacity rate will experience a larger temperature change maximum temperature difference.
+![eqns2](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns2.png)
+The heat exchanger model correlations determine a heat transfer effectiveness value, ε. The effectiveness relations for each heat exchanger type are shown below.
+![table1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_table1.png)
+
 Steam to water heat excahnger is used to couple a steam loop and a hot water loop. Figure 1 describes the loop structure with steam to water heat exchanger.
 ![figure1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_figure1.png)
-If one of the fluid in a heat exchanger undergoes a phase-change process, like steam in a steam to water heat exchaanger, the following effectiveness relation can be used for effectiveness value.
-("The heat capacity rate of a fluid during a phase-change process must approach infinity since the temperature change is practically zero. That is, ")
-
-
+In `HeatExchanger:FluidToFluid`, `Loop Supply Side` indicates that the heat exchanger is situated on the supply side of a loop. `Loop Demand Side` indicates that it is on the demand side of a loop. So from the point of view of the heat exchanger component itself, the `Loop Demand Side` acts like a supply source for the `Loop Supply Side` which acts like a demand to the component. Therefore, in the case of a steam to water heat exchanger, water is the `Loop Supply Side`  and steam is the `Loop Demand Side`.
+If one of the fluid in a heat exchanger undergoes a phase-change process, like steam in a steam to water heat exchanger, the following effectiveness relation reduces to
+![eqn3](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqn3.png)
+regardless of the type of heat exchanger. According to the Fundamentals of thermal-fluid sciences by Yunus A Çengel,
+> The heat capacity rate of a fluid during a phase-change process must approach infinity 
+> since the temperature change is practically zero, That is, C goes to infinity when 
+> deltaT goes 0, so that the heat transfer rate (m_dot * Cp * delta T) is a finite quantity. 
+> Therefore, in heat exchanger analysis, a phase-change fluid is conveniently modeled as a
+> fluid whose heat capacity rate is infinity.
 
 
 
