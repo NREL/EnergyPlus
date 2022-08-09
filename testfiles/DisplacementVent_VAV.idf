@@ -614,19 +614,19 @@
 
   People,
     ZONE ONE People 1,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     WorkHours ScheduleG,     !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     10,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.5,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Live Gang;               !- Activity Level Schedule Name
 
   ElectricEquipment,
     ZONE ONE ElecEq 1,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     WorkHours ScheduleG,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2200,                    !- Design Level {W}
@@ -638,7 +638,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE ONE Infil 1,        !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     LEC,                     !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.089,                   !- Design Flow Rate {m3/s}

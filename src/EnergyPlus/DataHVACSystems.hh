@@ -86,6 +86,11 @@ public:
     virtual void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) = 0;
     virtual int getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
     virtual int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
+    virtual int getAirOutletNode() = 0;
+    virtual int getMixerOANode() = 0;
+    virtual int getMixerMixNode() = 0;
+    virtual int getMixerRetNode() = 0;
+    virtual int getEquipIndex() = 0;
 };
 
 } // namespace EnergyPlus
