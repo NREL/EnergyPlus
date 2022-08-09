@@ -10523,7 +10523,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPre
 
     std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHeatIndex = &DataHeatBalance::ZoneResilience::ZoneHeatIndexHourBins;
     WriteResilienceBinsTableNonPreDefUseZoneData<5>(
-        *state, columnNum, tableName, columnHead, columnWidth, ptrHeatIndex, rowHead, tableBody, unitConvMultiplier);
+        *state, tableName, columnHead, columnWidth, ptrHeatIndex, rowHead, tableBody, unitConvMultiplier);
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
         for (int j = 0; j < columnNum; j++) {
             EXPECT_EQ(tableBody(j + 1, zone_i), RealToStr(std::pow(j, 2) * zone_i * 1.0, 2));
