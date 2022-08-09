@@ -12977,9 +12977,9 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
                               const std::array<Real64, columnNum> DataHeatBalance::ZoneResilience::*memberPtr,
                               Real64 const unitConvMultiplier)
 {
-    std::vector<Real64> columnMax(columnNum, 0);
-    std::vector<Real64> columnMin(columnNum, 0);
-    std::vector<Real64> columnSum(columnNum, 0);
+    std::array<Real64, columnNum> columnMax = {0.0};
+    std::array<Real64, columnNum> columnMin = {0.0};
+    std::array<Real64, columnNum> columnSum = {0.0};
     for (int j = 0; j < columnNum; j++) {
         columnMin[j] = (state.dataHeatBal->Resilience(1).*memberPtr)[j] * unitConvMultiplier;
     }
@@ -13013,9 +13013,9 @@ void WriteResilienceBinsTableNonPreDefUseZoneData(EnergyPlusData &state,
 {
     WriteSubtitle(state, tableName);
 
-    std::vector<Real64> columnMax(columnNum, 0);
-    std::vector<Real64> columnMin(columnNum, 0);
-    std::vector<Real64> columnSum(columnNum, 0);
+    std::array<Real64, columnNum> columnMax = {0.0};
+    std::array<Real64, columnNum> columnMin = {0.0};
+    std::array<Real64, columnNum> columnSum = {0.0};
 
     for (int j = 0; j < columnNum; j++) {
         columnMin.at(j) = (state.dataHeatBal->Resilience(1).*memberPtr).at(j) * unitConvMultiplier;
@@ -13453,298 +13453,290 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     // Using/Aliasing
     auto &ort(state.dataOutRptTab);
 
-    if (state.dataGlobal->NumOfZones > 0) {
+    if (state.dataGlobal->NumOfZones <= 0) return;
 
-        Real64 degreeHourConversion;
-        UnitsStyle unitsStyle_cur = ort->unitsStyle;
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
-        } else {
-            degreeHourConversion = 1.0;
+    Real64 degreeHourConversion;
+    UnitsStyle unitsStyle_cur = ort->unitsStyle;
+    if (unitsStyle_cur == UnitsStyle::InchPound) {
+        degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
+    } else {
+        degreeHourConversion = 1.0;
+    }
+
+    WriteReportHeaders(state, "Annual Thermal Resilience Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+
+    Array1D_int columnWidth;
+    columnWidth.allocate(numColumnThermalTbl);
+    columnWidth = 10;
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+    tableBody.allocate(numColumnThermalTbl, state.dataGlobal->NumOfZones + 4);
+    Array1D_string columnHeadStr(numColumnThermalTbl);
+
+    if (unitsStyle_cur == UnitsStyle::InchPound) {
+        columnHeadStr(1) = "Safe (≤ 80.1°F) [hr]";
+        columnHeadStr(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
+        columnHeadStr(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
+        columnHeadStr(4) = "Danger (> 102.9, ≤ 125.1°F) [hr]";
+        columnHeadStr(5) = "Extreme Danger (> 125.1°F) [hr]";
+    } else {
+        columnHeadStr(1) = "Safe (≤ 26.7°C) [hr]";
+        columnHeadStr(2) = "Caution (> 26.7°C, ≤ 32.2°C) [hr]";
+        columnHeadStr(3) = "Extreme Caution (> 32.2°C, ≤ 39.4°C) [hr]";
+        columnHeadStr(4) = "Danger (> 39.4°C, ≤ 51.7°C) [hr]";
+        columnHeadStr(5) = "Extreme Danger (> 51.7°C) [hr]";
+    }
+
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHeatIndex = &DataHeatBalance::ZoneResilience::ZoneHeatIndexHourBins;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHeatIndexOccuHour =
+        &DataHeatBalance::ZoneResilience::ZoneHeatIndexOccuHourBins;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHeatIndexOccupiedHour =
+        &DataHeatBalance::ZoneResilience::ZoneHeatIndexOccupiedHourBins;
+    std::string tableName = "Heat Index Hours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(state, tableName, columnHeadStr, columnWidth, ptrHeatIndex, rowHead, tableBody);
+    tableName = "Heat Index OccupantHours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(
+        state, tableName, columnHeadStr, columnWidth, ptrHeatIndexOccuHour, rowHead, tableBody);
+    tableName = "Heat Index OccupiedHours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(
+        state, tableName, columnHeadStr, columnWidth, ptrHeatIndexOccupiedHour, rowHead, tableBody);
+
+    columnHeadStr(1) = "Little to no Discomfort (≤ 29) [hr]";
+    columnHeadStr(2) = "Some Discomfort (> 29, ≤ 40) [hr]";
+    columnHeadStr(3) = "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]";
+    columnHeadStr(4) = "Dangerous (> 45, ≤ 50) [hr]";
+    columnHeadStr(5) = "Heat Stroke Quite Possible (> 50) [hr]";
+
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHumidex = &DataHeatBalance::ZoneResilience::ZoneHumidexHourBins;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHumidexOccuHour =
+        &DataHeatBalance::ZoneResilience::ZoneHumidexOccuHourBins;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHumidexOccupiedHour =
+        &DataHeatBalance::ZoneResilience::ZoneHumidexOccupiedHourBins;
+    tableName = "Humidex Hours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(state, tableName, columnHeadStr, columnWidth, ptrHumidex, rowHead, tableBody);
+    tableName = "Humidex OccupantHours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(
+        state, tableName, columnHeadStr, columnWidth, ptrHumidexOccuHour, rowHead, tableBody);
+    tableName = "Humidex OccupiedHours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(
+        state, tableName, columnHeadStr, columnWidth, ptrHumidexOccupiedHour, rowHead, tableBody);
+
+    bool hasPierceSET = true;
+    if (state.dataHeatBal->TotPeople == 0) {
+        hasPierceSET = false;
+        if (ort->displayThermalResilienceSummaryExplicitly) {
+            ShowWarningError(state,
+                             "Writing Annual Thermal Resilience Summary - SET Degree-Hours reports: "
+                             "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                             "but no People object is defined.");
         }
-
-        WriteReportHeaders(state, "Annual Thermal Resilience Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-
-        int columnNum = 5;
-        Array1D_int columnWidth;
-        columnWidth.allocate(columnNum);
-        columnWidth = 10;
-        Array1D_string rowHead;
-        Array2D_string tableBody;
-        rowHead.allocate(state.dataGlobal->NumOfZones + 4);
-        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
-        Array1D_string columnHeadStr(5);
-
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            columnHeadStr(1) = "Safe (≤ 80.1°F) [hr]";
-            columnHeadStr(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
-            columnHeadStr(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
-            columnHeadStr(4) = "Danger (> 102.9, ≤ 125.1°F) [hr]";
-            columnHeadStr(5) = "Extreme Danger (> 125.1°F) [hr]";
-        } else {
-            columnHeadStr(1) = "Safe (≤ 26.7°C) [hr]";
-            columnHeadStr(2) = "Caution (> 26.7°C, ≤ 32.2°C) [hr]";
-            columnHeadStr(3) = "Extreme Caution (> 32.2°C, ≤ 39.4°C) [hr]";
-            columnHeadStr(4) = "Danger (> 39.4°C, ≤ 51.7°C) [hr]";
-            columnHeadStr(5) = "Extreme Danger (> 51.7°C) [hr]";
-        }
-
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHeatIndex = &DataHeatBalance::ZoneResilience::ZoneHeatIndexHourBins;
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHeatIndexOccuHour = &DataHeatBalance::ZoneResilience::ZoneHeatIndexOccuHourBins;
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHeatIndexOccupiedHour =
-            &DataHeatBalance::ZoneResilience::ZoneHeatIndexOccupiedHourBins;
-        std::string tableName = "Heat Index Hours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, tableName, columnHeadStr, columnWidth, ptrHeatIndex, rowHead, tableBody);
-        tableName = "Heat Index OccupantHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, tableName, columnHeadStr, columnWidth, ptrHeatIndexOccuHour, rowHead, tableBody);
-        tableName = "Heat Index OccupiedHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, tableName, columnHeadStr, columnWidth, ptrHeatIndexOccupiedHour, rowHead, tableBody);
-
-        columnHeadStr(1) = "Little to no Discomfort (≤ 29) [hr]";
-        columnHeadStr(2) = "Some Discomfort (> 29, ≤ 40) [hr]";
-        columnHeadStr(3) = "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]";
-        columnHeadStr(4) = "Dangerous (> 45, ≤ 50) [hr]";
-        columnHeadStr(5) = "Heat Stroke Quite Possible (> 50) [hr]";
-
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHumidex = &DataHeatBalance::ZoneResilience::ZoneHumidexHourBins;
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHumidexOccuHour = &DataHeatBalance::ZoneResilience::ZoneHumidexOccuHourBins;
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHumidexOccupiedHour =
-            &DataHeatBalance::ZoneResilience::ZoneHumidexOccupiedHourBins;
-        tableName = "Humidex Hours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, tableName, columnHeadStr, columnWidth, ptrHumidex, rowHead, tableBody);
-        tableName = "Humidex OccupantHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, tableName, columnHeadStr, columnWidth, ptrHumidexOccuHour, rowHead, tableBody);
-        tableName = "Humidex OccupiedHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, tableName, columnHeadStr, columnWidth, ptrHumidexOccupiedHour, rowHead, tableBody);
-
-        bool hasPierceSET = true;
-        if (state.dataHeatBal->TotPeople == 0) {
+    }
+    for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
+        if (!state.dataHeatBal->People(iPeople).Pierce) {
             hasPierceSET = false;
             if (ort->displayThermalResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  "Writing Annual Thermal Resilience Summary - SET Degree-Hours reports: "
                                  "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-                                 "but no People object is defined.");
+                                 "but no Pierce model is defined in " +
+                                     state.dataHeatBal->People(iPeople).Name + " object.");
             }
         }
-        for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
-            if (!state.dataHeatBal->People(iPeople).Pierce) {
-                hasPierceSET = false;
-                if (ort->displayThermalResilienceSummaryExplicitly) {
-                    ShowWarningError(state,
-                                     "Writing Annual Thermal Resilience Summary - SET Degree-Hours reports: "
-                                     "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
-                                     "but no Pierce model is defined in " +
-                                         state.dataHeatBal->People(iPeople).Name + " object.");
-                }
-            }
-        }
-
-        if (hasPierceSET) {
-            if (unitsStyle_cur == UnitsStyle::InchPound) {
-                columnHeadStr(1) = "SET > 86°F Degree-Hours [°F·hr]";
-                columnHeadStr(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
-                columnHeadStr(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
-                columnHeadStr(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
-                columnHeadStr(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
-            } else {
-                columnHeadStr(1) = "SET > 30°C Degree-Hours [°C·hr]";
-                columnHeadStr(2) = "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]";
-                columnHeadStr(3) = "SET > 30°C Occupied Degree-Hours [°C·hr]";
-                columnHeadStr(4) = "Longest SET > 30°C Duration for Occupied Period [hr]";
-                columnHeadStr(5) = "Start Time of the Longest SET > 30°C Duration for Occupied Period";
-            }
-
-            std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrLowSETHours = &DataHeatBalance::ZoneResilience::ZoneLowSETHours;
-            std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHighSETHours = &DataHeatBalance::ZoneResilience::ZoneHighSETHours;
-            Array1D_string rowHeadSET;
-            Array2D_string tableBodySET;
-            rowHeadSET.allocate(state.dataGlobal->NumOfZones + 3);
-            tableBodySET.allocate(columnNum, state.dataGlobal->NumOfZones + 3);
-            tableName = "Heating SET Degree-Hours";
-            WriteSETHoursTableNonPreDefUseZoneData(
-                state, columnNum, tableName, columnHeadStr, columnWidth, ptrLowSETHours, rowHeadSET, tableBodySET, degreeHourConversion);
-            tableName = "Cooling SET Degree-Hours";
-            WriteSETHoursTableNonPreDefUseZoneData(
-                state, columnNum, tableName, columnHeadStr, columnWidth, ptrHighSETHours, rowHeadSET, tableBodySET, degreeHourConversion);
-        }
-
-        columnNum = 5;
-
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins = &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;
-        std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHeatHourOfSafetyBins = &DataHeatBalance::ZoneResilience::ZoneHeatHourOfSafetyBins;
-        tableName = "Hours of Safety for Cold Events";
-        columnHeadStr(1) = "Hours of Safety [hr]";
-        columnHeadStr(2) = "End Time of the Safety Duration";
-        columnHeadStr(3) = "Safe Temperature Exceedance Hours [hr]";
-        columnHeadStr(4) = "Safe Temperature Exceedance OccupantHours [hr]";
-        columnHeadStr(5) = "Safe Temperature Exceedance OccupiedHours [hr]";
-        WriteHourOfSafetyTableNonPreDefUseZoneData(
-            state, columnNum, tableName, columnHeadStr, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, 2);
-        tableName = "Hours of Safety for Heat Events";
-        WriteHourOfSafetyTableNonPreDefUseZoneData(
-            state, columnNum, tableName, columnHeadStr, columnWidth, ptrHeatHourOfSafetyBins, rowHead, tableBody, 2);
-
-        int columnNumUnmetDegHr = 6;
-        Array1D_int columnWidthUnmetDegHr;
-        columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
-        columnWidthUnmetDegHr = 10;
-        Array1D_string columnHeadUnmetDegHr;
-        columnHeadUnmetDegHr.allocate(columnNumUnmetDegHr);
-        Array2D_string tableBodyUnmetDegHr;
-        tableBodyUnmetDegHr.allocate(columnNumUnmetDegHr, state.dataGlobal->NumOfZones + 4);
-        tableName = "Unmet Degree-Hours";
-        columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
-        columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
-        columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]";
-        columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours [°C·hr]";
-        columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
-        columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
-
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            int indexUnitConv;
-            std::string curUnits;
-            for (int i = 1; i < columnNumUnmetDegHr; i++) {
-                LookupSItoIP(state, columnHeadUnmetDegHr(i), indexUnitConv, curUnits);
-                columnHeadUnmetDegHr(i) = curUnits;
-            }
-        }
-
-        std::array<Real64, 6> DataHeatBalance::ZoneResilience::*ptrUnmetDegreeHourBins = &DataHeatBalance::ZoneResilience::ZoneUnmetDegreeHourBins;
-        WriteResilienceBinsTableNonPreDefUseZoneData<6>(state,
-                                                        tableName,
-                                                        columnHeadUnmetDegHr,
-                                                        columnWidthUnmetDegHr,
-                                                        ptrUnmetDegreeHourBins,
-                                                        rowHead,
-                                                        tableBodyUnmetDegHr,
-                                                        degreeHourConversion);
-
-        columnNum = 4;
-        columnHeadStr.allocate(columnNum);
-        columnWidth.allocate(columnNum);
-        columnWidth = 10;
-        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
-        columnHeadStr(1) = "Very-cold Exceedance OccupantHours [hr]";
-        columnHeadStr(2) = "Cool Exceedance OccupantHours [hr]";
-        columnHeadStr(3) = "Warm Exceedance OccupantHours [hr]";
-        columnHeadStr(4) = "Very-hot Exceedance OccupantHours [hr]";
-
-        std::array<Real64, 4> DataHeatBalance::ZoneResilience::*ptrDiscomfortWtExceedOccuHourBins =
-            &DataHeatBalance::ZoneResilience::ZoneDiscomfortWtExceedOccuHourBins;
-        std::array<Real64, 4> DataHeatBalance::ZoneResilience::*ptrDiscomfortWtExceedOccupiedHourBins =
-            &DataHeatBalance::ZoneResilience::ZoneDiscomfortWtExceedOccupiedHourBins;
-        tableName = "Discomfort-weighted Exceedance OccupantHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<4>(
-            state, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccuHourBins, rowHead, tableBody);
-        tableName = "Discomfort-weighted Exceedance OccupiedHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<4>(
-            state, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccupiedHourBins, rowHead, tableBody);
-        rowHead.deallocate();
-        columnHeadStr.deallocate();
-        tableBody.deallocate();
-        tableBodyUnmetDegHr.deallocate();
-        columnWidth.deallocate();
-        columnHeadUnmetDegHr.deallocate();
-        columnWidthUnmetDegHr.deallocate();
     }
+
+    if (hasPierceSET) {
+        if (unitsStyle_cur == UnitsStyle::InchPound) {
+            columnHeadStr(1) = "SET > 86°F Degree-Hours [°F·hr]";
+            columnHeadStr(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
+            columnHeadStr(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
+            columnHeadStr(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
+            columnHeadStr(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
+        } else {
+            columnHeadStr(1) = "SET > 30°C Degree-Hours [°C·hr]";
+            columnHeadStr(2) = "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]";
+            columnHeadStr(3) = "SET > 30°C Occupied Degree-Hours [°C·hr]";
+            columnHeadStr(4) = "Longest SET > 30°C Duration for Occupied Period [hr]";
+            columnHeadStr(5) = "Start Time of the Longest SET > 30°C Duration for Occupied Period";
+        }
+
+        std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrLowSETHours = &DataHeatBalance::ZoneResilience::ZoneLowSETHours;
+        std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHighSETHours =
+            &DataHeatBalance::ZoneResilience::ZoneHighSETHours;
+        Array1D_string rowHeadSET;
+        Array2D_string tableBodySET;
+        rowHeadSET.allocate(state.dataGlobal->NumOfZones + 3);
+        tableBodySET.allocate(numColumnThermalTbl, state.dataGlobal->NumOfZones + 3);
+        tableName = "Heating SET Degree-Hours";
+        WriteSETHoursTableNonPreDefUseZoneData(
+            state, numColumnThermalTbl, tableName, columnHeadStr, columnWidth, ptrLowSETHours, rowHeadSET, tableBodySET, degreeHourConversion);
+        tableName = "Cooling SET Degree-Hours";
+        WriteSETHoursTableNonPreDefUseZoneData(
+            state, numColumnThermalTbl, tableName, columnHeadStr, columnWidth, ptrHighSETHours, rowHeadSET, tableBodySET, degreeHourConversion);
+    }
+
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins =
+        &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHeatHourOfSafetyBins =
+        &DataHeatBalance::ZoneResilience::ZoneHeatHourOfSafetyBins;
+    tableName = "Hours of Safety for Cold Events";
+    columnHeadStr(1) = "Hours of Safety [hr]";
+    columnHeadStr(2) = "End Time of the Safety Duration";
+    columnHeadStr(3) = "Safe Temperature Exceedance Hours [hr]";
+    columnHeadStr(4) = "Safe Temperature Exceedance OccupantHours [hr]";
+    columnHeadStr(5) = "Safe Temperature Exceedance OccupiedHours [hr]";
+    WriteHourOfSafetyTableNonPreDefUseZoneData(
+        state, numColumnThermalTbl, tableName, columnHeadStr, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, 2);
+    tableName = "Hours of Safety for Heat Events";
+    WriteHourOfSafetyTableNonPreDefUseZoneData(
+        state, numColumnThermalTbl, tableName, columnHeadStr, columnWidth, ptrHeatHourOfSafetyBins, rowHead, tableBody, 2);
+
+    Array1D_int columnWidthUnmetDegHr;
+    columnWidthUnmetDegHr.allocate(numColumnUnmetDegreeHourTbl);
+    columnWidthUnmetDegHr = 10;
+    Array1D_string columnHeadUnmetDegHr;
+    columnHeadUnmetDegHr.allocate(numColumnUnmetDegreeHourTbl);
+    Array2D_string tableBodyUnmetDegHr;
+    tableBodyUnmetDegHr.allocate(numColumnUnmetDegreeHourTbl, state.dataGlobal->NumOfZones + 4);
+    tableName = "Unmet Degree-Hours";
+    columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+
+    if (unitsStyle_cur == UnitsStyle::InchPound) {
+        int indexUnitConv;
+        std::string curUnits;
+        for (int i = 1; i < numColumnUnmetDegreeHourTbl; i++) {
+            LookupSItoIP(state, columnHeadUnmetDegHr(i), indexUnitConv, curUnits);
+            columnHeadUnmetDegHr(i) = curUnits;
+        }
+    }
+
+    std::array<Real64, numColumnUnmetDegreeHourTbl> DataHeatBalance::ZoneResilience::*ptrUnmetDegreeHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneUnmetDegreeHourBins;
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnUnmetDegreeHourTbl>(
+        state, tableName, columnHeadUnmetDegHr, columnWidthUnmetDegHr, ptrUnmetDegreeHourBins, rowHead, tableBodyUnmetDegHr, degreeHourConversion);
+
+    columnHeadStr.allocate(numColumnDiscomfortWtExceedHourTbl);
+    columnWidth.allocate(numColumnDiscomfortWtExceedHourTbl);
+    columnWidth = 10;
+    tableBody.allocate(numColumnDiscomfortWtExceedHourTbl, state.dataGlobal->NumOfZones + 4);
+    columnHeadStr(1) = "Very-cold Exceedance OccupantHours [hr]";
+    columnHeadStr(2) = "Cool Exceedance OccupantHours [hr]";
+    columnHeadStr(3) = "Warm Exceedance OccupantHours [hr]";
+    columnHeadStr(4) = "Very-hot Exceedance OccupantHours [hr]";
+
+    std::array<Real64, numColumnDiscomfortWtExceedHourTbl> DataHeatBalance::ZoneResilience::*ptrDiscomfortWtExceedOccuHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneDiscomfortWtExceedOccuHourBins;
+    std::array<Real64, numColumnDiscomfortWtExceedHourTbl> DataHeatBalance::ZoneResilience::*ptrDiscomfortWtExceedOccupiedHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneDiscomfortWtExceedOccupiedHourBins;
+    tableName = "Discomfort-weighted Exceedance OccupantHours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnDiscomfortWtExceedHourTbl>(
+        state, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccuHourBins, rowHead, tableBody);
+    tableName = "Discomfort-weighted Exceedance OccupiedHours";
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnDiscomfortWtExceedHourTbl>(
+        state, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccupiedHourBins, rowHead, tableBody);
+    rowHead.deallocate();
+    columnHeadStr.deallocate();
+    tableBody.deallocate();
+    tableBodyUnmetDegHr.deallocate();
+    columnWidth.deallocate();
+    columnHeadUnmetDegHr.deallocate();
+    columnWidthUnmetDegHr.deallocate();
 }
 
 void WriteCO2ResilienceTables(EnergyPlusData &state)
 {
 
-    // Using/Aliasing
-    if (state.dataGlobal->NumOfZones > 0) {
-        std::vector<int> columnHead = {state.dataOutRptPredefined->pdchCO2HourSafe,
-                                       state.dataOutRptPredefined->pdchCO2HourCaution,
-                                       state.dataOutRptPredefined->pdchCO2HourHazard};
+    if (state.dataGlobal->NumOfZones <= 0) return;
+    std::vector<int> columnHead = {
+        state.dataOutRptPredefined->pdchCO2HourSafe, state.dataOutRptPredefined->pdchCO2HourCaution, state.dataOutRptPredefined->pdchCO2HourHazard};
 
-        std::array<Real64, 3> DataHeatBalance::ZoneResilience::*ptrCO2LevelHourBins = &DataHeatBalance::ZoneResilience::ZoneCO2LevelHourBins;
-        std::array<Real64, 3> DataHeatBalance::ZoneResilience::*ptrCO2LevelOccuHourBins = &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccuHourBins;
-        std::array<Real64, 3> DataHeatBalance::ZoneResilience::*ptrCO2LevelOccupiedHourBins =
-            &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccupiedHourBins;
-        WriteResilienceBinsTable<3>(state, columnHead, ptrCO2LevelHourBins);
+    std::array<Real64, numColumnCO2Tbl> DataHeatBalance::ZoneResilience::*ptrCO2LevelHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneCO2LevelHourBins;
+    std::array<Real64, numColumnCO2Tbl> DataHeatBalance::ZoneResilience::*ptrCO2LevelOccuHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccuHourBins;
+    std::array<Real64, numColumnCO2Tbl> DataHeatBalance::ZoneResilience::*ptrCO2LevelOccupiedHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccupiedHourBins;
+    WriteResilienceBinsTable<numColumnCO2Tbl> (state, columnHead, ptrCO2LevelHourBins);
 
-        columnHead = {state.dataOutRptPredefined->pdchCO2OccuHourSafe,
-                      state.dataOutRptPredefined->pdchCO2OccuHourCaution,
-                      state.dataOutRptPredefined->pdchCO2OccuHourHazard};
-        WriteResilienceBinsTable<3>(state, columnHead, ptrCO2LevelOccuHourBins);
+    columnHead = {state.dataOutRptPredefined->pdchCO2OccuHourSafe,
+                  state.dataOutRptPredefined->pdchCO2OccuHourCaution,
+                  state.dataOutRptPredefined->pdchCO2OccuHourHazard};
+    WriteResilienceBinsTable<numColumnCO2Tbl> (state, columnHead, ptrCO2LevelOccuHourBins);
 
-        columnHead = {state.dataOutRptPredefined->pdchCO2OccupiedHourSafe,
-                      state.dataOutRptPredefined->pdchCO2OccupiedHourCaution,
-                      state.dataOutRptPredefined->pdchCO2OccupiedHourHazard};
-        WriteResilienceBinsTable<3>(state, columnHead, ptrCO2LevelOccupiedHourBins);
-    }
+    columnHead = {state.dataOutRptPredefined->pdchCO2OccupiedHourSafe,
+                  state.dataOutRptPredefined->pdchCO2OccupiedHourCaution,
+                  state.dataOutRptPredefined->pdchCO2OccupiedHourHazard};
+    WriteResilienceBinsTable<numColumnCO2Tbl> (state, columnHead, ptrCO2LevelOccupiedHourBins);
 }
 
 void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx)
 {
     auto &ort(state.dataOutRptTab);
-    if (ort->WriteTabularFiles) {
-        WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
-        std::string periodTitle = state.dataWeatherManager->CO2ReportPeriodInput(periodIdx).title;
+    if (ort->WriteTabularFiles) return;
+    WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
+    std::string periodTitle = state.dataWeatherManager->CO2ReportPeriodInput(periodIdx).title;
 
-        int columnNum = 3;
-        Array1D_int columnWidth;
-        columnWidth.allocate(columnNum);
-        columnWidth = 10;
-        Array1D_string columnHead(columnNum);
-        columnHead(1) = "Safe (<= 1000 ppm) [hr]";
-        columnHead(2) = "Caution (> 1000, <= 5000 ppm) [hr]";
-        columnHead(3) = "Hazard (> 5000 ppm) [hr]";
+    Array1D_int columnWidth;
+    columnWidth.allocate(numColumnCO2Tbl);
+    columnWidth = 10;
+    Array1D_string columnHead(numColumnCO2Tbl);
+    columnHead(1) = "Safe (<= 1000 ppm) [hr]";
+    columnHead(2) = "Caution (> 1000, <= 5000 ppm) [hr]";
+    columnHead(3) = "Hazard (> 5000 ppm) [hr]";
 
-        Array1D_string rowHead;
-        Array2D_string tableBody;
-        rowHead.allocate(state.dataGlobal->NumOfZones + 4);
-        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+    tableBody.allocate(numColumnCO2Tbl, state.dataGlobal->NumOfZones + 4);
 
-        std::string tableName = "CO2 Level Hours";
-        std::string tableType = "CO2";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                tableType,
-                                                columnNum,
-                                                periodIdx,
-                                                periodTitle,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
+    std::string tableName = "CO2 Level Hours";
+    std::string tableType = "CO2";
+    WriteResilienceBinsTableReportingPeriod(state,
+                                            tableType,
+                                            numColumnCO2Tbl,
+                                            periodIdx,
+                                            periodTitle,
+                                            tableName,
+                                            columnHead,
+                                            columnWidth,
+                                            state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody);
 
-        tableName = "CO2 Level OccupantHours";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                tableType,
-                                                columnNum,
-                                                periodIdx,
-                                                periodTitle,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
+    tableName = "CO2 Level OccupantHours";
+    WriteResilienceBinsTableReportingPeriod(state,
+                                            tableType,
+                                            numColumnCO2Tbl,
+                                            periodIdx,
+                                            periodTitle,
+                                            tableName,
+                                            columnHead,
+                                            columnWidth,
+                                            state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody);
 
-        tableName = "CO2 Level OccupiedHours";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                tableType,
-                                                columnNum,
-                                                periodIdx,
-                                                periodTitle,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
-    }
+    tableName = "CO2 Level OccupiedHours";
+    WriteResilienceBinsTableReportingPeriod(state,
+                                            tableType,
+                                            numColumnCO2Tbl,
+                                            periodIdx,
+                                            periodTitle,
+                                            tableName,
+                                            columnHead,
+                                            columnWidth,
+                                            state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody);
 }
 
 void WriteVisualResilienceTables(EnergyPlusData &state)
 {
-
-    // Using/Aliasing
-
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
@@ -13757,96 +13749,93 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
         }
     }
 
-    if (state.dataGlobal->NumOfZones > 0) {
-        std::vector<int> columnHead = {state.dataOutRptPredefined->pdchIllumHourDark,
-                                       state.dataOutRptPredefined->pdchIllumHourDim,
-                                       state.dataOutRptPredefined->pdchIllumHourAdequate,
-                                       state.dataOutRptPredefined->pdchIllumHourBright};
+    if (state.dataGlobal->NumOfZones <= 0) return;
+    std::vector<int> columnHead = {state.dataOutRptPredefined->pdchIllumHourDark,
+                                   state.dataOutRptPredefined->pdchIllumHourDim,
+                                   state.dataOutRptPredefined->pdchIllumHourAdequate,
+                                   state.dataOutRptPredefined->pdchIllumHourBright};
 
-        std::array<Real64, 4> DataHeatBalance::ZoneResilience::*ptrLightingLevelHourBins =
-            &DataHeatBalance::ZoneResilience::ZoneLightingLevelHourBins;
-        std::array<Real64, 4> DataHeatBalance::ZoneResilience::*ptrLightingLevelOccuHourBins =
-            &DataHeatBalance::ZoneResilience::ZoneLightingLevelOccuHourBins;
-        std::array<Real64, 4> DataHeatBalance::ZoneResilience::*ptrLightingLevelOccupiedHourBins =
-            &DataHeatBalance::ZoneResilience::ZoneLightingLevelOccupiedHourBins;
-        WriteResilienceBinsTable<4>(state, columnHead, ptrLightingLevelHourBins);
+    std::array<Real64, numColumnVisualTbl> DataHeatBalance::ZoneResilience::*ptrLightingLevelHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneLightingLevelHourBins;
+    std::array<Real64, numColumnVisualTbl> DataHeatBalance::ZoneResilience::*ptrLightingLevelOccuHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneLightingLevelOccuHourBins;
+    std::array<Real64, numColumnVisualTbl> DataHeatBalance::ZoneResilience::*ptrLightingLevelOccupiedHourBins =
+        &DataHeatBalance::ZoneResilience::ZoneLightingLevelOccupiedHourBins;
+    WriteResilienceBinsTable<numColumnVisualTbl>(state, columnHead, ptrLightingLevelHourBins);
 
-        columnHead = {state.dataOutRptPredefined->pdchIllumOccuHourDark,
-                      state.dataOutRptPredefined->pdchIllumOccuHourDim,
-                      state.dataOutRptPredefined->pdchIllumOccuHourAdequate,
-                      state.dataOutRptPredefined->pdchIllumOccuHourBright};
-        WriteResilienceBinsTable<4>(state, columnHead, ptrLightingLevelOccuHourBins);
+    columnHead = {state.dataOutRptPredefined->pdchIllumOccuHourDark,
+                  state.dataOutRptPredefined->pdchIllumOccuHourDim,
+                  state.dataOutRptPredefined->pdchIllumOccuHourAdequate,
+                  state.dataOutRptPredefined->pdchIllumOccuHourBright};
+    WriteResilienceBinsTable<numColumnVisualTbl>(state, columnHead, ptrLightingLevelOccuHourBins);
 
-        columnHead = {state.dataOutRptPredefined->pdchIllumOccupiedHourDark,
-                      state.dataOutRptPredefined->pdchIllumOccupiedHourDim,
-                      state.dataOutRptPredefined->pdchIllumOccupiedHourAdequate,
-                      state.dataOutRptPredefined->pdchIllumOccupiedHourBright};
-        WriteResilienceBinsTable<4>(state, columnHead, ptrLightingLevelOccupiedHourBins);
-    }
+    columnHead = {state.dataOutRptPredefined->pdchIllumOccupiedHourDark,
+                  state.dataOutRptPredefined->pdchIllumOccupiedHourDim,
+                  state.dataOutRptPredefined->pdchIllumOccupiedHourAdequate,
+                  state.dataOutRptPredefined->pdchIllumOccupiedHourBright};
+    WriteResilienceBinsTable<numColumnVisualTbl>(state, columnHead, ptrLightingLevelOccupiedHourBins);
 }
 
 void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx)
 {
     auto &ort(state.dataOutRptTab);
-    if (ort->WriteTabularFiles) {
-        WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
-        std::string periodTitle = state.dataWeatherManager->VisualReportPeriodInput(periodIdx).title;
+    if (!ort->WriteTabularFiles) return;
+    WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
+    std::string periodTitle = state.dataWeatherManager->VisualReportPeriodInput(periodIdx).title;
 
-        int columnNum = 4;
-        Array1D_int columnWidth;
-        columnWidth.allocate(columnNum);
-        columnWidth = 10;
-        Array1D_string columnHead(columnNum);
-        columnHead(1) = "A Bit Dark (<= 100 lux) [hr]";
-        columnHead(2) = "Dim (> 100, <= 300 lux) [hr]";
-        columnHead(3) = "Adequate (> 300, <= 500 lux) [hr]";
-        columnHead(4) = "Bright (>500 lux) [hr]";
+    Array1D_int columnWidth;
+    columnWidth.allocate(numColumnVisualTbl);
+    columnWidth = 10;
+    Array1D_string columnHead(numColumnVisualTbl);
+    columnHead(1) = "A Bit Dark (<= 100 lux) [hr]";
+    columnHead(2) = "Dim (> 100, <= 300 lux) [hr]";
+    columnHead(3) = "Adequate (> 300, <= 500 lux) [hr]";
+    columnHead(4) = "Bright (>500 lux) [hr]";
 
-        Array1D_string rowHead;
-        Array2D_string tableBody;
-        rowHead.allocate(state.dataGlobal->NumOfZones + 4);
-        tableBody.allocate(columnNum, state.dataGlobal->NumOfZones + 4);
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+    tableBody.allocate(numColumnVisualTbl, state.dataGlobal->NumOfZones + 4);
 
-        std::string tableName = "Illuminance Level Hours";
-        std::string tableType = "Visual";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                tableType,
-                                                columnNum,
-                                                periodIdx,
-                                                periodTitle,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
+    std::string tableName = "Illuminance Level Hours";
+    std::string tableType = "Visual";
+    WriteResilienceBinsTableReportingPeriod(state,
+                                            tableType,
+                                            numColumnVisualTbl,
+                                            periodIdx,
+                                            periodTitle,
+                                            tableName,
+                                            columnHead,
+                                            columnWidth,
+                                            state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody);
 
-        tableName = "Illuminance Level OccupantHours";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                tableType,
-                                                columnNum,
-                                                periodIdx,
-                                                periodTitle,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
+    tableName = "Illuminance Level OccupantHours";
+    WriteResilienceBinsTableReportingPeriod(state,
+                                            tableType,
+                                            numColumnVisualTbl,
+                                            periodIdx,
+                                            periodTitle,
+                                            tableName,
+                                            columnHead,
+                                            columnWidth,
+                                            state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody);
 
-        tableName = "Illuminance Level OccupiedHours";
-        WriteResilienceBinsTableReportingPeriod(state,
-                                                tableType,
-                                                columnNum,
-                                                periodIdx,
-                                                periodTitle,
-                                                tableName,
-                                                columnHead,
-                                                columnWidth,
-                                                state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod,
-                                                rowHead,
-                                                tableBody);
-    }
+    tableName = "Illuminance Level OccupiedHours";
+    WriteResilienceBinsTableReportingPeriod(state,
+                                            tableType,
+                                            numColumnVisualTbl,
+                                            periodIdx,
+                                            periodTitle,
+                                            tableName,
+                                            columnHead,
+                                            columnWidth,
+                                            state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody);
 }
 
 void WriteHeatEmissionTable(EnergyPlusData &state)

@@ -10490,17 +10490,16 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_RetrieveEntryFromTableBody)
 // fixme: change the testcase
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPreDef)
 {
-    int columnNum = 5;
     std::string tableName = "test table";
     Array1D_string columnHead;
-    columnHead.allocate(columnNum);
+    columnHead.allocate(numColumnThermalTbl);
     columnHead(1) = "col 1";
     columnHead(2) = "col 2";
     columnHead(3) = "col 3";
     columnHead(4) = "col 4";
     columnHead(5) = "col 5";
     Array1D_int columnWidth;
-    columnWidth.allocate(columnNum);
+    columnWidth.allocate(numColumnThermalTbl);
     columnWidth = 10;
     Array1D_string rowHead;
     Array2D_string tableBody;
@@ -10512,25 +10511,25 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPre
     state->dataHeatBal->Zone(2).Name = "Zone 2";
     int rowNum = numZone + 4;
     rowHead.allocate(rowNum);
-    tableBody.allocate(columnNum, rowNum);
+    tableBody.allocate(numColumnThermalTbl, rowNum);
     Real64 unitConvMultiplier = 1.0;
 
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
-        for (int j = 0; j < columnNum; j++) {
+        for (int j = 0; j < numColumnThermalTbl; j++) {
             (state->dataHeatBal->Resilience(zone_i).ZoneHeatIndexHourBins).at(j) = std::pow(j, 2) * zone_i;
         }
     }
 
-    std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHeatIndex = &DataHeatBalance::ZoneResilience::ZoneHeatIndexHourBins;
-    WriteResilienceBinsTableNonPreDefUseZoneData<5>(
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHeatIndex = &DataHeatBalance::ZoneResilience::ZoneHeatIndexHourBins;
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(
         *state, tableName, columnHead, columnWidth, ptrHeatIndex, rowHead, tableBody, unitConvMultiplier);
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
-        for (int j = 0; j < columnNum; j++) {
+        for (int j = 0; j < numColumnThermalTbl; j++) {
             EXPECT_EQ(tableBody(j + 1, zone_i), RealToStr(std::pow(j, 2) * zone_i * 1.0, 2));
         }
     }
 
-    for (int j = 0; j < columnNum; j++) {
+    for (int j = 0; j < numColumnThermalTbl; j++) {
         EXPECT_EQ(tableBody(j + 1, numZone + 1), RealToStr(std::pow(j, 2) * 1 * 1.0, 2));                                    // min
         EXPECT_EQ(tableBody(j + 1, numZone + 2), RealToStr(std::pow(j, 2) * 2 * 1.0, 2));                                    // max
         EXPECT_EQ(tableBody(j + 1, numZone + 3), RealToStr((std::pow(j, 2) * 1 * 1.0 + std::pow(j, 2) * 2 * 1.0) / 2.0, 2)); // mean
@@ -10541,16 +10540,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPre
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
 {
 
-    int columnNum = 5;
     Array1D_string columnHead;
-    columnHead.allocate(columnNum);
+    columnHead.allocate(numColumnThermalTbl);
     columnHead(1) = "col 1";
     columnHead(2) = "col 2";
     columnHead(3) = "col 3";
     columnHead(4) = "col 4";
     columnHead(5) = "col 5";
     Array1D_int columnWidth;
-    columnWidth.allocate(columnNum);
+    columnWidth.allocate(numColumnThermalTbl);
     columnWidth = 10;
     Array1D_string rowHead;
     Array2D_string tableBody;
@@ -10575,12 +10573,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
     std::string tableName = "Heating SET Degree-Hours";
 
     rowHead.allocate(state->dataGlobal->NumOfZones + 3);
-    tableBody.allocate(columnNum, state->dataGlobal->NumOfZones + 3);
+    tableBody.allocate(numColumnThermalTbl, state->dataGlobal->NumOfZones + 3);
     Real64 unitConvMultiplier = 1.0;
 
-    std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrZoneLowSETHours = &DataHeatBalance::ZoneResilience::ZoneLowSETHours;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrZoneLowSETHours = &DataHeatBalance::ZoneResilience::ZoneLowSETHours;
     WriteSETHoursTableNonPreDefUseZoneData(
-        *state, columnNum, tableName, columnHead, columnWidth, ptrZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
+        *state, numColumnThermalTbl, tableName, columnHead, columnWidth, ptrZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
 
     EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
     EXPECT_EQ("-1.0", RetrieveEntryFromTableBody(tableBody, 1, 2));
@@ -10595,7 +10593,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
 
     unitConvMultiplier = 1.8;
     WriteSETHoursTableNonPreDefUseZoneData(
-        *state, columnNum, tableName, columnHead, columnWidth, ptrZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
+        *state, numColumnThermalTbl, tableName, columnHead, columnWidth, ptrZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
 
     EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
     EXPECT_EQ("-1.8", RetrieveEntryFromTableBody(tableBody, 1, 2));
@@ -10614,13 +10612,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDef)
 {
     std::string tableName = "Hours of Safety for Cold Events";
-    int columnNum = 5;
     Array1D_string columnHead;
-    columnHead.allocate(columnNum);
+    columnHead.allocate(numColumnThermalTbl);
     Array1D_string rowHead;
     Array2D_string tableBody;
     Array1D_int columnWidth;
-    columnWidth.allocate(columnNum);
+    columnWidth.allocate(numColumnThermalTbl);
     columnWidth = 10;
     state->dataGlobal->NumOfZones = 2;
     int numZone = state->dataGlobal->NumOfZones;
@@ -10629,7 +10626,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDe
     state->dataHeatBal->Zone(1).Name = "Zone 1";
     state->dataHeatBal->Zone(2).Name = "Zone 2";
     rowHead.allocate(numZone + 4);
-    tableBody.allocate(columnNum, numZone + 4);
+    tableBody.allocate(numColumnThermalTbl, numZone + 4);
     columnHead(1) = "Hours of Safety [hr]";
     columnHead(2) = "End Time of the Safety Duration";
     columnHead(3) = "Safe Temperature Exceedance Hours [hr]";
@@ -10640,16 +10637,16 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDe
     int timeColumnIdx = 2;
     int encodedMonDayHrMin;
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
-        for (int j = 0; j < columnNum; j++) {
+        for (int j = 0; j < numColumnThermalTbl; j++) {
             (state->dataHeatBal->Resilience(zone_i).ZoneColdHourOfSafetyBins).at(j) = std::pow(j, 2) * zone_i;
         }
         General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
         (state->dataHeatBal->Resilience(zone_i).ZoneColdHourOfSafetyBins).at(timeColumnIdx - 1) = encodedMonDayHrMin;
     }
 
-    std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins = &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins = &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;
     WriteHourOfSafetyTableNonPreDefUseZoneData(
-        *state, columnNum, tableName, columnHead, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, timeColumnIdx);
+        *state, numColumnThermalTbl, tableName, columnHead, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, timeColumnIdx);
 
     EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
     EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 2));
