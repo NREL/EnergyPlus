@@ -105,7 +105,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataHeatBalFanSys->ZTM1.allocate(1);
-    state->dataHeatBalFanSys->HeatBalAirTemperatures.allocate(1);
+    state->dataHeatBalFanSys->heatBalAirTemperatures.allocate(1);
     state->dataHeatBalFanSys->ZTM2.allocate(1);
     state->dataHeatBalFanSys->ZTM3.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
@@ -114,9 +114,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->WZoneTimeMinus1Temp.allocate(1);
     state->dataHeatBalFanSys->WZoneTimeMinus2Temp.allocate(1);
     state->dataHeatBalFanSys->WZoneTimeMinus3Temp.allocate(1);
-    state->dataHeatBalFanSys->WZoneTimeMinus1.allocate(1);
-    state->dataHeatBalFanSys->WZoneTimeMinus2.allocate(1);
-    state->dataHeatBalFanSys->WZoneTimeMinus3.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->NonAirSystemResponse.allocate(1);
@@ -196,7 +193,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataHeatBalFanSys->ZoneW1.allocate(1);
+    state->dataHeatBalFanSys->heatBalAirHumidities.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
     state->dataHeatBalFanSys->SumLatentPool.allocate(1);
     state->dataHeatBalFanSys->SumLatentPool(1) = 0.0;
@@ -602,7 +599,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     // CorrectZoneContaminants variable initialization
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataHeatBalFanSys->ZoneW1.allocate(1);
+    state->dataHeatBalFanSys->heatBalAirHumidities.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
     state->dataHeatBalFanSys->OAMFL.allocate(1);
     state->dataHeatBalFanSys->OAMFL(1) = 0.0;
@@ -791,68 +788,4 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     CorrectZoneContaminants(*state, true);
     EXPECT_NEAR(7.27, state->dataHeatBal->Zone(1).NumOccHM, 0.1);
-
-    // Deallocate everything
-    state->dataHeatBal->Zone.deallocate();
-    state->dataHybridModel->HybridModelZone.deallocate();
-    state->dataRoomAirMod->AirModel.deallocate();
-    state->dataRoomAirMod->ZTOC.deallocate();
-    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.deallocate();
-    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.deallocate();
-    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.deallocate();
-    state->dataContaminantBalance->CO2ZoneTimeMinus1.deallocate();
-    state->dataContaminantBalance->CO2ZoneTimeMinus2.deallocate();
-    state->dataContaminantBalance->CO2ZoneTimeMinus3.deallocate();
-    state->dataHeatBalFanSys->AIRRAT.deallocate();
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
-    state->dataHeatBalFanSys->SysDepZoneLoadsLagged.deallocate();
-    state->afn->exchangeData.deallocate();
-    state->dataLoopNodes->Node.deallocate();
-    state->dataHeatBalFanSys->TempTstatAir.deallocate();
-    state->dataHeatBalFanSys->LoadCorrectionFactor.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate();
-    state->dataHeatBalFanSys->ZT.deallocate();
-    state->dataHeatBalFanSys->PreviousMeasuredZT1.deallocate();
-    state->dataHeatBalFanSys->PreviousMeasuredZT2.deallocate();
-    state->dataHeatBalFanSys->PreviousMeasuredZT3.deallocate();
-    state->dataHeatBalFanSys->MCPI.deallocate();
-    state->dataHeatBalFanSys->MCPV.deallocate();
-    state->dataHeatBalFanSys->MCPM.deallocate();
-    state->dataHeatBalFanSys->MCPE.deallocate();
-    state->dataHeatBalFanSys->MCPC.deallocate();
-    state->dataHeatBalFanSys->MDotCPOA.deallocate();
-    state->dataHeatBalFanSys->MDotOA.deallocate();
-    state->dataHeatBalFanSys->MCPTI.deallocate();
-    state->dataHeatBalFanSys->MCPTV.deallocate();
-    state->dataHeatBalFanSys->MCPTM.deallocate();
-    state->dataHeatBalFanSys->MCPTE.deallocate();
-    state->dataHeatBalFanSys->MCPTC.deallocate();
-    state->dataSurface->SurfaceWindow.deallocate();
-    state->dataSurface->Surface.deallocate();
-    state->dataHeatBalSurf->SurfHConvInt.deallocate();
-    state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
-    state->dataRoomAirMod->IsZoneDV.deallocate();
-    state->dataRoomAirMod->IsZoneCV.deallocate();
-    state->dataRoomAirMod->IsZoneUI.deallocate();
-    state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
-    state->dataHeatBal->ZnAirRpt.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBalFanSys->MixingMassFlowZone.deallocate();
-    state->dataHeatBalFanSys->ZoneW1.deallocate();
-    state->dataHeatBalFanSys->ZoneAirHumRatTemp.deallocate();
-    state->dataHeatBalFanSys->OAMFL.deallocate();
-    state->dataHeatBalFanSys->VAMFL.deallocate();
-    state->dataHeatBalFanSys->EAMFL.deallocate();
-    state->dataHeatBalFanSys->EAMFLxHumRat.deallocate();
-    state->dataHeatBalFanSys->CTMFL.deallocate();
-    state->dataContaminantBalance->ZoneAirCO2.deallocate();
-    state->dataContaminantBalance->ZoneAirCO2Temp.deallocate();
-    state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
-    state->dataContaminantBalance->ZoneCO2Gain.deallocate();
-    state->dataContaminantBalance->ZoneCO2GainExceptPeople.deallocate();
-    state->dataContaminantBalance->ZoneGCGain.deallocate();
-    state->dataContaminantBalance->MixingMassFlowCO2.deallocate();
-    state->dataScheduleMgr->Schedule.deallocate();
 }

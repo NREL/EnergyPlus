@@ -2775,28 +2775,17 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBal->ZoneSNLoadPredictedHSPRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->ZoneSNLoadPredictedCSPRate.dimension(NumOfZones, 0.0);
         state.dataHeatBal->latentReports.allocate(NumOfZones);
-        state.dataHeatBalFanSys->WZoneTimeMinus1.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->WZoneTimeMinus2.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->WZoneTimeMinus3.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->WZoneTimeMinus4.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->DSWZoneTimeMinus1.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->DSWZoneTimeMinus2.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->DSWZoneTimeMinus3.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->DSWZoneTimeMinus4.dimension(NumOfZones, 0.0);
+        state.dataHeatBalFanSys->heatBalAirHumidities.allocate(NumOfZones);
         state.dataHeatBalFanSys->ZoneAirHumRatTemp.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus1Temp.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus2Temp.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus3Temp.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->WZoneTimeMinusP.dimension(NumOfZones, 0.0);
         state.dataZoneTempPredictorCorrector->TempIndZnLd.dimension(NumOfZones, 0.0);
         state.dataZoneTempPredictorCorrector->TempDepZnLd.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->NonAirSystemResponse.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->SysDepZoneLoads.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->SysDepZoneLoadsLagged.dimension(NumOfZones, 0.0);
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->ZoneWMX.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->ZoneWM2.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->ZoneW1.dimension(NumOfZones, 0.0);
 
         state.dataHeatBal->ZoneListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
         state.dataHeatBal->ZoneListSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
@@ -3212,15 +3201,21 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBalFanSys->ZTM1 = 0.0;
         state.dataHeatBalFanSys->ZTM2 = 0.0;
         state.dataHeatBalFanSys->ZTM3 = 0.0;
-        state.dataHeatBalFanSys->WZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->WZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->WZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->WZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->WZoneTimeMinusP = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->DSWZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->DSWZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->DSWZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->DSWZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(zoneNum);
+            thisHBAirHums.WZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.WZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.WZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.WZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.WZoneTimeMinusP = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.DSWZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.DSWZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.DSWZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.DSWZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.ZoneW1 = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.ZoneWMX = state.dataEnvrn->OutHumRat;
+            thisHBAirHums.ZoneWM2 = state.dataEnvrn->OutHumRat;
+        }
         state.dataHeatBalFanSys->WZoneTimeMinus1Temp = 0.0;
         state.dataHeatBalFanSys->WZoneTimeMinus2Temp = 0.0;
         state.dataHeatBalFanSys->WZoneTimeMinus3Temp = 0.0;
@@ -3280,11 +3275,8 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum = 0.0;
         for (auto &e : state.dataHeatBal->Zone)
             e.NoHeatToReturnAir = false;
-        for (auto &e : state.dataHeatBalFanSys->HeatBalAirTemperatures)
+        for (auto &e : state.dataHeatBalFanSys->heatBalAirTemperatures)
             e.ZoneT1 = 0.0;
-        state.dataHeatBalFanSys->ZoneW1 = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->ZoneWMX = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->ZoneWM2 = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->PreviousMeasuredZT1 = 0.0;     // Hybrid modeling
         state.dataHeatBalFanSys->PreviousMeasuredZT2 = 0.0;     // Hybrid modeling
         state.dataHeatBalFanSys->PreviousMeasuredZT3 = 0.0;     // Hybrid modeling
@@ -3524,7 +3516,7 @@ void PredictSystemLoads(EnergyPlusData &state,
     if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
         for (int RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneTempPredictorCorrector->NumStageCtrZone; ++RelativeZoneNum) {
             int ActualZoneNum = StageControlledZone(RelativeZoneNum).ActualZoneNum;
-            auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ActualZoneNum);
+            auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ActualZoneNum);
             Real64 ZoneT = state.dataHeatBalFanSys->MAT(ActualZoneNum); // Zone temperature at previous time step
             if (ShortenTimeStepSys) ZoneT = thisHBAirTemps.XMPT;
             StageControlledZone(RelativeZoneNum).HeatSetPoint = GetCurrentScheduleValue(state, StageControlledZone(RelativeZoneNum).HSBchedIndex);
@@ -3605,7 +3597,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                     TempControlledZone(RelativeZoneNum).CoolModeLastSave = TempControlledZone(RelativeZoneNum).CoolModeLast;
                 }
                 int ZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
-                auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+                auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
 
                 TempControlledZone(RelativeZoneNum).CoolOffFlag = false;
                 TempControlledZone(RelativeZoneNum).HeatOffFlag = false;
@@ -3717,7 +3709,8 @@ void PredictSystemLoads(EnergyPlusData &state,
 
     // Update zone temperatures
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum);
 
         if (ShortenTimeStepSys) {
             // timestep has just shifted from full zone timestep to a new shorter system timestep
@@ -3725,9 +3718,8 @@ void PredictSystemLoads(EnergyPlusData &state,
             if (Zone(ZoneNum).SystemZoneNodeNumber > 0) { // roll back result for zone air node,
                 Node(Zone(ZoneNum).SystemZoneNodeNumber).Temp = thisHBAirTemps.XMAT;
                 state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = thisHBAirTemps.XMAT;
-                Node(Zone(ZoneNum).SystemZoneNodeNumber).HumRat = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
-                Node(Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy =
-                    PsyHFnTdbW(thisHBAirTemps.XMAT, state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum));
+                Node(Zone(ZoneNum).SystemZoneNodeNumber).HumRat = thisHBAirHums.WZoneTimeMinus1;
+                Node(Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy = PsyHFnTdbW(thisHBAirTemps.XMAT, thisHBAirHums.WZoneTimeMinus1);
             }
 
             if (state.dataHVACGlobal->NumOfSysTimeSteps !=
@@ -3749,14 +3741,14 @@ void PredictSystemLoads(EnergyPlusData &state,
                 //                                 WZoneTimeMinus3(ZoneNum),   WZoneTimeMinus4(ZoneNum), &
                 DownInterpolate4HistoryValues(PriorTimeStep,
                                               TimeStepSys,
-                                              state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum),
-                                              state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum),
-                                              state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum),
+                                              thisHBAirHums.WZoneTimeMinus1,
+                                              thisHBAirHums.WZoneTimeMinus2,
+                                              thisHBAirHums.WZoneTimeMinus3,
                                               state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum),
-                                              state.dataHeatBalFanSys->DSWZoneTimeMinus4(ZoneNum));
+                                              thisHBAirHums.DSWZoneTimeMinus1,
+                                              thisHBAirHums.DSWZoneTimeMinus2,
+                                              thisHBAirHums.DSWZoneTimeMinus3,
+                                              thisHBAirHums.DSWZoneTimeMinus4);
 
                 if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
 
@@ -3830,18 +3822,18 @@ void PredictSystemLoads(EnergyPlusData &state,
             state.dataHeatBalFanSys->ZTM2(ZoneNum) = thisHBAirTemps.XM2T;
             state.dataHeatBalFanSys->ZTM3(ZoneNum) = thisHBAirTemps.XM3T;
 
-            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = thisHBAirHums.WZoneTimeMinus1;
+            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = thisHBAirHums.WZoneTimeMinus2;
+            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = thisHBAirHums.WZoneTimeMinus3;
 
         } else { // use down-stepped history
             state.dataHeatBalFanSys->ZTM1(ZoneNum) = thisHBAirTemps.DSXMAT;
             state.dataHeatBalFanSys->ZTM2(ZoneNum) = thisHBAirTemps.DSXM2T;
             state.dataHeatBalFanSys->ZTM3(ZoneNum) = thisHBAirTemps.DSXM3T;
 
-            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = thisHBAirHums.DSWZoneTimeMinus1;
+            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = thisHBAirHums.DSWZoneTimeMinus2;
+            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = thisHBAirHums.DSWZoneTimeMinus3;
         }
 
         AIRRAT(ZoneNum) =
@@ -3917,7 +3909,7 @@ void PredictSystemLoads(EnergyPlusData &state,
             if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
                 if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     thisHBAirTemps.ZoneT1 = thisHBAirTemps.ZoneTM2;
-                    state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneWM2(ZoneNum);
+                    thisHBAirHums.ZoneW1 = thisHBAirHums.ZoneWM2;
                     if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                         for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
@@ -3928,7 +3920,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                     }
                 } else {
                     thisHBAirTemps.ZoneT1 = thisHBAirTemps.ZoneTMX;
-                    state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneWMX(ZoneNum);
+                    thisHBAirHums.ZoneW1 = thisHBAirHums.ZoneWMX;
                     if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                         for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
@@ -3941,7 +3933,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                 state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
             } else {
                 thisHBAirTemps.ZoneT1 = state.dataHeatBalFanSys->ZT(ZoneNum);
-                state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
+                thisHBAirHums.ZoneW1 = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                 if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
@@ -4224,7 +4216,7 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
     auto &ZoneAirSolutionAlgo = state.dataHeatBal->ZoneAirSolutionAlgo;
     auto &AIRRAT = state.dataHeatBalFanSys->AIRRAT;
 
-    auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+    auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
 
     state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = false;
     ZoneSetPoint = 0.0;
@@ -4813,6 +4805,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     }
 
     if (ControlledHumidZoneFlag) {
+        auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum);
         // Calculate hourly humidity ratio from infiltration + humidity added from latent load
         // to determine system added/subtracted moisture.
         LatentGain = state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) +
@@ -4875,13 +4868,13 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
             // Exact solution
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
-                LoadToHumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) - B;
+                LoadToHumidifySetPoint = C * (WZoneSetPoint - thisHBAirHums.ZoneW1) - B;
             } else {
                 exp_700_A_C = std::exp(min(700.0, -A / C)); // Tuned Save expensive value
-                LoadToHumidifySetPoint = A * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
+                LoadToHumidifySetPoint = A * (WZoneSetPoint - thisHBAirHums.ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
             }
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            LoadToHumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
+            LoadToHumidifySetPoint = C * (WZoneSetPoint - thisHBAirHums.ZoneW1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
         zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
@@ -4894,13 +4887,13 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
             // Exact solution
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
-                LoadToDehumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) - B;
+                LoadToDehumidifySetPoint = C * (WZoneSetPoint - thisHBAirHums.ZoneW1) - B;
             } else {
                 LoadToDehumidifySetPoint =
-                    A * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
+                    A * (WZoneSetPoint - thisHBAirHums.ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
             }
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            LoadToDehumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
+            LoadToDehumidifySetPoint = C * (WZoneSetPoint - thisHBAirHums.ZoneW1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
         zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
@@ -5037,7 +5030,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
     // Update zone temperatures
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum);
         auto &thisMAT = state.dataHeatBalFanSys->MAT(ZoneNum);
         auto &thisZT = state.dataHeatBalFanSys->ZT(ZoneNum);
 
@@ -5049,17 +5043,17 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             state.dataHeatBalFanSys->ZTM2(ZoneNum) = thisHBAirTemps.DSXM2T;
             state.dataHeatBalFanSys->ZTM3(ZoneNum) = thisHBAirTemps.DSXM3T;
 
-            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = thisHBAirHums.DSWZoneTimeMinus1;
+            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = thisHBAirHums.DSWZoneTimeMinus2;
+            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = thisHBAirHums.DSWZoneTimeMinus3;
         } else {
             state.dataHeatBalFanSys->ZTM1(ZoneNum) = thisHBAirTemps.XMAT;
             state.dataHeatBalFanSys->ZTM2(ZoneNum) = thisHBAirTemps.XM2T;
             state.dataHeatBalFanSys->ZTM3(ZoneNum) = thisHBAirTemps.XM3T;
 
-            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
-            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = thisHBAirHums.WZoneTimeMinus1;
+            state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = thisHBAirHums.WZoneTimeMinus2;
+            state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = thisHBAirHums.WZoneTimeMinus3;
         }
 
         AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
@@ -5337,7 +5331,8 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
     // Push the temperature and humidity ratio histories
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum);
         auto &thisZT = state.dataHeatBalFanSys->ZT(ZoneNum);
         auto &thisZTAV = state.dataHeatBalFanSys->ZTAV(ZoneNum);
         thisHBAirTemps.XM4T = thisHBAirTemps.XM3T;
@@ -5346,13 +5341,12 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
         thisHBAirTemps.XMAT = thisZTAV; // using average for whole zone time step.
         thisHBAirTemps.XMPT = thisZT;
 
-        state.dataHeatBalFanSys->WZoneTimeMinus4(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
-        state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
-        state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
-        state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum) =
-            state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
+        thisHBAirHums.WZoneTimeMinus4 = thisHBAirHums.WZoneTimeMinus3;
+        thisHBAirHums.WZoneTimeMinus3 = thisHBAirHums.WZoneTimeMinus2;
+        thisHBAirHums.WZoneTimeMinus2 = thisHBAirHums.WZoneTimeMinus1;
+        thisHBAirHums.WZoneTimeMinus1 = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
         state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
-        state.dataHeatBalFanSys->WZoneTimeMinusP(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+        thisHBAirHums.WZoneTimeMinusP = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) =
             100.0 * PsyRhFnTdbWPb(state, thisZT, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, CorrectZoneAirTemp);
 
@@ -5397,8 +5391,8 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
         if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
             thisHBAirTemps.ZoneTM2 = thisHBAirTemps.ZoneTMX;
             thisHBAirTemps.ZoneTMX = thisZTAV; // using average for whole zone time step.
-            state.dataHeatBalFanSys->ZoneWM2(ZoneNum) = state.dataHeatBalFanSys->ZoneWMX(ZoneNum);
-            state.dataHeatBalFanSys->ZoneWMX(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
+            thisHBAirHums.ZoneWM2 = thisHBAirHums.ZoneWMX;
+            thisHBAirHums.ZoneWMX = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
             if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
                 AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
                 AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
@@ -5435,16 +5429,17 @@ void PushSystemTimestepHistories(EnergyPlusData &state)
     // Push the temperature and humidity ratio histories back in time
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum);
         thisHBAirTemps.DSXM4T = thisHBAirTemps.DSXM3T;
         thisHBAirTemps.DSXM3T = thisHBAirTemps.DSXM2T;
         thisHBAirTemps.DSXM2T = thisHBAirTemps.DSXMAT;
         thisHBAirTemps.DSXMAT = state.dataHeatBalFanSys->MAT(ZoneNum);
 
-        state.dataHeatBalFanSys->DSWZoneTimeMinus4(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum);
-        state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum);
-        state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum);
-        state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
+        thisHBAirHums.DSWZoneTimeMinus4 = thisHBAirHums.DSWZoneTimeMinus3;
+        thisHBAirHums.DSWZoneTimeMinus3 = thisHBAirHums.DSWZoneTimeMinus2;
+        thisHBAirHums.DSWZoneTimeMinus2 = thisHBAirHums.DSWZoneTimeMinus1;
+        thisHBAirHums.DSWZoneTimeMinus1 = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
 
         if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
             state.dataRoomAirMod->DSXM4TFloor(ZoneNum) = state.dataRoomAirMod->DSXM3TFloor(ZoneNum);
@@ -5480,12 +5475,12 @@ void PushSystemTimestepHistories(EnergyPlusData &state)
 
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+            auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
+            auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum);
             thisHBAirTemps.ZoneTM2 = thisHBAirTemps.ZoneTMX;
             thisHBAirTemps.ZoneTMX = state.dataHeatBalFanSys->MAT(ZoneNum); // using average for whole zone time step.
-            state.dataHeatBalFanSys->ZoneWM2(ZoneNum) = state.dataHeatBalFanSys->ZoneWMX(ZoneNum);
-            state.dataHeatBalFanSys->ZoneWMX(ZoneNum) =
-                state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum); // using average for whole zone time step.
+            thisHBAirHums.ZoneWM2 = thisHBAirHums.ZoneWMX;
+            thisHBAirHums.ZoneWMX = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum); // using average for whole zone time step.
 
             if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
                 state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
@@ -5521,16 +5516,17 @@ void RevertZoneTimestepHistories(EnergyPlusData &state)
     // Revert the temperature and humidity ratio histories
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        auto &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
+        auto &thisHBAirHums = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum);
         //  thisHBAirTemps.MAT  = thisHBAirTemps.XMAT
         thisHBAirTemps.XMAT = thisHBAirTemps.XM2T;
         thisHBAirTemps.XM2T = thisHBAirTemps.XM3T;
         thisHBAirTemps.XM3T = thisHBAirTemps.XM4T;
 
         //   ZoneAirHumRat(ZoneNum)  = WZoneTimeMinus1(ZoneNum)
-        state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
-        state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
-        state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus4(ZoneNum);
+        thisHBAirHums.WZoneTimeMinus1 = thisHBAirHums.WZoneTimeMinus2;
+        thisHBAirHums.WZoneTimeMinus2 = thisHBAirHums.WZoneTimeMinus3;
+        thisHBAirHums.WZoneTimeMinus3 = thisHBAirHums.WZoneTimeMinus4;
 
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
             state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
@@ -5666,6 +5662,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // Use a 3rd order derivative to predict final zone humidity ratio and
     // smooth the changes using the zone air capacitance.
     auto &zoneAirHumRatTemp = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+    auto &zoneW1 = state.dataHeatBalFanSys->heatBalAirHumidities(ZoneNum).ZoneW1;
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
         zoneAirHumRatTemp = (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) -
@@ -5676,13 +5673,13 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
         if (A == 0.0) { // B=0
-            zoneAirHumRatTemp = state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B / C;
+            zoneAirHumRatTemp = zoneW1 + B / C;
         } else {
-            zoneAirHumRatTemp = (state.dataHeatBalFanSys->ZoneW1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
+            zoneAirHumRatTemp = (zoneW1 - B / A) * std::exp(min(700.0, -A / C)) + B / A;
         }
     } break;
     case DataHeatBalance::SolutionAlgo::EulerMethod: {
-        zoneAirHumRatTemp = (C * state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B) / (C + A);
+        zoneAirHumRatTemp = (C * zoneW1 + B) / (C + A);
     } break;
     default:
         break;
@@ -6460,7 +6457,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     Real64 QSensRate = 0.0;
 
     auto &zone = state.dataHeatBal->Zone(ZoneNum);
-    auto const &thisHBAirTemps = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum);
+    auto const &thisHBAirTemps = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum);
     Real64 const thisMAT = state.dataHeatBalFanSys->MAT(ZoneNum);
     Real64 const zoneAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
 

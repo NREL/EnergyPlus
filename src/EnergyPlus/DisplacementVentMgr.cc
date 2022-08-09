@@ -949,7 +949,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-        Real64 const thisZoneT1 = state.dataHeatBalFanSys->HeatBalAirTemperatures(ZoneNum).ZoneT1;
+        Real64 const thisZoneT1 = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum).ZoneT1;
         AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
         TempHistTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
                                  OneThird * state.dataHeatBalFanSys->ZTM3(ZoneNum));

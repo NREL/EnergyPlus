@@ -5967,7 +5967,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->HeatBalAirTemperatures.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->heatBalAirTemperatures.allocate(state.dataGlobal->NumOfZones);
         // Allocate this zone air humidity ratio
         state.dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
         state.dataHeatBalFanSys->ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);

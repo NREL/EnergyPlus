@@ -2075,17 +2075,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         state.dataHeatBalFanSys->MAT(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
         state.dataHeatBalFanSys->ZT(zoneNum) = ZoneInitialTemp;
         state.dataHeatBalFanSys->ZTAV(zoneNum) = ZoneInitialTemp;
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).XMAT = ZoneInitialTemp; // DataHeatBalFanSys array
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).XM2T = ZoneInitialTemp; // DataHeatBalFanSys array
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).XM3T = ZoneInitialTemp; // DataHeatBalFanSys array
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).XM4T = ZoneInitialTemp;
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).XMPT = ZoneInitialTemp;
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).DSXMAT = ZoneInitialTemp; // DataHeatBalFanSys array
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).DSXM2T = ZoneInitialTemp; // DataHeatBalFanSys array
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).DSXM3T = ZoneInitialTemp; // DataHeatBalFanSys array
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).DSXM4T = ZoneInitialTemp;
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).ZoneTMX = ZoneInitialTemp; // DataHeatBalFanSys array
-        state.dataHeatBalFanSys->HeatBalAirTemperatures(zoneNum).ZoneTM2 = ZoneInitialTemp; // DataHeatBalFanSys array
+        new (&state.dataHeatBalFanSys->heatBalAirTemperatures(zoneNum)) AirBalanceTemperatures();
         // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
         state.dataHeatBalFanSys->ZoneAirHumRatAvg(zoneNum) = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum) = state.dataEnvrn->OutHumRat;
