@@ -682,20 +682,20 @@ namespace OutputReportTabular {
 
     void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int periodIdx);
 
-    template <typename T>
+    template <int numOfColumn>
     void WriteResilienceBinsTable(EnergyPlusData &state,
                                   int const columnNum,
                                   std::vector<int> const &columnHead,
-                                  const T DataHeatBalance::ZoneResilience::*memberPtr,
+                                  const std::array<Real64, numOfColumn> DataHeatBalance::ZoneResilience::*memberPtr,
                                   Real64 const unitConvMultiplier = 1.0);
 
-    template <typename T>
+    template <int numOfColumn>
     void WriteResilienceBinsTableNonPreDefUseZoneData(EnergyPlusData &state,
                                                       int const columnNum,
                                                       const std::string &tableName,
                                                       Array1D_string const &columnHead,
                                                       Array1D_int &columnWidth,
-                                                      const T DataHeatBalance::ZoneResilience::*memberPtr,
+                                                      const std::array<Real64, numOfColumn> DataHeatBalance::ZoneResilience::*memberPtr,
                                                       Array1D_string &rowHead,
                                                       Array2D_string &tableBody,
                                                       Real64 const unitConvMultiplier = 1.0);

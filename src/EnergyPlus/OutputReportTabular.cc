@@ -12971,11 +12971,11 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     }
 }
 
-template <typename T>
+template <int numOfColumn>
 void WriteResilienceBinsTable(EnergyPlusData &state,
                               int const columnNum,
                               std::vector<int> const &columnHead,
-                              const T DataHeatBalance::ZoneResilience::*memberPtr,
+                              const std::array<Real64, numOfColumn> DataHeatBalance::ZoneResilience::*memberPtr,
                               Real64 const unitConvMultiplier)
 {
     std::vector<Real64> columnMax(columnNum, 0);
@@ -13002,13 +13002,13 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
     }
 }
 
-template <typename T>
+template <int numOfColumn>
 void WriteResilienceBinsTableNonPreDefUseZoneData(EnergyPlusData &state,
                                                   int const columnNum,
                                                   const std::string &tableName,
                                                   Array1D_string const &columnHead,
                                                   Array1D_int &columnWidth,
-                                                  const T DataHeatBalance::ZoneResilience::*memberPtr,
+                                                  const std::array<Real64, numOfColumn> DataHeatBalance::ZoneResilience::*memberPtr,
                                                   Array1D_string &rowHead,
                                                   Array2D_string &tableBody,
                                                   Real64 const unitConvMultiplier)
@@ -13496,13 +13496,12 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHeatIndexOccupiedHour =
             &DataHeatBalance::ZoneResilience::ZoneHeatIndexOccupiedHourBins;
         std::string tableName = "Heat Index Hours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
-            state, columnNum, tableName, columnHeadStr, columnWidth, ptrHeatIndex, rowHead, tableBody);
+        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, columnNum, tableName, columnHeadStr, columnWidth, ptrHeatIndex, rowHead, tableBody);
         tableName = "Heat Index OccupantHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
+        WriteResilienceBinsTableNonPreDefUseZoneData<5>(
             state, columnNum, tableName, columnHeadStr, columnWidth, ptrHeatIndexOccuHour, rowHead, tableBody);
         tableName = "Heat Index OccupiedHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
+        WriteResilienceBinsTableNonPreDefUseZoneData<5>(
             state, columnNum, tableName, columnHeadStr, columnWidth, ptrHeatIndexOccupiedHour, rowHead, tableBody);
 
         columnHeadStr(1) = "Little to no Discomfort (≤ 29) [hr]";
@@ -13516,13 +13515,12 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrHumidexOccupiedHour =
             &DataHeatBalance::ZoneResilience::ZoneHumidexOccupiedHourBins;
         tableName = "Humidex Hours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
-            state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidex, rowHead, tableBody);
+        WriteResilienceBinsTableNonPreDefUseZoneData<5>(state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidex, rowHead, tableBody);
         tableName = "Humidex OccupantHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
+        WriteResilienceBinsTableNonPreDefUseZoneData<5>(
             state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidexOccuHour, rowHead, tableBody);
         tableName = "Humidex OccupiedHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 5>>(
+        WriteResilienceBinsTableNonPreDefUseZoneData<5>(
             state, columnNum, tableName, columnHeadStr, columnWidth, ptrHumidexOccupiedHour, rowHead, tableBody);
 
         bool hasPierceSET = true;
@@ -13619,15 +13617,15 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         }
 
         std::array<Real64, 6> DataHeatBalance::ZoneResilience::*ptrUnmetDegreeHourBins = &DataHeatBalance::ZoneResilience::ZoneUnmetDegreeHourBins;
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 6>>(state,
-                                                                            columnNumUnmetDegHr,
-                                                                            tableName,
-                                                                            columnHeadUnmetDegHr,
-                                                                            columnWidthUnmetDegHr,
-                                                                            ptrUnmetDegreeHourBins,
-                                                                            rowHead,
-                                                                            tableBodyUnmetDegHr,
-                                                                            degreeHourConversion);
+        WriteResilienceBinsTableNonPreDefUseZoneData<6>(state,
+                                                        columnNumUnmetDegHr,
+                                                        tableName,
+                                                        columnHeadUnmetDegHr,
+                                                        columnWidthUnmetDegHr,
+                                                        ptrUnmetDegreeHourBins,
+                                                        rowHead,
+                                                        tableBodyUnmetDegHr,
+                                                        degreeHourConversion);
 
         columnNum = 4;
         columnHeadStr.allocate(columnNum);
@@ -13644,10 +13642,10 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
         std::array<Real64, 4> DataHeatBalance::ZoneResilience::*ptrDiscomfortWtExceedOccupiedHourBins =
             &DataHeatBalance::ZoneResilience::ZoneDiscomfortWtExceedOccupiedHourBins;
         tableName = "Discomfort-weighted Exceedance OccupantHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 4>>(
+        WriteResilienceBinsTableNonPreDefUseZoneData<4>(
             state, columnNum, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccuHourBins, rowHead, tableBody);
         tableName = "Discomfort-weighted Exceedance OccupiedHours";
-        WriteResilienceBinsTableNonPreDefUseZoneData<std::array<Real64, 4>>(
+        WriteResilienceBinsTableNonPreDefUseZoneData<4>(
             state, columnNum, tableName, columnHeadStr, columnWidth, ptrDiscomfortWtExceedOccupiedHourBins, rowHead, tableBody);
         rowHead.deallocate();
         columnHeadStr.deallocate();
@@ -13673,17 +13671,17 @@ void WriteCO2ResilienceTables(EnergyPlusData &state)
         std::array<Real64, 3> DataHeatBalance::ZoneResilience::*ptrCO2LevelOccuHourBins = &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccuHourBins;
         std::array<Real64, 3> DataHeatBalance::ZoneResilience::*ptrCO2LevelOccupiedHourBins =
             &DataHeatBalance::ZoneResilience::ZoneCO2LevelOccupiedHourBins;
-        WriteResilienceBinsTable<std::array<Real64, 3>>(state, columnNum, columnHead, ptrCO2LevelHourBins);
+        WriteResilienceBinsTable<3>(state, columnNum, columnHead, ptrCO2LevelHourBins);
 
         columnHead = {state.dataOutRptPredefined->pdchCO2OccuHourSafe,
                       state.dataOutRptPredefined->pdchCO2OccuHourCaution,
                       state.dataOutRptPredefined->pdchCO2OccuHourHazard};
-        WriteResilienceBinsTable<std::array<Real64, 3>>(state, columnNum, columnHead, ptrCO2LevelOccuHourBins);
+        WriteResilienceBinsTable<3>(state, columnNum, columnHead, ptrCO2LevelOccuHourBins);
 
         columnHead = {state.dataOutRptPredefined->pdchCO2OccupiedHourSafe,
                       state.dataOutRptPredefined->pdchCO2OccupiedHourCaution,
                       state.dataOutRptPredefined->pdchCO2OccupiedHourHazard};
-        WriteResilienceBinsTable<std::array<Real64, 3>>(state, columnNum, columnHead, ptrCO2LevelOccupiedHourBins);
+        WriteResilienceBinsTable<3>(state, columnNum, columnHead, ptrCO2LevelOccupiedHourBins);
     }
 }
 
@@ -13780,19 +13778,19 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
             &DataHeatBalance::ZoneResilience::ZoneLightingLevelOccuHourBins;
         std::array<Real64, 4> DataHeatBalance::ZoneResilience::*ptrLightingLevelOccupiedHourBins =
             &DataHeatBalance::ZoneResilience::ZoneLightingLevelOccupiedHourBins;
-        WriteResilienceBinsTable<std::array<Real64, 4>>(state, columnNum, columnHead, ptrLightingLevelHourBins);
+        WriteResilienceBinsTable<4>(state, columnNum, columnHead, ptrLightingLevelHourBins);
 
         columnHead = {state.dataOutRptPredefined->pdchIllumOccuHourDark,
                       state.dataOutRptPredefined->pdchIllumOccuHourDim,
                       state.dataOutRptPredefined->pdchIllumOccuHourAdequate,
                       state.dataOutRptPredefined->pdchIllumOccuHourBright};
-        WriteResilienceBinsTable<std::array<Real64, 4>>(state, columnNum, columnHead, ptrLightingLevelOccuHourBins);
+        WriteResilienceBinsTable<4>(state, columnNum, columnHead, ptrLightingLevelOccuHourBins);
 
         columnHead = {state.dataOutRptPredefined->pdchIllumOccupiedHourDark,
                       state.dataOutRptPredefined->pdchIllumOccupiedHourDim,
                       state.dataOutRptPredefined->pdchIllumOccupiedHourAdequate,
                       state.dataOutRptPredefined->pdchIllumOccupiedHourBright};
-        WriteResilienceBinsTable<std::array<Real64, 4>>(state, columnNum, columnHead, ptrLightingLevelOccupiedHourBins);
+        WriteResilienceBinsTable<4>(state, columnNum, columnHead, ptrLightingLevelOccupiedHourBins);
     }
 }
 
