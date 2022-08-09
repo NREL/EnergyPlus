@@ -10242,6 +10242,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
     state->dataOutRptTab->displayThermalResilienceSummary = true;
@@ -10260,6 +10262,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable)
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "Test";
 
     int columnNum = 5;
@@ -10275,14 +10278,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable)
     s->pdchHeatingSETUnmetTime = OutputReportPredefined::newPreDefColumn(
         *state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period");
 
-    // state->dataHeatBal->Zone(1).resilience.ZoneLowSETHours: [0, -1, 4, -9, 16]
+    // state->dataHeatBal->Resilience(1).ZoneLowSETHours: [0, -1, 4, -9, 16]
     for (int i = 0; i < 4; i++) {
-        state->dataHeatBal->Zone(1).resilience.ZoneLowSETHours[i] = std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+        state->dataHeatBal->Resilience(1).ZoneLowSETHours[i] = std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
     }
 
     int encodedMonDayHrMin;
     General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5, 30);
-    state->dataHeatBal->Zone(1).resilience.ZoneLowSETHours[4] = encodedMonDayHrMin;
+    state->dataHeatBal->Resilience(1).ZoneLowSETHours[4] = encodedMonDayHrMin;
 
     Real64 degreeHourConversion = 1.8;
 
@@ -10308,6 +10311,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPer
     // test unit conversion in SET Degree-Hour report table for reporting periods
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "Test";
 
     int columnNum = 5;
@@ -10413,7 +10417,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
         state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, i).assign(columnNumUnmetDegHr, 0.0);
     }
-    // state->dataHeatBal->Zone(1).resilience.ZoneUnmetDegreeHourBins: [0, -1, 4, -9, 16, -25]
+    // state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins: [0, -1, 4, -9, 16, -25]
     for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
         for (int i = 0; i < 6; i++) {
             state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
@@ -10503,6 +10507,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPre
     state->dataGlobal->NumOfZones = 2;
     int numZone = state->dataGlobal->NumOfZones;
     state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Resilience.allocate(numZone);
     state->dataHeatBal->Zone(1).Name = "Zone 1";
     state->dataHeatBal->Zone(2).Name = "Zone 2";
     int rowNum = numZone + 4;
@@ -10512,7 +10517,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPre
 
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
         for (int j = 0; j < columnNum; j++) {
-            (state->dataHeatBal->Zone(zone_i).resilience.ZoneHeatIndexHourBins).at(j) = std::pow(j, 2) * zone_i;
+            (state->dataHeatBal->Resilience(zone_i).ZoneHeatIndexHourBins).at(j) = std::pow(j, 2) * zone_i;
         }
     }
 
@@ -10552,6 +10557,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
     state->dataGlobal->NumOfZones = 2;
     int numZone = state->dataGlobal->NumOfZones;
     state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Resilience.allocate(numZone);
     state->dataHeatBal->Zone(1).Name = "Zone 1";
     state->dataHeatBal->Zone(2).Name = "Zone 2";
 
@@ -10560,10 +10566,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
     int encodedMonDayHrMin;
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
         for (int i = 0; i < 5; i++) {
-            (state->dataHeatBal->Zone(zone_i).resilience.ZoneLowSETHours).at(i) = float(zone_i) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+            (state->dataHeatBal->Resilience(zone_i).ZoneLowSETHours).at(i) = float(zone_i) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }
         General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
-        (state->dataHeatBal->Zone(zone_i).resilience.ZoneLowSETHours).at(4) = encodedMonDayHrMin;
+        (state->dataHeatBal->Resilience(zone_i).ZoneLowSETHours).at(4) = encodedMonDayHrMin;
     }
 
     std::string tableName = "Heating SET Degree-Hours";
@@ -10619,6 +10625,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDe
     state->dataGlobal->NumOfZones = 2;
     int numZone = state->dataGlobal->NumOfZones;
     state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Resilience.allocate(numZone);
     state->dataHeatBal->Zone(1).Name = "Zone 1";
     state->dataHeatBal->Zone(2).Name = "Zone 2";
     rowHead.allocate(numZone + 4);
@@ -10634,10 +10641,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDe
     int encodedMonDayHrMin;
     for (int zone_i = 1; zone_i <= numZone; zone_i++) {
         for (int j = 0; j < columnNum; j++) {
-            (state->dataHeatBal->Zone(zone_i).resilience.ZoneColdHourOfSafetyBins).at(j) = std::pow(j, 2) * zone_i;
+            (state->dataHeatBal->Resilience(zone_i).ZoneColdHourOfSafetyBins).at(j) = std::pow(j, 2) * zone_i;
         }
         General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
-        (state->dataHeatBal->Zone(zone_i).resilience.ZoneColdHourOfSafetyBins).at(timeColumnIdx - 1) = encodedMonDayHrMin;
+        (state->dataHeatBal->Resilience(zone_i).ZoneColdHourOfSafetyBins).at(timeColumnIdx - 1) = encodedMonDayHrMin;
     }
 
     std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins = &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;

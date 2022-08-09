@@ -219,27 +219,27 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
             Real64 valueNotInit = -999.0;
             Real64 nearThreshold = 1.0;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                state.dataHeatBal->Zone(ZoneNum).resilience.ColdStressTempThresh = valueNotInit;
-                state.dataHeatBal->Zone(ZoneNum).resilience.HeatStressTempThresh = valueNotInit;
+                state.dataHeatBal->Resilience(ZoneNum).ColdStressTempThresh = valueNotInit;
+                state.dataHeatBal->Resilience(ZoneNum).HeatStressTempThresh = valueNotInit;
             }
             for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                 int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
 
                 Real64 ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
-                if (state.dataHeatBal->Zone(ZoneNum).resilience.ColdStressTempThresh < valueNotInit + nearThreshold) {
-                    state.dataHeatBal->Zone(ZoneNum).resilience.ColdStressTempThresh = ColdTempThresh;
+                if (state.dataHeatBal->Resilience(ZoneNum).ColdStressTempThresh < valueNotInit + nearThreshold) {
+                    state.dataHeatBal->Resilience(ZoneNum).ColdStressTempThresh = ColdTempThresh;
                 } else {
-                    if (state.dataHeatBal->Zone(ZoneNum).resilience.ColdStressTempThresh != ColdTempThresh) {
+                    if (state.dataHeatBal->Resilience(ZoneNum).ColdStressTempThresh != ColdTempThresh) {
                         ShowWarningMessage(
                             state, fmt::format("Zone {} has multiple people objects with different Cold Stress Temperature Threshold.", ZoneNum));
                     }
                 }
 
                 Real64 HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
-                if (state.dataHeatBal->Zone(ZoneNum).resilience.HeatStressTempThresh < valueNotInit + nearThreshold) {
-                    state.dataHeatBal->Zone(ZoneNum).resilience.HeatStressTempThresh = HeatTempThresh;
+                if (state.dataHeatBal->Resilience(ZoneNum).HeatStressTempThresh < valueNotInit + nearThreshold) {
+                    state.dataHeatBal->Resilience(ZoneNum).HeatStressTempThresh = HeatTempThresh;
                 } else {
-                    if (state.dataHeatBal->Zone(ZoneNum).resilience.HeatStressTempThresh != HeatTempThresh) {
+                    if (state.dataHeatBal->Resilience(ZoneNum).HeatStressTempThresh != HeatTempThresh) {
                         ShowWarningMessage(
                             state, fmt::format("Zone {} has multiple people objects with different Heat Stress Temperature Threshold.", ZoneNum));
                     }
@@ -12980,12 +12980,12 @@ void WriteResilienceBinsTable(EnergyPlusData &state,
     std::vector<Real64> columnMin(columnNum, 0);
     std::vector<Real64> columnSum(columnNum, 0);
     for (int j = 0; j < columnNum; j++) {
-        columnMin[j] = (state.dataHeatBal->Zone(1).resilience.*memberPtr)[j] * unitConvMultiplier;
+        columnMin[j] = (state.dataHeatBal->Resilience(1).*memberPtr)[j] * unitConvMultiplier;
     }
     for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
         const std::string &ZoneName = state.dataHeatBal->Zone(i).Name;
         for (int j = 0; j < columnNum; j++) {
-            Real64 curValue = (state.dataHeatBal->Zone(i).resilience.*memberPtr)[j] * unitConvMultiplier;
+            Real64 curValue = (state.dataHeatBal->Resilience(i).*memberPtr)[j] * unitConvMultiplier;
             if (curValue > columnMax[j]) columnMax[j] = curValue;
             if (curValue < columnMin[j]) columnMin[j] = curValue;
             columnSum[j] += curValue;
@@ -13018,13 +13018,13 @@ void WriteResilienceBinsTableNonPreDefUseZoneData(EnergyPlusData &state,
     std::vector<Real64> columnSum(columnNum, 0);
 
     for (int j = 0; j < columnNum; j++) {
-        columnMin.at(j) = (state.dataHeatBal->Zone(1).resilience.*memberPtr).at(j) * unitConvMultiplier;
+        columnMin.at(j) = (state.dataHeatBal->Resilience(1).*memberPtr).at(j) * unitConvMultiplier;
     }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ZoneNum++) {
         rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
         std::string ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
         for (int j = 0; j < columnNum; j++) {
-            Real64 curValue = (state.dataHeatBal->Zone(ZoneNum).resilience.*memberPtr).at(j) * unitConvMultiplier;
+            Real64 curValue = (state.dataHeatBal->Resilience(ZoneNum).*memberPtr).at(j) * unitConvMultiplier;
             if (curValue > columnMax.at(j)) columnMax.at(j) = curValue;
             if (curValue < columnMin.at(j)) columnMin.at(j) = curValue;
             columnSum.at(j) += curValue;
@@ -13132,19 +13132,19 @@ void WriteSETHoursTableNonPreDefUseZoneData(EnergyPlusData &state,
     multiplier[columnNum - 2] = 1.0;
 
     for (int j = 0; j < columnNum - 1; j++) {
-        columnMin.at(j) = (state.dataHeatBal->Zone(1).resilience.*memberPtr).at(j) * multiplier.at(j);
+        columnMin.at(j) = (state.dataHeatBal->Resilience(1).*memberPtr).at(j) * multiplier.at(j);
     }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ZoneNum++) {
         std::string ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
         rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
         for (int j = 0; j < columnNum - 1; j++) {
-            Real64 curValue = (state.dataHeatBal->Zone(ZoneNum).resilience.*memberPtr).at(j) * multiplier.at(j);
+            Real64 curValue = (state.dataHeatBal->Resilience(ZoneNum).*memberPtr).at(j) * multiplier.at(j);
             if (curValue > columnMax.at(j)) columnMax.at(j) = curValue;
             if (curValue < columnMin.at(j)) columnMin.at(j) = curValue;
             columnSum.at(j) += curValue;
             tableBody(j + 1, ZoneNum) = RealToStr(curValue, 2);
         }
-        tableBody(columnNum, ZoneNum) = DateToString((state.dataHeatBal->Zone(ZoneNum).resilience.*memberPtr).at(columnNum - 1));
+        tableBody(columnNum, ZoneNum) = DateToString((state.dataHeatBal->Resilience(ZoneNum).*memberPtr).at(columnNum - 1));
     }
 
     rowHead(state.dataGlobal->NumOfZones + 1) = "Min";
@@ -13252,9 +13252,9 @@ void WriteHourOfSafetyTableNonPreDefUseZoneData(EnergyPlusData &state,
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         rowHead(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Name;
         for (int j = 1; j <= columnNum; j++) {
-            tableBody(j, ZoneNum) = RealToStr((state.dataHeatBal->Zone(ZoneNum).resilience.*memberPtr).at(j - 1), 2);
+            tableBody(j, ZoneNum) = RealToStr((state.dataHeatBal->Resilience(ZoneNum).*memberPtr).at(j - 1), 2);
         }
-        tableBody(dateColIdx, ZoneNum) = DateToString((state.dataHeatBal->Zone(ZoneNum).resilience.*memberPtr).at(dateColIdx - 1));
+        tableBody(dateColIdx, ZoneNum) = DateToString((state.dataHeatBal->Resilience(ZoneNum).*memberPtr).at(dateColIdx - 1));
     }
 
     std::vector<Real64> columnMax(columnNum, 0);
@@ -13262,12 +13262,12 @@ void WriteHourOfSafetyTableNonPreDefUseZoneData(EnergyPlusData &state,
     std::vector<Real64> columnSum(columnNum, 0);
 
     for (int j = 0; j < columnNum; j++) {
-        columnMin.at(j) = (state.dataHeatBal->Zone(1).resilience.*memberPtr).at(j);
+        columnMin.at(j) = (state.dataHeatBal->Resilience(1).*memberPtr).at(j);
     }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         std::string ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
         for (int j = 0; j < columnNum; j++) {
-            Real64 curValue = (state.dataHeatBal->Zone(ZoneNum).resilience.*memberPtr).at(j);
+            Real64 curValue = (state.dataHeatBal->Resilience(ZoneNum).*memberPtr).at(j);
             if (curValue > columnMax.at(j)) columnMax.at(j) = curValue;
             if (curValue < columnMin.at(j)) columnMin.at(j) = curValue;
             columnSum.at(j) += curValue;
@@ -13424,17 +13424,17 @@ void WriteSETHoursTable(EnergyPlusData &state,
     multiplier[columnNum - 2] = 1.0;
 
     for (int j = 0; j < columnNum - 1; j++) {
-        columnMin[j] = (state.dataHeatBal->Zone(1).resilience.*memberPtr)[j] * multiplier[j];
+        columnMin[j] = (state.dataHeatBal->Resilience(1).*memberPtr)[j] * multiplier[j];
     }
     for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
         for (int j = 0; j < columnNum - 1; j++) {
-            Real64 curValue = (state.dataHeatBal->Zone(i).resilience.*memberPtr)[j] * multiplier[j];
+            Real64 curValue = (state.dataHeatBal->Resilience(i).*memberPtr)[j] * multiplier[j];
             if (curValue > columnMax[j]) columnMax[j] = curValue;
             if (curValue < columnMin[j]) columnMin[j] = curValue;
             columnSum[j] += curValue;
             PreDefTableEntry(state, columnHead[j], Zone(i).Name, RealToStr(curValue, 2));
         }
-        std::string startDateTime = DateToString(int((state.dataHeatBal->Zone(i).resilience.*memberPtr)[columnNum - 1]));
+        std::string startDateTime = DateToString(int((state.dataHeatBal->Resilience(i).*memberPtr)[columnNum - 1]));
         PreDefTableEntry(state, columnHead[columnNum - 1], Zone(i).Name, startDateTime);
     }
     for (int j = 0; j < columnNum - 1; j++) {

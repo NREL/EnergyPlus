@@ -4961,6 +4961,8 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        // always allocate as the data structure is needed in output variable Zone Heat Index, Zone Humidity Index
+        state.dataHeatBal->Resilience.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
 

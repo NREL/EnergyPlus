@@ -540,18 +540,17 @@ namespace DataHeatBalance {
 
     struct ZoneResilience
     {
-        Real64 ZoneNumOcc = 0.0;
-        Real64 ColdStressTempThresh = 15.56;
-        Real64 HeatStressTempThresh = 30.0;
+        Real64 ZoneNumOcc;
+        Real64 ColdStressTempThresh;
+        Real64 HeatStressTempThresh;
         Real64 PierceSET;
-        Real64 PMV = 0.0;
-
+        Real64 PMV;
         Real64 ZonePierceSET;
         Real64 ZonePierceSETLastStep;
-        Real64 ZoneHeatIndex = 0.0;
-        Real64 ZoneHumidex = 0.0;
-        bool CrossedColdThresh = false;
-        bool CrossedHeatThresh = false;
+        Real64 ZoneHeatIndex;
+        Real64 ZoneHumidex;
+        bool CrossedColdThresh;
+        bool CrossedHeatThresh;
 
         std::array<Real64, numColumnThermalTbl> ZoneHeatIndexHourBins = {0.0};
         std::array<Real64, numColumnThermalTbl> ZoneHeatIndexOccuHourBins = {0.0};
@@ -574,6 +573,13 @@ namespace DataHeatBalance {
         std::array<Real64, numColumnVisualTbl> ZoneLightingLevelHourBins = {0.0};
         std::array<Real64, numColumnVisualTbl> ZoneLightingLevelOccuHourBins = {0.0};
         std::array<Real64, numColumnVisualTbl> ZoneLightingLevelOccupiedHourBins = {0.0};
+
+        // Default Constructor
+        ZoneResilience()
+            : ZoneNumOcc(0.0), ColdStressTempThresh(15.56), HeatStressTempThresh(30.0), PierceSET(-999.0), PMV(0.0), ZonePierceSET(-1.0),
+              ZonePierceSETLastStep(-1.0), ZoneHeatIndex(0.0), ZoneHumidex(0.0), CrossedColdThresh(false), CrossedHeatThresh(false)
+        {
+        }
     };
 
     struct ZoneData
@@ -702,8 +708,6 @@ namespace DataHeatBalance {
         bool FlagCustomizedZoneCap = false;     // True if customized Zone Capacitance Multiplier is used
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this zone
-
-        ZoneResilience resilience;
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature = 0.0;               // Measured zone air temperature input by user
@@ -2258,6 +2262,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::SpaceData> space;
     EPVector<DataHeatBalance::SpaceListData> spaceList;
     EPVector<DataHeatBalance::ZoneData> Zone;
+    EPVector<DataHeatBalance::ZoneResilience> Resilience;
     EPVector<DataHeatBalance::ZoneListData> ZoneList;
     EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
     EPVector<DataHeatBalance::PeopleData> People;
