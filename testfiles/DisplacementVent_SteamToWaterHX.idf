@@ -74,7 +74,7 @@
 ! HVAC:                       single duct VAV with hot water reheat, single boiler, chiller and
 !                             cooling tower, supply air temperature = 19C
 
-  Version,22.1;
+  Version,22.2;
 
   Building,
     Building,                !- Name
@@ -2474,7 +2474,7 @@
     HeatingAvailSched,                    !- Availability Schedule Name
     Steam to Water HX Steam Inlet Node,   !- Steam Inlet Node Name
     Steam to Water HX Steam Outlet Node,  !- Steam Outlet Node Name
-    autosize,                                  !- Steam Side Design Flow Rate
+    autosize,                             !- Steam Side Design Flow Rate
     Steam to Water HX Water Inlet Node,   !- Water Inlet Node Name
     Steam to Water HX Water Outlet Node,  !- Water Outlet Node Name
     autosize,                             !- Water Side Design Flow Rate

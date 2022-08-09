@@ -207,7 +207,6 @@ void PlantProfileData::simulate(EnergyPlusData &state,
         } else {
             this->Power = 0.0;
         }
-
     }
 
     this->UpdatePlantProfile(state);
