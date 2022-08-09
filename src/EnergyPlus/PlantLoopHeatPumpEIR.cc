@@ -1194,6 +1194,14 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
     }
 }
 
+// From here on, the Fuel Fired Heat Pump module EIRFuelFiredHeatPump
+// Enum string definitions
+static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatPump::OATempCurveVar::Num)> OATempCurveVarNamesUC = {"DRYBULB",
+                                                                                                                                    "WETBULB"};
+static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatPump::WaterTempCurveVar::Num)> WaterTempCurveVarNamesUC = {
+    "ENTERINGCONDENSER", "LEAVINGCONDENSER"};
+static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatPump::DefrostType::Num)> DefrostTypeNamesUC = {"TIMED", "ONDEMAND"};
+
 void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
     Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -1786,7 +1794,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 // A9 outdoor_air_temperature_curve_input_variable
                 std::string oaTempCurveInputVar =
                     UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
-                thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumerationValue(thisPLHP.OATempCurveVarNamesUC, oaTempCurveInputVar));
+                thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumerationValue(OATempCurveVarNamesUC, oaTempCurveInputVar));
                 if (thisPLHP.oaTempCurveInputVar == OATempCurveVar::Invalid) {
                     thisPLHP.oaTempCurveInputVar = OATempCurveVar::DryBulb; // set to default
                     // 2022-08-08: better give a warning for resetting to default
@@ -1796,7 +1804,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string waterTempCurveInputVar =
                     UtilityRoutines::MakeUPPERCase(fields.at("water_temperature_curve_input_variable").get<std::string>());
                 thisPLHP.waterTempCurveInputVar =
-                    static_cast<WaterTempCurveVar>(getEnumerationValue(thisPLHP.WaterTempCurveVarNamesUC, waterTempCurveInputVar));
+                    static_cast<WaterTempCurveVar>(getEnumerationValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
                 if (thisPLHP.waterTempCurveInputVar == WaterTempCurveVar::Invalid) {
                     thisPLHP.waterTempCurveInputVar = WaterTempCurveVar::EnteringCondenser;
                     // 2022-08-08: give warning for resetting
@@ -1897,7 +1905,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.defrostType = DefrostType::OnDemand;
                 } else {
                     std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
-                    thisPLHP.defrostType = static_cast<DefrostType>(getEnumerationValue(thisPLHP.DefrostTypeNamesUC, defrostControlType));
+                    thisPLHP.defrostType = static_cast<DefrostType>(getEnumerationValue(DefrostTypeNamesUC, defrostControlType));
                     if (thisPLHP.defrostType == DefrostType::Invalid) {
                         thisPLHP.defrostType = DefrostType::OnDemand; // set to default
                         thisPLHP.defrostOpTimeFrac = 0.0;
