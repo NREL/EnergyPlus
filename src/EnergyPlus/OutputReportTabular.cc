@@ -4594,31 +4594,31 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     // HVAC Input Cooled Surface Cooling    Zone Ventilated Slab Radiant Cooling Energy    -VentSlab()%RadCoolingEnergy HVAC     Energy
     //                                      Hydronic Low Temp Radiant Cooling Energy       -HydrRadSys()%CoolEnergy     HVAC     Energy
     //                                      Constant Flow Low Temp Radiant Cooling Energy  -CFloRadSys()%CoolEnergy     HVAC     Energy
-    // People Sensible Heat Addition        Zone People Sensible Heating Energy            ZnRpt()%PeopleSenGain        Zone     Energy
-    // Lights Sensible Heat Addition        Zone Lights Total Heating Energy               ZnRpt()%LtsTotGain           Zone     Energy
-    // Equipment Sensible Heat Addition     Zone Electric Equipment Radiant Heating Energy ZnRpt()%ElecRadGain          Zone     Energy
-    //                                      Zone Gas Equipment Radiant Heating Energy      ZnRpt()%GasRadGain           Zone     Energy
-    //                                      Zone Steam Equipment Radiant Heating Energy    ZnRpt()%SteamRadGain         Zone     Energy
-    //                                      Zone Hot Water Equipment Radiant Heating Energy ZnRpt()%HWRadGain           Zone     Energy
-    //                                      Zone Other Equipment Radiant Heating Energy    ZnRpt()%OtherRadGain         Zone     Energy
-    //                                   Zone Electric Equipment Convective Heating Energy ZnRpt()%ElecConGain          Zone     Energy
-    //                                      Zone Gas Equipment Convective Heating Energy   ZnRpt()%GasConGain           Zone     Energy
-    //                                      Zone Steam Equipment Convective Heating Energy ZnRpt()%SteamConGain         Zone     Energy
-    //                                    Zone Hot Water Equipment Convective Heating Energy ZnRpt()%HWConGain          Zone     Energy
-    //                                      Zone Other Equipment Convective Heating Energy ZnRpt()%OtherConGain         Zone     Energy
+    // People Sensible Heat Addition        Zone People Sensible Heating Energy            ZoneRpt()%PeopleSenGain        Zone     Energy
+    // Lights Sensible Heat Addition        Zone Lights Total Heating Energy               ZoneRpt()%LtsTotGain           Zone     Energy
+    // Equipment Sensible Heat Addition     Zone Electric Equipment Radiant Heating Energy ZoneRpt()%ElecRadGain          Zone     Energy
+    //                                      Zone Gas Equipment Radiant Heating Energy      ZoneRpt()%GasRadGain           Zone     Energy
+    //                                      Zone Steam Equipment Radiant Heating Energy    ZoneRpt()%SteamRadGain         Zone     Energy
+    //                                      Zone Hot Water Equipment Radiant Heating Energy ZoneRpt()%HWRadGain           Zone     Energy
+    //                                      Zone Other Equipment Radiant Heating Energy    ZoneRpt()%OtherRadGain         Zone     Energy
+    //                                   Zone Electric Equipment Convective Heating Energy ZoneRpt()%ElecConGain          Zone     Energy
+    //                                      Zone Gas Equipment Convective Heating Energy   ZoneRpt()%GasConGain           Zone     Energy
+    //                                      Zone Steam Equipment Convective Heating Energy ZoneRpt()%SteamConGain         Zone     Energy
+    //                                    Zone Hot Water Equipment Convective Heating Energy ZoneRpt()%HWConGain          Zone     Energy
+    //                                      Zone Other Equipment Convective Heating Energy ZoneRpt()%OtherConGain         Zone     Energy
     // Window Heat Addition                 Zone Windows Total Heat Gain Energy            ZoneWinHeatGainRepEnergy()   Zone     Energy
     // Interzone Air Transfer Heat Addition Zone Air Heat Balance Interzone Air Transfer Rate  ZnAirRpt()%SumMCpDTzones HVAC     Rate
     // Infiltration Heat Addition           Zone Air Heat Balance Outdoor Air Transfer Rate ZnAirRpt()%SumMCpDtInfil     HVAC     Rate
-    // Equipment Sensible Heat Removal      Zone Electric Equipment Radiant Heating Energy ZnRpt()%ElecRadGain          Zone     Energy
-    //                                      Zone Gas Equipment Radiant Heating Energy      ZnRpt()%GasRadGain           Zone     Energy
-    //                                      Zone Steam Equipment Radiant Heating Energy    ZnRpt()%SteamRadGain         Zone     Energy
-    //                                      Zone Hot Water Equipment Radiant Heating Energy ZnRpt()%HWRadGain           Zone     Energy
-    //                                      Zone Other Equipment Radiant Heating Energy    ZnRpt()%OtherRadGain         Zone     Energy
-    //                                   Zone Electric Equipment Convective Heating Energy ZnRpt()%ElecConGain          Zone     Energy
-    //                                      Zone Gas Equipment Convective Heating Energy   ZnRpt()%GasConGain           Zone     Energy
-    //                                      Zone Steam Equipment Convective Heating Energy ZnRpt()%SteamConGain         Zone     Energy
-    //                                     Zone Hot Water Equipment Convective Heating Energy ZnRpt()%HWConGain         Zone     Energy
-    //                                      Zone Other Equipment Convective Heating Energy ZnRpt()%OtherConGain         Zone     Energy
+    // Equipment Sensible Heat Removal      Zone Electric Equipment Radiant Heating Energy ZoneRpt()%ElecRadGain          Zone     Energy
+    //                                      Zone Gas Equipment Radiant Heating Energy      ZoneRpt()%GasRadGain           Zone     Energy
+    //                                      Zone Steam Equipment Radiant Heating Energy    ZoneRpt()%SteamRadGain         Zone     Energy
+    //                                      Zone Hot Water Equipment Radiant Heating Energy ZoneRpt()%HWRadGain           Zone     Energy
+    //                                      Zone Other Equipment Radiant Heating Energy    ZoneRpt()%OtherRadGain         Zone     Energy
+    //                                   Zone Electric Equipment Convective Heating Energy ZoneRpt()%ElecConGain          Zone     Energy
+    //                                      Zone Gas Equipment Convective Heating Energy   ZoneRpt()%GasConGain           Zone     Energy
+    //                                      Zone Steam Equipment Convective Heating Energy ZoneRpt()%SteamConGain         Zone     Energy
+    //                                     Zone Hot Water Equipment Convective Heating Energy ZoneRpt()%HWConGain         Zone     Energy
+    //                                      Zone Other Equipment Convective Heating Energy ZoneRpt()%OtherConGain         Zone     Energy
     // Window Heat Removal                  Zone Windows Total Heat Loss Energy            -ZoneWinHeatLossRepEnergy()  Zone     Energy
     // Interzone Air Transfer Heat Removal  Zone Air Heat Balance Interzone Air Transfer Rate ZnAirRpt()%SumMCpDTzones  HVAC     Rate
     // Infiltration Heat Removal            Zone Air Heat Balance Outdoor Air Transfer Rate ZnAirRpt()%SumMCpDtInfil     HVAC     Rate
@@ -4689,10 +4689,10 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
         mult = Zone(state.dataOutRptTab->iZoneGHGR).Multiplier * Zone(state.dataOutRptTab->iZoneGHGR).ListMultiplier;
         // People Sensible Heat Addition
         ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnPeoplAdd +=
-            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGain * mult * state.dataOutRptTab->timeStepRatio;
+            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGain * mult * state.dataOutRptTab->timeStepRatio;
         // Lights Sensible Heat Addition
         ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnLiteAdd +=
-            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGain * mult * state.dataOutRptTab->timeStepRatio;
+            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGain * mult * state.dataOutRptTab->timeStepRatio;
         // HVAC Input Sensible Air Heating
         // HVAC Input Sensible Air Cooling
         Real64 ZoneEqHeatorCool = state.dataHeatBal->ZnAirRpt(state.dataOutRptTab->iZoneGHGR).SumMCpDTsystem +
@@ -4731,16 +4731,16 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
         // Equipment Sensible Heat Addition
         // Equipment Sensible Heat Removal
         // the following variables are already gains so they do not need to be converted by multiplying by time.
-        state.dataOutRptTab->eqpSensGHGR = (state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGain +
-                                            state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGain) *
+        state.dataOutRptTab->eqpSensGHGR = (state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGain +
+                                            state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGain) *
                                            state.dataOutRptTab->timeStepRatio;
         if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
             ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSAnEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
@@ -4879,23 +4879,23 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
                     state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR); // multipliers included above
                 // People Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtPeoplAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtLiteAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
                 // non-HVAC ZnAirRpt variables DO NOT include zone multipliers
-                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
                 if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipAdd = state.dataOutRptTab->eqpSensGHGR * mult;
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSHtEquipRem = 0.0;
@@ -4987,22 +4987,22 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClHvacATUCl = state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
                 // People Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClPeoplAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
                 ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClLiteAdd =
-                    state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+                    state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
-                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                                   state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+                state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                                   state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
                 if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipAdd = state.dataOutRptTab->eqpSensGHGR * mult;
                     ZonePreDefRep(state.dataOutRptTab->iZoneGHGR).SHGSClEquipRem = 0.0;
@@ -5126,21 +5126,22 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
             state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt += state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR);
             state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl += state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
             // People Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd +=
+                state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
             // Lights Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd += state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
             // Equipment Sensible Heat Addition
             // Equipment Sensible Heat Removal
-            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
             if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                 state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
             } else {
@@ -5231,21 +5232,22 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
             state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt += state.dataOutRptTab->ATUHeat(state.dataOutRptTab->iZoneGHGR);
             state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl += state.dataOutRptTab->ATUCool(state.dataOutRptTab->iZoneGHGR);
             // People Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd +=
+                state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).PeopleSenGainRate * mult;
             // Lights Sensible Heat Addition
-            state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd += state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
+            state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd += state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).LtsTotGainRate * mult;
             // Equipment Sensible Heat Addition
             // Equipment Sensible Heat Removal
-            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
-                                               state.dataHeatBal->ZnRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
+            state.dataOutRptTab->eqpSensGHGR = state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherRadGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).ElecConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).GasConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).HWConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).SteamConGainRate +
+                                               state.dataHeatBal->ZoneRpt(state.dataOutRptTab->iZoneGHGR).OtherConGainRate;
             if (state.dataOutRptTab->eqpSensGHGR > 0.0) {
                 state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd += state.dataOutRptTab->eqpSensGHGR * mult;
             } else {

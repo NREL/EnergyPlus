@@ -425,7 +425,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     obFMU_PeopleSch,         !- Name
@@ -436,7 +437,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     No,                      !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     ZONE 1_MeasuredTemperature,  !- Name
@@ -447,7 +449,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     ZONE 2_MeasuredHumidityRatio,  !- Name
@@ -458,7 +461,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     ZONE 3_MeasuredCO2Concentration,  !- Name
@@ -469,7 +473,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
 ! No location information present in original BLAST file
@@ -1297,12 +1302,12 @@
 
   People,
     Zone 1 People,           !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     OfficeSmall BLDG_OCC_SCH,!- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.1,                     !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.1,                     !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
@@ -1316,12 +1321,12 @@
 
   People,
     Zone 2 People,           !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone or ZoneList or Space or SpaceList Name
     OfficeSmall BLDG_OCC_SCH,!- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.1,                     !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.1,                     !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
@@ -1335,12 +1340,12 @@
 
   People,
     Zone 3 People,           !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone or ZoneList or Space or SpaceList Name
     obFMU_PeopleSch,         !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.1,                     !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.1,                     !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
@@ -1354,12 +1359,12 @@
 
   People,
     Zone 4 People,           !- Name
-    ZONE 4,                  !- Zone or ZoneList Name
+    ZONE 4,                  !- Zone or ZoneList or Space or SpaceList Name
     obFMU_PeopleSch,         !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.1,                     !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.1,                     !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
@@ -1375,7 +1380,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 1 Infil,            !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1389,7 +1394,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 2 Infil,            !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1403,7 +1408,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 3 Infil,            !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1417,7 +1422,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 4 Infil,            !- Name
-    ZONE 4,                  !- Zone or ZoneList Name
+    ZONE 4,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}

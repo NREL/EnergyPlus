@@ -118,8 +118,9 @@
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
+
   Sizing:System,
-    Typical Residential System,    !- AirLoop Name
+    Typical Residential System,  !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
     1,                       !- Central Heating Maximum System Air Flow Ratio
@@ -158,7 +159,7 @@
     OnOff;                   !- Central Cooling Capacity Control Method
 
   Sizing:Zone,
-    LIVING ZONE,                !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
     12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
     11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
@@ -167,7 +168,7 @@
     ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
     0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    ,        !- Design Specification Outdoor Air Object Name
+    ,                        !- Design Specification Outdoor Air Object Name
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
     DesignDay,               !- Cooling Design Air Flow Method
@@ -180,7 +181,7 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    ,       !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
     No,                      !- Account for Dedicated Outdoor Air System
     NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
     autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
@@ -554,10 +555,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.323,10.778,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    10.323,10.778,0,         !- X,Y,Z ==> Vertex 2 {m}
-    0,10.778,0,              !- X,Y,Z ==> Vertex 3 {m}
-    0,10.778,2.4384;         !- X,Y,Z ==> Vertex 4 {m}
+    10.323,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    10.323,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Living:East,             !- Name
@@ -571,10 +572,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    17.242,0,2.4384,         !- X,Y,Z ==> Vertex 1 {m}
-    17.242,0,0,              !- X,Y,Z ==> Vertex 2 {m}
-    17.242,10.778,0,         !- X,Y,Z ==> Vertex 3 {m}
-    17.242,10.778,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    17.242,0,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Living:South,            !- Name
@@ -588,10 +589,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,2.4383,              !- X,Y,Z ==> Vertex 1 {m}
-    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}
-    17.242,0,0,              !- X,Y,Z ==> Vertex 3 {m}
-    17.242,0,2.4384;         !- X,Y,Z ==> Vertex 4 {m}
+    0,0,2.4383,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,0,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Living:West,             !- Name
@@ -605,10 +606,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10.778,2.4384,         !- X,Y,Z ==> Vertex 1 {m}
-    0,10.778,0,              !- X,Y,Z ==> Vertex 2 {m}
-    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}
-    0,0,2.4384;              !- X,Y,Z ==> Vertex 4 {m}
+    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    0,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Garage:Interior,         !- Name
@@ -622,10 +623,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.323,10.778,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    10.323,10.778,0,         !- X,Y,Z ==> Vertex 2 {m}
-    17.242,10.778,0,         !- X,Y,Z ==> Vertex 3 {m}
-    17.242,10.778,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    10.323,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    10.323,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Living:Interior,         !- Name
@@ -639,10 +640,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    17.242,10.778,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    17.242,10.778,0,         !- X,Y,Z ==> Vertex 2 {m}
-    10.323,10.778,0,         !- X,Y,Z ==> Vertex 3 {m}
-    10.323,10.778,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.323,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.323,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Living:Floor,            !- Name
@@ -656,10 +657,10 @@
     NoWind,                  !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,                   !- X,Y,Z ==> Vertex 1 {m}
-    0,10.778,0,              !- X,Y,Z ==> Vertex 2 {m}
-    17.242,10.778,0,         !- X,Y,Z ==> Vertex 3 {m}
-    17.242,0,0;              !- X,Y,Z ==> Vertex 4 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Living:Ceiling,          !- Name
@@ -673,10 +674,10 @@
     NoWind,                  !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10.778,2.4384,         !- X,Y,Z ==> Vertex 1 {m}
-    0,0,2.4384,              !- X,Y,Z ==> Vertex 2 {m}
-    17.242,0,2.4384,         !- X,Y,Z ==> Vertex 3 {m}
-    17.242,10.778,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,0,2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Attic:LivingFloor,       !- Name
@@ -690,10 +691,10 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,2.4384,              !- X,Y,Z ==> Vertex 1 {m}
-    0,10.778,2.4384,         !- X,Y,Z ==> Vertex 2 {m}
-    17.242,10.778,2.4384,    !- X,Y,Z ==> Vertex 3 {m}
-    17.242,0,2.4384;         !- X,Y,Z ==> Vertex 4 {m}
+    0,0,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,0,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     NorthRoof1,              !- Name
@@ -707,10 +708,10 @@
     WindExposed,             !- Wind Exposure
     0.9,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    13.782,5.389,4.6838,     !- X,Y,Z ==> Vertex 1 {m}
-    13.782,7.3172,3.8804,    !- X,Y,Z ==> Vertex 2 {m}
-    0,7.3172,3.8804,         !- X,Y,Z ==> Vertex 3 {m}
-    0,5.389,4.6838;          !- X,Y,Z ==> Vertex 4 {m}
+    13.782,5.389,4.6838,  !- X,Y,Z ==> Vertex 1 {m}
+    13.782,7.3172,3.8804,  !- X,Y,Z ==> Vertex 2 {m}
+    0,7.3172,3.8804,  !- X,Y,Z ==> Vertex 3 {m}
+    0,5.389,4.6838;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     SouthRoof,               !- Name
@@ -741,10 +742,10 @@
     WindExposed,             !- Wind Exposure
     0.9,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    13.782,7.3172,3.8804,    !- X,Y,Z ==> Vertex 1 {m}
-    10.332,10.778,2.4384,    !- X,Y,Z ==> Vertex 2 {m}
-    0,10.778,2.4384,         !- X,Y,Z ==> Vertex 3 {m}
-    0,7.3172,3.8804;         !- X,Y,Z ==> Vertex 4 {m}
+    13.782,7.3172,3.8804,  !- X,Y,Z ==> Vertex 1 {m}
+    10.332,10.778,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    0,7.3172,3.8804;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     NorthRoof3,              !- Name
@@ -758,10 +759,10 @@
     WindExposed,             !- Wind Exposure
     0.9,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    17.242,5.389,4.6838,     !- X,Y,Z ==> Vertex 1 {m}
-    17.242,7.3172,3.8804,    !- X,Y,Z ==> Vertex 2 {m}
-    13.782,7.3172,3.8804,    !- X,Y,Z ==> Vertex 3 {m}
-    13.782,5.389,4.6838;     !- X,Y,Z ==> Vertex 4 {m}
+    17.242,5.389,4.6838,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,7.3172,3.8804,  !- X,Y,Z ==> Vertex 2 {m}
+    13.782,7.3172,3.8804,  !- X,Y,Z ==> Vertex 3 {m}
+    13.782,5.389,4.6838;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     NorthRoof4,              !- Name
@@ -775,9 +776,9 @@
     WindExposed,             !- Wind Exposure
     0.9,                     !- View Factor to Ground
     3,                       !- Number of Vertices
-    17.242,7.3172,3.8804,    !- X,Y,Z ==> Vertex 1 {m}
-    17.242,10.778,2.4384,    !- X,Y,Z ==> Vertex 2 {m}
-    13.782,7.3172,3.8804;    !- X,Y,Z ==> Vertex 3 {m}
+    17.242,7.3172,3.8804,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    13.782,7.3172,3.8804;  !- X,Y,Z ==> Vertex 3 {m}
 
   BuildingSurface:Detailed,
     EastGable,               !- Name
@@ -791,9 +792,9 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     3,                       !- Number of Vertices
-    17.242,5.389,4.6838,     !- X,Y,Z ==> Vertex 1 {m}
-    17.242,0.0,2.4384,       !- X,Y,Z ==> Vertex 2 {m}
-    17.242,10.778,2.4384;    !- X,Y,Z ==> Vertex 3 {m}
+    17.242,5.389,4.6838,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,0.0,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 3 {m}
 
   BuildingSurface:Detailed,
     WestGable,               !- Name
@@ -807,9 +808,9 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     3,                       !- Number of Vertices
-    0.0,5.389,4.6838,        !- X,Y,Z ==> Vertex 1 {m}
-    0.0,10.778,2.4384,       !- X,Y,Z ==> Vertex 2 {m}
-    0.0,0.0,2.4384;          !- X,Y,Z ==> Vertex 3 {m}
+    0.0,5.389,4.6838,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,10.778,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,2.4384;  !- X,Y,Z ==> Vertex 3 {m}
 
   BuildingSurface:Detailed,
     EastRoof,                !- Name
@@ -823,10 +824,10 @@
     WindExposed,             !- Wind Exposure
     0.9,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    13.782,16.876,3.8804,    !- X,Y,Z ==> Vertex 1 {m}
-    13.782,7.3172,3.8804,    !- X,Y,Z ==> Vertex 2 {m}
-    17.242,10.778,2.4384,    !- X,Y,Z ==> Vertex 3 {m}
-    17.242,16.876,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    13.782,16.876,3.8804,  !- X,Y,Z ==> Vertex 1 {m}
+    13.782,7.3172,3.8804,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,16.876,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     WestRoof,                !- Name
@@ -840,10 +841,10 @@
     WindExposed,             !- Wind Exposure
     0.9,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.323,16.876,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    10.323,10.778,2.4384,    !- X,Y,Z ==> Vertex 2 {m}
-    13.782,7.3172,3.8804,    !- X,Y,Z ==> Vertex 3 {m}
-    13.782,16.876,3.8804;    !- X,Y,Z ==> Vertex 4 {m}
+    10.323,16.876,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    10.323,10.778,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    13.782,7.3172,3.8804,  !- X,Y,Z ==> Vertex 3 {m}
+    13.782,16.876,3.8804;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Attic:NorthGable,        !- Name
@@ -857,9 +858,9 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     3,                       !- Number of Vertices
-    13.782,16.876,3.8804,    !- X,Y,Z ==> Vertex 1 {m}
-    17.242,16.876,2.4384,    !- X,Y,Z ==> Vertex 2 {m}
-    10.323,16.876,2.4384;    !- X,Y,Z ==> Vertex 3 {m}
+    13.782,16.876,3.8804,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,16.876,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    10.323,16.876,2.4384;  !- X,Y,Z ==> Vertex 3 {m}
 
   BuildingSurface:Detailed,
     Garage:EastWall,         !- Name
@@ -873,10 +874,10 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    17.242,10.778,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    17.242,10.778,0.0,       !- X,Y,Z ==> Vertex 2 {m}
-    17.242,16.876,0.0,       !- X,Y,Z ==> Vertex 3 {m}
-    17.242,16.876,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,10.778,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,16.876,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,16.876,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Garage:WestWall,         !- Name
@@ -890,10 +891,10 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.323,16.876,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    10.323,16.876,0.0,       !- X,Y,Z ==> Vertex 2 {m}
-    10.323,10.778,0.0,       !- X,Y,Z ==> Vertex 3 {m}
-    10.323,10.778,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    10.323,16.876,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    10.323,16.876,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.323,10.778,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.323,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Garage:FrontDoor,        !- Name
@@ -907,10 +908,10 @@
     WindExposed,             !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    17.242,16.876,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    17.242,16.876,0.0,       !- X,Y,Z ==> Vertex 2 {m}
-    10.323,16.876,0.0,       !- X,Y,Z ==> Vertex 3 {m}
-    10.323,16.876,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    17.242,16.876,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,16.876,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.323,16.876,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.323,16.876,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Attic:GarageFloor,       !- Name
@@ -924,10 +925,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.323,10.778,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    10.323,16.876,2.4384,    !- X,Y,Z ==> Vertex 2 {m}
-    17.242,16.876,2.4384,    !- X,Y,Z ==> Vertex 3 {m}
-    17.242,10.778,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    10.323,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    10.323,16.876,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,16.876,2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Garage:Ceiling,          !- Name
@@ -941,10 +942,10 @@
     NoWind,                  !- Wind Exposure
     0.5,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.323,16.876,2.4384,    !- X,Y,Z ==> Vertex 1 {m}
-    10.323,10.778,2.4384,    !- X,Y,Z ==> Vertex 2 {m}
-    17.242,10.778,2.4384,    !- X,Y,Z ==> Vertex 3 {m}
-    17.242,16.876,2.4384;    !- X,Y,Z ==> Vertex 4 {m}
+    10.323,16.876,2.4384,  !- X,Y,Z ==> Vertex 1 {m}
+    10.323,10.778,2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,16.876,2.4384;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Garage:Floor,            !- Name
@@ -958,10 +959,10 @@
     NoWind,                  !- Wind Exposure
     0,                       !- View Factor to Ground
     4,                       !- Number of Vertices
-    10.323,10.778,0,         !- X,Y,Z ==> Vertex 1 {m}
-    10.323,16.876,0,         !- X,Y,Z ==> Vertex 2 {m}
-    17.242,16.876,0,         !- X,Y,Z ==> Vertex 3 {m}
-    17.242,10.778,0;         !- X,Y,Z ==> Vertex 4 {m}
+    10.323,10.778,0,  !- X,Y,Z ==> Vertex 1 {m}
+    10.323,16.876,0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,16.876,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,10.778,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     NorthWindow,             !- Name
@@ -973,10 +974,10 @@
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
-    6.572,10.778,2.1336,     !- X,Y,Z ==> Vertex 1 {m}
-    6.572,10.778,0.6096,     !- X,Y,Z ==> Vertex 2 {m}
-    2,10.778,0.6096,         !- X,Y,Z ==> Vertex 3 {m}
-    2,10.778,2.1336;         !- X,Y,Z ==> Vertex 4 {m}
+    6.572,10.778,2.1336,  !- X,Y,Z ==> Vertex 1 {m}
+    6.572,10.778,0.6096,  !- X,Y,Z ==> Vertex 2 {m}
+    2,10.778,0.6096,  !- X,Y,Z ==> Vertex 3 {m}
+    2,10.778,2.1336;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     EastWindow,              !- Name
@@ -988,10 +989,10 @@
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
-    17.242,2,2.1336,         !- X,Y,Z ==> Vertex 1 {m}
-    17.242,2,0.6096,         !- X,Y,Z ==> Vertex 2 {m}
-    17.242,6.572,0.6096,     !- X,Y,Z ==> Vertex 3 {m}
-    17.242,6.572,2.1336;     !- X,Y,Z ==> Vertex 4 {m}
+    17.242,2,2.1336,  !- X,Y,Z ==> Vertex 1 {m}
+    17.242,2,0.6096,  !- X,Y,Z ==> Vertex 2 {m}
+    17.242,6.572,0.6096,  !- X,Y,Z ==> Vertex 3 {m}
+    17.242,6.572,2.1336;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     SouthWindow,             !- Name
@@ -1003,10 +1004,10 @@
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
-    2,0,2.1336,              !- X,Y,Z ==> Vertex 1 {m}
-    2,0,0.6096,              !- X,Y,Z ==> Vertex 2 {m}
-    6.572,0,0.6096,          !- X,Y,Z ==> Vertex 3 {m}
-    6.572,0,2.1336;          !- X,Y,Z ==> Vertex 4 {m}
+    2,0,2.1336,  !- X,Y,Z ==> Vertex 1 {m}
+    2,0,0.6096,  !- X,Y,Z ==> Vertex 2 {m}
+    6.572,0,0.6096,  !- X,Y,Z ==> Vertex 3 {m}
+    6.572,0,2.1336;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     WestWindow,              !- Name
@@ -1018,10 +1019,10 @@
     ,                        !- Frame and Divider Name
     1.0,                     !- Multiplier
     4,                       !- Number of Vertices
-    0,6.572,2.1336,          !- X,Y,Z ==> Vertex 1 {m}
-    0,6.572,0.6096,          !- X,Y,Z ==> Vertex 2 {m}
-    0,2,0.6096,              !- X,Y,Z ==> Vertex 3 {m}
-    0,2,2.1336;              !- X,Y,Z ==> Vertex 4 {m}
+    0,6.572,2.1336,  !- X,Y,Z ==> Vertex 1 {m}
+    0,6.572,0.6096,  !- X,Y,Z ==> Vertex 2 {m}
+    0,2,0.6096,  !- X,Y,Z ==> Vertex 3 {m}
+    0,2,2.1336;  !- X,Y,Z ==> Vertex 4 {m}
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -1164,12 +1165,12 @@
 
   People,
     LIVING ZONE People,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE OCCUPANCY,         !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1186,7 +1187,7 @@
 
   Lights,
     LIVING ZONE Lights,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE LIGHTING,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1000,                    !- Lighting Level {W}
@@ -1200,7 +1201,7 @@
 
   ZoneVentilation:DesignFlowRate,
     LIVING ZONE Ventl 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.131944,                !- Design Flow Rate {m3/s}
@@ -1222,7 +1223,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LIVING ZONE Infil 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01,                    !- Design Flow Rate {m3/s}
@@ -1236,7 +1237,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ATTIC ZONE Infil 1,      !- Name
-    ATTIC ZONE,              !- Zone or ZoneList Name
+    ATTIC ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1250,7 +1251,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GARAGE ZONE Infil 1,     !- Name
-    GARAGE ZONE,             !- Zone or ZoneList Name
+    GARAGE ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1264,7 +1265,7 @@
 
   ElectricEquipment,
     LIVING ZONE ElecEq,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     500,                     !- Design Level {W}
@@ -1453,9 +1454,9 @@
     HVACAvailSched,          !- Availability Schedule Name
     AIR LOOP INLET NODE,     !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    Fan:OnOff,               !- Supply Air Fan Object Type
-    Supply Fan 1,            !- Supply Air Fan Name
-    BlowThrough,             !- Supply Air Fan Placement
+    Fan:OnOff,               !- Supply Fan Object Type
+    Supply Fan 1,            !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
     Always Off Discrete,     !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:DX:MultiSpeed,  !- Heating Coil Object Type
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
@@ -1468,12 +1469,12 @@
     Coil:Heating:Electric:MultiStage,  !- Supplemental Heating Coil Object Type
     Supp Heating Coil 1,     !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
-    autosize,                        !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
     ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
     SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
-    autosize,                        !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
@@ -1493,25 +1494,25 @@
     60,                      !- Heat Pump Fan Delay Time {s}
     0,                       !- Ancillary On-Cycle Electric Power {W}
     0,                       !- Ancillary Off-Cycle Electric Power {W}
-    ,                                        !- Design Heat Recovery Water Flow Rate {m3/s}
-    ,                                        !- Maximum Temperature for Heat Recovery {C}
-    ,                                        !- Heat Recovery Water Inlet Node Name
-    ,                                        !- Heat Recovery Water Outlet Node Name
-    UnitarySystemPerformance:Multispeed,     !- Design Specification Multispeed Object Type
-    Unitary System Performance Multispeed 1; !- Design Specification Multispeed Object Name
+    ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
+    ,                        !- Maximum Temperature for Heat Recovery {C}
+    ,                        !- Heat Recovery Water Inlet Node Name
+    ,                        !- Heat Recovery Water Outlet Node Name
+    UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Object Type
+    Unitary System Performance Multispeed 1;  !- Design Specification Multispeed Object Name
 
   Schedule:Constant,Always Off Discrete,Any Number,0;
 
   UnitarySystemPerformance:Multispeed,
-    Unitary System Performance Multispeed 1, !- Name
-    2,                                       !- Number of Speeds for Heating
-    2,                                       !- Number of Speeds for Cooling
-    No,                                      !- Single Mode Operation
-    ,                                        !- No Load Supply Air Flow Rate Ratio
-    0.8,                                     !- Heating Speed Supply Air Flow Ratio 1
-    0.86,                                    !- Cooling Speed Supply Air Flow Ratio 1
-    1,                                       !- Heating Speed Supply Air Flow Ratio 2
-    1;                                       !- Cooling Speed Supply Air Flow Ratio 2
+    Unitary System Performance Multispeed 1,  !- Name
+    2,                       !- Number of Speeds for Heating
+    2,                       !- Number of Speeds for Cooling
+    No,                      !- Single Mode Operation
+    ,                        !- No Load Supply Air Flow Rate Ratio
+    0.8,                     !- Heating Speed 1 Supply Air Flow Ratio
+    0.86,                    !- Cooling Speed 1 Supply Air Flow Ratio
+    1,                       !- Heating Speed 2 Supply Air Flow Ratio
+    1;                       !- Cooling Speed 2 Supply Air Flow Ratio
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZoneDirectAir,           !- Name
@@ -2070,3 +2071,4 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+

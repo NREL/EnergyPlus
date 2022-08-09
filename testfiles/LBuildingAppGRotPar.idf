@@ -1712,19 +1712,19 @@
 
   People,
     Main_Zone_a_b_g_l_Peop,  !- Name
-    Main_Zone_a_b_g_l,       !- Zone or ZoneList Name
+    Main_Zone_a_b_g_l,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_a_b_g_l_Lite,  !- Name
-    Main_Zone_a_b_g_l,       !- Zone or ZoneList Name
+    Main_Zone_a_b_g_l,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1738,7 +1738,7 @@
 
   ElectricEquipment,
     Main_Zone_a_b_g_l_Elec,  !- Name
-    Main_Zone_a_b_g_l,       !- Zone or ZoneList Name
+    Main_Zone_a_b_g_l,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1755,8 +1755,8 @@
     Main_Zone_a_b_g_l_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    90.7638663194365;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    90.7638663194365;        !- Surface Area {m2}
 
                              !- Name
 
@@ -1764,8 +1764,8 @@
     Main_Zone_a_b_g_l_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    90.7638663194365;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    90.7638663194365;        !- Surface Area {m2}
 
   Zone,
     Main_Zone_b_c_h_g,       !- Name
@@ -1782,19 +1782,19 @@
 
   People,
     Main_Zone_b_c_h_g_Peop,  !- Name
-    Main_Zone_b_c_h_g,       !- Zone or ZoneList Name
+    Main_Zone_b_c_h_g,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_b_c_h_g_Lite,  !- Name
-    Main_Zone_b_c_h_g,       !- Zone or ZoneList Name
+    Main_Zone_b_c_h_g,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1808,7 +1808,7 @@
 
   ElectricEquipment,
     Main_Zone_b_c_h_g_Elec,  !- Name
-    Main_Zone_b_c_h_g,       !- Zone or ZoneList Name
+    Main_Zone_b_c_h_g,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1825,8 +1825,8 @@
     Main_Zone_b_c_h_g_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    21.908520224611;         !- Extended Field
+    ,                        !- Space or SpaceList Name
+    21.908520224611;         !- Surface Area {m2}
 
                              !- Name
 
@@ -1834,8 +1834,8 @@
     Main_Zone_b_c_h_g_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    21.908520224611;         !- Extended Field
+    ,                        !- Space or SpaceList Name
+    21.908520224611;         !- Surface Area {m2}
 
   Zone,
     Main_Zone_c_d_i_h,       !- Name
@@ -1852,19 +1852,19 @@
 
   People,
     Main_Zone_c_d_i_h_Peop,  !- Name
-    Main_Zone_c_d_i_h,       !- Zone or ZoneList Name
+    Main_Zone_c_d_i_h,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_c_d_i_h_Lite,  !- Name
-    Main_Zone_c_d_i_h,       !- Zone or ZoneList Name
+    Main_Zone_c_d_i_h,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1878,7 +1878,7 @@
 
   ElectricEquipment,
     Main_Zone_c_d_i_h_Elec,  !- Name
-    Main_Zone_c_d_i_h,       !- Zone or ZoneList Name
+    Main_Zone_c_d_i_h,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1895,8 +1895,8 @@
     Main_Zone_c_d_i_h_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    68.8553478084919;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    68.8553478084919;        !- Surface Area {m2}
 
                              !- Name
 
@@ -1904,8 +1904,8 @@
     Main_Zone_c_d_i_h_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    68.8553478084919;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    68.8553478084919;        !- Surface Area {m2}
 
   Zone,
     Main_Zone_d_e_j_i,       !- Name
@@ -1922,19 +1922,19 @@
 
   People,
     Main_Zone_d_e_j_i_Peop,  !- Name
-    Main_Zone_d_e_j_i,       !- Zone or ZoneList Name
+    Main_Zone_d_e_j_i,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_d_e_j_i_Lite,  !- Name
-    Main_Zone_d_e_j_i,       !- Zone or ZoneList Name
+    Main_Zone_d_e_j_i,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1948,7 +1948,7 @@
 
   ElectricEquipment,
     Main_Zone_d_e_j_i_Elec,  !- Name
-    Main_Zone_d_e_j_i,       !- Zone or ZoneList Name
+    Main_Zone_d_e_j_i,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1965,8 +1965,8 @@
     Main_Zone_d_e_j_i_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    31.2978850559206;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    31.2978850559206;        !- Surface Area {m2}
 
                              !- Name
 
@@ -1974,8 +1974,8 @@
     Main_Zone_d_e_j_i_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    31.2978850559206;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    31.2978850559206;        !- Surface Area {m2}
 
   Zone,
     Main_Zone_e_f_k_j,       !- Name
@@ -1992,19 +1992,19 @@
 
   People,
     Main_Zone_e_f_k_j_Peop,  !- Name
-    Main_Zone_e_f_k_j,       !- Zone or ZoneList Name
+    Main_Zone_e_f_k_j,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_e_f_k_j_Lite,  !- Name
-    Main_Zone_e_f_k_j,       !- Zone or ZoneList Name
+    Main_Zone_e_f_k_j,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2018,7 +2018,7 @@
 
   ElectricEquipment,
     Main_Zone_e_f_k_j_Elec,  !- Name
-    Main_Zone_e_f_k_j,       !- Zone or ZoneList Name
+    Main_Zone_e_f_k_j,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -2035,8 +2035,8 @@
     Main_Zone_e_f_k_j_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    21.908520224611;         !- Extended Field
+    ,                        !- Space or SpaceList Name
+    21.908520224611;         !- Surface Area {m2}
 
                              !- Name
 
@@ -2044,8 +2044,8 @@
     Main_Zone_e_f_k_j_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    21.908520224611;         !- Extended Field
+    ,                        !- Space or SpaceList Name
+    21.908520224611;         !- Surface Area {m2}
 
   Zone,
     Main_Zone_l_k_f_a,       !- Name
@@ -2062,19 +2062,19 @@
 
   People,
     Main_Zone_l_k_f_a_Peop,  !- Name
-    Main_Zone_l_k_f_a,       !- Zone or ZoneList Name
+    Main_Zone_l_k_f_a,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_l_k_f_a_Lite,  !- Name
-    Main_Zone_l_k_f_a,       !- Zone or ZoneList Name
+    Main_Zone_l_k_f_a,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2088,7 +2088,7 @@
 
   ElectricEquipment,
     Main_Zone_l_k_f_a_Elec,  !- Name
-    Main_Zone_l_k_f_a,       !- Zone or ZoneList Name
+    Main_Zone_l_k_f_a,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -2105,8 +2105,8 @@
     Main_Zone_l_k_f_a_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    53.206406994198;         !- Extended Field
+    ,                        !- Space or SpaceList Name
+    53.206406994198;         !- Surface Area {m2}
 
                              !- Name
 
@@ -2114,8 +2114,8 @@
     Main_Zone_l_k_f_a_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    53.206406994198;         !- Extended Field
+    ,                        !- Space or SpaceList Name
+    53.206406994198;         !- Surface Area {m2}
 
   Zone,
     Main_Zone_g_h_i_l,       !- Name
@@ -2132,19 +2132,19 @@
 
   People,
     Main_Zone_g_h_i_l_Peop,  !- Name
-    Main_Zone_g_h_i_l,       !- Zone or ZoneList Name
+    Main_Zone_g_h_i_l,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_g_h_i_l_Lite,  !- Name
-    Main_Zone_g_h_i_l,       !- Zone or ZoneList Name
+    Main_Zone_g_h_i_l,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2158,7 +2158,7 @@
 
   ElectricEquipment,
     Main_Zone_g_h_i_l_Elec,  !- Name
-    Main_Zone_g_h_i_l,       !- Zone or ZoneList Name
+    Main_Zone_g_h_i_l,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -2175,8 +2175,8 @@
     Main_Zone_g_h_i_l_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    100.153236291745;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    100.153236291745;        !- Surface Area {m2}
 
                              !- Name
 
@@ -2184,8 +2184,8 @@
     Main_Zone_g_h_i_l_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    100.153236291745;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    100.153236291745;        !- Surface Area {m2}
 
   Zone,
     Main_Zone_i_j_k_l,       !- Name
@@ -2202,19 +2202,19 @@
 
   People,
     Main_Zone_i_j_k_l_Peop,  !- Name
-    Main_Zone_i_j_k_l,       !- Zone or ZoneList Name
+    Main_Zone_i_j_k_l,       !- Zone or ZoneList or Space or SpaceList Name
     People_office_Sch,       !- Number of People Schedule Name
     area/person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    23.22349,                !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    23.22349,                !- Floor Area per Person {m2/person}
     0.2,                     !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     Activity_office_Sch;     !- Activity Level Schedule Name
 
   Lights,
     Main_Zone_i_j_k_l_Lite,  !- Name
-    Main_Zone_i_j_k_l,       !- Zone or ZoneList Name
+    Main_Zone_i_j_k_l,       !- Zone or ZoneList or Space or SpaceList Name
     Lights_office_Sch,       !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2228,7 +2228,7 @@
 
   ElectricEquipment,
     Main_Zone_i_j_k_l_Elec,  !- Name
-    Main_Zone_i_j_k_l,       !- Zone or ZoneList Name
+    Main_Zone_i_j_k_l,       !- Zone or ZoneList or Space or SpaceList Name
     Elec_office_Sch,         !- Schedule Name
     Watts/area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -2245,8 +2245,8 @@
     Main_Zone_i_j_k_l_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    50.0766181458726;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    50.0766181458726;        !- Surface Area {m2}
 
                              !- Name
 
@@ -2254,8 +2254,8 @@
     Main_Zone_i_j_k_l_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    50.0766181458726;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    50.0766181458726;        !- Surface Area {m2}
 
   Schedule:Compact,
     People_office_Sch,       !- Name
