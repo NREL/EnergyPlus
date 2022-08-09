@@ -56,17 +56,17 @@ The current object name and meter names of DistrictHeating are changed to Distri
 
 3. `HeatExchanger:SteamToWater` :
 The current `HeatExchanger:FluidToFluid` is a hydronic heat exchanger that can be used to couple two hydronic plant or condenser loops. Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model correlations determine a heat transfer effectiveness value, ε, which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams. The effectiveness-NTU Method can be described following equations.
-![eqns1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns1.png)
+![eqns1](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns1.png)
 The fluid with the smaller heat capacity rate will experience a larger temperature change maximum temperature difference.
-![eqns2](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns2.png)
+![eqns2](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns2.png)
 The heat exchanger model correlations determine a heat transfer effectiveness value, ε. The effectiveness relations for each heat exchanger type are shown below.
-![table1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_table1.png)
+![table1](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_table1.png)
 
 Steam to water heat exchanger is used to couple a steam loop and a hot water loop. Figure 1 describes the loop structure with a steam to water heat exchanger.
-![figure1](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_figure1.png)
+![figure1](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_figure1.png)
 In `HeatExchanger:FluidToFluid`, `Loop Supply Side` indicates that the heat exchanger is situated on the supply side of a loop. `Loop Demand Side` indicates that it is on the demand side of a loop. So from the point of view of the heat exchanger component itself, the `Loop Demand Side` acts like a supply source for the `Loop Supply Side` which acts like a demand to the component. Therefore, in the case of steam to water heat exchanger, water is the `Loop Supply Side`  and steam is the `Loop Demand Side`.
 If one of the fluids in a heat exchanger undergoes a phase-change process, like steam in a steam to water heat exchanger, the following effectiveness relation reduces to
-![eqn3](https://github.com/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqn3.png)
+![eqn3](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqn3.PNG)
 regardless of the type of heat exchanger. According to the Fundamentals of thermal-fluid sciences by Yunus A Çengel,
 > The heat capacity rate of a fluid during a phase-change process must approach infinity 
 > since the temperature change is practically zero, That is, C goes to infinity when 
