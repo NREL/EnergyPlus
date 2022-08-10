@@ -711,12 +711,6 @@ namespace OutputReportTabular {
                                                  Array2D_string &tableBody,
                                                  Real64 const unitConvMultiplier = 1.0);
 
-    void WriteSETHoursTable(EnergyPlusData &state,
-                            int const columnNum,
-                            std::vector<int> const &columnHead,
-                            const std::array<Real64, 5> DataHeatBalance::ZoneResilience::*memberPtr,
-                            Real64 const unitConvMultiplier = 1.0);
-
     void WriteSETHoursTableNonPreDefUseZoneData(EnergyPlusData &state,
                                                 int const columnNum,
                                                 const std::string &tableName,

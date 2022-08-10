@@ -13409,44 +13409,6 @@ void WriteHourOfSafetyTable(EnergyPlusData &state,
     }
 }
 
-void WriteSETHoursTable(EnergyPlusData &state,
-                        int const columnNum,
-                        std::vector<int> const &columnHead,
-                        const std::array<Real64, 5> DataHeatBalance::ZoneResilience::*memberPtr,
-                        Real64 const unitConvMultiplier)
-{
-    auto &Zone(state.dataHeatBal->Zone);
-
-    std::vector<Real64> columnMax(columnNum - 1, 0);
-    std::vector<Real64> columnMin(columnNum - 1, 0);
-    std::vector<Real64> columnSum(columnNum - 1, 0);
-    std::vector<Real64> multiplier(columnNum - 1, unitConvMultiplier);
-    multiplier[columnNum - 2] = 1.0;
-
-    for (int j = 0; j < columnNum - 1; j++) {
-        columnMin[j] = (state.dataHeatBal->Resilience(1).*memberPtr)[j] * multiplier[j];
-    }
-    for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
-        for (int j = 0; j < columnNum - 1; j++) {
-            Real64 curValue = (state.dataHeatBal->Resilience(i).*memberPtr)[j] * multiplier[j];
-            if (curValue > columnMax[j]) columnMax[j] = curValue;
-            if (curValue < columnMin[j]) columnMin[j] = curValue;
-            columnSum[j] += curValue;
-            PreDefTableEntry(state, columnHead[j], Zone(i).Name, RealToStr(curValue, 2));
-        }
-        std::string startDateTime = DateToString(int((state.dataHeatBal->Resilience(i).*memberPtr)[columnNum - 1]));
-        PreDefTableEntry(state, columnHead[columnNum - 1], Zone(i).Name, startDateTime);
-    }
-    for (int j = 0; j < columnNum - 1; j++) {
-        PreDefTableEntry(state, columnHead[j], "Min", RealToStr(columnMin[j], 2));
-        PreDefTableEntry(state, columnHead[j], "Max", RealToStr(columnMax[j], 2));
-        PreDefTableEntry(state, columnHead[j], "Average", RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2));
-    }
-    PreDefTableEntry(state, columnHead[columnNum - 1], "Min", "-");
-    PreDefTableEntry(state, columnHead[columnNum - 1], "Max", "-");
-    PreDefTableEntry(state, columnHead[columnNum - 1], "Average", "-");
-}
-
 void WriteThermalResilienceTables(EnergyPlusData &state)
 {
 
