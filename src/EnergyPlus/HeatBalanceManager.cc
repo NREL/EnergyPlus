@@ -5214,7 +5214,7 @@ namespace HeatBalanceManager {
             }
 
             // Assign surface number
-            auto const &SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
+            int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
             if (SurfNum == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -5225,42 +5225,48 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataSurface->Surface(SurfNum).Class != DataSurfaces::SurfaceClass::Window) {
+            auto &Surf = state.dataSurface->Surface(SurfNum);
+            if (Surf.Class != DataSurfaces::SurfaceClass::Window) {
                 ShowSevereError(state, "IncidentSolarMultiplier defined for non-window surfaces");
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataSurface->Surface(SurfNum).ExtBoundCond != DataSurfaces::ExternalEnvironment) {
+            if (Surf.ExtBoundCond != DataSurfaces::ExternalEnvironment) {
                 ShowSevereError(state, "IncidentSolarMultiplier defined for interior surfaces");
                 ErrorsFound = true;
                 continue;
             }
-            auto const &ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-            auto const &MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-            bool withNoncompatibleShades = (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Shade ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Screen ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
-                                            state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer ||
-                                            state.dataSurface->Surface(SurfNum).HasShadeControl);
+            int ConstrNum = Surf.Construction;
+            auto const &Constr = state.dataConstruction->Construct(ConstrNum);
+            int MaterNum = Constr.LayerPoint(Constr.TotLayers);
+            auto const &Mat = state.dataMaterial->Material(MaterNum);
+            bool withNoncompatibleShades = (Mat.Group == DataHeatBalance::MaterialGroup::Shade ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::Screen ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
+                                            Mat.Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer ||
+                                            Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                 ErrorsFound = true;
                 continue;
             }
-            state.dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
-            state.dataSurface->SurfIncSolMultiplier(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
-            state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = state.dataIPShortCut->rNumericArgs(1);
-            state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-            // SchedPtr == 0 but schedule field is not empty
-            if (state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr == 0 && !(state.dataIPShortCut->cAlphaArgs(2).empty())) {
+            int ScheduleIdx = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+            // Schedule not found but schedule field is not empty, user had the wrong schedule name
+            if (ScheduleIdx == 0 && !(state.dataIPShortCut->cAlphaArgs(2).empty())) {
                 ShowSevereError(state, "Invalid Incident Solar Multiplier Schedule Name in SurfaceProperty:IncidentSolarMultiplier");
+                continue;
             }
+            Surf.hasIncSolMultiplier = true;
+            auto &SurfIncSolMult = state.dataSurface->SurfIncSolMultiplier(SurfNum);
+            SurfIncSolMult.Name = state.dataIPShortCut->cAlphaArgs(1);
+            SurfIncSolMult.SurfaceIdx = SurfNum;
+            SurfIncSolMult.Scaler = state.dataIPShortCut->rNumericArgs(1);
+            SurfIncSolMult.SchedPtr = ScheduleIdx;
         }
     }
 
