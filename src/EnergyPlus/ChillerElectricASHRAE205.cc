@@ -160,7 +160,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         thisChiller.Representation =
             std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
         if (nullptr == thisChiller.Representation) {
-            ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path));
+            ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
             ErrorsFound = true;
         }
         thisChiller.InterpolationType = static_cast<PerformanceInterpolationType>(getEnumerationValue(
