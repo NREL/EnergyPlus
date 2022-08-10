@@ -216,7 +216,7 @@ namespace ChillerElectricEIR {
 
         virtual void size(EnergyPlusData &state);
 
-        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
+        virtual void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void calcHeatRecovery(EnergyPlusData &state,
                               Real64 &QCond,        // Current condenser load [W]

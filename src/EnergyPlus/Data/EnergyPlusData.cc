@@ -334,6 +334,7 @@ void EnergyPlusData::clear_state()
     this->dataChillerGasAbsorption->clear_state();
     this->dataChillerIndirectAbsorption->clear_state();
     this->dataChillerReformulatedEIR->clear_state();
+    this->dataChillerElectricASHRAE205->clear_state();
     this->dataCoilCooingDX->clear_state();
     this->dataCondenserLoopTowers->clear_state();
     this->dataConstruction->clear_state();

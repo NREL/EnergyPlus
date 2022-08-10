@@ -117,7 +117,6 @@ enum class PlantEquipmentType
     Chiller_Electric, // basic BLAST Chiller
     Chiller_ElectricEIR,
     Chiller_ElectricReformEIR,
-    Chiller_ElectricASHRAE205,
     Chiller_EngineDriven,
     CoolingTower_SingleSpd,
     CoolingTower_TwoSpd,
@@ -204,6 +203,7 @@ enum class PlantEquipmentType
     CoolingPanel_Simple,
     HeatPumpEIRCooling,
     HeatPumpEIRHeating,
+    Chiller_ElectricASHRAE205,
     Num
 };
 
