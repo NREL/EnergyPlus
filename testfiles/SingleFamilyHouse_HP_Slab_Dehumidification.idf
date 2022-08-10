@@ -2595,8 +2595,8 @@
     Internalmass_unit1,      !- Name
     InteriorFurnishings,     !- Construction Name
     living_unit1,            !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    9.89591078066915;        !- Extended Field
+    ,                        !- Space or SpaceList Name
+    9.89591078066915;        !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: SHADING:OVERHANG ===========
 
@@ -2794,12 +2794,12 @@
 
   People,
     people_unit1,            !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     Occupancy,               !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     3,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0,                       !- Fraction Radiant
     autocalculate,           !- Sensible Heat Fraction
     activity_sch,            !- Activity Level Schedule Name
@@ -2811,7 +2811,7 @@
 
   Lights,
     Living Hardwired Lighting1,  !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     InteriorLightingHE,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2824,7 +2824,7 @@
 
   Lights,
     Living Plug-in Lighting1,!- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     InteriorLightingHE,      !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -2839,7 +2839,7 @@
 
   ElectricEquipment,
     dishwasher1,             !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     DishWasher,              !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     65.698787492023,         !- Design Level {W}
@@ -2852,7 +2852,7 @@
 
   ElectricEquipment,
     refrigerator1,           !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     Refrigerator,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     91.0575745202123,        !- Design Level {W}
@@ -2865,7 +2865,7 @@
 
   ElectricEquipment,
     clotheswasher1,          !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     ClothesWasher,           !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     28.4784377542718,        !- Design Level {W}
@@ -2878,7 +2878,7 @@
 
   ElectricEquipment,
     electric_dryer1,         !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     ClothesDryer,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     213.064557285022,        !- Design Level {W}
@@ -2891,7 +2891,7 @@
 
   ElectricEquipment,
     electric_range1,         !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     CookingRange,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     248.154224774405,        !- Design Level {W}
@@ -2904,7 +2904,7 @@
 
   ElectricEquipment,
     television1,             !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     InteriorLighting,        !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -2917,7 +2917,7 @@
 
   ElectricEquipment,
     electric_mels1,          !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     MiscPlugLoad,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     567.464237516869,        !- Design Level {W}
@@ -2930,7 +2930,7 @@
 
   ElectricEquipment,
     IECC_Adj1,               !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     MiscPlugLoad,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -2945,7 +2945,7 @@
 
   ZoneVentilation:DesignFlowRate,
     Ventilation_unit1,       !- Name
-    living_unit1,            !- Zone or ZoneList Name
+    living_unit1,            !- Zone or ZoneList or Space or SpaceList Name
     always_avail,            !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
@@ -2988,7 +2988,8 @@
     0.75,                    !- Ratio of Building Width Along Short Axis to Width Along Long Axis
     ,                        !- Height Dependence of External Node Temperature
     ,                        !- Solver
-    Yes;                     !- Allow Unsupported Zone Equipment
+    Yes,                     !- Allow Unsupported Zone Equipment
+    ;                        !- Do Distribution Duct Sizing Calculation
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRFLOWNETWORK:MULTIZONE:ZONE ===========
 

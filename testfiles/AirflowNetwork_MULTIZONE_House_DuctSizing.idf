@@ -96,7 +96,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,22.1;
+  Version,22.2;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -1119,12 +1119,12 @@
 
   People,
     LIVING ZONE People,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE OCCUPANCY,         !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1141,7 +1141,7 @@
 
   Lights,
     LIVING ZONE Lights,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE LIGHTING,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1000,                    !- Lighting Level {W}
@@ -1155,7 +1155,7 @@
 
   ElectricEquipment,
     LIVING ZONE ElecEq,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     500,                     !- Design Level {W}
@@ -1327,15 +1327,15 @@
     No,                      !- Allow Unsupported Zone Equipment
     Yes;                     !- Do Distribution Duct Sizing Calculation
 
-AirflowNetwork:Distribution:DuctSizing,
+  AirflowNetwork:Distribution:DuctSizing,
     Duct Sizing,             !- Name
     PressureLoss,            !- Duct Sizing Method
     1.0,                     !- Duct Sizing Factor
-    5.0,                     !- Maximum Airflow Velocity
-    5.0,                     !- Total Pressure Loss Across Supply Truck
-    70.0,                    !- Total Pressure Loss Across Supply Branch
-    4.0,                     !- Total Pressure Loss Across ReturnTruck
-    4.0;                     !- Total Pressure Loss Across Return Branch
+    5.0,                     !- Maximum Airflow Velocity {m/s}
+    5.0,                     !- Total Pressure Loss Across Supply Trunk {Pa}
+    70.0,                    !- Total Pressure Loss Across Supply Branch {Pa}
+    4.0,                     !- Total Pressure Loss Across Return Trunk {Pa}
+    4.0;                     !- Total Pressure Loss Across Return Branch {Pa}
 
   AirflowNetwork:MultiZone:Zone,
     LIVING ZONE,             !- Zone Name
@@ -1643,7 +1643,7 @@ AirflowNetwork:Distribution:DuctSizing,
     0.4064,                  !- Hydraulic Diameter {m}
     0.1297,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
-    0.1,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
+    0.1,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
     0.946792,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
     5.018000,                !- Outside Convection Coefficient {W/m2-K}
@@ -1667,7 +1667,7 @@ AirflowNetwork:Distribution:DuctSizing,
     0.50,                    !- Hydraulic Diameter {m}
     0.1963,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
-    0.1,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
+    0.1,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
     0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
     0.006500,                !- Outside Convection Coefficient {W/m2-K}
@@ -1691,7 +1691,7 @@ AirflowNetwork:Distribution:DuctSizing,
     0.50,                    !- Hydraulic Diameter {m}
     0.1963,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
-    0.5,                    !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
+    0.5,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
     0.001226,                !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
     0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
     0.006500,                !- Outside Convection Coefficient {W/m2-K}

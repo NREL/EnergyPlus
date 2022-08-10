@@ -438,9 +438,11 @@ namespace SurfaceGeometry {
             if (!state.dataConstruction->Construct(thisSurface.Construction).TypeIsWindow) {
                 if (thisSurface.ExtBoundCond == ExternalEnvironment || thisSurface.ExtBoundCond == OtherSideCondModeledExt) {
                     thisZone.ExteriorTotalSurfArea += thisSurface.GrossArea;
+                    thisSpace.ExteriorTotalSurfArea += thisSurface.GrossArea;
                     if (thisSurface.Class == SurfaceClass::Wall) {
                         thisZone.ExtNetWallArea += thisSurface.Area;
                         thisZone.ExtGrossWallArea += thisSurface.GrossArea;
+                        thisSpace.ExtGrossWallArea += thisSurface.GrossArea;
                         thisZone.ExtGrossWallArea_Multiplied += thisSurface.GrossArea * thisZone.Multiplier * thisZone.ListMultiplier;
                         if (DetailedWWR) {
                             print(state.files.debug,
@@ -570,6 +572,14 @@ namespace SurfaceGeometry {
                 }
             }
             if ((thisZone.CeilingHeight <= 0.0) && (AverageHeight > 0.0)) thisZone.CeilingHeight = AverageHeight;
+            // For now - set space ceiling height to zone ceiling height, if not entered
+            for (int spaceNum : thisZone.spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                // don't touch if already user-specified
+                if (thisSpace.CeilingHeight == 0.0) {
+                    thisSpace.CeilingHeight = thisZone.CeilingHeight;
+                }
+            }
         }
 
         CalculateZoneVolume(state, ZoneCeilingHeightEntered); // Calculate Zone Volumes
@@ -11925,7 +11935,6 @@ namespace SurfaceGeometry {
         //       AUTHOR         Legacy Code
         //       DATE WRITTEN   1992-1994
         //       MODIFIED       Sep 2007, Mar 2017
-        //       RE-ENGINEERED  na
 
         // METHODOLOGY EMPLOYED:
         // Uses surface area information for calculations.  Modified to use the
@@ -11935,12 +11944,8 @@ namespace SurfaceGeometry {
         // REFERENCES:
         // Legacy Code (IBLAST)
 
-        // Using/Aliasing
         using namespace Vectors;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SumAreas;  // Sum of the Zone surface areas that are not "internal mass"
         Real64 SurfCount; // Surface Count
         int SurfNum;      // Loop counter for surfaces
@@ -11975,7 +11980,7 @@ namespace SurfaceGeometry {
 
         int countNotFullyEnclosedZones = 0;
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-
+            auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
             if (!state.dataHeatBal->Zone(ZoneNum).HasFloor) {
                 ShowWarningError(state,
                                  "No floor exists in Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
@@ -12171,6 +12176,17 @@ namespace SurfaceGeometry {
                 ShowContinueError(state, "The simulation will continue with the Zone Volume set to 10.0 m3. ");
                 ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
                 state.dataHeatBal->Zone(ZoneNum).Volume = 10.;
+            }
+            // For now - pro-rate space volumes by floor area, if not entered
+            for (int spaceNum : thisZone.spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                // don't touch if already user-specified
+                if (thisSpace.Volume > 0.0) continue;
+                if (thisZone.numSpaces == 1) {
+                    thisSpace.Volume = thisZone.Volume;
+                } else if (thisZone.FloorArea > 0.0) {
+                    thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.FloorArea;
+                }
             }
 
             if (ShowZoneSurfaces) {

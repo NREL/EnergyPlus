@@ -773,8 +773,8 @@
     Bottom:PartitionIntMass1,!- Name
     Light Partitions,        !- Construction Name
     Bottom,                  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4.645;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4.645;                   !- Surface Area {m2}
 
 ! =========================
 
@@ -782,8 +782,8 @@
     Bottom:PartitionIntMass2,!- Name
     Light Partitions,        !- Construction Name
     Bottom,                  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4.645;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4.645;                   !- Surface Area {m2}
 
 ! =========================
 
@@ -791,8 +791,8 @@
     SecondLevel:IntMass1,    !- Name
     Light Partitions,        !- Construction Name
     SecondLevel,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4.645;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4.645;                   !- Surface Area {m2}
 
 ! =========================
 
@@ -800,8 +800,8 @@
     SecondLevel:IntMass2,    !- Name
     Light Partitions,        !- Construction Name
     SecondLevel,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4.645;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4.645;                   !- Surface Area {m2}
 
 ! =========================
 
@@ -809,8 +809,8 @@
     ThirdLevel:IntMass1,     !- Name
     Light Partitions,        !- Construction Name
     ThirdLevel,              !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4.645;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4.645;                   !- Surface Area {m2}
 
 ! =========================
 
@@ -818,8 +818,8 @@
     ThirdLevel:IntMass2,     !- Name
     Light Partitions,        !- Construction Name
     ThirdLevel,              !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4.645;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4.645;                   !- Surface Area {m2}
 
   SurfaceProperty:ConvectionCoefficients,
     Bottom:Top,              !- Surface Name
