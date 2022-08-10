@@ -10256,55 +10256,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTable)
-{
-    // test unit conversion in SET Degree-Hour report table for run periods
-
-    state->dataGlobal->NumOfZones = 1;
-    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).Name = "Test";
-
-    int columnNum = 5;
-
-    auto &s(state->dataOutRptPredefined);
-    s->pdchHeatingSETHours = OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Degree-Hours [°C·hr]");
-    s->pdchHeatingSETOccuHours =
-        OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]");
-    s->pdchHeatingSETOccupiedHours =
-        OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]");
-    s->pdchHeatingSETUnmetDuration =
-        OutputReportPredefined::newPreDefColumn(*state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration Duration for Occupied Period [hr]");
-    s->pdchHeatingSETUnmetTime = OutputReportPredefined::newPreDefColumn(
-        *state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period");
-
-    // state->dataHeatBal->Resilience(1).ZoneLowSETHours: [0, -1, 4, -9, 16]
-    for (int i = 0; i < 4; i++) {
-        state->dataHeatBal->Resilience(1).ZoneLowSETHours[i] = std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
-    }
-
-    int encodedMonDayHrMin;
-    General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5, 30);
-    state->dataHeatBal->Resilience(1).ZoneLowSETHours[4] = encodedMonDayHrMin;
-
-    Real64 degreeHourConversion = 1.8;
-
-    std::vector<int> columnHead = {state->dataOutRptPredefined->pdchHeatingSETHours,
-                                   state->dataOutRptPredefined->pdchHeatingSETOccuHours,
-                                   state->dataOutRptPredefined->pdchHeatingSETOccupiedHours,
-                                   state->dataOutRptPredefined->pdchHeatingSETUnmetDuration,
-                                   state->dataOutRptPredefined->pdchHeatingSETUnmetTime};
-    std::array<Real64, 5> DataHeatBalance::ZoneResilience::*ptrZoneLowSETHours = &DataHeatBalance::ZoneResilience::ZoneLowSETHours;
-    WriteSETHoursTable(*state, columnNum, columnHead, ptrZoneLowSETHours, degreeHourConversion);
-
-    EXPECT_EQ("0.00", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETHours, "Test"));
-    EXPECT_EQ("-1.8", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETOccuHours, "Test"));
-    EXPECT_EQ("7.20", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETOccupiedHours, "Test"));
-    //    duration hour don't change
-    EXPECT_EQ("-9.0", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETUnmetDuration, "Test"));
-    EXPECT_EQ("01-JAN-04:30", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchHeatingSETUnmetTime, "Test"));
-}
-
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPeriod)
 {
 
