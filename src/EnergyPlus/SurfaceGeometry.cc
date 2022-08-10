@@ -9742,7 +9742,8 @@ namespace SurfaceGeometry {
 
             if (windowShadingControl.ShadingDevice > 0) {
                 if (state.dataMaterial->Material(windowShadingControl.ShadingDevice).Group == DataHeatBalance::MaterialGroup::Screen &&
-                    !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn || windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
+                    !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn ||
+                      windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
                       windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9757,7 +9758,8 @@ namespace SurfaceGeometry {
                     state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).IsUsed = true;
                     if (state.dataMaterial->Material(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))
                                 .Group == DataHeatBalance::MaterialGroup::Screen &&
-                        !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn || windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
+                        !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn ||
+                          windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
                           windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -9785,7 +9787,8 @@ namespace SurfaceGeometry {
 
             // Warning if setpoint is unintentionally zero
             if (windowShadingControl.SetPoint == 0 && windowShadingControl.shadingControlType != WindowShadingControlType::AlwaysOn &&
-                windowShadingControl.shadingControlType != WindowShadingControlType::AlwaysOff && windowShadingControl.shadingControlType != WindowShadingControlType::OnIfScheduled &&
+                windowShadingControl.shadingControlType != WindowShadingControlType::AlwaysOff &&
+                windowShadingControl.shadingControlType != WindowShadingControlType::OnIfScheduled &&
                 windowShadingControl.shadingControlType != WindowShadingControlType::HiGlare) {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", The first SetPoint is zero.");
                 ShowContinueError(state, "..You may have forgotten to specify that setpoint.");
@@ -9837,7 +9840,8 @@ namespace SurfaceGeometry {
                 state.dataIPShortCut->cAlphaArgs(3) = "EXTERIORSHADE";
             }
 
-            if (windowShadingControl.shadingControlType == WindowShadingControlType::MeetDaylIlumSetp && state.dataIPShortCut->cAlphaArgs(3) != "SWITCHABLEGLAZING") {
+            if (windowShadingControl.shadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
+                state.dataIPShortCut->cAlphaArgs(3) != "SWITCHABLEGLAZING") {
                 ErrorsFound = true;
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
