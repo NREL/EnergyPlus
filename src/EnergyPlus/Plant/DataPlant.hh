@@ -97,6 +97,7 @@ namespace DataPlant {
         "Chiller:Electric",
         "Chiller:Electric:EIR",
         "Chiller:Electric:ReformulatedEIR",
+        "Chiller:Electric:ASHRAE205",
         "Chiller:EngineDriven",
         "CoolingTower:SingleSpeed",
         "CoolingTower:TwoSpeed",
@@ -182,8 +183,7 @@ namespace DataPlant {
         "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
         "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
         "HeatPump:PlantLoop:EIR:Cooling",
-        "HeatPump:PlantLoop:EIR:Heating",
-        "Chiller:Electric:ASHRAE205"};
+        "HeatPump:PlantLoop:EIR:Heating"};
 
     static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
@@ -196,6 +196,7 @@ namespace DataPlant {
         "CHILLER:ELECTRIC",
         "CHILLER:ELECTRIC:EIR",
         "CHILLER:ELECTRIC:REFORMULATEDEIR",
+        "CHILLER:ELECTRIC:ASHRAE205",
         "CHILLER:ENGINEDRIVEN",
         "COOLINGTOWER:SINGLESPEED",
         "COOLINGTOWER:TWOSPEED",
@@ -281,8 +282,7 @@ namespace DataPlant {
         "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
         "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
-        "HEATPUMP:PLANTLOOP:EIR:HEATING",
-        "CHILLER:ELECTRIC:ASHRAE205"};
+        "HEATPUMP:PLANTLOOP:EIR:HEATING"};
 
     static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
@@ -296,8 +296,7 @@ namespace DataPlant {
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
         LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
-        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,
-        LoopType::Plant};
+        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both};
 
 } // namespace DataPlant
 
