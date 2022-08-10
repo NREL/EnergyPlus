@@ -9616,7 +9616,7 @@ void WindowShadingManager(EnergyPlusData &state)
 
             bool shadingOn = false;
             bool shadingOffButGlareControlOn = false;
-            switch (state.dataSurface->WindowShadingControl(IShadingCtrl).ShadingControlType) {
+            switch (state.dataSurface->WindowShadingControl(IShadingCtrl).shadingControlType) {
             case WindowShadingControlType::AlwaysOn: // 'ALWAYSON'
                 shadingOn = true;
                 break;

@@ -1008,7 +1008,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscControl,
                                      surfName,
-                                     WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
+                                     WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).shadingControlType)]);
 
                     // output list of all possible shading contructions for shaded windows including those with storms
                     std::string names = "";

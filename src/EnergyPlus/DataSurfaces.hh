@@ -964,7 +964,7 @@ namespace DataSurfaces {
         //  ExteriorShade,BetweenGlassShade,InteriorBlind,ExteriorBlind,BetweenGlassBlind,
         //  ExteriorScreen;
         //  this must be a Material:WindowShade, Material:WindowScreen, or Material:WindowBlind
-        WindowShadingControlType ShadingControlType{
+        WindowShadingControlType shadingControlType{
             WindowShadingControlType::UnControlled}; // Takes one of the following values that specifies type of shading control
         //  CHARACTER(len=60) :: ShadingControlType =' ' ! Takes one of the following values that specifies type of shading control
         // (control is active only when schedule value = 1; if no schedule

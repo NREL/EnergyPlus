@@ -9737,13 +9737,13 @@ namespace SurfaceGeometry {
                                     "\" invalid. Must reference at least one Fenestration Surface object name.");
             }
 
-            WindowShadingControlType shadingControlType = static_cast<WindowShadingControlType>(
+            windowShadingControl.shadingControlType = static_cast<WindowShadingControlType>(
                 getEnumerationValue(WindowShadingControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
 
             if (windowShadingControl.ShadingDevice > 0) {
                 if (state.dataMaterial->Material(windowShadingControl.ShadingDevice).Group == DataHeatBalance::MaterialGroup::Screen &&
-                    !(shadingControlType == WindowShadingControlType::AlwaysOn || shadingControlType == WindowShadingControlType::AlwaysOff ||
-                      shadingControlType == WindowShadingControlType::OnIfScheduled)) {
+                    !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn || windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
+                      windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
                     ErrorsFound = true;
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
@@ -9757,8 +9757,8 @@ namespace SurfaceGeometry {
                     state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).IsUsed = true;
                     if (state.dataMaterial->Material(state.dataConstruction->Construct(windowShadingControl.getInputShadedConstruction).LayerPoint(1))
                                 .Group == DataHeatBalance::MaterialGroup::Screen &&
-                        !(shadingControlType == WindowShadingControlType::AlwaysOn || shadingControlType == WindowShadingControlType::AlwaysOff ||
-                          shadingControlType == WindowShadingControlType::OnIfScheduled)) {
+                        !(windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOn || windowShadingControl.shadingControlType == WindowShadingControlType::AlwaysOff ||
+                          windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled)) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " +
@@ -9784,9 +9784,9 @@ namespace SurfaceGeometry {
             }
 
             // Warning if setpoint is unintentionally zero
-            if (windowShadingControl.SetPoint == 0 && shadingControlType != WindowShadingControlType::AlwaysOn &&
-                shadingControlType != WindowShadingControlType::AlwaysOff && shadingControlType != WindowShadingControlType::OnIfScheduled &&
-                shadingControlType != WindowShadingControlType::HiGlare) {
+            if (windowShadingControl.SetPoint == 0 && windowShadingControl.shadingControlType != WindowShadingControlType::AlwaysOn &&
+                windowShadingControl.shadingControlType != WindowShadingControlType::AlwaysOff && windowShadingControl.shadingControlType != WindowShadingControlType::OnIfScheduled &&
+                windowShadingControl.shadingControlType != WindowShadingControlType::HiGlare) {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\", The first SetPoint is zero.");
                 ShowContinueError(state, "..You may have forgotten to specify that setpoint.");
             }
@@ -9805,7 +9805,7 @@ namespace SurfaceGeometry {
                                     "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\".");
             }
 
-            if ((windowShadingControl.ShadingControlType == WindowShadingControlType::OnIfScheduled) &&
+            if ((windowShadingControl.shadingControlType == WindowShadingControlType::OnIfScheduled) &&
                 (!windowShadingControl.ShadingControlIsScheduled)) { // CR 7709 BG
                 ErrorsFound = true;
                 ShowSevereError(state,
@@ -9837,7 +9837,7 @@ namespace SurfaceGeometry {
                 state.dataIPShortCut->cAlphaArgs(3) = "EXTERIORSHADE";
             }
 
-            if (shadingControlType == WindowShadingControlType::MeetDaylIlumSetp && state.dataIPShortCut->cAlphaArgs(3) != "SWITCHABLEGLAZING") {
+            if (windowShadingControl.shadingControlType == WindowShadingControlType::MeetDaylIlumSetp && state.dataIPShortCut->cAlphaArgs(3) != "SWITCHABLEGLAZING") {
                 ErrorsFound = true;
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
@@ -10168,7 +10168,7 @@ namespace SurfaceGeometry {
         auto &WindowShadingControlB(state.dataSurface->WindowShadingControl(b));
         return (WindowShadingControlA.ZoneIndex == WindowShadingControlB.ZoneIndex &&
                 WindowShadingControlA.ShadingType == WindowShadingControlB.ShadingType &&
-                WindowShadingControlA.ShadingControlType == WindowShadingControlB.ShadingControlType &&
+                WindowShadingControlA.shadingControlType == WindowShadingControlB.shadingControlType &&
                 WindowShadingControlA.SetPoint == WindowShadingControlB.SetPoint &&
                 WindowShadingControlA.ShadingControlIsScheduled == WindowShadingControlB.ShadingControlIsScheduled &&
                 WindowShadingControlA.GlareControlIsActive == WindowShadingControlB.GlareControlIsActive &&

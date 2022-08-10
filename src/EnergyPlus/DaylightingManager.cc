@@ -4140,7 +4140,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                     }
                 }
 
-                if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).ShadingControlType ==
+                if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).shadingControlType ==
                     WindowShadingControlType::MeetDaylIlumSetp) {
                     // Error if window has ShadingControlType = MeetDaylightingIlluminanceSetpoint &
                     // but is not in a Daylighting:Detailed zone
@@ -6649,7 +6649,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         int IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
         ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
         if (state.dataSurface->Surface(IWin).HasShadeControl && ISWFLG == 0) {
-            if (state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
+            if (state.dataSurface->WindowShadingControl(ICtrl).shadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
                 state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::GlassConditionallyLightened)
                 ISWFLG = 1;
         }
@@ -6701,7 +6701,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     int IS = findWinShadingStatus(state, IWin);
                     if (state.dataSurface->Surface(IWin).HasShadeControl) {
                         if (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::GlassConditionallyLightened &&
-                            state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
+                            state.dataSurface->WindowShadingControl(ICtrl).shadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
                             !previously_shaded(loop)) {
                             DILLSW(igroup) += thisDaylightControl.IllumFromWinAtRefPt(loop, IS, 1);
                             previously_shaded(loop) = true;
@@ -6749,7 +6749,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                             continue;
                         }
                         if (state.dataSurface->SurfWinShadingFlag(IWin) != WinShadingType::GlassConditionallyLightened ||
-                            state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType != WindowShadingControlType::MeetDaylIlumSetp) {
+                            state.dataSurface->WindowShadingControl(ICtrl).shadingControlType != WindowShadingControlType::MeetDaylIlumSetp) {
                             continueOuterLoop = true;
                             continue;
                         }
@@ -7067,7 +7067,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                         if (GlareOK) {
                             if (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::SwitchableGlazing &&
-                                state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WindowShadingControlType::MeetDaylIlumSetp) {
+                                state.dataSurface->WindowShadingControl(ICtrl).shadingControlType == WindowShadingControlType::MeetDaylIlumSetp) {
                                 // Added TH 1/14/2010
                                 // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
                                 // The glazing is in fully dark state, it might lighten a bit to provide more daylight
@@ -9612,7 +9612,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
 
             ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
             if (state.dataSurface->Surface(IWin).HasShadeControl) {
-                if (state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
+                if (state.dataSurface->WindowShadingControl(ICtrl).shadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
                     state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::SwitchableGlazing) {
                     // switchable windows in partial or fully switched state,
                     //  get its intermediate VT calculated in DayltgInteriorIllum
