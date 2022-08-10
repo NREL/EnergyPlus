@@ -1124,12 +1124,12 @@
 
   People,
     LIVING ZONE People,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE OCCUPANCY,         !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1146,7 +1146,7 @@
 
   Lights,
     LIVING ZONE Lights,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE LIGHTING,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1000,                    !- Lighting Level {W}
@@ -1160,7 +1160,7 @@
 
   ElectricEquipment,
     LIVING ZONE ElecEq,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     500,                     !- Design Level {W}
@@ -1326,7 +1326,11 @@
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
-    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    1.0,                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    ,                        !- Height Dependence of External Node Temperature
+    ,                        !- Solver
+    ,                        !- Allow Unsupported Zone Equipment
+    ;                        !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     LIVING ZONE,             !- Zone Name
