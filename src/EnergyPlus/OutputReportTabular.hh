@@ -684,7 +684,7 @@ namespace OutputReportTabular {
 
     template <int columnNum>
     void WriteResilienceBinsTable(EnergyPlusData &state,
-                                  std::vector<int> const &columnHead,
+                                  std::array<int, columnNum> const &columnHead,
                                   const std::array<Real64, columnNum> DataHeatBalance::ZoneResilience::*memberPtr,
                                   Real64 const unitConvMultiplier = 1.0);
 

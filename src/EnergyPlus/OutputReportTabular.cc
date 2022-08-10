@@ -12973,7 +12973,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
 template <int columnNum>
 void WriteResilienceBinsTable(EnergyPlusData &state,
-                              std::vector<int> const &columnHead,
+                              std::array<int, columnNum> const &columnHead,
                               const std::array<Real64, columnNum> DataHeatBalance::ZoneResilience::*memberPtr,
                               Real64 const unitConvMultiplier)
 {
@@ -13614,7 +13614,7 @@ void WriteCO2ResilienceTables(EnergyPlusData &state)
 {
 
     if (state.dataGlobal->NumOfZones <= 0) return;
-    std::vector<int> columnHead = {
+    std::array<int, numColumnCO2Tbl> columnHead = {
         state.dataOutRptPredefined->pdchCO2HourSafe, state.dataOutRptPredefined->pdchCO2HourCaution, state.dataOutRptPredefined->pdchCO2HourHazard};
 
     std::array<Real64, numColumnCO2Tbl> DataHeatBalance::ZoneResilience::*ptrCO2LevelHourBins =
@@ -13712,10 +13712,10 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
     }
 
     if (state.dataGlobal->NumOfZones <= 0) return;
-    std::vector<int> columnHead = {state.dataOutRptPredefined->pdchIllumHourDark,
-                                   state.dataOutRptPredefined->pdchIllumHourDim,
-                                   state.dataOutRptPredefined->pdchIllumHourAdequate,
-                                   state.dataOutRptPredefined->pdchIllumHourBright};
+    std::array<int, numColumnVisualTbl> columnHead = {state.dataOutRptPredefined->pdchIllumHourDark,
+                                                      state.dataOutRptPredefined->pdchIllumHourDim,
+                                                      state.dataOutRptPredefined->pdchIllumHourAdequate,
+                                                      state.dataOutRptPredefined->pdchIllumHourBright};
 
     std::array<Real64, numColumnVisualTbl> DataHeatBalance::ZoneResilience::*ptrLightingLevelHourBins =
         &DataHeatBalance::ZoneResilience::ZoneLightingLevelHourBins;
