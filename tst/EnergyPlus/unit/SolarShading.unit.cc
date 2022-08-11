@@ -2699,9 +2699,9 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     int SurfNum = 2;
     state->dataSurface->TotSurfaces = SurfNum;
     state->dataSurface->Surface(1).activeWindowShadingControl =
-            state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
+        state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
     state->dataSurface->Surface(2).activeWindowShadingControl =
-            state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
+        state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;

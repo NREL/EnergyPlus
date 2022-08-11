@@ -9751,7 +9751,7 @@ void WindowShadingManager(EnergyPlusData &state)
                     }
                 }
                 // if it is the beginning of the day, then shades off
-                if ((state.dataGlobal->HourOfDay-1)*state.dataGlobal->NumOfTimeStepInHour+state.dataGlobal->TimeStep == 1) {
+                if ((state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep == 1) {
                     shadingOn = false;
                     shadingOffButGlareControlOn = false;
                 }
