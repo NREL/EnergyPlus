@@ -15030,28 +15030,27 @@ namespace SurfaceGeometry {
                     }
                     if (solarSetup && constr.TypeIsAirBoundaryMixing) {
                         // Set up mixing air boundaries only once, during solar setup
-                        int zoneNum1 = min(surf.Zone, state.dataSurface->Surface(surf.ExtBoundCond).Zone);
-                        int zoneNum2 = min(surf.Zone, state.dataSurface->Surface(surf.ExtBoundCond).Zone);
+                        int spaceNum1 = min(surf.spaceNum, state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
+                        int spaceNum2 = min(surf.spaceNum, state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
                         // This pair already saved?
                         bool found = false;
-                        for (int n = 0; n < state.dataHeatBal->NumAirBoundaryMixing - 1; ++n) {
-                            if ((zoneNum1 == state.dataHeatBal->AirBoundaryMixingZone1[n]) &&
-                                (zoneNum2 == state.dataHeatBal->AirBoundaryMixingZone2[n])) {
+                        for (auto thisAirBoundaryMixing : state.dataHeatBal->airBoundaryMixing) {
+                            if ((spaceNum1 == thisAirBoundaryMixing.space1) && (spaceNum2 == thisAirBoundaryMixing.space1)) {
                                 found = true;
                                 break;
                             }
                         }
                         if (!found) {
-                            // Store the zone pairs to use later to create cross mixing objects
-                            ++state.dataHeatBal->NumAirBoundaryMixing;
-                            state.dataHeatBal->AirBoundaryMixingZone1.push_back(zoneNum1);
-                            state.dataHeatBal->AirBoundaryMixingZone2.push_back(zoneNum2);
-                            state.dataHeatBal->AirBoundaryMixingSched.push_back(
-                                state.dataConstruction->Construct(surf.Construction).AirBoundaryMixingSched);
-                            Real64 mixingVol = state.dataConstruction->Construct(surf.Construction).AirBoundaryACH *
-                                               min(state.dataHeatBal->Zone(zoneNum1).Volume, state.dataHeatBal->Zone(zoneNum2).Volume) /
-                                               DataGlobalConstants::SecInHour;
-                            state.dataHeatBal->AirBoundaryMixingVol.push_back(mixingVol);
+                            // Store the space pairs, schedule, and flow rate to use later to create cross mixing objects
+                            DataHeatBalance::AirBoundaryMixingSpecs newAirBoundaryMixing;
+                            newAirBoundaryMixing.space1 = spaceNum1;
+                            newAirBoundaryMixing.space2 = spaceNum2;
+                            newAirBoundaryMixing.scheduleindex = state.dataConstruction->Construct(surf.Construction).AirBoundaryMixingSched;
+                            Real64 mixingVolume =
+                                state.dataConstruction->Construct(surf.Construction).AirBoundaryACH * DataGlobalConstants::SecInHour;
+                            DataGlobalConstants::SecInHour;
+                            newAirBoundaryMixing.mixingVolumeFlowRate = mixingVolume;
+                            state.dataHeatBal->airBoundaryMixing.push_back(newAirBoundaryMixing);
                         }
                     }
                 }

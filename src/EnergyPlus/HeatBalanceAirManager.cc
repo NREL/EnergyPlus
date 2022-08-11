@@ -297,8 +297,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     Real64 constexpr RefDoorStripCurtain(0.9);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array2D<Real64> SVals1;
-    Array2D<Real64> SVals2;
     int NumAlpha;  // Number of Alphas for each GetobjectItem call
     int NumNumber; // Number of Numbers for each GetobjectItem call
     int maxAlpha;  // max of Alphas for allocation
@@ -330,9 +328,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     int Zone2Num;
     int ZoneNumA;
     int ZoneNumB;
-    int SourceCount;
-    int ReceivingCount;
-    int IsSourceZone;
 
     // Formats
     static constexpr std::string_view Format_720(" {} Airflow Stats Nominal, {},{},{},{:.2R},{:.1R},");
@@ -902,9 +897,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                         if (rNumericArgs(2) >= 0.0) {
                             thisInfiltration.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
                             if (thisInfiltration.ZonePtr > 0) {
-                                if (thisZone.FloorArea <= 0.0) {
+                                if (thisSpace.floorArea <= 0.0) {
                                     ShowWarningError(state,
-                                                     format("{}{}=\"{}\", {} specifies {}, but Zone Floor Area = 0.  0 Infiltration will result.",
+                                                     format("{}{}=\"{}\", {} specifies {}, but Space Floor Area = 0.  0 Infiltration will result.",
                                                             RoutineName,
                                                             cCurrentModuleObject,
                                                             thisInfiltration.Name,
@@ -922,7 +917,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(2)) {
+                    if (lNumericFieldBlanks(2)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
                                                 RoutineName,
@@ -2532,422 +2527,474 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
     }
 
+    // Set up and process ZoneMixing and ZoneCrossMixing inputs
+
     RepVarSet = true;
 
     cCurrentModuleObject = "ZoneMixing";
-    state.dataHeatBal->TotMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataHeatBal->Mixing.allocate(state.dataHeatBal->TotMixing);
+    int numZoneMixingObjects = 0;
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneMixingObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(
+        state, cCurrentModuleObject, zoneMixingObjects, numZoneMixingObjects, state.dataHeatBal->TotMixing, ErrorsFound, zoneListNotAllowed);
 
-    for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+    if (state.dataHeatBal->TotMixing > 0) {
+        cCurrentModuleObject = "ZoneMixing";
+        state.dataHeatBal->Mixing.allocate(state.dataHeatBal->TotMixing);
+        int mixingNum = 0;
+        for (int mixingInputNum = 1; mixingInputNum <= state.dataHeatBal->TotMixing; ++mixingInputNum) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     mixingInputNum,
+                                                                     cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
-        state.dataHeatBal->Mixing(Loop).Name = cAlphaArgs(1);
+            // Create one Mixing instance for every space associated with this input object
+            auto &thisMixingInput = zoneMixingObjects(mixingInputNum);
+            for (int Item1 = 1; Item1 <= thisMixingInput.numOfSpaces; ++Item1) {
+                ++mixingNum;
+                auto &thisMixing = state.dataHeatBal->Mixing(mixingNum);
+                thisMixing.Name = thisMixingInput.names(Item1);
+                int const spaceNum = thisMixingInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+                thisMixing.spaceIndex = spaceNum;
+                thisMixing.ZonePtr = zoneNum;
 
-        state.dataHeatBal->Mixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        if (state.dataHeatBal->Mixing(Loop).ZonePtr == 0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-            ErrorsFound = true;
-        }
-
-        state.dataHeatBal->Mixing(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-
-        if (state.dataHeatBal->Mixing(Loop).SchedPtr == 0) {
-            if (lAlphaFieldBlanks(3)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                    " is required but field is blank.");
-            } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                    cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-            }
-            ErrorsFound = true;
-        }
-
-        // Mixing equipment design level calculation method
-        AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
-        switch (flow) {
-        case AirflowSpec::Flow:
-        case AirflowSpec::FlowPerZone:
-            state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(1);
-            if (lAlphaFieldBlanks(1)) {
-                ShowWarningError(state,
-                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                     " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Mixing will result.");
-            }
-            break;
-
-        case AirflowSpec::FlowPerArea:
-            if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
-                if (rNumericArgs(2) >= 0.0) {
-                    state.dataHeatBal->Mixing(Loop).DesignLevel =
-                        rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea;
-                    if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea <= 0.0) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                             " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Mixing will result.");
-                    }
+                if (lAlphaFieldBlanks(3)) {
+                    thisMixing.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    ShowSevereError(state,
-                                    format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                           RoutineName,
-                                           cCurrentModuleObject,
-                                           cAlphaArgs(1),
-                                           rNumericArgs(2)));
-                    ErrorsFound = true;
+                    thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 }
-            }
-            if (lNumericFieldBlanks(2)) {
-                ShowWarningError(state,
-                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                     " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Mixing will result.");
-            }
-            break;
-
-        case AirflowSpec::FlowPerPerson:
-            if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
-                if (rNumericArgs(3) >= 0.0) {
-                    state.dataHeatBal->Mixing(Loop).DesignLevel =
-                        rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants;
-                    if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants <= 0.0) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                             " specifies " + cNumericFieldNames(3) + ", but Zone Total Occupants = 0.  0 Mixing will result.");
-                    }
-                } else {
-                    ShowSevereError(state,
-                                    format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                           RoutineName,
-                                           cCurrentModuleObject,
-                                           cAlphaArgs(1),
-                                           rNumericArgs(3)));
-                    ErrorsFound = true;
-                }
-            }
-            if (lNumericFieldBlanks(3)) {
-                ShowWarningError(state,
-                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                     " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Mixing will result.");
-            }
-            break;
-
-        case AirflowSpec::AirChanges:
-            if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
-                if (rNumericArgs(4) >= 0.0) {
-                    state.dataHeatBal->Mixing(Loop).DesignLevel =
-                        rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
-                    if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume <= 0.0) {
-                        ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                             " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Mixing will result.");
-                    }
-                } else {
-                    ShowSevereError(state,
-                                    format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                           RoutineName,
-                                           cCurrentModuleObject,
-                                           cAlphaArgs(1),
-                                           rNumericArgs(4)));
-                    ErrorsFound = true;
-                }
-            }
-            if (lAlphaFieldBlanks(4)) {
-                ShowWarningError(state,
-                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                     " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Mixing will result.");
-            }
-            break;
-
-        default:
-            ShowSevereError(
-                state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid calculation method=" + cAlphaArgs(4));
-            ErrorsFound = true;
-        }
-
-        state.dataHeatBal->Mixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
-        if (state.dataHeatBal->Mixing(Loop).FromZone == 0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cAlphaFieldNames(5) + " not found=" + cAlphaArgs(5) + " for " + cCurrentModuleObject + '=' +
-                                cAlphaArgs(1));
-            ErrorsFound = true;
-        }
-        state.dataHeatBal->Mixing(Loop).DeltaTemperature = rNumericArgs(5);
-
-        if (NumAlpha > 5) {
-            state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
-            if (state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr > 0) {
-                if (!lNumericFieldBlanks(5))
+                if (thisMixing.SchedPtr == 0) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} +
-                                         "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                         cCurrentModuleObject + " object = " + cAlphaArgs(1));
-                if (GetScheduleMinValue(state, state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr) < -MixingTempLimit) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
-                                        " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs(6));
+                                     format("{}{}=\"{}\", invalid (not found) {}=\"{}\"",
+                                            RoutineName,
+                                            cCurrentModuleObject,
+                                            thisMixingInput.Name,
+                                            cAlphaFieldNames(3),
+                                            cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
-            }
-        }
-        if (state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
-            ShowWarningError(state,
-                             format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
-                                    RoutineName,
-                                    cNumericFieldNames(5),
-                                    rNumericArgs(5)));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-        if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr == 0)) {
-            ShowWarningError(state,
-                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
-                                    RoutineName,
-                                    cAlphaFieldNames(6),
-                                    cAlphaArgs(6),
-                                    rNumericArgs(5)));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
 
-        if (NumAlpha > 6) {
-            state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
-            if (state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr == 0) {
-                if ((!lAlphaFieldBlanks(7))) {
+                // Mixing equipment design level calculation method
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                switch (flow) {
+                case AirflowSpec::Flow:
+                case AirflowSpec::FlowPerZone:
+                    thisMixing.DesignLevel = rNumericArgs(1);
+                    if (lNumericFieldBlanks(1)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {} = {}, but that field is blank.  0 Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(1)));
+                    } else {
+                        Real64 spaceFrac = 1.0;
+                        if (!thisMixingInput.spaceListActive && (thisMixingInput.numOfSpaces > 1)) {
+                            Real64 const zoneVolume = thisZone.Volume;
+                            if (zoneVolume > 0.0) {
+                                spaceFrac = thisSpace.Volume / zoneVolume;
+                            } else {
+                                ShowSevereError(state, std::string(RoutineName) + "Zone volume is zero when allocating Mixing to Spaces.");
+                                ShowContinueError(
+                                    state, format("Occurs for {}=\"{}\" in Zone=\"{}\".", cCurrentModuleObject, thisMixingInput.Name, thisZone.Name));
+                                ErrorsFound = true;
+                            }
+                        }
+
+                        thisMixing.DesignLevel = rNumericArgs(1) * spaceFrac;
+                    }
+                    break;
+
+                case AirflowSpec::FlowPerArea:
+                    if (thisMixing.spaceIndex != 0) {
+                        if (rNumericArgs(2) >= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
+                            if (thisMixing.spaceIndex > 0) {
+                                if (thisZone.FloorArea <= 0.0) {
+                                    ShowWarningError(state,
+                                                     format("{}{}=\"{}\", {} specifies {}, but Space Floor Area = 0.  0 Mixing will result.",
+                                                            RoutineName,
+                                                            cCurrentModuleObject,
+                                                            thisMixingInput.Name,
+                                                            cAlphaFieldNames(4),
+                                                            cNumericFieldNames(2)));
+                                }
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisMixingInput.Name,
+                                                   rNumericArgs(2)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lNumericFieldBlanks(2)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(2)));
+                    }
+                    break;
+
+                case AirflowSpec::FlowPerPerson:
+                    if (thisMixing.spaceIndex != 0) {
+                        if (rNumericArgs(3) >= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(3) * thisSpace.totOccupants;
+                            if (thisSpace.totOccupants <= 0.0) {
+                                ShowWarningError(state,
+                                                 format("{}{}=\"{}\", {} specifies {}, but Space Total Occupants = 0.  0 Mixing will result.",
+                                                        RoutineName,
+                                                        cCurrentModuleObject,
+                                                        thisMixingInput.Name,
+                                                        cAlphaFieldNames(4),
+                                                        cNumericFieldNames(3)));
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisMixingInput.Name,
+                                                   rNumericArgs(3)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lNumericFieldBlanks(3)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(3)));
+                    }
+                    break;
+
+                case AirflowSpec::AirChanges:
+                    if (thisMixing.spaceIndex != 0) {
+                        if (rNumericArgs(4) >= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            if (thisSpace.Volume <= 0.0) {
+                                ShowWarningError(state,
+                                                 format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Mixing will result.",
+                                                        RoutineName,
+                                                        cCurrentModuleObject,
+                                                        thisMixingInput.Name,
+                                                        cAlphaFieldNames(4),
+                                                        cNumericFieldNames(4)));
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisMixingInput.Name,
+                                                   rNumericArgs(4)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lAlphaFieldBlanks(4)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(4)));
+                    }
+                    break;
+
+                default:
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", invalid calculation method={}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4)));
+                    ErrorsFound = true;
+                }
+
+                thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                if (thisMixing.FromZone == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + cAlphaFieldNames(7) + " not found=" + cAlphaArgs(7) + " for " + cCurrentModuleObject +
+                                    std::string{RoutineName} + cAlphaFieldNames(5) + " not found=" + cAlphaArgs(5) + " for " + cCurrentModuleObject +
                                         '=' + cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-            }
-            if (state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr > 0) {
-                // Check min and max values in the schedule to ensure both values are within the range
-                if (!CheckScheduleValueMinMax(
-                        state, state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
-                                        " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
-                    ErrorsFound = true;
-                }
-            }
-        }
+                thisMixing.DeltaTemperature = rNumericArgs(5);
 
-        if (NumAlpha > 7) {
-            state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
-            if (state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr == 0) {
-                if ((!lAlphaFieldBlanks(8))) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(8) +
-                                        " not found=\"" + cAlphaArgs(8) + "\".");
-                    ErrorsFound = true;
+                if (NumAlpha > 5) {
+                    thisMixing.DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
+                    if (thisMixing.DeltaTempSchedPtr > 0) {
+                        if (!lNumericFieldBlanks(5))
+                            ShowWarningError(
+                                state,
+                                std::string{RoutineName} +
+                                    "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
+                                    cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                        if (GetScheduleMinValue(state, thisMixing.DeltaTempSchedPtr) < -MixingTempLimit) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
+                                                " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs(6));
+                            ErrorsFound = true;
+                        }
+                    }
                 }
-            }
-            if (state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr > 0) {
-                // Check min and max values in the schedule to ensure both values are within the range
-                if (!CheckScheduleValueMinMax(
-                        state, state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                        "\" must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
-                    ErrorsFound = true;
+                if (thisMixing.DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
+                    ShowWarningError(state,
+                                     format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                            RoutineName,
+                                            cNumericFieldNames(5),
+                                            rNumericArgs(5)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
                 }
-            }
-        }
+                if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && thisMixing.DeltaTempSchedPtr == 0)) {
+                    ShowWarningError(state,
+                                     format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(6),
+                                            cAlphaArgs(6),
+                                            rNumericArgs(5)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
 
-        if (NumAlpha > 8) {
-            state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
-            if (state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr == 0) {
-                if ((!lAlphaFieldBlanks(9))) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(9) +
-                                        " not found=\"" + cAlphaArgs(9) + "\".");
-                    ErrorsFound = true;
+                if (NumAlpha > 6) {
+                    thisMixing.MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                    if (thisMixing.MinIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(7))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cAlphaFieldNames(7) + " not found=" + cAlphaArgs(7) + " for " +
+                                                cCurrentModuleObject + '=' + cAlphaArgs(1));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MinIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
+                                    " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
+                            ErrorsFound = true;
+                        }
+                    }
                 }
-            }
-            if (state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr > 0) {
-                // Check min and max values in the schedule to ensure both values are within the range
-                if (!CheckScheduleValueMinMax(
-                        state, state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                    ShowSevereError(
-                        state,
-                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                            "\" must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
-                    ErrorsFound = true;
-                }
-            }
-        }
 
-        if (NumAlpha > 9) {
-            state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
-            if (state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr == 0) {
-                if ((!lAlphaFieldBlanks(10))) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(10) +
-                                        " not found=\"" + cAlphaArgs(10) + "\".");
-                    ErrorsFound = true;
+                if (NumAlpha > 7) {
+                    thisMixing.MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
+                    if (thisMixing.MaxIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(8))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(8) +
+                                                " not found=\"" + cAlphaArgs(8) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MaxIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\" must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
+                            ErrorsFound = true;
+                        }
+                    }
                 }
-            }
-            if (state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr > 0) {
-                // Check min and max values in the schedule to ensure both values are within the range
-                if (!CheckScheduleValueMinMax(
-                        state, state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                    ShowSevereError(
-                        state,
-                        std::string{RoutineName} + cCurrentModuleObject + " statement =\"" + cAlphaArgs(1) +
-                            "\" must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
-                    ErrorsFound = true;
-                }
-            }
-        }
 
-        if (NumAlpha > 10) {
-            state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
-            if (state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr == 0) {
-                if ((!lAlphaFieldBlanks(11))) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(11) +
-                                        " not found=\"" + cAlphaArgs(11) + "\".");
-                    ErrorsFound = true;
+                if (NumAlpha > 8) {
+                    thisMixing.MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
+                    if (thisMixing.MinSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(9))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(9) +
+                                                " not found=\"" + cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MinSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\" must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
+                            ErrorsFound = true;
+                        }
+                    }
                 }
-            }
-            if (state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr > 0) {
-                // Check min and max values in the schedule to ensure both values are within the range
-                if (!CheckScheduleValueMinMax(
-                        state, state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                    ShowSevereError(
-                        state,
-                        std::string{RoutineName} + cCurrentModuleObject + " =\"" + cAlphaArgs(1) +
-                            "\" must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
-                    ErrorsFound = true;
-                }
-            }
-        }
 
-        if (NumAlpha > 11) {
-            state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
-            if (state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr == 0) {
-                if ((!lAlphaFieldBlanks(12))) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(12) +
-                                        " not found=\"" + cAlphaArgs(12) + "\".");
-                    ErrorsFound = true;
+                if (NumAlpha > 9) {
+                    thisMixing.MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
+                    if (thisMixing.MaxSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(10))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(10) +
+                                                " not found=\"" + cAlphaArgs(10) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MaxSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " statement =\"" + cAlphaArgs(1) +
+                                    "\" must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
+                            ErrorsFound = true;
+                        }
+                    }
                 }
-            }
-            if (state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr > 0) {
-                // Check min and max values in the schedule to ensure both values are within the range
-                if (!CheckScheduleValueMinMax(
-                        state, state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                    ShowSevereError(
-                        state,
-                        std::string{RoutineName} + cCurrentModuleObject + " =\"" + cAlphaArgs(1) +
-                            "\" must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
-                    ErrorsFound = true;
-                }
-            }
-        }
 
-        if (state.dataHeatBal->Mixing(Loop).ZonePtr > 0) {
-            if (RepVarSet(state.dataHeatBal->Mixing(Loop).ZonePtr)) {
-                RepVarSet(state.dataHeatBal->Mixing(Loop).ZonePtr) = false;
-                SetupOutputVariable(state,
-                                    "Zone Mixing Volume",
-                                    OutputProcessor::Unit::m3,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixVolume,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Current Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixVdotCurDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Standard Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixVdotStdDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Mass",
-                                    OutputProcessor::Unit::kg,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixMass,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixMdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Sensible Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixHeatLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Sensible Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixHeatGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Latent Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixLatentLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Latent Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixLatentGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Total Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixTotalLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Total Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixTotalGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
+                if (NumAlpha > 10) {
+                    thisMixing.MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
+                    if (thisMixing.MinOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(11))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(11) +
+                                                " not found=\"" + cAlphaArgs(11) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MinOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " =\"" + cAlphaArgs(1) +
+                                    "\" must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 11) {
+                    thisMixing.MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
+                    if (thisMixing.MaxOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(12))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(12) +
+                                                " not found=\"" + cAlphaArgs(12) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MaxOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " =\"" + cAlphaArgs(1) +
+                                    "\" must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (thisMixing.ZonePtr > 0) {
+                    if (RepVarSet(thisMixing.ZonePtr)) {
+                        RepVarSet(thisMixing.ZonePtr) = false;
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Volume",
+                                            OutputProcessor::Unit::m3,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixVolume,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Current Density Volume Flow Rate",
+                                            OutputProcessor::Unit::m3_s,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixVdotCurDensity,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Standard Density Volume Flow Rate",
+                                            OutputProcessor::Unit::m3_s,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixVdotStdDensity,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Mass",
+                                            OutputProcessor::Unit::kg,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixMass,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Mass Flow Rate",
+                                            OutputProcessor::Unit::kg_s,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixMdot,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Sensible Heat Loss Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixHeatLoss,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Sensible Heat Gain Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixHeatGain,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Latent Heat Loss Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixLatentLoss,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Latent Heat Gain Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixLatentGain,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Total Heat Loss Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixTotalLoss,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Mixing Total Heat Gain Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisMixing.ZonePtr).MixTotalGain,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(thisMixing.ZonePtr).Name);
+                    }
+                }
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                    SetupEMSActuator(state,
+                                     "ZoneMixing",
+                                     thisMixing.Name,
+                                     "Air Exchange Flow Rate",
+                                     "[m3/s]",
+                                     thisMixing.EMSSimpleMixingOn,
+                                     thisMixing.EMSimpleMixingFlowRate);
+                }
             }
-        }
-        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupEMSActuator(state,
-                             "ZoneMixing",
-                             state.dataHeatBal->Mixing(Loop).Name,
-                             "Air Exchange Flow Rate",
-                             "[m3/s]",
-                             state.dataHeatBal->Mixing(Loop).EMSSimpleMixingOn,
-                             state.dataHeatBal->Mixing(Loop).EMSimpleMixingFlowRate);
         }
     }
 
@@ -2959,7 +3006,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         ZoneMixingNum.allocate(state.dataHeatBal->TotMixing);
         // get source zones mixing objects index
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            SourceCount = 0;
+            int SourceCount = 0;
             for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 if (ZoneNum == state.dataHeatBal->Mixing(Loop).FromZone) {
                     SourceCount += 1;
@@ -2978,7 +3025,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         // check zones which are used only as a source zones
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            IsSourceZone = false;
+            bool IsSourceZone = false;
             for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 if (ZoneNum != state.dataHeatBal->Mixing(Loop).FromZone) continue;
                 state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone = true;
@@ -2993,7 +3040,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         // get receiving zones mixing objects index
         ZoneMixingNum = 0;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            ReceivingCount = 0;
+            int ReceivingCount = 0;
             for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 if (ZoneNum == state.dataHeatBal->Mixing(Loop).ZonePtr) {
                     ReceivingCount += 1;
@@ -3040,27 +3087,25 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             state.dataHeatBalFanSys->ZoneReOrder(Loop2) = ZoneNum;
         }
     }
+
     cCurrentModuleObject = "ZoneCrossMixing";
-    int inputCrossMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    state.dataHeatBal->TotCrossMixing = inputCrossMixing + state.dataHeatBal->NumAirBoundaryMixing;
-    state.dataHeatBal->CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
+    int numZoneCrossMixingObjects = 0;
+    int totZoneCrossMixing = 0; // Total ZoneCrossMixing instances after expansion to spaces
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneCrossMixingObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(
+        state, cCurrentModuleObject, zoneCrossMixingObjects, numZoneCrossMixingObjects, totZoneCrossMixing, ErrorsFound, zoneListNotAllowed);
+    state.dataHeatBal->TotCrossMixing = totZoneCrossMixing + state.dataHeatBal->airBoundaryMixing.size();
 
-    for (int Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
+    if (state.dataHeatBal->TotCrossMixing > 0) {
+        cCurrentModuleObject = "ZoneCrossMixing";
+        state.dataHeatBal->CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
 
-        if (Loop > inputCrossMixing) {
-            // Create CrossMixing object from air boundary info
-            int airBoundaryIndex = Loop - inputCrossMixing - 1; // zero-based
-            int zone1 = state.dataHeatBal->AirBoundaryMixingZone1[airBoundaryIndex];
-            int zone2 = state.dataHeatBal->AirBoundaryMixingZone2[airBoundaryIndex];
-            state.dataHeatBal->CrossMixing(Loop).Name = fmt::format("Air Boundary Mixing Zones {} and {}", zone1, zone2);
-            state.dataHeatBal->CrossMixing(Loop).ZonePtr = zone1;
-            state.dataHeatBal->CrossMixing(Loop).SchedPtr = state.dataHeatBal->AirBoundaryMixingSched[airBoundaryIndex];
-            state.dataHeatBal->CrossMixing(Loop).DesignLevel = state.dataHeatBal->AirBoundaryMixingVol[airBoundaryIndex];
-            state.dataHeatBal->CrossMixing(Loop).FromZone = zone2;
-        } else {
+        int mixingNum = 0;
+        for (int mixingInputNum = 1; mixingInputNum <= numZoneCrossMixingObjects; ++mixingInputNum) {
+
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
-                                                                     Loop,
+                                                                     mixingInputNum,
                                                                      cAlphaArgs,
                                                                      NumAlpha,
                                                                      rNumericArgs,
@@ -3070,490 +3115,551 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                      lAlphaFieldBlanks,
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            // Create one Mixing instance for every space associated with this input object
+            auto &thisMixingInput = zoneCrossMixingObjects(mixingInputNum);
+            for (int Item1 = 1; Item1 <= thisMixingInput.numOfSpaces; ++Item1) {
+                ++mixingNum;
+                auto &thisMixing = state.dataHeatBal->CrossMixing(mixingNum);
+                thisMixing.Name = thisMixingInput.names(Item1);
+                int const spaceNum = thisMixingInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+                thisMixing.spaceIndex = spaceNum;
+                thisMixing.ZonePtr = zoneNum;
 
-            state.dataHeatBal->CrossMixing(Loop).Name = cAlphaArgs(1);
-
-            state.dataHeatBal->CrossMixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-            if (state.dataHeatBal->CrossMixing(Loop).ZonePtr == 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                    cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                ErrorsFound = true;
-            }
-
-            state.dataHeatBal->CrossMixing(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-            if (state.dataHeatBal->CrossMixing(Loop).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                        " is required but field is blank.");
+                    thisMixing.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
+                    thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
+                if (thisMixing.SchedPtr == 0) {
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\", invalid (not found) {}=\"{}\"",
+                                            RoutineName,
+                                            cCurrentModuleObject,
+                                            thisMixingInput.Name,
+                                            cAlphaFieldNames(3),
+                                            cAlphaArgs(3)));
+                    ErrorsFound = true;
+                }
+
+                // Mixing equipment design level calculation method.
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                switch (flow) {
+                case AirflowSpec::Flow:
+                case AirflowSpec::FlowPerZone:
+                    thisMixing.DesignLevel = rNumericArgs(1);
+                    if (lNumericFieldBlanks(1)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {} = {}, but that field is blank.  0 Cross Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(1)));
+                    } else {
+                        Real64 spaceFrac = 1.0;
+                        if (!thisMixingInput.spaceListActive && (thisMixingInput.numOfSpaces > 1)) {
+                            Real64 const zoneVolume = thisZone.Volume;
+                            if (zoneVolume > 0.0) {
+                                spaceFrac = thisSpace.Volume / zoneVolume;
+                            } else {
+                                ShowSevereError(state, std::string(RoutineName) + "Zone volume is zero when allocating Cross Mixing to Spaces.");
+                                ShowContinueError(
+                                    state, format("Occurs for {}=\"{}\" in Zone=\"{}\".", cCurrentModuleObject, thisMixingInput.Name, thisZone.Name));
+                                ErrorsFound = true;
+                            }
+                        }
+
+                        thisMixing.DesignLevel = rNumericArgs(1) * spaceFrac;
+                    }
+                    break;
+
+                case AirflowSpec::FlowPerArea:
+                    if (thisMixing.spaceIndex != 0) {
+                        if (rNumericArgs(2) >= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
+                            if (thisMixing.spaceIndex > 0) {
+                                if (thisZone.FloorArea <= 0.0) {
+                                    ShowWarningError(state,
+                                                     format("{}{}=\"{}\", {} specifies {}, but Space Floor Area = 0.  0 Cross Mixing will result.",
+                                                            RoutineName,
+                                                            cCurrentModuleObject,
+                                                            thisMixingInput.Name,
+                                                            cAlphaFieldNames(4),
+                                                            cNumericFieldNames(2)));
+                                }
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid flow/area specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisMixingInput.Name,
+                                                   rNumericArgs(2)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lNumericFieldBlanks(2)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Cross Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(2)));
+                    }
+                    break;
+
+                case AirflowSpec::FlowPerPerson:
+                    if (thisMixing.spaceIndex != 0) {
+                        if (rNumericArgs(3) >= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(3) * thisSpace.totOccupants;
+                            if (thisSpace.totOccupants <= 0.0) {
+                                ShowWarningError(state,
+                                                 format("{}{}=\"{}\", {} specifies {}, but Space Total Occupants = 0.  0 Cross Mixing will result.",
+                                                        RoutineName,
+                                                        cCurrentModuleObject,
+                                                        thisMixingInput.Name,
+                                                        cAlphaFieldNames(4),
+                                                        cNumericFieldNames(3)));
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisMixingInput.Name,
+                                                   rNumericArgs(3)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lNumericFieldBlanks(3)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Cross Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(3)));
+                    }
+                    break;
+
+                case AirflowSpec::AirChanges:
+                    if (thisMixing.spaceIndex != 0) {
+                        if (rNumericArgs(4) >= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            if (thisSpace.Volume <= 0.0) {
+                                ShowWarningError(state,
+                                                 format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Cross Mixing will result.",
+                                                        RoutineName,
+                                                        cCurrentModuleObject,
+                                                        thisMixingInput.Name,
+                                                        cAlphaFieldNames(4),
+                                                        cNumericFieldNames(4)));
+                            }
+                        } else {
+                            ShowSevereError(state,
+                                            format("{}{}=\"{}\", invalid ACH (air changes per hour) specification [<0.0]={:.3R}",
+                                                   RoutineName,
+                                                   cCurrentModuleObject,
+                                                   thisMixingInput.Name,
+                                                   rNumericArgs(4)));
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (lAlphaFieldBlanks(4)) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Cross Mixing will result.",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(4),
+                                                cNumericFieldNames(4)));
+                    }
+                    break;
+
+                default:
+                    ShowSevereError(
+                        state, format("{}{}=\"{}\", invalid calculation method={}", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4)));
+                    ErrorsFound = true;
+                }
+
+                thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                if (thisMixing.FromZone == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                        cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                                        cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
+                    ErrorsFound = true;
                 }
-                ErrorsFound = true;
-            }
+                thisMixing.DeltaTemperature = rNumericArgs(5);
 
-            // Mixing equipment design level calculation method.
-            AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
-            switch (flow) {
-            case AirflowSpec::Flow:
-            case AirflowSpec::FlowPerZone:
-                state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(1);
-                if (lAlphaFieldBlanks(1)) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
-                }
-                break;
-
-            case AirflowSpec::FlowPerArea:
-                if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
-                    if (rNumericArgs(2) >= 0.0) {
-                        state.dataHeatBal->CrossMixing(Loop).DesignLevel =
-                            rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea;
-                        if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
+                if (NumAlpha > 5) {
+                    thisMixing.DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
+                    if (thisMixing.DeltaTempSchedPtr > 0) {
+                        if (!lNumericFieldBlanks(5))
+                            ShowWarningError(
+                                state,
+                                std::string{RoutineName} +
+                                    "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
+                                    cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                        if (GetScheduleMinValue(state, thisMixing.DeltaTempSchedPtr) < 0.0) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                                " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs(6));
+                            ErrorsFound = true;
                         }
-                    } else {
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               rNumericArgs(2)));
-                        ErrorsFound = true;
                     }
                 }
-                if (lAlphaFieldBlanks(2)) {
+                if (thisMixing.DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
+                                     format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                            RoutineName,
+                                            cNumericFieldNames(5),
+                                            rNumericArgs(5)));
+                    ShowContinueError(state, "in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
                 }
-                break;
+                if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && thisMixing.DeltaTempSchedPtr == 0)) {
+                    ShowWarningError(state,
+                                     format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(6),
+                                            cAlphaArgs(6),
+                                            rNumericArgs(5)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
 
-            case AirflowSpec::FlowPerPerson:
-                if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
-                    if (rNumericArgs(3) >= 0.0) {
-                        state.dataHeatBal->CrossMixing(Loop).DesignLevel =
-                            rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants;
-                        if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(3) +
-                                                 ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
+                if (NumAlpha > 6) {
+                    thisMixing.MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                    if (thisMixing.MinIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(7))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(7) +
+                                                " not found=" + cAlphaArgs(7) + "\".");
+                            ErrorsFound = true;
                         }
-                    } else {
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               rNumericArgs(3)));
-                        ErrorsFound = true;
                     }
-                }
-                if (lAlphaFieldBlanks(3)) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
-                }
-                break;
-
-            case AirflowSpec::AirChanges:
-                if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
-                    if (rNumericArgs(4) >= 0.0) {
-                        state.dataHeatBal->CrossMixing(Loop).DesignLevel =
-                            rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume /
-                            DataGlobalConstants::SecInHour;
-                        if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
+                    if (thisMixing.MinIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                    " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
+                            ErrorsFound = true;
                         }
-                    } else {
-                        ShowSevereError(state,
-                                        format("{}{}=\"{}\", invalid flow/person specification [<0.0]={:.3R}",
-                                               RoutineName,
-                                               cCurrentModuleObject,
-                                               cAlphaArgs(1),
-                                               rNumericArgs(4)));
-                        ErrorsFound = true;
                     }
                 }
-                if (lAlphaFieldBlanks(4)) {
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                         " specifies " + cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
-                }
-                break;
 
-            default:
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                    "\", invalid calculation method=" + cAlphaArgs(4));
-                ErrorsFound = true;
-            }
+                if (NumAlpha > 7) {
+                    thisMixing.MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
+                    if (thisMixing.MaxIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(8))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(8) +
+                                                " not found=\"" + cAlphaArgs(8) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MaxIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                    " must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
 
-            state.dataHeatBal->CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
-            if (state.dataHeatBal->CrossMixing(Loop).FromZone == 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                    cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
-                ErrorsFound = true;
-            }
-            state.dataHeatBal->CrossMixing(Loop).DeltaTemperature = rNumericArgs(5);
+                if (NumAlpha > 8) {
+                    thisMixing.MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
+                    if (thisMixing.MinSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(9))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(9) +
+                                                " not found=\"" + cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MinSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                    " must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
 
-            if (NumAlpha > 5) {
-                state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
-                if (state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr > 0) {
-                    if (!lNumericFieldBlanks(5))
-                        ShowWarningError(state,
-                                         std::string{RoutineName} +
-                                             "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                             cCurrentModuleObject + " object = " + cAlphaArgs(1));
-                    if (GetScheduleMinValue(state, state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr) < 0.0) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                            " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs(6));
-                        ErrorsFound = true;
+                if (NumAlpha > 9) {
+                    thisMixing.MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
+                    if (thisMixing.MaxSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(10))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(10) +
+                                                " not found=\"" + cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MaxSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                    " must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
+                            ErrorsFound = true;
+                        }
                     }
                 }
-            }
-            if (state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
-                ShowWarningError(state,
-                                 format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
-                                        RoutineName,
-                                        cNumericFieldNames(5),
-                                        rNumericArgs(5)));
-                ShowContinueError(state, "in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
-            }
-            if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
-                ShowWarningError(state,
-                                 format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
-                                        RoutineName,
-                                        cAlphaFieldNames(6),
-                                        cAlphaArgs(6),
-                                        rNumericArgs(5)));
-                ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-            }
 
-            if (NumAlpha > 6) {
-                state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
-                if (state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(7))) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(7) +
-                                            " not found=" + cAlphaArgs(7) + "\".");
-                        ErrorsFound = true;
+                if (NumAlpha > 10) {
+                    thisMixing.MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
+                    if (thisMixing.MinOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(11))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(11) +
+                                                " not found=\"" + cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (thisMixing.MinOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                    " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
+                            ErrorsFound = true;
+                        }
                     }
                 }
-                if (state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(
-                            state, state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            state,
-                            std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
-                        ErrorsFound = true;
-                    }
-                }
-            }
 
-            if (NumAlpha > 7) {
-                state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
-                if (state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(8))) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(8) +
-                                            " not found=\"" + cAlphaArgs(8) + "\".");
-                        ErrorsFound = true;
+                if (NumAlpha > 11) {
+                    thisMixing.MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
+                    if (thisMixing.MaxOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(12))) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(12) +
+                                                " not found=\"" + cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
                     }
-                }
-                if (state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(
-                            state, state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            state,
-                            std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                " must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
-                        ErrorsFound = true;
-                    }
-                }
-            }
-
-            if (NumAlpha > 8) {
-                state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
-                if (state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(9))) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(9) +
-                                            " not found=\"" + cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
-                    }
-                }
-                if (state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(
-                            state, state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            state,
-                            std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                " must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
-                        ErrorsFound = true;
-                    }
-                }
-            }
-
-            if (NumAlpha > 9) {
-                state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
-                if (state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(10))) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(10) +
-                                            " not found=\"" + cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
-                    }
-                }
-                if (state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(
-                            state, state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            state,
-                            std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                " must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
-                        ErrorsFound = true;
-                    }
-                }
-            }
-
-            if (NumAlpha > 10) {
-                state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
-                if (state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(11))) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(11) +
-                                            " not found=\"" + cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
-                    }
-                }
-                if (state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(
-                            state, state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            state,
-                            std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
-                        ErrorsFound = true;
-                    }
-                }
-            }
-
-            if (NumAlpha > 11) {
-                state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
-                if (state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(12))) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(12) +
-                                            " not found=\"" + cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
-                    }
-                }
-                if (state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(
-                            state, state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            state,
-                            std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
-                        ErrorsFound = true;
+                    if (thisMixing.MaxOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(state, thisMixing.MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                state,
+                                std::string{RoutineName} + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                    " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
+                            ErrorsFound = true;
+                        }
                     }
                 }
             }
         }
-
-        if (state.dataHeatBal->CrossMixing(Loop).ZonePtr > 0) {
-            if (RepVarSet(state.dataHeatBal->CrossMixing(Loop).ZonePtr)) {
-                RepVarSet(state.dataHeatBal->CrossMixing(Loop).ZonePtr) = false;
-                SetupOutputVariable(state,
-                                    "Zone Mixing Volume",
-                                    OutputProcessor::Unit::m3,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixVolume,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Current Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixVdotCurDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Standard Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixVdotStdDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Mass",
-                                    OutputProcessor::Unit::kg,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixMass,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixMdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Sensible Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixHeatLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Sensible Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixHeatGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Latent Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixLatentLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Latent Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixLatentGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Total Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixTotalLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Total Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixTotalGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
-            }
+        // Create CrossMixing objects from air boundary info
+        for (auto thisAirBoundaryMixing : state.dataHeatBal->airBoundaryMixing) {
+            ++mixingNum;
+            // Create CrossMixing object from air boundary info
+            int space1 = thisAirBoundaryMixing.space1;
+            int space2 = thisAirBoundaryMixing.space2;
+            int zone1 = state.dataHeatBal->space(space1).zoneNum;
+            int zone2 = state.dataHeatBal->space(space1).zoneNum;
+            auto &thisCrossMizing = state.dataHeatBal->CrossMixing(mixingNum);
+            thisCrossMizing.Name = fmt::format("Air Boundary Mixing Zones {} and {}", zone1, zone2);
+            thisCrossMizing.spaceIndex = space1;
+            thisCrossMizing.ZonePtr = zone1;
+            thisCrossMizing.SchedPtr = thisAirBoundaryMixing.scheduleindex;
+            thisCrossMizing.DesignLevel = thisAirBoundaryMixing.mixingVolumeFlowRate;
+            thisCrossMizing.FromZone = zone2;
+            thisCrossMizing.fromSpaceIndex = space2;
         }
-        if (state.dataHeatBal->CrossMixing(Loop).FromZone > 0) {
-            if (RepVarSet(state.dataHeatBal->CrossMixing(Loop).FromZone)) {
-                RepVarSet(state.dataHeatBal->CrossMixing(Loop).FromZone) = false;
-                SetupOutputVariable(state,
-                                    "Zone Mixing Volume",
-                                    OutputProcessor::Unit::m3,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixVolume,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Current Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixVdotCurDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Standard Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixVdotStdDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Mass",
-                                    OutputProcessor::Unit::kg,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixMass,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixMdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Sensible Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixHeatLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Sensible Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixHeatGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Latent Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixLatentLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Latent Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixLatentGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Total Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixTotalLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
-                SetupOutputVariable(state,
-                                    "Zone Mixing Total Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixTotalGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
+        assert(mixingNum == state.dataHeatBal->TotCrossMixing);
+        for (int mixingRepNum = 1; mixingRepNum <= state.dataHeatBal->TotMixing; ++mixingRepNum) {
+            int zoneNum = state.dataHeatBal->CrossMixing(mixingRepNum).ZonePtr;
+            if (zoneNum > 0) {
+                std::string const zoneName = state.dataHeatBal->Zone(zoneNum).Name;
+                if (RepVarSet(zoneNum)) {
+                    RepVarSet(zoneNum) = false;
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Volume",
+                                        OutputProcessor::Unit::m3,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixVolume,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Current Density Volume Flow Rate",
+                                        OutputProcessor::Unit::m3_s,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixVdotCurDensity,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Standard Density Volume Flow Rate",
+                                        OutputProcessor::Unit::m3_s,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixVdotStdDensity,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Mass",
+                                        OutputProcessor::Unit::kg,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixMass,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Mass Flow Rate",
+                                        OutputProcessor::Unit::kg_s,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixMdot,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Sensible Heat Loss Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixHeatLoss,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Sensible Heat Gain Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixHeatGain,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Latent Heat Loss Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixLatentLoss,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Latent Heat Gain Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixLatentGain,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Total Heat Loss Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixTotalLoss,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Total Heat Gain Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixTotalGain,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        zoneName);
+                }
             }
-        }
+            int fromZoneNum = state.dataHeatBal->CrossMixing(mixingRepNum).FromZone;
+            if (fromZoneNum > 0) {
+                if (RepVarSet(fromZoneNum)) {
+                    RepVarSet(fromZoneNum) = false;
+                    std::string const fromZoneName = state.dataHeatBal->Zone(fromZoneNum).Name;
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Volume",
+                                        OutputProcessor::Unit::m3,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixVolume,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Current Density Volume Flow Rate",
+                                        OutputProcessor::Unit::m3_s,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixVdotCurDensity,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Standard Density Volume Flow Rate",
+                                        OutputProcessor::Unit::m3_s,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixVdotStdDensity,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Mass",
+                                        OutputProcessor::Unit::kg,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixMass,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Mass Flow Rate",
+                                        OutputProcessor::Unit::kg_s,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixMdot,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Sensible Heat Loss Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixHeatLoss,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Sensible Heat Gain Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixHeatGain,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Latent Heat Loss Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixLatentLoss,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Latent Heat Gain Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixLatentGain,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Total Heat Loss Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixTotalLoss,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                    SetupOutputVariable(state,
+                                        "Zone Mixing Total Heat Gain Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixTotalGain,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        fromZoneName);
+                }
+            }
 
-        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupEMSActuator(state,
-                             "ZoneCrossMixing",
-                             state.dataHeatBal->CrossMixing(Loop).Name,
-                             "Air Exchange Flow Rate",
-                             "[m3/s]",
-                             state.dataHeatBal->CrossMixing(Loop).EMSSimpleMixingOn,
-                             state.dataHeatBal->CrossMixing(Loop).EMSimpleMixingFlowRate);
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                SetupEMSActuator(state,
+                                 "ZoneCrossMixing",
+                                 state.dataHeatBal->CrossMixing(mixingRepNum).Name,
+                                 "Air Exchange Flow Rate",
+                                 "[m3/s]",
+                                 state.dataHeatBal->CrossMixing(mixingRepNum).EMSSimpleMixingOn,
+                                 state.dataHeatBal->CrossMixing(mixingRepNum).EMSimpleMixingFlowRate);
+            }
         }
     }
 

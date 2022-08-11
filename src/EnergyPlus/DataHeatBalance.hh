@@ -1128,9 +1128,11 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;
+        int spaceIndex = 0; // Space index for this mixing instance
         int SchedPtr = 0;
         Real64 DesignLevel = 0.0;
         int FromZone = 0;
+        int fromSpaceIndex = 0; // Source space index for this mixing instance
         Real64 DeltaTemperature = 0.0;
         Real64 DesiredAirFlowRate = 0.0;
         Real64 DesiredAirFlowRateSaved = 0.0;
@@ -1166,6 +1168,14 @@ namespace DataHeatBalance {
         Array1D_string DoorProtTypeName;     // Used in eio
                                              // Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
         // For ref door mixing, dimensioned by number of zones.
+    };
+
+    struct AirBoundaryMixingSpecs
+    {
+        int space1;                  // Air boundary simple mixing space 1
+        int space2;                  // Air boundary simple mixing space 2
+        int scheduleindex;           // Air boundary simple mixing schedule index
+        Real64 mixingVolumeFlowRate; // Air boundary simple mixing volume flow rate [m3/s]
     };
 
     struct ZoneAirMassFlowConservation
@@ -2167,11 +2177,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array4D<Real64> SurfWinOverlapAreas; // For a given hour and timestep, the areas of the exterior window sending beam solar radiation to the
                                          // surfaces listed in BackSurfaces
     Real64 zeroPointerVal = 0.0;
-    int NumAirBoundaryMixing = 0;             // Number of air boundary simple mixing objects needed
-    std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
-    std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
-    std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
-    std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
     EPVector<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
     DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
     EPVector<DataHeatBalance::SpaceZoneSimData> ZoneIntGain;
@@ -2199,6 +2204,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
     EPVector<DataHeatBalance::MixingData> Mixing;
     EPVector<DataHeatBalance::MixingData> CrossMixing;
+    EPVector<DataHeatBalance::AirBoundaryMixingSpecs> airBoundaryMixing;
     EPVector<DataHeatBalance::MixingData> RefDoorMixing;
     Array1D<DataHeatBalance::WindowBlindProperties> Blind;
     EPVector<DataHeatBalance::WindowComplexShade> ComplexShade;
