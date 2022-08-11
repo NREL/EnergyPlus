@@ -102,79 +102,86 @@ namespace UnitarySystems {
         std::string supply_air_fan_operating_mode_schedule_name;
         std::string heating_coil_object_type;
         std::string heating_coil_name;
-        Real64 dx_heating_coil_sizing_ratio;
+        Real64 dx_heating_coil_sizing_ratio = 1.0;
         std::string cooling_coil_object_type;
         std::string cooling_coil_name;
         std::string use_doas_dx_cooling_coil;
-        Real64 minimum_supply_air_temperature;
+        Real64 minimum_supply_air_temperature = 2.0;
         std::string latent_load_control;
         std::string supplemental_heating_coil_object_type;
         std::string supplemental_heating_coil_name;
         std::string cooling_supply_air_flow_rate_method;
-        Real64 cooling_supply_air_flow_rate;
-        Real64 cooling_supply_air_flow_rate_per_floor_area;
-        Real64 cooling_fraction_of_autosized_cooling_supply_air_flow_rate;
-        Real64 cooling_supply_air_flow_rate_per_unit_of_capacity;
+        Real64 cooling_supply_air_flow_rate = -999.0;
+        Real64 cooling_supply_air_flow_rate_per_floor_area = -999.0;
+        Real64 cooling_fraction_of_autosized_cooling_supply_air_flow_rate = -999.0;
+        Real64 cooling_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string heating_supply_air_flow_rate_method;
-        Real64 heating_supply_air_flow_rate;
-        Real64 heating_supply_air_flow_rate_per_floor_area;
-        Real64 heating_fraction_of_autosized_heating_supply_air_flow_rate;
-        Real64 heating_supply_air_flow_rate_per_unit_of_capacity;
+        Real64 heating_supply_air_flow_rate = -999.0;
+        Real64 heating_supply_air_flow_rate_per_floor_area = -999.0;
+        Real64 heating_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
+        Real64 heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string no_load_supply_air_flow_rate_method;
-        Real64 no_load_supply_air_flow_rate;
-        Real64 no_load_supply_air_flow_rate_per_floor_area;
-        Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate;
-        Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate;
-        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_cooling_operation;
-        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation;
-        Real64 maximum_supply_air_temperature;
-        Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation;
+        Real64 no_load_supply_air_flow_rate = -999.0;
+        Real64 no_load_supply_air_flow_rate_per_floor_area = -999.0;
+        Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate = -999.0;
+        Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
+        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_cooling_operation = -999.0;
+        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation = -999.0;
+        Real64 maximum_supply_air_temperature = 80.0;
+        Real64 maximum_supply_air_temperature_from_supplemental_heater = 50.0;
+        Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation = 21.0;
         std::string outdoor_dry_bulb_temperature_sensor_node_name;
-        Real64 maximum_cycling_rate;
-        Real64 heat_pump_time_constant;
-        Real64 fraction_of_on_cycle_power_use;
-        Real64 heat_pump_fan_delay_time;
-        Real64 ancillary_on_cycle_electric_power;
-        Real64 ancillary_off_cycle_electric_power;
-        Real64 design_heat_recovery_water_flow_rate;
-        Real64 maximum_temperature_for_heat_recovery;
+        std::string heat_pump_coil_water_flow_mode;
+        Real64 maximum_cycling_rate = 2.5;
+        Real64 heat_pump_time_constant = 60.0;
+        Real64 fraction_of_on_cycle_power_use = 0.01;
+        Real64 heat_pump_fan_delay_time = 60.0;
+        Real64 ancillary_on_cycle_electric_power = 0.0;
+        Real64 ancillary_off_cycle_electric_power = 0.0;
+        Real64 design_heat_recovery_water_flow_rate = 0.0;
+        Real64 maximum_temperature_for_heat_recovery = 80.0;
         std::string heat_recovery_water_inlet_node_name;
         std::string heat_recovery_water_outlet_node_name;
         std::string design_specification_multispeed_object_type;
         std::string design_specification_multispeed_object_name;
 
+        // inputs required by non-UnitarySystem parent objects
         std::string dx_cooling_coil_system_sensor_node_name;
+        std::string oa_mixer_type;
+        std::string oa_mixer_name;
+        std::string avail_manager_list_name;
+        std::string design_spec_zonehvac_sizing_object_name;
+        Real64 cooling_oa_flow_rate = 0.0;
+        Real64 heating_oa_flow_rate = 0.0;
+        Real64 no_load_oa_flow_rate = 0.0;
+        Real64 heat_conv_tol = 0.001;
+        Real64 cool_conv_tol = 0.001;
 
-        UnitarySysInputSpec();
-
-        ~UnitarySysInputSpec()
-        {
-        }
+        UnitarySysInputSpec() = default;
+        ~UnitarySysInputSpec() = default;
     };
 
     struct DesignSpecMSHP
     {
 
     public:
-        DesignSpecMSHP(); // constructor
-        ~DesignSpecMSHP() // destructor
-        {
-        }
-
         std::string name;
         static DesignSpecMSHP *factory(EnergyPlusData &state, int object_type_of_num, std::string const objectName);
-        int numOfSpeedHeating;
-        int numOfSpeedCooling;
-        Real64 noLoadAirFlowRateRatio;
+        int numOfSpeedHeating = 0;
+        int numOfSpeedCooling = 0;
+        Real64 noLoadAirFlowRateRatio = 1.0;
         std::vector<Real64> coolingVolFlowRatio; // The ratio of flow to max for this speed
         std::vector<Real64> heatingVolFlowRatio; // The ratio of flow to max for this speed
 
         //    private:
-        int m_DesignSpecMSHPType_Num;
-        bool m_SingleModeFlag;
+        int m_DesignSpecMSHPType_Num = 0;
+        bool m_SingleModeFlag = false;
 
         static void getDesignSpecMSHP(EnergyPlusData &state);
         static void getDesignSpecMSHPdata([[maybe_unused]] EnergyPlusData &state, bool errorsFound);
+
+        DesignSpecMSHP() = default;
+        ~DesignSpecMSHP() = default;
     };
 
     struct UnitarySys : HVACSystemData
@@ -224,273 +231,303 @@ namespace UnitarySystems {
             Unitary,          // AirloopHVAC:UnitarySystem
             CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water
-            Num
+            PackagedAC,       // ZoneHVAC:PackagedTerminalAirConditioner
+            PackagedHP,       // ZoneHVAC:PackagedTerminalHeatPump
+            PackagedWSHP,     // ZoneHVAC:WaterToAirHeatPump
+            Num,
         };
 
         UnitarySysInputSpec original_input_specs;
-        int m_UnitarySysNum;
-        SysType m_sysType;
-        bool m_ThisSysInputShouldBeGotten;
-        int m_SysAvailSchedPtr; // Pointer to the availability schedule
-        UnitarySysCtrlType m_ControlType;
-        DehumCtrlType m_DehumidControlType_Num;
-        bool m_Humidistat;
-        bool m_ValidASHRAECoolCoil;
-        bool m_ValidASHRAEHeatCoil;
-        bool m_SimASHRAEModel; // flag denoting that ASHRAE model (SZVAV) should be used
-        bool m_setFaultModelInput;
-        int m_FanIndex;
-        FanPlace m_FanPlace;
-        int m_FanOpModeSchedPtr;
-        bool m_FanExists;
-        int m_FanType_Num;
-        bool m_RequestAutoSize;
-        Real64 m_ActualFanVolFlowRate;
-        Real64 m_DesignFanVolFlowRate;
-        Real64 m_DesignMassFlowRate;
-        int m_FanAvailSchedPtr;
-        int m_FanOpMode;
-        int m_ATMixerIndex;
-        int m_ATMixerPriNode;
-        int m_ATMixerSecNode;
-        bool m_AirLoopEquipment;
-        int m_ZoneInletNode;
-        int m_ZoneSequenceCoolingNum;
-        int m_ZoneSequenceHeatingNum;
-        bool m_HeatCoilExists;
-        Real64 m_HeatingSizingRatio;
-        int m_HeatingCoilType_Num;
-        bool m_DXHeatingCoil;
-        int m_HeatingCoilIndex;
-        int m_HeatingCoilAvailSchPtr;
-        Real64 m_DesignHeatingCapacity;
-        Real64 m_MaxHeatAirVolFlow;
-        int m_NumOfSpeedHeating;
-        int m_NumOfSpeedSuppHeating;
-        bool m_MultiSpeedHeatingCoil;
-        bool m_VarSpeedHeatingCoil;
-        int m_SystemHeatControlNodeNum;
-        bool m_CoolCoilExists;
-        int m_CoolingCoilType_Num;
-        int m_NumOfSpeedCooling;
-        int m_CoolingCoilAvailSchPtr;
-        Real64 m_DesignCoolingCapacity;
-        Real64 m_MaxCoolAirVolFlow;
-        int m_CondenserNodeNum;
-        DataHeatBalance::RefrigCondenserType m_CondenserType;
-        int m_CoolingCoilIndex;
-        bool m_HeatPump;
-        int m_ActualDXCoilIndexForHXAssisted;
-        bool m_DiscreteSpeedCoolingCoil;
-        bool m_ContSpeedCoolingCoil;
-        int m_SystemCoolControlNodeNum;
-        int m_WaterCyclingMode;
-        bool m_ISHundredPercentDOASDXCoil;
-        bool m_RunOnSensibleLoad;
-        bool m_RunOnLatentLoad;
-        bool m_RunOnLatentOnlyWithSensible;
-        int m_DehumidificationMode;
-        int m_SuppHeatCoilType_Num;
-        bool m_SuppCoilExists;
-        Real64 m_DesignSuppHeatingCapacity;
-        int m_SuppCoilAirInletNode;
-        int m_SuppCoilAirOutletNode;
-        int m_SuppCoilFluidInletNode;
-        Real64 m_MaxSuppCoilFluidFlow;
-        int m_SuppHeatCoilIndex;
-        int m_SuppHeatControlNodeNum;
-        Real64 m_SupHeaterLoad;
-        int m_CoolingSAFMethod;
-        int m_HeatingSAFMethod;
-        int m_NoCoolHeatSAFMethod;
-        Real64 m_MaxNoCoolHeatAirVolFlow;
-        UseCompFlow m_AirFlowControl;
-        bool m_CoolingCoilUpstream;
-        Real64 m_MaxOATSuppHeat;
-        Real64 m_MinOATCompressorCooling;
-        Real64 m_MinOATCompressorHeating;
-        Real64 m_MaxONOFFCyclesperHour;
-        Real64 m_HPTimeConstant;
-        Real64 m_OnCyclePowerFraction;
-        Real64 m_FanDelayTime;
-        Real64 m_AncillaryOnPower;
-        Real64 m_AncillaryOffPower;
-        Real64 m_DesignHRWaterVolumeFlow;
-        Real64 m_MaxHROutletWaterTemp;
-        bool m_HeatRecActive;
-        int m_HeatRecoveryInletNodeNum;
-        int m_HeatRecoveryOutletNodeNum;
-        int m_DesignSpecMSHPIndex;
-        Real64 m_NoLoadAirFlowRateRatio;
-        int m_SingleMode;
-        bool m_MultiOrVarSpeedHeatCoil;
-        bool m_MultiOrVarSpeedCoolCoil;
-        Real64 m_PartLoadFrac;
-        Real64 m_CoolingPartLoadFrac;
-        Real64 m_HeatingPartLoadFrac;
-        Real64 m_SuppHeatPartLoadFrac;
-        Real64 m_HeatCompPartLoadRatio;
-        Real64 m_CoolCompPartLoadRatio;
-        Real64 m_SpeedRatio;
-        Real64 m_CycRatio;
+        int m_UnitarySysNum = -1;
+        SysType m_sysType = SysType::Invalid;
+        bool m_ThisSysInputShouldBeGotten = true;
+        int m_SysAvailSchedPtr = 0; // Pointer to the availability schedule
+        UnitarySysCtrlType m_ControlType = UnitarySysCtrlType::None;
+        DehumCtrlType m_DehumidControlType_Num = DehumCtrlType::None;
+        bool m_Humidistat = false;
+        bool m_ValidASHRAECoolCoil = false;
+        bool m_ValidASHRAEHeatCoil = false;
+        bool m_SimASHRAEModel = false; // flag denoting that ASHRAE model (SZVAV) should be used
+        bool m_setFaultModelInput = true;
+        int m_FanIndex = 0;
+        FanPlace m_FanPlace = FanPlace::NotYetSet;
+        int m_FanOpModeSchedPtr = 0;
+        bool m_FanExists = false;
+        int m_FanType_Num = 0;
+        bool m_RequestAutoSize = false;
+        Real64 m_ActualFanVolFlowRate = 0.0;
+        Real64 m_DesignFanVolFlowRate = 0.0;
+        Real64 m_DesignMassFlowRate = 0.0;
+        int m_FanAvailSchedPtr = 0;
+        int m_FanOpMode = 0;
+        int m_ATMixerIndex = 0;
+        int m_ATMixerPriNode = 0;
+        int m_ATMixerSecNode = 0;
+        bool m_AirLoopEquipment = true; // ?
+        int m_ZoneInletNode = 0;
+        int m_ZoneSequenceCoolingNum = 0;
+        int m_ZoneSequenceHeatingNum = 0;
+        bool m_HeatCoilExists = false;
+        Real64 m_HeatingSizingRatio = 1.0;
+        int m_HeatingCoilType_Num = 0;
+        bool m_DXHeatingCoil = false;
+        int m_HeatingCoilIndex = 0;
+        int m_HeatingCoilAvailSchPtr = 0;
+        Real64 m_DesignHeatingCapacity = 0.0;
+        Real64 m_MaxHeatAirVolFlow = 0.0;
+        int m_NumOfSpeedHeating = 0;
+        int m_NumOfSpeedSuppHeating = 0;
+        bool m_MultiSpeedHeatingCoil = false;
+        bool m_VarSpeedHeatingCoil = false;
+        int m_SystemHeatControlNodeNum = 0;
+        bool m_CoolCoilExists = false;
+        int m_CoolingCoilType_Num = 0;
+        int m_NumOfSpeedCooling = 0;
+        int m_CoolingCoilAvailSchPtr = 0;
+        Real64 m_DesignCoolingCapacity = 0.0;
+        Real64 m_MaxCoolAirVolFlow = 0.0;
+        int m_CondenserNodeNum = 0;
+        DataHeatBalance::RefrigCondenserType m_CondenserType = DataHeatBalance::RefrigCondenserType::Invalid;
+        int m_CoolingCoilIndex = 0;
+        bool m_HeatPump = false;
+        int m_ActualDXCoilIndexForHXAssisted = 0;
+        bool m_DiscreteSpeedCoolingCoil = false;
+        bool m_ContSpeedCoolingCoil = false;
+        int m_SystemCoolControlNodeNum = 0;
+        int m_WaterCyclingMode = 0;
+        bool m_ISHundredPercentDOASDXCoil = false;
+        bool m_RunOnSensibleLoad = false;
+        bool m_RunOnLatentLoad = false;
+        bool m_RunOnLatentOnlyWithSensible = false;
+        int m_DehumidificationMode = 0;
+        int m_SuppHeatCoilType_Num = 0;
+        bool m_SuppCoilExists = false;
+        Real64 m_DesignSuppHeatingCapacity = 0.0;
+        int m_SuppCoilAirInletNode = 0;
+        int m_SuppCoilAirOutletNode = 0;
+        int m_SuppCoilFluidInletNode = 0;
+        Real64 m_MaxSuppCoilFluidFlow = 0.0;
+        int m_SuppHeatCoilIndex = 0;
+        int m_SuppHeatControlNodeNum = 0;
+        Real64 m_SupHeaterLoad = 0.0;
+        int m_CoolingSAFMethod = 0;
+        int m_HeatingSAFMethod = 0;
+        int m_NoCoolHeatSAFMethod = 0;
+        int m_CoolingCapMethod = 0;
+        int m_HeatingCapMethod = 0;
+        Real64 m_MaxNoCoolHeatAirVolFlow = 0.0;
+        UseCompFlow m_AirFlowControl = UseCompFlow::Invalid;
+        bool m_CoolingCoilUpstream = true;
+        Real64 m_MaxOATSuppHeat = 0.0;
+        Real64 m_MinOATCompressorCooling = 0.0;
+        Real64 m_MinOATCompressorHeating = 0.0;
+        Real64 m_MaxONOFFCyclesperHour = 0.0;
+        Real64 m_HPTimeConstant = 0.0;
+        Real64 m_OnCyclePowerFraction = 0.0;
+        Real64 m_FanDelayTime = 0.0;
+        Real64 m_AncillaryOnPower = 0.0;
+        Real64 m_AncillaryOffPower = 0.0;
+        Real64 m_DesignHRWaterVolumeFlow = 0.0;
+        Real64 m_MaxHROutletWaterTemp = 0.0;
+        bool m_HeatRecActive = false;
+        int m_HeatRecoveryInletNodeNum = 0;
+        int m_HeatRecoveryOutletNodeNum = 0;
+        int m_DesignSpecMSHPIndex = -1;
+        Real64 m_NoLoadAirFlowRateRatio = 1.0;
+        int m_SingleMode = 0;
+        bool m_MultiOrVarSpeedHeatCoil = false;
+        bool m_MultiOrVarSpeedCoolCoil = false;
+        Real64 m_PartLoadFrac = 0.0;
+        Real64 m_CoolingPartLoadFrac = 0.0;
+        Real64 m_HeatingPartLoadFrac = 0.0;
+        Real64 m_SuppHeatPartLoadFrac = 0.0;
+        Real64 m_HeatCompPartLoadRatio = 0.0;
+        Real64 m_CoolCompPartLoadRatio = 0.0;
+        Real64 m_SpeedRatio = 0.0;
+        Real64 m_CycRatio = 0.0;
 
-        bool m_MyEnvrnFlag;
-        bool m_MyEnvrnFlag2;
-        bool m_MyPlantScanFlag;
-        bool m_MySuppCoilPlantScanFlag;
-        bool m_MySetPointCheckFlag;
-        bool m_MySizingCheckFlag;
-        bool m_InitHeatPump; // Heat pump initialization flag (for error reporting)
+        bool m_MyEnvrnFlag = true;
+        bool m_MyEnvrnFlag2 = true;
+        bool m_MyPlantScanFlag = true;
+        bool m_MySuppCoilPlantScanFlag = true;
+        bool m_MySetPointCheckFlag = true;
+        bool m_MySizingCheckFlag = true;
+        bool m_InitHeatPump = false; // Heat pump initialization flag (for error reporting)
         PlantLocation m_HRPlantLoc;
         PlantLocation m_SuppCoilPlantLoc;
-        int m_SuppCoilFluidOutletNodeNum;
+        int m_SuppCoilFluidOutletNodeNum = 0;
 
-        Real64 m_WSHPRuntimeFrac;
-        Real64 m_CompPartLoadRatio;
-        Real64 m_CoolingCoilSensDemand;
-        Real64 m_CoolingCoilLatentDemand;
-        Real64 m_HeatingCoilSensDemand;
-        Real64 m_SenLoadLoss;
-        Real64 m_LatLoadLoss;
-        Real64 m_DesignHeatRecMassFlowRate;
-        Real64 m_HeatRecoveryMassFlowRate;
-        Real64 m_HeatRecoveryRate;
-        Real64 m_HeatRecoveryEnergy;
-        Real64 m_HeatRecoveryInletTemp;
-        Real64 m_HeatRecoveryOutletTemp;
+        Real64 m_WSHPRuntimeFrac = 0.0;
+        Real64 m_CompPartLoadRatio = 0.0;
+        Real64 m_CoolingCoilSensDemand = 0.0;
+        Real64 m_CoolingCoilLatentDemand = 0.0;
+        Real64 m_HeatingCoilSensDemand = 0.0;
+        Real64 m_SenLoadLoss = 0.0;
+        Real64 m_LatLoadLoss = 0.0;
+        Real64 m_DesignHeatRecMassFlowRate = 0.0;
+        Real64 m_HeatRecoveryMassFlowRate = 0.0;
+        Real64 m_HeatRecoveryRate = 0.0;
+        Real64 m_HeatRecoveryEnergy = 0.0;
+        Real64 m_HeatRecoveryInletTemp = 0.0;
+        Real64 m_HeatRecoveryOutletTemp = 0.0;
 
-        int m_IterationCounter;
+        int m_IterationCounter = 0;
 
-        Real64 m_DesiredOutletTemp;
-        Real64 m_DesiredOutletHumRat;
-        int m_FrostControlStatus;
+        Real64 m_DesiredOutletTemp = 0.0;
+        Real64 m_DesiredOutletHumRat = 0.0;
+        int m_FrostControlStatus = 0;
 
-        Real64 m_CoolingCycRatio;
-        Real64 m_CoolingSpeedRatio;
-        int m_CoolingSpeedNum;
-        Real64 m_HeatingCycRatio;
-        Real64 m_HeatingSpeedRatio;
-        int m_HeatingSpeedNum;
-        int m_SpeedNum;
-        Real64 m_SuppHeatingCycRatio;
-        Real64 m_SuppHeatingSpeedRatio;
-        int m_SuppHeatingSpeedNum;
+        Real64 m_CoolingCycRatio = 0.0;
+        Real64 m_CoolingSpeedRatio = 0.0;
+        int m_CoolingSpeedNum = 0;
+        Real64 m_HeatingCycRatio = 0.0;
+        Real64 m_HeatingSpeedRatio = 0.0;
+        int m_HeatingSpeedNum = 0;
+        int m_SpeedNum = 0;
+        Real64 m_SuppHeatingCycRatio = 0.0;
+        Real64 m_SuppHeatingSpeedRatio = 0.0;
+        int m_SuppHeatingSpeedNum = 0;
 
-        bool m_EMSOverrideCoilSpeedNumOn;
-        Real64 m_EMSOverrideCoilSpeedNumValue;
-        int m_CoilSpeedErrIdx;
+        bool m_EMSOverrideCoilSpeedNumOn = false;
+        Real64 m_EMSOverrideCoilSpeedNumValue = 0.0;
+        bool m_EMSOverrideSuppCoilSpeedNumOn = false;
+        Real64 m_EMSOverrideSuppCoilSpeedNumValue = 0.0;
+        int m_CoilSpeedErrIdx = 0;
 
-        Real64 m_DehumidInducedHeatingDemandRate;
+        Real64 m_DehumidInducedHeatingDemandRate = 0.0;
 
-        Real64 m_TotalAuxElecPower;
-        Real64 m_HeatingAuxElecConsumption;
-        Real64 m_CoolingAuxElecConsumption;
-        Real64 m_ElecPower;
-        Real64 m_ElecPowerConsumption;
+        Real64 m_TotalAuxElecPower = 0.0;
+        Real64 m_HeatingAuxElecConsumption = 0.0;
+        Real64 m_CoolingAuxElecConsumption = 0.0;
+        Real64 m_ElecPower = 0.0;
+        Real64 m_ElecPowerConsumption = 0.0;
 
-        int m_LastMode;
-        bool m_FirstPass;
+        int m_LastMode = 0;
+        bool m_FirstPass = true;
 
-        Real64 m_TotCoolEnergyRate;
-        Real64 m_SensCoolEnergyRate;
-        Real64 m_LatCoolEnergyRate;
-        Real64 m_TotHeatEnergyRate;
-        Real64 m_SensHeatEnergyRate;
-        Real64 m_LatHeatEnergyRate;
+        Real64 m_TotCoolEnergyRate = 0.0;
+        Real64 m_TotCoolEnergy = 0.0;
+        Real64 m_SensCoolEnergyRate = 0.0;
+        Real64 m_SensCoolEnergy = 0.0;
+        Real64 m_LatCoolEnergyRate = 0.0;
+        Real64 m_LatCoolEnergy = 0.0;
+        Real64 m_TotHeatEnergyRate = 0.0;
+        Real64 m_TotHeatEnergy = 0.0;
+        Real64 m_SensHeatEnergyRate = 0.0;
+        Real64 m_SensHeatEnergy = 0.0;
+        Real64 m_LatHeatEnergyRate = 0.0;
+        Real64 m_LatHeatEnergy = 0.0;
 
-        bool m_DesignFanVolFlowRateEMSOverrideOn;         // If true, then EMS is calling to override autosize fan flow
-        bool m_MaxHeatAirVolFlowEMSOverrideOn;            // If true, then EMS is calling to override autosize fan flow
-        bool m_MaxCoolAirVolFlowEMSOverrideOn;            // If true, then EMS is calling to override autosize fan flow
-        bool m_MaxNoCoolHeatAirVolFlowEMSOverrideOn;      // If true, then EMS is calling to override autosize fan flow
-        Real64 m_DesignFanVolFlowRateEMSOverrideValue;    // EMS value for override of fan flow rate autosize [m3/s]
-        Real64 m_MaxHeatAirVolFlowEMSOverrideValue;       // EMS value for override of fan flow rate autosize [m3/s]
-        Real64 m_MaxCoolAirVolFlowEMSOverrideValue;       // EMS value for override of fan flow rate autosize [m3/s]
-        Real64 m_MaxNoCoolHeatAirVolFlowEMSOverrideValue; // EMS value for override of fan flow rate autosize [m3/s]
-        bool m_EMSOverrideSensZoneLoadRequest;            // If true, then EMS is calling to override zone load
-        bool m_EMSOverrideMoistZoneLoadRequest;           // If true, then EMS is calling to override zone load
-        Real64 m_EMSSensibleZoneLoadValue;                // Value EMS is directing to use
-        Real64 m_EMSMoistureZoneLoadValue;                // Value EMS is directing to use
+        bool m_DesignFanVolFlowRateEMSOverrideOn = false;       // If true, then EMS is calling to override autosize fan flow
+        bool m_MaxHeatAirVolFlowEMSOverrideOn = false;          // If true, then EMS is calling to override autosize fan flow
+        bool m_MaxCoolAirVolFlowEMSOverrideOn = false;          // If true, then EMS is calling to override autosize fan flow
+        bool m_MaxNoCoolHeatAirVolFlowEMSOverrideOn = false;    // If true, then EMS is calling to override autosize fan flow
+        Real64 m_DesignFanVolFlowRateEMSOverrideValue = 0.0;    // EMS value for override of fan flow rate autosize [m3/s]
+        Real64 m_MaxHeatAirVolFlowEMSOverrideValue = 0.0;       // EMS value for override of fan flow rate autosize [m3/s]
+        Real64 m_MaxCoolAirVolFlowEMSOverrideValue = 0.0;       // EMS value for override of fan flow rate autosize [m3/s]
+        Real64 m_MaxNoCoolHeatAirVolFlowEMSOverrideValue = 0.0; // EMS value for override of fan flow rate autosize [m3/s]
+        bool m_EMSOverrideSensZoneLoadRequest = false;          // If true, then EMS is calling to override zone load
+        bool m_EMSOverrideMoistZoneLoadRequest = false;         // If true, then EMS is calling to override zone load
+        Real64 m_EMSSensibleZoneLoadValue = 0.0;                // Value EMS is directing to use
+        Real64 m_EMSMoistureZoneLoadValue = 0.0;                // Value EMS is directing to use
         // Staged thermostat control
-        int m_StageNum; // Stage number specified by staged thermostat
-        bool m_Staged;  // Using Staged thermostat
+        int m_StageNum = 0;    // Stage number specified by staged thermostat
+        bool m_Staged = false; // Using Staged thermostat
 
-        Real64 m_HeatingFanSpeedRatio;
-        Real64 m_CoolingFanSpeedRatio;
-        Real64 m_NoHeatCoolSpeedRatio;
-        bool m_MyFanFlag;
-        bool m_MyCheckFlag;
-        Real64 m_SensibleLoadMet;
-        Real64 m_LatentLoadMet;
-        bool m_MyStagedFlag;
-        Real64 m_SensibleLoadPredicted;
-        Real64 m_MoistureLoadPredicted;
+        Real64 m_HeatingFanSpeedRatio = 0.0;
+        Real64 m_CoolingFanSpeedRatio = 0.0;
+        Real64 m_NoHeatCoolSpeedRatio = 0.0;
+        bool m_MyFanFlag = true;
+        bool m_MyCheckFlag = true;
+        Real64 m_SensibleLoadMet = 0.0;
+        Real64 m_LatentLoadMet = 0.0;
+        bool m_MyStagedFlag = false;
+        Real64 m_SensibleLoadPredicted = 0.0;
+        Real64 m_MoistureLoadPredicted = 0.0;
 
         // Fault model of coil SAT sensor
-        bool m_FaultyCoilSATFlag;     // True if the coil has SAT sensor fault
-        int m_FaultyCoilSATIndex;     // Index of the fault object corresponding to the coil
-        Real64 m_FaultyCoilSATOffset; // Coil SAT sensor offset
+        bool m_FaultyCoilSATFlag = false;   // True if the coil has SAT sensor fault
+        int m_FaultyCoilSATIndex = 0;       // Index of the fault object corresponding to the coil
+        Real64 m_FaultyCoilSATOffset = 0.0; // Coil SAT sensor offset
 
-        PackagedThermalStorageCoil::PTSCOperatingMode m_TESOpMode; // operating mode of TES DX cooling coil
-        bool m_initLoadBasedControlAirLoopPass;
-        int m_airLoopPassCounter;
-        int m_airLoopReturnCounter;
-        bool m_FanCompNotSetYet;
-        bool m_CoolCompNotSetYet;
-        bool m_HeatCompNotSetYet;
-        bool m_SuppCompNotSetYet;
-        bool m_OKToPrintSizing;
-        bool m_IsDXCoil;
-        Real64 m_SmallLoadTolerance;
-        bool m_TemperatureOffsetControlActive; // true if water-side economizer coil is active
-        Real64 m_minAirToWaterTempOffset;      // coil entering air to entering water temp offset
+        PackagedThermalStorageCoil::PTSCOperatingMode m_TESOpMode = PackagedThermalStorageCoil::PTSCOperatingMode::Invalid;
+        bool m_initLoadBasedControlAirLoopPass = false;
+        int m_airLoopPassCounter = 0;
+        int m_airLoopReturnCounter = 0;
+        bool m_FanCompNotSetYet = true;
+        bool m_CoolCompNotSetYet = true;
+        bool m_HeatCompNotSetYet = true;
+        bool m_SuppCompNotSetYet = true;
+        bool m_OKToPrintSizing = false;
+        bool m_IsDXCoil = true;
+        Real64 m_SmallLoadTolerance = 5.0;             // watts
+        bool m_TemperatureOffsetControlActive = false; // true if water-side economizer coil is active
+        Real64 m_minAirToWaterTempOffset = 0.0;        // coil entering air to entering water temp offset
 
-        int m_HRcoolCoilFluidInletNode;
-        int m_HRcoolCoilAirInNode;
-        Real64 m_minWaterLoopTempForHR; // water coil heat recovery loops
-        bool m_waterSideEconomizerFlag; // user input to enable lockout with economizer
-        bool m_WaterHRPlantLoopModel;   // signifies water heat recovery loop for this CoilSystem
+        int m_HRcoolCoilFluidInletNode = 0;
+        int m_HRcoolCoilAirInNode = 0;
+        Real64 m_minWaterLoopTempForHR = 0.0;   // water coil heat recovery loops
+        bool m_waterSideEconomizerFlag = false; // user input to enable lockout with economizer
+        bool m_WaterHRPlantLoopModel = false;   // signifies water heat recovery loop for this CoilSystem
+        std::array<int, 4> m_OAMixerNodes{0, 0, 0, 0};
+        Real64 m_CoolOutAirVolFlow = 0.0;
+        Real64 m_CoolOutAirMassFlow = 0.0;
+        Real64 m_HeatOutAirVolFlow = 0.0;
+        Real64 m_HeatOutAirMassFlow = 0.0;
+        Real64 m_NoCoolHeatOutAirVolFlow = 0.0;
+        Real64 m_NoCoolHeatOutAirMassFlow = 0.0;
+        Real64 m_HeatConvTol = 0.001;
+        Real64 m_CoolConvTol = 0.001;
+        int m_HVACSizingIndex = -1;
+        int m_AvailStatus = 0;
+        bool m_IsZoneEquipment = false;
+        bool m_ZoneCompFlag = true;
+        std::string m_AvailManagerListName;
+        int m_EquipCompNum = 0; // 1-based index of this parent type for specific equipment type processing
 
     public:
         // SZVAV variables
-        int UnitarySystemType_Num;
-        int MaxIterIndex;
-        int RegulaFalsiFailedIndex;
-        int NodeNumOfControlledZone;
-        Real64 FanPartLoadRatio;
-        Real64 CoolCoilWaterFlowRatio;
-        Real64 HeatCoilWaterFlowRatio;
-        int ControlZoneNum;              // index of unit in ZoneEquipConfig
-        int AirInNode;                   // Parent inlet air node number
-        int AirOutNode;                  // Parent outlet air node number
-        Real64 MaxCoolAirMassFlow;       // Maximum coil air mass flow for cooling [kg/s]
-        Real64 MaxHeatAirMassFlow;       // Maximum coil air mass flow for heating [kg/s]
-        Real64 MaxNoCoolHeatAirMassFlow; // Maximum coil air mass flow for no cooling or heating [kg/s]
-        Real64 DesignMinOutletTemp;      // DOAS DX Cooling or SZVAV coil outlet air minimum temperature [C]
-        Real64 DesignMaxOutletTemp;      // Maximum supply air temperature from heating coil [C]
-        Real64 LowSpeedCoolFanRatio;     // cooling mode ratio of low speed fan flow to full flow rate
-        Real64 LowSpeedHeatFanRatio;     // heating mode ratio of low speed fan flow to full flow rate
-        Real64 MaxCoolCoilFluidFlow;     // Maximum cooling coil fluid flow for chilled water coil
-        Real64 MaxHeatCoilFluidFlow;     // Maximum heating coil fluid flow for hot water or steam coil
-        int CoolCoilInletNodeNum;        // Cooling coil air inlet node number
-        int CoolCoilOutletNodeNum;       // Cooling coil air outlet node number
-        int CoolCoilFluidOutletNodeNum;  // Cooling coil fluid outlet node number (from Plant Loop data)
-        PlantLocation CoolCoilPlantLoc;  // Location of the cooling coil in the plant loop
-        int CoolCoilFluidInletNode;      // Cooling coil fluid inlet node
-        PlantLocation HeatCoilPlantLoc;  // Location of the heating coil in the plant loop
-        int HeatCoilFluidInletNode;      // Heating coil fluid inlet node
-        int HeatCoilFluidOutletNodeNum;  // Heating coil fluid outlet node number (from Plant Loop data)
-        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
-        bool ATMixerExists;              // true if AT mixer is connected to Unitary System
-        int ATMixerType;                 // type of AT mixer, inlet-side or supply-side
-        int ATMixerOutNode;              // AT mixer outlet node number
-        Real64 ControlZoneMassFlowFrac;  // fraction of air flow to the control zone
-        DesignSpecMSHP *m_CompPointerMSHP;
+        int UnitarySystemType_Num = 0;
+        int MaxIterIndex = 0;
+        int RegulaFalsiFailedIndex = 0;
+        int NodeNumOfControlledZone = 0;
+        Real64 FanPartLoadRatio = 0.0;
+        Real64 CoolCoilWaterFlowRatio = 0.0;
+        Real64 HeatCoilWaterFlowRatio = 0.0;
+        int ControlZoneNum = 0;                // index of unit in ZoneEquipConfig
+        int AirInNode = 0;                     // Parent inlet air node number
+        int AirOutNode = 0;                    // Parent outlet air node number
+        Real64 MaxCoolAirMassFlow = 0.0;       // Maximum coil air mass flow for cooling [kg/s]
+        Real64 MaxHeatAirMassFlow = 0.0;       // Maximum coil air mass flow for heating [kg/s]
+        Real64 MaxNoCoolHeatAirMassFlow = 0.0; // Maximum coil air mass flow for no cooling or heating [kg/s]
+        Real64 DesignMinOutletTemp = 0.0;      // DOAS DX Cooling or SZVAV coil outlet air minimum temperature [C]
+        Real64 DesignMaxOutletTemp = 0.0;      // Maximum supply air temperature from heating coil [C]
+        Real64 LowSpeedCoolFanRatio = 0.0;     // cooling mode ratio of low speed fan flow to full flow rate
+        Real64 LowSpeedHeatFanRatio = 0.0;     // heating mode ratio of low speed fan flow to full flow rate
+        Real64 MaxCoolCoilFluidFlow = 0.0;     // Maximum cooling coil fluid flow for chilled water coil
+        Real64 MaxHeatCoilFluidFlow = 0.0;     // Maximum heating coil fluid flow for hot water or steam coil
+        int CoolCoilInletNodeNum = 0;          // Cooling coil air inlet node number
+        int CoolCoilOutletNodeNum = 0;         // Cooling coil air outlet node number
+        int CoolCoilFluidOutletNodeNum = 0;    // Cooling coil fluid outlet node number (from Plant Loop data)
+        PlantLocation CoolCoilPlantLoc;        // Location of the cooling coil in the plant loop
+        int CoolCoilFluidInletNode = 0;        // Cooling coil fluid inlet node
+        PlantLocation HeatCoilPlantLoc;        // Location of the heating coil in the plant loop
+        int HeatCoilFluidInletNode = 0;        // Heating coil fluid inlet node
+        int HeatCoilFluidOutletNodeNum = 0;    // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilInletNodeNum = 0;          // Heating coil air inlet node number
+        int HeatCoilOutletNodeNum = 0;         // Heating coil air outlet node number
+        bool ATMixerExists = false;            // true if AT mixer is connected to Unitary System
+        int ATMixerType = 0;                   // type of AT mixer, inlet-side or supply-side
+        int ATMixerOutNode = 0;                // AT mixer outlet node number
+        Real64 ControlZoneMassFlowFrac = 0.0;  // fraction of air flow to the control zone
+        DesignSpecMSHP *m_CompPointerMSHP = nullptr;
         std::string Name;
         std::string UnitType;
-        Real64 LoadSHR;                     // Load sensible heat ratio with humidity control
-        Real64 CoilSHR;                     // Load sensible heat ratio with humidity control
-        int temperatureOffsetControlStatus; // water side economizer status flag, also report variable
+        Real64 LoadSHR = 0.0;                   // Load sensible heat ratio with humidity control
+        Real64 CoilSHR = 0.0;                   // Load sensible heat ratio with humidity control
+        int temperatureOffsetControlStatus = 0; // water side economizer status flag, also report variable
+        int OAMixerIndex = -1;                  // index to zone equipment OA mixer
+        bool OAMixerExists = false;             // true if OA mixer is connected to inlet of UnitarySystem
 
         //    private:
         // private members not initialized in constructor
@@ -807,9 +844,10 @@ namespace UnitarySystems {
 
         void calcUnitarySuppHeatingSystem(EnergyPlusData &state,
                                           bool const FirstHVACIteration, // True when first HVAC iteration
-                                          Real64 const PartLoadRatio,    // coil operating part-load ratio
                                           Real64 const SuppCoilLoad      // adjusted supp coil load when outlet temp exceeds max (W)
         );
+
+        void setEMSSuppCoilStagePLR(EnergyPlusData &state);
 
         void calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
         );
@@ -859,12 +897,6 @@ namespace UnitarySystems {
         );
 
     public:
-        UnitarySys(); // constructor
-
-        ~UnitarySys() // destructor
-        {
-        }
-
         static void
         getUnitarySystemInputData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
@@ -873,6 +905,9 @@ namespace UnitarySystems {
 
         static void getCoilWaterSystemInputData(
             EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
+        static void getPackagedTerminalUnitData(
+            EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static void allocateUnitarySys(EnergyPlusData &state);
 
@@ -938,6 +973,14 @@ namespace UnitarySystems {
         void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) override;
         int getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
         int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
+        int getAirOutletNode() override;
+        int getMixerOANode() override;
+        int getMixerMixNode() override;
+        int getMixerRetNode() override;
+        int getEquipIndex() override;
+
+        UnitarySys() = default;
+        ~UnitarySys() = default;
     };
 
     int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);
@@ -947,7 +990,6 @@ namespace UnitarySystems {
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);
@@ -965,6 +1007,8 @@ struct UnitarySystemsData : BaseGlobalStruct
     Real64 MoistureLoad = 0.0;        // Dehumidification Load (W)
     Real64 CompOnMassFlow = 0.0;      // Supply air mass flow rate w/ compressor ON [kg/s]
     Real64 CompOffMassFlow = 0.0;     // Supply air mass flow rate w/ compressor OFF [kg/s]
+    Real64 OACompOnMassFlow = 0.0;    // OA mass flow rate w/ compressor ON [kg/s]
+    Real64 OACompOffMassFlow = 0.0;   // OA mass flow rate w/ compressor OFF [kg/s]
 
     Real64 CompOnFlowRatio = 0.0;       // fan flow ratio when coil on
     Real64 CompOffFlowRatio = 0.0;      // fan flow ratio when coil off
@@ -1005,6 +1049,8 @@ struct UnitarySystemsData : BaseGlobalStruct
         CompOffMassFlow = 0.0;
         CompOnFlowRatio = 0.0;
         CompOffFlowRatio = 0.0;
+        OACompOnMassFlow = 0.0;
+        OACompOffMassFlow = 0.0;
         FanSpeedRatio = 0.0;
         CoolHeatPLRRat = 1.0;
         OnOffAirFlowRatioSave = 0.0;

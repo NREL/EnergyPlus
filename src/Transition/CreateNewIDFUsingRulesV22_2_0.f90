@@ -424,6 +424,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with F, insert the rules here
 
+             CASE('FUELFACTORS')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1)=InArgs(1)
+                 OutArgs(2:CurArgs-2)=InArgs(4:CurArgs)
+                 CurArgs = CurArgs - 2
+
               ! If your original object starts with G, insert the rules here
 
               ! If your original object starts with H, insert the rules here
@@ -443,6 +450,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with R, insert the rules here
 
               ! If your original object starts with S, insert the rules here
+
+              CASE('SPACE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:2)=InArgs(1:2)
+                  OutArgs(3:4) = 'autocalculate'
+                  OutArgs(5:CurArgs+2)=InArgs(3:CurArgs)
+                  CurArgs = CurArgs + 2
 
               ! If your original object starts with T, insert the rules here
 

@@ -925,12 +925,12 @@
 
   People,
     WEST_ZONE People,        !- Name
-    WEST_ZONE,               !- Zone or ZoneList Name
+    WEST_ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -947,12 +947,12 @@
 
   People,
     EAST_ZONE People,        !- Name
-    EAST_ZONE,               !- Zone or ZoneList Name
+    EAST_ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -969,12 +969,12 @@
 
   People,
     NORTH_ZONE People,       !- Name
-    NORTH_ZONE,              !- Zone or ZoneList Name
+    NORTH_ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -991,7 +991,7 @@
 
   Lights,
     EAST_ZONE Lights,        !- Name
-    EAST_ZONE,               !- Zone or ZoneList Name
+    EAST_ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}
@@ -1005,7 +1005,7 @@
 
   Lights,
     NORTH_ZONE Lights,       !- Name
-    NORTH_ZONE,              !- Zone or ZoneList Name
+    NORTH_ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     878.6252,                !- Lighting Level {W}
@@ -1019,7 +1019,7 @@
 
   ElectricEquipment,
     WEST_ZONE Equip,         !- Name
-    WEST_ZONE,               !- Zone or ZoneList Name
+    WEST_ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1031,7 +1031,7 @@
 
   ElectricEquipment,
     EAST_ZONE Equip,         !- Name
-    EAST_ZONE,               !- Zone or ZoneList Name
+    EAST_ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1464.375,                !- Design Level {W}
@@ -1043,7 +1043,7 @@
 
   ElectricEquipment,
     NORTH_ZONE Equip,        !- Name
-    NORTH_ZONE,              !- Zone or ZoneList Name
+    NORTH_ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1065,7 +1065,11 @@
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     0.0,                     !- Azimuth Angle of Long Axis of Building {deg}
-    1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    1.0,                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    ,                        !- Height Dependence of External Node Temperature
+    ,                        !- Solver
+    ,                        !- Allow Unsupported Zone Equipment
+    ;                        !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     WEST_ZONE,               !- Zone Name

@@ -55,8 +55,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    15,                       !- Minimum System Timestep {minutes}
-    5;                        !- Maximum HVAC Iterations
+    15,                      !- Minimum System Timestep {minutes}
+    5;                       !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -131,7 +131,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -142,34 +142,34 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 2,              !- Name
-    4,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    4,                        !- End Month
-    30,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 2,             !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    4,                       !- End Month
+    30,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 3,              !- Name
-    7,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    7,                        !- End Month
-    31,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 3,             !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -6523,12 +6523,12 @@
 
   People,
     Basement,                !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6545,12 +6545,12 @@
 
   People,
     Core_bottom,             !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6567,12 +6567,12 @@
 
   People,
     Core_mid,                !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6589,12 +6589,12 @@
 
   People,
     Core_top,                !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6611,12 +6611,12 @@
 
   People,
     Perimeter_bot_ZN_3,      !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6633,12 +6633,12 @@
 
   People,
     Perimeter_bot_ZN_2,      !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6655,12 +6655,12 @@
 
   People,
     Perimeter_bot_ZN_1,      !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6677,12 +6677,12 @@
 
   People,
     Perimeter_bot_ZN_4,      !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6699,12 +6699,12 @@
 
   People,
     Perimeter_mid_ZN_3,      !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6721,12 +6721,12 @@
 
   People,
     Perimeter_mid_ZN_2,      !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_w_SB,       !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6743,12 +6743,12 @@
 
   People,
     Perimeter_mid_ZN_1,      !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6765,12 +6765,12 @@
 
   People,
     Perimeter_mid_ZN_4,      !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6787,12 +6787,12 @@
 
   People,
     Perimeter_top_ZN_3,      !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6809,12 +6809,12 @@
 
   People,
     Perimeter_top_ZN_2,      !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6831,12 +6831,12 @@
 
   People,
     Perimeter_top_ZN_1,      !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6853,12 +6853,12 @@
 
   People,
     Perimeter_top_ZN_4,      !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH_wo_SB,      !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.5787942465724,        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.5787942465724,        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -6877,7 +6877,7 @@
 
   Lights,
     Basement_Lights,         !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6892,7 +6892,7 @@
 
   Lights,
     Core_bottom_Lights,      !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6907,7 +6907,7 @@
 
   Lights,
     Core_mid_Lights,         !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6922,7 +6922,7 @@
 
   Lights,
     Core_top_Lights,         !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6937,7 +6937,7 @@
 
   Lights,
     Perimeter_bot_ZN_3_Lights,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6952,7 +6952,7 @@
 
   Lights,
     Perimeter_bot_ZN_2_Lights,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6967,7 +6967,7 @@
 
   Lights,
     Perimeter_bot_ZN_1_Lights,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6982,7 +6982,7 @@
 
   Lights,
     Perimeter_bot_ZN_4_Lights,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -6997,7 +6997,7 @@
 
   Lights,
     Perimeter_mid_ZN_3_Lights,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7012,7 +7012,7 @@
 
   Lights,
     Perimeter_mid_ZN_2_Lights,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7027,7 +7027,7 @@
 
   Lights,
     Perimeter_mid_ZN_1_Lights,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7042,7 +7042,7 @@
 
   Lights,
     Perimeter_mid_ZN_4_Lights,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7057,7 +7057,7 @@
 
   Lights,
     Perimeter_top_ZN_3_Lights,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7072,7 +7072,7 @@
 
   Lights,
     Perimeter_top_ZN_2_Lights,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7087,7 +7087,7 @@
 
   Lights,
     Perimeter_top_ZN_1_Lights,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7102,7 +7102,7 @@
 
   Lights,
     Perimeter_top_ZN_4_Lights,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7117,7 +7117,7 @@
 
   Lights,
     DataCenter_Basement_Lights,  !- Name
-    DataCenter_basement_ZN_6,!- Zone or ZoneList Name
+    DataCenter_basement_ZN_6,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7132,7 +7132,7 @@
 
   Lights,
     DataCenter_bot_Lights,   !- Name
-    DataCenter_bot_ZN_6,     !- Zone or ZoneList Name
+    DataCenter_bot_ZN_6,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7147,7 +7147,7 @@
 
   Lights,
     DataCenter_mid_Lights,   !- Name
-    DataCenter_mid_ZN_6,     !- Zone or ZoneList Name
+    DataCenter_mid_ZN_6,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7162,7 +7162,7 @@
 
   Lights,
     DataCenter_top_Lights,   !- Name
-    DataCenter_top_ZN_6,     !- Zone or ZoneList Name
+    DataCenter_top_ZN_6,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -7179,7 +7179,7 @@
 
   ElectricEquipment,
     Basement_MiscPlug_Equip, !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     Always_on,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     13457.544,               !- Design Level {W}
@@ -7192,7 +7192,7 @@
 
   ElectricEquipment,
     Core_bottom_MiscPlug_Equip,  !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     20142.877,               !- Design Level {W}
@@ -7205,7 +7205,7 @@
 
   ElectricEquipment,
     Core_mid_MiscPlug_Equip, !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     20142.8,                 !- Design Level {W}
@@ -7218,7 +7218,7 @@
 
   ElectricEquipment,
     Core_top_MiscPlug_Equip, !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     20142.8,                 !- Design Level {W}
@@ -7231,7 +7231,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_3_MiscPlug_Equip,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2421,               !- Design Level {W}
@@ -7244,7 +7244,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_2_MiscPlug_Equip,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9400,               !- Design Level {W}
@@ -7257,7 +7257,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_1_MiscPlug_Equip,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2809,               !- Design Level {W}
@@ -7270,7 +7270,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_4_MiscPlug_Equip,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9293,               !- Design Level {W}
@@ -7283,7 +7283,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_3_MiscPlug_Equip,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2421,               !- Design Level {W}
@@ -7296,7 +7296,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_2_MiscPlug_Equip,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9400,               !- Design Level {W}
@@ -7309,7 +7309,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_1_MiscPlug_Equip,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2809,               !- Design Level {W}
@@ -7322,7 +7322,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_4_MiscPlug_Equip,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9293,               !- Design Level {W}
@@ -7335,7 +7335,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_3_MiscPlug_Equip,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2421,               !- Design Level {W}
@@ -7348,7 +7348,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_2_MiscPlug_Equip,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9400,               !- Design Level {W}
@@ -7361,7 +7361,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_1_MiscPlug_Equip,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2529.2809,               !- Design Level {W}
@@ -7374,7 +7374,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_4_MiscPlug_Equip,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1629.9293,               !- Design Level {W}
@@ -7387,7 +7387,7 @@
 
   ElectricEquipment,
     DataCenter_Basement_MiscPlug_Equip,  !- Name
-    DataCenter_basement_ZN_6,!- Zone or ZoneList Name
+    DataCenter_basement_ZN_6,!- Zone or ZoneList or Space or SpaceList Name
     DataCenter_EQUIP_SCH,    !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -7400,7 +7400,7 @@
 
   ElectricEquipment,
     DataCenter_bot_MiscPlug_Equip,  !- Name
-    DataCenter_bot_ZN_6,     !- Zone or ZoneList Name
+    DataCenter_bot_ZN_6,     !- Zone or ZoneList or Space or SpaceList Name
     DataCenter_EQUIP_SCH,    !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -7413,7 +7413,7 @@
 
   ElectricEquipment,
     DataCenter_mid_MiscPlug_Equip,  !- Name
-    DataCenter_mid_ZN_6,     !- Zone or ZoneList Name
+    DataCenter_mid_ZN_6,     !- Zone or ZoneList or Space or SpaceList Name
     DataCenter_EQUIP_SCH,    !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -7426,7 +7426,7 @@
 
   ElectricEquipment,
     DataCenter_top_MiscPlug_Equip,  !- Name
-    DataCenter_top_ZN_6,     !- Zone or ZoneList Name
+    DataCenter_top_ZN_6,     !- Zone or ZoneList or Space or SpaceList Name
     DataCenter_EQUIP_SCH,    !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -7441,7 +7441,7 @@
 
   Daylighting:Controls,
     Perimeter_bot_ZN_1_DaylCtrl,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone Name
+    Perimeter_bot_ZN_1,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7454,15 +7454,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_bot_ZN_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_bot_ZN_1_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_bot_ZN_2_DaylCtrl,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone Name
+    Perimeter_bot_ZN_2,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7475,15 +7475,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_bot_ZN_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_bot_ZN_2_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_bot_ZN_3_DaylCtrl,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone Name
+    Perimeter_bot_ZN_3,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7496,15 +7496,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_bot_ZN_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_bot_ZN_3_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_bot_ZN_4_DaylCtrl,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone Name
+    Perimeter_bot_ZN_4,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7517,15 +7517,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_bot_ZN_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_bot_ZN_4_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_mid_ZN_1_DaylCtrl,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone Name
+    Perimeter_mid_ZN_1,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7538,15 +7538,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_mid_ZN_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_mid_ZN_1_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_mid_ZN_2_DaylCtrl,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone Name
+    Perimeter_mid_ZN_2,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7559,15 +7559,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_mid_ZN_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_mid_ZN_2_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_mid_ZN_3_DaylCtrl,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone Name
+    Perimeter_mid_ZN_3,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7580,15 +7580,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_mid_ZN_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_mid_ZN_3_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_mid_ZN_4_DaylCtrl,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone Name
+    Perimeter_mid_ZN_4,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7601,15 +7601,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_mid_ZN_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_mid_ZN_4_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_top_ZN_1_DaylCtrl,  !- Name
-    Perimeter_top_ZN_1,      !- Zone Name
+    Perimeter_top_ZN_1,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7622,15 +7622,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_top_ZN_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_top_ZN_1_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_top_ZN_2_DaylCtrl,  !- Name
-    Perimeter_top_ZN_2,      !- Zone Name
+    Perimeter_top_ZN_2,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7643,15 +7643,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_top_ZN_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_top_ZN_2_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_top_ZN_3_DaylCtrl,  !- Name
-    Perimeter_top_ZN_3,      !- Zone Name
+    Perimeter_top_ZN_3,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7664,15 +7664,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_top_ZN_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_top_ZN_3_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Perimeter_top_ZN_4_DaylCtrl,  !- Name
-    Perimeter_top_ZN_4,      !- Zone Name
+    Perimeter_top_ZN_4,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -7685,178 +7685,178 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Perimeter_top_ZN_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.3857,                  !- Fraction of Zone Controlled by Reference Point 1
+    0.3857,                  !- Fraction of Lights Controlled by Reference Point 1
     377.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Perimeter_top_ZN_4_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.1385,                  !- Fraction of Zone Controlled by Reference Point 2
+    0.1385,                  !- Fraction of Lights Controlled by Reference Point 2
     377.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
 !-   ===========  ALL OBJECTS IN CLASS: DAYLIGHTING:REFERENCEPOINT ===========
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_1_DaylRefPt1,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone Name
+    Perimeter_bot_ZN_1,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     1.676400,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_1_DaylRefPt2,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone Name
+    Perimeter_bot_ZN_1,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     3.352800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_2_DaylRefPt1,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone Name
+    Perimeter_bot_ZN_2,      !- Zone or Space Name
     71.430800,               !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_2_DaylRefPt2,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone Name
+    Perimeter_bot_ZN_2,      !- Zone or Space Name
     69.754400,               !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_3_DaylRefPt1,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone Name
+    Perimeter_bot_ZN_3,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     47.061700,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_3_DaylRefPt2,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone Name
+    Perimeter_bot_ZN_3,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     45.384700,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_4_DaylRefPt1,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone Name
+    Perimeter_bot_ZN_4,      !- Zone or Space Name
     1.676400,                !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_bot_ZN_4_DaylRefPt2,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone Name
+    Perimeter_bot_ZN_4,      !- Zone or Space Name
     3.352800,                !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_1_DaylRefPt1,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone Name
+    Perimeter_mid_ZN_1,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     1.676400,                !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_1_DaylRefPt2,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone Name
+    Perimeter_mid_ZN_1,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     3.352800,                !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_2_DaylRefPt1,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone Name
+    Perimeter_mid_ZN_2,      !- Zone or Space Name
     71.430800,               !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_2_DaylRefPt2,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone Name
+    Perimeter_mid_ZN_2,      !- Zone or Space Name
     69.754400,               !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_3_DaylRefPt1,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone Name
+    Perimeter_mid_ZN_3,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     47.061700,               !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_3_DaylRefPt2,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone Name
+    Perimeter_mid_ZN_3,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     45.384700,               !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_4_DaylRefPt1,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone Name
+    Perimeter_mid_ZN_4,      !- Zone or Space Name
     1.676400,                !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_mid_ZN_4_DaylRefPt2,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone Name
+    Perimeter_mid_ZN_4,      !- Zone or Space Name
     3.352800,                !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     17.526000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_1_DaylRefPt1,  !- Name
-    Perimeter_top_ZN_1,      !- Zone Name
+    Perimeter_top_ZN_1,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     1.676400,                !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_1_DaylRefPt2,  !- Name
-    Perimeter_top_ZN_1,      !- Zone Name
+    Perimeter_top_ZN_1,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     3.352800,                !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_2_DaylRefPt1,  !- Name
-    Perimeter_top_ZN_2,      !- Zone Name
+    Perimeter_top_ZN_2,      !- Zone or Space Name
     71.430800,               !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_2_DaylRefPt2,  !- Name
-    Perimeter_top_ZN_2,      !- Zone Name
+    Perimeter_top_ZN_2,      !- Zone or Space Name
     69.754400,               !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_3_DaylRefPt1,  !- Name
-    Perimeter_top_ZN_3,      !- Zone Name
+    Perimeter_top_ZN_3,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     47.061700,               !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_3_DaylRefPt2,  !- Name
-    Perimeter_top_ZN_3,      !- Zone Name
+    Perimeter_top_ZN_3,      !- Zone or Space Name
     36.576000,               !- X-Coordinate of Reference Point {m}
     45.384700,               !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_4_DaylRefPt1,  !- Name
-    Perimeter_top_ZN_4,      !- Zone Name
+    Perimeter_top_ZN_4,      !- Zone or Space Name
     1.676400,                !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Perimeter_top_ZN_4_DaylRefPt2,  !- Name
-    Perimeter_top_ZN_4,      !- Zone Name
+    Perimeter_top_ZN_4,      !- Zone or Space Name
     3.352800,                !- X-Coordinate of Reference Point {m}
     24.384000,               !- Y-Coordinate of Reference Point {m}
     34.290000;               !- Z-Coordinate of Reference Point {m}
@@ -7865,7 +7865,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_3_Infiltration,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7879,7 +7879,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_2_Infiltration,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7893,7 +7893,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_1_Infiltration,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7907,7 +7907,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_4_Infiltration,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7921,7 +7921,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_3_Infiltration,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7935,7 +7935,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_2_Infiltration,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7949,7 +7949,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_1_Infiltration,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7963,7 +7963,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_4_Infiltration,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7977,7 +7977,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_3_Infiltration,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -7991,7 +7991,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_2_Infiltration,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -8005,7 +8005,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_1_Infiltration,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -8019,7 +8019,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_4_Infiltration,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -8033,7 +8033,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GroundFloor_Plenum_Infiltration,  !- Name
-    GroundFloor_Plenum,      !- Zone or ZoneList Name
+    GroundFloor_Plenum,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -8047,7 +8047,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     MidFloor_Plenum_Infiltration,  !- Name
-    MidFloor_Plenum,         !- Zone or ZoneList Name
+    MidFloor_Plenum,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -8061,7 +8061,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     TopFloor_Plenum_Infiltration,  !- Name
-    TopFloor_Plenum,         !- Zone or ZoneList Name
+    TopFloor_Plenum,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH_PNNL,          !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -11562,7 +11562,7 @@
     VAV_top WITH REHEAT_DCV, !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,  !- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_top,                !- Zone or ZoneList 1 Name
     CM DSOA Core_top,        !- Design Specification Outdoor Air Object Name 1
@@ -11584,7 +11584,7 @@
     VAV_bot WITH REHEAT_DCV, !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,  !- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_bottom,             !- Zone or ZoneList 1 Name
     CM DSOA Core_bottom,     !- Design Specification Outdoor Air Object Name 1
@@ -11606,7 +11606,7 @@
     VAV_mid WITH REHEAT_DCV, !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,  !- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_mid,                !- Zone or ZoneList 1 Name
     CM DSOA Core_mid,        !- Design Specification Outdoor Air Object Name 1
@@ -17098,3 +17098,4 @@
     InteriorEquipment:Electricity,  !- Source Meter Name
     ,                        !- Key Name 1
     DataCenterPlugLoads:InteriorEquipment:Electricity;  !- Output Variable or Meter Name 1
+
