@@ -1206,7 +1206,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeatingWater,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -1336,7 +1336,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeatingWater,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
         "  Pump:VariableSpeed,",
@@ -1355,7 +1355,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    0.0,                     !- Design Minimum Flow Rate {m3/s}",
         "    Intermittent;            !- Pump Control Type",
 
-        "  DistrictHeatingWater,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",

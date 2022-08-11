@@ -87,7 +87,7 @@
 ! Purchased Heating:              None
 ! Coils:                          Coil:Cooling:Water, COIL:Steam:AirHeating
 ! Pumps:                          Pump:VariableSpeed
-! Boilers:                        DistrictHeatingSteam
+! Boilers:                        DistrictHeating:Steam
 ! Chillers:                       Chiller:Electric
 !
 ! Results:
@@ -2557,7 +2557,7 @@
   Branch,
     DistrictHeating Steam Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
-    DistrictHeatingSteam,            !- Component 1 Object Type
+    DistrictHeating:Steam,            !- Component 1 Object Type
     DistrictHeating Steam,  !- Component 1 Name
     DistrictHeating Steam Inlet Node,  !- Component 1 Inlet Node Name
     DistrictHeating Steam Outlet Node;  !- Component 1 Outlet Node Name
@@ -2696,7 +2696,7 @@
 
   PlantEquipmentList,
     DistrictHeating Steam heating plant,  !- Name
-    DistrictHeatingSteam,            !- Equipment 1 Object Type
+    DistrictHeating:Steam,            !- Equipment 1 Object Type
     DistrictHeating Steam;  !- Equipment 1 Name
 
   Connector:Splitter,
@@ -3260,7 +3260,7 @@
     SPACE4-1 Damper Inlet,   !- Outlet 4 Node Name
     SPACE5-1 Damper Inlet;   !- Outlet 5 Node Name
 
-  DistrictHeatingSteam,
+  DistrictHeating:Steam,
     DistrictHeating Steam,  !- Name
     DistrictHeating Steam Inlet Node,  !- Steam Inlet Node Name
     DistrictHeating Steam Outlet Node,  !- Steam Outlet Node Name

@@ -21,11 +21,13 @@ EnergyPlus Technicalities Call on 2/24/2021
 
 EnergyPlus Iteration Call on 2/2/2022
 - Instead of a separate object (PlantLoadProfile:Steam), a few optional input fields for a steam loop should be added to the current object (PlantLoadProfile).
+- As for DistrictHeating, separate object should be fine since steam and water use different source factors.
 
 EnergyPlus Technicalities Call on 2/9/2022
 - Currently, there is `steam` as a resource type. This should be changed to `DistrictHeatingSteam`.
 - Current `DistrictHeating` should be `DistrictHeatingWater`.
-- `DistrictHeatingWater` and `DistrictHeatingSteam` are better than `DistrictHeating:Water` and `DistrictHeating:Steam` because full meter names are a combination of resource type, end-use, etc. which are joined by colons so another colon would be confusing.
+- In IDD and input parts, `DistrictHeating:Water` and `DistrictHeating:Steam` should be used.
+- As for meter names, `DistrictHeatingWater` and `DistrictHeatingSteam` are better than `DistrictHeating:Water` and `DistrictHeating:Steam` because full meter names are a combination of resource type, end-use, etc. which are joined by colons so another colon would be confusing.
 - Keep these `DistrictHeatingWater` and `DistrictHeatingSteam` separate for output report since hot water and steam basically have different source factors and emission factors.
 - `SteamEquipment` should go on the same meter as this `DistrictHeatingSteam`
 - As for Steam to Water Heat Exchanger, we stick with two explicit objects because it's better from the user standpoint.

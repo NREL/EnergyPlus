@@ -1493,7 +1493,7 @@
   Branch,
     Purchased Heating Branch,!- Name
     ,                        !- Pressure Drop Curve Name
-    DistrictHeatingWater,         !- Component 1 Object Type
+    DistrictHeating:Water,         !- Component 1 Object Type
     Steam,                   !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
     Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
@@ -1633,7 +1633,7 @@
     Purchased Heating Branch,!- Inlet Branch 2 Name
     Heating Supply Bypass Branch;  !- Inlet Branch 3 Name
 
-  DistrictHeatingWater,
+  DistrictHeating:Water,
     Steam,                   !- Name
     Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name
     Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name
@@ -1656,14 +1656,14 @@
 
   PlantEquipmentList,
     Purchased Heating Plant, !- Name
-    DistrictHeatingWater,         !- Equipment 1 Object Type
+    DistrictHeating:Water,         !- Equipment 1 Object Type
     Steam;                   !- Equipment 1 Name
 
   PlantEquipmentList,
     GSHP plant,              !- Name
     HeatPump:WaterToWater:ParameterEstimation:Heating,  !- Equipment 1 Object Type
     GshpHeating,             !- Equipment 1 Name
-    DistrictHeatingWater,         !- Equipment 2 Object Type
+    DistrictHeating:Water,         !- Equipment 2 Object Type
     Steam;                   !- Equipment 2 Name
 
   Pump:ConstantSpeed,

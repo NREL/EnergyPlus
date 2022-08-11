@@ -147,9 +147,9 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     // are initialized. Output variables are set up.
 
     // GET NUMBER OF ALL EQUIPMENT TYPES
-    int const NumDistrictUnitsHeatWater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeatingWater");
+    int const NumDistrictUnitsHeatWater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeating:Water");
     int const NumDistrictUnitsCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictCooling");
-    int const NumDistrictUnitsHeatSteam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeatingSteam");
+    int const NumDistrictUnitsHeatSteam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeating:Steam");
     state.dataOutsideEnergySrcs->NumDistrictUnits = NumDistrictUnitsHeatWater + NumDistrictUnitsCool + NumDistrictUnitsHeatSteam;
 
     if (allocated(state.dataOutsideEnergySrcs->EnergySource)) return;
@@ -169,7 +169,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
         DataLoopNode::ConnectionObjectType objType;
         int thisIndex;
         if (EnergySourceNum <= NumDistrictUnitsHeatWater) {
-            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeatingWater";
+            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating:Water";
             objType = DataLoopNode::ConnectionObjectType::DistrictHeatingWater;
             nodeNames = "Hot Water Nodes";
             EnergyType = DataPlant::PlantEquipmentType::PurchHotWater;
@@ -183,7 +183,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
             coolIndex++;
             thisIndex = coolIndex;
         } else { // EnergySourceNum > NumDistrictUnitsHeatWater + NumDistrictUnitsCool
-            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeatingSteam";
+            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating:Steam";
             objType = DataLoopNode::ConnectionObjectType::DistrictHeatingSteam;
             nodeNames = "Steam Nodes";
             EnergyType = DataPlant::PlantEquipmentType::PurchSteam;
