@@ -3147,7 +3147,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisMixing.DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
                         ShowWarningError(state,
-                                         format("{}{}=\"{}\", {} specifies {} = {}, but that field is blank.  0 Cross Mixing will result.",
+                                         format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Cross Mixing will result.",
                                                 RoutineName,
                                                 cCurrentModuleObject,
                                                 thisMixingInput.Name,
