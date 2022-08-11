@@ -1,3 +1,0 @@
-[submodule "third_party/libtk205"]
-	path = third_party/libtk205
-	url = https://github.com/open205/libtk205.git
