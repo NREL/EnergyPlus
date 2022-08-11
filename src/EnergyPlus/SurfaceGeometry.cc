@@ -15031,11 +15031,11 @@ namespace SurfaceGeometry {
                     if (solarSetup && constr.TypeIsAirBoundaryMixing) {
                         // Set up mixing air boundaries only once, during solar setup
                         int spaceNum1 = min(surf.spaceNum, state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
-                        int spaceNum2 = min(surf.spaceNum, state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
+                        int spaceNum2 = max(surf.spaceNum, state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
                         // This pair already saved?
                         bool found = false;
                         for (auto thisAirBoundaryMixing : state.dataHeatBal->airBoundaryMixing) {
-                            if ((spaceNum1 == thisAirBoundaryMixing.space1) && (spaceNum2 == thisAirBoundaryMixing.space1)) {
+                            if ((spaceNum1 == thisAirBoundaryMixing.space1) && (spaceNum2 == thisAirBoundaryMixing.space2)) {
                                 found = true;
                                 break;
                             }
@@ -15046,9 +15046,9 @@ namespace SurfaceGeometry {
                             newAirBoundaryMixing.space1 = spaceNum1;
                             newAirBoundaryMixing.space2 = spaceNum2;
                             newAirBoundaryMixing.scheduleIndex = state.dataConstruction->Construct(surf.Construction).AirBoundaryMixingSched;
-                            Real64 mixingVolume =
-                                state.dataConstruction->Construct(surf.Construction).AirBoundaryACH * DataGlobalConstants::SecInHour;
-                            DataGlobalConstants::SecInHour;
+                            Real64 mixingVolume = state.dataConstruction->Construct(surf.Construction).AirBoundaryACH *
+                                                  min(state.dataHeatBal->space(spaceNum1).Volume, state.dataHeatBal->space(spaceNum2).Volume) /
+                                                  DataGlobalConstants::SecInHour;
                             newAirBoundaryMixing.mixingVolumeFlowRate = mixingVolume;
                             state.dataHeatBal->airBoundaryMixing.push_back(newAirBoundaryMixing);
                         }

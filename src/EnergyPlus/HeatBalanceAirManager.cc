@@ -3018,7 +3018,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         // check zones which are used only as a source zones
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            bool IsSourceZone = false;
             for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 if (ZoneNum != state.dataHeatBal->Mixing(Loop).FromZone) continue;
                 state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone = true;
