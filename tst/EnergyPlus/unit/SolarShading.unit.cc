@@ -52,6 +52,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
@@ -2653,6 +2655,84 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
     activeWindowShadingControl = state->dataSurface->Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 1);
+}
+
+TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
+{
+    state->dataSurface->Surface.allocate(2);
+    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataConstruction->Construct.allocate(1);
+    state->dataSurface->WindowShadingControl.allocate(2);
+    state->dataDaylightingData->ZoneDaylight.allocate(1);
+
+    state->dataSurface->Surface(1).Name = "Surface1";
+    state->dataSurface->Surface(2).Name = "Surface2";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(1).windowShadingControlList.push_back(1);
+    state->dataSurface->Surface(2).windowShadingControlList.push_back(2);
+    state->dataSurface->Surface(1).HasShadeControl = true;
+    state->dataSurface->Surface(2).HasShadeControl = true;
+
+    state->dataSurface->SurfWinHasShadeOrBlindLayer(1) = false;
+    state->dataSurface->SurfWinHasShadeOrBlindLayer(2) = false;
+    state->dataSurface->Surface(1).activeShadedConstruction = 1;
+    state->dataSurface->Surface(2).activeShadedConstruction = 1;
+
+    state->dataConstruction->Construct(1).Name = "Construction1";
+
+    state->dataSurface->WindowShadingControl(1).Name = "WindowShadingControl1";
+    state->dataSurface->WindowShadingControl(2).Name = "WindowShadingControl2";
+    state->dataSurface->WindowShadingControl(1).ShadingType = DataSurfaces::WinShadingType::IntShade;
+    state->dataSurface->WindowShadingControl(2).ShadingType = DataSurfaces::WinShadingType::ExtShade;
+    state->dataSurface->WindowShadingControl(1).ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffMidNight;
+    state->dataSurface->WindowShadingControl(2).ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffNextMorning;
+    state->dataSurface->WindowShadingControl(1).SetPoint = 9400;
+    state->dataSurface->WindowShadingControl(2).SetPoint = 94.64;
+    state->dataSurface->WindowShadingControl(1).SetPoint2 = 2000;
+    state->dataSurface->WindowShadingControl(2).SetPoint2 = 2000;
+
+    int SurfNum = 2;
+    state->dataSurface->TotSurfaces = SurfNum;
+    state->dataSurface->Surface(1).activeWindowShadingControl =
+            state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
+    state->dataSurface->Surface(2).activeWindowShadingControl =
+            state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
+
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).WindowSurfaceLast = 2;
+    state->dataGlobal->NumOfZones = 1;
+
+    // the following enables calculation when sun is up with SolarOnWindow computed to be 3700
+    int constexpr NumTimeSteps(6);
+    int constexpr HoursInDay(24);
+    state->dataEnvrn->SunIsUp = true;
+    state->dataEnvrn->SunIsUpPrevTS = true;
+    state->dataSolarShading->SurfAnisoSkyMult.allocate(SurfNum);
+    state->dataSolarShading->SurfAnisoSkyMult = 1.0;
+    state->dataEnvrn->DifSolarRad = 100.0;
+    state->dataEnvrn->BeamSolarRad = 100.0;
+    state->dataEnvrn->SOLCOS = 0.5;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 10;
+    state->dataGlobal->NumOfTimeStepInHour = NumTimeSteps;
+    state->dataHeatBal->SurfSunlitFrac.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAng.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAng = 45;
+    state->dataHeatBal->SurfSunlitFrac = 0.8;
+
+    SolarShading::WindowShadingManager(*state);
+
+    // solar below setpoint, shading expected to be conditionally off
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfWinShadingFlag(1), WinShadingType::IntShadeConditionallyOff));
+
+    // solar above setpoint, shading expcted to be on
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfWinShadingFlag(2), WinShadingType::ExtShade));
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ShadingFlagTest)
