@@ -15045,7 +15045,7 @@ namespace SurfaceGeometry {
                             DataHeatBalance::AirBoundaryMixingSpecs newAirBoundaryMixing;
                             newAirBoundaryMixing.space1 = spaceNum1;
                             newAirBoundaryMixing.space2 = spaceNum2;
-                            newAirBoundaryMixing.scheduleindex = state.dataConstruction->Construct(surf.Construction).AirBoundaryMixingSched;
+                            newAirBoundaryMixing.scheduleIndex = state.dataConstruction->Construct(surf.Construction).AirBoundaryMixingSched;
                             Real64 mixingVolume =
                                 state.dataConstruction->Construct(surf.Construction).AirBoundaryACH * DataGlobalConstants::SecInHour;
                             DataGlobalConstants::SecInHour;

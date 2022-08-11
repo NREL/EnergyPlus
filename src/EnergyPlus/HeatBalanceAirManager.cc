@@ -836,25 +836,23 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 ++infiltrationNum;
                 auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
                 thisInfiltration.Name = thisInfiltrationInput.names(Item1);
-                int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                int const zoneNum = thisSpace.zoneNum;
-                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                thisInfiltration.spaceIndex = spaceNum;
-                thisInfiltration.ZonePtr = zoneNum;
+                thisInfiltration.spaceIndex = thisInfiltrationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(thisInfiltration.spaceIndex);
+                thisInfiltration.ZonePtr = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
                 if (lAlphaFieldBlanks(3)) {
                     thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                }
-                if (thisInfiltration.SchedPtr == 0) {
-                    if (Item1 == 1) { // avoid repeated error messages from the same input object
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                        ErrorsFound = true;
+                    if (thisInfiltration.SchedPtr == 0) {
+                        if (Item1 == 1) { // avoid repeated error messages from the same input object
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                                cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                            ErrorsFound = true;
+                        }
                     }
                 }
 
@@ -1079,12 +1077,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 ++infiltrationNum;
                 auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
                 thisInfiltration.Name = thisInfiltrationInput.names(Item1);
-                int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                int const zoneNum = thisSpace.zoneNum;
-                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                thisInfiltration.spaceIndex = spaceNum;
-                thisInfiltration.ZonePtr = zoneNum;
+                thisInfiltration.spaceIndex = thisInfiltrationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(thisInfiltration.spaceIndex);
+                thisInfiltration.ZonePtr = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::ShermanGrimsrud;
 
@@ -1092,16 +1088,16 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                }
-                if (thisInfiltration.SchedPtr == 0) {
-                    ShowSevereError(state,
-                                    format(R"({}{}="{}", invalid (not found) {}="{}".)",
-                                           RoutineName,
-                                           cCurrentModuleObject,
-                                           cAlphaArgs(1),
-                                           cAlphaFieldNames(3),
-                                           cAlphaArgs(3)));
-                    ErrorsFound = true;
+                    if (thisInfiltration.SchedPtr == 0) {
+                        ShowSevereError(state,
+                                        format(R"({}{}="{}", invalid (not found) {}="{}".)",
+                                               RoutineName,
+                                               cCurrentModuleObject,
+                                               cAlphaArgs(1),
+                                               cAlphaFieldNames(3),
+                                               cAlphaArgs(3)));
+                        ErrorsFound = true;
+                    }
                 }
                 thisInfiltration.BasicStackCoefficient = rNumericArgs(2);
                 thisInfiltration.BasicWindCoefficient = rNumericArgs(3);
@@ -1132,7 +1128,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisInfiltration.LeakageArea = rNumericArgs(1) * spaceFrac;
                 }
                 // check if space has exterior surfaces
-                if (spaceNum > 0) {
+                if (thisInfiltration.spaceIndex > 0) {
                     if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
                         ShowWarningError(state,
                                          format(R"({}{}="{}", Space="{}" does not have surfaces exposed to outdoors.)",
@@ -1168,12 +1164,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 ++infiltrationNum;
                 auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
                 thisInfiltration.Name = thisInfiltrationInput.names(Item1);
-                int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                int const zoneNum = thisSpace.zoneNum;
-                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                thisInfiltration.spaceIndex = spaceNum;
-                thisInfiltration.ZonePtr = zoneNum;
+                thisInfiltration.spaceIndex = thisInfiltrationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(thisInfiltration.spaceIndex);
+                thisInfiltration.ZonePtr = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::AIM2;
 
@@ -1181,12 +1175,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                }
-                if (thisInfiltration.SchedPtr == 0) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                        cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                    ErrorsFound = true;
+                    if (thisInfiltration.SchedPtr == 0) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                        ErrorsFound = true;
+                    }
                 }
                 thisInfiltration.AIM2StackCoefficient = rNumericArgs(2);
                 thisInfiltration.PressureExponent = rNumericArgs(3);
@@ -1218,7 +1212,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                     thisInfiltration.FlowCoefficient = rNumericArgs(1) * spaceFrac;
                     // check if space has exterior surfaces
-                    if (spaceNum > 0) {
+                    if (thisInfiltration.spaceIndex > 0) {
                         if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
                             ShowWarningError(state,
                                              format(R"({}{}="{}", Space="{}" does not have surfaces exposed to outdoors.)",
@@ -1488,26 +1482,24 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 ++ventilationNum;
                 auto &thisVentilation = state.dataHeatBal->Ventilation(ventilationNum);
                 thisVentilation.Name = thisVentilationInput.names(Item1);
-                int const spaceNum = thisVentilationInput.spaceNums(Item1);
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                int const zoneNum = thisSpace.zoneNum;
-                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                thisVentilation.spaceIndex = spaceNum;
-                thisVentilation.ZonePtr = zoneNum;
+                thisVentilation.spaceIndex = thisVentilationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(thisVentilation.spaceIndex);
+                thisVentilation.ZonePtr = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 thisVentilation.ModelType = DataHeatBalance::VentilationModelType::DesignFlowRate;
                 if (lAlphaFieldBlanks(3)) {
                     thisVentilation.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisVentilation.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                }
-                if (thisVentilation.SchedPtr == 0) {
-                    if (Item1 == 1) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                    if (thisVentilation.SchedPtr == 0) {
+                        if (Item1 == 1) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                                cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                        }
+                        ErrorsFound = true;
                     }
-                    ErrorsFound = true;
                 }
 
                 // Ventilation equipment design level calculation method
@@ -2101,12 +2093,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 ++ventilationNum;
                 auto &thisVentilation = state.dataHeatBal->Ventilation(ventilationNum);
                 thisVentilation.Name = thisVentilationInput.names(Item1);
-                int const spaceNum = thisVentilationInput.spaceNums(Item1);
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                int const zoneNum = thisSpace.zoneNum;
-                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                thisVentilation.spaceIndex = spaceNum;
-                thisVentilation.ZonePtr = zoneNum;
+                thisVentilation.spaceIndex = thisVentilationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(thisVentilation.spaceIndex);
+                thisVentilation.ZonePtr = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 thisVentilation.ModelType = DataHeatBalance::VentilationModelType::WindAndStack;
 
@@ -2122,12 +2112,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisVentilation.OpenAreaSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisVentilation.OpenAreaSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                }
-                if (thisVentilation.OpenAreaSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                        cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                    ErrorsFound = true;
+                    if (thisVentilation.OpenAreaSchedPtr == 0) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                        ErrorsFound = true;
+                    }
                 }
 
                 thisVentilation.OpenEff = rNumericArgs(2);
@@ -2532,16 +2522,21 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     RepVarSet = true;
 
     cCurrentModuleObject = "ZoneMixing";
-    int numZoneMixingObjects = 0;
-    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneMixingObjects;
-    InternalHeatGains::setupIHGZonesAndSpaces(
-        state, cCurrentModuleObject, zoneMixingObjects, numZoneMixingObjects, state.dataHeatBal->TotMixing, ErrorsFound, zoneListNotAllowed);
+    int numZoneMixingInputObjects = 0;
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneMixingInputObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(state,
+                                              cCurrentModuleObject,
+                                              zoneMixingInputObjects,
+                                              numZoneMixingInputObjects,
+                                              state.dataHeatBal->TotMixing,
+                                              ErrorsFound,
+                                              zoneListNotAllowed);
 
     if (state.dataHeatBal->TotMixing > 0) {
         cCurrentModuleObject = "ZoneMixing";
         state.dataHeatBal->Mixing.allocate(state.dataHeatBal->TotMixing);
         int mixingNum = 0;
-        for (int mixingInputNum = 1; mixingInputNum <= state.dataHeatBal->TotMixing; ++mixingInputNum) {
+        for (int mixingInputNum = 1; mixingInputNum <= numZoneMixingInputObjects; ++mixingInputNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -2557,32 +2552,30 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                      cNumericFieldNames);
 
             // Create one Mixing instance for every space associated with this input object
-            auto &thisMixingInput = zoneMixingObjects(mixingInputNum);
+            auto const &thisMixingInput = zoneMixingInputObjects(mixingInputNum);
             for (int Item1 = 1; Item1 <= thisMixingInput.numOfSpaces; ++Item1) {
                 ++mixingNum;
                 auto &thisMixing = state.dataHeatBal->Mixing(mixingNum);
                 thisMixing.Name = thisMixingInput.names(Item1);
-                int const spaceNum = thisMixingInput.spaceNums(Item1);
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                int const zoneNum = thisSpace.zoneNum;
-                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                thisMixing.spaceIndex = spaceNum;
-                thisMixing.ZonePtr = zoneNum;
+                thisMixing.spaceIndex = thisMixingInput.spaceNums(Item1);
+                auto const &thisSpace = state.dataHeatBal->space(thisMixing.spaceIndex);
+                thisMixing.ZonePtr = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 if (lAlphaFieldBlanks(3)) {
                     thisMixing.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                }
-                if (thisMixing.SchedPtr == 0) {
-                    ShowWarningError(state,
-                                     format("{}{}=\"{}\", invalid (not found) {}=\"{}\"",
-                                            RoutineName,
-                                            cCurrentModuleObject,
-                                            thisMixingInput.Name,
-                                            cAlphaFieldNames(3),
-                                            cAlphaArgs(3)));
-                    ErrorsFound = true;
+                    if (thisMixing.SchedPtr == 0) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", invalid (not found) {}=\"{}\"",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(3),
+                                                cAlphaArgs(3)));
+                        ErrorsFound = true;
+                    }
                 }
 
                 // Mixing equipment design level calculation method
@@ -3089,11 +3082,16 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     cCurrentModuleObject = "ZoneCrossMixing";
-    int numZoneCrossMixingObjects = 0;
+    int numZoneCrossMixingInputObjects = 0;
     int totZoneCrossMixing = 0; // Total ZoneCrossMixing instances after expansion to spaces
-    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneCrossMixingObjects;
-    InternalHeatGains::setupIHGZonesAndSpaces(
-        state, cCurrentModuleObject, zoneCrossMixingObjects, numZoneCrossMixingObjects, totZoneCrossMixing, ErrorsFound, zoneListNotAllowed);
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneCrossMixingInputObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(state,
+                                              cCurrentModuleObject,
+                                              zoneCrossMixingInputObjects,
+                                              numZoneCrossMixingInputObjects,
+                                              totZoneCrossMixing,
+                                              ErrorsFound,
+                                              zoneListNotAllowed);
     state.dataHeatBal->TotCrossMixing = totZoneCrossMixing + state.dataHeatBal->airBoundaryMixing.size();
 
     if (state.dataHeatBal->TotCrossMixing > 0) {
@@ -3101,7 +3099,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         state.dataHeatBal->CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
 
         int mixingNum = 0;
-        for (int mixingInputNum = 1; mixingInputNum <= numZoneCrossMixingObjects; ++mixingInputNum) {
+        for (int mixingInputNum = 1; mixingInputNum <= numZoneCrossMixingInputObjects; ++mixingInputNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -3116,32 +3114,30 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
             // Create one Mixing instance for every space associated with this input object
-            auto &thisMixingInput = zoneCrossMixingObjects(mixingInputNum);
+            auto const &thisMixingInput = zoneCrossMixingInputObjects(mixingInputNum);
             for (int Item1 = 1; Item1 <= thisMixingInput.numOfSpaces; ++Item1) {
                 ++mixingNum;
                 auto &thisMixing = state.dataHeatBal->CrossMixing(mixingNum);
                 thisMixing.Name = thisMixingInput.names(Item1);
-                int const spaceNum = thisMixingInput.spaceNums(Item1);
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                int const zoneNum = thisSpace.zoneNum;
-                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-                thisMixing.spaceIndex = spaceNum;
-                thisMixing.ZonePtr = zoneNum;
+                thisMixing.spaceIndex = thisMixingInput.spaceNums(Item1);
+                auto const &thisSpace = state.dataHeatBal->space(thisMixing.spaceIndex);
+                thisMixing.ZonePtr = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(thisSpace.zoneNum);
 
                 if (lAlphaFieldBlanks(3)) {
                     thisMixing.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisMixing.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                }
-                if (thisMixing.SchedPtr == 0) {
-                    ShowWarningError(state,
-                                     format("{}{}=\"{}\", invalid (not found) {}=\"{}\"",
-                                            RoutineName,
-                                            cCurrentModuleObject,
-                                            thisMixingInput.Name,
-                                            cAlphaFieldNames(3),
-                                            cAlphaArgs(3)));
-                    ErrorsFound = true;
+                    if (thisMixing.SchedPtr == 0) {
+                        ShowWarningError(state,
+                                         format("{}{}=\"{}\", invalid (not found) {}=\"{}\"",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisMixingInput.Name,
+                                                cAlphaFieldNames(3),
+                                                cAlphaArgs(3)));
+                        ErrorsFound = true;
+                    }
                 }
 
                 // Mixing equipment design level calculation method.
@@ -3464,7 +3460,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             }
         }
         // Create CrossMixing objects from air boundary info
-        for (auto thisAirBoundaryMixing : state.dataHeatBal->airBoundaryMixing) {
+        for (auto const &thisAirBoundaryMixing : state.dataHeatBal->airBoundaryMixing) {
             ++mixingNum;
             // Create CrossMixing object from air boundary info
             int space1 = thisAirBoundaryMixing.space1;
@@ -3475,7 +3471,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             thisCrossMizing.Name = fmt::format("Air Boundary Mixing Zones {} and {}", zone1, zone2);
             thisCrossMizing.spaceIndex = space1;
             thisCrossMizing.ZonePtr = zone1;
-            thisCrossMizing.SchedPtr = thisAirBoundaryMixing.scheduleindex;
+            thisCrossMizing.SchedPtr = thisAirBoundaryMixing.scheduleIndex;
             thisCrossMizing.DesignLevel = thisAirBoundaryMixing.mixingVolumeFlowRate;
             thisCrossMizing.FromZone = zone2;
             thisCrossMizing.fromSpaceIndex = space2;
@@ -3484,83 +3480,84 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         for (int mixingRepNum = 1; mixingRepNum <= state.dataHeatBal->TotMixing; ++mixingRepNum) {
             int zoneNum = state.dataHeatBal->CrossMixing(mixingRepNum).ZonePtr;
             if (zoneNum > 0) {
-                std::string const zoneName = state.dataHeatBal->Zone(zoneNum).Name;
+                std::string const &zoneName = state.dataHeatBal->Zone(zoneNum).Name;
+                auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(zoneNum);
                 if (RepVarSet(zoneNum)) {
                     RepVarSet(zoneNum) = false;
                     SetupOutputVariable(state,
                                         "Zone Mixing Volume",
                                         OutputProcessor::Unit::m3,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixVolume,
+                                        thisZnAirRpt.MixVolume,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixVdotCurDensity,
+                                        thisZnAirRpt.MixVdotCurDensity,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixVdotStdDensity,
+                                        thisZnAirRpt.MixVdotStdDensity,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Mass",
                                         OutputProcessor::Unit::kg,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixMass,
+                                        thisZnAirRpt.MixMass,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixMdot,
+                                        thisZnAirRpt.MixMdot,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixHeatLoss,
+                                        thisZnAirRpt.MixHeatLoss,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixHeatGain,
+                                        thisZnAirRpt.MixHeatGain,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixLatentLoss,
+                                        thisZnAirRpt.MixLatentLoss,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixLatentGain,
+                                        thisZnAirRpt.MixLatentGain,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixTotalLoss,
+                                        thisZnAirRpt.MixTotalLoss,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(zoneNum).MixTotalGain,
+                                        thisZnAirRpt.MixTotalGain,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         zoneName);
@@ -3570,81 +3567,82 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             if (fromZoneNum > 0) {
                 if (RepVarSet(fromZoneNum)) {
                     RepVarSet(fromZoneNum) = false;
-                    std::string const fromZoneName = state.dataHeatBal->Zone(fromZoneNum).Name;
+                    std::string const &fromZoneName = state.dataHeatBal->Zone(fromZoneNum).Name;
+                    auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(fromZoneNum);
                     SetupOutputVariable(state,
                                         "Zone Mixing Volume",
                                         OutputProcessor::Unit::m3,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixVolume,
+                                        thisZnAirRpt.MixVolume,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixVdotCurDensity,
+                                        thisZnAirRpt.MixVdotCurDensity,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixVdotStdDensity,
+                                        thisZnAirRpt.MixVdotStdDensity,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Mass",
                                         OutputProcessor::Unit::kg,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixMass,
+                                        thisZnAirRpt.MixMass,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixMdot,
+                                        thisZnAirRpt.MixMdot,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixHeatLoss,
+                                        thisZnAirRpt.MixHeatLoss,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixHeatGain,
+                                        thisZnAirRpt.MixHeatGain,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixLatentLoss,
+                                        thisZnAirRpt.MixLatentLoss,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixLatentGain,
+                                        thisZnAirRpt.MixLatentGain,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixTotalLoss,
+                                        thisZnAirRpt.MixTotalLoss,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);
                     SetupOutputVariable(state,
                                         "Zone Mixing Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnAirRpt(fromZoneNum).MixTotalGain,
+                                        thisZnAirRpt.MixTotalGain,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         fromZoneName);

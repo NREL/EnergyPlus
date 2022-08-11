@@ -1174,7 +1174,7 @@ namespace DataHeatBalance {
     {
         int space1;                  // Air boundary simple mixing space 1
         int space2;                  // Air boundary simple mixing space 2
-        int scheduleindex;           // Air boundary simple mixing schedule index
+        int scheduleIndex;           // Air boundary simple mixing schedule index
         Real64 mixingVolumeFlowRate; // Air boundary simple mixing volume flow rate [m3/s]
     };
 
