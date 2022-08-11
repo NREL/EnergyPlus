@@ -10,7 +10,6 @@
 !                          exchanges energy between the outdoor air system outdoor air and exhaust air streams.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
-
 !                          Run Control executes the run periods using the weather file
 !
 ! Location:                Chicago, IL
@@ -104,13 +103,13 @@
 
   Version,22.2;
 
-
 ! *** Run Around Coil Heat Recovery Loop ****
+
   PlantLoop,
     Run Around Coil HR Loop, !- Name
     Water,                   !- Fluid Type
     ,                        !- User Defined Fluid Type
-    Run Around Coil HR Loop Operation,       !- Plant Equipment Operation Scheme Name
+    Run Around Coil HR Loop Operation,  !- Plant Equipment Operation Scheme Name
     HR Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
     98,                      !- Maximum Loop Temperature {C}
     1,                       !- Minimum Loop Temperature {C}
@@ -119,33 +118,40 @@
     ,                        !- Plant Loop Volume {m3}
     HR Supply Inlet Node,    !- Plant Side Inlet Node Name
     HR Supply Outlet Node,   !- Plant Side Outlet Node Name
-    HR Supply Side Branches,  !- Plant Side Branch List Name
+    HR Supply Side Branches, !- Plant Side Branch List Name
     HR Supply Side Connectors,  !- Plant Side Connector List Name
     HR Demand Inlet Node,    !- Demand Side Inlet Node Name
     HR Demand Outlet Node,   !- Demand Side Outlet Node Name
-    HR Demand Side Branches,  !- Demand Side Branch List Name
+    HR Demand Side Branches, !- Demand Side Branch List Name
     HR Demand Side Connectors,  !- Demand Side Connector List Name
     SequentialLoad,          !- Load Distribution Scheme
     HR Avail List;           !- Availability Manager List Name
 
   Output:Variable,HR Supply Inlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR Supply Inlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,HR Supply Outlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR Supply Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,HR Demand Inlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR Demand Inlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,HR Demand Outlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR Demand Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
 
   PlantEquipmentOperationSchemes,
-    Run Around Coil HR Loop Operation,       !- Name
+    Run Around Coil HR Loop Operation,  !- Name
     PlantEquipmentOperation:Uncontrolled,  !- Control Scheme 1 Object Type
-    HR Loop Control Scheme,    !- Control Scheme 1 Name
+    HR Loop Control Scheme,  !- Control Scheme 1 Name
     PlantOnSched;            !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperation:Uncontrolled,
-    HR Loop Control Scheme,    !- Name
-    HR Coil Plant;           !- Range 1 Equipment List Name
+    HR Loop Control Scheme,  !- Name
+    HR Coil Plant;           !- Equipment List Name
 
   PlantEquipmentList,
     HR Coil Plant;           !- Name
@@ -158,22 +164,23 @@
   AvailabilityManager:LowTemperatureTurnOff,
     HR Low Temp Limit,       !- Name
     Outside Air Inlet Node 1,!- Sensor Node Name
-    -22.0,                     !- Temperature {C}
-    HRPumpAvailSched;   !- Applicability Schedule Name
+    -22.0,                   !- Temperature {C}
+    HRPumpAvailSched;        !- Applicability Schedule Name
 
   Schedule:Compact,
-    HRPumpAvailSched,   !- Name
+    HRPumpAvailSched,        !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1.0;        !- Field 3
 
 ! ** Run Around Coil HR Loop Supply Side **
+
   BranchList,
-    HR Supply Side Branches,  !- Name
+    HR Supply Side Branches, !- Name
     HR Pump Branch,          !- Branch 1 Name
-    HR Supply Bypass Branch,  !- Branch 3 Name
-    HR Supply Outlet;   !- Branch 4 Name
+    HR Supply Bypass Branch, !- Branch 2 Name
+    HR Supply Outlet;        !- Branch 3 Name
 
   Branch,
     HR Pump Branch,          !- Name
@@ -201,28 +208,28 @@
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
   Branch,
-    HR Supply Bypass Branch,       !- Name
-    ,                              !- Pressure Drop Curve Name
-    Pipe:Adiabatic,                !- Component 1 Object Type
-    HR Supply Side Bypass,         !- Component 1 Name
-    HR Supply Bypass Inlet Node,   !- Component 1 Inlet Node Name
+    HR Supply Bypass Branch, !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    HR Supply Side Bypass,   !- Component 1 Name
+    HR Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
     HR Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
-    HR Supply Side Bypass,         !- Name
-    HR Supply Bypass Inlet Node,   !- Inlet Node Name
+    HR Supply Side Bypass,   !- Name
+    HR Supply Bypass Inlet Node,  !- Inlet Node Name
     HR Supply Bypass Outlet Node;  !- Outlet Node Name
 
   Branch,
     HR Supply Outlet,        !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
-    HR Supply Side Outlet Pipe, !- Component 1 Name
+    HR Supply Side Outlet Pipe,  !- Component 1 Name
     HR Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
     HR Supply Outlet Node;   !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
-    HR Supply Side Outlet Pipe, !- Name
+    HR Supply Side Outlet Pipe,  !- Name
     HR Supply Side Exit Pipe Inlet Node,  !- Inlet Node Name
     HR Supply Outlet Node;   !- Outlet Node Name
 
@@ -236,23 +243,24 @@
   Connector:Splitter,
     HR Loop Splitter,        !- Name
     HR Pump Branch,          !- Inlet Branch Name
-    HR Supply Bypass Branch;  !- Outlet Branch 2 Name
+    HR Supply Bypass Branch; !- Outlet Branch 1 Name
 
   Connector:Mixer,
     HR Loop Mixer,           !- Name
-    HR Supply Outlet,   !- Outlet Branch Name
-    HR Supply Bypass Branch;  !- Inlet Branch 2 Name
+    HR Supply Outlet,        !- Outlet Branch Name
+    HR Supply Bypass Branch; !- Inlet Branch 1 Name
 
 ! ** Run Around Coil HR Loop Demand Side **
+
   BranchList,
-    HR Demand Side Branches,  !- Name
-    HR Demand Inlet,    !- Branch 1 Name
-    HR Coil Branch,     !- Branch 2 Name
-    HR Demand Bypass Branch,  !- Branch 4 Name
-    HR Demand Outlet;   !- Branch 5 Name
+    HR Demand Side Branches, !- Name
+    HR Demand Inlet,         !- Branch 1 Name
+    HR Coil Branch,          !- Branch 2 Name
+    HR Demand Bypass Branch, !- Branch 3 Name
+    HR Demand Outlet;        !- Branch 4 Name
 
   Branch,
-    HR Demand Inlet,    !- Name
+    HR Demand Inlet,         !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HR Demand Side Inlet Pipe,  !- Component 1 Name
@@ -265,23 +273,23 @@
     HR Demand Entrance Pipe Outlet Node;  !- Outlet Node Name
 
   Branch,
-    HR Coil Branch,     !- Name
+    HR Coil Branch,          !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
-    HR Cooling Coil 1,     !- Component 1 Name
+    HR Cooling Coil 1,       !- Component 1 Name
     HR Cooling Coil 1 Water Inlet Node,  !- Component 1 Inlet Node Name
     HR InterConnecting Inlet Node,  !- Component 1 Outlet Node Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    HR Coil InterConnecting Pipe,  !- Component 1 Name
-    HR InterConnecting Inlet Node,    !- Component 1 Inlet Node Name
-    HR InterConnecting Outlet Node,  !- Component 1 Outlet Node Name
-    Coil:Cooling:Water,      !- Component 1 Object Type
-    HR Cooling Coil 2,     !- Component 1 Name
-    HR InterConnecting Outlet Node,  !- Component 1 Inlet Node Name
-    HR Cooling Coil 2 Water Outlet Node;  !- Component 1 Outlet Node Name
+    Pipe:Adiabatic,          !- Component 2 Object Type
+    HR Coil InterConnecting Pipe,  !- Component 2 Name
+    HR InterConnecting Inlet Node,  !- Component 2 Inlet Node Name
+    HR InterConnecting Outlet Node,  !- Component 2 Outlet Node Name
+    Coil:Cooling:Water,      !- Component 3 Object Type
+    HR Cooling Coil 2,       !- Component 3 Name
+    HR InterConnecting Outlet Node,  !- Component 3 Inlet Node Name
+    HR Cooling Coil 2 Water Outlet Node;  !- Component 3 Outlet Node Name
 
   Coil:Cooling:Water,
-    HR Cooling Coil 1,     !- Name
+    HR Cooling Coil 1,       !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     autosize,                !- Design Water Flow Rate {m3/s}
     autosize,                !- Design Air Flow Rate {m3/s}
@@ -292,7 +300,7 @@
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     HR Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name
     HR InterConnecting Inlet Node,  !- Water Outlet Node Name
-    Outside Air Inlet Node 1,        !- Air Inlet Node Name
+    Outside Air Inlet Node 1,!- Air Inlet Node Name
     OA Heating Coil 1 Air Inlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow,               !- Heat Exchanger Configuration
@@ -300,36 +308,43 @@
     4.0;                     !- Design Water Temperature Difference {deltaC}
 
   CoilSystem:Cooling:Water,
-    HR Cooling Coil 1 Sys,            !- Name
-    Outside Air Inlet Node 1,         !- Air Inlet Node Name
-    OA Heating Coil 1 Air Inlet Node, !- Air Outlet Node Name
-    CoolingCoilAvailSched,            !- Availability Schedule Name
-    Coil:Cooling:Water,               !- Cooling Coil Object Type
-    HR Cooling Coil 1,                !- Cooling Coil Name
-    ,                                 !- Dehumidification Control Type
-    ,                                 !- Run on Sensible Load
-    ,                                 !- Run on Latent Load
-    3.0,                              !- Minimum Air To Water Temperature Offset
-    ,                                 !- Economizer Lockout
-    5.0,                              !- Minimum Water Loop Temperature For Heat Recovery
-    HR Cooling Coil 2;                !- Companion Coil Used For Heat Recovery
+    HR Cooling Coil 1 Sys,   !- Name
+    Outside Air Inlet Node 1,!- Air Inlet Node Name
+    OA Heating Coil 1 Air Inlet Node,  !- Air Outlet Node Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    Coil:Cooling:Water,      !- Cooling Coil Object Type
+    HR Cooling Coil 1,       !- Cooling Coil Name
+    ,                        !- Dehumidification Control Type
+    ,                        !- Run on Sensible Load
+    ,                        !- Run on Latent Load
+    3.0,                     !- Minimum Air To Water Temperature Offset {deltaC}
+    ,                        !- Economizer Lockout
+    5.0,                     !- Minimum Water Loop Temperature For Heat Recovery {C}
+    HR Cooling Coil 2;       !- Companion Coil Used For Heat Recovery
 
   Pipe:Adiabatic,
     HR Coil InterConnecting Pipe,  !- Name
-    HR InterConnecting Inlet Node,    !- Inlet Node Name
+    HR InterConnecting Inlet Node,  !- Inlet Node Name
     HR InterConnecting Outlet Node;  !- Outlet Node Name
 
   Output:Variable,HR Cooling Coil 1 Water Inlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR Cooling Coil 1 Water Inlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,HR InterConnecting Inlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR InterConnecting Inlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,Outside Air Inlet Node 1,System Node Temperature,hourly;
+
   Output:Variable,Outside Air Inlet Node 1,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,OA Heating Coil 1 Air Inlet Node,System Node Temperature,hourly;
+
   Output:Variable,OA Heating Coil 1 Air Inlet Node,System Node Standard Density Volume Flow Rate,hourly;
 
   Coil:Cooling:Water,
-    HR Cooling Coil 2,     !- Name
+    HR Cooling Coil 2,       !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     autosize,                !- Design Water Flow Rate {m3/s}
     autosize,                !- Design Air Flow Rate {m3/s}
@@ -340,7 +355,7 @@
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     HR InterConnecting Outlet Node,  !- Water Inlet Node Name
     HR Cooling Coil 2 Water Outlet Node,  !- Water Outlet Node Name
-    Relief Air Outlet Node 1,        !- Air Inlet Node Name
+    Relief Air Outlet Node 1,!- Air Inlet Node Name
     HR Cooling Coil Exhaust Outlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow,               !- Heat Exchanger Configuration
@@ -348,29 +363,36 @@
     4.0;                     !- Design Water Temperature Difference {deltaC}
 
   Output:Variable,HR InterConnecting Outlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR InterConnecting Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,HR Cooling Coil 2 Water Outlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR Cooling Coil 2 Water Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,Relief Air Outlet Node 1,System Node Temperature,hourly;
+
   Output:Variable,Relief Air Outlet Node 1,System Node Standard Density Volume Flow Rate,hourly;
+
   Output:Variable,HR Cooling Coil Exhaust Outlet Node,System Node Temperature,hourly;
+
   Output:Variable,HR Cooling Coil Exhaust Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
 
   Branch,
-    HR Demand Bypass Branch,  !- Name
+    HR Demand Bypass Branch, !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
-    HR Demand Side Bypass,  !- Component 1 Name
+    HR Demand Side Bypass,   !- Component 1 Name
     HR Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
     HR Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Pipe:Adiabatic,
-    HR Demand Side Bypass,  !- Name
+    HR Demand Side Bypass,   !- Name
     HR Demand Bypass Inlet Node,  !- Inlet Node Name
     HR Demand Bypass Outlet Node;  !- Outlet Node Name
 
   Branch,
-    HR Demand Outlet,   !- Name
+    HR Demand Outlet,        !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
     HR Demand Side Outlet Pipe,  !- Component 1 Name
@@ -391,15 +413,15 @@
 
   Connector:Splitter,
     HR Demand Splitter,      !- Name
-    HR Demand Inlet,    !- Inlet Branch Name
-    HR Coil Branch,     !- Outlet Branch 1 Name
-    HR Demand Bypass Branch;  !- Outlet Branch 3 Name
+    HR Demand Inlet,         !- Inlet Branch Name
+    HR Coil Branch,          !- Outlet Branch 1 Name
+    HR Demand Bypass Branch; !- Outlet Branch 2 Name
 
   Connector:Mixer,
     HR Demand Mixer,         !- Name
-    HR Demand Outlet,   !- Outlet Branch Name
-    HR Coil Branch,     !- Inlet Branch 1 Name
-    HR Demand Bypass Branch;  !- Inlet Branch 3 Name
+    HR Demand Outlet,        !- Outlet Branch Name
+    HR Coil Branch,          !- Inlet Branch 1 Name
+    HR Demand Bypass Branch; !- Inlet Branch 2 Name
 
 ! *** Run Around Coil Heat Recovery Loop ****
 ! the CoilSystem object is the first object in the OA Equipmet list
@@ -408,16 +430,16 @@
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     OA Sys 1 Equipment,      !- Name
-    CoilSystem:Cooling:Water, !- Component 1 Object Type - run around HR coil in OA system
-    HR Cooling Coil 1 Sys,   !- Component 1 Name         - run around HR coil in OA system
-    Coil:Heating:Water,      !- Component 1 Object Type
-    OA Heating Coil 1,       !- Component 1 Name
-    Coil:Cooling:Water,      !- Component 2 Object Type
-    OA Cooling Coil 1,       !- Component 2 Name
-    OutdoorAir:Mixer,        !- Component 3 Object Type
-    OA Mixing Box 1,         !- Component 3 Name
-    Coil:Cooling:Water,      !- Component 1 Object Type - run around HR coil in OA system
-    HR Cooling Coil 2;       !- Component 1 Name        - run around HR coil in OA system
+    CoilSystem:Cooling:Water,!- Component 1 Object Type
+    HR Cooling Coil 1 Sys,   !- Component 1 Name
+    Coil:Heating:Water,      !- Component 2 Object Type
+    OA Heating Coil 1,       !- Component 2 Name
+    Coil:Cooling:Water,      !- Component 3 Object Type
+    OA Cooling Coil 1,       !- Component 3 Name
+    OutdoorAir:Mixer,        !- Component 4 Object Type
+    OA Mixing Box 1,         !- Component 4 Name
+    Coil:Cooling:Water,      !- Component 5 Object Type
+    HR Cooling Coil 2;       !- Component 5 Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name
@@ -429,36 +451,35 @@
     OA HC Controller 1;      !- Controller 3 Name
 
   SetpointManager:Scheduled,
-    OA Air Temp Manager HR1,   !- Name
+    OA Air Temp Manager HR1, !- Name
     Temperature,             !- Control Variable
     OA HR Supply Air Temp Sch,  !- Schedule Name
     OA Heating Coil 1 Air Inlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:Scheduled,
-    OA Air Temp Manager HR2,   !- Name
+    OA Air Temp Manager HR2, !- Name
     Temperature,             !- Control Variable
     OA HR Supply Air Temp Sch,  !- Schedule Name
     HR Cooling Coil Exhaust Outlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:Scheduled,
-    OA Air Temp Manager HR3,   !- Name
+    OA Air Temp Manager HR3, !- Name
     Temperature,             !- Control Variable
     OA HR Supply Air Temp Sch,  !- Schedule Name
-    HR Supply Outlet Node;  !- Setpoint Node or NodeList Name
+    HR Supply Outlet Node;   !- Setpoint Node or NodeList Name
 
   Schedule:Compact,
     OA HR Supply Air Temp Sch,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 4.5;        !- Field 3
+    Until: 24:00,4.5;        !- Field 3
 
   Sizing:Plant,
-    Run Around Coil HR Loop,      !- Plant or Condenser Loop Name
+    Run Around Coil HR Loop, !- Plant or Condenser Loop Name
     cooling,                 !- Loop Type
     7.00,                    !- Design Loop Exit Temperature {C}
     4.00;                    !- Loop Design Temperature Difference {deltaC}
-
 
   Building,
     Building,                !- Name
@@ -1093,7 +1114,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.032,                   !- Design Flow Rate {m3/s}
@@ -1107,19 +1128,19 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1133,7 +1154,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1308,7 +1329,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.014,                   !- Design Flow Rate {m3/s}
@@ -1322,19 +1343,19 @@
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1348,7 +1369,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1488,7 +1509,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.032,                   !- Design Flow Rate {m3/s}
@@ -1502,19 +1523,19 @@
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1528,7 +1549,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1683,7 +1704,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.014,                   !- Design Flow Rate {m3/s}
@@ -1697,19 +1718,19 @@
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1723,7 +1744,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1863,7 +1884,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.062,                   !- Design Flow Rate {m3/s}
@@ -1877,19 +1898,19 @@
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1903,7 +1924,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -2909,6 +2930,7 @@
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
     OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
+
 !    VAV Sys 1 Avail List;    !- Availability Manager List Name
 
   Coil:Heating:Water,
@@ -2918,7 +2940,7 @@
     autosize,                !- Maximum Water Flow Rate {m3/s}
     OA Heating Coil 1 Water Inlet Node,  !- Water Inlet Node Name
     OA Heating Coil 1 Water Outlet Node,  !- Water Outlet Node Name
-    OA Heating Coil 1 Air Inlet Node,!- Air Inlet Node Name
+    OA Heating Coil 1 Air Inlet Node,  !- Air Inlet Node Name
     OA Heating Coil 1 Air Outlet Node,  !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}

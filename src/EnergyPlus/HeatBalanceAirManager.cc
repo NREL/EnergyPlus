@@ -70,6 +70,7 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -272,22 +273,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     //       MODIFIED       Jan 2008,LG: Allow multiple infiltration and ventilation objects per zone
     //                      May 2009, BG: added calls to setup for possible EMS override
     //                      August 2011, TKS: added refrigeration door mixing
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the input for the "simple" air flow model.
-
-    // REFERENCES:
-    // IDD Statements
-    // INFILTRATION,A1 [Zone Name],A2 [SCHEDULE Name],N1 [Design level KW],
-    //     N2 [Constant Term Coefficient], N3 [Temperature Term Coefficient],
-    //     N4 [Velocity Term Coefficient], N5 [Velocity Squared Term Coefficient];
-    // MIXING,A1 [Zone Name],A2 [SCHEDULE Name],N1 [Design Level], A3 [Source Zone Name],
-    //     N2 [Delta Temperature delta C];
-    // CROSS MIXING,A1 [Zone Name],A2 [SCHEDULE Name],N1 [Design Level],
-    //     A3 [Source Zone Name], N2 [Delta Temperature delta C];
-    // REFRIGERATION DOOR MIXING,A1 [Zone Name],A2 [Mate Zone Name],N1 [Design Level],
-    //     A3 [Source Zone Name], N2 [Delta Temperature delta C];
 
     // Using/Aliasing
     using General::CheckCreatedZoneItemName;
@@ -325,20 +313,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     Array1D<Real64> rNumericArgs;
     std::string cCurrentModuleObject;
 
-    int Loop;
-    int Loop1;
     Array1D_bool RepVarSet;
     bool IsNotOK;
 
-    int ZoneNum;
     std::string StringOut;
     std::string NameThisObject;
-    int InfiltCount;
-    int VentiCount;
     bool ControlFlag;
-    int Item1;
-    bool errFlag;
-    int ZLItem;
     Array1D<Real64> TotInfilVentFlow;
     Array1D<Real64> TotMixingFlow;
     Array1D<Real64> ZoneMixingNum;
@@ -365,7 +345,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     // Following used for reporting
     state.dataHeatBal->ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
 
-    for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
         // CurrentModuleObject='Zone'
         SetupOutputVariable(state,
                             "Zone Mean Air Temperature",
@@ -576,7 +556,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     state.dataHeatBal->ZoneAirBalance.allocate(state.dataHeatBal->TotZoneAirBalance);
 
-    for (Loop = 1; Loop <= state.dataHeatBal->TotZoneAirBalance; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotZoneAirBalance; ++Loop) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Loop,
@@ -603,6 +583,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                    cAlphaFieldNames(2),
                                    cAlphaArgs(2)));
             ErrorsFound = true;
+        } else {
+            state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).zoneOABalanceIndex = Loop;
         }
         GlobalNames::IntraObjUniquenessCheck(
             state, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataHeatBalAirMgr->UniqueZoneNames, IsNotOK);
@@ -689,6 +671,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
+            state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).zoneOAQuadratureSum = true;
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
@@ -796,78 +779,52 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
     }
 
-    cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-    state.dataHeatBal->TotShermGrimsInfiltration = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-
-    cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-    state.dataHeatBal->TotAIM2Infiltration = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    // Set up and process ZoneInfiltration:* inputs
 
     cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-    state.dataHeatBal->NumInfiltrationStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numDesignFlowInfiltrationObjects = 0;
+    int totDesignFlowInfiltration = 0; // Total ZoneInfiltration:DesignFlowRate instances after expansion to spaces
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> infiltrationDesignFlowRateObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(
+        state, cCurrentModuleObject, infiltrationDesignFlowRateObjects, numDesignFlowInfiltrationObjects, totDesignFlowInfiltration, ErrorsFound);
 
-    state.dataHeatBal->InfiltrationObjects.allocate(state.dataHeatBal->NumInfiltrationStatements);
+    cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
+    int numLeakageAreaInfiltrationObjects = 0;
+    int totLeakageAreaInfiltration = 0; // Total ZoneInfiltration:EffectiveLeakageArea instances after expansion to spaces
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> infiltrationLeakageAreaObjects;
+    bool const zoneListNotAllowed = true;
+    InternalHeatGains::setupIHGZonesAndSpaces(state,
+                                              cCurrentModuleObject,
+                                              infiltrationLeakageAreaObjects,
+                                              numLeakageAreaInfiltrationObjects,
+                                              totLeakageAreaInfiltration,
+                                              ErrorsFound,
+                                              zoneListNotAllowed);
 
-    state.dataHeatBal->TotDesignFlowInfiltration = 0;
-    errFlag = false;
-    for (int Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Item,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+    cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
+    int numFlowCoefficientInfiltrationObjects = 0;
+    int totFlowCoefficientInfiltration = 0; // Total ZoneInfiltration:FlowCoefficient instances after expansion to spaces
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> infiltrationFlowCoefficientObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(state,
+                                              cCurrentModuleObject,
+                                              infiltrationFlowCoefficientObjects,
+                                              numFlowCoefficientInfiltrationObjects,
+                                              totFlowCoefficientInfiltration,
+                                              ErrorsFound,
+                                              zoneListNotAllowed);
 
-        state.dataHeatBal->InfiltrationObjects(Item).Name = cAlphaArgs(1);
-        Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        ZLItem = 0;
-        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
-        if (Item1 > 0) {
-            state.dataHeatBal->InfiltrationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowInfiltration + 1;
-            ++state.dataHeatBal->TotDesignFlowInfiltration;
-            state.dataHeatBal->InfiltrationObjects(Item).NumOfZones = 1;
-            state.dataHeatBal->InfiltrationObjects(Item).ZoneListActive = false;
-            state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr = Item1;
-        } else if (ZLItem > 0) {
-            state.dataHeatBal->InfiltrationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowInfiltration + 1;
-            state.dataHeatBal->TotDesignFlowInfiltration += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-            state.dataHeatBal->InfiltrationObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-            state.dataHeatBal->InfiltrationObjects(Item).ZoneListActive = true;
-            state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr = ZLItem;
-        } else {
-            ShowSevereError(
-                state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found.");
-            ErrorsFound = true;
-            errFlag = true;
-        }
-    }
-
-    if (errFlag) {
-        ShowSevereError(state, format("{}Errors with invalid names in {} objects.", RoutineName, cCurrentModuleObject));
-        ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-        state.dataHeatBal->TotDesignFlowInfiltration = 0;
-    }
-
-    state.dataHeatBal->TotInfiltration =
-        state.dataHeatBal->TotDesignFlowInfiltration + state.dataHeatBal->TotShermGrimsInfiltration + state.dataHeatBal->TotAIM2Infiltration;
-
+    state.dataHeatBal->TotInfiltration = totDesignFlowInfiltration + totLeakageAreaInfiltration + totFlowCoefficientInfiltration;
     state.dataHeatBal->Infiltration.allocate(state.dataHeatBal->TotInfiltration);
     state.dataHeatBalAirMgr->UniqueInfiltrationNames.reserve(static_cast<unsigned>(state.dataHeatBal->TotInfiltration));
 
-    if (state.dataHeatBal->TotDesignFlowInfiltration > 0) {
-        Loop = 0;
+    int infiltrationNum = 0;
+    if (totDesignFlowInfiltration > 0) {
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-        for (int Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
+        for (int infilInputNum = 1; infilInputNum <= numDesignFlowInfiltrationObjects; ++infilInputNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
-                                                                     Item,
+                                                                     infilInputNum,
                                                                      cAlphaArgs,
                                                                      NumAlpha,
                                                                      rNumericArgs,
@@ -878,72 +835,42 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            for (Item1 = 1; Item1 <= state.dataHeatBal->InfiltrationObjects(Item).NumOfZones; ++Item1) {
-                ++Loop;
-                auto &thisInfiltration = state.dataHeatBal->Infiltration(Loop);
-                if (!state.dataHeatBal->InfiltrationObjects(Item).ZoneListActive) {
-                    thisInfiltration.Name = cAlphaArgs(1);
-                    thisInfiltration.ZonePtr = state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr;
-                } else {
-                    CheckCreatedZoneItemName(
-                        state,
-                        RoutineName,
-                        cCurrentModuleObject,
-                        state.dataHeatBal
-                            ->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                            .Name,
-                        state.dataHeatBal->ZoneList(state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                        state.dataHeatBal->InfiltrationObjects(Item).Name,
-                        state.dataHeatBal->Infiltration,
-                        Loop - 1,
-                        thisInfiltration.Name,
-                        errFlag);
-                    thisInfiltration.ZonePtr =
-                        state.dataHeatBal->ZoneList(state.dataHeatBal->InfiltrationObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                    if (errFlag) ErrorsFound = true;
-                }
+            // Create one Infiltration instance for every space associated with this input object
+            auto &thisInfiltrationInput = infiltrationDesignFlowRateObjects(infilInputNum);
+            for (int Item1 = 1; Item1 <= thisInfiltrationInput.numOfSpaces; ++Item1) {
+                ++infiltrationNum;
+                auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
+                thisInfiltration.Name = thisInfiltrationInput.names(Item1);
+                int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+                thisInfiltration.spaceIndex = spaceNum;
+                thisInfiltration.ZonePtr = zoneNum;
 
                 thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
-                thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (lAlphaFieldBlanks(3)) {
+                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
                 if (thisInfiltration.SchedPtr == 0) {
-                    if (Item1 == 1) {
-                        if (lAlphaFieldBlanks(3)) {
-                            ShowSevereError(state,
-                                            format("{}{}=\"{}\",{} is required but field is blank.",
-                                                   RoutineName,
-                                                   cCurrentModuleObject,
-                                                   cAlphaArgs(1),
-                                                   cAlphaFieldNames(3)));
-                        } else {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                                cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                        }
+                    if (Item1 == 1) { // avoid repeated error messages from the same input object
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                         ErrorsFound = true;
                     }
                 }
 
-                // setup a flag if the outdoor air balance method is applied
-                if (thisInfiltration.ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-                    for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
-                        if (thisInfiltration.ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
-                                thisInfiltration.QuadratureSum = true;
-                                thisInfiltration.OABalancePtr = i;
-                                break;
-                            }
-                        }
-                    }
-                }
-
+                // Set space flow fractions
                 // Infiltration equipment design level calculation method.
                 AirflowSpecAlt flow =
                     static_cast<AirflowSpecAlt>(getEnumerationValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
                 case AirflowSpecAlt::Flow:
                 case AirflowSpecAlt::FlowPerZone:
-                    thisInfiltration.DesignLevel = rNumericArgs(1);
-                    if (lAlphaFieldBlanks(1)) {
+                    if (lNumericFieldBlanks(1)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
                                                 RoutineName,
@@ -951,15 +878,31 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                 thisInfiltration.Name,
                                                 cAlphaFieldNames(4),
                                                 cNumericFieldNames(1)));
+                    } else {
+                        Real64 spaceFrac = 1.0;
+                        if (!thisInfiltrationInput.spaceListActive && (thisInfiltrationInput.numOfSpaces > 1)) {
+                            Real64 const zoneVolume = thisZone.Volume;
+                            if (zoneVolume > 0.0) {
+                                spaceFrac = thisSpace.Volume / zoneVolume;
+                            } else {
+                                ShowSevereError(state, std::string(RoutineName) + "Zone volume is zero when allocating Infiltration to Spaces.");
+                                ShowContinueError(
+                                    state,
+                                    format("Occurs for {}=\"{}\" in Zone=\"{}\".", cCurrentModuleObject, thisInfiltrationInput.Name, thisZone.Name));
+                                ErrorsFound = true;
+                            }
+                        }
+
+                        thisInfiltration.DesignLevel = rNumericArgs(1) * spaceFrac;
                     }
                     break;
 
                 case AirflowSpecAlt::FlowPerArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea;
+                            thisInfiltration.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
                             if (thisInfiltration.ZonePtr > 0) {
-                                if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).FloorArea <= 0.0) {
+                                if (thisZone.FloorArea <= 0.0) {
                                     ShowWarningError(state,
                                                      format("{}{}=\"{}\", {} specifies {}, but Zone Floor Area = 0.  0 Infiltration will result.",
                                                             RoutineName,
@@ -993,8 +936,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpecAlt::FlowPerExteriorArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea;
-                            if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExteriorTotalSurfArea <= 0.0) {
+                            thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExteriorTotalSurfArea;
+                            if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Exterior Surface Area = 0.  0 Infiltration will result.",
                                                         RoutineName,
@@ -1027,8 +970,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpecAlt::FlowPerExteriorWallArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea;
-                            if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).ExtGrossWallArea <= 0.0) {
+                            thisInfiltration.DesignLevel = rNumericArgs(3) * thisSpace.ExtGrossWallArea;
+                            if (thisSpace.ExtGrossWallArea <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Exterior Wall Area = 0.  0 Infiltration will result.",
                                                         RoutineName,
@@ -1059,13 +1002,12 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpecAlt::AirChanges:
-                    if (thisInfiltration.ZonePtr != 0) {
+                    if (thisInfiltration.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisInfiltration.DesignLevel =
-                                rNumericArgs(4) * state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume / DataGlobalConstants::SecInHour;
-                            if (state.dataHeatBal->Zone(thisInfiltration.ZonePtr).Volume <= 0.0) {
+                            thisInfiltration.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
-                                                 format("{}{}=\"{}\", {} specifies {}, but Zone Volume = 0.  0 Infiltration will result.",
+                                                 format("{}{}=\"{}\", {} specifies {}, but Space Volume = 0.  0 Infiltration will result.",
                                                         RoutineName,
                                                         cCurrentModuleObject,
                                                         thisInfiltration.Name,
@@ -1087,7 +1029,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
                                                 RoutineName,
                                                 cCurrentModuleObject,
-                                                thisInfiltration.Name,
+                                                thisInfiltrationInput.Name,
                                                 cAlphaFieldNames(4),
                                                 cNumericFieldNames(4)));
                     }
@@ -1121,160 +1063,187 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
     }
 
-    cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-    InfiltCount = state.dataHeatBal->TotDesignFlowInfiltration;
-    for (Loop = 1; Loop <= state.dataHeatBal->TotShermGrimsInfiltration; ++Loop) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
-        ++InfiltCount;
-        GlobalNames::VerifyUniqueInterObjectName(
-            state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
-        state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).ModelType = DataHeatBalance::InfiltrationModelType::ShermanGrimsrud;
-        state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr == 0) {
-            ShowSevereError(state,
-                            format(R"({}{}="{}", invalid (not found) {}="{}".)",
-                                   RoutineName,
-                                   cCurrentModuleObject,
-                                   cAlphaArgs(1),
-                                   cAlphaFieldNames(2),
-                                   cAlphaArgs(2)));
-            ErrorsFound = true;
-        }
+    if (totLeakageAreaInfiltration > 0) {
+        cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
+        for (int infilInputNum = 1; infilInputNum <= numLeakageAreaInfiltrationObjects; ++infilInputNum) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     infilInputNum,
+                                                                     cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
+            // Create one Infiltration instance for every space associated with this input object
+            auto &thisInfiltrationInput = infiltrationLeakageAreaObjects(infilInputNum);
+            for (int Item1 = 1; Item1 <= thisInfiltrationInput.numOfSpaces; ++Item1) {
+                ++infiltrationNum;
+                auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
+                thisInfiltration.Name = thisInfiltrationInput.names(Item1);
+                int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+                thisInfiltration.spaceIndex = spaceNum;
+                thisInfiltration.ZonePtr = zoneNum;
 
-        // setup a flag if the outdoor air balance method is applied
-        if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-            for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
-                if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
-                        state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
-                        state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
-                        break;
+                thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::ShermanGrimsrud;
+
+                if (lAlphaFieldBlanks(3)) {
+                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
+                if (thisInfiltration.SchedPtr == 0) {
+                    ShowSevereError(state,
+                                    format(R"({}{}="{}", invalid (not found) {}="{}".)",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cAlphaFieldNames(3),
+                                           cAlphaArgs(3)));
+                    ErrorsFound = true;
+                }
+                thisInfiltration.BasicStackCoefficient = rNumericArgs(2);
+                thisInfiltration.BasicWindCoefficient = rNumericArgs(3);
+
+                if (lNumericFieldBlanks(1)) {
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\", field {} is blank.  0 Infiltration will result.",
+                                            RoutineName,
+                                            cCurrentModuleObject,
+                                            thisInfiltrationInput.Name,
+                                            cNumericFieldNames(1)));
+                } else {
+                    Real64 spaceFrac = 1.0;
+                    if (!thisInfiltrationInput.spaceListActive && (thisInfiltrationInput.numOfSpaces > 1)) {
+                        Real64 const zoneExteriorTotalSurfArea = thisZone.ExteriorTotalSurfArea;
+                        if (zoneExteriorTotalSurfArea > 0.0) {
+                            spaceFrac = thisSpace.ExteriorTotalSurfArea / zoneExteriorTotalSurfArea;
+                        } else {
+                            ShowSevereError(state,
+                                            std::string(RoutineName) + "Zone exterior surface area is zero when allocating Infiltration to Spaces.");
+                            ShowContinueError(
+                                state,
+                                format("Occurs for {}=\"{}\" in Zone=\"{}\".", cCurrentModuleObject, thisInfiltrationInput.Name, thisZone.Name));
+                            ErrorsFound = true;
+                        }
+                    }
+
+                    thisInfiltration.LeakageArea = rNumericArgs(1) * spaceFrac;
+                }
+                // check if space has exterior surfaces
+                if (spaceNum > 0) {
+                    if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
+                        ShowWarningError(state,
+                                         format(R"({}{}="{}", Space="{}" does not have surfaces exposed to outdoors.)",
+                                                RoutineName,
+                                                cCurrentModuleObject,
+                                                thisInfiltrationInput.Name,
+                                                thisSpace.Name));
+                        ShowContinueError(state, "Infiltration model is appropriate for exterior spaces not interior spaces, simulation continues.");
                     }
                 }
-            }
-        }
-
-        state.dataHeatBal->Infiltration(InfiltCount).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-        if (state.dataHeatBal->Infiltration(InfiltCount).SchedPtr == 0) {
-            if (lAlphaFieldBlanks(3)) {
-                ShowSevereError(
-                    state,
-                    format("{}{}=\"{}\",{} is required but field is blank.", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(3)));
-            } else {
-                ShowSevereError(state,
-                                format(R"({}{}="{}", invalid (not found) {}="{}".)",
-                                       RoutineName,
-                                       cCurrentModuleObject,
-                                       cAlphaArgs(1),
-                                       cAlphaFieldNames(3),
-                                       cAlphaArgs(3)));
-            }
-            ErrorsFound = true;
-        }
-        state.dataHeatBal->Infiltration(InfiltCount).LeakageArea = rNumericArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).BasicStackCoefficient = rNumericArgs(2);
-        state.dataHeatBal->Infiltration(InfiltCount).BasicWindCoefficient = rNumericArgs(3);
-
-        // check if zone has exterior surfaces
-        if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr > 0) {
-            if (state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(InfiltCount).ZonePtr).ExteriorTotalSurfArea <= 0.0) {
-                ShowWarningError(state,
-                                 format(R"({}{}="{}", {}="{}" does not have surfaces exposed to outdoors.)",
-                                        RoutineName,
-                                        cCurrentModuleObject,
-                                        cAlphaArgs(1),
-                                        cAlphaFieldNames(2),
-                                        cAlphaArgs(2)));
-                ShowContinueError(state, "Infiltration model is appropriate for exterior zones not interior zones, simulation continues.");
             }
         }
     }
 
-    cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-    for (Loop = 1; Loop <= state.dataHeatBal->TotAIM2Infiltration; ++Loop) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
-        ++InfiltCount;
-        GlobalNames::VerifyUniqueInterObjectName(
-            state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
-        state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).ModelType = DataHeatBalance::InfiltrationModelType::AIM2;
-        state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr == 0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-            ErrorsFound = true;
-        }
+    if (totFlowCoefficientInfiltration > 0) {
+        cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
+        for (int infilInputNum = 1; infilInputNum <= numFlowCoefficientInfiltrationObjects; ++infilInputNum) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     infilInputNum,
+                                                                     cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
+            // Create one Infiltration instance for every space associated with this input object
+            auto &thisInfiltrationInput = infiltrationFlowCoefficientObjects(infilInputNum);
+            for (int Item1 = 1; Item1 <= thisInfiltrationInput.numOfSpaces; ++Item1) {
+                ++infiltrationNum;
+                auto &thisInfiltration = state.dataHeatBal->Infiltration(infiltrationNum);
+                thisInfiltration.Name = thisInfiltrationInput.names(Item1);
+                int const spaceNum = thisInfiltrationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+                thisInfiltration.spaceIndex = spaceNum;
+                thisInfiltration.ZonePtr = zoneNum;
 
-        // setup a flag if the outdoor air balance method is applied
-        if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-            for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
-                if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
-                        state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
-                        state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
-                        break;
+                thisInfiltration.ModelType = DataHeatBalance::InfiltrationModelType::AIM2;
+
+                if (lAlphaFieldBlanks(3)) {
+                    thisInfiltration.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisInfiltration.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
+                if (thisInfiltration.SchedPtr == 0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                        cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                    ErrorsFound = true;
+                }
+                thisInfiltration.AIM2StackCoefficient = rNumericArgs(2);
+                thisInfiltration.PressureExponent = rNumericArgs(3);
+                thisInfiltration.AIM2WindCoefficient = rNumericArgs(4);
+                thisInfiltration.ShelterFactor = rNumericArgs(5);
+
+                if (lNumericFieldBlanks(1)) {
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\", field {} is blank.  0 Infiltration will result.",
+                                            RoutineName,
+                                            cCurrentModuleObject,
+                                            thisInfiltrationInput.Name,
+                                            cNumericFieldNames(1)));
+                } else {
+                    Real64 spaceFrac = 1.0;
+                    if (!thisInfiltrationInput.spaceListActive && (thisInfiltrationInput.numOfSpaces > 1)) {
+                        Real64 const zoneExteriorTotalSurfArea = thisZone.ExteriorTotalSurfArea;
+                        if (zoneExteriorTotalSurfArea > 0.0) {
+                            spaceFrac = thisSpace.ExteriorTotalSurfArea / zoneExteriorTotalSurfArea;
+                        } else {
+                            ShowSevereError(state,
+                                            std::string(RoutineName) + "Zone exterior surface area is zero when allocating Infiltration to Spaces.");
+                            ShowContinueError(
+                                state,
+                                format("Occurs for {}=\"{}\" in Zone=\"{}\".", cCurrentModuleObject, thisInfiltrationInput.Name, thisZone.Name));
+                            ErrorsFound = true;
+                        }
+                    }
+
+                    thisInfiltration.FlowCoefficient = rNumericArgs(1) * spaceFrac;
+                    // check if space has exterior surfaces
+                    if (spaceNum > 0) {
+                        if (thisSpace.ExteriorTotalSurfArea <= 0.0) {
+                            ShowWarningError(state,
+                                             format(R"({}{}="{}", Space="{}" does not have surfaces exposed to outdoors.)",
+                                                    RoutineName,
+                                                    cCurrentModuleObject,
+                                                    thisInfiltrationInput.Name,
+                                                    thisSpace.Name));
+                            ShowContinueError(state,
+                                              "Infiltration model is appropriate for exterior spaces not interior spaces, simulation continues.");
+                        }
                     }
                 }
-            }
-        }
-
-        state.dataHeatBal->Infiltration(InfiltCount).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-        if (state.dataHeatBal->Infiltration(InfiltCount).SchedPtr == 0) {
-            if (lAlphaFieldBlanks(3)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                    " is required but field is blank.");
-            } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                    cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-            }
-            ErrorsFound = true;
-        }
-        state.dataHeatBal->Infiltration(InfiltCount).FlowCoefficient = rNumericArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).AIM2StackCoefficient = rNumericArgs(2);
-        state.dataHeatBal->Infiltration(InfiltCount).PressureExponent = rNumericArgs(3);
-        state.dataHeatBal->Infiltration(InfiltCount).AIM2WindCoefficient = rNumericArgs(4);
-        state.dataHeatBal->Infiltration(InfiltCount).ShelterFactor = rNumericArgs(5);
-
-        // check if zone has exterior surfaces
-        if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr > 0) {
-            if (state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(InfiltCount).ZonePtr).ExteriorTotalSurfArea <= 0.0) {
-                ShowWarningError(state,
-                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
-                                     cAlphaArgs(2) + "\" does not have surfaces exposed to outdoors.");
-                ShowContinueError(state, "Infiltration model is appropriate for exterior zones not interior zones, simulation continues.");
             }
         }
     }
 
     // setup zone-level infiltration reports
-    for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
-        if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && !state.dataHeatBal->Infiltration(Loop).QuadratureSum) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
+        if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 &&
+            !state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).zoneOAQuadratureSum) {
             // Object report variables
             SetupOutputVariable(state,
                                 "Infiltration Sensible Heat Loss Energy",
@@ -1474,79 +1443,41 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                              state.dataHeatBal->Infiltration(Loop).EMSAirFlowRateValue);
         }
     }
-    // VENTILATION Section: The following section is responsible for obtaining the simple ventilation
-    // from the user's input file.
+
+    // Set up and process ZoneVentilation:* inputs
+
     RepVarSet = true;
 
     cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-    state.dataHeatBal->NumVentilationStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numDesignFlowVentilationObjects = 0;
+    int totDesignFlowVentilation = 0; // Total ZoneVentilation:DesignFlowRate instances after expansion to spaces
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> ventilationDesignFlowRateObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(
+        state, cCurrentModuleObject, ventilationDesignFlowRateObjects, numDesignFlowVentilationObjects, totDesignFlowVentilation, ErrorsFound);
 
     cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-    state.dataHeatBal->TotWindAndStackVentilation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int numWindStackVentilationObjects = 0;
+    int totWindStackVentilation = 0; // Total ZoneVentilation:WindandStackOpenArea instances after expansion to spaces
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> ventilationWindStackObjects;
+    InternalHeatGains::setupIHGZonesAndSpaces(state,
+                                              cCurrentModuleObject,
+                                              ventilationWindStackObjects,
+                                              numWindStackVentilationObjects,
+                                              totWindStackVentilation,
+                                              ErrorsFound,
+                                              zoneListNotAllowed);
 
-    state.dataHeatBal->VentilationObjects.allocate(state.dataHeatBal->NumVentilationStatements);
-
-    state.dataHeatBal->TotDesignFlowVentilation = 0;
-    errFlag = false;
-    cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-    for (int Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Item,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-        errFlag = ErrorsFound;
-
-        state.dataHeatBal->VentilationObjects(Item).Name = cAlphaArgs(1);
-
-        Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        ZLItem = 0;
-        if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
-        if (Item1 > 0) {
-            state.dataHeatBal->VentilationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowVentilation + 1;
-            ++state.dataHeatBal->TotDesignFlowVentilation;
-            state.dataHeatBal->VentilationObjects(Item).NumOfZones = 1;
-            state.dataHeatBal->VentilationObjects(Item).ZoneListActive = false;
-            state.dataHeatBal->VentilationObjects(Item).ZoneOrZoneListPtr = Item1;
-        } else if (ZLItem > 0) {
-            state.dataHeatBal->VentilationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowVentilation + 1;
-            state.dataHeatBal->TotDesignFlowVentilation += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-            state.dataHeatBal->VentilationObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-            state.dataHeatBal->VentilationObjects(Item).ZoneListActive = true;
-            state.dataHeatBal->VentilationObjects(Item).ZoneOrZoneListPtr = ZLItem;
-        } else {
-            ShowSevereError(
-                state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found.");
-            ErrorsFound = true;
-            errFlag = true;
-        }
-    }
-
-    if (errFlag) {
-        ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
-        ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-        state.dataHeatBal->TotDesignFlowVentilation = 0;
-    }
-
-    state.dataHeatBal->TotVentilation = state.dataHeatBal->TotDesignFlowVentilation + state.dataHeatBal->TotWindAndStackVentilation;
+    state.dataHeatBal->TotVentilation = totDesignFlowVentilation + totWindStackVentilation;
     state.dataHeatBal->Ventilation.allocate(state.dataHeatBal->TotVentilation);
 
-    if (state.dataHeatBal->TotDesignFlowVentilation > 0) {
-        Loop = 0;
+    int ventilationNum = 0;
+    if (numDesignFlowVentilationObjects > 0) {
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        for (int Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
+        for (int ventInputNum = 1; ventInputNum <= numDesignFlowVentilationObjects; ++ventInputNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
-                                                                     Item,
+                                                                     ventInputNum,
                                                                      cAlphaArgs,
                                                                      NumAlpha,
                                                                      rNumericArgs,
@@ -1557,56 +1488,29 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            for (Item1 = 1; Item1 <= state.dataHeatBal->VentilationObjects(Item).NumOfZones; ++Item1) {
-                ++Loop;
-                auto &thisVentilation = state.dataHeatBal->Ventilation(Loop);
-                if (!state.dataHeatBal->VentilationObjects(Item).ZoneListActive) {
-                    thisVentilation.Name = cAlphaArgs(1);
-                    thisVentilation.ZonePtr = state.dataHeatBal->VentilationObjects(Item).ZoneOrZoneListPtr;
-                } else {
-                    CheckCreatedZoneItemName(
-                        state,
-                        RoutineName,
-                        cCurrentModuleObject,
-                        state.dataHeatBal
-                            ->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->VentilationObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                            .Name,
-                        state.dataHeatBal->ZoneList(state.dataHeatBal->VentilationObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                        state.dataHeatBal->VentilationObjects(Item).Name,
-                        state.dataHeatBal->Ventilation,
-                        Loop - 1,
-                        thisVentilation.Name,
-                        errFlag);
-                    thisVentilation.ZonePtr = state.dataHeatBal->ZoneList(state.dataHeatBal->VentilationObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                    if (errFlag) ErrorsFound = true;
-                }
-
-                // setup a flag if the outdoor air balance method is applied
-                if (thisVentilation.ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-                    for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
-                        if (thisVentilation.ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
-                                thisVentilation.QuadratureSum = true;
-                                thisVentilation.OABalancePtr = i;
-                                break;
-                            }
-                        }
-                    }
-                }
+            auto &thisVentilationInput = ventilationDesignFlowRateObjects(ventInputNum);
+            for (int Item1 = 1; Item1 <= thisVentilationInput.numOfSpaces; ++Item1) {
+                ++ventilationNum;
+                auto &thisVentilation = state.dataHeatBal->Ventilation(ventilationNum);
+                thisVentilation.Name = thisVentilationInput.names(Item1);
+                int const spaceNum = thisVentilationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+                thisVentilation.spaceIndex = spaceNum;
+                thisVentilation.ZonePtr = zoneNum;
 
                 thisVentilation.ModelType = DataHeatBalance::VentilationModelType::DesignFlowRate;
-                thisVentilation.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (lAlphaFieldBlanks(3)) {
+                    thisVentilation.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisVentilation.SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
                 if (thisVentilation.SchedPtr == 0) {
                     if (Item1 == 1) {
-                        if (lAlphaFieldBlanks(3)) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                                " is required but field is blank.");
-                        } else {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                                cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                        }
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                            cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     }
                     ErrorsFound = true;
                 }
@@ -1626,14 +1530,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpec::FlowPerArea:
-                    if (thisVentilation.ZonePtr != 0) {
+                    if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(thisVentilation.ZonePtr).FloorArea;
-                            if (state.dataHeatBal->Zone(thisVentilation.ZonePtr).FloorArea <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
+                            if (thisSpace.floorArea <= 0.0) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                                      cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
-                                                     ", but Zone Floor Area = 0.  0 Ventilation will result.");
+                                                     ", but Space Floor Area = 0.  0 Ventilation will result.");
                             }
                         } else {
                             ShowSevereError(state,
@@ -1654,10 +1558,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpec::FlowPerPerson:
-                    if (thisVentilation.ZonePtr != 0) {
+                    if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(thisVentilation.ZonePtr).TotOccupants;
-                            if (state.dataHeatBal->Zone(thisVentilation.ZonePtr).TotOccupants <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(3) * thisSpace.totOccupants;
+                            if (thisSpace.totOccupants <= 0.0) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                                      cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(3) +
@@ -1682,15 +1586,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     break;
 
                 case AirflowSpec::AirChanges:
-                    if (thisVentilation.ZonePtr != 0) {
+                    if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            thisVentilation.DesignLevel =
-                                rNumericArgs(4) * state.dataHeatBal->Zone(thisVentilation.ZonePtr).Volume / DataGlobalConstants::SecInHour;
-                            if (state.dataHeatBal->Zone(thisVentilation.ZonePtr).Volume <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(4) * thisSpace.Volume / DataGlobalConstants::SecInHour;
+                            if (thisSpace.Volume <= 0.0) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                                      cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
-                                                     ", but Zone Volume = 0.  0 Ventilation will result.");
+                                                     ", but Space Volume = 0.  0 Ventilation will result.");
                             }
                         } else {
                             ShowSevereError(state,
@@ -1796,11 +1699,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (thisVentilation.MinIndoorTempSchedPtr > 0) {
                     if (Item1 == 1) {
                         if (!lNumericFieldBlanks(11))
-                            ShowWarningError(
-                                state,
-                                std::string{RoutineName} +
-                                    "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                    cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                            ShowWarningError(state,
+                                             std::string{RoutineName} +
+                                                 "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will "
+                                                 "be used in the " +
+                                                 cCurrentModuleObject + " object = " + cAlphaArgs(1));
                         // Check min and max values in the schedule to ensure both values are within the range
                         if (!CheckScheduleValueMinMax(state, thisVentilation.MinIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
                             ShowSevereError(
@@ -1851,11 +1754,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (thisVentilation.MaxIndoorTempSchedPtr > 0) {
                     if (Item1 == 1) {
                         if (!lNumericFieldBlanks(12))
-                            ShowWarningError(
-                                state,
-                                std::string{RoutineName} +
-                                    "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                    cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                            ShowWarningError(state,
+                                             std::string{RoutineName} +
+                                                 "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will "
+                                                 "be used in the " +
+                                                 cCurrentModuleObject + " object = " + cAlphaArgs(1));
                         // Check min and max values in the schedule to ensure both values are within the range
                         if (!CheckScheduleValueMinMax(state, thisVentilation.MaxIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
                             ShowSevereError(
@@ -1926,14 +1829,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                // Check delta temperature value and schedule fields
-                //    if (lAlphaFieldBlanks(13) .AND. cAlphaArgs(8) .EQ. BlankString) THEN
-                //      CALL ShowWarningError(state, RoutineName//'Both the delta temperature value and delta schedule are blank. ')
-                //      CALL ShowContinueError(state, 'Will set the temperature to a constant value of '//TRIM(format("{:.1R}", -VentilTempLimit))
-                //      &
-                //           //' degrees C ')
-                //      CALL ShowContinueError(state, 'in the Ventilation object = '//TRIM(cAlphaArgs(1))//' and the simulation continues...')
-                //    END IF
                 if (!lNumericFieldBlanks(13) && ((!lAlphaFieldBlanks(8)) && thisVentilation.DeltaTempSchedPtr == 0)) {
                     if (Item1 == 1) {
                         ShowWarningError(state,
@@ -2060,7 +1955,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 // Report variables should be added for individual VENTILATION objects, in addition to zone totals below
 
                 if (thisVentilation.ZonePtr > 0) {
-                    if (RepVarSet(thisVentilation.ZonePtr) && !thisVentilation.QuadratureSum) {
+                    if (RepVarSet(thisVentilation.ZonePtr) && !thisZone.zoneOAQuadratureSum) {
                         RepVarSet(thisVentilation.ZonePtr) = false;
                         SetupOutputVariable(state,
                                             "Zone Ventilation Sensible Heat Loss Energy",
@@ -2068,111 +1963,111 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilHeatLoss,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Sensible Heat Gain Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilHeatGain,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Latent Heat Loss Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilLatentLoss,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Latent Heat Gain Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilLatentGain,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Total Heat Loss Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilTotalLoss,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Total Heat Gain Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilTotalGain,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Current Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVdotCurDensity,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Standard Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVdotStdDensity,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Current Density Volume",
                                             OutputProcessor::Unit::m3,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVolumeCurDensity,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Standard Density Volume",
                                             OutputProcessor::Unit::m3,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVolumeStdDensity,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Mass",
                                             OutputProcessor::Unit::kg,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilMass,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilMdot,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Air Change Rate",
                                             OutputProcessor::Unit::ach,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilAirChangeRate,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Fan Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilFanElec,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name,
+                                            thisZone.Name,
                                             _,
                                             "Electricity",
                                             "Fans",
                                             "Ventilation (simple)",
                                             "Building",
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Air Inlet Temperature",
                                             OutputProcessor::Unit::C,
                                             state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilAirTemp,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(thisVentilation.ZonePtr).Name);
+                                            thisZone.Name);
                     }
                 }
 
@@ -2189,468 +2084,451 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
     }
 
-    cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-    VentiCount = state.dataHeatBal->TotDesignFlowVentilation;
-    for (Loop = 1; Loop <= state.dataHeatBal->TotWindAndStackVentilation; ++Loop) {
+    if (numWindStackVentilationObjects > 0) {
+        cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
+        for (int ventInputNum = 1; ventInputNum <= numWindStackVentilationObjects; ++ventInputNum) {
 
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 Loop,
-                                                                 cAlphaArgs,
-                                                                 NumAlpha,
-                                                                 rNumericArgs,
-                                                                 NumNumber,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ventInputNum,
+                                                                     cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     lNumericFieldBlanks,
+                                                                     lAlphaFieldBlanks,
+                                                                     cAlphaFieldNames,
+                                                                     cNumericFieldNames);
 
-        VentiCount = state.dataHeatBal->TotDesignFlowVentilation + Loop;
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            auto &thisVentilationInput = ventilationWindStackObjects(ventInputNum);
+            for (int Item1 = 1; Item1 <= thisVentilationInput.numOfSpaces; ++Item1) {
+                ++ventilationNum;
+                auto &thisVentilation = state.dataHeatBal->Ventilation(ventilationNum);
+                thisVentilation.Name = thisVentilationInput.names(Item1);
+                int const spaceNum = thisVentilationInput.spaceNums(Item1);
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                int const zoneNum = thisSpace.zoneNum;
+                auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+                thisVentilation.spaceIndex = spaceNum;
+                thisVentilation.ZonePtr = zoneNum;
 
-        state.dataHeatBal->Ventilation(VentiCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Ventilation(VentiCount).ModelType = DataHeatBalance::VentilationModelType::WindAndStack;
+                thisVentilation.ModelType = DataHeatBalance::VentilationModelType::WindAndStack;
 
-        state.dataHeatBal->Ventilation(VentiCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr == 0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-            ErrorsFound = true;
-        }
+                thisVentilation.OpenArea = rNumericArgs(1);
+                if (thisVentilation.OpenArea < 0.0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                                        " must be positive.");
+                    ErrorsFound = true;
+                }
 
-        // setup a flag if the outdoor air balance method is applied
-        if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
-            for (int i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
-                if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
-                        state.dataHeatBal->Ventilation(VentiCount).QuadratureSum = true;
-                        state.dataHeatBal->Ventilation(VentiCount).OABalancePtr = i;
-                        break;
+                if (lAlphaFieldBlanks(3)) {
+                    thisVentilation.OpenAreaSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                } else {
+                    thisVentilation.OpenAreaSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                }
+                if (thisVentilation.OpenAreaSchedPtr == 0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
+                                        cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                    ErrorsFound = true;
+                }
+
+                thisVentilation.OpenEff = rNumericArgs(2);
+                if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate &&
+                    (thisVentilation.OpenEff < 0.0 || thisVentilation.OpenEff > 1.0)) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                                        " must be between 0 and 1.");
+                    ErrorsFound = true;
+                }
+
+                thisVentilation.EffAngle = rNumericArgs(3);
+                if (thisVentilation.EffAngle < 0.0 || thisVentilation.EffAngle >= 360.0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
+                                        " must be between 0 and 360.");
+                    ErrorsFound = true;
+                }
+
+                thisVentilation.DH = rNumericArgs(4);
+                if (thisVentilation.DH < 0.0) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(4) +
+                                        " must be positive.");
+                    ErrorsFound = true;
+                }
+
+                thisVentilation.DiscCoef = rNumericArgs(5);
+                if (thisVentilation.DiscCoef != DataGlobalConstants::AutoCalculate &&
+                    (thisVentilation.DiscCoef < 0.0 || thisVentilation.DiscCoef > 1.0)) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
+                                        " must be between 0 and 1.");
+                    ErrorsFound = true;
+                }
+
+                if (!lNumericFieldBlanks(6)) {
+                    thisVentilation.MinIndoorTemperature = rNumericArgs(6);
+                } else {
+                    thisVentilation.MinIndoorTemperature = -VentilTempLimit;
+                }
+                if ((thisVentilation.MinIndoorTemperature < -VentilTempLimit) || (thisVentilation.MinIndoorTemperature > VentilTempLimit)) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) + " must have " +
+                                        cNumericFieldNames(6) + " between -100C and 100C");
+                    ErrorsFound = true;
+                }
+
+                thisVentilation.MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
+                if (thisVentilation.MinIndoorTempSchedPtr > 0) {
+                    if (!lNumericFieldBlanks(6))
+                        ShowWarningError(
+                            state,
+                            std::string{RoutineName} +
+                                "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
+                                cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                    // Check min and max values in the schedule to ensure both values are within the range
+                    if (!CheckScheduleValueMinMax(state, thisVentilation.MinIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
+                        ShowSevereError(
+                            state,
+                            std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
+                                " must have a minimum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(4));
+                        ErrorsFound = true;
                     }
                 }
-            }
-        }
+                if (thisVentilation.MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks(6) && (!lAlphaFieldBlanks(4))) {
+                    ShowWarningError(state,
+                                     format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                            RoutineName,
+                                            cNumericFieldNames(6),
+                                            -VentilTempLimit));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+                // Check Minimum indoor temperature value and schedule fields
+                if (!lNumericFieldBlanks(6) && (!cAlphaArgs(4).empty() && thisVentilation.MinIndoorTempSchedPtr == 0)) {
+                    ShowWarningError(state,
+                                     format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(4),
+                                            cAlphaArgs(4),
+                                            rNumericArgs(11)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
 
-        state.dataHeatBal->Ventilation(VentiCount).OpenArea = rNumericArgs(1);
-        if (state.dataHeatBal->Ventilation(VentiCount).OpenArea < 0.0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
-                                " must be positive.");
-            ErrorsFound = true;
-        }
+                if (!lNumericFieldBlanks(7)) {
+                    thisVentilation.MaxIndoorTemperature = rNumericArgs(7);
+                } else {
+                    thisVentilation.MaxIndoorTemperature = VentilTempLimit;
+                }
+                if ((thisVentilation.MaxIndoorTemperature < -VentilTempLimit) || (thisVentilation.MaxIndoorTemperature > VentilTempLimit)) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                        "\" must have a maximum indoor temperature between -100C and 100C");
+                    ErrorsFound = true;
+                }
 
-        state.dataHeatBal->Ventilation(VentiCount).OpenAreaSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-        if (state.dataHeatBal->Ventilation(VentiCount).OpenAreaSchedPtr == 0) {
-            if (lAlphaFieldBlanks(3)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(3) +
-                                    " is required but field is blank.");
-            } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
-                                    cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-            }
-            ErrorsFound = true;
-        }
+                thisVentilation.MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(5));
+                if (thisVentilation.MaxIndoorTempSchedPtr > 0) {
+                    if (!lNumericFieldBlanks(7))
+                        ShowWarningError(
+                            state,
+                            std::string{RoutineName} +
+                                "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
+                                cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                    // Check min and max values in the schedule to ensure both values are within the range
+                    if (!CheckScheduleValueMinMax(state, thisVentilation.MaxIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
+                        ShowSevereError(
+                            state,
+                            cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a maximum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(5));
+                        ErrorsFound = true;
+                    }
+                }
+                if (thisVentilation.MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks(7) && (!lAlphaFieldBlanks(5))) {
+                    ShowWarningError(state,
+                                     format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                            RoutineName,
+                                            cNumericFieldNames(7),
+                                            VentilTempLimit));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+                // Check Maximum indoor temperature value and schedule fields
+                if (!lNumericFieldBlanks(7) && ((!lAlphaFieldBlanks(5)) && thisVentilation.MaxIndoorTempSchedPtr == 0)) {
+                    ShowWarningError(state,
+                                     format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(7),
+                                            cAlphaArgs(5),
+                                            rNumericArgs(7)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
 
-        state.dataHeatBal->Ventilation(VentiCount).OpenEff = rNumericArgs(2);
-        if (state.dataHeatBal->Ventilation(VentiCount).OpenEff != DataGlobalConstants::AutoCalculate &&
-            (state.dataHeatBal->Ventilation(VentiCount).OpenEff < 0.0 || state.dataHeatBal->Ventilation(VentiCount).OpenEff > 1.0)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
-                                " must be between 0 and 1.");
-            ErrorsFound = true;
-        }
+                if (!lNumericFieldBlanks(8)) {
+                    thisVentilation.DelTemperature = rNumericArgs(8);
+                } else {
+                    thisVentilation.DelTemperature = -VentilTempLimit;
+                }
 
-        state.dataHeatBal->Ventilation(VentiCount).EffAngle = rNumericArgs(3);
-        if (state.dataHeatBal->Ventilation(VentiCount).EffAngle < 0.0 || state.dataHeatBal->Ventilation(VentiCount).EffAngle >= 360.0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
-                                " must be between 0 and 360.");
-            ErrorsFound = true;
-        }
+                thisVentilation.DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
+                if (thisVentilation.DeltaTempSchedPtr > 0) {
+                    if (!lNumericFieldBlanks(8))
+                        ShowWarningError(state,
+                                         std::string{RoutineName} +
+                                             "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
+                                             cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                    // Check min value in the schedule to ensure both values are within the range
+                    if (GetScheduleMinValue(state, thisVentilation.DeltaTempSchedPtr) < -VentilTempLimit) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
+                                            " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs(8));
+                        ErrorsFound = true;
+                    }
+                }
+                if (thisVentilation.DeltaTempSchedPtr == 0 && lNumericFieldBlanks(8) && (!lAlphaFieldBlanks(6))) {
+                    ShowWarningError(state,
+                                     format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                            RoutineName,
+                                            cNumericFieldNames(8),
+                                            VentilTempLimit));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+                if (!lNumericFieldBlanks(8) && ((!lAlphaFieldBlanks(6)) && thisVentilation.DeltaTempSchedPtr == 0)) {
+                    ShowWarningError(state,
+                                     format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(6),
+                                            cAlphaArgs(6),
+                                            rNumericArgs(8)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
 
-        state.dataHeatBal->Ventilation(VentiCount).DH = rNumericArgs(4);
-        if (state.dataHeatBal->Ventilation(VentiCount).DH < 0.0) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(4) +
-                                " must be positive.");
-            ErrorsFound = true;
-        }
+                thisVentilation.MinOutdoorTemperature = !lNumericFieldBlanks(9) ? rNumericArgs(9) : -VentilTempLimit;
+                if ((thisVentilation.MinOutdoorTemperature < -VentilTempLimit) || (thisVentilation.MinOutdoorTemperature > VentilTempLimit)) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) + " must have " +
+                                        cNumericFieldNames(9) + " between -100C and 100C");
+                    ErrorsFound = true;
+                }
 
-        state.dataHeatBal->Ventilation(VentiCount).DiscCoef = rNumericArgs(5);
-        if (state.dataHeatBal->Ventilation(VentiCount).DiscCoef != DataGlobalConstants::AutoCalculate &&
-            (state.dataHeatBal->Ventilation(VentiCount).DiscCoef < 0.0 || state.dataHeatBal->Ventilation(VentiCount).DiscCoef > 1.0)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
-                                " must be between 0 and 1.");
-            ErrorsFound = true;
-        }
-
-        if (!lNumericFieldBlanks(6)) {
-            state.dataHeatBal->Ventilation(VentiCount).MinIndoorTemperature = rNumericArgs(6);
-        } else {
-            state.dataHeatBal->Ventilation(VentiCount).MinIndoorTemperature = -VentilTempLimit;
-        }
-        if ((state.dataHeatBal->Ventilation(VentiCount).MinIndoorTemperature < -VentilTempLimit) ||
-            (state.dataHeatBal->Ventilation(VentiCount).MinIndoorTemperature > VentilTempLimit)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) + " must have " +
-                                cNumericFieldNames(6) + " between -100C and 100C");
-            ErrorsFound = true;
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
-        if (state.dataHeatBal->Ventilation(VentiCount).MinIndoorTempSchedPtr > 0) {
-            if (!lNumericFieldBlanks(6))
-                ShowWarningError(
-                    state,
-                    std::string{RoutineName} +
-                        "The Minimum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                        cCurrentModuleObject + " object = " + cAlphaArgs(1));
-            // Check min and max values in the schedule to ensure both values are within the range
-            if (!CheckScheduleValueMinMax(
-                    state, state.dataHeatBal->Ventilation(VentiCount).MinIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
-                                    " must have a minimum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(4));
-                ErrorsFound = true;
-            }
-        }
-        if (state.dataHeatBal->Ventilation(VentiCount).MinIndoorTempSchedPtr == 0 && lNumericFieldBlanks(6) && (!lAlphaFieldBlanks(4))) {
-            ShowWarningError(state,
-                             format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
-                                    RoutineName,
-                                    cNumericFieldNames(6),
-                                    -VentilTempLimit));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-        // Check Minimum indoor temperature value and schedule fields
-        if (!lNumericFieldBlanks(6) && (!cAlphaArgs(4).empty() && state.dataHeatBal->Ventilation(VentiCount).MinIndoorTempSchedPtr == 0)) {
-            ShowWarningError(state,
-                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
-                                    RoutineName,
-                                    cAlphaFieldNames(4),
-                                    cAlphaArgs(4),
-                                    rNumericArgs(11)));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-
-        if (!lNumericFieldBlanks(7)) {
-            state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTemperature = rNumericArgs(7);
-        } else {
-            state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTemperature = VentilTempLimit;
-        }
-        if ((state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTemperature < -VentilTempLimit) ||
-            (state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTemperature > VentilTempLimit)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                "\" must have a maximum indoor temperature between -100C and 100C");
-            ErrorsFound = true;
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(5));
-        if (state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTempSchedPtr > 0) {
-            if (!lNumericFieldBlanks(7))
-                ShowWarningError(
-                    state,
-                    std::string{RoutineName} +
-                        "The Maximum Indoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                        cCurrentModuleObject + " object = " + cAlphaArgs(1));
-            // Check min and max values in the schedule to ensure both values are within the range
-            if (!CheckScheduleValueMinMax(
-                    state, state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
-                ShowSevereError(state,
-                                cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                    " must have a maximum indoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(5));
-                ErrorsFound = true;
-            }
-        }
-        if (state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTempSchedPtr == 0 && lNumericFieldBlanks(7) && (!lAlphaFieldBlanks(5))) {
-            ShowWarningError(state,
-                             format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
-                                    RoutineName,
-                                    cNumericFieldNames(7),
-                                    VentilTempLimit));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-        // Check Maximum indoor temperature value and schedule fields
-        if (!lNumericFieldBlanks(7) && ((!lAlphaFieldBlanks(5)) && state.dataHeatBal->Ventilation(VentiCount).MaxIndoorTempSchedPtr == 0)) {
-            ShowWarningError(state,
-                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
-                                    RoutineName,
-                                    cAlphaFieldNames(7),
-                                    cAlphaArgs(5),
-                                    rNumericArgs(7)));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-
-        if (!lNumericFieldBlanks(8)) {
-            state.dataHeatBal->Ventilation(VentiCount).DelTemperature = rNumericArgs(8);
-        } else {
-            state.dataHeatBal->Ventilation(VentiCount).DelTemperature = -VentilTempLimit;
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
-        if (state.dataHeatBal->Ventilation(VentiCount).DeltaTempSchedPtr > 0) {
-            if (!lNumericFieldBlanks(8))
-                ShowWarningError(state,
-                                 std::string{RoutineName} +
-                                     "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                     cCurrentModuleObject + " object = " + cAlphaArgs(1));
-            // Check min value in the schedule to ensure both values are within the range
-            if (GetScheduleMinValue(state, state.dataHeatBal->Ventilation(VentiCount).DeltaTempSchedPtr) < -VentilTempLimit) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
-                                    " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs(8));
-                ErrorsFound = true;
-            }
-        }
-        if (state.dataHeatBal->Ventilation(VentiCount).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(8) && (!lAlphaFieldBlanks(6))) {
-            ShowWarningError(state,
-                             format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
-                                    RoutineName,
-                                    cNumericFieldNames(8),
-                                    VentilTempLimit));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-        if (!lNumericFieldBlanks(8) && ((!lAlphaFieldBlanks(6)) && state.dataHeatBal->Ventilation(VentiCount).DeltaTempSchedPtr == 0)) {
-            ShowWarningError(state,
-                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
-                                    RoutineName,
-                                    cAlphaFieldNames(6),
-                                    cAlphaArgs(6),
-                                    rNumericArgs(8)));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature = !lNumericFieldBlanks(9) ? rNumericArgs(9) : -VentilTempLimit;
-        if ((state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature < -VentilTempLimit) ||
-            (state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTemperature > VentilTempLimit)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) + " must have " +
-                                cNumericFieldNames(9) + " between -100C and 100C");
-            ErrorsFound = true;
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
-        if (state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTempSchedPtr > 0) {
-            if (!lNumericFieldBlanks(9))
-                ShowWarningError(
-                    state,
-                    std::string{RoutineName} +
-                        "The Minimum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                        cCurrentModuleObject + " object = " + cAlphaArgs(1));
-            // Check min and max values in the schedule to ensure both values are within the range
-            if (!CheckScheduleValueMinMax(
-                    state, state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
-                                    " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
-                ErrorsFound = true;
-            }
-        }
-        if (state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(9) && (!lAlphaFieldBlanks(7))) {
-            ShowWarningError(state,
-                             format("{}Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The default value "
-                                    "will be used ({:.1R}) ",
-                                    RoutineName,
-                                    -VentilTempLimit));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-        // Check Minimum outdoor temperature value and schedule fields
-        if (!lNumericFieldBlanks(9) && ((!lAlphaFieldBlanks(7)) && state.dataHeatBal->Ventilation(VentiCount).MinOutdoorTempSchedPtr == 0)) {
-            ShowWarningError(state,
-                             format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
-                                    RoutineName,
-                                    cAlphaFieldNames(7),
-                                    cAlphaArgs(7),
-                                    rNumericArgs(14)));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature = !lNumericFieldBlanks(10) ? rNumericArgs(10) : VentilTempLimit;
-        if ((state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature < -VentilTempLimit) ||
-            (state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTemperature > VentilTempLimit)) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) + " must have a " +
-                                cNumericFieldNames(10) + " between -100C and 100C");
-            ErrorsFound = true;
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
-        if (state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTempSchedPtr > 0) {
-            if (!lNumericFieldBlanks(10))
-                ShowWarningError(
-                    state,
-                    std::string{RoutineName} +
-                        "The Maximum Outdoor Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                        cCurrentModuleObject + " object = " + cAlphaArgs(1));
-            if (!CheckScheduleValueMinMax(
-                    state, state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
-                                    " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
-                ErrorsFound = true;
-            }
-        }
-        if (state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(10) && (!lAlphaFieldBlanks(8))) {
-            ShowWarningError(state,
-                             format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
-                                    RoutineName,
-                                    cNumericFieldNames(10),
-                                    VentilTempLimit));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-        // Check Maximum outdoor temperature value and schedule fields
-        if (!lNumericFieldBlanks(10) && ((!lAlphaFieldBlanks(8)) && state.dataHeatBal->Ventilation(VentiCount).MaxOutdoorTempSchedPtr == 0)) {
-            ShowWarningError(state,
-                             format("{}{} = {}is invalid. The constant value will be used at {:.1R} degrees C ",
-                                    RoutineName,
-                                    cAlphaFieldNames(8),
-                                    cAlphaArgs(8),
-                                    rNumericArgs(10)));
-            ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-        }
-
-        state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed = !lNumericFieldBlanks(11) ? rNumericArgs(11) : VentilWSLimit;
-        if ((state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed < -VentilWSLimit) ||
-            (state.dataHeatBal->Ventilation(VentiCount).MaxWindSpeed > VentilWSLimit)) {
-            ShowSevereError(state,
+                thisVentilation.MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                if (thisVentilation.MinOutdoorTempSchedPtr > 0) {
+                    if (!lNumericFieldBlanks(9))
+                        ShowWarningError(state,
+                                         std::string{RoutineName} +
+                                             "The Minimum Outdoor Temperature value and schedule are provided. The scheduled temperature will be "
+                                             "used in the " +
+                                             cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                    // Check min and max values in the schedule to ensure both values are within the range
+                    if (!CheckScheduleValueMinMax(state, thisVentilation.MinOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
+                        ShowSevereError(
+                            state,
                             std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
-                                " must have a maximum wind speed between 0 m/s and 40 m/s");
-            ErrorsFound = true;
-        }
+                                " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
+                        ErrorsFound = true;
+                    }
+                }
+                if (thisVentilation.MinOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(9) && (!lAlphaFieldBlanks(7))) {
+                    ShowWarningError(
+                        state,
+                        format("{}Minimum Outdoor Temperature: the value field is blank and schedule field is invalid. The default value "
+                               "will be used ({:.1R}) ",
+                               RoutineName,
+                               -VentilTempLimit));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+                // Check Minimum outdoor temperature value and schedule fields
+                if (!lNumericFieldBlanks(9) && ((!lAlphaFieldBlanks(7)) && thisVentilation.MinOutdoorTempSchedPtr == 0)) {
+                    ShowWarningError(state,
+                                     format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(7),
+                                            cAlphaArgs(7),
+                                            rNumericArgs(14)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
 
-        // Report variables should be added for individual VENTILATION objects, in addition to zone totals below
+                thisVentilation.MaxOutdoorTemperature = !lNumericFieldBlanks(10) ? rNumericArgs(10) : VentilTempLimit;
+                if ((thisVentilation.MaxOutdoorTemperature < -VentilTempLimit) || (thisVentilation.MaxOutdoorTemperature > VentilTempLimit)) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) + " must have a " +
+                                        cNumericFieldNames(10) + " between -100C and 100C");
+                    ErrorsFound = true;
+                }
 
-        if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr > 0) {
-            if (RepVarSet(state.dataHeatBal->Ventilation(VentiCount).ZonePtr) && !state.dataHeatBal->Ventilation(Loop).QuadratureSum) {
-                RepVarSet(state.dataHeatBal->Ventilation(VentiCount).ZonePtr) = false;
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Sensible Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilHeatLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Sensible Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilHeatGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Latent Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilLatentLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Latent Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilLatentGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Total Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilTotalLoss,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Total Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilTotalGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Current Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVdotCurDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Standard Density Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVdotStdDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Current Density Volume",
-                                    OutputProcessor::Unit::m3,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVolumeCurDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Standard Density Volume",
-                                    OutputProcessor::Unit::m3,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVolumeStdDensity,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Mass",
-                                    OutputProcessor::Unit::kg,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilMass,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilMdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Air Change Rate",
-                                    OutputProcessor::Unit::ach,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilAirChangeRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Fan Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilFanElec,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name,
-                                    _,
-                                    "Electricity",
-                                    "Fans",
-                                    "Ventilation (simple)",
-                                    "Building",
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Ventilation Air Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilAirTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
+                thisVentilation.MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
+                if (thisVentilation.MaxOutdoorTempSchedPtr > 0) {
+                    if (!lNumericFieldBlanks(10))
+                        ShowWarningError(state,
+                                         std::string{RoutineName} +
+                                             "The Maximum Outdoor Temperature value and schedule are provided. The scheduled temperature will be "
+                                             "used in the " +
+                                             cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                    if (!CheckScheduleValueMinMax(state, thisVentilation.MaxOutdoorTempSchedPtr, ">=", -VentilTempLimit, "<=", VentilTempLimit)) {
+                        ShowSevereError(
+                            state,
+                            std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
+                                " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
+                        ErrorsFound = true;
+                    }
+                }
+                if (thisVentilation.MaxOutdoorTempSchedPtr == 0 && lNumericFieldBlanks(10) && (!lAlphaFieldBlanks(8))) {
+                    ShowWarningError(state,
+                                     format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
+                                            RoutineName,
+                                            cNumericFieldNames(10),
+                                            VentilTempLimit));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+                // Check Maximum outdoor temperature value and schedule fields
+                if (!lNumericFieldBlanks(10) && ((!lAlphaFieldBlanks(8)) && thisVentilation.MaxOutdoorTempSchedPtr == 0)) {
+                    ShowWarningError(state,
+                                     format("{}{} = {}is invalid. The constant value will be used at {:.1R} degrees C ",
+                                            RoutineName,
+                                            cAlphaFieldNames(8),
+                                            cAlphaArgs(8),
+                                            rNumericArgs(10)));
+                    ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+
+                thisVentilation.MaxWindSpeed = !lNumericFieldBlanks(11) ? rNumericArgs(11) : VentilWSLimit;
+                if ((thisVentilation.MaxWindSpeed < -VentilWSLimit) || (thisVentilation.MaxWindSpeed > VentilWSLimit)) {
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
+                                        " must have a maximum wind speed between 0 m/s and 40 m/s");
+                    ErrorsFound = true;
+                }
+
+                // Report variables should be added for individual VENTILATION objects, in addition to zone totals below
+
+                if (thisVentilation.ZonePtr > 0) {
+                    if (RepVarSet(thisVentilation.ZonePtr) && !thisZone.zoneOAQuadratureSum) {
+                        RepVarSet(thisVentilation.ZonePtr) = false;
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Sensible Heat Loss Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilHeatLoss,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Sensible Heat Gain Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilHeatGain,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Latent Heat Loss Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilLatentLoss,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Latent Heat Gain Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilLatentGain,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Total Heat Loss Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilTotalLoss,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Total Heat Gain Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilTotalGain,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Current Density Volume Flow Rate",
+                                            OutputProcessor::Unit::m3_s,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVdotCurDensity,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Standard Density Volume Flow Rate",
+                                            OutputProcessor::Unit::m3_s,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVdotStdDensity,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Current Density Volume",
+                                            OutputProcessor::Unit::m3,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVolumeCurDensity,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Standard Density Volume",
+                                            OutputProcessor::Unit::m3,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilVolumeStdDensity,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Mass",
+                                            OutputProcessor::Unit::kg,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilMass,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Mass Flow Rate",
+                                            OutputProcessor::Unit::kg_s,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilMdot,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Air Change Rate",
+                                            OutputProcessor::Unit::ach,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilAirChangeRate,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Fan Electricity Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilFanElec,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            thisZone.Name,
+                                            _,
+                                            "Electricity",
+                                            "Fans",
+                                            "Ventilation (simple)",
+                                            "Building",
+                                            thisZone.Name);
+                        SetupOutputVariable(state,
+                                            "Zone Ventilation Air Inlet Temperature",
+                                            OutputProcessor::Unit::C,
+                                            state.dataHeatBal->ZnAirRpt(thisVentilation.ZonePtr).VentilAirTemp,
+                                            OutputProcessor::SOVTimeStepType::System,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            thisZone.Name);
+                    }
+                }
+
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                    SetupEMSActuator(state,
+                                     "Zone Ventilation",
+                                     thisVentilation.Name,
+                                     "Air Exchange Flow Rate",
+                                     "[m3/s]",
+                                     thisVentilation.EMSSimpleVentOn,
+                                     thisVentilation.EMSimpleVentFlowRate);
+                }
             }
-        }
-
-        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupEMSActuator(state,
-                             "Zone Ventilation",
-                             state.dataHeatBal->Ventilation(VentiCount).Name,
-                             "Air Exchange Flow Rate",
-                             "[m3/s]",
-                             state.dataHeatBal->Ventilation(VentiCount).EMSSimpleVentOn,
-                             state.dataHeatBal->Ventilation(VentiCount).EMSimpleVentFlowRate);
         }
     }
 
@@ -2660,7 +2538,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     state.dataHeatBal->TotMixing = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataHeatBal->Mixing.allocate(state.dataHeatBal->TotMixing);
 
-    for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
@@ -3080,9 +2958,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     if (state.dataHeatBal->TotMixing > 0) {
         ZoneMixingNum.allocate(state.dataHeatBal->TotMixing);
         // get source zones mixing objects index
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             SourceCount = 0;
-            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 if (ZoneNum == state.dataHeatBal->Mixing(Loop).FromZone) {
                     SourceCount += 1;
                     ZoneMixingNum(SourceCount) = Loop;
@@ -3092,19 +2970,19 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             state.dataHeatBal->MassConservation(ZoneNum).NumSourceZonesMixingObject = SourceCount;
             if (SourceCount > 0) {
                 state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingSourcesPtr.allocate(SourceCount);
-                for (Loop = 1; Loop <= SourceCount; ++Loop) {
+                for (int Loop = 1; Loop <= SourceCount; ++Loop) {
                     state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingSourcesPtr(Loop) = ZoneMixingNum(Loop);
                 }
             }
         }
 
         // check zones which are used only as a source zones
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             IsSourceZone = false;
-            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 if (ZoneNum != state.dataHeatBal->Mixing(Loop).FromZone) continue;
                 state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone = true;
-                for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotMixing; ++Loop1) {
+                for (int Loop1 = 1; Loop1 <= state.dataHeatBal->TotMixing; ++Loop1) {
                     if (ZoneNum == state.dataHeatBal->Mixing(Loop1).ZonePtr) {
                         state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone = false;
                         break;
@@ -3114,9 +2992,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
         // get receiving zones mixing objects index
         ZoneMixingNum = 0;
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             ReceivingCount = 0;
-            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 if (ZoneNum == state.dataHeatBal->Mixing(Loop).ZonePtr) {
                     ReceivingCount += 1;
                     ZoneMixingNum(ReceivingCount) = Loop;
@@ -3127,7 +3005,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             if (ReceivingCount > 0) {
                 state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingPtr.allocate(ReceivingCount);
                 state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingFr.allocate(ReceivingCount);
-                for (Loop = 1; Loop <= ReceivingCount; ++Loop) {
+                for (int Loop = 1; Loop <= ReceivingCount; ++Loop) {
                     state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop) = ZoneMixingNum(Loop);
                 }
             }
@@ -3142,24 +3020,24 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     // zone mass conservation calculation order starts with receiving zones
     // and then proceeds to source zones
-    Loop = 0;
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    int Loop2 = 0;
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (!state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone &&
             !state.dataHeatBal->MassConservation(ZoneNum).IsSourceAndReceivingZone) {
-            Loop += 1;
-            state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
+            Loop2 += 1;
+            state.dataHeatBalFanSys->ZoneReOrder(Loop2) = ZoneNum;
         }
     }
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataHeatBal->MassConservation(ZoneNum).IsSourceAndReceivingZone) {
-            Loop += 1;
-            state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
+            Loop2 += 1;
+            state.dataHeatBalFanSys->ZoneReOrder(Loop2) = ZoneNum;
         }
     }
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) {
-            Loop += 1;
-            state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
+            Loop2 += 1;
+            state.dataHeatBalFanSys->ZoneReOrder(Loop2) = ZoneNum;
         }
     }
     cCurrentModuleObject = "ZoneCrossMixing";
@@ -3167,7 +3045,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     state.dataHeatBal->TotCrossMixing = inputCrossMixing + state.dataHeatBal->NumAirBoundaryMixing;
     state.dataHeatBal->CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
 
-    for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
 
         if (Loop > inputCrossMixing) {
             // Create CrossMixing object from air boundary info
@@ -3686,7 +3564,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         for (auto &e : state.dataHeatBal->RefDoorMixing)
             e.NumRefDoorConnections = 0;
 
-        for (Loop = 1; Loop <= state.dataHeatBal->TotRefDoorMixing; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotRefDoorMixing; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -4097,7 +3975,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
     };
 
-    for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
         if (Loop == 1)
             print(state.files.eio,
                   Format_721,
@@ -4106,7 +3984,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                   "Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - "
                   "Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}");
 
-        ZoneNum = state.dataHeatBal->Infiltration(Loop).ZonePtr;
+        int ZoneNum = state.dataHeatBal->Infiltration(Loop).ZonePtr;
         if (ZoneNum == 0) {
             print(state.files.eio, Format_722, "Infiltration-Illegal Zone specified", state.dataHeatBal->Infiltration(Loop).Name);
             continue;
@@ -4135,13 +4013,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
-        for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
-            ZoneNum = state.dataHeatBal->Infiltration(Loop).ZonePtr;
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
+            int ZoneNum = state.dataHeatBal->Infiltration(Loop).ZonePtr;
             state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr = Loop;
         }
     }
 
-    for (Loop = 1; Loop <= state.dataHeatBal->TotVentilation; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotVentilation; ++Loop) {
         if (Loop == 1) {
             print(state.files.eio,
                   Format_721,
@@ -4154,7 +4032,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                   "Temperature{C}/Schedule,Maximum WindSpeed{m/s}");
         }
 
-        ZoneNum = state.dataHeatBal->Ventilation(Loop).ZonePtr;
+        int ZoneNum = state.dataHeatBal->Ventilation(Loop).ZonePtr;
         if (ZoneNum == 0) {
             print(state.files.eio, Format_722, "Ventilation-Illegal Zone specified", state.dataHeatBal->Ventilation(Loop).Name);
             continue;
@@ -4218,7 +4096,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     TotMixingFlow.dimension(state.dataGlobal->NumOfZones, 0.0);
-    for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
         if (Loop == 1)
             print(state.files.eio,
                   Format_721,
@@ -4226,7 +4104,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                   "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                   "Changes per Hour,From/Source Zone,Delta Temperature {C}");
 
-        ZoneNum = state.dataHeatBal->Mixing(Loop).ZonePtr;
+        int ZoneNum = state.dataHeatBal->Mixing(Loop).ZonePtr;
         if (ZoneNum == 0) {
             print(state.files.eio, Format_722, "Mixing-Illegal Zone specified", state.dataHeatBal->Mixing(Loop).Name);
             continue;
@@ -4250,7 +4128,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         print(state.files.eio, "{:.2R}\n", state.dataHeatBal->Mixing(Loop).DeltaTemperature);
     }
 
-    for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
+    for (int Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
         if (Loop == 1) {
             print(state.files.eio,
                   Format_721,
@@ -4259,7 +4137,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                   "Changes per Hour,From/Source Zone,Delta Temperature {C}");
         }
 
-        ZoneNum = state.dataHeatBal->CrossMixing(Loop).ZonePtr;
+        int ZoneNum = state.dataHeatBal->CrossMixing(Loop).ZonePtr;
         if (ZoneNum == 0) {
             print(state.files.eio, Format_722, "CrossMixing-Illegal Zone specified", state.dataHeatBal->CrossMixing(Loop).Name);
             continue;
@@ -4311,14 +4189,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }     // ZoneNumA
     }         //(TotRefDoorMixing .GT. 0)
 
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         state.dataHeatBal->Zone(ZoneNum).NominalInfilVent = TotInfilVentFlow(ZoneNum);
         state.dataHeatBal->Zone(ZoneNum).NominalMixing = TotMixingFlow(ZoneNum);
     }
 
     if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
         // Check for infiltration in zone which are only a mixing source zone
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if ((state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing &&
                  state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) &&
                 (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No)) {
@@ -4330,7 +4208,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             }
         }
         // Set up zone air mass balance output variables
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             SetupOutputVariable(state,
                                 "Zone Air Mass Balance Supply Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
@@ -4758,17 +4636,8 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
 void CalcHeatBalanceAir(EnergyPlusData &state)
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Legacy Code
-    //       DATE WRITTEN   na
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calculates the air component of the heat balance.
-
-    // Using/Aliasing
-    using HVACManager::ManageHVAC;
 
     if (state.dataGlobal->externalHVACManager) {
         if (!state.dataGlobal->externalHVACManagerInitialized) {
@@ -4776,13 +4645,8 @@ void CalcHeatBalanceAir(EnergyPlusData &state)
         }
         state.dataGlobal->externalHVACManager(&state);
     } else {
-        ManageHVAC(state);
+        HVACManager::ManageHVAC(state);
     }
-
-    // Do Final Temperature Calculations for Heat Balance before next Time step
-    state.dataHeatBalFanSys->SumHmAW = 0.0;
-    state.dataHeatBalFanSys->SumHmARa = 0.0;
-    state.dataHeatBalFanSys->SumHmARaW = 0.0;
 }
 
 // END Algorithm Section of the Module

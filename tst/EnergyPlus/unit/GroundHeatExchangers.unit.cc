@@ -1336,6 +1336,106 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UHF)
     EXPECT_NEAR(thisGLHE.interpGFunc(-3.963), 5.82, tolerance);
 }
 
+TEST_F(EnergyPlusFixture, GHE_InterpTest1)
+{
+    std::shared_ptr<GroundHeatExchangers::GLHEResponseFactors> thisRF(new GroundHeatExchangers::GLHEResponseFactors());
+    thisRF->LNTTS.allocate(11);
+    thisRF->GFNC.allocate(11);
+    thisRF->LNTTS = {-5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
+    thisRF->GFNC = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};
+
+    GroundHeatExchangers::GLHEVert thisGHE = GroundHeatExchangers::GLHEVert();
+    thisGHE.myRespFactors = thisRF;
+
+    double tolerance = 0.01;
+    EXPECT_NEAR(thisGHE.interpGFunc(-10.0), -2.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-9.5), -2.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-9.0), -2.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-8.5), -1.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-8.0), -1.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-7.5), -1.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-7.0), -1.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-6.5), -0.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-6.0), -0.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-5.5), -0.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-5.0), 0.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-4.5), 0.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-4.0), 0.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-3.5), 0.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-3.0), 1.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-2.5), 1.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-2.0), 1.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-1.5), 1.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-1.0), 2.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-0.5), 2.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(0.0), 2.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(0.5), 2.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(1.0), 3.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(1.5), 3.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(2.0), 3.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(2.5), 3.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(3.0), 4.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(3.5), 4.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(4.0), 4.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(4.5), 4.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(5.0), 5.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(5.5), 5.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(6.0), 5.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(6.5), 5.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(7.0), 6.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(7.5), 6.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(8.0), 6.50, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(8.5), 6.75, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(9.0), 7.00, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(9.5), 7.25, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(10.0), 7.50, tolerance);
+}
+
+TEST_F(EnergyPlusFixture, GHE_InterpTest2)
+{
+    std::shared_ptr<GroundHeatExchangers::GLHEResponseFactors> thisRF(new GroundHeatExchangers::GLHEResponseFactors());
+    thisRF->LNTTS.allocate(8);
+    thisRF->GFNC.allocate(8);
+    thisRF->LNTTS = {-15.2202, -15.083, -14.9459, -14.8087, -14.6716, -14.5344, -14.3973, -14.2601};
+    thisRF->GFNC = {-2.55692, -2.48389, -2.40819, -2.32936, -2.24715, -2.16138, -2.07195, -1.97882};
+
+    GroundHeatExchangers::GLHEVert thisGHE = GroundHeatExchangers::GLHEVert();
+    thisGHE.myRespFactors = thisRF;
+
+    double tolerance = 1e-6;
+
+    EXPECT_NEAR(thisGHE.interpGFunc(-15.220200), -2.556920, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-15.187093), -2.539298, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-15.153986), -2.521675, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-15.120879), -2.504053, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-15.087772), -2.486430, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-15.054666), -2.468245, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-15.021559), -2.449965, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.988452), -2.431685, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.955345), -2.413405, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.922238), -2.394595, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.889131), -2.375573, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.856024), -2.356551, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.822917), -2.337529, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.789810), -2.318033, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.756703), -2.298181, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.723597), -2.278329, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.690490), -2.258477, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.657383), -2.238262, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.624276), -2.217566, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.591169), -2.196869, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.558062), -2.176172, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.524955), -2.155219, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.491848), -2.133624, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.458741), -2.112028, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.425634), -2.090433, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.392528), -2.068711, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.359421), -2.046238, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.326314), -2.023765, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.293207), -2.001293, tolerance);
+    EXPECT_NEAR(thisGHE.interpGFunc(-14.260100), -1.978820, tolerance);
+}
+
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UBHWT)
 {
     using namespace DataSystemVariables;

@@ -71,10 +71,12 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -83,6 +85,7 @@
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 
@@ -342,6 +345,7 @@ namespace RoomAirModelAirflowNetwork {
                     SupplyFrac = 0.0;
                     ReturnFrac = 0.0;
                     NodeFound = false;
+                    int numAirDistUnits = 0;
 
                     // find supply air node number
                     for (LoopAirNode = 1; LoopAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
@@ -350,24 +354,61 @@ namespace RoomAirModelAirflowNetwork {
                              ++EquipLoop) { // loop over all the equip for a single room air node
                             // Check zone equipment name
                             for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
-                                if (UtilityRoutines::SameString(
-                                        state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I),
-                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name)) {
-                                    if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
-                                            .Node(LoopAirNode)
-                                            .HVAC(EquipLoop)
-                                            .EquipConfigIndex == 0)
-                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
-                                            .Node(LoopAirNode)
-                                            .HVAC(EquipLoop)
-                                            .EquipConfigIndex = I;
-                                    EquipFound(I) = true;
-                                    SupplyFrac(I) =
-                                        SupplyFrac(I) +
-                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupplyFraction;
-                                    ReturnFrac(I) =
-                                        ReturnFrac(I) +
-                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnFraction;
+                                if (state.dataZoneEquip->ZoneEquipList(LoopZone).EquipTypeEnum(I) == DataZoneEquipment::ZoneEquip::AirDistUnit) {
+                                    if (numAirDistUnits == 0)
+                                        numAirDistUnits =
+                                            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:AirDistributionUnit");
+                                    if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
+                                        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+                                        state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+                                    }
+                                    for (int AirDistUnitNum = 1; AirDistUnitNum <= numAirDistUnits; ++AirDistUnitNum) {
+                                        if (state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) ==
+                                            state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name) {
+                                            if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name ==
+                                                state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(1)) {
+                                                if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                        .Node(LoopAirNode)
+                                                        .HVAC(EquipLoop)
+                                                        .EquipConfigIndex == 0)
+                                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                        .Node(LoopAirNode)
+                                                        .HVAC(EquipLoop)
+                                                        .EquipConfigIndex = I;
+                                                if (!EquipFound(I)) EquipFound(I) = true;
+                                                SupplyFrac(I) = SupplyFrac(I) + state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                                                    .Node(LoopAirNode)
+                                                                                    .HVAC(EquipLoop)
+                                                                                    .SupplyFraction;
+                                                ReturnFrac(I) = ReturnFrac(I) + state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                                                    .Node(LoopAirNode)
+                                                                                    .HVAC(EquipLoop)
+                                                                                    .ReturnFraction;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if (UtilityRoutines::SameString(
+                                            state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I),
+                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name)) {
+                                        if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                .Node(LoopAirNode)
+                                                .HVAC(EquipLoop)
+                                                .EquipConfigIndex == 0)
+                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                .Node(LoopAirNode)
+                                                .HVAC(EquipLoop)
+                                                .EquipConfigIndex = I;
+                                        EquipFound(I) = true;
+                                        SupplyFrac(I) = SupplyFrac(I) + state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                                            .Node(LoopAirNode)
+                                                                            .HVAC(EquipLoop)
+                                                                            .SupplyFraction;
+                                        ReturnFrac(I) = ReturnFrac(I) + state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
+                                                                            .Node(LoopAirNode)
+                                                                            .HVAC(EquipLoop)
+                                                                            .ReturnFraction;
+                                    }
                                 }
                             }
                             for (IdNode = 1; IdNode <= state.dataLoopNodes->NumOfNodes; ++IdNode) { // loop over all nodes to find supply node ID
