@@ -1218,9 +1218,9 @@ ZoneMixing is intended to allow simplified treatment of air exchange between zon
 
 The name of the ZoneMixing object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-3}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-3}
 
-This field is the name of the zone (ref: Zone) receiving the amount of air being exchanged and attaches a particular mixing statement to a thermal zone in the building.
+This field applies this ZoneMixing object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual ZoneMixing objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneMixing Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-3}
 
@@ -1266,9 +1266,9 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate is the maximum amount of mixing air expected. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
 
-\paragraph{Field: Flow Rate per Zone Floor Area}\label{field-flow-rate-per-zone-floor-area-1}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-rate-per-zone-floor-area-1}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone of Space Floor  Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
 
 \paragraph{Field: Flow Rate per Person}\label{field-flow-rate-per-person-1}
 
@@ -1278,9 +1278,9 @@ This factor (m\(^{3}\)/s-person) is used, along with the nominal (maximum) numbe
 
 With this choice, the method used will be the number of air changes per hour for the mixing amount. This factor, along with the Zone Volume, will be used to determine the Design Flow Rate. The choice from the method field should be ``AirChanges/Hour''.
 
-\paragraph{Field: Source Zone Name}\label{field-source-zone-name}
+\paragraph{Field: Source Zone or Space Name}\label{field-source-zone-name}
 
-This field is the name of the ``source'' zone (ref: Zone) that exhausts the amount of air specified by the design level and schedule fields to the zone named in the zone name field.
+This field is the name of the ``source'' zone or space that exhausts the amount of air specified by the design level and schedule fields to the receiving zone or space.
 
 \paragraph{Field: Delta Temperature}\label{field-delta-temperature-2}
 
@@ -1290,25 +1290,25 @@ This number controls when mixing air from the source zone is sent to the receivi
 
 This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the source zone and receiving zone air dry-bulb temperatures as a function of time. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will supersede the constant value specified in the Delta Temperature field.
 
-\paragraph{Field: Minimum Zone Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name}
+\paragraph{Field: Minimum Receiving Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
 
-\paragraph{Field: Maximum Zone Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name}
+\paragraph{Field: Maximum Receiving Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
 
-\textbf{Note:} The maximum zone temperature when mixing is shutoff must be greater than or equal to the minimum zone temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum zone shutoff temperature will be set to the minimum zone shutoff temperature.
+\textbf{Note:} The maximum receiving temperature when mixing is shutoff must be greater than or equal to the minimum receiving temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum shutoff temperature will be set to the minimum shutoff temperature.
 
-\paragraph{Field: Minimum Source Zone Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name}
+\paragraph{Field: Minimum Source Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
 
-\paragraph{Field: Maximum Source Zone Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name}
+\paragraph{Field: Maximum Source Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
 
-\textbf{Note:} The maximum source zone temperature when mixing is shutoff must be greater than or equal to the minimum source zone temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source zone shutoff temperature will be set to the minimum source zone shutoff temperature.
+\textbf{Note:} The maximum source temperature when mixing is shutoff must be greater than or equal to the minimum source temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source shutoff temperature will be set to the minimum source shutoff temperature.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name-2}
 
@@ -1326,15 +1326,15 @@ An IDF Example:
 
 ZoneMixing,
     Kitchen_ZN_1_FLR_1 Exhaust Fanmixing_0,  !- Name
-    Kitchen_ZN_1_FLR_1,  !- Zone Name
-    Hours_of_operation,  !- Schedule Name
-    Flow/Zone,  !- Design Flow Rate Calculation Method
-    1.4540,  !- Design Level
-    ,  !- Volume Flow Rate per Area {m3/s/m2}
-    ,  !- Volume Flow Rate Per Person {m3/s/person}
-    ,  !- Air Changes per Hour {ACH}
-    CAFETERIA_ZN_1_FLR_1,  !- Source Zone Name
-    0.0;  !- Delta Temperature
+    Kitchen_ZN_1_FLR_1,   !- Zone or Space Name
+    Hours_of_operation,   !- Schedule Name
+    Flow/Zone,            !- Design Flow Rate Calculation Method
+    1.4540,               !- Design Flow Rate {m3/s}
+    ,                     !- Flow Rate per Floor Area {m3/s-m2}
+    ,                     !- Flow Rate per Person {m3/s-person}
+    ,                     !- Air Changes Per Hour
+    CAFETERIA_ZN_1_FLR_1, !- Source Zone or Space Name
+    0.0;                  !- Delta Temperature
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-000}
@@ -1416,9 +1416,9 @@ ZoneCrossMixing can be entered once (in one of the mixing zones), twice (once fo
 
 The name of the ZoneCrossMixing object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-4}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-4}
 
-This field is the name of the zone (ref: Zone) receiving the amount of air being exchanged and attaches a particular cross mixing statement to a thermal zone in the building.
+This field applies this ZoneCrossMixing object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual ZoneCrossMixing objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneCrossMixing Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-4}
 
@@ -1464,9 +1464,9 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate is the maximum amount of mixing air expected. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
 
-\paragraph{Field: Flow Rate per Zone Floor Area}\label{field-flow-rate-per-zone-floor-area-2}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-rate-per-zone-floor-area-2}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
 
 \paragraph{Field: Flow Rate per Person}\label{field-flow-rate-per-person-2}
 
@@ -1476,9 +1476,9 @@ This factor (m\(^{3}\)/s-person) is used, along with the nominal (maximum) numbe
 
 With this choice, the method used will be the number of air changes per hour for the mixing amount. This factor, along with the Zone Volume, will be used to determine the Design Flow Rate. The choice from the method field should be ``AirChanges/Hour''.
 
-\paragraph{Field: Source Zone Name}\label{field-source-zone-name-1}
+\paragraph{Field: Source Zone or Space Name}\label{field-source-zone-name-1}
 
-This field is the name of the ``source'' zone (ref: Zone) that exhausts the amount of air specified by the design level and schedule fields to the zone named in the zone name field. In reality, the ``source'' and ``receiving'' zones are interchangeable since the cross-mixed air affects both zones.
+This field is the name of the ``source'' zone or space that exhausts the amount of air specified by the design level and schedule fields to the zone named in the zone name field. In reality, the ``source'' and ``receiving'' zones or spaces are interchangeable since the cross-mixed air affects both zones.
 
 \paragraph{Field: Delta Temperature}\label{field-delta-temperature-3}
 
@@ -1488,25 +1488,25 @@ This number controls when mixing air from the source zone is sent to the receivi
 
 This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the source zone and receiving zone air dry-bulb temperatures as a function of time. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will supersede the constant value specified in the Delta Temperature field.
 
-\paragraph{Field: Minimum Zone Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name-1}
+\paragraph{Field: Minimum Receiving Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
 
-\paragraph{Field: Maximum Zone Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name-1}
+\paragraph{Field: Maximum Receiving Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
 
-\textbf{Note:} The maximum zone temperature when cross mixing is shutoff must be greater than or equal to the minimum zone temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum zone shutoff temperature will be set to the minimum zone shutoff temperature.
+\textbf{Note:} The maximum receiving temperature when cross mixing is shutoff must be greater than or equal to the minimum receiving temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum shutoff temperature will be set to the minimum shutoff temperature.
 
-\paragraph{Field: Minimum Source Zone Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name-1}
+\paragraph{Field: Minimum Source Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
 
-\paragraph{Field: Maximum Source Zone Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name-1}
+\paragraph{Field: Maximum Source Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
 
-\textbf{Note:} The maximum source zone temperature when cross mixing is shutoff must be greater than or equal to the minimum source zone temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source zone shutoff temperature will be set to the minimum source zone shutoff temperature.
+\textbf{Note:} The maximum source temperature when cross mixing is shutoff must be greater than or equal to the minimum source temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source shutoff temperature will be set to the minimum source shutoff temperature.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name-3}
 
@@ -1524,27 +1524,15 @@ An IDF Example:
 
 ZoneCrossMixing,
       1stFloor-Garage,  !- Name
-      GARAGE,      !- Zone Name
-      Always On,   !- SCHEDULE Name
-      Flow/Zone,               !- Design Flow Rate calculation method
-      0.1,                     !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per Area {m3/s/m2}
-      ,                        !- Flow Rate per Person {m3/s/person}
-      ,                        !- Air Changes Per Hour
-      1ST-FLOOR,   !- Source Zone Name
+      GARAGE,      !- Zone or Space Name
+      Always On,   !- Schedule Name
+      Flow/Zone,   !- Design Flow Rate Calculation Method
+      0.1,         !- Design Flow Rate {m3/s}
+      ,            !- Flow Rate per Floor Area {m3/s-m2}
+      ,            !- Flow Rate per Person {m3/s-person}
+      ,            !- Air Changes Per Hour
+      1ST-FLOOR,   !- Source Zone or Space Name
       1.0;         !- Delta temp
-
-  ZoneCrossMixing,
-      Garage-1stFloor,  !- Name
-      1ST-FLOOR,   ! Zone Name
-      Always On,   !- SCHEDULE Name
-      flow/zone,               !- Design Flow Rate calculation method
-      0.1,                     !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per area {m3/s/m2}
-      ,                        !- Flow Rate per person {m3/s/person}
-      ,                        !- Air Changes Per Hour
-      GARAGE,      ! Source Zone Name
-      1.0;         ! Delta temp
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-000}
