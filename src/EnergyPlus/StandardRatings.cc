@@ -175,13 +175,11 @@ namespace StandardRatings {
     static constexpr std::array<Real64, 6> SpeedLoadFactor = {1.10, 1.06, 1.30, 1.15, 1.16, 1.11};
 
     // between calculated and measured building loads, dimensionless.
-    Real64 constexpr CyclicDegradationCoeff(
-        0.25); //?? We need to update it for SEER calculation as well cause 0.25 was in 2008 and got updated to 0.20 in 2017
-    Real64 constexpr CyclicDegradationCoeffSEER2(0.20); // ANSI/AHRI 210/240 2023 Section 6.1.3.1
+    Real64 constexpr CyclicDegradationCoeff(0.25);
     // For Single Stage Systems, if the optional CFull and DFull tests are not performed, a
     // default value of 0.20 shall be used for the cooling Degradation Coefficient
-    // TODO: Cover all scenarios for cooling/heating/twostage using two different values 0.20 and 0.25
-
+    Real64 constexpr CyclicDegradationCoeffSEER2(0.20); // ANSI/AHRI 210/240 2023 Section 6.1.3.1
+  
     // Default Heating Degradation Coefficient | HSPF2
     // ANSI/AHRI Standard 2023 Section 6.1.3.2.1 -> For Single Stage Systems, if the optional H1CFull test or H1CLow is not performed, a default value
     // of 0.25 shall be used for the heating Degradation Coefficient
@@ -209,7 +207,7 @@ namespace StandardRatings {
          {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
 
     // Fractional bin hours for different bin temperatures from ANSI/AHRI 210/240 - 2023 (Section 11.2.2 - Table 14)
-    // BPS: As the Fractional Bin Hours for each region is not summing up to 1 we're using the adjusted one down below
+    // As the Fractional Bin Hours for each region is not summing up to 1 we're using the adjusted one down below
     /*static constexpr std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> FracBinHoursAtOutdoorBinTempHSPF2 = {
         {{0.0, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
          {0.0, 0.0, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -218,13 +216,114 @@ namespace StandardRatings {
          {0.0, 0.0, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001},
          {0.0, 0.0, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};*/
     // Adjusted to sum up to 1
-    static constexpr std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> FracBinHoursAtOutdoorBinTempHSPF2 = {
-        {{0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-         {0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-         {0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0},
-         {0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0},
-         {0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001},
-         {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
+    static constexpr std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> FracBinHoursAtOutdoorBinTempHSPF2 = {{{0.0,
+                                                                                                                          0.337094499,
+                                                                                                                          0.273624824,
+                                                                                                                          0.181946403,
+                                                                                                                          0.114245416,
+                                                                                                                          0.057827927,
+                                                                                                                          0.026798307,
+                                                                                                                          0.007052186,
+                                                                                                                          0.001410437,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0},
+                                                                                                                         {0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.273489933,
+                                                                                                                          0.239932886,
+                                                                                                                          0.187919463,
+                                                                                                                          0.147651007,
+                                                                                                                          0.093959732,
+                                                                                                                          0.040268456,
+                                                                                                                          0.013422819,
+                                                                                                                          0.003355705,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0},
+                                                                                                                         {0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.195744681,
+                                                                                                                          0.194326241,
+                                                                                                                          0.191489362,
+                                                                                                                          0.167375887,
+                                                                                                                          0.130496454,
+                                                                                                                          0.066666667,
+                                                                                                                          0.029787234,
+                                                                                                                          0.012765957,
+                                                                                                                          0.007092199,
+                                                                                                                          0.002836879,
+                                                                                                                          0.00141844,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0},
+                                                                                                                         {0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.136063408,
+                                                                                                                          0.122853369,
+                                                                                                                          0.132100396,
+                                                                                                                          0.143989432,
+                                                                                                                          0.166446499,
+                                                                                                                          0.114927345,
+                                                                                                                          0.072655218,
+                                                                                                                          0.047556143,
+                                                                                                                          0.034346103,
+                                                                                                                          0.017173052,
+                                                                                                                          0.007926024,
+                                                                                                                          0.002642008,
+                                                                                                                          0.001321004,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0},
+                                                                                                                         {0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.10723192,
+                                                                                                                          0.094763092,
+                                                                                                                          0.097256858,
+                                                                                                                          0.108478803,
+                                                                                                                          0.127182045,
+                                                                                                                          0.117206983,
+                                                                                                                          0.092269327,
+                                                                                                                          0.068578554,
+                                                                                                                          0.058603491,
+                                                                                                                          0.047381546,
+                                                                                                                          0.036159601,
+                                                                                                                          0.02244389,
+                                                                                                                          0.012468828,
+                                                                                                                          0.006234414,
+                                                                                                                          0.002493766,
+                                                                                                                          0.001246883},
+                                                                                                                         {0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.315712188,
+                                                                                                                          0.299559471,
+                                                                                                                          0.207048458,
+                                                                                                                          0.111600587,
+                                                                                                                          0.049926579,
+                                                                                                                          0.01174743,
+                                                                                                                          0.004405286,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0,
+                                                                                                                          0.0}}};
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
     int constexpr NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
@@ -989,7 +1088,6 @@ namespace StandardRatings {
         Array1D<Real64> TotElectricPowerRated(16); // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
 
         Array1D<Real64> NetCoolingCapRated_2023(ns); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
-        //??TODO
         Array1D<Real64> NetTotCoolingCapRated_2023(16); // net total cooling capacity of DX Coils for the sixteen ASHRAE Std 127 Test conditions
         Array1D<Real64> TotElectricPowerRated_2023(16); // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
 
@@ -1059,7 +1157,7 @@ namespace StandardRatings {
                                DXCoilType,
                                DXCoilName,
                                DXCoilType_Num,
-                               NetCoolingCapRated_2023(1), //??(1)
+                               NetCoolingCapRated_2023(1), 
                                SEER2_User * ConvFromSIToIP,
                                SEER2_Standard * ConvFromSIToIP,
                                EER_2023,
@@ -1496,7 +1594,7 @@ namespace StandardRatings {
 
         // For ANSI/AHRI 210/240 Standard 2023 | Concept of DHRI min and max is removed
         // Section 11.2.2.1 Equation 11.104  which suggests QAFull is used instead of DHRI min
-        DesignHeatingRequirement2023 = NetHeatingCapRated_2023; //?? QAFull
+        DesignHeatingRequirement2023 = NetHeatingCapRated_2023;
         Int64 RN = static_cast<int64_t>(RegionNum);
 
         for (BinNum2023 = 0; BinNum2023 < TotalNumOfTemperatureBinsHSPF2[RN - 1]; ++BinNum2023) {
@@ -3222,7 +3320,6 @@ namespace StandardRatings {
                     PartLoadFraction = 1.0 - CyclicDegradationCoeff * (1.0 - PartLoadRatio);
                     TotHeatElecPowerBinnedHP = (PartLoadRatio / PartLoadFraction) * HeatingElecPowerLS * LowTempCutOutFactor;
                     TotHeatElecPowerBinnedRH = BuildingHeatingLoad * (1.0 - LowTempCutOutFactor);
-
                     goto HeatSpeedLoop_exit;
 
                 } else if ((BuildingHeatingLoad > HeatingCapacityLS) && (BuildingHeatingLoad < HeatingCapacityHS)) {
@@ -3234,7 +3331,6 @@ namespace StandardRatings {
                     TotHeatElecPowerBinnedHP = LoadFactor * HeatingElecPowerLS + (1.0 - LoadFactor) * HeatingElecPowerHS;
                     TotHeatElecPowerBinnedHP *= LowTempCutOutFactor;
                     TotHeatElecPowerBinnedRH = BuildingHeatingLoad * (1.0 - LowTempCutOutFactor);
-
                     goto HeatSpeedLoop_exit;
 
                 } else if (BuildingHeatingLoad >= HeatingCapacityMax) {
@@ -3254,7 +3350,6 @@ namespace StandardRatings {
 
                     TotHeatElecPowerBinnedHP = HeatingElecPowerMax * LowTempCutOutFactor;
                     TotHeatElecPowerBinnedRH = BuildingHeatingLoad - HeatingCapacityMax * LowTempCutOutFactor;
-
                     goto HeatSpeedLoop_exit;
                 }
             }
@@ -3388,7 +3483,7 @@ namespace StandardRatings {
         Real64 HeatingOutdoorCoilInletAirDBTemp_H4FullTest = -15;  // Outdoor air dry-bulb temp in degrees  C (5 F)
         Real64 HeatingIndoorCoilInletAirDBTemp_H4FullTest = 21.11; // Indoor air dry-bulb temp in degrees 21.11 C (70 F)
 
-        Array1D<Real64> Q_A_Full(nsp); //??
+        Array1D<Real64> Q_A_Full(nsp); 
 
         Array1D<Real64> Q_H0_Low(nsp);  // Total cooling capacity at H0 Low test condition (Low speed)
         Array1D<Real64> Q_H1_Low(nsp);  // Total cooling capacity at H1 Low test condition (Low speed)
@@ -3510,11 +3605,7 @@ namespace StandardRatings {
         // determine the HP capacity at the rated condition (AHRI H1 high speed test Condition); and determine the
         // the building heat requirement for the user specified region
         NetHeatingCapRatedHighTemp_2023 = Q_H1_Full(nsp);
-        NetHeatingCapRatedLowTemp_2023 = Q_H4_Full(nsp); //?? Previously TotHeatCapTestH3(nsp);
-        Real64 q_A_full = Q_A_Full(nsp);
-        // For ANSI/AHRI 210/240 Standard 2023 | Concept of DHRI min and max is removed
-        // Section 11.2.2.1 Equation 11.104  which suggests QAFull is used instead of DHRI min
-        DesignHeatingRequirement2023 = NetHeatingCapRatedHighTemp_2023; //?? QAFull
+        NetHeatingCapRatedLowTemp_2023 = Q_H3_Full(nsp);
 
         // The minimum temperature below which the compressor is turned off
         Real64 t_Off = MinOATCompressor; // Heating off | outdoor Minimum temperature below which the compressor ceases to operate
@@ -3526,20 +3617,27 @@ namespace StandardRatings {
         Real64 q_sum(0.0);
         Real64 e_sum(0.0);
         Real64 rh_sum(0.0);
-        for (BinNum2023 = 0; BinNum2023 < TotalNumOfTemperatureBinsHSPF2[RN - 1]; ++BinNum2023) { // NumOfOATempBins
+
+        // Equation 11.111 AHRI-2023
+        Real64 t_ob = 7.22; //  temperature at which frosting influence on full stage performance begins 7.22 C (45 F)
+        for (BinNum2023 = 0; BinNum2023 < 18; ++BinNum2023) { // NumOfOATempBins
 
             Real64 t = OutdoorBinTemperature[BinNum2023];
             n = FracBinHoursAtOutdoorBinTempHSPF2[RN - 1][BinNum2023];
+            if (n == 0.0) {
+                // we're skipping load calculations for any Temperature bin against which fractional hours are 0.0
+                continue;
+            }
             Real64 t_zl = ZoneLoadTemperature[RN - 1];
             Real64 t_od = OutdoorDesignTemperature[RN - 1];
-            Real64 c_x = SpeedLoadFactor[RN - 1];
+            Real64 c_x = VariableSpeedLoadFactor[RN - 1];
 
-            // Q_A_Full = ??
-            Real64 bl = (t_zl - t) / (t_zl - t_od) * c_x * DesignHeatingRequirement2023; //?? replace with q_A_full
-            Real64 bl1 = (t_zl - t) / (t_zl - t_od) * c_x * q_A_full;                    //?? replace with q_A_full
-
-            // Equation 11.111 AHRI-2023
-            Real64 t_ob = 7.22; //  temperature at which frosting influence on full stage performance begins 7.22 C (45 F)
+            // For ANSI/AHRI 210/240 Standard 2023 | Concept of DHRI min and max is removed
+            // Section 11.2.2.1 Equation 11.104  which suggests QAFull is used instead of DHRI min
+            // While Calculaiting the Building load For heating-only heat pump units, replace Q_A_Full with Q_H_Full
+            // Q_H_Full = the heating capacity at 47°F determined from the H1N test for variable capacity systems and
+            // from the H1Full test for other systems, Btu/h.
+            Real64 bl = (t_zl - t) / (t_zl - t_od) * c_x * Q_H1_Full(nsp);
 
             Real64 q_full(0.0);
             Real64 p_full(0.0);
@@ -3550,13 +3648,17 @@ namespace StandardRatings {
             Real64 e(0.0);
             Real64 rh(0.0);
 
-            if (t >= t_ob || t <= -8.33) {                                                                        // t>=tobo or t<=17F
-                q_full = Q_H3_Full(nsp) + (Q_H1_Full(nsp) - Q_H3_Full(nsp)) * ((t - (-8.33)) / (8.33 - (-8.33))); // Equation 11.109 AHRI-2023
-                p_full = P_H3_Full(nsp) + (P_H1_Full(nsp) - P_H3_Full(nsp)) * ((t - (-8.33)) / (8.33 - (-8.33))); // Equation 11.115 AHRI-2023
-            } else {                                                                                              // t > fr_u(17,"°F") and t < t_ob
-                q_full = Q_H3_Full(nsp) + (Q_H2_Full(nsp) - Q_H3_Full(nsp)) * ((t - (-8.33)) / (1.66 - (-8.33))); // Equation 11.110 AHRI-2023
-                p_full = P_H3_Full(nsp) + (P_H2_Full(nsp) - P_H3_Full(nsp)) * ((t - (-8.33)) / (1.66 - (-8.33))); // Equation 11.116 AHRI-2023
+            if (t >= t_ob) {
+                q_full = Q_H3_Full(nsp) + (Q_H1_Full(nsp) - Q_H3_Full(nsp)) * ((t - (-8.33)) / (8.33 - (-8.33))); // Equation 11.112 AHRI-2023
+                p_full = P_H3_Full(nsp) + (P_H1_Full(nsp) - P_H3_Full(nsp)) * ((t - (-8.33)) / (8.33 - (-8.33))); // Equation 11.117 AHRI-2023
+            } else if (t >= (-8.33) && t < t_ob) {
+                q_full = Q_H3_Full(nsp) + (Q_H2_Full(nsp) - Q_H3_Full(nsp)) * ((t - (-8.33)) / (1.66 - (-8.33)));  // Equation 11.113 AHRI-2023
+                p_full = P_H3_Full(nsp) + (P_H2_Full(nsp) - P_H3_Full(nsp)) * ((t - (-8.33)) / (1.66 - (-8.33)));  // Equation 11.118 AHRI-2023
+            } else if (t < (-8.33)) {                                                                              // if(t<(-8.33))
+                q_full = Q_H4_Full(nsp) + (Q_H3_Full(nsp) - Q_H4_Full(nsp)) * ((t - (-8.33)) / ((-8.33) - (-15))); // Equation 11.114 AHRI-2023
+                p_full = P_H4_Full(nsp) + (P_H3_Full(nsp) - P_H4_Full(nsp)) * ((t - (-8.33)) / ((-8.33) - (-15))); // Equation 11.119 AHRI-2023
             }
+
             cop_full = q_full / p_full;
 
             if (t <= t_Off || cop_full < 1.0) {
@@ -3573,7 +3675,7 @@ namespace StandardRatings {
                 hlf_full = 1.0; // Equation 11.108 AHRI-2023
             }
 
-            for (spnum = 1; spnum <= nsp; ++spnum) {
+            for (spnum = 1; spnum <= nsp - 1; ++spnum) {
 
                 // Intermediate capacity
                 Real64 q_H0_low = Q_H0_Low(spnum);
@@ -3583,16 +3685,14 @@ namespace StandardRatings {
                 Real64 q_H2_full = Q_H2_Full(spnum);
                 Real64 q_H3_full = Q_H3_Full(spnum);
                 Real64 q_H4_full = Q_H4_Full(spnum);
-                //?? or f(cond_1) + (f(cond_2) - f(cond_1))/(cond_2.outdoor.db - cond_1.outdoor.db)*(x - cond_1.outdoor.db)
                 // Equation 11.177 AHRI-2023
-                Real64 q_35_low =
-                    q_H1_low + (q_H0_low - q_H1_low) * ((t - (8.33)) / (1.66 - (8.33))); //?? (replaced 62 with 35) in Ratio expression (t-47/62-47)
+                //?? (replaced 62 with 35) in Ratio expression // (t=>35-47/62-47)
+                Real64 q_35_low = // q_H1_low + (q_H0_low - q_H1_low) * ((t - (8.33)) / (1.66 - (8.33)));
+                    q_H1_low + (q_H0_low - q_H1_low) * ((1.67 - (8.33)) / (16.67 - (8.33)));
 
-                Real64 q_35_low1 = q_H0_low + (q_H1_low - q_H0_low) /
-                                                  (HeatingOutdoorCoilInletAirDBTemp_H1LowTest - HeatingOutdoorCoilInletAirDBTemp_H0LowTest) *
-                                                  (1.66 - HeatingOutdoorCoilInletAirDBTemp_H0LowTest);
                 // Equation 11.191 AHRI-2023
-                Real64 N_Hq = (q_H2_int - q_35_low) / (q_H2_full - q_35_low);
+                Real64 N_Hq = min(1.0, (q_H2_int - q_35_low) / (q_H2_full - q_35_low));
+                N_Hq = max(0.0, N_Hq);
                 // Equation 11.190 AHRI-2023
                 Real64 M_Hq = (q_H0_low - q_H1_low) / (16.66 - 8.33) * (1.0 - N_Hq) + (q_H2_full - q_H3_full) / (1.66 - (-8.33)) * N_Hq;
 
@@ -3605,15 +3705,14 @@ namespace StandardRatings {
                 Real64 p_H3_full = P_H3_Full(spnum);
                 Real64 p_H4_full = P_H4_Full(spnum);
                 // Equation 11.178 AHRI - 2023
-                Real64 p_35_low =
-                    p_H1_low + (p_H0_low - p_H1_low) * ((t - (8.33)) / (1.66 - (8.33))); //?? (replaced 62 with 35) in Ratio expression (t-47/35-47)
-
-                Real64 p_35_low1 = p_H0_low + (p_H1_low - p_H0_low) /
-                                                  (HeatingOutdoorCoilInletAirDBTemp_H1LowTest - HeatingOutdoorCoilInletAirDBTemp_H0LowTest) *
-                                                  (1.66 - HeatingOutdoorCoilInletAirDBTemp_H0LowTest);
+                //?? (replaced 62 with 35) in Ratio expression (t=>35 F-47/35-47)
+                Real64 p_35_low = // p_H1_low + (p_H0_low - p_H1_low) * ((t - (8.33)) / (1.66 - (8.33)));
+                    p_H1_low + (p_H0_low - p_H1_low) * ((1.67 - (8.33)) / (16.67 - (8.33)));
 
                 // Equation 11.194 AHRI-2023
-                Real64 N_HE = (p_H2_int - p_35_low) / (p_H2_full - p_35_low);
+                Real64 N_HE = min(1.0, (p_H2_int - p_35_low) / (p_H2_full - p_35_low));
+                N_HE = max(0.0, N_HE);
+
                 // Equation 11.193 AHRI-2023
                 Real64 M_HE = (p_H0_low - p_H1_low) / (16.66 - 8.33) * (1.0 - N_HE) + (p_H2_full - p_H3_full) / (1.66 - (-8.33)) * N_HE;
 
@@ -3622,6 +3721,40 @@ namespace StandardRatings {
                 Real64 q_low = q_H1_low + (q_H0_low - q_H1_low) * ((t - (8.33)) / (16.66 - (8.33)));
                 // Equation 11.178 AHRI-2023
                 Real64 p_low = p_H1_low + (p_H0_low - p_H1_low) * ((t - (8.33)) / (16.66 - (8.33)));
+                Real64 q_hs(0.0);
+                Real64 p_hs(0.0);
+                // Low Speed
+                if (t < -8.33) {
+                    q_low = Q_H3_Full(spnum) + ((Q_H1_Low(spnum) - Q_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
+
+                    p_low = P_H3_Full(spnum) + ((P_H1_Low(spnum) - P_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
+                } else if (t >= 4.44) {
+                    q_low = Q_H1_Low(spnum) + ((Q_H0_Low(spnum) - Q_H1_Low(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempRated) /
+                                               (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
+                    p_low = P_H1_Low(spnum) + ((P_H0_Low(spnum) - P_H1_Low(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempRated) /
+                                               (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
+                } else {
+                    q_low = Q_H3_Full(spnum) + ((Q_H2_Full(spnum) - Q_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
+                    p_low = P_H3_Full(spnum) + ((P_H2_Full(spnum) - P_H3_Full(spnum)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
+                }
+
+                // High Speed
+                if ((t <= -8.33) || (t >= 7.20)) {
+                    q_hs = Q_H3_Full(spnum + 1) + ((Q_H1_Full(spnum + 1) - Q_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
+                    p_hs = P_H3_Full(spnum + 1) + ((P_H1_Full(spnum + 1) - P_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
+                } else {
+                    q_hs = Q_H3_Full(spnum + 1) + ((Q_H2_Full(spnum + 1) - Q_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
+                    p_hs = P_H3_Full(spnum + 1) + ((P_H2_Full(spnum + 1) - P_H3_Full(spnum + 1)) * (t - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
+                }
+
                 Real64 cop_low = q_low / p_low;
 
                 Real64 q_int = q_H2_int + M_Hq * (t - (1.66));
@@ -3640,43 +3773,51 @@ namespace StandardRatings {
                         delta_low = 0.5; // Equation 11.161 AHRI-2023
                     }
 
-                    Real64 hlf_low = bl / q_low; // Equation 11.155 AHRI-2023
+                    Real64 hlf_low(0.0); // Par tLoad Ratio
+                    if (q_low > 0.0) {
+                        hlf_low = min(1.0, bl / q_low); // Equation 11.155 AHRI-2023
+                    }
                     // Section 6.1.3.2.3 (AHRI-2023) For Variable Capacity Systems, if the optional H1CFull and H1CLow tests are not
                     // performed, a default value of 0.25 shall be used for the heating Degradation Coefficient
                     Real64 CyclicMSHeatingDegradationCoeffHSPF2 = 0.25;
+                    // Part Load Fration
                     Real64 plf_low = 1.0 - CyclicMSHeatingDegradationCoeffHSPF2 * (1.0 - hlf_low); // Equation 11.156 AHRI-2023
-                    e = p_low * hlf_low * delta_low * n / plf_low;                                 // Equation 11.153 AHRI-2023
-                    rh = bl * (1.0 - delta_low) * n;                                               // Equation 11.154 AHRI-2023
-                    // goto HeatSpeedLoop4_exit;
-                } else if (bl < q_full) {
+                    // e = p_low * hlf_low * delta_low * n / plf_low;                                 // Equation 11.153 AHRI-2023
+                    e = (hlf_low / plf_low) * p_low * delta_low * n;
+                    rh = bl * (1.0 - delta_low) * n; // Equation 11.154 AHRI-2023
+                    goto HeatSpeedLoop4_exit;
+                } else if (bl > q_low && bl < q_hs) {
+                    // (bl > q_low && bl < q_full) {
                     // CASE 2 : 11.2.2.3.2 AHRI-2023
                     // Building load can be matched by modulating the compressor speed between low speed and full speed, q_low < bl < q_full
                     Real64 cop_int_bin(0.0);
                     Real64 delta_int_bin(0.0);
                     if (bl <= q_int) {
-                        cop_int_bin = cop_low + (cop_int - cop_low) / (q_int - q_low) * (bl - q_low);   // Equation 11.187 AHRI-2023
-                    } else {                                                                            // if bl > q_int
-                        cop_int_bin = cop_int + (cop_full - cop_int) / (q_full - q_int) * (bl - q_int); // Equation 11.188 AHRI-2023
+                        cop_int_bin = cop_low + ((cop_int - cop_low) / (q_int - q_low)) * (bl - q_low);   // Equation 11.187 AHRI-2023
+                    } else {                                                                              // if bl > q_int
+                        cop_int_bin = cop_int + ((cop_full - cop_int) / (q_full - q_int)) * (bl - q_int); // Equation 11.188 AHRI-2023
                     }
 
-                    if (t <= t_Off || cop_int_bin < 1.0) {
-                        delta_int_bin = 0.0; // Equation 11.196 AHRI-2023
-                    } else if (t > t_On) {
-                        delta_int_bin = 1.0; // Equation 11.198 AHRI-2023
+                    delta_int_bin = 0.0;
+                    if (!OATempCompressorOnOffBlank) {
+                        if (t <= t_Off) {
+                            delta_int_bin = 0.0;
+                        } else if (t > t_Off && t <= t_On) {
+                            delta_int_bin = 0.5;
+                        } else {
+                            delta_int_bin = 1.0;
+                        }
                     } else {
-                        delta_int_bin = 0.5; // Equation 11.197 AHRI-2023
+                        delta_int_bin = 1.0;
                     }
 
                     rh = bl * (1.0 - delta_int_bin) * n;
-                    Real64 q = bl * n;
-                    e = q / cop_int_bin * delta_int_bin;
-
-                    // goto HeatSpeedLoop4_exit;
-                } else {
+                    Real64 q = bl * n;                   // Equation 11.185 AHRI-2023
+                    e = q / cop_int_bin * delta_int_bin; // Equaiton 11.186 AHRI-2023
+                    goto HeatSpeedLoop4_exit;
+                } else if (bl >= q_full) {
                     // CASE 3 : 11.2.2.3.3 AHRI-2023
                     // Building Load is greater than the capacity of the unit at the Full Compressor Speed, q_full <= bl or (bl >= q_full:)
-                    //?? TODO : allow no H4 conditions
-                    //?? Note : builds on previously defined q_full / p_full
                     if (t > (-15) || t <= (-8.33)) {
                         Real64 t_ratio = (t - (-15)) / ((-8.33) - (-15));
                         // Equation 11.203 AHRI-2023
@@ -3691,17 +3832,45 @@ namespace StandardRatings {
                         p_full = p_H4_full + (p_H1_full - p_H3_full) * t_ratio;
                     }
 
+                    /* if not conducting H4 Test then use this block
+                    if (t >= t_ob || t <= (-8.33)) {
+                         Real64 t_ratio = (t - (-8.33)) / ((8.33) - (-8.33));
+                         // Equation 11.199 AHRI-2023
+                         q_full = q_H3_full + (q_H1_full - q_H3_full) * t_ratio;
+                         // Equation 11.200 AHRI-2023
+                         p_full = p_H3_full + (p_H1_full - p_H3_full) * t_ratio;
+                     } else if ((-8.33) < t && t < t_ob) {
+                         Real64 t_ratio = (t - (-8.33)) / (1.66 - (-8.33));
+                         // Equation 11.201 AHRI-2023
+                         q_full = q_H3_full + (q_H2_full - q_H3_full) * t_ratio;
+                         // Equation 11.202 AHRI-2023
+                         p_full = p_H3_full + (p_H2_full - p_H3_full) * t_ratio;
+                     }
+                     */
+
+                    if (!OATempCompressorOnOffBlank && p_full > 0.0) {
+                        if ((t <= OATempCompressorOff) || (q_full / p_full < 1.0)) {
+                            delta_full = 0.0;
+                        } else if ((t > OATempCompressorOff && t <= OATempCompressorOn) && (q_full / p_full > 1.0)) {
+                            delta_full = 0.5;
+                        } else if ((t > OATempCompressorOn) && (q_full / p_full > 1.0)) {
+                            delta_full = 1.0;
+                        }
+                    } else {
+                        delta_full = 1.0;
+                    }
+
                     hlf_full = 1.0; // Equation 11.170 AHRI-2023
+
                     // Equaiton 11.168 AHRI-2023
                     e = p_full * hlf_full * delta_full * n;
                     // Equation 11.169 AHRI - 2023
-                    // rh = (bl - q_full * hlf_full * delta_full) * n; //?? 3.412 as devisor
-                    rh = ((bl - q_full * hlf_full * delta_full) / 3.412) * n; //?? 3.412 as devisor
-                    // goto HeatSpeedLoop4_exit;
+                    rh = (bl - q_full * hlf_full * delta_full) * n;
+                    goto HeatSpeedLoop4_exit;
                 }
             }
 
-            // HeatSpeedLoop4_exit:;
+        HeatSpeedLoop4_exit:;
             q_sum += n * bl;
             e_sum += e;
             rh_sum += rh;
