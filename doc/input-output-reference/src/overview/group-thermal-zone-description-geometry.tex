@@ -25,6 +25,20 @@ The name of the Space object. This name must be unique across Zone, Space, ZoneL
 
 The name of the \hyperref[zone]{Zone} this Space is a part of. This field is required.
 
+\paragraph{Field: Ceiling Height}\label{field-space-ceiling-height}
+
+Space ceiling height is used in several areas within EnergyPlus (such as various room models, some convection coefficient calculations and, primarily, in calculating the space volume in the absence of other parameters). Energyplus automatically calculates the space ceiling height (m) from the average height of the space. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated space ceiling height will be used in subsequent calculations. If this field is positive, then the calculated space ceiling height will not be used -- the number entered here will be used as the space ceiling height. If this number differs significantly from the calculated ceiling height, then a warning message will be issued. If a space ceiling height and floor area are entered, but no volume is entered, then the volume will be the ceiling height times floor area.
+
+Note that the Ceiling Height is the distance from the Floor to the Ceiling in the Space, not an absolute height from the ground.
+
+NOTE: At the moment, the autocalcuted Space ceiling height is set to the Zone ceiling height.
+
+\paragraph{Field: Volume}\label{field-space-volume}
+
+Space volume is used in several areas within EnergyPlus (such as calculating air change rates for reporting or flow when air change rates are chosen as input, daylighting calculations, some convection coefficient calculations). EnergyPlus automatically calculates the space volume (\SI{}{\volume}) from the space geometry given by the surfaces that belong to the space. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated space volume will be used in subsequent calculations. If this field is positive, then it will be used as the space volume. If this number differs significantly from the calculated space volume a warning message will be issued. For autocalculate to work properly, the space must be enclosed by the entered walls. Note that indicating the volume to be calculated but entering a positive ceiling height in the previous field will cause the volume to be calculated as the floor area (if \textgreater{} 0) times the entered ceiling height; else the volume will be calculated from the described surfaces. If this field is positive, any ceiling height positive value will not be used in volume calculations.
+
+NOTE: At the moment, the autocalculated Space volume is the Zone volume apportioned by floor area.
+
 \paragraph{Field: Floor Area}\label{space-field-floor-area}
 
 Space floor area is used in many places within EnergyPlus. EnergyPlus automatically calculates the space floor area (\SI{}{\area}) as the total area of surfaces with Surface Type = Floor. If this field is 0.0, negative or \textbf{autocalculate} (the default), then the calculated space floor area will be used in subsequent calculations. If this field is positive, then it will be used as the space floor area. If the calculated floor area differs from the user input floor area by more than 5\%, a warning message will be issued.
@@ -277,6 +291,19 @@ In addition to the canned Surface reports (view the Reports section later in thi
   HVAC,Average,Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}
 \item
   HVAC,Average,Zone Air Relative Humidity{[}\%{]}
+\item
+  HVAC,Sum,Zone Air System Latent Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Zone Air System Latent Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air System Latent Heating Rate {[}W{]}
+\item
+  HVAC,Average,Zone Air System Latent Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Zone Air System Sensible Heat Ratio {[}{]}
+\item
+  HVAC,Average,Zone Air Vapor Pressure Difference {[}Pa{]}
+
 \end{itemize}
 
 Two of these are of particular interest:
@@ -394,6 +421,28 @@ This output variable represents the air humidity ratio after the correct step fo
 \subsubsection{Zone Air Relative Humidity {[}\%{]}}\label{zone-air-relative-humidity}
 
 This output variable represents the air relative humidity after the correct step for each zone. The relative humidity is in percent and uses the Zone Air Temperature, the Zone Air Humidity Ratio and the Outside Barometric Pressure for calculation.
+
+\subsubsection{Zone Air System Latent Heating Energy {[}J{]}}\label{zone-air-system-latent-heating-energy-j}
+
+\subsubsection{Zone Air System Latent Cooling Energy {[}J{]}}\label{zone-air-system-latent-cooling-energy-j}
+
+These output variables represent the latent heating/cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating/cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+
+\subsubsection{Zone Air System Latent Heating Rate {[}W{]}}\label{zone-air-system-latent-heating-rate-w}
+
+This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
+
+\subsubsection{Zone Air System Latent Cooling Rate {[}W{]}}\label{zone-air-system-latent-cooling-rate-w}
+
+This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
+
+\subsubsection{Zone Air System Sensible Heat Ratio {[}{]}}\label{zone-air-system-sensible-heat-ratio}
+
+This output variable represents the zone sensible heat transfer divided by the total heat transfer for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.
+
+\subsubsection{Zone Air Vapor Pressure Difference {[}Pa{]}}\label{zone-air-vapor-pressure-difference-pa}
+
+This output variable represents the zone vapor pressure difference, or depression, in pascals for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This value represents the saturated air vapor pressure minus the actual zone air vapor pressure and is indicative of the dryness of the zone air when latent loads are of interest.
 
 \subsubsection{Space or Zone Total Internal Radiant Heating Rate {[}W{]}}\label{zone-total-internal-radiant-heating-rate-w}
 

@@ -1613,29 +1613,29 @@
     InternalMass_SouthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
     SouthZone_1stFloor,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_NorthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
     NorthZone_1stFloor,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_SouthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
     SouthZone_2ndFloor,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_NorthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
     NorthZone_2ndFloor,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    77;                      !- Extended Field
+    ,                        !- Space or SpaceList Name
+    77;                      !- Surface Area {m2}
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -1911,55 +1911,55 @@
 
   People,
     SouthZone_1stFloor People,  !- Name
-    SouthZone_1stFloor,      !- Zone or ZoneList Name
+    SouthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     6,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Office Activity Level;   !- Activity Level Schedule Name
 
   People,
     NorthZone_1stFloor People,  !- Name
-    NorthZone_1stFloor,      !- Zone or ZoneList Name
+    NorthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     6,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Office Activity Level;   !- Activity Level Schedule Name
 
   People,
     SouthZone_2ndFloor People,  !- Name
-    SouthZone_2ndFloor,      !- Zone or ZoneList Name
+    SouthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     6,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Office Activity Level;   !- Activity Level Schedule Name
 
   People,
     NorthZone_2ndFloor People,  !- Name
-    NorthZone_2ndFloor,      !- Zone or ZoneList Name
+    NorthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     6,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Office Activity Level;   !- Activity Level Schedule Name
 
   Lights,
     SouthZone_1stFloor Lights,  !- Name
-    SouthZone_1stFloor,      !- Zone or ZoneList Name
+    SouthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -1973,7 +1973,7 @@
 
   Lights,
     NorthZone_1stFloor Lights,  !- Name
-    NorthZone_1stFloor,      !- Zone or ZoneList Name
+    NorthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -1987,7 +1987,7 @@
 
   Lights,
     SouthZone_2ndFloor Lights,  !- Name
-    SouthZone_2ndFloor,      !- Zone or ZoneList Name
+    SouthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -2001,7 +2001,7 @@
 
   Lights,
     NorthZone_2ndFloor Lights,  !- Name
-    NorthZone_2ndFloor,      !- Zone or ZoneList Name
+    NorthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3025,                    !- Lighting Level {W}
@@ -2015,7 +2015,7 @@
 
   ElectricEquipment,
     SouthZone_1stFloor ElecEq,  !- Name
-    SouthZone_1stFloor,      !- Zone or ZoneList Name
+    SouthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -2027,7 +2027,7 @@
 
   ElectricEquipment,
     NorthZone_1stFloor ElecEq,  !- Name
-    NorthZone_1stFloor,      !- Zone or ZoneList Name
+    NorthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -2039,7 +2039,7 @@
 
   ElectricEquipment,
     SouthZone_2ndFloor ElecEq,  !- Name
-    SouthZone_2ndFloor,      !- Zone or ZoneList Name
+    SouthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -2051,7 +2051,7 @@
 
   ElectricEquipment,
     NorthZone_2ndFloor ElecEq,  !- Name
-    NorthZone_2ndFloor,      !- Zone or ZoneList Name
+    NorthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     687.5,                   !- Design Level {W}
@@ -2063,7 +2063,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SouthZone_1stFloor Infil,!- Name
-    SouthZone_1stFloor,      !- Zone or ZoneList Name
+    SouthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Schedule,   !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.035,                   !- Design Flow Rate {m3/s}
@@ -2077,7 +2077,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NorthZone_1stFloor Infil,!- Name
-    NorthZone_1stFloor,      !- Zone or ZoneList Name
+    NorthZone_1stFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Schedule,   !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.035,                   !- Design Flow Rate {m3/s}
@@ -2091,7 +2091,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SouthZone_2ndFloor Infil,!- Name
-    SouthZone_2ndFloor,      !- Zone or ZoneList Name
+    SouthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Schedule,   !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.035,                   !- Design Flow Rate {m3/s}
@@ -2105,7 +2105,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NorthZone_2ndFloor Infil,!- Name
-    NorthZone_2ndFloor,      !- Zone or ZoneList Name
+    NorthZone_2ndFloor,      !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Schedule,   !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.035,                   !- Design Flow Rate {m3/s}
@@ -2700,22 +2700,22 @@
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_SouthZone_1stFloor,  !- Name
     OASystemControllers_SouthZone_1stFloor,  !- Controller List Name
-    OASystemEquipment_SouthZone_1stFloor;    !- Outdoor Air Equipment List Name
+    OASystemEquipment_SouthZone_1stFloor;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_NorthZone_1stFloor,  !- Name
     OASystemControllers_NorthZone_1stFloor,  !- Controller List Name
-    OASystemEquipment_NorthZone_1stFloor;    !- Outdoor Air Equipment List Name
+    OASystemEquipment_NorthZone_1stFloor;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_SouthZone_2ndFloor,  !- Name
     OASystemControllers_SouthZone_2ndFloor,  !- Controller List Name
-    OASystemEquipment_SouthZone_2ndFloor;    !- Outdoor Air Equipment List Name
+    OASystemEquipment_SouthZone_2ndFloor;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OASystem_NorthZone_2ndFloor,  !- Name
     OASystemControllers_NorthZone_2ndFloor,  !- Controller List Name
-    OASystemEquipment_NorthZone_2ndFloor;    !- Outdoor Air Equipment List Name
+    OASystemEquipment_NorthZone_2ndFloor;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -4602,8 +4602,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -4642,8 +4640,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.253,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     168.333168,              !- CO2 Emission Factor {g/MJ}

@@ -2256,7 +2256,7 @@ namespace AirflowNetwork {
                        "single object."));
             ShowContinueError(m_state, format("..Duct sizing is not performed"));
             simulation_control.autosize_ducts = false;
-        } else if (NumDuctSizing == 1) {
+        } else if (simulation_control.autosize_ducts && NumDuctSizing == 0) {
             ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
             ShowContinueError(
                 m_state,
@@ -2295,7 +2295,7 @@ namespace AirflowNetwork {
                                          Alphas(1)));
                 ErrorsFound = true;
             }
-            if (simulation_control.type == ControlType::MultizoneWithDistribution) {
+            if (simulation_control.type != ControlType::MultizoneWithDistribution) {
                 ShowWarningError(m_state, format(RoutineName) + CurrentModuleObject + " object, ");
                 ShowContinueError(m_state,
                                   format("Although {} = \"{}\" is entered, but {} is not MultizoneWithoutDistribution.",
@@ -10462,19 +10462,19 @@ namespace AirflowNetwork {
                 }
             }
 
-            for (j = 1; j <= m_state.dataGlobal->NumOfZones; ++j) {
-                if (!m_state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
-                if (m_state.dataZoneEquip->ZoneEquipConfig(j).ZoneNode == i) {
-                    if (m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum > AirflowNetworkNumOfNodes) {
+            for (int zoneNum = 1; zoneNum <= m_state.dataGlobal->NumOfZones; ++zoneNum) {
+                if (!m_state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
+                if (m_state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneNode == i) {
+                    if (zoneNum > AirflowNetworkNumOfNodes) {
                         ShowSevereError(m_state,
                                         format(RoutineName) + "'" + m_state.dataLoopNodes->NodeID(i) +
                                             "' is not defined as an AirflowNetwork:Distribution:Node object.");
-                        ShowContinueError(m_state,
-                                          "This Node is the zone air node for Zone '" + m_state.dataZoneEquip->ZoneEquipConfig(j).ZoneName + "'.");
+                        ShowContinueError(
+                            m_state, "This Node is the zone air node for Zone '" + m_state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneName + "'.");
                         ErrorsFound = true;
                     } else {
                         NodeFound(i) = true;
-                        AirflowNetworkNodeData(m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum).EPlusNodeNum = i;
+                        AirflowNetworkNodeData(zoneNum).EPlusNodeNum = i;
                     }
                     break;
                 }
@@ -11329,7 +11329,7 @@ namespace AirflowNetwork {
                     if (!m_state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
                     for (k = 1; k <= m_state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                         if (m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k) == MultizoneCompExhaustFanData(i).InletNode) {
-                            MultizoneCompExhaustFanData(i).EPlusZoneNum = m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum;
+                            MultizoneCompExhaustFanData(i).EPlusZoneNum = j;
                             break;
                         }
                     }
@@ -11387,7 +11387,7 @@ namespace AirflowNetwork {
                         for (k = 1; k <= m_state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                             for (i = 1; i <= AirflowNetworkNumOfExhFan; ++i) {
                                 if (m_state.dataZoneEquip->ZoneEquipConfig(j).ExhaustNode(k) == MultizoneCompExhaustFanData(i).InletNode) {
-                                    MultizoneCompExhaustFanData(i).EPlusZoneNum = m_state.dataZoneEquip->ZoneEquipConfig(j).ActualZoneNum;
+                                    MultizoneCompExhaustFanData(i).EPlusZoneNum = j;
                                     found = true;
                                 }
                             }
@@ -11417,7 +11417,6 @@ namespace AirflowNetwork {
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Dec. 2006
         //       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone hybrid ventilation managers
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs hybrid ventilation control
@@ -11440,7 +11439,6 @@ namespace AirflowNetwork {
         int SysAvailNum;       // Hybrid ventilation control number
         int AirLoopNum;        // Airloop number
         int ControlledZoneNum; // Controlled zone number
-        int ActualZoneNum;     // Actual zone number
         int ANSurfaceNum;      // AirflowNetwork Surface Number
         int SurfNum;           // Surface number
         int ControlType;       // Hybrid ventilation control type: 0 individual; 1 global
@@ -11461,18 +11459,18 @@ namespace AirflowNetwork {
                 ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, HybridVentSysAvailANCtrlStatus(SysAvailNum)));
             }
             Found = false;
-            ActualZoneNum = 0;
+            int ActualZoneNum = 0;
             for (ControlledZoneNum = 1; ControlledZoneNum <= m_state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                 if (!m_state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
                 // Ensure all the zones served by this AirLoopHVAC to be controlled by the hybrid ventilation
                 for (int zoneInNode = 1; zoneInNode <= m_state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                     if (AirLoopNum > 0) {
                         if (AirLoopNum == m_state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode)) {
-                            ActualZoneNum = m_state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
+                            ActualZoneNum = ControlledZoneNum;
                             break;
                         }
                     } else {
-                        if (HybridVentSysAvailActualZoneNum(SysAvailNum) == m_state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
+                        if (HybridVentSysAvailActualZoneNum(SysAvailNum) == ControlledZoneNum) {
                             ActualZoneNum = HybridVentSysAvailActualZoneNum(SysAvailNum);
                         }
                     }
