@@ -3397,12 +3397,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(2.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance table data
@@ -3478,13 +3476,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(13.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        8.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(8.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8);  // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(10.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
@@ -3529,13 +3525,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(14.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        11.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(11.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
@@ -3578,13 +3572,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(21.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        25.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(25.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(19.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
@@ -3629,13 +3621,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(36.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        37.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(37.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(34.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
@@ -3682,13 +3672,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     // Unmet Degree-Hours
     EXPECT_NEAR(36.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        37.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(37.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
     EXPECT_NEAR(34.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
     EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
-    EXPECT_NEAR(
-        0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
-    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
 
     // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
     EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
