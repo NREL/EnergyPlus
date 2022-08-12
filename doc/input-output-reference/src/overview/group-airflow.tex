@@ -70,7 +70,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The flow per Zone Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Flow Rate per Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -78,7 +78,7 @@ With this choice, the method used will be a factor per floor area of the zone. (
   Flow/ExteriorArea
 \end{itemize}
 
-With this choice, the method used will be a factor per exterior surface area of the zone. (The flow per Exterior Surface Area field should be filled).
+With this choice, the method used will be a factor per exterior surface area of the zone. (The Flow Rate per Exterior Surface Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -86,7 +86,7 @@ With this choice, the method used will be a factor per exterior surface area of 
   Flow/ExteriorWallArea
 \end{itemize}
 
-With this choice, the method used will be a factor per exterior wall surface area of the zone. (The flow per Exterior Surface Area field should be filled).
+With this choice, the method used will be a factor per exterior wall surface area of the zone. (The Flow Rate per Exterior Surface Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -100,11 +100,11 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as I\(_{design}\) in the above equation) is the maximum amount of infiltration expected at design conditions. The design value is modified by the schedule fraction (see Field:Schedule Name) and user specified coefficients (see ''coefficient'' fields below). The resulting volume flow rate is converted to mass flow using the current outdoor air density at each time step.
 
-\paragraph{Field: Flow per Floor Area}\label{field-flow-per-zone-floor-area}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-per-zone-floor-area}
 
 This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum Design Flow Rate as described in the Design Flow Rate field. The choice from the method field should be ``Flow/Area''.
 
-\paragraph{Field: Flow per Exterior Surface Area}\label{field-flow-per-exterior-surface-area}
+\paragraph{Field: Flow Rate per Exterior Surface Area}\label{field-flow-per-exterior-surface-area}
 
 This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Exterior Surface Area in the Zone or Space to determine the maximum Design Flow Rate as described in the Design Flow Rate field. The choice from the method field should be ``Flow/Exteriorarea'' or ``Flow/ExteriorWallArea''.
 
@@ -138,8 +138,8 @@ ZoneInfiltration:DesignFlowRate,
     Infiltration Sch, !- Schedule Name
     Flow/Zone,      !- Design Flow Rate Calculation Method
     2.831685,       !- Design Flow Rate {m3/s}
-    ,               !- Flow per Floor Area {m3/s/m2}
-    ,               !- Flow per Exterior Surface Area {m3/s/m2}
+    ,               !- Flow Rate per Floor Area {m3/s/m2}
+    ,               !- Flow Rate per Exterior Surface Area {m3/s/m2}
     ,               !- Air Changes per Hour
     0.6060000    ,  !- Constant Term Coefficient
     3.6359996E-02,  !- Temperature Term Coefficient
@@ -160,8 +160,8 @@ Global Infiltration example:
       Infiltration Sch,        !- Schedule Name
       AirChanges/Hour,         !- Design Flow Rate Calculation Method
       ,                        !- Design Flow Rate {m3/s}
-      ,                        !- Flow per Floor Area {m3/s-m2}
-      ,                        !- Flow per Exterior Surface Area {m3/s-m2}
+      ,                        !- Flow Rate per Floor Area {m3/s-m2}
+      ,                        !- Flow Rate per Exterior Surface Area {m3/s-m2}
       4.7,                     !- Air Changes per Hour
       0.6060000,               !- Constant Term Coefficient
       3.6359996E-02,           !- Temperature Term Coefficient
@@ -589,7 +589,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone or space. (The Flow per Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone or space. (The Flow Rate per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -597,7 +597,7 @@ With this choice, the method used will be a factor per floor area of the zone or
   Flow/Person
 \end{itemize}
 
-With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow per Person field should be filled).
+With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow Rate per Person field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -611,11 +611,11 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as V\(_{design}\) in the above equation) is the maximum amount of ventilation expected at design conditions. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
 
-\paragraph{Field: Flow per Floor Area}\label{field-flow-rate-per-zone-floor-area}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-rate-per-zone-floor-area}
 
 This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``flow/area''.
 
-\paragraph{Field: Flow per Person}\label{field-flow-rate-per-person}
+\paragraph{Field: Flow Rate per Person}\label{field-flow-rate-per-person}
 
 This factor (m\(^{3}\)/s-person) is used, along with the nominal (maximum) number of occupants (people) in the Zone or Space to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``flow/person''.
 
@@ -711,9 +711,9 @@ ZoneVentilation:DesignFlowRate,
     Simple Vent,    !- Schedule Name
     Flow/Zone,      !- Design Volume Flow Rate calculation method
     6.131944,       !- Design Volume Flow Rate {m3/s}
-    ,               !- Flow per Floor Area {m3/s-m2}
-    ,               !- Flow per Person {m3/s-person}
-    ,               !- Air Changes Per Hour
+    ,               !- Flow Rate per Floor Area {m3/s-m2}
+    ,               !- Flow Rate per Person {m3/s-person}
+    ,               !- Air Changes per Hour
     INTAKE,         !- Ventilation Type
     400.0,          !- Fan Pressure Rise{Pa}
     0.9,            !- Fan Total Efficiency
@@ -733,9 +733,9 @@ ZoneVentilation:DesignFlowRate,
       NightVentSched,          !- SCHEDULE Name
       Flow/Zone,               !- Design Volume Flow Rate calculation method
       .05295,                  !- Design Volume Flow Rate {m3/s}
-      ,                        !- Flow per Floor Area {m3/s-m2}
-      ,                        !- Flow per Person {m3/s-person}
-      ,                        !- Air Changes Per Hour
+      ,                        !- Flow Rate per Floor Area {m3/s-m2}
+      ,                        !- Flow Rate per Person {m3/s-person}
+      ,                        !- Air Changes per Hour
       Intake,                  !- Ventilation Type
       67.,                     !- Fan Pressure Rise
       .7,                      !- Fan Total Efficiency
@@ -769,9 +769,9 @@ Global Ventilation example:
       VentSched,               !- Schedule Name
       AirChanges/Hour,         !- Design Flow Rate Calculation Method
       ,                        !- Design Flow Rate {m3/s}
-      ,                        !- Flow per Floor Area {m3/s-m2}
-      ,                        !- Flow per Person {m3/s-person}
-      1.7,                        !- Air Changes per Hour
+      ,                        !- Flow Rate per Floor Area {m3/s-m2}
+      ,                        !- Flow Rate per Person {m3/s-person}
+      1.7,                     !- Air Changes per Hour
       Intake,                  !- Ventilation Type
       67.,                     !- Fan Pressure Rise {Pa}
       0.7,                     !- Fan Total Efficiency
@@ -1244,7 +1244,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Flow per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Flow Rate per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1252,7 +1252,7 @@ With this choice, the method used will be a factor per floor area of the zone. (
   Flow/Person
 \end{itemize}
 
-With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow per Person field should be filled).
+With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow Rate per Person field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1442,7 +1442,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Flow per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Flow Rate per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1450,7 +1450,7 @@ With this choice, the method used will be a factor per floor area of the zone. (
   Flow/Person
 \end{itemize}
 
-With this choice, the method used will be a factor per nominal number of people in the zone. (The flow per person field should be filled).
+With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow Rate per Person field should be filled).
 
 \begin{itemize}
 \tightlist

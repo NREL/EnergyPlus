@@ -287,64 +287,64 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
         "ZoneInfiltration:DesignFlowRate": {
             "Zone1Infiltration": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 1.0,
+                "flow_rate_per_floor_area": 1.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Zone 1"
             },
             "Zone2Infiltration": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 2.0,
+                "flow_rate_per_floor_area": 2.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Zone 2"
             },
             "Space1aInfiltration": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 3.0,
+                "flow_rate_per_floor_area": 3.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Space 1a"
             },
             "Space1bInfiltration": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 4.0,
+                "flow_rate_per_floor_area": 4.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Space 1b"
             },
             "SomeSpacesInfiltration": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 5.0,
+                "flow_rate_per_floor_area": 5.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "SomeSpaces"
             },
             "AllZonesInfiltration": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 6.0,
+                "flow_rate_per_floor_area": 6.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "AllZones"
             }
         },
         "ZoneVentilation:DesignFlowRate": {
             "Zone1Ventilation": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 1.0,
+                "flow_rate_per_floor_area": 1.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Zone 1"
             },
             "Zone2Ventilation": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 2.0,
+                "flow_rate_per_floor_area": 2.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Zone 2"
             },
             "Space1aVentilation": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 3.0,
+                "flow_rate_per_floor_area": 3.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Space 1a"
             },
             "Space1bVentilation": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 4.0,
+                "flow_rate_per_floor_area": 4.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "Space 1b"
             },
             "SomeSpacesVentilation": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 5.0,
+                "flow_rate_per_floor_area": 5.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "SomeSpaces"
             },
             "AllZonesVentilation": {
                 "design_flow_rate_calculation_method": "Flow/Area",
-                "flow_per_floor_area": 6.0,
+                "flow_rate_per_floor_area": 6.0,
                 "zone_or_zonelist_or_space_or_spacelist_name": "AllZones"
             }
         }
