@@ -191,6 +191,8 @@ namespace PlantHeatExchangerFluidToFluid {
         bool MyOneTimeFlag;
         bool MyFlag;
         bool MyEnvrnFlag;
+        Real64 DegOfSubcooling;   // In case of steam to water HX: Degree of subcooling in steam outlet
+        Real64 LoopSubcoolReturn; // In case of steam to water HX: Loop subcooling for steam return
 
         // Default Constructor
         HeatExchangerStruct()
@@ -199,7 +201,7 @@ namespace PlantHeatExchangerFluidToFluid {
               MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
               HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
               DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
-              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true), DegOfSubcooling(0.0), LoopSubcoolReturn(0.0)
         {
         }
 

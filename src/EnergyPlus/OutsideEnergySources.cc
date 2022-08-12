@@ -576,15 +576,15 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     // for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
     std::string reportVarPrefix = "District Heating Water ";
     std::string heatingOrCooling = "Heating";
-    std::string_view typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::PurchHotWater)];
+    std::string_view meterTypeKey = "DistrictHeatingWater";
     if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         reportVarPrefix = "District Cooling ";
         heatingOrCooling = "Cooling";
-        typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater)];
+        meterTypeKey = "DistrictCooling";
     } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) {
         reportVarPrefix = "District Heating Steam ";
         heatingOrCooling = "Heating";
-        typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::PurchSteam)];
+        meterTypeKey = "DistrictHeatingSteam";
     }
 
     SetupOutputVariable(state,
@@ -595,7 +595,7 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
-                        typeName,
+                        meterTypeKey,
                         heatingOrCooling,
                         _,
                         "Plant");

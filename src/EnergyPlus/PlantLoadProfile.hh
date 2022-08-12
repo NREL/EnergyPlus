@@ -109,8 +109,8 @@ namespace PlantLoadProfile {
         PlantProfileData()
             : Type(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, FluidType(PlantLoopFluidType::Invalid), Init(true), InitSizing(true),
               InletNode(0), InletTemp(0.0), OutletNode(0), OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0),
-              PeakVolFlowRate(0.0), FlowRateFracSchedule(0), VolFlowRate(0.0), MassFlowRate(0.0), EMSOverrideMassFlow(false), EMSMassFlowValue(0.0),
-              Power(0.0), Energy(0.0), HeatingEnergy(0.0), CoolingEnergy(0.0)
+              PeakVolFlowRate(0.0), FlowRateFracSchedule(0), VolFlowRate(0.0), MassFlowRate(0.0), DegOfSubcooling(0.0), LoopSubcoolReturn(0.0),
+              EMSOverrideMassFlow(false), EMSMassFlowValue(0.0), Power(0.0), Energy(0.0), HeatingEnergy(0.0), CoolingEnergy(0.0)
         {
         }
 

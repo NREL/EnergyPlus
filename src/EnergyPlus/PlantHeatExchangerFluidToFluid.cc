@@ -211,7 +211,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:SteamToWater");
     state.dataPlantHXFluidToFluid->NumberOfHXs =
         state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs + state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs;
-    if (state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs == 0 && state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs == 0) return;
+    if (state.dataPlantHXFluidToFluid->NumberOfHXs == 0) return;
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "HeatExchanger:FluidToFluid", TotalArgs, NumAlphas, NumNums);
     MaxNumNumbers = NumNums;
@@ -765,6 +765,18 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxOperationTemp = rNumericArgs(7);
         } else {
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).MaxOperationTemp = 9999.0;
+        }
+
+        if (!lNumericFieldBlanks(8)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfSubcooling = rNumericArgs(8);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DegOfSubcooling = 5.0;
+        }
+
+        if (!lNumericFieldBlanks(9)) {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).LoopSubcoolReturn = rNumericArgs(9);
+        } else {
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).LoopSubcoolReturn = 20.0;
         }
     }
 
