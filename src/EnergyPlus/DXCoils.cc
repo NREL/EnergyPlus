@@ -5123,9 +5123,6 @@ void GetDXCoils(EnergyPlusData &state)
         }
         if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
             for (I = 1; I <= state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                /*state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(I) = Numbers(30 + (I - 1) * 3);
-                state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlowScalingFactor(I) = Numbers(31 + (I - 1) * 3);
-                state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilRatedSHR(I) = Numbers(32 + (I - 1) * 3);*/
                 state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(I) = Numbers(34 + (I - 1) * 3);
                 state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlowScalingFactor(I) = Numbers(35 + (I - 1) * 3);
                 state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilRatedSHR(I) = Numbers(36 + (I - 1) * 3);

@@ -1,4 +1,5 @@
 // EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -179,7 +180,7 @@ namespace StandardRatings {
     // For Single Stage Systems, if the optional CFull and DFull tests are not performed, a
     // default value of 0.20 shall be used for the cooling Degradation Coefficient
     Real64 constexpr CyclicDegradationCoeffSEER2(0.20); // ANSI/AHRI 210/240 2023 Section 6.1.3.1
-  
+
     // Default Heating Degradation Coefficient | HSPF2
     // ANSI/AHRI Standard 2023 Section 6.1.3.2.1 -> For Single Stage Systems, if the optional H1CFull test or H1CLow is not performed, a default value
     // of 0.25 shall be used for the heating Degradation Coefficient
@@ -208,13 +209,13 @@ namespace StandardRatings {
 
     // Fractional bin hours for different bin temperatures from ANSI/AHRI 210/240 - 2023 (Section 11.2.2 - Table 14)
     // As the Fractional Bin Hours for each region is not summing up to 1 we're using the adjusted one down below
-    /*static constexpr std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> FracBinHoursAtOutdoorBinTempHSPF2 = {
-        {{0.0, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-         {0.0, 0.0, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-         {0.0, 0.0, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0},
-         {0.0, 0.0, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0},
-         {0.0, 0.0, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001},
-         {0.0, 0.0, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};*/
+    // static constexpr std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> FracBinHoursAtOutdoorBinTempHSPF2 = {
+    //{{0.0, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+    // {0.0, 0.0, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+    // {0.0, 0.0, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0},
+    // {0.0, 0.0, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0},
+    // {0.0, 0.0, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001},
+    // {0.0, 0.0, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
     // Adjusted to sum up to 1
     static constexpr std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> FracBinHoursAtOutdoorBinTempHSPF2 = {{{0.0,
                                                                                                                           0.337094499,
@@ -1087,7 +1088,7 @@ namespace StandardRatings {
         Array1D<Real64> NetTotCoolingCapRated(16); // net total cooling capacity of DX Coils for the sixteen ASHRAE Std 127 Test conditions
         Array1D<Real64> TotElectricPowerRated(16); // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
 
-        Array1D<Real64> NetCoolingCapRated_2023(ns); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
+        Array1D<Real64> NetCoolingCapRated_2023(ns);    // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
         Array1D<Real64> NetTotCoolingCapRated_2023(16); // net total cooling capacity of DX Coils for the sixteen ASHRAE Std 127 Test conditions
         Array1D<Real64> TotElectricPowerRated_2023(16); // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
 
@@ -1157,7 +1158,7 @@ namespace StandardRatings {
                                DXCoilType,
                                DXCoilName,
                                DXCoilType_Num,
-                               NetCoolingCapRated_2023(1), 
+                               NetCoolingCapRated_2023(1),
                                SEER2_User * ConvFromSIToIP,
                                SEER2_Standard * ConvFromSIToIP,
                                EER_2023,
@@ -2592,19 +2593,20 @@ namespace StandardRatings {
                     TotCoolElecPowerBinned = LoadFactor * CoolingElecPowerLS + (1.0 - LoadFactor) * CoolingElecPowerHS;
                     TotCoolElecPowerBinnedDefault = TotCoolElecPowerBinned;
 
-                    /* TBD:  // Suggestion for improvement as per 2017 Standard MCQ & MCE are differently calculated
-                    * // and so does the load factor for Cooling and Power
-                    Real64 LoadFactorQEnt_2023 =
-                         min(1.0, (TotCoolCapTestEint(spnum2023) - CoolingCapacityLS_2023) / (CoolingCapacityHS_2023 - CoolingCapacityLS_2023));
-                     LoadFactorQEnt_2023 = max(0.0, LoadFactorQEnt_2023);
-                     Real64 LoadFactorPEnt_2023 = min(
-                         1.0, (OutdoorUnitPowerTestEint(spnum2023) - CoolingElecPowerLS_2023) / (CoolingElecPowerHS_2023 - CoolingElecPowerLS_2023));
-                     LoadFactorPEnt_2023 = max(0.0, LoadFactorPEnt_2023);
+                    // TBD:  // Suggestion for improvement as per 2017 Standard MCQ & MCE are differently calculated
+                    // and so does the load factor for Cooling and Power
+                    // Real64 LoadFactorQEnt_2023 =
+                    //     min(1.0, (TotCoolCapTestEint(spnum2023) - CoolingCapacityLS_2023) / (CoolingCapacityHS_2023 - CoolingCapacityLS_2023));
+                    // LoadFactorQEnt_2023 = max(0.0, LoadFactorQEnt_2023);
+                    // Real64 LoadFactorPEnt_2023 = min(
+                    //     1.0, (OutdoorUnitPowerTestEint(spnum2023) - CoolingElecPowerLS_2023) / (CoolingElecPowerHS_2023 -
+                    //     CoolingElecPowerLS_2023));
+                    // LoadFactorPEnt_2023 = max(0.0, LoadFactorPEnt_2023);
 
-                     NetTotCoolCapBinned_2023 = LoadFactorQEnt_2023 * CoolingCapacityHS_2023 + (1.0 - LoadFactorQEnt_2023) * CoolingCapacityLS_2023;
-                     TotCoolElecPowerBinned_2023 =
-                         LoadFactorPEnt_2023 * CoolingElecPowerHS_2023 + (1.0 - LoadFactorPEnt_2023) * CoolingElecPowerLS_2023;
-                     TotCoolElecPowerBinnedDefault_2023 = TotCoolElecPowerBinned_2023;*/
+                    // NetTotCoolCapBinned_2023 = LoadFactorQEnt_2023 * CoolingCapacityHS_2023 + (1.0 - LoadFactorQEnt_2023) * CoolingCapacityLS_2023;
+                    // TotCoolElecPowerBinned_2023 =
+                    //     LoadFactorPEnt_2023 * CoolingElecPowerHS_2023 + (1.0 - LoadFactorPEnt_2023) * CoolingElecPowerLS_2023;
+                    // TotCoolElecPowerBinnedDefault_2023 = TotCoolElecPowerBinned_2023;
                     goto SpeedLoop_exit;
                 } else if (BuildingCoolingLoad >= CoolingCapacityMax) {
                     NetTotCoolCapBinned = CoolingCapacityMax;
@@ -3483,7 +3485,7 @@ namespace StandardRatings {
         Real64 HeatingOutdoorCoilInletAirDBTemp_H4FullTest = -15;  // Outdoor air dry-bulb temp in degrees  C (5 F)
         Real64 HeatingIndoorCoilInletAirDBTemp_H4FullTest = 21.11; // Indoor air dry-bulb temp in degrees 21.11 C (70 F)
 
-        Array1D<Real64> Q_A_Full(nsp); 
+        Array1D<Real64> Q_A_Full(nsp);
 
         Array1D<Real64> Q_H0_Low(nsp);  // Total cooling capacity at H0 Low test condition (Low speed)
         Array1D<Real64> Q_H1_Low(nsp);  // Total cooling capacity at H1 Low test condition (Low speed)
@@ -3832,21 +3834,20 @@ namespace StandardRatings {
                         p_full = p_H4_full + (p_H1_full - p_H3_full) * t_ratio;
                     }
 
-                    /* if not conducting H4 Test then use this block
-                    if (t >= t_ob || t <= (-8.33)) {
-                         Real64 t_ratio = (t - (-8.33)) / ((8.33) - (-8.33));
-                         // Equation 11.199 AHRI-2023
-                         q_full = q_H3_full + (q_H1_full - q_H3_full) * t_ratio;
-                         // Equation 11.200 AHRI-2023
-                         p_full = p_H3_full + (p_H1_full - p_H3_full) * t_ratio;
-                     } else if ((-8.33) < t && t < t_ob) {
-                         Real64 t_ratio = (t - (-8.33)) / (1.66 - (-8.33));
-                         // Equation 11.201 AHRI-2023
-                         q_full = q_H3_full + (q_H2_full - q_H3_full) * t_ratio;
-                         // Equation 11.202 AHRI-2023
-                         p_full = p_H3_full + (p_H2_full - p_H3_full) * t_ratio;
-                     }
-                     */
+                    // if not conducting H4 Test then use this block
+                    // if (t >= t_ob || t <= (-8.33)) {
+                    //     Real64 t_ratio = (t - (-8.33)) / ((8.33) - (-8.33));
+                    //     // Equation 11.199 AHRI-2023
+                    //     q_full = q_H3_full + (q_H1_full - q_H3_full) * t_ratio;
+                    //     // Equation 11.200 AHRI-2023
+                    //     p_full = p_H3_full + (p_H1_full - p_H3_full) * t_ratio;
+                    // } else if ((-8.33) < t && t < t_ob) {
+                    //     Real64 t_ratio = (t - (-8.33)) / (1.66 - (-8.33));
+                    //     // Equation 11.201 AHRI-2023
+                    //     q_full = q_H3_full + (q_H2_full - q_H3_full) * t_ratio;
+                    //     // Equation 11.202 AHRI-2023
+                    //     p_full = p_H3_full + (p_H2_full - p_H3_full) * t_ratio;
+                    // }
 
                     if (!OATempCompressorOnOffBlank && p_full > 0.0) {
                         if ((t <= OATempCompressorOff) || (q_full / p_full < 1.0)) {
