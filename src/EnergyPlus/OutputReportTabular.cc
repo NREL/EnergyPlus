@@ -12936,26 +12936,29 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 tableBodyUnmetDegHr,
                                                 degreeHourConversion);
 
-        columnHead(1) = "Very-cold Exceedance OccupiedHours [hr]";
-        columnHead(2) = "Cool Exceedance OccupiedHours [hr]";
-        columnHead(3) = "Warm Exceedance OccupiedHours [hr]";
-        columnHead(4) = "Very-hot Exceedance OccupiedHours [hr]";
-        tableName = "Discomfort-weighted Exceedance OccupantHours";
         int columnNumDiscomfortWt = 4;
+        Array1D_string columnHeadDiscomfortWt(columnNumDiscomfortWt);
+        columnHeadDiscomfortWt(1) = "Very-cold Exceedance OccupiedHours [hr]";
+        columnHeadDiscomfortWt(2) = "Cool Exceedance OccupiedHours [hr]";
+        columnHeadDiscomfortWt(3) = "Warm Exceedance OccupiedHours [hr]";
+        columnHeadDiscomfortWt(4) = "Very-hot Exceedance OccupiedHours [hr]";
+        tableName = "Discomfort-weighted Exceedance OccupantHours";
         Array1D_int columnWidthDiscomfortWt;
         columnWidthDiscomfortWt.allocate(columnNumDiscomfortWt);
         columnWidth = 10;
+        Array2D_string tableBodyDiscomfortWt;
+        tableBodyDiscomfortWt.allocate(columnNumDiscomfortWt, state.dataGlobal->NumOfZones + 4);
         WriteResilienceBinsTableReportingPeriod(state,
                                                 tableType,
                                                 columnNumDiscomfortWt,
                                                 periodIdx,
                                                 periodTitle,
                                                 tableName,
-                                                columnHead,
+                                                columnHeadDiscomfortWt,
                                                 columnWidthDiscomfortWt,
                                                 state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod,
                                                 rowHead,
-                                                tableBody);
+                                                tableBodyDiscomfortWt);
         tableName = "Discomfort-weighted Exceedance OccupiedHours";
         WriteResilienceBinsTableReportingPeriod(state,
                                                 tableType,
@@ -12963,11 +12966,20 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                                 periodIdx,
                                                 periodTitle,
                                                 tableName,
-                                                columnHead,
+                                                columnHeadDiscomfortWt,
                                                 columnWidthDiscomfortWt,
                                                 state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod,
                                                 rowHead,
-                                                tableBody);
+                                                tableBodyDiscomfortWt);
+        columnHead.deallocate();
+        columnWidth.deallocate();
+        tableBody.deallocate();
+        columnHeadUnmetDegHr.deallocate();
+        columnWidthUnmetDegHr.deallocate();
+        tableBodyUnmetDegHr.deallocate();
+        columnHeadDiscomfortWt.deallocate();
+        columnWidthDiscomfortWt.deallocate();
+        tableBodyDiscomfortWt.deallocate();
     }
 }
 
@@ -17357,7 +17369,7 @@ void WriteTable(EnergyPlusData &state,
         rowsRowLabels = rowsBody;
     }
     if ((colsBody != colsColumnLabels) || (colsBody != colsWidthColumn)) {
-        ShowWarningError(state, "REPORT:TABLE Inconsistant number of columns.");
+        ShowWarningError(state, "REPORT:TABLE Inconsistent number of columns.");
         colsBody = min(colsBody, min(colsColumnLabels, colsWidthColumn));
         colsWidthColumn = colsBody;
         colsColumnLabels = colsBody;
