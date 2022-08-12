@@ -1051,24 +1051,28 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                     nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenUfact, surfName, nomUfact, 3);
-                    // if the construction report is requested the SummerSHGC is already calculated
-                    if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
-                        SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
-                        TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
-                    } else {
-                        // must calculate Summer SHGC
-                        if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
-                            CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                    if (!state.dataConstruction->Construct(curCons).TypeIsAirBoundary) {
+                        // Solar properties not applicable for air boundary surfaces
+                        // if the construction report is requested the SummerSHGC is already calculated
+                        if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
+                            SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
+                            TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
+                        } else {
+                            // must calculate Summer SHGC
+                            if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
+                                CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                            }
                         }
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, surfName, SHGCSummer, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenVisTr, surfName, TransVisNorm, 3);
+                        // compute totals for area weighted averages
+                        intShgcArea += SHGCSummer * windowAreaWMult;
+                        intVistranArea += TransVisNorm * windowAreaWMult;
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, surfName, SHGCSummer, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenVisTr, surfName, TransVisNorm, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenParent, surfName, Surface(iSurf).BaseSurfName);
                     // compute totals for area weighted averages
                     intFenTotArea += windowAreaWMult;
                     intUfactArea += nomUfact * windowAreaWMult;
-                    intShgcArea += SHGCSummer * windowAreaWMult;
-                    intVistranArea += TransVisNorm * windowAreaWMult;
                 }
             } else if (Surface(iSurf).Class == SurfaceClass::Door) {
                 surfName = Surface(iSurf).Name;
