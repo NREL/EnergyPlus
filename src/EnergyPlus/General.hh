@@ -335,6 +335,10 @@ namespace General {
                    Array1A<Real64> SmoothedData // output data after smoothing
     );
 
+    void MovingAvg2(Array1D<Real64> &DataIn,      // input data that needs smoothing
+                   int NumItemsInAvg              // number of items in the averaging window
+    );
+
     void ProcessDateString(EnergyPlusData &state,
                            std::string const &String,
                            int &PMonth,

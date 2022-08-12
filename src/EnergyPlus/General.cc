@@ -398,6 +398,45 @@ void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
     }
 }
 
+void MovingAvg2(Array1D<Real64> &DataIn, // input data that needs smoothing
+               int const NumItemsInAvg      // number of items in the averaging window
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Fred Buhl
+    //       DATE WRITTEN   January 2003
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Smooth the data in the 1-d array DataIn by averaging over a window NumItemsInAvg
+    // wide. Return the results in the 1-d array SmoothedData
+
+    // METHODOLOGY EMPLOYED:
+    // Note that DataIn and SmoothedData should have the same size. This is the reponsibility
+    // of the calling routine. NumItemsInAvg should be no bigger than the size of DataIn.
+
+    if (NumItemsInAvg == 1) return;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Array1D<Real64> TempData(DataIn.size() + NumItemsInAvg); // a scratch array
+
+    for (int i = DataIn.size() + NumItemsInAvg; i > NumItemsInAvg; --i) {
+        TempData(i) = DataIn(i - NumItemsInAvg);
+    }
+    for (int i = 1; i <= NumItemsInAvg; ++i) {
+        TempData(NumItemsInAvg - i + 1) = DataIn(DataIn.size() - i + 1);
+    }
+
+    for (int i = DataIn.size(); i > 0; --i) {
+        for (int j = 1; j < NumItemsInAvg; ++j) {
+            DataIn(i) += TempData(i + NumItemsInAvg - j);
+        }
+        DataIn(i) /= double(NumItemsInAvg);
+    }
+}
+
 void ProcessDateString(EnergyPlusData &state,
                        std::string const &String,
                        int &PMonth,
