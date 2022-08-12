@@ -2270,7 +2270,8 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
         "  0.740402528813699,       !- Gross Rated Sensible Heat Ratio",
         "  3.99990781858502,        !- Gross Rated Cooling COP {W/W}",
         "  0.728875631277391,       !- Rated Air Flow Rate {m3/s}",
-        "  773.3912012006,          !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  773.3912012006,          !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  773.3912012006,          !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??BPS:TBD
         "  central ac unitary system Fan - Cooling Coil Node,  !- Air Inlet Node Name",
         "  Node 5,                  !- Air Outlet Node Name",
         "  Cool-Cap-fT1,            !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -2867,7 +2868,8 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "  0.714816560872937,                      !- Speed Gross Rated Sensible Heat Ratio 1",
         "  4.84033093564236,                       !- Speed Gross Rated Cooling COP 1 {W/W}",
         "  0.576666917476216,                      !- Speed Rated Air Flow Rate 1 {m3/s}",
-        "  773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "  773.3,                                  !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  934.4,                                  !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??BPS:TBD
         "  Cool-Cap-fT1,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 1",
         "  Cool-Cap-fFF1,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 1",
         "  Cool-EIR-fT1,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
@@ -2887,7 +2889,8 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "  0.733764546660947,                      !- Speed Gross Rated Sensible Heat Ratio 2",
         "  4.34646555035634,                       !- Speed Gross Rated Cooling COP 2 {W/W}",
         "  0.670542927297926,                      !- Speed Rated Air Flow Rate 2 {m3/s}",
-        "  773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "  773.3,                                  !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  934.4,                                  !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??BPS:TBD
         "  Cool-Cap-fT2,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 2",
         "  Cool-Cap-fFF2,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 2",
         "  Cool-EIR-fT2,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
@@ -3580,13 +3583,14 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
         "    0.2;                     !- Fraction of Pump Heat to Water",
 
         "Coil:Cooling:DX:SingleSpeed,",
-        "  SingleSpeed_COIL,                        !- Name",
-        "  ALWAYS_ON,                     !- Availability Schedule Name",
+        "  SingleSpeed_COIL,        !- Name",
+        "  ALWAYS_ON,               !- Availability Schedule Name",
         "  14067.4113682534,        !- Gross Rated Total Cooling Capacity {W}",
         "  0.740402528813699,       !- Gross Rated Sensible Heat Ratio",
         "  3.99990781858502,        !- Gross Rated Cooling COP {W/W}",
         "  0.728875631277391,       !- Rated Air Flow Rate {m3/s}",
-        "  773.3912012006,          !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  773.3912012006,          !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  773.3912012006,          !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??BPS:TBD
         "  central ac unitary system Fan - Cooling Coil Node,  !- Air Inlet Node Name",
         "  Node 5,                  !- Air Outlet Node Name",
         "  Cool-Cap-fT1,            !- Total Cooling Capacity Function of Temperature Curve Name",
