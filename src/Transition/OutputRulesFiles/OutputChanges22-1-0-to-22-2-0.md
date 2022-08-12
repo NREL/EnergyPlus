@@ -92,3 +92,11 @@ New results were added to the zone sizing results file eplusout.zsz
     Heating Zone Relative Humidity [%]
     Cooling Zone Temperature [C]
     Cooling Zone Relative Humidity [%]
+
+See pull request [#9406](https://github.com/NREL/EnergyPlus/pull/9406) for more details.
+
+### Envelope Summary Report - Interior Fenestration Subtable
+
+Missing Parent Surface column was added.
+
+See pull request [#9582](https://github.com/NREL/EnergyPlus/pull/9582) for more details.
