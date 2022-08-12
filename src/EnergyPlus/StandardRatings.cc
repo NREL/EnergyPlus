@@ -3635,7 +3635,7 @@ namespace StandardRatings {
             // For ANSI/AHRI 210/240 Standard 2023 | Concept of DHRI min and max is removed
             // Section 11.2.2.1 Equation 11.104  which suggests QAFull is used instead of DHRI min
             // While Calculaiting the Building load For heating-only heat pump units, replace Q_A_Full with Q_H_Full
-            // Q_H_Full = the heating capacity at 47°F determined from the H1N test for variable capacity systems and
+            // Q_H_Full = the heating capacity at 47F determined from the H1N test for variable capacity systems and
             // from the H1Full test for other systems, Btu/h.
             Real64 bl = (t_zl - t) / (t_zl - t_od) * c_x * Q_H1_Full(nsp);
 
