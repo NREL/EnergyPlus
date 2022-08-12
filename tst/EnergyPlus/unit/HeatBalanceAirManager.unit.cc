@@ -389,23 +389,30 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     Real64 constexpr Space1bFloorArea = 100.0;
     Real64 constexpr Zone2FloorArea = 1000.0;
 
-    int zoneNum = 1;
+    // Zone and space nums
+    int const zone1 = UtilityRoutines::FindItemInList("ZONE 1", state->dataHeatBal->Zone);
+    int const zone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->Zone);
+    int const space1a = UtilityRoutines::FindItemInList("SPACE 1A", state->dataHeatBal->space);
+    int const space1b = UtilityRoutines::FindItemInList("SPACE 1B", state->dataHeatBal->space);
+    int const spaceZone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->space);
+
+    int zoneNum = zone1;
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(zoneNum).Name);
     EXPECT_EQ(2, state->dataHeatBal->Zone(zoneNum).numSpaces);
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[0]).Name);
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[1]).Name);
-    zoneNum = 2;
+    zoneNum = zone2;
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(zoneNum).Name);
     EXPECT_EQ(1, state->dataHeatBal->Zone(zoneNum).numSpaces);
     EXPECT_EQ("ZONE 2", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[0]).Name);
 
-    int spaceNum = 1;
+    int spaceNum = space1a;
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
 
-    spaceNum = 2;
+    spaceNum = space1b;
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
@@ -417,14 +424,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(state->dataHeatBal->spaceList(1).spaces[1]).Name);
 
     // This space is auto-generated
-    spaceNum = 3;
+    spaceNum = spaceZone2;
     EXPECT_EQ("ZONE 2", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     // Defaults
     EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
     EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
 
-    // Now get to the point and check the infiltration setup
+    // Now get to the point and check the infiltration and ventilation setup
     // Expected number of infiltration and ventilation instances:
     // AllZonesInfiltration - 3, 3 spaces total in the zones in the zonelist, flow/area =
     // SomeSpacesInfiltration - 2, 2 spaces in the spacelist
@@ -442,6 +449,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     constexpr Real64 Zone2FlowPerArea = 2.0;
 
     // Note that the epJSON input will sort the objects alphabetically, so AllZoneInfiltration comes first
+    const std::array<int, numInstances> spaceNums = {space1a, space1b, spaceZone2, space1a, space1b, space1a, space1b, space1a, space1b, spaceZone2};
+
+    const std::array<int, numInstances> zoneNums = {zone1, zone1, zone2, zone1, zone1, zone1, zone1, zone1, zone1, zone2};
+
     constexpr std::array<std::string_view, numInstances> infilNames = {"Space 1a AllZonesInfiltration",
                                                                        "Space 1b AllZonesInfiltration",
                                                                        "Zone 2 AllZonesInfiltration",
@@ -483,6 +494,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
         EXPECT_EQ(thisInfiltration.DesignLevel, flows[itemNum]);
         EXPECT_TRUE(UtilityRoutines::SameString(ventNames[itemNum], thisVentilation.Name));
         EXPECT_EQ(thisVentilation.DesignLevel, flows[itemNum]);
+        EXPECT_EQ(thisInfiltration.ZonePtr, zoneNums[itemNum]);
+        EXPECT_EQ(thisVentilation.ZonePtr, zoneNums[itemNum]);
+        EXPECT_EQ(thisInfiltration.spaceIndex, spaceNums[itemNum]);
+        EXPECT_EQ(thisVentilation.spaceIndex, spaceNums[itemNum]);
     }
 }
 TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
@@ -662,7 +677,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
                 "design_flow_rate_calculation_method": "Flow/Area",
                 "flow_rate_per_floor_area": 1.0,
                 "zone_or_space_name": "Zone 1",
-                "source_zone_or_space_name": "Zone 1"
+                "source_zone_or_space_name": "Zone 2"
             },
             "Zone2Mixing": {
                 "design_flow_rate_calculation_method": "Flow/Area",
@@ -674,13 +689,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
                 "design_flow_rate_calculation_method": "Flow/Area",
                 "flow_rate_per_floor_area": 3.0,
                 "zone_or_space_name": "Space 1a",
-                "source_zone_or_space_name": "Zone 1"
+                "source_zone_or_space_name": "Space 1b"
             },
             "Space1bMixing": {
                 "design_flow_rate_calculation_method": "Flow/Area",
                 "flow_rate_per_floor_area": 4.0,
                 "zone_or_space_name": "Space 1b",
-                "source_zone_or_space_name": "Zone 1"
+                "source_zone_or_space_name": "Zone 2"
             }
         },
         "ZoneCrossMixing": {
@@ -688,7 +703,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
                 "design_flow_rate_calculation_method": "Flow/Area",
                 "flow_rate_per_floor_area": 1.0,
                 "zone_or_space_name": "Zone 1",
-                "source_zone_or_space_name": "Zone 1"
+                "source_zone_or_space_name": "Zone 2"
             },
             "Zone2CrossMixing": {
                 "design_flow_rate_calculation_method": "Flow/Area",
@@ -700,13 +715,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
                 "design_flow_rate_calculation_method": "Flow/Area",
                 "flow_rate_per_floor_area": 3.0,
                 "zone_or_space_name": "Space 1a",
-                "source_zone_or_space_name": "Zone 1"
+                "source_zone_or_space_name": "Space 1b"
             },
             "Space1bCrossMixing": {
                 "design_flow_rate_calculation_method": "Flow/Area",
                 "flow_rate_per_floor_area": 4.0,
                 "zone_or_space_name": "Space 1b",
-                "source_zone_or_space_name": "Zone 1"
+                "source_zone_or_space_name": "Zone 2"
             }
         }
     }
@@ -750,23 +765,30 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     Real64 constexpr Space1bFloorArea = 100.0;
     Real64 constexpr Zone2FloorArea = 1000.0;
 
-    int zoneNum = 1;
+    // Zone  and space nums
+    int const zone1 = UtilityRoutines::FindItemInList("ZONE 1", state->dataHeatBal->Zone);
+    int const zone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->Zone);
+    int const space1a = UtilityRoutines::FindItemInList("SPACE 1A", state->dataHeatBal->space);
+    int const space1b = UtilityRoutines::FindItemInList("SPACE 1B", state->dataHeatBal->space);
+    int const spaceZone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->space);
+
+    int zoneNum = zone1;
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(zoneNum).Name);
     EXPECT_EQ(2, state->dataHeatBal->Zone(zoneNum).numSpaces);
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[0]).Name);
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[1]).Name);
-    zoneNum = 2;
+    zoneNum = zone2;
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(zoneNum).Name);
     EXPECT_EQ(1, state->dataHeatBal->Zone(zoneNum).numSpaces);
     EXPECT_EQ("ZONE 2", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[0]).Name);
 
-    int spaceNum = 1;
+    int spaceNum = space1a;
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
 
-    spaceNum = 2;
+    spaceNum = space1b;
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
@@ -778,29 +800,35 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(state->dataHeatBal->spaceList(1).spaces[1]).Name);
 
     // This space is auto-generated
-    spaceNum = 3;
+    spaceNum = spaceZone2;
     EXPECT_EQ("ZONE 2", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     // Defaults
     EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
     EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
 
-    // Now get to the point and check the infiltration setup
-    // Expected number of infiltration and ventilation instances:
-    // Space1aInfiltration - 1
-    // Space1bInfiltration - 1
-    // Zone1Infiltration - 2, 2 spaces in the zone
-    // Zone2Infiltration - 1, 1 space in the zone
+    // Now get to the point and check the mixing setup
+    // Expected number of mixing and crossmixing instances:
+    // Space1aMixing - 1
+    // Space1bMixing - 1
+    // Zone1Mixing - 2, 2 spaces in the zone
+    // Zone2Mixing - 1, 1 space in the zone
     constexpr int numInstances = 5;
 
-    constexpr Real64 AllZonesFlowPerArea = 6.0;
-    constexpr Real64 SomeSpacesFlowPerArea = 5.0;
     constexpr Real64 Space1aFlowPerArea = 3.0;
     constexpr Real64 Space1bFlowPerArea = 4.0;
     constexpr Real64 Zone1FlowPerArea = 1.0;
     constexpr Real64 Zone2FlowPerArea = 2.0;
 
-    // Note that the epJSON input will sort the objects alphabetically, so AllZoneInfiltration comes first
+    // Note that the epJSON input will sort the objects alphabetically, so Space1aMixing comes first
+    const std::array<int, numInstances> spaceNums = {space1a, space1b, space1a, space1b, spaceZone2};
+
+    const std::array<int, numInstances> zoneNums = {zone1, zone1, zone1, zone1, zone2};
+
+    const std::array<int, numInstances> fromSpaceNums = {space1b, spaceZone2, spaceZone2, spaceZone2, 0};
+
+    const std::array<int, numInstances> fromZoneNums = {zone1, zone2, zone2, zone2, zone1};
+
     constexpr std::array<std::string_view, numInstances> mixNames = {
         "Space1aMixing", "Space1bMixing", "Space 1a Zone1Mixing", "Space 1b Zone1Mixing", "Zone2Mixing"};
 
@@ -821,6 +849,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
         EXPECT_EQ(thisMixing.DesignLevel, flows[itemNum]);
         EXPECT_TRUE(UtilityRoutines::SameString(crossMixNames[itemNum], thisCrossMixing.Name));
         EXPECT_EQ(thisCrossMixing.DesignLevel, flows[itemNum]);
+        EXPECT_EQ(thisMixing.ZonePtr, zoneNums[itemNum]);
+        EXPECT_EQ(thisCrossMixing.ZonePtr, zoneNums[itemNum]);
+        EXPECT_EQ(thisMixing.spaceIndex, spaceNums[itemNum]);
+        EXPECT_EQ(thisCrossMixing.spaceIndex, spaceNums[itemNum]);
+        EXPECT_EQ(thisMixing.fromSpaceIndex, fromSpaceNums[itemNum]);
+        EXPECT_EQ(thisCrossMixing.fromSpaceIndex, fromSpaceNums[itemNum]);
+        EXPECT_EQ(thisMixing.FromZone, fromZoneNums[itemNum]);
+        EXPECT_EQ(thisCrossMixing.FromZone, fromZoneNums[itemNum]);
     }
 }
 

@@ -2720,8 +2720,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     ErrorsFound = true;
                 }
 
-                thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
-                if (thisMixing.FromZone == 0) {
+                thisMixing.fromSpaceIndex = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->space);
+                if (thisMixing.fromSpaceIndex == 0) {
+                    thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                } else {
+                    thisMixing.FromZone = state.dataHeatBal->space(thisMixing.fromSpaceIndex).zoneNum;
+                }
+                if ((thisMixing.FromZone == 0) && (thisMixing.fromSpaceIndex == 0)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cAlphaFieldNames(5) + " not found=" + cAlphaArgs(5) + " for " + cCurrentModuleObject +
                                         '=' + cAlphaArgs(1));
@@ -3281,8 +3286,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     ErrorsFound = true;
                 }
 
-                thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
-                if (thisMixing.FromZone == 0) {
+                thisMixing.fromSpaceIndex = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->space);
+                if (thisMixing.fromSpaceIndex == 0) {
+                    thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                } else {
+                    thisMixing.FromZone = state.dataHeatBal->space(thisMixing.fromSpaceIndex).zoneNum;
+                }
+                if ((thisMixing.FromZone == 0) && (thisMixing.fromSpaceIndex == 0)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
                                         cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
