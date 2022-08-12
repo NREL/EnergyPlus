@@ -308,36 +308,6 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    std::string MakeUPPERCase(std::string_view const InputString)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This function returns the Upper Case representation of the InputString.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the Intrinsic SCAN function to scan the lowercase representation of
-        // characters (DataStringGlobals) for each character in the given string.
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        std::string ResultString(InputString);
-
-        for (std::string::size_type i = 0, e = len(InputString); i < e; ++i) {
-            int const curCharVal = int(InputString[i]);
-            if ((97 <= curCharVal && curCharVal <= 122) || (224 <= curCharVal && curCharVal <= 255)) { // lowercase ASCII and accented characters
-                ResultString[i] = char(curCharVal - 32);
-            }
-        }
-
-        return ResultString;
-    }
-
     void VerifyName(EnergyPlusData &state,
                     std::string const &NameToVerify,
                     Array1D_string const &NamesList,
@@ -428,15 +398,15 @@ namespace UtilityRoutines {
         return false;
     }
 
-    size_t case_insensitive_hasher::operator()(const std::string_view key) const noexcept
+    size_t case_insensitive_hasher::operator()(std::string_view const key) const noexcept
     {
         std::string keyCopy = MakeUPPERCase(key);
         return std::hash<std::string>()(keyCopy);
     }
 
-    bool case_insensitive_comparator::operator()(const std::string_view a, const std::string_view b) const noexcept
+    bool case_insensitive_comparator::operator()(std::string_view const a, std::string_view const b) const noexcept
     {
-        return SameString(a, b);
+        return lessthani(a, b); // SameString(a, b);
     }
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn)

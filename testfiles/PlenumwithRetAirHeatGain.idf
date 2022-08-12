@@ -389,19 +389,19 @@
 
   People,
     ZONE 1 People 1,         !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   1,            !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     144.0000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Lvl   1;        !- Activity Level Schedule Name
 
   Lights,
     ZONE 1 Lights 1,         !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   2,            !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     4310.000,                !- Lighting Level {W}
@@ -415,7 +415,7 @@
 
   ElectricEquipment,
     ZONE 1 ElecEq 1,         !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   2,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     4310.000,                !- Design Level {W}
@@ -1345,7 +1345,19 @@
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
-    ;                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    ,                        !- Drift Loss Percent {percent}
+    ,                        !- Blowdown Calculation Mode
+    ;                        !- Blowdown Concentration Ratio
 
   Pump:VariableSpeed,
     Cond Circ Pump,          !- Name

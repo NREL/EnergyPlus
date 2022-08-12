@@ -441,8 +441,6 @@ set(SRC
     OutsideEnergySources.hh
     PVWatts.cc
     PVWatts.hh
-    PackagedTerminalHeatPump.cc
-    PackagedTerminalHeatPump.hh
     PackagedThermalStorageCoil.cc
     PackagedThermalStorageCoil.hh
     PhaseChangeModeling/HysteresisModel.cc
@@ -695,7 +693,8 @@ set(INPUTPARSING_SRC
     InputProcessing/IdfParser.cc
     InputProcessing/IdfParser.hh
     InputProcessing/InputValidation.cc
-    InputProcessing/InputValidation.hh)
+    InputProcessing/InputValidation.hh
+    UtilityRoutines.hh)
 
 create_src_groups("${INPUTPARSING_SRC}")
 

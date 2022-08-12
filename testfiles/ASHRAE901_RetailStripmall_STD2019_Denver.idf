@@ -35,7 +35,7 @@
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
     30,                      !- Shading Calculation Update Frequency
-    200;                   !- Maximum Figures in Shadow Overlap Calculations
+    200;                     !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -56,8 +56,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    15,                       !- Minimum System Timestep {minutes}
-    5;                      !- Maximum HVAC Iterations
+    15,                      !- Minimum System Timestep {minutes}
+    5;                       !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -132,7 +132,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -143,34 +143,34 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 2,              !- Name
-    4,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    4,                        !- End Month
-    30,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 2,             !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    4,                       !- End Month
+    30,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 3,              !- Name
-    7,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    7,                        !- End Month
-    31,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 3,             !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -3975,12 +3975,12 @@
 
   People,
     LGstore1,                !- Name
-    LGstore1,                !- Zone or ZoneList Name
+    LGstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     29.9961,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3997,12 +3997,12 @@
 
   People,
     SMstore1,                !- Name
-    SMstore1,                !- Zone or ZoneList Name
+    SMstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4019,12 +4019,12 @@
 
   People,
     SMstore2,                !- Name
-    SMstore2,                !- Zone or ZoneList Name
+    SMstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4041,12 +4041,12 @@
 
   People,
     SMstore3,                !- Name
-    SMstore3,                !- Zone or ZoneList Name
+    SMstore3,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4063,12 +4063,12 @@
 
   People,
     SMstore4,                !- Name
-    SMstore4,                !- Zone or ZoneList Name
+    SMstore4,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4085,12 +4085,12 @@
 
   People,
     LGstore2,                !- Name
-    LGstore2,                !- Zone or ZoneList Name
+    LGstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     29.9961,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4107,12 +4107,12 @@
 
   People,
     SMstore5,                !- Name
-    SMstore5,                !- Zone or ZoneList Name
+    SMstore5,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4129,12 +4129,12 @@
 
   People,
     SMstore6,                !- Name
-    SMstore6,                !- Zone or ZoneList Name
+    SMstore6,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4151,12 +4151,12 @@
 
   People,
     SMstore7,                !- Name
-    SMstore7,                !- Zone or ZoneList Name
+    SMstore7,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4173,12 +4173,12 @@
 
   People,
     SMstore8,                !- Name
-    SMstore8,                !- Zone or ZoneList Name
+    SMstore8,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_OCC_SCH,           !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     14.9980,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4197,7 +4197,7 @@
 
   Lights,
     LGstore1_Lights,         !- Name
-    LGstore1,                !- Zone or ZoneList Name
+    LGstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4212,7 +4212,7 @@
 
   Lights,
     LGstore1_Lights_allowance,  !- Name
-    LGstore1,                !- Zone or ZoneList Name
+    LGstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4227,7 +4227,7 @@
 
   Lights,
     SMstore1_Lights,         !- Name
-    SMstore1,                !- Zone or ZoneList Name
+    SMstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4242,7 +4242,7 @@
 
   Lights,
     SMstore1_Lights_allowance,  !- Name
-    SMstore1,                !- Zone or ZoneList Name
+    SMstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4257,7 +4257,7 @@
 
   Lights,
     SMstore2_Lights,         !- Name
-    SMstore2,                !- Zone or ZoneList Name
+    SMstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4272,7 +4272,7 @@
 
   Lights,
     SMstore2_Lights_allowance,  !- Name
-    SMstore2,                !- Zone or ZoneList Name
+    SMstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4287,7 +4287,7 @@
 
   Lights,
     SMstore3_Lights,         !- Name
-    SMstore3,                !- Zone or ZoneList Name
+    SMstore3,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4302,7 +4302,7 @@
 
   Lights,
     SMstore3_Lights_allowance,  !- Name
-    SMstore3,                !- Zone or ZoneList Name
+    SMstore3,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4317,7 +4317,7 @@
 
   Lights,
     SMstore4_Lights,         !- Name
-    SMstore4,                !- Zone or ZoneList Name
+    SMstore4,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4332,7 +4332,7 @@
 
   Lights,
     SMstore4_Lights_allowance,  !- Name
-    SMstore4,                !- Zone or ZoneList Name
+    SMstore4,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4347,7 +4347,7 @@
 
   Lights,
     LGstore2_Lights,         !- Name
-    LGstore2,                !- Zone or ZoneList Name
+    LGstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4362,7 +4362,7 @@
 
   Lights,
     LGstore2_Lights_allowance,  !- Name
-    LGstore2,                !- Zone or ZoneList Name
+    LGstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4377,7 +4377,7 @@
 
   Lights,
     SMstore5_Lights,         !- Name
-    SMstore5,                !- Zone or ZoneList Name
+    SMstore5,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4392,7 +4392,7 @@
 
   Lights,
     SMstore5_Lights_allowance,  !- Name
-    SMstore5,                !- Zone or ZoneList Name
+    SMstore5,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4407,7 +4407,7 @@
 
   Lights,
     SMstore6_Lights,         !- Name
-    SMstore6,                !- Zone or ZoneList Name
+    SMstore6,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4422,7 +4422,7 @@
 
   Lights,
     SMstore6_Lights_allowance,  !- Name
-    SMstore6,                !- Zone or ZoneList Name
+    SMstore6,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4437,7 +4437,7 @@
 
   Lights,
     SMstore7_Lights,         !- Name
-    SMstore7,                !- Zone or ZoneList Name
+    SMstore7,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4452,7 +4452,7 @@
 
   Lights,
     SMstore7_Lights_allowance,  !- Name
-    SMstore7,                !- Zone or ZoneList Name
+    SMstore7,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4467,7 +4467,7 @@
 
   Lights,
     SMstore8_Lights,         !- Name
-    SMstore8,                !- Zone or ZoneList Name
+    SMstore8,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4482,7 +4482,7 @@
 
   Lights,
     SMstore8_Lights_allowance,  !- Name
-    SMstore8,                !- Zone or ZoneList Name
+    SMstore8,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_LIGHT_SCH,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -4499,7 +4499,7 @@
 
   ElectricEquipment,
     LGstore1_MiscPlug_Equip, !- Name
-    LGstore1,                !- Zone or ZoneList Name
+    LGstore1,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE1_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1498.0615,               !- Design Level {W}
@@ -4512,7 +4512,7 @@
 
   ElectricEquipment,
     SMstore1_MiscPlug_Equip, !- Name
-    SMstore1,                !- Zone or ZoneList Name
+    SMstore1,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE1_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4525,7 +4525,7 @@
 
   ElectricEquipment,
     SMstore2_MiscPlug_Equip, !- Name
-    SMstore2,                !- Zone or ZoneList Name
+    SMstore2,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE2_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4538,7 +4538,7 @@
 
   ElectricEquipment,
     SMstore3_MiscPlug_Equip, !- Name
-    SMstore3,                !- Zone or ZoneList Name
+    SMstore3,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE2_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4551,7 +4551,7 @@
 
   ElectricEquipment,
     SMstore4_MiscPlug_Equip, !- Name
-    SMstore4,                !- Zone or ZoneList Name
+    SMstore4,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE2_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4564,7 +4564,7 @@
 
   ElectricEquipment,
     LGstore2_MiscPlug_Equip, !- Name
-    LGstore2,                !- Zone or ZoneList Name
+    LGstore2,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE3_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1498.0615,               !- Design Level {W}
@@ -4577,7 +4577,7 @@
 
   ElectricEquipment,
     SMstore5_MiscPlug_Equip, !- Name
-    SMstore5,                !- Zone or ZoneList Name
+    SMstore5,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE3_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4590,7 +4590,7 @@
 
   ElectricEquipment,
     SMstore6_MiscPlug_Equip, !- Name
-    SMstore6,                !- Zone or ZoneList Name
+    SMstore6,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE3_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4603,7 +4603,7 @@
 
   ElectricEquipment,
     SMstore7_MiscPlug_Equip, !- Name
-    SMstore7,                !- Zone or ZoneList Name
+    SMstore7,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE3_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4616,7 +4616,7 @@
 
   ElectricEquipment,
     SMstore8_MiscPlug_Equip, !- Name
-    SMstore8,                !- Zone or ZoneList Name
+    SMstore8,                !- Zone or ZoneList or Space or SpaceList Name
     TYPE3_EQUIP_SCH,         !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     749.0308,                !- Design Level {W}
@@ -4631,7 +4631,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LGstore1_Infiltration,   !- Name
-    LGstore1,                !- Zone or ZoneList Name
+    LGstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4645,7 +4645,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LGstore1_Door_Infiltration,  !- Name
-    LGstore1,                !- Zone or ZoneList Name
+    LGstore1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.241164917,             !- Design Flow Rate {m3/s}
@@ -4659,7 +4659,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore1_Infiltration,   !- Name
-    SMstore1,                !- Zone or ZoneList Name
+    SMstore1,                !- Zone or ZoneList or Space or SpaceList Name
     Type1_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4673,7 +4673,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore1_Door_Infiltration,  !- Name
-    SMstore1,                !- Zone or ZoneList Name
+    SMstore1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -4687,7 +4687,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore2_Infiltration,   !- Name
-    SMstore2,                !- Zone or ZoneList Name
+    SMstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4701,7 +4701,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore2_Door_Infiltration,  !- Name
-    SMstore2,                !- Zone or ZoneList Name
+    SMstore2,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -4715,7 +4715,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore3_Infiltration,   !- Name
-    SMstore3,                !- Zone or ZoneList Name
+    SMstore3,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4729,7 +4729,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore3_Door_Infiltration,  !- Name
-    SMstore3,                !- Zone or ZoneList Name
+    SMstore3,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -4743,7 +4743,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore4_Infiltration,   !- Name
-    SMstore4,                !- Zone or ZoneList Name
+    SMstore4,                !- Zone or ZoneList or Space or SpaceList Name
     Type2_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4757,7 +4757,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore4_Door_Infiltration,  !- Name
-    SMstore4,                !- Zone or ZoneList Name
+    SMstore4,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -4771,7 +4771,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LGstore2_Infiltration,   !- Name
-    LGstore2,                !- Zone or ZoneList Name
+    LGstore2,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4785,7 +4785,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LGstore2_Door_Infiltration,  !- Name
-    LGstore2,                !- Zone or ZoneList Name
+    LGstore2,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.241164917,             !- Design Flow Rate {m3/s}
@@ -4799,7 +4799,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore5_Infiltration,   !- Name
-    SMstore5,                !- Zone or ZoneList Name
+    SMstore5,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4813,7 +4813,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore5_Door_Infiltration,  !- Name
-    SMstore5,                !- Zone or ZoneList Name
+    SMstore5,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -4827,7 +4827,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore6_Infiltration,   !- Name
-    SMstore6,                !- Zone or ZoneList Name
+    SMstore6,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4841,7 +4841,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore6_Door_Infiltration,  !- Name
-    SMstore6,                !- Zone or ZoneList Name
+    SMstore6,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -4855,7 +4855,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore7_Infiltration,   !- Name
-    SMstore7,                !- Zone or ZoneList Name
+    SMstore7,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4869,7 +4869,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore7_Door_Infiltration,  !- Name
-    SMstore7,                !- Zone or ZoneList Name
+    SMstore7,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -4883,7 +4883,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore8_Infiltration,   !- Name
-    SMstore8,                !- Zone or ZoneList Name
+    SMstore8,                !- Zone or ZoneList or Space or SpaceList Name
     Type3_Infil_SCH,         !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4897,7 +4897,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SMstore8_Door_Infiltration,  !- Name
-    SMstore8,                !- Zone or ZoneList Name
+    SMstore8,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.134504895,             !- Design Flow Rate {m3/s}
@@ -10160,3 +10160,4 @@
   Output:Meter:MeterFileOnly,ElectricityNet:Facility,Hourly;
 
   Output:Meter:MeterFileOnly,NaturalGas:Facility,Hourly;
+

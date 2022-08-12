@@ -58,6 +58,7 @@
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -456,13 +457,9 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                     // Validate DEMAND MANAGER Type
                     ManagerType MgrType = static_cast<ManagerType>(
                         getEnumerationValue(ManagerNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
-
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5));
                     if (MgrType != ManagerType::Invalid) {
-
                         thisManager =
                             UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
-
                         if (thisManager == 0) {
                             ShowSevereError(state,
                                             format("{} = \"{}\" invalid {} = \"{}\" not found.",
@@ -472,7 +469,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                                                    state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6)));
                             ErrorsFound = true;
                         }
-
                     } else {
                         ShowSevereError(state,
                                         format("{} = \"{}\" invalid value {} = \"{}\".",
@@ -827,9 +823,9 @@ void GetDemandManagerInput(EnergyPlusData &state)
             // Count actual pointers to controlled zones
             DemandMgr(MgrNum).NumOfLoads = 0;
             for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->LightsObjects);
+                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->lightsObjects);
                 if (LoadPtr > 0) {
-                    DemandMgr(MgrNum).NumOfLoads += state.dataHeatBal->LightsObjects(LoadPtr).NumOfZones;
+                    DemandMgr(MgrNum).NumOfLoads += state.dataInternalHeatGains->lightsObjects(LoadPtr).numOfSpaces;
                 } else {
                     LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->Lights);
                     if (LoadPtr > 0) {
@@ -849,11 +845,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                 LoadNum = 0;
                 for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->LightsObjects);
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->lightsObjects);
                     if (LoadPtr > 0) {
-                        for (Item1 = 1; Item1 <= state.dataHeatBal->LightsObjects(LoadPtr).NumOfZones; ++Item1) {
+                        for (Item1 = 1; Item1 <= state.dataInternalHeatGains->lightsObjects(LoadPtr).numOfSpaces; ++Item1) {
                             ++LoadNum;
-                            DemandMgr(MgrNum).Load(LoadNum) = state.dataHeatBal->LightsObjects(LoadPtr).StartPtr + Item1 - 1;
+                            DemandMgr(MgrNum).Load(LoadNum) = state.dataInternalHeatGains->lightsObjects(LoadPtr).spaceStartPtr + Item1 - 1;
                         }
                     } else {
                         LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->Lights);
@@ -939,9 +935,9 @@ void GetDemandManagerInput(EnergyPlusData &state)
             // Count actual pointers to controlled zones
             DemandMgr(MgrNum).NumOfLoads = 0;
             for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectricObjects);
+                LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->zoneElectricObjects);
                 if (LoadPtr > 0) {
-                    DemandMgr(MgrNum).NumOfLoads += state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones;
+                    DemandMgr(MgrNum).NumOfLoads += state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).numOfSpaces;
                 } else {
                     LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectric);
                     if (LoadPtr > 0) {
@@ -961,11 +957,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                 LoadNum = 0;
                 for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectricObjects);
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->zoneElectricObjects);
                     if (LoadPtr > 0) {
-                        for (Item1 = 1; Item1 <= state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones; ++Item1) {
+                        for (Item1 = 1; Item1 <= state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).numOfSpaces; ++Item1) {
                             ++LoadNum;
-                            DemandMgr(MgrNum).Load(LoadNum) = state.dataHeatBal->ZoneElectricObjects(LoadPtr).StartPtr + Item1 - 1;
+                            DemandMgr(MgrNum).Load(LoadNum) = state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).spaceStartPtr + Item1 - 1;
                         }
                     } else {
                         LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectric);

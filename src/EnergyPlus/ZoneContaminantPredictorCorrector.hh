@@ -95,9 +95,7 @@ namespace ZoneContaminantPredictorCorrector {
     );
 
     void CorrectZoneContaminants(EnergyPlusData &state,
-                                 bool ShortenTimeStepSys,
-                                 bool UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-                                 Real64 PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+                                 bool UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
     );
 
 } // namespace ZoneContaminantPredictorCorrector

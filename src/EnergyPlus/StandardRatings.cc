@@ -113,7 +113,7 @@ namespace StandardRatings {
     Real64 constexpr OutdoorCoilInletAirDryBulbTempTestA2(35.0);  // 35.00C (95F)  Test A2 (high speed)
     Real64 constexpr OutdoorCoilInletAirDryBulbTempTestB2(27.78); // 27.78C (82F)  Test B2 (high speed)
     Real64 constexpr OutdoorCoilInletAirDryBulbTempTestB1(27.78); // 27.78C (82F)  Test B1 (Low speed)
-    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestF1(19.44); // 19.44C (67F)  Test B1 (Low speed)
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestF1(19.44); // 19.44C (67F)  Test F1 (Low speed)
 
     // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
     Real64 constexpr CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B

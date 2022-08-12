@@ -2157,36 +2157,36 @@
     ZN1_S_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN1_S_Space_1,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    897.599;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    897.599;                 !- Surface Area {m2}
 
   InternalMass,
     ZN2_E_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN2_E_Space_1,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    132.747;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    132.747;                 !- Surface Area {m2}
 
   InternalMass,
     ZN3_N_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN3_N_Space_1,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    897.599;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    897.599;                 !- Surface Area {m2}
 
   InternalMass,
     ZN4_W_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN4_W_Space_1,           !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    132.747;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    132.747;                 !- Surface Area {m2}
 
   InternalMass,
     ZN5_Core_Space_1,        !- Name
     InteriorFurnishings,     !- Construction Name
     ZN5_Core_Space_1,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1655.308;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1655.308;                !- Surface Area {m2}
 
   FenestrationSurface:Detailed,
     ZN1_S_Space_1:S_Window_0,!- Name
@@ -2250,7 +2250,7 @@
 
   ElectricEquipment,
     ZN1_S_Space_1 Eq 1,      !- Name
-    ZN1_S_Space_1,           !- Zone or ZoneList Name
+    ZN1_S_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     13463.980,               !- Design Level {W}
@@ -2262,7 +2262,7 @@
 
   ElectricEquipment,
     ZN2_E_Space_1 Eq 1,      !- Name
-    ZN2_E_Space_1,           !- Zone or ZoneList Name
+    ZN2_E_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1991.211,                !- Design Level {W}
@@ -2274,7 +2274,7 @@
 
   ElectricEquipment,
     ZN3_N_Space_1 Eq 1,      !- Name
-    ZN3_N_Space_1,           !- Zone or ZoneList Name
+    ZN3_N_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     13463.980,               !- Design Level {W}
@@ -2286,7 +2286,7 @@
 
   ElectricEquipment,
     ZN4_W_Space_1 Eq 1,      !- Name
-    ZN4_W_Space_1,           !- Zone or ZoneList Name
+    ZN4_W_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1991.211,                !- Design Level {W}
@@ -2298,7 +2298,7 @@
 
   ElectricEquipment,
     ZN5_Core_Space_1 Eq 1,   !- Name
-    ZN5_Core_Space_1,        !- Zone or ZoneList Name
+    ZN5_Core_Space_1,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     24829.619,               !- Design Level {W}
@@ -2310,7 +2310,7 @@
 
   Lights,
     ZN1_S_Space_1 Lights 1,  !- Name
-    ZN1_S_Space_1,           !- Zone or ZoneList Name
+    ZN1_S_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     4712.393,                !- Lighting Level {W}
@@ -2324,7 +2324,7 @@
 
   Lights,
     ZN2_E_Space_1 Lights 1,  !- Name
-    ZN2_E_Space_1,           !- Zone or ZoneList Name
+    ZN2_E_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     696.924,                 !- Lighting Level {W}
@@ -2338,7 +2338,7 @@
 
   Lights,
     ZN3_N_Space_1 Lights 1,  !- Name
-    ZN3_N_Space_1,           !- Zone or ZoneList Name
+    ZN3_N_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     4712.393,                !- Lighting Level {W}
@@ -2352,7 +2352,7 @@
 
   Lights,
     ZN4_W_Space_1 Lights 1,  !- Name
-    ZN4_W_Space_1,           !- Zone or ZoneList Name
+    ZN4_W_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     696.924,                 !- Lighting Level {W}
@@ -2366,7 +2366,7 @@
 
   Lights,
     ZN5_Core_Space_1 Lights 1,  !- Name
-    ZN5_Core_Space_1,        !- Zone or ZoneList Name
+    ZN5_Core_Space_1,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     8690.367,                !- Lighting Level {W}
@@ -2380,12 +2380,12 @@
 
   People,
     ZN1_S_Space_1,           !- Name
-    ZN1_S_Space_1,           !- Zone or ZoneList Name
+    ZN1_S_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     40.392,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.300,                   !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2401,12 +2401,12 @@
 
   People,
     ZN2_E_Space_1,           !- Name
-    ZN2_E_Space_1,           !- Zone or ZoneList Name
+    ZN2_E_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5.974,                   !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.300,                   !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2422,12 +2422,12 @@
 
   People,
     ZN3_N_Space_1,           !- Name
-    ZN3_N_Space_1,           !- Zone or ZoneList Name
+    ZN3_N_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     40.392,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.300,                   !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2443,12 +2443,12 @@
 
   People,
     ZN4_W_Space_1,           !- Name
-    ZN4_W_Space_1,           !- Zone or ZoneList Name
+    ZN4_W_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5.974,                   !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.300,                   !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2464,12 +2464,12 @@
 
   People,
     ZN5_Core_Space_1,        !- Name
-    ZN5_Core_Space_1,        !- Zone or ZoneList Name
+    ZN5_Core_Space_1,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     74.489,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.300,                   !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2485,7 +2485,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN1_S_Space_1 Infl 1,    !- Name
-    ZN1_S_Space_1,           !- Zone or ZoneList Name
+    ZN1_S_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.03615,                 !- Design Flow Rate {m3/s}
@@ -2499,7 +2499,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN2_E_Space_1 Infl 1,    !- Name
-    ZN2_E_Space_1,           !- Zone or ZoneList Name
+    ZN2_E_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00535,                 !- Design Flow Rate {m3/s}
@@ -2513,7 +2513,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN3_N_Space_1 Infl 1,    !- Name
-    ZN3_N_Space_1,           !- Zone or ZoneList Name
+    ZN3_N_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.03615,                 !- Design Flow Rate {m3/s}
@@ -2527,7 +2527,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN4_W_Space_1 Infl 1,    !- Name
-    ZN4_W_Space_1,           !- Zone or ZoneList Name
+    ZN4_W_Space_1,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00535,                 !- Design Flow Rate {m3/s}
@@ -2541,7 +2541,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN5_Core_Space_1 Infl 1, !- Name
-    ZN5_Core_Space_1,        !- Zone or ZoneList Name
+    ZN5_Core_Space_1,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.06667,                 !- Design Flow Rate {m3/s}
@@ -2555,7 +2555,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN6_S_Plen_1 Infl 1,     !- Name
-    ZN6_S_Plen_1,            !- Zone or ZoneList Name
+    ZN6_S_Plen_1,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01122,                 !- Design Flow Rate {m3/s}
@@ -2569,7 +2569,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN7_E_Plen_1 Infl 1,     !- Name
-    ZN7_E_Plen_1,            !- Zone or ZoneList Name
+    ZN7_E_Plen_1,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00166,                 !- Design Flow Rate {m3/s}
@@ -2583,7 +2583,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN8_N_Plen_1 Infl 1,     !- Name
-    ZN8_N_Plen_1,            !- Zone or ZoneList Name
+    ZN8_N_Plen_1,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01122,                 !- Design Flow Rate {m3/s}
@@ -2597,7 +2597,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN9_W_Plen_1 Infl 1,     !- Name
-    ZN9_W_Plen_1,            !- Zone or ZoneList Name
+    ZN9_W_Plen_1,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00166,                 !- Design Flow Rate {m3/s}
@@ -2611,7 +2611,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZN10_Core_Plen_1 Infl 1, !- Name
-    ZN10_Core_Plen_1,        !- Zone or ZoneList Name
+    ZN10_Core_Plen_1,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.02069,                 !- Design Flow Rate {m3/s}
@@ -4070,7 +4070,19 @@
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
-    ;                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    ,                        !- Drift Loss Percent {percent}
+    ,                        !- Blowdown Calculation Mode
+    ;                        !- Blowdown Concentration Ratio
 
   Sizing:Plant,
     Boiler Plant,            !- Plant or Condenser Loop Name
