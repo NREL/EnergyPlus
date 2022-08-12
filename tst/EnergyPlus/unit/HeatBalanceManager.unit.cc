@@ -1894,9 +1894,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     state->dataSurface->Surface(1).Construction = 1;
     state->dataSurface->Surface(2).Construction = 2;
     state->dataSurface->Surface(3).Construction = 3;
+    state->dataSurface->AllHTWindowSurfaceList.push_back(2);
+    state->dataSurface->AllHTWindowSurfaceList.push_back(3);
     state->dataConstruction->Construct(1).WindowTypeBSDF = false;
     state->dataConstruction->Construct(2).WindowTypeBSDF = false;
     state->dataConstruction->Construct(3).WindowTypeBSDF = true;
+
     int SurfsForRegWindow = 3;
     state->dataConstruction->Construct(1).TotLayers = 1;
     state->dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
