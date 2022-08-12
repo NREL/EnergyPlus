@@ -580,7 +580,8 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  0.7,                               !- Gross Rated Sensible Heat Ratio",
         "  3,                                      !- Gross Rated Cooling COP {W/W}",
         "  0.021,                               !- Rated Air Flow Rate {m3/s}",
-        "  773.3,                                  !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  773.3,                                  !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  773.3,                                  !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??BPS:TBD
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Mixed Air Node, !- Air Inlet Node Name",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Cooling Coil Outlet Node, !- Air Outlet Node Name",
         "  Curve Biquadratic 1,                    !- Total Cooling Capacity Function of Temperature Curve Name",
