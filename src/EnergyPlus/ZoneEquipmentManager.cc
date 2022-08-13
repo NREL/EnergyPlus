@@ -5473,24 +5473,21 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                      (state.dataHeatBal->Ventilation(j).VelocityTermCoef + WindSpeedExt * state.dataHeatBal->Ventilation(j).VelocitySQTermCoef));
             if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
             VAMFL_temp = state.dataZoneEquip->VentMCP(j) / CpAir;
-            if (state.dataHeatBal->Ventilation(j).QuadratureSum) {
+            if (state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum) {
+                auto &thisZoneAirBalance = state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(NZ).zoneOABalanceIndex);
                 switch (state.dataHeatBal->Ventilation(j).FanType) {
                     // ventilation type based calculation
                 case DataHeatBalance::VentilationType::Exhaust: {
-                    state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).ExhMassFlowRate +=
-                        state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.ExhMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                 } break;
                 case DataHeatBalance::VentilationType::Intake: {
-                    state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).IntMassFlowRate +=
-                        state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.IntMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                 } break;
                 case DataHeatBalance::VentilationType::Natural: {
-                    state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).NatMassFlowRate +=
-                        state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.NatMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                 } break;
                 case DataHeatBalance::VentilationType::Balanced: {
-                    state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).BalMassFlowRate +=
-                        state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.BalMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                 } break;
                 default:
                     break;
@@ -5542,7 +5539,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             } else {
                 state.dataHeatBal->Ventilation(j).AirTemp = TempExt;
             }
-            if (!state.dataHeatBal->Ventilation(j).QuadratureSum)
+            if (!state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum)
                 state.dataHeatBalFanSys->MCPTV(NZ) += state.dataZoneEquip->VentMCP(j) * state.dataHeatBal->Ventilation(j).AirTemp;
         }
 
@@ -5571,8 +5568,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (VVF < 0.0) VVF = 0.0;
             state.dataZoneEquip->VentMCP(j) = VVF * AirDensity * CpAir;
             if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
-            if (state.dataHeatBal->Ventilation(j).QuadratureSum) {
-                state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).NatMassFlowRate +=
+            if (state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum) {
+                state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(NZ).zoneOABalanceIndex).NatMassFlowRate +=
                     state.dataZoneEquip->VentMCP(j) / CpAir;
             } else {
                 state.dataHeatBalFanSys->MCPV(NZ) += state.dataZoneEquip->VentMCP(j);
@@ -6173,8 +6170,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (MCpI_temp < 0.0) MCpI_temp = 0.0;
         }
 
-        if (state.dataHeatBal->Infiltration(j).QuadratureSum) {
-            state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Infiltration(j).OABalancePtr).InfMassFlowRate += MCpI_temp / CpAir;
+        if (state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum) {
+            state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(NZ).zoneOABalanceIndex).InfMassFlowRate += MCpI_temp / CpAir;
         } else {
             state.dataHeatBal->Infiltration(j).MCpI_temp = MCpI_temp;
             state.dataHeatBalFanSys->MCPI(NZ) += MCpI_temp;
@@ -6191,36 +6188,35 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     }
 
     // Calculate combined outdoor air flows
-    for (int j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
-        if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == AirBalance::Quadrature) {
-            if (!state.dataHeatBal->ZoneAirBalance(j).OneTimeFlag) GetStandAloneERVNodes(state, j);
-            if (state.dataHeatBal->ZoneAirBalance(j).NumOfERVs > 0) {
-                for (I = 1; I <= state.dataHeatBal->ZoneAirBalance(j).NumOfERVs; ++I) {
-                    Real64 MassFlowDiff = state.dataLoopNodes->Node(state.dataHeatBal->ZoneAirBalance(j).ERVExhaustNode(I)).MassFlowRate -
-                                          state.dataLoopNodes->Node(state.dataHeatBal->ZoneAirBalance(j).ERVInletNode(I)).MassFlowRate;
+    for (auto thisZoneAirBalance : state.dataHeatBal->ZoneAirBalance) {
+        if (thisZoneAirBalance.BalanceMethod == AirBalance::Quadrature) {
+            if (!thisZoneAirBalance.OneTimeFlag) GetStandAloneERVNodes(state, thisZoneAirBalance);
+            if (thisZoneAirBalance.NumOfERVs > 0) {
+                for (I = 1; I <= thisZoneAirBalance.NumOfERVs; ++I) {
+                    Real64 MassFlowDiff = state.dataLoopNodes->Node(thisZoneAirBalance.ERVExhaustNode(I)).MassFlowRate -
+                                          state.dataLoopNodes->Node(thisZoneAirBalance.ERVInletNode(I)).MassFlowRate;
                     if (MassFlowDiff > 0.0) {
-                        state.dataHeatBal->ZoneAirBalance(j).ERVMassFlowRate += MassFlowDiff;
+                        thisZoneAirBalance.ERVMassFlowRate += MassFlowDiff;
                     }
                 }
             }
-            int NZ = state.dataHeatBal->ZoneAirBalance(j).ZonePtr;
+            int NZ = thisZoneAirBalance.ZonePtr;
             AirDensity = PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataHeatBal->Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
             CpAir = PsyCpAirFnW(HumRatExt);
-            state.dataHeatBal->ZoneAirBalance(j).ERVMassFlowRate *= AirDensity;
-            state.dataHeatBalFanSys->MDotOA(NZ) =
-                std::sqrt(pow_2(state.dataHeatBal->ZoneAirBalance(j).NatMassFlowRate) + pow_2(state.dataHeatBal->ZoneAirBalance(j).IntMassFlowRate) +
-                          pow_2(state.dataHeatBal->ZoneAirBalance(j).ExhMassFlowRate) + pow_2(state.dataHeatBal->ZoneAirBalance(j).ERVMassFlowRate) +
-                          pow_2(state.dataHeatBal->ZoneAirBalance(j).InfMassFlowRate) +
-                          pow_2(AirDensity * state.dataHeatBal->ZoneAirBalance(j).InducedAirRate *
-                                GetCurrentScheduleValue(state, state.dataHeatBal->ZoneAirBalance(j).InducedAirSchedPtr))) +
-                state.dataHeatBal->ZoneAirBalance(j).BalMassFlowRate;
+            thisZoneAirBalance.ERVMassFlowRate *= AirDensity;
+            state.dataHeatBalFanSys->MDotOA(NZ) = std::sqrt(pow_2(thisZoneAirBalance.NatMassFlowRate) + pow_2(thisZoneAirBalance.IntMassFlowRate) +
+                                                            pow_2(thisZoneAirBalance.ExhMassFlowRate) + pow_2(thisZoneAirBalance.ERVMassFlowRate) +
+                                                            pow_2(thisZoneAirBalance.InfMassFlowRate) +
+                                                            pow_2(AirDensity * thisZoneAirBalance.InducedAirRate *
+                                                                  GetCurrentScheduleValue(state, thisZoneAirBalance.InducedAirSchedPtr))) +
+                                                  thisZoneAirBalance.BalMassFlowRate;
             state.dataHeatBalFanSys->MDotCPOA(NZ) = state.dataHeatBalFanSys->MDotOA(NZ) * CpAir;
         }
     }
 }
 
-void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum) // Zone Air Balance Outdoor index
+void GetStandAloneERVNodes(EnergyPlusData &state, DataHeatBalance::ZoneAirBalanceData &thisZoneAirBalance)
 {
 
     // SUBROUTINE INFORMATION:
@@ -6234,23 +6230,23 @@ void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum) // Zone 
     // Uses program data structures ZoneEquipInfo
 
     if (allocated(state.dataZoneEquip->ZoneEquipList)) {
-        int ZoneNum = state.dataHeatBal->ZoneAirBalance(OutdoorNum).ZonePtr;
-        state.dataHeatBal->ZoneAirBalance(OutdoorNum).OneTimeFlag = true;
+        int ZoneNum = thisZoneAirBalance.ZonePtr;
+        thisZoneAirBalance.OneTimeFlag = true;
         if (state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes > 0) {
             for (int I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
                 if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(I) == DataZoneEquipment::ZoneEquip::ERVStandAlone) {
-                    ++state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs;
+                    ++thisZoneAirBalance.NumOfERVs;
                 }
             }
-            if (state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs > 0) {
-                state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVInletNode.allocate(state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs);
-                state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVExhaustNode.allocate(state.dataHeatBal->ZoneAirBalance(OutdoorNum).NumOfERVs);
+            if (thisZoneAirBalance.NumOfERVs > 0) {
+                thisZoneAirBalance.ERVInletNode.allocate(thisZoneAirBalance.NumOfERVs);
+                thisZoneAirBalance.ERVExhaustNode.allocate(thisZoneAirBalance.NumOfERVs);
                 int j = 1;
                 for (int I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
                     if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(I) == DataZoneEquipment::ZoneEquip::ERVStandAlone) {
-                        state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVInletNode(j) =
+                        thisZoneAirBalance.ERVInletNode(j) =
                             HVACStandAloneERV::GetStandAloneERVOutAirNode(state, state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(I));
-                        state.dataHeatBal->ZoneAirBalance(OutdoorNum).ERVExhaustNode(j) =
+                        thisZoneAirBalance.ERVExhaustNode(j) =
                             HVACStandAloneERV::GetStandAloneERVReturnAirNode(state, state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(I));
                         ++j;
                     }

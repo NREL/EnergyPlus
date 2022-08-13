@@ -10532,7 +10532,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "FirstFloor_Plenum"
+            "zone_or_zonelist_or_space_or_spacelist_name": "FirstFloor_Plenum"
         },
         "MidFloor_Plenum_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10542,7 +10542,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "MidFloor_Plenum"
+            "zone_or_zonelist_or_space_or_spacelist_name": "MidFloor_Plenum"
         },
         "Perimeter_bot_ZN_1_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10552,7 +10552,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_1"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_1"
         },
         "Perimeter_bot_ZN_2_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10562,7 +10562,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_2"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_2"
         },
         "Perimeter_bot_ZN_3_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10572,7 +10572,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_3"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_3"
         },
         "Perimeter_bot_ZN_4_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10582,7 +10582,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_bot_ZN_4"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_bot_ZN_4"
         },
         "Perimeter_mid_ZN_1_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10592,7 +10592,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_1"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_1"
         },
         "Perimeter_mid_ZN_2_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10602,7 +10602,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_2"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_2"
         },
         "Perimeter_mid_ZN_3_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10612,7 +10612,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_3"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_3"
         },
         "Perimeter_mid_ZN_4_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10622,7 +10622,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_mid_ZN_4"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_mid_ZN_4"
         },
         "Perimeter_top_ZN_1_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10632,7 +10632,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_1"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_1"
         },
         "Perimeter_top_ZN_2_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10642,7 +10642,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_2"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_2"
         },
         "Perimeter_top_ZN_3_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10652,7 +10652,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_3"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_3"
         },
         "Perimeter_top_ZN_4_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10662,7 +10662,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "Perimeter_top_ZN_4"
+            "zone_or_zonelist_or_space_or_spacelist_name": "Perimeter_top_ZN_4"
         },
         "TopFloor_Plenum_Infiltration": {
             "constant_term_coefficient": 1.0,
@@ -10672,7 +10672,7 @@
             "temperature_term_coefficient": 0.0,
             "velocity_squared_term_coefficient": 0.0,
             "velocity_term_coefficient": 0.0,
-            "zone_or_zonelist_name": "TopFloor_Plenum"
+            "zone_or_zonelist_or_space_or_spacelist_name": "TopFloor_Plenum"
         }
     }
 }

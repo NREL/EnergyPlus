@@ -1115,12 +1115,12 @@
 
   People,
     LIVING ZONE People,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE OCCUPANCY,         !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1137,7 +1137,7 @@
 
   Lights,
     LIVING ZONE Lights,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE LIGHTING,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1000,                    !- Lighting Level {W}
@@ -1151,7 +1151,7 @@
 
   ZoneVentilation:DesignFlowRate,
     LIVING ZONE Ventl 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.131944,                !- Design Flow Rate {m3/s}
@@ -1173,7 +1173,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LIVING ZONE Infil 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01,                    !- Design Flow Rate {m3/s}
@@ -1187,7 +1187,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ATTIC ZONE Infil 1,      !- Name
-    ATTIC ZONE,              !- Zone or ZoneList Name
+    ATTIC ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1201,7 +1201,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GARAGE ZONE Infil 1,     !- Name
-    GARAGE ZONE,             !- Zone or ZoneList Name
+    GARAGE ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1215,7 +1215,7 @@
 
   ElectricEquipment,
     LIVING ZONE ElecEq,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     500,                     !- Design Level {W}
@@ -1982,13 +1982,13 @@
     Verbose;                 !- EMS Runtime Language Debug Output Level
 
   EnergyManagementSystem:Sensor,
-    HeatingSetpoint,                               !- Name
-    LIVING ZONE,                                   !- Output:Variable or Output:Meter Index Key Name
+    HeatingSetpoint,         !- Name
+    LIVING ZONE,             !- Output:Variable or Output:Meter Index Key Name
     Zone Thermostat Heating Setpoint Temperature;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
-    CoolingSetpoint,                               !- Name
-    LIVING ZONE,                                   !- Output:Variable or Output:Meter Index Key Name
+    CoolingSetpoint,         !- Name
+    LIVING ZONE,             !- Output:Variable or Output:Meter Index Key Name
     Zone Thermostat Cooling Setpoint Temperature;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
@@ -1997,44 +1997,45 @@
     Zone Air Temperature;    !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:GlobalVariable,
-    CoilSpeedLevelOverrideReport;      !- Erl Variable 1 Name
+    CoilSpeedLevelOverrideReport;  !- Erl Variable 1 Name
 
   EnergyManagementSystem:OutputVariable,
     EMS Coil Speed Level Override On,  !- Name
-    CoilSpeedLevelOverrideReport,      !- EMS Variable Name
-    Averaged,                          !- Type of Data in Variable
-    SystemTimeStep,                    !- Update Frequency
-    ,                                  !- EMS Program or Subroutine Name
-    On/Off;                            !- Units
+    CoilSpeedLevelOverrideReport,  !- EMS Variable Name
+    Averaged,                !- Type of Data in Variable
+    SystemTimeStep,          !- Update Frequency
+    ,                        !- EMS Program or Subroutine Name
+    On/Off;                  !- Units
 
   EnergyManagementSystem:Actuator,
-    CoilSpeedOverride,                           !- Name
-    TWOSPEED HEAT PUMP 1,                        !- Actuated Component Unique Name
-    Coil Speed Control,                          !- Actuated Component Type
-    Unitary System DX Coil Speed Value;          !- Actuated Component Control Type
+    CoilSpeedOverride,       !- Name
+    TWOSPEED HEAT PUMP 1,    !- Actuated Component Unique Name
+    Coil Speed Control,      !- Actuated Component Type
+    Unitary System DX Coil Speed Value;  !- Actuated Component Control Type
 
   EnergyManagementSystem:ProgramCallingManager,
-    Coil Speed  Management,                      !- Name
-    InsideHVACSystemIterationLoop,               !- EnergyPlus Model Calling Point
-    CoilSpeedControl;                            !- Program Name 1
+    Coil Speed  Management,  !- Name
+    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
+    CoilSpeedControl;        !- Program Name 1
 
   EnergyManagementSystem:Program,
-    CoilSpeedControl,                                                                            !- Name
-    IF (ZoneAirTemperature < HeatingSetpoint),                                                   !- Program Line 1
-    SET CoilSpeedOverride = 1.9,                                                                 !- Program Line 2
-    SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 3
-    ELSEIF (ZoneAirTemperature < HeatingSetpoint + 0.5),                                         !- Program Line 4
-    SET CoilSpeedOverride = 1,                                                                   !- Program Line 5
-    SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 6
-    ELSEIF (ZoneAirTemperature > CoolingSetpoint + 1),                                           !- Program Line 7
-    SET CoilSpeedOverride = 1.95,                                                                !- Program Line 8
-    SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 9
-    ELSEIF (ZoneAirTemperature > CoolingSetpoint),                                               !- Program Line 10
-    SET CoilSpeedOverride = 1,                                                                   !- Program Line 11
-    SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 12
-    ELSE,                                                                                        !- Program Line 13
-    SET CoilSpeedOverride = Null,                                                                !- Program Line 14
-    SET CoilSpeedLevelOverrideReport = 0,                                                        !- Program Line 15
-    ENDIF;                                                                                       !- <none>
+    CoilSpeedControl,        !- Name
+    IF (ZoneAirTemperature < HeatingSetpoint),  !- Program Line 1
+    SET CoilSpeedOverride = 1.9,  !- Program Line 2
+    SET CoilSpeedLevelOverrideReport = 1,  !- <none>
+    ELSEIF (ZoneAirTemperature < HeatingSetpoint + 0.5),  !- <none>
+    SET CoilSpeedOverride = 1,  !- <none>
+    SET CoilSpeedLevelOverrideReport = 1,  !- <none>
+    ELSEIF (ZoneAirTemperature > CoolingSetpoint + 1),  !- <none>
+    SET CoilSpeedOverride = 1.95,  !- <none>
+    SET CoilSpeedLevelOverrideReport = 1,  !- <none>
+    ELSEIF (ZoneAirTemperature > CoolingSetpoint),  !- <none>
+    SET CoilSpeedOverride = 1,  !- <none>
+    SET CoilSpeedLevelOverrideReport = 1,  !- <none>
+    ELSE,                    !- <none>
+    SET CoilSpeedOverride = Null,  !- <none>
+    SET CoilSpeedLevelOverrideReport = 0,  !- <none>
+    ENDIF;                   !- <none>
 
   Output:Variable,*,EMS Coil Speed Level Override On,Detailed;
+
