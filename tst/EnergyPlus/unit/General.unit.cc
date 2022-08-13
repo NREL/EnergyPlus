@@ -61,10 +61,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 
-// #include <ctime>;
-// #include <chrono>;
-// #include <EnergyPlus/DisplayRoutines.hh>;
-
 namespace EnergyPlus {
 
 using namespace EnergyPlus::General;
@@ -470,27 +466,7 @@ TEST_F(EnergyPlusFixture, General_MovingAvg_SpeedTest)
         ASSERT_EQ(inputData(j), (saveData(j) + saveData(j - 1)) / 2);
     }
     inputData = saveData;
-    ////    std::chrono::system_clock::time_point startMovingAvg = std::chrono::system_clock::now();
-    // for (int loop = 1; loop < 100000000; ++loop) {
-    //    outputData = 0;
-    //    MovingAvg(saveData, numItem, avgWindowWidth, outputData);
-    //    inputData = outputData;
-    //}
-    ////    std::chrono::system_clock::time_point endMovingAvg = std::chrono::system_clock::now();
-    // for (int loop = 1; loop < 100000000; ++loop) {
-    //    MovingAvg2(saveData, avgWindowWidth);
-    //}
-    ////    std::chrono::system_clock::time_point endMovingAvg2 = std::chrono::system_clock::now();
 
-    //    time_t startt = std::chrono::system_clock::to_time_t(startMovingAvg);
-    //    time_t endt = std::chrono::system_clock::to_time_t(endMovingAvg);
-    //    time_t endt2 = std::chrono::system_clock::to_time_t(endMovingAvg2);
-
-    //    printf((ctime(&startt)));
-    //    printf((ctime(&endt)));
-    //    printf((ctime(&endt2)));
-
-    inputData = saveData;
     avgWindowWidth = 4;
     MovingAvg(inputData, numItem, avgWindowWidth, outputData);
     EXPECT_NEAR(outputData(1), (inputData(1) + inputData(10) + inputData(11) + inputData(12)) / avgWindowWidth, 0.000000001);
