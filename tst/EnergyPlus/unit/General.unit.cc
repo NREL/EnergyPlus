@@ -469,19 +469,19 @@ TEST_F(EnergyPlusFixture, General_MovingAvg_SpeedTest)
 
     avgWindowWidth = 4;
     MovingAvg(inputData, numItem, avgWindowWidth, outputData);
-    EXPECT_NEAR(outputData(1), (inputData(1) + inputData(10) + inputData(11) + inputData(12)) / avgWindowWidth, 0.000000001);
-    EXPECT_NEAR(outputData(2), (inputData(1) + inputData(2) + inputData(11) + inputData(12)) / avgWindowWidth, 0.000000001);
-    EXPECT_NEAR(outputData(3), (inputData(1) + inputData(2) + inputData(3) + inputData(12)) / avgWindowWidth, 0.000000001);
+    EXPECT_NEAR(outputData(1), (inputData(1) + inputData(12) + inputData(11) + inputData(10)) / avgWindowWidth, 1E-9);
+    EXPECT_NEAR(outputData(2), (inputData(2) + inputData(1) + inputData(12) + inputData(11)) / avgWindowWidth, 1E-9);
+    EXPECT_NEAR(outputData(3), (inputData(3) + inputData(2) + inputData(1) + inputData(12)) / avgWindowWidth, 1E-9);
     for (int j = 4; j <= numItem; j++) {
-        EXPECT_NEAR(outputData(j), (inputData(j) + inputData(j - 1) + inputData(j - 2) + inputData(j - 3)) / avgWindowWidth, 0.000000001);
+        EXPECT_NEAR(outputData(j), (inputData(j) + inputData(j - 1) + inputData(j - 2) + inputData(j - 3)) / avgWindowWidth, 1E-9);
     }
 
     MovingAvg2(inputData, avgWindowWidth);
-    EXPECT_NEAR(inputData(1), (saveData(1) + saveData(10) + saveData(11) + saveData(12)) / avgWindowWidth, 0.000000001);
-    EXPECT_NEAR(inputData(2), (saveData(1) + saveData(2) + saveData(11) + saveData(12)) / avgWindowWidth, 0.000000001);
-    EXPECT_NEAR(inputData(3), (saveData(1) + saveData(2) + saveData(3) + saveData(12)) / avgWindowWidth, 0.000000001);
+    EXPECT_NEAR(inputData(1), (saveData(1) + saveData(12) + saveData(11) + saveData(10)) / avgWindowWidth, 1E-9);
+    EXPECT_NEAR(inputData(2), (saveData(2) + saveData(1) + saveData(12) + saveData(11)) / avgWindowWidth, 1E-9);
+    EXPECT_NEAR(inputData(3), (saveData(3) + saveData(2) + saveData(1) + saveData(12)) / avgWindowWidth, 1E-9);
     for (int j = 4; j <= numItem; j++) {
-        EXPECT_NEAR(inputData(j), (saveData(j) + saveData(j - 1) + saveData(j - 2) + saveData(j - 3)) / avgWindowWidth, 0.000000001);
+        EXPECT_NEAR(inputData(j), (saveData(j) + saveData(j - 1) + saveData(j - 2) + saveData(j - 3)) / avgWindowWidth, 1E-9);
     }
 }
 } // namespace EnergyPlus

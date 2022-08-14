@@ -402,20 +402,20 @@ void MovingAvg2(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
     if (NumItemsInAvg == 1) return; // no need to average/smooth
 
-    Array1D<Real64> TempData(DataIn.size() + NumItemsInAvg); // scratch array with end original elements appended to beginning of temp array
+    Array1D<Real64> TempData(DataIn.size() + NumItemsInAvg - 1); // scratch array with end original elements appended to beginning of temp array
 
     for (int i = DataIn.size() + NumItemsInAvg; i > NumItemsInAvg; --i) {
         TempData(i) = DataIn(i - NumItemsInAvg); // load original data into top end of TempData
     }
-    for (int i = 1; i <= NumItemsInAvg; ++i) {
-        TempData(NumItemsInAvg - i + 1) = DataIn(DataIn.size() - i + 1); // load top end of original data into bottom end of TempData
+    for (int i = 0; i < NumItemsInAvg; ++i) {
+        TempData(NumItemsInAvg - i) = DataIn(DataIn.size() - i); // load top end of original data into bottom end of TempData
     }
 
-    for (int i = DataIn.size(); i > 0; --i) {
+    for (int i = DataIn.size(); i > 0; --i) { // average over each element based on NumItemsInAvg
         for (int j = 1; j < NumItemsInAvg; ++j) {
             DataIn(i) += TempData(i + NumItemsInAvg - j); // add previous time step data to original data
         }
-        DataIn(i) /= NumItemsInAvg; // average over NumItemsInAvg
+        DataIn(i) /= NumItemsInAvg; // averaging over NumItemsInAvg smooths current element by previous history
     }
 }
 
