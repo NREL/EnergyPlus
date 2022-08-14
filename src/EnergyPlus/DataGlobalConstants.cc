@@ -123,7 +123,7 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
         } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
             return ResourceType::DistrictCooling;
 
-        } else if ((SELECT_CASE_var == "DISTRICTHEATING:WATER") || ("DISTRICTHEATINGWATER")) {
+        } else if ((SELECT_CASE_var == "DISTRICTHEATING:WATER") || (SELECT_CASE_var == "DISTRICTHEATINGWATER")) {
             return ResourceType::DistrictHeatingWater;
 
         } else if ((SELECT_CASE_var == "STEAM") || (SELECT_CASE_var == "DISTRICTHEATING:STEAM") || (SELECT_CASE_var == "DISTRICTHEATINGSTEAM")) {

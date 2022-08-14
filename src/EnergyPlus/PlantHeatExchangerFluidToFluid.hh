@@ -75,7 +75,7 @@ namespace PlantHeatExchangerFluidToFluid {
         CounterFlow,
         ParallelFlow,
         Ideal,
-        PhaseChangeProcess, // one of the fluids in a HX undergoes a phase-change process, like steam to water HX
+        PhaseChangeProcess, // one of the fluids in a HX undergoes a phase-change process, like steam
         Num
     };
 
