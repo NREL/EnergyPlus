@@ -139,7 +139,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
     state.dataChillerElectricASHRAE205->Electric205Chiller.allocate(numElectric205Chillers);
 
     auto const ChillerInstances = ip->epJSON.find(state.dataIPShortCut->cCurrentModuleObject).value();
-    auto ChillerNum{0};
+    int ChillerNum{0};
     auto const &objectSchemaProps = ip->getObjectSchemaProps(state, state.dataIPShortCut->cCurrentModuleObject);
     for (auto &instance : ChillerInstances.items()) {
         auto const &fields = instance.value();
@@ -565,17 +565,13 @@ void ASHRAE205ChillerSpecs::oneTimeInit(EnergyPlusData &state)
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPointHi;
         }
     }
+
+    this->setOutputVariables(state);
 }
 
 void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
 {
     static constexpr std::string_view RoutineName("ASHRAE205ChillerSpecs::initialize");
-
-    if (this->oneTimeFlag) {
-        this->oneTimeInit(state);
-        this->setOutputVariables(state);
-        this->oneTimeFlag = false;
-    }
 
     switch (this->AmbientTempType) {
     case AmbientTempIndicator::Schedule: {
@@ -1424,9 +1420,6 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
                                                                 this->CondInletTemp + DataGlobalConstants::KelvinConv,
                                                                 this->MaxSequenceNumber)
                                          .net_evaporator_capacity;
-    if (maximumChillerCap <= 0) {
-        // TODO: Issue a warning
-    }
     const Real64 minimumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
                                                                 this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
