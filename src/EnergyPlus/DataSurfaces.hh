@@ -1785,7 +1785,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinDividerHeatLoss;
     Array1D<Real64> SurfWinTCLayerTemp;           // The temperature of the thermochromic layer of the window
     Array1D<Real64> SurfWinSpecTemp;              // The specification temperature of the TC layer glass Added for W6 integration June 2010
-    Array1D<Real64> SurfWinWindowModelType;       // if set to WindowBSDFModel, then uses BSDF methods
+    Array1D<int> SurfWinWindowModelType;          // if set to WindowBSDFModel, then uses BSDF methods
     Array1D<Real64> SurfWinTDDPipeNum;            // Tubular daylighting device pipe number for TDD domes and diffusers
     Array1D<int> SurfWinStormWinConstr;           // Construction with storm window (windows only)
     Array1D<int> SurfActiveConstruction;          // The currently active construction with or without storm window
