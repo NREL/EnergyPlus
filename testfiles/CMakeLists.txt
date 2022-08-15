@@ -19,6 +19,7 @@ add_simulation_test(IDF_FILE 1ZoneDataCenterCRAC_wApproachTemp.idf EPW_FILE USA_
 add_simulation_test(IDF_FILE 2ZoneDataCenterHVAC_wEconomizer.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 2ZoneDataCenterHVAC_wEconomizer_ClassA1A2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneEvapCooler.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+add_simulation_test(IDF_FILE 1ZoneEvapCooler_4Win_incidentSolarMultiplier.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneEvapCooler_ReportPeriodPowerOutage.idf EPW_FILE USA_CO_Denver-Stapleton_TMY.epw)
 add_simulation_test(IDF_FILE 1ZoneEvapCooler_ReportPeriodPowerOutage_naturalVent.idf EPW_FILE USA_CO_Denver-Stapleton_TMY.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
