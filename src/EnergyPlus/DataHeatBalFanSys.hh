@@ -105,7 +105,7 @@ namespace DataHeatBalFanSys {
         // Exact and Euler solutions
         Real64 ZoneTMX = ZoneInitialTemp; // Temporary zone/space temperature to test convergence in Exact and Euler method
         Real64 ZoneTM2 = ZoneInitialTemp; // Temporary zone/space temperature at timestep t-2 in Exact and Euler method
-        Real64 ZoneT1 = 0.0;  // Zone/space temperature at the previous time step used in Exact and Euler method
+        Real64 ZoneT1 = 0.0;              // Zone/space temperature at the previous time step used in Exact and Euler method
     };
 
     struct AirBalanceHumidities
